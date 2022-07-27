@@ -29,6 +29,7 @@
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
 /**** Cluster endpoint counts ****/
+#define EMBER_AF_DESCRIPTOR_CLUSTER_SERVER_ENDPOINT_COUNT (2)
 #define EMBER_AF_ACCESS_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_OTA_PROVIDER_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -45,6 +46,11 @@
 #define EMBER_AF_USER_LABEL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
+
+// Use this macro to check if the server side of the Descriptor cluster is included
+#define ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_DESCRIPTOR_SERVER
+#define EMBER_AF_PLUGIN_DESCRIPTOR
 
 // Use this macro to check if the server side of the Access Control cluster is included
 #define ZCL_USING_ACCESS_CONTROL_CLUSTER_SERVER

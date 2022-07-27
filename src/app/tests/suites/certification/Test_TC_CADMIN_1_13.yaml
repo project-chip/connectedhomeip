@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    24.1.13. [TC-CADMIN-1.15] Open commissioning window twice on DUT using BCM
+    24.1.13. [TC-CADMIN-1.13] Open commissioning window twice on DUT using BCM
     then ECM [DUT - Commissionee]
 
 config:
@@ -58,6 +58,8 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "discriminator"
+                value: discriminator
 
     - label: "Commission from gamma"
       identity: "gamma"
@@ -90,6 +92,8 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "discriminator"
+                value: discriminator
 
     - label: "Commission from beta"
       identity: "beta"
@@ -121,6 +125,8 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "discriminator"
+                value: discriminator
 
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
       identity: "alpha"

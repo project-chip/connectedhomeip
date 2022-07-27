@@ -57,7 +57,7 @@ k32w0_sdk("sdk") {
 }
 
 k32w0_executable("shell_app") {
-  output_name = "chip-k32w061-shell-example"
+  output_name = "chip-k32w0x-shell-example"
 
   sources = [
     "${k32w0_platform_dir}/util/LEDWidget.cpp",
@@ -79,7 +79,7 @@ k32w0_executable("shell_app") {
 
   output_dir = root_out_dir
 
-  ldscript = "${k32w0_platform_dir}/app/ldscripts/chip-k32w061-linker.ld"
+  ldscript = "${k32w0_platform_dir}/app/ldscripts/chip-k32w0x-linker.ld"
 
   inputs = [ ldscript ]
 

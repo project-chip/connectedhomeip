@@ -350,7 +350,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
         std::string manualPairingCode;
         chip::SetupPayload payload;
-        payload.discriminator = discriminator;
+        payload.discriminator.SetLongValue(discriminator);
         payload.setUpPINCode = setupPINCode;
 
         auto errorCode = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);

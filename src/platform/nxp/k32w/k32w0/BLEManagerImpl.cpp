@@ -184,6 +184,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(bleAppCreated == pdPASS, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* BLE Radio Init */
+    XCVR_TemperatureUpdate(BOARD_GetTemperature());
     VerifyOrExit(XCVR_Init(BLE_MODE, DR_2MBPS) == gXcvrSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* Create BLE Controller Task */

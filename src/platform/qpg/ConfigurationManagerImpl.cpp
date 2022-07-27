@@ -190,5 +190,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     qvCHIP_ResetSystem();
 }
 
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

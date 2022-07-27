@@ -97,7 +97,7 @@ template("qpg_executable") {
     gen_ota_header("$executable_target_name.ota") {
       ota_header_script_name = "${root_out_dir}/${executable_target_name}.ota"
       out_dir = rebase_path(root_out_dir, root_build_dir)
-      ota_header_generator = "${qpg_sdk_root}/Tools/ota/generate_ota_img.py"
+      ota_header_generator = "${qpg_sdk_root}/Tools/Ota/generate_ota_img.py"
 
       ota_header_options = [
         string_join("=",
@@ -119,7 +119,7 @@ template("qpg_executable") {
                     [
                       "--pem_file_path",
                       rebase_path(qpg_sdk_root, root_build_dir) +
-                          "/Tools/ota/example_private_key.pem.example",
+                          "/Tools/Ota/example_private_key.pem.example",
                     ]),
         "--pem_password=test1234",
         "--sign",

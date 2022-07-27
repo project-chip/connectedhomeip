@@ -26,7 +26,7 @@ tests:
           a given cluster and endpoint. On receipt of this message, DUT should
           send a write response action."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
 
@@ -78,7 +78,7 @@ tests:
           "[Optional] TH sends the WriteRequestMessage to the DUT to write an
           attribute of data type bool."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo ./chip-tool basic write local-config-disabled 1 1 0
 
@@ -122,7 +122,7 @@ tests:
           "[Optional] TH sends the WriteRequestMessage to the DUT to write an
           attribute of data type string."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
           ./chip-tool basic write node-label new 1 0
@@ -166,7 +166,7 @@ tests:
           "[Optional] TH sends the WriteRequestMessage to the DUT to write an
           attribute of data type unsigned integer."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
           ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
@@ -245,7 +245,7 @@ tests:
           "[Optional] TH sends the WriteRequestMessage to the DUT to write an
           attribute of data type enum."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo ./chip-tool any write-by-id 0x0204 0  1  1 1
 
@@ -289,7 +289,7 @@ tests:
           "[Optional] TH sends the WriteRequestMessage to the DUT to write an
           attribute of data type bitmap."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo ./chip-tool colorcontrol write-by-id 0x000f 1 1 1
 
@@ -339,7 +339,7 @@ tests:
           "TH sends the WriteRequestMessage to the DUT to write any attribute on
           an unsupported Endpoint. DUT responds with the Write Response action"
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo ./chip-tool levelcontrol write on-level 2 1 20
 
@@ -378,7 +378,7 @@ tests:
           "TH sends the WriteRequestMessage to the DUT to write any attribute on
           an unsupported cluster. DUT responds with the Write Response action"
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo ./chip-tool thermostat write  unoccupied-heating-setpoint 1200  1 0
 
@@ -416,7 +416,7 @@ tests:
           "TH sends the WriteRequestMessage to the DUT to write an unsupported
           attribute DUT responds with the Write Response action"
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo ./chip-tool thermostat write  unoccupied-heating-setpoint 1200  1 1
 
@@ -454,7 +454,7 @@ tests:
           "TH sends the WriteRequestMessage to the DUT to write an attribute
           which is not writable. DUT responds with the Write Response action"
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
            ./chip-tool basic write-by-id 0x7 2 1 0
 
@@ -494,11 +494,12 @@ tests:
           in the path that requires a privilege that is not granted for the
           cluster in the path. DUT responds with the Write Response action"
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
-          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
 
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
+           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
 
           sudo ./chip-tool thermostatuserinterfaceconfiguration write temperature-display-mode 2 1 1
 
@@ -529,14 +530,16 @@ tests:
           [1650552778.853780][17227:17232] CHIP:DMG:         InteractionModelRevision = 1
           [1650552778.853813][17227:17232] CHIP:DMG: }
           [1650552778.853890][17227:17232] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1650552778.853935][17227:17232] CHIP:DMG: WriteClient moving to [AwaitingDe]"
+          [1650552778.853935][17227:17232] CHIP:DMG: WriteClient moving to [AwaitingDe]
+
+          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
       disabled: true
 
     - label:
           "TH sends the WriteRequestMessage to the DUT to write one attribute on
           a given cluster and endpoint. Repeat the above steps 3 times."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo  ./chip-tool levelcontrol write on-level 2 1 1
 
@@ -642,7 +645,7 @@ tests:
           WriteRequestMessage to the DUT to modify the value of one attribute
           with the DataVersion field set to the one received in the prior step."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
           ./chip-tool levelcontrol read on-level 1 1
@@ -724,7 +727,7 @@ tests:
           DUT to modify the value of an attribute with the dataversion field set
           to the value received earlier."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
 

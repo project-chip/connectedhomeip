@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 19.3.1. [TC-KEYPADINPUT-3.1] Send Key Command Verification (DUT as Client)
+name: 19.3.2. [TC-KEYPADINPUT-3.2] Location Keys Verification
 
 config:
     nodeId: 0x12344321

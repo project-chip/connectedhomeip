@@ -32,14 +32,14 @@ tests:
           "Precondition: Media content in a paused state at the beginning of the
           content"
       command: "Pause"
-      PICS: MEDIAPLAYBACK.S.C0001
+      PICS: MEDIAPLAYBACK.S.C01.Rsp
       response:
           values:
               - name: "status"
                 value: 0
 
     - label: "Reads the CurrentState attribute from the DUT"
-      PICS: MEDIAPLAYBACK.S.A0000
+      PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
@@ -61,14 +61,14 @@ tests:
                 value: 0
 
     - label: "Reads the CurrentState attribute"
-      PICS: MEDIAPLAYBACK.S.A0000
+      PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 0
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
-      PICS: MEDIAPLAYBACK.S.A0004
+      PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C07.Rsp
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
@@ -83,7 +83,7 @@ tests:
                 value: 0
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
-      PICS: MEDIAPLAYBACK.S.A0004
+      PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C07.Rsp
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
@@ -98,7 +98,7 @@ tests:
                 value: 0
 
     - label: "Reads the CurrentState attribute"
-      PICS: MEDIAPLAYBACK.S.A0000
+      PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C06.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
@@ -113,11 +113,11 @@ tests:
           [1655114487.018421][41855:41860] CHIP:EM: Sending Standalone Ack for MessageCounter:163883813 on exchange 24959
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C07.Rsp
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0004
       arguments:
           values:
               - name: "message"
-                value: "Please enter 'y' if PlaybackSpeed value is -2"
+                value: "Please enter 'y' if PlaybackSpeed value is -1"
               - name: "expectedValue"
                 value: "y"
 
@@ -147,7 +147,7 @@ tests:
                 value: "y"
 
     - label: "Sends a Play command"
-      PICS: MEDIAPLAYBACK.S.C0000
+      PICS: MEDIAPLAYBACK.S.C00.Rsp
       command: "Play"
       response:
           values:
@@ -157,7 +157,7 @@ tests:
     - label: "Reads the PlaybackSpeed attribute from the DUT"
       command: "readAttribute"
       attribute: "PlaybackSpeed"
-      PICS: MEDIAPLAYBACK.S.A0004
+      PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C00.Rsp
       response:
           value: 1
 

@@ -40,7 +40,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
           onoff  subscribe start-up-on-off  30 100 1 1
-          Verify on TH , DUT is responds right attribute value for above command
+          on TH, verify that DUT is responds right attribute value for above command
 
           [1657451357.177831][11635:11640] CHIP:DMG: {
           [1657451357.177894][11635:11640] CHIP:DMG:      SubscriptionId = 0xf3aa49ef,
@@ -115,8 +115,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
            onoff  subscribe on-off 10 200  1 1
-
-          Verify on TH , DUT is responds right attribute value for above command
+           on TH  verify Verify that DUT is responds right attribute value for above command
 
           [1657451491.078934][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657451491.079004][11635:11640] CHIP:DMG: {
@@ -179,7 +178,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
-          Verify on TH , DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
+           on TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
            basic subscribe local-config-disabled 100 200 1 0
           [1657451690.259096][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733078 from RetransTable on exchange 33639i
@@ -266,7 +265,7 @@ tests:
           basic subscribe node-label 10 100 1 0
 
 
-          Verify on TH , DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
+          on TH  verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
           1657452002.280167][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733100 from RetransTable on exchange 33648i
           [1657452002.280291][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -348,7 +347,7 @@ tests:
 
           any subscribe-by-id 0x0008 0x0010 10 100  1 1
 
-          Verify on TH , DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
+           on TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
           [1657452196.617935][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733107 from RetransTable on exchange 33650i
           [1657452196.618061][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -451,8 +450,7 @@ tests:
 
 
            userlabel subscribe label-list 100 500 1 0
-
-          Verify on TH , DUT is responds right attribute value for above  command
+           On TH verify that  DUT is responds right attribute value for above  command
           [1655896309.160632][1885:1890] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_0000 DataVersion: 3773922725
           [1655896309.160795][1885:1890] CHIP:TOO:   label list: 0 entries
           [1655896309.160851][1885:1890] CHIP:DMG: MoveToState ReadClient[0xffffa0005710]: Moving to [AwaitingSu]
@@ -488,8 +486,7 @@ tests:
 
 
           basic subscribe local-config-disabled 10 100  1 0 --keepSubscriptions 0
-
-          Verify on TH , DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
+          on TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
           [1657453109.707943][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733139 from RetransTable on exchange 33658i
           [1657453109.708065][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -600,7 +597,7 @@ tests:
            levelcontrol subscribe  on-level 10 80 1 1
 
 
-          Verify on TH , DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
+          On TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
 
           [1657453503.538054][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733149 from RetransTable on exchange 33661i
@@ -725,7 +722,7 @@ tests:
           >>>  onoff subscribe off-wait-time 10 500 1 1 --keepSubscriptions 1
 
 
-          Verify on TH , DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not for both attributes
+          On TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not for both attributes
 
 
           [1657454078.091825][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -864,7 +861,7 @@ tests:
 
           onoff subscribe on-time 10 100 1 1 --keepSubscriptions 1
 
-          Verify on TH , DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not for both attributes. Verify that the first subscription is terminated after the MaxInterval of the first subscription is reached.
+          On TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not for both attributes. Verify that the first subscription is terminated after the MaxInterval of the first subscription is reached.
 
 
           1657454443.310644][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -1039,7 +1036,89 @@ tests:
           Attribute, Cluster = ClusterID ]]. Set the MinIntervalFloor to some
           value say "N"(seconds). Change the attribute on the DUT'
       verification: |
-          Out of Scope for V1.0
+          onoff subscribe-by-id 0x4001 200 700  1 0xFFFF
+           on TH, verify that DUT is responds right attribute value for  command and then send write command to change the attribute value,
+          [1658322253.825601][4866:4871] CHIP:DMG: ReportDataMessage =
+          [1658322253.825662][4866:4871] CHIP:DMG: {
+          [1658322253.825714][4866:4871] CHIP:DMG:        SubscriptionId = 0x42baa1,
+          [1658322253.825767][4866:4871] CHIP:DMG:        AttributeReportIBs =
+          [1658322253.825831][4866:4871] CHIP:DMG:        [
+          [1658322253.825904][4866:4871] CHIP:DMG:                AttributeReportIB =
+          [1658322253.825998][4866:4871] CHIP:DMG:                {
+          [1658322253.826055][4866:4871] CHIP:DMG:                        AttributeDataIB =
+          [1658322253.826137][4866:4871] CHIP:DMG:                        {
+          [1658322253.826209][4866:4871] CHIP:DMG:                                DataVersion = 0xa6fa1c6d,
+          [1658322253.826295][4866:4871] CHIP:DMG:                                AttributePathIB =
+          [1658322253.826391][4866:4871] CHIP:DMG:                                {
+          [1658322253.826465][4866:4871] CHIP:DMG:                                        Endpoint = 0x1,
+          [1658322253.826557][4866:4871] CHIP:DMG:                                        Cluster = 0x6,
+          [1658322253.826650][4866:4871] CHIP:DMG:                                        Attribute = 0x0000_4001,
+          [1658322253.826722][4866:4871] CHIP:DMG:                                }
+          [1658322253.826810][4866:4871] CHIP:DMG:
+          [1658322253.826882][4866:4871] CHIP:DMG:                                Data = 1,
+          [1658322253.826967][4866:4871] CHIP:DMG:                        },
+          [1658322253.827054][4866:4871] CHIP:DMG:
+          [1658322253.827110][4866:4871] CHIP:DMG:                },
+          [1658322253.827204][4866:4871] CHIP:DMG:
+          [1658322253.827258][4866:4871] CHIP:DMG:                AttributeReportIB =
+          [1658322253.827341][4866:4871] CHIP:DMG:                {
+          [1658322253.827397][4866:4871] CHIP:DMG:                        AttributeDataIB =
+          [1658322253.827478][4866:4871] CHIP:DMG:                        {
+          [1658322253.827545][4866:4871] CHIP:DMG:                                DataVersion = 0x73700d2f,
+          [1658322253.827612][4866:4871] CHIP:DMG:                                AttributePathIB =
+          [1658322253.827680][4866:4871] CHIP:DMG:                                {
+          [1658322253.827750][4866:4871] CHIP:DMG:                                        Endpoint = 0x2,
+          [1658322253.827823][4866:4871] CHIP:DMG:                                        Cluster = 0x6,
+          [1658322253.827896][4866:4871] CHIP:DMG:                                        Attribute = 0x0000_4001,
+          [1658322253.827964][4866:4871] CHIP:DMG:                                }
+          [1658322253.828034][4866:4871] CHIP:DMG:
+          [1658322253.828105][4866:4871] CHIP:DMG:                                Data = 0,
+          [1658322253.828169][4866:4871] CHIP:DMG:                        },
+          [1658322253.828237][4866:4871] CHIP:DMG:
+          [1658322253.828294][4866:4871] CHIP:DMG:                },
+          [1658322253.828357][4866:4871] CHIP:DMG:
+          [1658322253.828407][4866:4871] CHIP:DMG:        ],
+          [1658322253.828479][4866:4871] CHIP:DMG:
+          [1658322253.828529][4866:4871] CHIP:DMG:        InteractionModelRevision = 1
+          [1658322253.828579][4866:4871] CHIP:DMG: }
+          [1658322253.828785][4866:4871] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_4001 DataVersion: 2801409133
+          [1658322253.828857][4866:4871] CHIP:TOO:   OnTime: 0
+          [1658322253.829013][4866:4871] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_0006 Attribute 0x0000_4001 DataVersion: 1936723247
+          [1658322253.829073][4866:4871] CHIP:TOO:   OnTime: 0
+          [1658322253.829154][4866:4871] CHIP:DMG: MoveToState ReadClient[0xffffa4003810]: Moving to [AwaitingSu]
+
+
+          onoff write-by-id 0x4001 1  1 1
+          On TH, Verify that the DUT sends reports for all the attributes that have changed after N(200) seconds
+          [1658322453.896805][4866:4871] CHIP:DMG: ReportDataMessage =
+          [1658322453.896834][4866:4871] CHIP:DMG: {
+          [1658322453.896859][4866:4871] CHIP:DMG:        SubscriptionId = 0x42baa1,
+          [1658322453.896884][4866:4871] CHIP:DMG:        AttributeReportIBs =
+          [1658322453.896915][4866:4871] CHIP:DMG:        [
+          [1658322453.896974][4866:4871] CHIP:DMG:                AttributeReportIB =
+          [1658322453.897009][4866:4871] CHIP:DMG:                {
+          [1658322453.897074][4866:4871] CHIP:DMG:                        AttributeDataIB =
+          [1658322453.897155][4866:4871] CHIP:DMG:                        {
+          [1658322453.897235][4866:4871] CHIP:DMG:                                DataVersion = 0xa6fa1c6e,
+          [1658322453.897321][4866:4871] CHIP:DMG:                                AttributePathIB =
+          [1658322453.897412][4866:4871] CHIP:DMG:                                {
+          [1658322453.897501][4866:4871] CHIP:DMG:                                        Endpoint = 0x1,
+          [1658322453.897588][4866:4871] CHIP:DMG:                                        Cluster = 0x6,
+          [1658322453.897675][4866:4871] CHIP:DMG:                                        Attribute = 0x0000_4001,
+          [1658322453.897757][4866:4871] CHIP:DMG:                                }
+          [1658322453.897842][4866:4871] CHIP:DMG:
+          [1658322453.897934][4866:4871] CHIP:DMG:                                Data = 1,
+          [1658322453.898011][4866:4871] CHIP:DMG:                        },
+          [1658322453.898095][4866:4871] CHIP:DMG:
+          [1658322453.898158][4866:4871] CHIP:DMG:                },
+          [1658322453.898232][4866:4871] CHIP:DMG:
+          [1658322453.898292][4866:4871] CHIP:DMG:        ],
+          [1658322453.898367][4866:4871] CHIP:DMG:
+          [1658322453.898427][4866:4871] CHIP:DMG:        InteractionModelRevision = 1
+          [1658322453.898486][4866:4871] CHIP:DMG: }
+          [1658322453.898693][4866:4871] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_4001 DataVersion: 2801409134
+          [1658322453.898777][4866:4871] CHIP:TOO:   OnTime: 1
+          [1658322453.898879][4866:4871] CHIP:DMG: Refresh LivenessCheckTime for 725000 milliseconds with SubscriptionId = 0x0042baa1 Peer = 01:0000000000000001
       disabled: true
 
     - label:

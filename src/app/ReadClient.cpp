@@ -22,7 +22,7 @@
  *
  */
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/InteractionModelHelper.h>
 #include <app/ReadClient.h>

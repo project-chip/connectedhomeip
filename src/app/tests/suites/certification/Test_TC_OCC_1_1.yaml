@@ -28,7 +28,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:

@@ -23,7 +23,7 @@
  *
  */
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
