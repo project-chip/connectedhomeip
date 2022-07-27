@@ -235,8 +235,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
             } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                memberValue = [NSNumber numberWithUnsignedChar:cppValue.adminFabricIndex];
-                value.adminFabricIndex = memberValue;
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+                value.fabricIndex = memberValue;
             } while (0);
 
             return value;
@@ -289,8 +289,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
             } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                memberValue = [NSNumber numberWithUnsignedChar:cppValue.adminFabricIndex];
-                value.adminFabricIndex = memberValue;
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+                value.fabricIndex = memberValue;
             } while (0);
 
             return value;
@@ -2173,8 +2173,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
 
             do {
                 NSNumber * _Nonnull memberValue;
-                memberValue = [NSNumber numberWithUnsignedChar:cppValue.arg1];
-                value.arg1 = memberValue;
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+                value.fabricIndex = memberValue;
             } while (0);
 
             return value;

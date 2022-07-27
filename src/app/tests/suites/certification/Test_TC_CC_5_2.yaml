@@ -18,6 +18,12 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    RateXValue:
+        type: INT16S
+        defaultValue: 50
+    RateYValue:
+        type: INT16S
+        defaultValue: 50
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -39,11 +45,19 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F03 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "TH reads CurrentX attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F03 && CC.S.A0003
       attribute: "CurrentX"
       response:
+          saveAs: CurrentXValue
           constraints:
               type: uint16
               minValue: 0
@@ -54,6 +68,7 @@ tests:
       PICS: CC.S.F03 && CC.S.A0004
       attribute: "CurrentY"
       response:
+          saveAs: CurrentYValue
           constraints:
               type: uint16
               minValue: 0
@@ -65,9 +80,9 @@ tests:
       arguments:
           values:
               - name: "rateX"
-                value: 15
+                value: RateXValue
               - name: "rateY"
-                value: 20
+                value: RateYValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -86,9 +101,10 @@ tests:
       command: "readAttribute"
       attribute: "CurrentX"
       response:
+          saveAs: CurrentXBeforeStopCommand
           constraints:
               type: uint16
-              minValue: 0
+              minValue: CurrentXValue
               maxValue: 65279
 
     - label: "TH reads CurrentY attribute from DUT"
@@ -96,9 +112,10 @@ tests:
       command: "readAttribute"
       attribute: "CurrentY"
       response:
+          saveAs: CurrentYBeforeStopCommand
           constraints:
               type: uint16
-              minValue: 0
+              minValue: CurrentYValue
               maxValue: 65279
 
     - label: "TH sends StopMoveStep command to DUT"
@@ -118,7 +135,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: 0
+              minValue: CurrentXBeforeStopCommand
               maxValue: 65279
 
     - label: "TH reads CurrentY attribute from DUT"
@@ -128,7 +145,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: 0
+              minValue: CurrentYBeforeStopCommand
               maxValue: 65279
 
     - label: "Turn off light that we turned on"

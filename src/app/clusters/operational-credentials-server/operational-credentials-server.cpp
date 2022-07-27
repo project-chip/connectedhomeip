@@ -343,20 +343,12 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
 // As per specifications section 11.22.5.1. Constant RESP_MAX
 constexpr size_t kMaxRspLen = 900;
 
-// TODO: The code currently has two sources of truths for fabrics, the fabricInfo table + the attributes. There should only be one,
-// the attributes list. Currently the attributes are not persisted so we are keeping the fabric table to have the
-// fabrics/admrins be persisted. Once attributes are persisted, there should only be one sorce of truth, the attributes list and
-// only that should be modifed to perosst/read/write fabrics.
-// TODO: Once attributes are persisted, implement reading/writing/manipulation fabrics around that and remove fabricTable
-// logic.
 class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
 {
 public:
-    // Gets called when a fabric is deleted from KVS store
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    // Gets called when a fabric is about to be deleted
+    void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
-
         // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
         for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
         {
@@ -377,8 +369,14 @@ public:
         // - removing the fabric removes all associated access control entries, so generating
         //   subsequent reports containing the leave event will fail the access control check.
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync();
-        EventManagement::GetInstance().FabricRemoved(fabricIndex);
+    }
 
+    // Gets called when a fabric is deleted
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
+
+        EventManagement::GetInstance().FabricRemoved(fabricIndex);
         NotifyFabricTableChanged();
     }
 

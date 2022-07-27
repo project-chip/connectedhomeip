@@ -11,7 +11,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, {{zapTypeToEncodable
     {{#unless isOptional}}
     {{~! Fabric index fields are not sent on writes, so don't force people to
       provide them. ~}}
-    {{#unless (isStrEqual label ../struct_fabric_idx_field)}}
+    {{#unless (is_num_equal fieldIdentifier 254)}}
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("{{parent.name}}.{{asLowerCamelCase label}}", "{{asLowerCamelCase label}}", value.isMember("{{asLowerCamelCase label}}")));
     {{/unless}}
     {{/unless}}
@@ -22,7 +22,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, {{zapTypeToEncodable
     {{#if isOptional}}
     if (value.isMember("{{asLowerCamelCase label}}"))
     {
-    {{else if (isStrEqual label ../struct_fabric_idx_field)}}
+    {{else if (is_num_equal fieldIdentifier 254)}}
     if (value.isMember("{{asLowerCamelCase label}}"))
     {
     {{/if}}
@@ -30,7 +30,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, {{zapTypeToEncodable
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.{{asLowerCamelCase label}}, value["{{asLowerCamelCase label}}"]));
     {{#if isOptional}}
     }
-    {{else if (isStrEqual label ../struct_fabric_idx_field)}}
+    {{else if (is_num_equal fieldIdentifier 254)}}
     }
     {{/if}}
 

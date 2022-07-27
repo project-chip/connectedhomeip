@@ -3514,11 +3514,11 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields
 {
-    kAdminNodeID      = 1,
-    kAdminPasscodeID  = 2,
-    kChangeType       = 3,
-    kLatestValue      = 4,
-    kAdminFabricIndex = 254,
+    kAdminNodeID     = 1,
+    kAdminPasscodeID = 2,
+    kChangeType      = 3,
+    kLatestValue     = 4,
+    kFabricIndex     = 254,
 };
 
 struct Type
@@ -3533,9 +3533,9 @@ public:
     DataModel::Nullable<uint16_t> adminPasscodeID;
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::AccessControlEntry::Type> latestValue;
-    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
-    auto GetFabricIndex() const { return adminFabricIndex; }
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3551,7 +3551,7 @@ public:
     DataModel::Nullable<uint16_t> adminPasscodeID;
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::AccessControlEntry::DecodableType> latestValue;
-    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -3561,11 +3561,11 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields
 {
-    kAdminNodeID      = 1,
-    kAdminPasscodeID  = 2,
-    kChangeType       = 3,
-    kLatestValue      = 4,
-    kAdminFabricIndex = 254,
+    kAdminNodeID     = 1,
+    kAdminPasscodeID = 2,
+    kChangeType      = 3,
+    kLatestValue     = 4,
+    kFabricIndex     = 254,
 };
 
 struct Type
@@ -3580,9 +3580,9 @@ public:
     DataModel::Nullable<uint16_t> adminPasscodeID;
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::ExtensionEntry::Type> latestValue;
-    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
-    auto GetFabricIndex() const { return adminFabricIndex; }
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3598,7 +3598,7 @@ public:
     DataModel::Nullable<uint16_t> adminPasscodeID;
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::ExtensionEntry::DecodableType> latestValue;
-    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -27747,7 +27747,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields
 {
-    kArg1 = 254,
+    kFabricIndex = 254,
 };
 
 struct Type
@@ -27758,9 +27758,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    chip::FabricIndex arg1 = static_cast<chip::FabricIndex>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
-    auto GetFabricIndex() const { return arg1; }
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -27772,7 +27772,7 @@ public:
     static constexpr EventId GetEventId() { return Events::TestFabricScopedEvent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
-    chip::FabricIndex arg1 = static_cast<chip::FabricIndex>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

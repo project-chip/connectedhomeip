@@ -68,6 +68,13 @@ tests:
               - name: "ms"
                 value: 1000
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.A000f && CC.S.F02 && CC.S.F01
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
       PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp

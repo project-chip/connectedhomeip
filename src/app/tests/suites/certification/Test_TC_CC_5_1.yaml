@@ -18,6 +18,12 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    colorXConfigValue:
+        type: INT16U
+        defaultValue: 400
+    colorYConfigValue:
+        type: INT16U
+        defaultValue: 500
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -38,6 +44,13 @@ tests:
       attribute: "OnOff"
       response:
           value: 1
+
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F03 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
 
     - label: "TH reads CurrentX attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0003
@@ -65,9 +78,9 @@ tests:
       arguments:
           values:
               - name: "colorX"
-                value: 200
+                value: colorXConfigValue
               - name: "colorY"
-                value: 300
+                value: colorYConfigValue
               - name: "TransitionTime"
                 value: 10
               - name: "OptionsMask"
@@ -88,7 +101,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentX"
       response:
-          value: 200
+          value: colorXConfigValue
           constraints:
               type: uint16
               minValue: 0
@@ -99,7 +112,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentY"
       response:
-          value: 300
+          value: colorYConfigValue
           constraints:
               type: uint16
               minValue: 0

@@ -358,7 +358,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
     ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, kPayloadDiscriminatorFieldLengthInBits));
     static_assert(kPayloadDiscriminatorFieldLengthInBits <= 16, "Won't fit in uint16_t");
-    outPayload.discriminator = static_cast<uint16_t>(dest);
+    outPayload.discriminator.SetLongValue(static_cast<uint16_t>(dest));
 
     ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, kSetupPINCodeFieldLengthInBits));
     static_assert(kSetupPINCodeFieldLengthInBits <= 32, "Won't fit in uint32_t");

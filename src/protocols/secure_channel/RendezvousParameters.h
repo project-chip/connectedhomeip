@@ -54,6 +54,8 @@ public:
         return *this;
     }
 
+    // Discriminators in RendezvousParameters are always long (12-bit)
+    // discriminators.
     bool HasDiscriminator() const { return mDiscriminator <= kMaxRendezvousDiscriminatorValue; }
     uint16_t GetDiscriminator() const { return mDiscriminator; }
     RendezvousParameters & SetDiscriminator(uint16_t discriminator)
