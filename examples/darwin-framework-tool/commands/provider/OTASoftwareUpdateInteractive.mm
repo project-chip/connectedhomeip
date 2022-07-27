@@ -19,12 +19,9 @@
 #include <fstream>
 #include <json/json.h>
 
-// TODO: Objective-C Matter.framework needs to expose this.
-#include <lib/core/OTAImageHeader.h>
-
 constexpr size_t kOtaHeaderMaxSize = 1024;
 
-bool ParseOTAHeader(chip::OTAImageHeaderParser & parser, const char * otaFilePath, chip::OTAImageHeader & header)
+MTROTAHeader * ParseOTAHeader(const char * otaFilePath)
 {
     uint8_t otaFileContent[kOtaHeaderMaxSize];
     chip::ByteSpan buffer(otaFileContent);
@@ -32,27 +29,17 @@ bool ParseOTAHeader(chip::OTAImageHeaderParser & parser, const char * otaFilePat
     std::ifstream otaFile(otaFilePath, std::ifstream::in);
     if (!otaFile.is_open() || !otaFile.good()) {
         ChipLogError(SoftwareUpdate, "Error opening OTA image file: %s", otaFilePath);
-        return false;
+        return nil;
     }
 
     otaFile.read(reinterpret_cast<char *>(otaFileContent), kOtaHeaderMaxSize);
     if (otaFile.bad()) {
         ChipLogError(SoftwareUpdate, "Error reading OTA image file: %s", otaFilePath);
-        return false;
+        return nil;
     }
 
-    parser.Init();
-    if (!parser.IsInitialized()) {
-        return false;
-    }
-
-    CHIP_ERROR error = parser.AccumulateAndDecode(buffer, header);
-    if (error != CHIP_NO_ERROR) {
-        ChipLogError(SoftwareUpdate, "Error parsing OTA image header: %" CHIP_ERROR_FORMAT, error.Format());
-        return false;
-    }
-
-    return true;
+    NSError * error;
+    return [MTROTAHeaderParser headerFromData:[NSData dataWithBytes:buffer.data() length:buffer.size()] error:&error];
 }
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
@@ -138,11 +125,9 @@ CHIP_ERROR OTASoftwareUpdateBase::SetCandidatesFromFilePath(char * _Nonnull file
     VerifyOrReturnError(ParseJsonFileAndPopulateCandidates(filePath, &candidates), CHIP_ERROR_INTERNAL);
 
     for (DeviceSoftwareVersionModel * candidate : candidates) {
-        chip::OTAImageHeaderParser parser;
-        chip::OTAImageHeader header;
-
         auto otaURL = [candidate.deviceModelData.otaURL UTF8String];
-        VerifyOrReturnError(ParseOTAHeader(parser, otaURL, header), CHIP_ERROR_INVALID_ARGUMENT);
+        auto header = ParseOTAHeader(otaURL);
+        VerifyOrReturnError(header != nil, CHIP_ERROR_INVALID_ARGUMENT);
 
         ChipLogDetail(chipTool, "Validating image list candidate %s: ", [candidate.deviceModelData.otaURL UTF8String]);
 
@@ -154,23 +139,28 @@ CHIP_ERROR OTASoftwareUpdateBase::SetCandidatesFromFilePath(char * _Nonnull file
         auto minApplicableSoftwareVersion = [candidate.deviceModelData.minApplicableSoftwareVersion unsignedLongValue];
         auto maxApplicableSoftwareVersion = [candidate.deviceModelData.maxApplicableSoftwareVersion unsignedLongValue];
 
-        VerifyOrReturnError(vendorId == header.mVendorId, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(productId == header.mProductId, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(softwareVersion == header.mSoftwareVersion, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(softwareVersionStringLength == header.mSoftwareVersionString.size(), CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(
-            memcmp(softwareVersionString, header.mSoftwareVersionString.data(), header.mSoftwareVersionString.size()) == 0,
+        auto headerVendorId = [header.vendorID unsignedIntValue];
+        auto headerProductId = [header.productID unsignedIntValue];
+        auto headerSoftwareVersion = [header.softwareVersion unsignedLongValue];
+        auto headerSoftwareVersionString = [header.softwareVersionString UTF8String];
+        auto headerSoftwareVersionStringLength = [header.softwareVersionString length];
+
+        VerifyOrReturnError(vendorId == headerVendorId, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(productId == headerProductId, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(softwareVersion == headerSoftwareVersion, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(softwareVersionStringLength == headerSoftwareVersionStringLength, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(memcmp(softwareVersionString, headerSoftwareVersionString, headerSoftwareVersionStringLength) == 0,
             CHIP_ERROR_INVALID_ARGUMENT);
 
-        if (header.mMinApplicableVersion.HasValue()) {
-            VerifyOrReturnError(minApplicableSoftwareVersion == header.mMinApplicableVersion.Value(), CHIP_ERROR_INVALID_ARGUMENT);
+        if (header.minApplicableVersion) {
+            auto version = [header.minApplicableVersion unsignedLongValue];
+            VerifyOrReturnError(minApplicableSoftwareVersion == version, CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        if (header.mMaxApplicableVersion.HasValue()) {
-            VerifyOrReturnError(maxApplicableSoftwareVersion == header.mMaxApplicableVersion.Value(), CHIP_ERROR_INVALID_ARGUMENT);
+        if (header.maxApplicableVersion) {
+            auto version = [header.maxApplicableVersion unsignedLongValue];
+            VerifyOrReturnError(maxApplicableSoftwareVersion == version, CHIP_ERROR_INVALID_ARGUMENT);
         }
-
-        parser.Clear();
     }
 
     mOTADelegate.candidates = candidates;
