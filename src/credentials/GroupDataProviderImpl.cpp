@@ -1857,14 +1857,14 @@ CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::DecryptMessage(const ByteSpan
                                    Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output);
 }
 
-CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::EncryptPrivacy(MutableByteSpan & header, uint16_t session_id,
-                                                                  const ByteSpan & payload, const ByteSpan & mic) const
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyEncrypt(const ByteSpan & input, uint16_t session_id, const ByteSpan & mic,
+                                                                  MutableByteSpan & output) const
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::DecryptPrivacy(MutableByteSpan & header, uint16_t session_id,
-                                                                  const ByteSpan & payload, const ByteSpan & mic) const
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyDecrypt(const ByteSpan & input, uint16_t session_id, const ByteSpan & mic,
+                                                                  MutableByteSpan & output) const
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
