@@ -65,7 +65,6 @@ void LEDWidget::Set(bool state)
 void LEDWidget::SetBrightness(uint8_t brightness)
 {
     uint8_t red, green, blue;
-    log_info("mDefaultOnBrightness: %d, brightness: %d\r\n", mDefaultOnBrightness, brightness);
     HSB2rgb(mHue, mSaturation, brightness, red, green, blue);
     log_info("brightness: %d, mHue: %d, mSaturation: %d, red: %d, green: %d, blue: %d\r\n", brightness, mHue, mSaturation, red,
              green, blue);
