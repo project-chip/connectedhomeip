@@ -140,6 +140,10 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
     FailIfNot(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID),
               "Failed to subscribe attributes.")
 
+    logger.info("Testing re-subscription")
+    FailIfNot(asyncio.run(test.TestResubscription(nodeid=device_nodeid)),
+              "Failed to validated re-subscription")
+
     logger.info("Testing on off cluster over resolved connection")
     FailIfNot(test.TestOnOffCluster(nodeid=device_nodeid,
                                     endpoint=LIGHTING_ENDPOINT_ID,

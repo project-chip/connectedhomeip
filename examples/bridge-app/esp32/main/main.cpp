@@ -32,6 +32,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/ErrorStr.h>
 
+#include <app/InteractionModelEngine.h>
 #include <app/server/Server.h>
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
