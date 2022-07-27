@@ -1024,7 +1024,7 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
         //
         if (_this->mReadPrepareParams.mSessionHolder)
         {
-            _this->mReadPrepareParams.mSessionHolder.Get().Value()->AsSecureSession()->MarkAsDefunct();
+            _this->mReadPrepareParams.mSessionHolder->AsSecureSession()->MarkAsDefunct();
         }
 
         //
@@ -1049,8 +1049,8 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         //
-        // Call Close (which should trigger re-subscription again) EXCEPT if we got here because we didn't have a valid fabric,
-        // or an invalid CASESessionManager pointer when mDoCaseOnNextResub was true.
+        // Call Close (which should trigger re-subscription again) EXCEPT if we got here because we didn't have a valid
+        // CASESessionManager pointer when mDoCaseOnNextResub was true.
         //
         // In that case, don't permit re-subscription to occur.
         //

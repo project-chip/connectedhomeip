@@ -549,11 +549,9 @@ void ReportEventCallback::OnSubscriptionEstablished(SubscriptionId aSubscription
 
 CHIP_ERROR ReportEventCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
 {
-    VerifyOrReturn(mResubscriptionAttemptCallbackRef != nullptr,
-                   ChipLogError(Controller, "mResubscriptionAttemptCallbackRef is null"));
+    VerifyOrReturnLogError(mResubscriptionAttemptCallbackRef != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ReturnErrorOnFailure(app::ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
 
