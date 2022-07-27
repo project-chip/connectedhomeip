@@ -77,6 +77,9 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
     } else if (errorCode == CHIP_ERROR_TIMEOUT) {
         code = MTRErrorCodeTimeout;
         [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Transaction timed out.", nil) }];
+    } else if (errorCode == CHIP_ERROR_BUFFER_TOO_SMALL) {
+        code = MTRErrorCodeBufferTooSmall;
+        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A buffer is too small.", nil) }];
     } else {
         code = MTRErrorCodeGeneralError;
         [userInfo addEntriesFromDictionary:@{
@@ -258,6 +261,9 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
         break;
     case MTRErrorCodeTimeout:
         code = CHIP_ERROR_TIMEOUT.AsInteger();
+        break;
+    case MTRErrorCodeBufferTooSmall:
+        code = CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger();
         break;
     case MTRErrorCodeGeneralError: {
         if (error.userInfo != nil && error.userInfo[@"errorCode"] != nil) {
