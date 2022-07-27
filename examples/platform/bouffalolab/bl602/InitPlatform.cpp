@@ -246,8 +246,7 @@ static void event_cb_key_event(input_event_t * event, void * private_data)
     switch (event->code)
     {
     case KEY_1: {
-        log_info("[KEY_1] [EVT] INIT DONE %lld\r\n", aos_now_ms());
-        log_info("short press \r\n");
+        log_info("Short press \r\n");
 
         if (Button_LightingActionEventHandler != nullptr)
         {
@@ -256,13 +255,11 @@ static void event_cb_key_event(input_event_t * event, void * private_data)
     }
     break;
     case KEY_2: {
-        log_info("[KEY_2] [EVT] INIT DONE %lld\r\n", aos_now_ms());
-        log_info("long press \r\n");
+        log_info("Long press \r\n");
     }
     break;
     case KEY_3: {
-        log_info("[KEY_3] [EVT] INIT DONE %lld\r\n", aos_now_ms());
-        log_info("longlong press \r\n");
+        log_info("LongLong press \r\n");
         if (Button_FactoryResetEventHandler != nullptr)
         {
             (*Button_FactoryResetEventHandler)();
