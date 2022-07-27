@@ -169,10 +169,11 @@ protected:
                                   MutableByteSpan & ciphertext) const override;
         CHIP_ERROR DecryptMessage(const ByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce, const ByteSpan & mic,
                                   MutableByteSpan & plaintext) const override;
-        CHIP_ERROR EncryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
-                                  const ByteSpan & mic) const override;
-        CHIP_ERROR DecryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
-                                  const ByteSpan & mic) const override;
+        CHIP_ERROR PrivacyEncrypt(const ByteSpan & input, uint16_t session_id, const ByteSpan & mic,
+                                  MutableByteSpan & output) const override;
+
+        CHIP_ERROR PrivacyDecrypt(const ByteSpan & input, uint16_t session_id, const ByteSpan & mic,
+                                  MutableByteSpan & output) const override;
 
         void Release() override;
 

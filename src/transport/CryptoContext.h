@@ -46,7 +46,7 @@ public:
     CryptoContext(const CryptoContext &) = default;
     CryptoContext(Crypto::SymmetricKeyContext * context) : mKeyContext(context){};
     CryptoContext & operator=(const CryptoContext &) = default;
-    CryptoContext & operator=(CryptoContext &&) = default;
+    CryptoContext & operator=(CryptoContext &&)      = default;
 
     /**
      *    Whether the current node initiated the session, or it is responded to a session request.
@@ -124,6 +124,12 @@ public:
      */
     CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, ConstNonceView nonce,
                        const PacketHeader & header, const MessageAuthenticationCode & mac) const;
+
+    CHIP_ERROR PrivacyObfuscate(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                                MessageAuthenticationCode & mac) const;
+
+    CHIP_ERROR PrivacyDeobfuscate(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+                                  const MessageAuthenticationCode & mac) const;
 
     ByteSpan GetAttestationChallenge() const { return ByteSpan(mKeys[kAttestationChallengeKey], Crypto::kAES_CCM128_Key_Length); }
 

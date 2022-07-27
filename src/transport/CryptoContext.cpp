@@ -253,4 +253,44 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CryptoContext::PrivacyObfuscate(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                                           MessageAuthenticationCode & mac) const
+{
+    const size_t taglen = header.MICTagLength();
+    VerifyOrDie(taglen <= kMaxTagLen);
+
+    VerifyOrReturnError(input != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(input_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Confirm group key is available. Privacy obfuscation is not supported on session keys.
+    VerifyOrReturnError(mKeyContext != nullptr, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
+
+    ByteSpan plaintext(input, input_length);
+    MutableByteSpan privacytext(output, input_length);
+    ByteSpan mic(mac.GetTag(), taglen);
+
+    return mKeyContext->PrivacyEncrypt(plaintext, header.GetSessionId(), mic, privacytext);
+}
+
+CHIP_ERROR CryptoContext::PrivacyDeobfuscate(const uint8_t * input, size_t input_length, uint8_t * output,
+                                             const PacketHeader & header, const MessageAuthenticationCode & mac) const
+{
+    const size_t taglen = header.MICTagLength();
+    VerifyOrDie(taglen <= kMaxTagLen);
+
+    VerifyOrReturnError(input != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(input_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Confirm group key is available. Privacy obfuscation is not supported on session keys.
+    VerifyOrReturnError(mKeyContext != nullptr, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
+
+    const ByteSpan privacytext(input, input_length);
+    MutableByteSpan plaintext(output, input_length);
+    ByteSpan mic(mac.GetTag(), taglen);
+
+    return mKeyContext->PrivacyDecrypt(privacytext, header.GetSessionId(), mic, plaintext);
+}
+
 } // namespace chip
