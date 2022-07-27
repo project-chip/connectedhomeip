@@ -126,6 +126,7 @@ BeagleBone
 befc
 betaprogram
 BinaryInputBasic
+Binfmt
 bitbake
 bld
 BLE
@@ -160,7 +161,9 @@ btmgmt
 BTN
 BTP
 btvirt
+BuildKit
 buildwithmatter
+buildX
 burndown
 ButtonIsr
 BytesMain
