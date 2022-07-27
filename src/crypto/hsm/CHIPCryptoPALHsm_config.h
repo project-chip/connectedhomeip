@@ -25,7 +25,7 @@
 /*
  * Enable HSM for SPAKE VERIFIER
  */
-#define ENABLE_HSM_SPAKE_VERIFIER 0
+#define ENABLE_HSM_SPAKE_VERIFIER 1
 
 /*
  * Enable HSM for SPAKE PROVER
@@ -35,7 +35,7 @@
 /*
  * Enable HSM for Generate EC Key
  */
-#define ENABLE_HSM_GENERATE_EC_KEY 1
+#define ENABLE_HSM_GENERATE_EC_KEY 0
 
 /*
  * Enable HSM for PBKDF SHA256
