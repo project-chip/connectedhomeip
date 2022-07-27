@@ -38,7 +38,7 @@ The CHIP demo application is supported on
 
 -   To build the demo application:
 
-          $ ./scripts/build/build_examples.py --target ameba-amebad-light-swtich build
+          $ ./scripts/build/build_examples.py --target ameba-amebad-light-switch build
 
     The output image files are stored in
     `out/ameba-amebad-light-switch/asdk/image` folder.
