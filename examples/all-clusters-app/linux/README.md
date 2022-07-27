@@ -1,8 +1,37 @@
 # Matter Linux/Mac All Clusters Example
 
+## Compiling all-clusters-app for testing on Linux and Mac
+
+To compile all-clusters-app on Intel Mac, run:
+
+```
+$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target darwin-x64-all-clusters-no-ble-asan-clang build"
+```
+
+at the top level of the Matter tree.
+
+To compile on an Arm Mac, run:
+
+```
+$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target darwin-arm64-all-clusters-no-ble-asan-clang build"
+```
+
+Similarly, to compile on Linux x86-64 run:
+
+```
+$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-clusters-no-ble-asan-clang build"
+```
+
+And to compile on Linux ARM run:
+
+```
+$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build"
+```
+
 ## Fuzzing integration
 
-This example supports compilation with libfuzzer enabled.
+This example also supports compilation with libfuzzer enabled. This should be
+used when trying to fuzz-test the Matter SDK.
 
 ### Compiling with fuzzing enabled
 
