@@ -58,7 +58,7 @@ constexpr uint16_t BridgedActionsAttrAccess::ClusterRevision;
 CHIP_ERROR BridgedActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
-        std::vector<Action *> actionList = GetActionListInfo(endpoint);
+        chip::Span<Action *> actionList = GetActionListInfo(endpoint);
 
         for (auto action : actionList)
         {

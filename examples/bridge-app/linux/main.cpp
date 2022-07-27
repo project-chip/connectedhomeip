@@ -65,6 +65,15 @@ static EndpointId gFirstDynamicEndpointId;
 static Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 Room gRooms[kMaxRooms];
 
+bool emberAfBridgedActionsClusterInstantActionCallback(app::CommandHandler * commandObj,
+                                                       const app::ConcreteCommandPath & commandPath,
+                                                       const BridgedActions::Commands::InstantAction::DecodableType & commandData)
+{
+    // No actions are implemented, just return status NotFound.
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
+    return true;
+}
+
 Device * FindDeviceEndpoint(chip::EndpointId id)
 {
     for (auto dev : gDevices)
@@ -142,6 +151,11 @@ Room * FindRoom(const std::string & name)
             return &room;
     }
     return nullptr;
+}
+
+chip::Span<Action *> GetActionListInfo(chip::EndpointId parentId)
+{
+    return chip::Span<Action *>();
 }
 
 void ApplicationInit()

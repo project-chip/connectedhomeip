@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "Device.h"
+
 class Room
 {
 public:
@@ -48,3 +50,5 @@ static constexpr uint32_t kMaxRooms = 16;
 extern Room gRooms[kMaxRooms];
 
 Room * FindRoom(const std::string & name);
+
+chip::Span<Action *> GetActionListInfo(chip::EndpointId parentId);
