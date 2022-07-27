@@ -1857,16 +1857,18 @@ CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::DecryptMessage(const ByteSpan
                                    Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output);
 }
 
-CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyEncrypt(const ByteSpan & input, uint16_t session_id, const ByteSpan & mic,
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyEncrypt(const ByteSpan & input, const ByteSpan & nonce,
                                                                   MutableByteSpan & output) const
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return Crypto::AES_CCM_encrypt(input.data(), input.size(), nullptr, 0, mKeyValue, Crypto::kAES_CCM128_Key_Length, nonce.data(),
+                                   nonce.size(), output.data(), nullptr, 0);
 }
 
-CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyDecrypt(const ByteSpan & input, uint16_t session_id, const ByteSpan & mic,
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyDecrypt(const ByteSpan & input, const ByteSpan & nonce,
                                                                   MutableByteSpan & output) const
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return Crypto::AES_CCM_decrypt(input.data(), input.size(), nullptr, 0, nullptr, 0, mKeyValue, Crypto::kAES_CCM128_Key_Length,
+                                   nonce.data(), nonce.size(), output.data());
 }
 
 GroupDataProviderImpl::GroupSessionIterator * GroupDataProviderImpl::IterateGroupSessions(uint16_t session_id)

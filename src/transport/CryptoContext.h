@@ -35,10 +35,11 @@ namespace chip {
 class DLL_EXPORT CryptoContext
 {
 public:
-    static constexpr size_t kAESCCMNonceLen = 13;
-    using NonceStorage                      = std::array<uint8_t, kAESCCMNonceLen>;
-    using NonceView                         = FixedSpan<uint8_t, kAESCCMNonceLen>;
-    using ConstNonceView                    = FixedSpan<const uint8_t, kAESCCMNonceLen>;
+    static constexpr size_t kPrivacyNonceMicFragmentLen = 11;
+    static constexpr size_t kAESCCMNonceLen             = 13;
+    using NonceStorage                                  = std::array<uint8_t, kAESCCMNonceLen>;
+    using NonceView                                     = FixedSpan<uint8_t, kAESCCMNonceLen>;
+    using ConstNonceView                                = FixedSpan<const uint8_t, kAESCCMNonceLen>;
 
     CryptoContext();
     ~CryptoContext();
@@ -93,6 +94,9 @@ public:
 
     /** @brief Build a Nonce buffer using given parameters for encrypt or decrypt. */
     static CHIP_ERROR BuildNonce(NonceView nonce, uint8_t securityFlags, uint32_t messageCounter, NodeId nodeId);
+
+    /** @brief Build a Nonce buffer using given parameters for encrypt or decrypt. */
+    static CHIP_ERROR BuildPrivacyNonce(NonceView nonce, uint16_t sessionId, const MessageAuthenticationCode & mac);
 
     /**
      * @brief
