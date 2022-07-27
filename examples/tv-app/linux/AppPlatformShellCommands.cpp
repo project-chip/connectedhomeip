@@ -20,8 +20,10 @@
  */
 
 #include "AppPlatformShellCommands.h"
+#include "AppImpl.h"
 #include "ControllerShellCommands.h"
 #include <AppMain.h>
+#include <access/AccessControl.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
@@ -114,6 +116,11 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(sout,
                     "  commission <udc-entry>     Commission given udc-entry using given pincode from corresponding app. Usage: "
                     "app commission 0\r\n");
+    streamer_printf(sout,
+                    "  add-admin-vendor <vid> Add vendor ID to list which will receive admin privileges. Usage: app "
+                    "add-admin-vendor 65521\r\n");
+    streamer_printf(sout, "  print-app-access     Print all ACLs for app platform fabric. Usage: app print-app-access\r\n");
+    streamer_printf(sout, "  remove-app-access    Remove all ACLs for app platform fabric. Usage: app remove-app-access\r\n");
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
@@ -126,6 +133,22 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
     if (argc == 0 || strcmp(argv[0], "help") == 0)
     {
         return PrintAllCommands();
+    }
+    else if (strcmp(argv[0], "add-admin-vendor") == 0)
+    {
+        if (argc < 2)
+        {
+            return PrintAllCommands();
+        }
+        char * eptr;
+
+        uint16_t vid                    = (uint16_t) strtol(argv[1], &eptr, 10);
+        ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
+        factory->AddAdminVendorId(vid);
+
+        ChipLogProgress(DeviceLayer, "added admin-vendor");
+
+        return CHIP_NO_ERROR;
     }
     else if (strcmp(argv[0], "add") == 0)
     {
@@ -204,6 +227,24 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         char * eptr;
         size_t index = (size_t) strtol(argv[1], &eptr, 10);
         return error = pairApp(true, index);
+    }
+    else if (strcmp(argv[0], "print-app-access") == 0)
+    {
+        Access::AccessControl::EntryIterator iterator;
+        Access::AccessControl & accessControl = Access::GetAccessControl();
+        ReturnErrorOnFailure(accessControl.Entries(GetDeviceCommissioner()->GetFabricIndex(), iterator));
+
+        Access::AccessControl::Entry entry;
+        while (iterator.Next(entry) == CHIP_NO_ERROR)
+        {
+            accessControl.Dump(entry);
+        }
+        return CHIP_NO_ERROR;
+    }
+    else if (strcmp(argv[0], "remove-app-access") == 0)
+    {
+        Access::GetAccessControl().DeleteAllEntriesForFabric(GetDeviceCommissioner()->GetFabricIndex());
+        return CHIP_NO_ERROR;
     }
     else
     {

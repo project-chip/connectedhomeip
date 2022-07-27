@@ -26,7 +26,7 @@
 #include <lib/core/CHIPCore.h>
 
 // Dump function for use during development only (0 for disabled, non-zero for enabled).
-#define CHIP_ACCESS_CONTROL_DUMP_ENABLED 0
+#define CHIP_ACCESS_CONTROL_DUMP_ENABLED 1
 
 namespace chip {
 namespace Access {
