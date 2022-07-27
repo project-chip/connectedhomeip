@@ -4627,3 +4627,55 @@ PICS:
     - label:
           "Does device support optional key SII in operational discovery mDNS?"
       id: MCORE.SC.T_KEY
+
+    - label: "Does the device support discovery over Bluetooth Low Power (BLE)?"
+      id: MCORE.SC.BLE
+
+    - label: "Does the device support discovery over Wi-Fi?"
+      id: MCORE.SC.WIFI
+
+    - label: "Does the device support discovery over Ethernet?"
+      id: MCORE.SC.ETH
+
+    - label: "Does the device support discovery over Thread?"
+      id: MCORE.SC.THR
+
+    - label:
+          "Does device support optional subtype _V in commissionable node
+          discovery mDNS?"
+      id: MCORE.SC.VENDOR_SUBTYPE
+
+    - label:
+          "Does device support optional subtype _T in commissionable node
+          discovery mDNS?"
+      id: MCORE.SC.DEVTYPE_SUBTYPE
+
+    - label:
+          "Does device support optional key VP in commissionable node discovery
+          mDNS?"
+      id: MCORE.SC.VP_KEY
+
+    - label:
+          "Does device support optional key DT in commissionable node discovery
+          mDNS?"
+      id: MCORE.SC.DT_KEY
+
+    - label:
+          "Does device support optional key DN in commissionable node discovery
+          mDNS?"
+      id: MCORE.SC.DN_KEY
+
+    - label:
+          "Does device support optional key RI in commissionable node discovery
+          mDNS?"
+      id: MCORE.SC.RI_KEY
+
+    - label:
+          "Does device support optional key PH in commissionable node discovery
+          mDNS?"
+      id: MCORE.SC.PH_KEY
+
+    - label:
+          "Does device support optional key PI in commissionable node discovery
+          mDNS?"
+      id: MCORE.SC.PI_KEY

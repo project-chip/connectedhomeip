@@ -19,6 +19,12 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    hueConfigValue:
+        type: INT8U
+        defaultValue: 40
+    SaturationConfigValue:
+        type: INT8U
+        defaultValue: 160
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -39,6 +45,13 @@ tests:
       attribute: "OnOff"
       response:
           value: 1
+
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F00 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
 
     - label: "TH reads CurrentHue attribute from DUT."
       PICS: CC.S.F01 && CC.S.A0000
@@ -66,9 +79,9 @@ tests:
       arguments:
           values:
               - name: "hue"
-                value: 40
+                value: hueConfigValue
               - name: "Saturation"
-                value: 160
+                value: SaturationConfigValue
               - name: "TransitionTime"
                 value: 10
               - name: "OptionsMask"
@@ -76,19 +89,20 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 1000ms"
+    - label: "Wait 1500ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 1000
+                value: 1500
 
     - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F01 && CC.S.A0000 && CC.S.C06.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
+          value: hueConfigValue
           constraints:
               type: uint8
               minValue: 0
@@ -100,6 +114,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
+          value: SaturationConfigValue
           constraints:
               type: uint8
               minValue: 0
