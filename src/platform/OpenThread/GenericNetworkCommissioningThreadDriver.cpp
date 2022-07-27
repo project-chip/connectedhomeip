@@ -175,18 +175,25 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
     }
 }
 
-void GenericThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
+static void ScanNetworksNow(System::Layer *, void * callbackPtr)
 {
-    CHIP_ERROR err = DeviceLayer::ThreadStackMgrImpl().StartThreadScan(callback);
-    if (err != CHIP_NO_ERROR)
+    ThreadDriver::ScanCallback * callback = static_cast<ThreadDriver::ScanCallback *>(callbackPtr);
+
+    if (DeviceLayer::ThreadStackMgrImpl().StartThreadScan(callback) != CHIP_NO_ERROR)
     {
-        mScanStatus.SetValue(Status::kUnknownError);
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
     }
-    else
+}
+
+void GenericThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
+{
+    using namespace System::Clock::Literals;
+
+    // While the Thread network discovery is happening, the communication over Thread can be disrupted,
+    // so introduce a delay to help deliver an ACK for the ScanNetwork command before the discovery begins.
+    if (DeviceLayer::SystemLayer().StartTimer(CHIP_DEVICE_CONFIG_THREAD_SCAN_DELAY, ScanNetworksNow, callback) != CHIP_NO_ERROR)
     {
-        // OpenThread's "scan" will always success once started, so we can set the value of scan result here.
-        mScanStatus.SetValue(Status::kSuccess);
+        callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
     }
 }
 
