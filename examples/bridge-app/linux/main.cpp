@@ -71,6 +71,9 @@ Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 std::vector<Room *> gRooms;
 std::vector<Action *> gActions;
 
+const int16_t minMeasuredValue = -27315;
+const int16_t maxMeasuredValue = 32766;
+
 // ENDPOINT DEFINITIONS:
 // =================================================================================
 //
@@ -84,14 +87,14 @@ std::vector<Action *> gActions;
 // state database representing the devices connected to it.
 
 // Device types for dynamic endpoints: TODO Need a generated file from ZAP to define these!
-// (taken from chip-devices.xml)
+// (taken from matter-devices.xml)
 #define DEVICE_TYPE_BRIDGED_NODE 0x0013
 // (taken from lo-devices.xml)
 #define DEVICE_TYPE_LO_ON_OFF_LIGHT 0x0100
-// (taken from lo-devices.xml)
-#define DEVICE_TYPE_LO_ON_OFF_LIGHT_SWITCH 0x0103
-// (taken from chip-devices.xml)
+// (taken from matter-devices.xml)
 #define DEVICE_TYPE_POWER_SOURCE 0x0011
+// (taken from matter-devices.xml)
+#define DEVICE_TYPE_TEMP_SENSOR 0x0302
 
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1
@@ -150,11 +153,11 @@ DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
 DeviceOnOff Light1("Light 1", "Office");
 DeviceOnOff Light2("Light 2", "Office");
 
-DeviceSwitch Switch1("Switch 1", "Office", EMBER_AF_SWITCH_FEATURE_LATCHING_SWITCH);
-DeviceSwitch Switch2("Switch 2", "Office",
-                     EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH | EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_RELEASE |
-                         EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_LONG_PRESS |
-                         EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_MULTI_PRESS);
+DeviceTempSensor TempSensor1("TempSensor 1", "Office", minMeasuredValue, maxMeasuredValue);
+DeviceTempSensor TempSensor2("TempSensor 2", "Office", minMeasuredValue, maxMeasuredValue);
+
+DeviceTempSensor ComposedTempSensor1("Composed TempSensor 1", "Bedroom", minMeasuredValue, maxMeasuredValue);
+DeviceTempSensor ComposedTempSensor2("Composed TempSensor 2", "Bedroom", minMeasuredValue, maxMeasuredValue);
 
 // Declare Bridged endpoints used for Action clusters
 DataVersion gActionLight1DataVersions[ArraySize(bridgedLightClusters)];
@@ -180,48 +183,6 @@ Action action3(0x1003, "Turn Off Room 1", BridgedActions::ActionTypeEnum::kAutom
 
 // ---------------------------------------------------------------------------
 //
-// SWITCH ENDPOINT: contains the following clusters:
-//   - Switch
-//   - Descriptor
-//   - Bridged Device Basic
-
-// Declare Switch cluster attributes
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(switchAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(ZCL_NUMBER_OF_POSITIONS_ATTRIBUTE_ID, INT8U, 1, 0),       /* NumberOfPositions */
-    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_CURRENT_POSITION_ATTRIBUTE_ID, INT8U, 1, 0),      /* CurrentPosition */
-    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_MULTI_PRESS_MAX_ATTRIBUTE_ID, INT8U, 1, 0),       /* MultiPressMax */
-    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID, BITMAP32, 4, 0), /* FeatureMap */
-    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
-
-// Declare Descriptor cluster attributes
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(switchDescriptorAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(ZCL_DEVICE_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0),     /* device list */
-    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_SERVER_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0), /* server list */
-    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_CLIENT_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0), /* client list */
-    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_PARTS_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0),  /* parts list */
-    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
-
-// Declare Bridged Device Basic information cluster attributes
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(switchBridgedDeviceBasicAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(ZCL_NODE_LABEL_ATTRIBUTE_ID, CHAR_STRING, kNodeLabelSize, 0), /* NodeLabel */
-    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_REACHABLE_ATTRIBUTE_ID, BOOLEAN, 1, 0),               /* Reachable */
-    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID, BITMAP32, 4, 0),     /* feature map */
-    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
-
-// Declare Cluster List for Bridged Switch endpoint
-DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedSwitchClusters)
-DECLARE_DYNAMIC_CLUSTER(ZCL_SWITCH_CLUSTER_ID, switchAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, switchDescriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, switchBridgedDeviceBasicAttrs, nullptr,
-                            nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
-
-// Declare Bridged Switch endpoint
-DECLARE_DYNAMIC_ENDPOINT(bridgedSwitchEndpoint, bridgedSwitchClusters);
-DataVersion gSwitch1DataVersions[ArraySize(bridgedSwitchClusters)];
-DataVersion gSwitch2DataVersions[ArraySize(bridgedSwitchClusters)];
-
-// ---------------------------------------------------------------------------
-//
 // POWER SOURCE ENDPOINT: contains the following clusters:
 //   - Power Source
 //   - Descriptor
@@ -240,6 +201,30 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nul
 
 DECLARE_DYNAMIC_ENDPOINT(bridgedPowerSourceEndpoint, bridgedPowerSourceClusters);
 
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(tempSensorAttrs)
+DECLARE_DYNAMIC_ATTRIBUTE(ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID, INT16S, 2, 0),              /* Measured Value */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_TEMP_MIN_MEASURED_VALUE_ATTRIBUTE_ID, INT16S, 2, 0),      /* Min Measured Value */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_TEMP_MAX_MEASURED_VALUE_ATTRIBUTE_ID, INT16S, 2, 0),      /* Max Measured Value */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID, BITMAP32, 4, 0),         /* FeatureMap */
+    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+
+// ---------------------------------------------------------------------------
+//
+// TEMPERATURE SENSOR ENDPOINT: contains the following clusters:
+//   - Temperature measurement
+//   - Descriptor
+//   - Bridged Device Basic
+DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedTempSensorClusters)
+DECLARE_DYNAMIC_CLUSTER(ZCL_TEMP_MEASUREMENT_CLUSTER_ID, tempSensorAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, bridgedDeviceBasicAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER_LIST_END;
+
+// Declare Bridged Light endpoint
+DECLARE_DYNAMIC_ENDPOINT(bridgedTempSensorEndpoint, bridgedTempSensorClusters);
+DataVersion gTempSensor1DataVersions[ArraySize(bridgedTempSensorClusters)];
+DataVersion gTempSensor2DataVersions[ArraySize(bridgedTempSensorClusters)];
+
 // ---------------------------------------------------------------------------
 //
 // COMPOSED DEVICE ENDPOINT: contains the following clusters:
@@ -254,8 +239,8 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nul
 
 DECLARE_DYNAMIC_ENDPOINT(bridgedComposedDeviceEndpoint, bridgedComposedDeviceClusters);
 DataVersion gComposedDeviceDataVersions[ArraySize(bridgedComposedDeviceClusters)];
-DataVersion gComposedSwitch1DataVersions[ArraySize(bridgedSwitchClusters)];
-DataVersion gComposedSwitch2DataVersions[ArraySize(bridgedSwitchClusters)];
+DataVersion gComposedTempSensor1DataVersions[ArraySize(bridgedTempSensorClusters)];
+DataVersion gComposedTempSensor2DataVersions[ArraySize(bridgedTempSensorClusters)];
 DataVersion gComposedPowerSourceDataVersions[ArraySize(bridgedPowerSourceClusters)];
 
 } // namespace
@@ -268,7 +253,7 @@ DataVersion gComposedPowerSourceDataVersions[ArraySize(bridgedPowerSourceCluster
 #define ZCL_BRIDGED_DEVICE_BASIC_FEATURE_MAP (0u)
 #define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
-#define ZCL_SWITCH_CLUSTER_REVISION (1u)
+#define ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION (1u)
 #define ZCL_POWER_SOURCE_CLUSTER_REVISION (1u)
 
 // ---------------------------------------------------------------------------
@@ -285,6 +270,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
             EmberAfStatus ret;
             while (1)
             {
+                DeviceLayer::StackLock lock;
                 dev->SetEndpointId(gCurrentEndpointId);
                 dev->SetParentEndpointId(parentEndpointId);
                 ret =
@@ -319,6 +305,7 @@ int RemoveDeviceEndpoint(Device * dev)
     {
         if (gDevices[index] == dev)
         {
+            DeviceLayer::StackLock lock;
             EndpointId ep   = emberAfClearDynamicEndpoint(index);
             gDevices[index] = nullptr;
             ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
@@ -382,6 +369,7 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     if (itemChangedMask & Device::kChanged_Reachable)
     {
         uint8_t reachable = dev->IsReachable() ? 1 : 0;
+        DeviceLayer::StackLock lock;
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
                                                ZCL_REACHABLE_ATTRIBUTE_ID, ZCL_BOOLEAN_ATTRIBUTE_TYPE, &reachable);
     }
@@ -391,6 +379,7 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
         uint8_t zclName[kNodeLabelSize];
         MutableByteSpan zclNameSpan(zclName);
         MakeZclCharString(zclNameSpan, dev->GetName());
+        DeviceLayer::StackLock lock;
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
                                                ZCL_NODE_LABEL_ATTRIBUTE_ID, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, zclNameSpan.data());
     }
@@ -406,37 +395,9 @@ void HandleDeviceOnOffStatusChanged(DeviceOnOff * dev, DeviceOnOff::Changed_t it
     if (itemChangedMask & DeviceOnOff::kChanged_OnOff)
     {
         uint8_t isOn = dev->IsOn() ? 1 : 0;
+        DeviceLayer::StackLock lock;
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
                                                ZCL_BOOLEAN_ATTRIBUTE_TYPE, &isOn);
-    }
-}
-
-void HandleDeviceSwitchStatusChanged(DeviceSwitch * dev, DeviceSwitch::Changed_t itemChangedMask)
-{
-    if (itemChangedMask & (DeviceSwitch::kChanged_Reachable | DeviceSwitch::kChanged_Name | DeviceSwitch::kChanged_Location))
-    {
-        HandleDeviceStatusChanged(static_cast<Device *>(dev), (Device::Changed_t) itemChangedMask);
-    }
-
-    if (itemChangedMask & DeviceSwitch::kChanged_NumberOfPositions)
-    {
-        uint8_t numberOfPositions = dev->GetNumberOfPositions();
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_SWITCH_CLUSTER_ID, ZCL_NUMBER_OF_POSITIONS_ATTRIBUTE_ID,
-                                               ZCL_INT8U_ATTRIBUTE_TYPE, &numberOfPositions);
-    }
-
-    if (itemChangedMask & DeviceSwitch::kChanged_CurrentPosition)
-    {
-        uint8_t currentPosition = dev->GetCurrentPosition();
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_SWITCH_CLUSTER_ID, ZCL_CURRENT_POSITION_ATTRIBUTE_ID,
-                                               ZCL_INT8U_ATTRIBUTE_TYPE, &currentPosition);
-    }
-
-    if (itemChangedMask & DeviceSwitch::kChanged_MultiPressMax)
-    {
-        uint8_t multiPressMax = dev->GetMultiPressMax();
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_SWITCH_CLUSTER_ID, ZCL_MULTI_PRESS_MAX_ATTRIBUTE_ID,
-                                               ZCL_INT8U_ATTRIBUTE_TYPE, &multiPressMax);
     }
 }
 
@@ -452,13 +413,30 @@ void HandleDevicePowerSourceStatusChanged(DevicePowerSource * dev, DevicePowerSo
     if (itemChangedMask & DevicePowerSource::kChanged_BatLevel)
     {
         uint8_t batChargeLevel = dev->GetBatChargeLevel();
+        DeviceLayer::StackLock lock;
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), PowerSource::Id, PowerSource::Attributes::BatChargeLevel::Id,
                                                ZCL_INT8U_ATTRIBUTE_TYPE, &batChargeLevel);
     }
 
     if (itemChangedMask & DevicePowerSource::kChanged_Description)
     {
+        DeviceLayer::StackLock lock;
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), PowerSource::Id, PowerSource::Attributes::Description::Id);
+    }
+}
+
+void HandleDeviceTempSensorStatusChanged(DeviceTempSensor * dev, DeviceTempSensor::Changed_t itemChangedMask)
+{
+    if (itemChangedMask &
+        (DeviceTempSensor::kChanged_Reachable | DeviceTempSensor::kChanged_Name | DeviceTempSensor::kChanged_Location))
+    {
+        HandleDeviceStatusChanged(static_cast<Device *>(dev), (Device::Changed_t) itemChangedMask);
+    }
+    if (itemChangedMask & DeviceTempSensor::kChanged_MeasurementValue)
+    {
+        DeviceLayer::StackLock lock;
+        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), TemperatureMeasurement::Id,
+                                               TemperatureMeasurement::Attributes::MeasuredValue::Id);
     }
 }
 
@@ -535,36 +513,6 @@ EmberAfStatus HandleWriteOnOffAttribute(DeviceOnOff * dev, chip::AttributeId att
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus HandleReadSwitchAttribute(DeviceSwitch * dev, chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
-{
-    if ((attributeId == ZCL_NUMBER_OF_POSITIONS_ATTRIBUTE_ID) && (maxReadLength == 1))
-    {
-        *buffer = dev->GetNumberOfPositions();
-    }
-    else if ((attributeId == ZCL_CURRENT_POSITION_ATTRIBUTE_ID) && (maxReadLength == 1))
-    {
-        *buffer = dev->GetCurrentPosition();
-    }
-    else if ((attributeId == ZCL_MULTI_PRESS_MAX_ATTRIBUTE_ID) && (maxReadLength == 1))
-    {
-        *buffer = dev->GetMultiPressMax();
-    }
-    else if ((attributeId == ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID) && (maxReadLength == 4))
-    {
-        *(uint32_t *) buffer = dev->GetFeatureMap();
-    }
-    else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
-    {
-        *buffer = (uint16_t) ZCL_SWITCH_CLUSTER_REVISION;
-    }
-    else
-    {
-        return EMBER_ZCL_STATUS_FAILURE;
-    }
-
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
-
 EmberAfStatus HandleReadPowerSourceAttribute(DevicePowerSource * dev, chip::AttributeId attributeId, uint8_t * buffer,
                                              uint16_t maxReadLength)
 {
@@ -604,6 +552,36 @@ EmberAfStatus HandleReadPowerSourceAttribute(DevicePowerSource * dev, chip::Attr
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
+EmberAfStatus HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
+{
+    if ((attributeId == ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID) && (maxReadLength == 2))
+    {
+        *(int16_t *) buffer = dev->GetMeasuredValue();
+    }
+    else if ((attributeId == ZCL_TEMP_MIN_MEASURED_VALUE_ATTRIBUTE_ID) && (maxReadLength == 2))
+    {
+        *(int16_t *) buffer = dev->mMin;
+    }
+    else if ((attributeId == ZCL_TEMP_MAX_MEASURED_VALUE_ATTRIBUTE_ID) && (maxReadLength == 2))
+    {
+        *(int16_t *) buffer = dev->mMax;
+    }
+    else if ((attributeId == ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID) && (maxReadLength == 4))
+    {
+        *buffer = (uint32_t) ZCL_BRIDGED_DEVICE_BASIC_FEATURE_MAP;
+    }
+    else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
+    {
+        *buffer = (uint16_t) ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION;
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
 EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                                    uint16_t maxReadLength)
@@ -624,15 +602,15 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
         {
             ret = HandleReadOnOffAttribute(static_cast<DeviceOnOff *>(dev), attributeMetadata->attributeId, buffer, maxReadLength);
         }
-        else if (clusterId == ZCL_SWITCH_CLUSTER_ID)
-        {
-            ret =
-                HandleReadSwitchAttribute(static_cast<DeviceSwitch *>(dev), attributeMetadata->attributeId, buffer, maxReadLength);
-        }
         else if (clusterId == chip::app::Clusters::PowerSource::Id)
         {
             ret = HandleReadPowerSourceAttribute(static_cast<DevicePowerSource *>(dev), attributeMetadata->attributeId, buffer,
                                                  maxReadLength);
+        }
+        else if (clusterId == TemperatureMeasurement::Id)
+        {
+            ret = HandleReadTempMeasurementAttribute(static_cast<DeviceTempSensor *>(dev), attributeMetadata->attributeId, buffer,
+                                                     maxReadLength);
         }
     }
 
@@ -742,14 +720,14 @@ void ApplicationInit() {}
 const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
                                                        { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 
-const EmberAfDeviceType gBridgedSwitchDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT_SWITCH, DEVICE_VERSION_DEFAULT },
-                                                        { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
-
 const EmberAfDeviceType gBridgedComposedDeviceTypes[] = { { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 
-const EmberAfDeviceType gComposedSwitchDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT_SWITCH, DEVICE_VERSION_DEFAULT } };
+const EmberAfDeviceType gComposedTempSensorDeviceTypes[] = { { DEVICE_TYPE_TEMP_SENSOR, DEVICE_VERSION_DEFAULT } };
 
 const EmberAfDeviceType gComposedPowerSourceDeviceTypes[] = { { DEVICE_TYPE_POWER_SOURCE, DEVICE_VERSION_DEFAULT } };
+
+const EmberAfDeviceType gBridgedTempSensorDeviceTypes[] = { { DEVICE_TYPE_TEMP_SENSOR, DEVICE_VERSION_DEFAULT },
+                                                            { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 
 #define POLL_INTERVAL_MS (100)
 uint8_t poll_prescale = 0;
@@ -760,6 +738,8 @@ bool kbhit()
     ioctl(0, FIONREAD, &byteswaiting);
     return byteswaiting > 0;
 }
+
+const int16_t oneDegree = 100;
 
 void * bridge_polling_thread(void * context)
 {
@@ -815,6 +795,14 @@ void * bridge_polling_thread(void * context)
                 {
                     Light2.Toggle();
                 }
+            }
+            if (ch == 't')
+            {
+                // TC-BR-4 step 1g, change the state of the temperature sensors
+                TempSensor1.SetMeasuredValue(static_cast<int16_t>(TempSensor1.GetMeasuredValue() + oneDegree));
+                TempSensor2.SetMeasuredValue(static_cast<int16_t>(TempSensor2.GetMeasuredValue() + oneDegree));
+                ComposedTempSensor1.SetMeasuredValue(static_cast<int16_t>(ComposedTempSensor1.GetMeasuredValue() + oneDegree));
+                ComposedTempSensor2.SetMeasuredValue(static_cast<int16_t>(ComposedTempSensor2.GetMeasuredValue() + oneDegree));
             }
 
             // Commands used for the actions cluster test plan.
@@ -878,11 +866,14 @@ int main(int argc, char * argv[])
     Light1.SetReachable(true);
     Light2.SetReachable(true);
 
-    Switch1.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
-    Switch2.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
+    TempSensor1.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
+    TempSensor2.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
 
-    Switch1.SetReachable(true);
-    Switch2.SetReachable(true);
+    TempSensor1.SetReachable(true);
+    TempSensor1.SetReachable(true);
+
+    TempSensor1.SetMeasuredValue(100);
+    TempSensor2.SetMeasuredValue(100);
 
     // Setup devices for action cluster tests
     ActionLight1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
@@ -895,22 +886,20 @@ int main(int argc, char * argv[])
     ActionLight3.SetReachable(true);
     ActionLight4.SetReachable(true);
 
-    // Define composed device with two switches
-    ComposedDevice ComposedDevice("Composed Switcher", "Bedroom");
-    DeviceSwitch ComposedSwitch1("Composed Switch 1", "Bedroom", EMBER_AF_SWITCH_FEATURE_LATCHING_SWITCH);
-    DeviceSwitch ComposedSwitch2("Composed Switch 2", "Bedroom",
-                                 EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH | EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_RELEASE |
-                                     EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_LONG_PRESS |
-                                     EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_MULTI_PRESS);
+    // Define composed device with two temperature sensors
+    ComposedDevice ComposedDevice("Composed Device", "Bedroom");
     DevicePowerSource ComposedPowerSource("Composed Power Source", "Bedroom", EMBER_AF_POWER_SOURCE_FEATURE_BATTERY);
 
-    ComposedSwitch1.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
-    ComposedSwitch2.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
+    ComposedTempSensor1.SetMeasuredValue(100);
+    ComposedTempSensor2.SetMeasuredValue(100);
+
+    ComposedTempSensor1.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
+    ComposedTempSensor2.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
     ComposedPowerSource.SetChangeCallback(&HandleDevicePowerSourceStatusChanged);
 
     ComposedDevice.SetReachable(true);
-    ComposedSwitch1.SetReachable(true);
-    ComposedSwitch2.SetReachable(true);
+    ComposedTempSensor1.SetReachable(true);
+    ComposedTempSensor2.SetReachable(true);
     ComposedPowerSource.SetReachable(true);
     ComposedPowerSource.SetBatChargeLevel(58);
 
@@ -948,19 +937,20 @@ int main(int argc, char * argv[])
     AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                       Span<DataVersion>(gLight1DataVersions), 1);
 
-    // Add switch 1..2 --> will be mapped to ZCL endpoints 4,5
-    AddDeviceEndpoint(&Switch1, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gBridgedSwitchDeviceTypes),
-                      Span<DataVersion>(gSwitch1DataVersions), 1);
-    AddDeviceEndpoint(&Switch2, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gBridgedSwitchDeviceTypes),
-                      Span<DataVersion>(gSwitch2DataVersions), 1);
+    // Add Temperature Sensor devices --> will be mapped to endpoints 4,5
+    AddDeviceEndpoint(&TempSensor1, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gBridgedTempSensorDeviceTypes),
+                      Span<DataVersion>(gTempSensor1DataVersions), 1);
+    AddDeviceEndpoint(&TempSensor2, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gBridgedTempSensorDeviceTypes),
+                      Span<DataVersion>(gTempSensor2DataVersions), 1);
 
-    // Add composed Device with two buttons and a power source
+
+    // Add composed Device with two temperature sensors and a power source
     AddDeviceEndpoint(&ComposedDevice, &bridgedComposedDeviceEndpoint, Span<const EmberAfDeviceType>(gBridgedComposedDeviceTypes),
                       Span<DataVersion>(gComposedDeviceDataVersions), 1);
-    AddDeviceEndpoint(&ComposedSwitch1, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gComposedSwitchDeviceTypes),
-                      Span<DataVersion>(gComposedSwitch1DataVersions), ComposedDevice.GetEndpointId());
-    AddDeviceEndpoint(&ComposedSwitch2, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gComposedSwitchDeviceTypes),
-                      Span<DataVersion>(gComposedSwitch2DataVersions), ComposedDevice.GetEndpointId());
+    AddDeviceEndpoint(&ComposedTempSensor1, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
+                      Span<DataVersion>(gComposedTempSensor1DataVersions), ComposedDevice.GetEndpointId());
+    AddDeviceEndpoint(&ComposedTempSensor2, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
+                      Span<DataVersion>(gComposedTempSensor2DataVersions), ComposedDevice.GetEndpointId());
     AddDeviceEndpoint(&ComposedPowerSource, &bridgedPowerSourceEndpoint,
                       Span<const EmberAfDeviceType>(gComposedPowerSourceDeviceTypes),
                       Span<DataVersion>(gComposedPowerSourceDataVersions), ComposedDevice.GetEndpointId());
