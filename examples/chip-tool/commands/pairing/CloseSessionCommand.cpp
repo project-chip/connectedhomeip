@@ -29,14 +29,14 @@ CHIP_ERROR CloseSessionCommand::RunCommand()
     if (CHIP_NO_ERROR == CurrentCommissioner().GetDeviceBeingCommissioned(mDestinationId, &commissioneeDeviceProxy))
     {
         VerifyOrReturnError(commissioneeDeviceProxy->GetSecureSession().HasValue(), CHIP_ERROR_INCORRECT_STATE);
-        return CloseSession(*commissioneeDeviceProxy->GetExchangeManager, commissioneeDeviceProxy->GetSecureSession().Value());
+        return CloseSession(*commissioneeDeviceProxy->GetExchangeManager(), commissioneeDeviceProxy->GetSecureSession().Value());
     }
 
     return CurrentCommissioner().GetConnectedDevice(mDestinationId, &mOnDeviceConnectedCallback,
                                                     &mOnDeviceConnectionFailureCallback);
 }
 
-CHIP_ERROR CloseSessionCommand::CloseSession(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+CHIP_ERROR CloseSessionCommand::CloseSession(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     // TODO perhaps factor out this code into something on StatusReport that
     // takes an exchange and maybe a SendMessageFlags?

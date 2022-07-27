@@ -52,7 +52,7 @@ Engine sShellSwitchBindingSubCommands;
 namespace {
 
 void ProcessOnOffUnicastBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding,
-                                       Messaging::ExchangeManager * exchangeMgr, SessionHandle & sessionHandle)
+                                       Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         ChipLogProgress(NotSpecified, "OnOff command succeeds");

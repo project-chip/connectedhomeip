@@ -51,7 +51,7 @@ private:
     static void OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     // Try to send the action CloseSession status report.
-    CHIP_ERROR CloseSession(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    CHIP_ERROR CloseSession(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
