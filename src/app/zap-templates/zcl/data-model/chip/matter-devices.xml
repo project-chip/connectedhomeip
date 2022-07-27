@@ -1970,13 +1970,10 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
-                <requireAttribute>BINDING</requireAttribute>
-            </include>
             <include cluster="Media Playback" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Keypad Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Application Launcher" client="false" server="true" clientLocked="false" serverLocked="false"></include>
-            <include cluster="Media Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Media Input" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="On/Off" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Channel" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Audio Output" client="false" server="true" clientLocked="false" serverLocked="false"></include>
