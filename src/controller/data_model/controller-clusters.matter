@@ -478,7 +478,7 @@ client cluster AccessControl = 31 {
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable AccessControlEntry latestValue = 4;
-    fabric_idx adminFabricIndex = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   info event access(read: administer) AccessControlExtensionChanged = 1 {
@@ -486,7 +486,7 @@ client cluster AccessControl = 31 {
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable ExtensionEntry latestValue = 4;
-    fabric_idx adminFabricIndex = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   attribute access(read: administer, write: administer) AccessControlEntry acl[] = 0;
@@ -4168,7 +4168,7 @@ client cluster TestCluster = 4294048773 {
   }
 
   info event TestFabricScopedEvent = 2 {
-    fabric_idx arg1 = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   attribute boolean boolean = 0;
