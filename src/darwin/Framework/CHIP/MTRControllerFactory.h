@@ -25,6 +25,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTRPersistentStorageDelegate;
+@protocol MTROTAProviderDelegate;
 @protocol MTRKeypair;
 
 @class MTRDeviceController;
@@ -37,6 +38,13 @@ NS_ASSUME_NONNULL_BEGIN
  * controllers ends up interacting with.
  */
 @property (strong, nonatomic, readonly) id<MTRPersistentStorageDelegate> storageDelegate;
+
+/*
+ * OTA Provider delegate to be called when an OTA Requestor is requesting a software update.
+ * Defaults to nil.
+ */
+@property (strong, nonatomic, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
+
 /*
  * The Product Attestation Authority certificates that are trusted to sign
  * device attestation information.  Defaults to nil.
