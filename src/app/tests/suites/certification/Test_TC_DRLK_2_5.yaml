@@ -80,7 +80,7 @@ tests:
               - name: "nextUserIndex"
                 value: null
 
-    - label: "Get Max number of Week Day schedules for user"
+    - label: "TH reads NumberOfWeekDay SchedulesSupportedPerUser attribute"
       PICS: DRLK.S.F04 && DRLK.S.A0014
       command: "readAttribute"
       attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
@@ -90,7 +90,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Get number of supported users"
+    - label: "TH reads NumberOfTotalUsers Supported attribute"
       PICS: DRLK.S.F08 && DRLK.S.A0011
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
@@ -100,7 +100,7 @@ tests:
               minValue: 0
               maxValue: 65534
 
-    - label: "Send Set Week Day Schedule Command to DUT"
+    - label: "TH send Set Week Day Schedule Command"
       PICS: DRLK.S.F04 && DRLK.S.C0b.Rsp
       command: "SetWeekDaySchedule"
       arguments:
@@ -121,7 +121,7 @@ tests:
                 value: 55
 
     #issue #18591
-    - label: "send GetWeekDay Schedule Command "
+    - label: "TH send Get Week Day Schedule Command to DUT"
       PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
       command: "GetWeekDaySchedule"
       arguments:
@@ -133,44 +133,27 @@ tests:
       response:
           values:
               - name: "weekDayIndex"
-                constraints:
-                    minValue: 1
-                    maxValue: NumberOfWeekDaySchedulesSupportedPerUser
+                value: 1
               - name: "userIndex"
-                constraints:
-                    minValue: 1
-                    maxValue: NumberOfTotalUsersSupported
+                value: 1
               - name: "status"
                 value: 0x0
               - name: "daysMask"
-                constraints:
-                    hasValue: true
-                    minValue: 0
-                    maxValue: 6
+                value: 2
               - name: "startHour"
-                constraints:
-                    hasValue: true
-                    minValue: 0
-                    maxValue: 23
+                value: 15
               - name: "startMinute"
-                constraints:
-                    hasValue: true
-                    minValue: 0
-                    maxValue: 59
+                value: 45
               - name: "endHour"
                 constraints:
                     hasValue: true
-                    minValue: 0
-                    maxValue: 23
+                    minValue: 16
               - name: "endMinute"
                 constraints:
                     hasValue: true
-                    minValue: 0
-                    maxValue: 59
+                    minValue: 55
 
-    - label:
-          "Send Set Week Day Schedule Command to DUT and verify INVALID_COMMAND
-          response"
+    - label: "TH send Set Week Day Schedule Command"
       PICS: DRLK.S.F04 && DRLK.S.C0b.Rsp
       command: "SetWeekDaySchedule"
       arguments:
@@ -192,9 +175,7 @@ tests:
       response:
           error: INVALID_COMMAND
 
-    - label:
-          "send GetWeekDay Schedule Command to DUT and verify INVALID_COMMAND
-          response"
+    - label: "TH send Get Week Day Schedule Command to DUT"
       PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
       command: "GetWeekDaySchedule"
       arguments:
@@ -227,7 +208,7 @@ tests:
                 constraints:
                     hasValue: false
 
-    - label: "Clear all week day schedules for the first user"
+    - label: "TH sends Clear Week Day Schedule Command to DUT"
       PICS: DRLK.S.F04 && DRLK.S.C0d.Rsp
       command: "ClearWeekDaySchedule"
       arguments:
@@ -237,19 +218,19 @@ tests:
               - name: "userIndex"
                 value: 1
 
-    - label: "send GetWeekDay Schedule Command "
+    - label: "TH sends Get Week Day Schedule Command to DUT"
       PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
       command: "GetWeekDaySchedule"
       arguments:
           values:
               - name: "weekDayIndex"
-                value: 2
+                value: 1
               - name: "userIndex"
                 value: 1
       response:
           values:
               - name: "weekDayIndex"
-                value: 2
+                value: 1
               - name: "userIndex"
                 value: 1
               - name: "status"
