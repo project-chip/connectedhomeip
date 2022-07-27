@@ -101,6 +101,7 @@ def get_field_type(definition: Field, cluster: Cluster, idl: Idl):
         return 'OctetString<{}, {}>'.format(size, matterType)
     return '{}<{}, {}, {}>'.format(container, cType, size, matterType)
 
+
 def get_attr_type(attr: Attribute, cluster: Cluster, idl: Idl):
     decl = get_field_type(attr.definition, cluster, idl)
     if attr.definition.is_list:
