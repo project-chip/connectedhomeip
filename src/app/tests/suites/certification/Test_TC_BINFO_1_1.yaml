@@ -35,7 +35,12 @@ tests:
 
           [1651214669.313397][2666:2671] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFFD DataVersion: 158558310
           [1651214669.313472][2666:2671] CHIP:TOO:   ClusterRevision: 1
-      disabled: true
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: uint16
 
     - label: "TH reads the FeatureMap from DUT"
       verification: |
@@ -46,7 +51,12 @@ tests:
           [1653459580.065669][29174:29179] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFFC DataVersion: 46104872
           [1653459580.065758][29174:29179] CHIP:TOO:   FeatureMap: 0
           [1653459580.065936][29174:29179] CHIP:EM: Sending Standalone Ack for MessageCounter:14961519 on exchange 31457i
-      disabled: true
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
 
     - label: "TH reads AttributeList from DUT"
       verification: |
@@ -81,7 +91,12 @@ tests:
           [1657021528.886209][7089:7094] CHIP:TOO:     [23]: 65531
           [1657021528.886234][7089:7094] CHIP:TOO:     [24]: 65532
           [1657021528.886258][7089:7094] CHIP:TOO:     [25]: 65533
-      disabled: true
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [25]
 
     - label: "TH reads EventList from DUT"
       verification: |
@@ -96,7 +111,12 @@ tests:
 
           [1651214820.355561][2695:2700] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFF9 DataVersion: 158558310
           [1651214820.355673][2695:2700] CHIP:TOO:   AcceptedCommandList: 0 entries
-      disabled: true
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
     - label: "TH reads GeneratedCommandList from DUT"
       verification: |
@@ -106,4 +126,9 @@ tests:
 
           [1651214861.208575][2702:2707] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFF8 DataVersion: 158558310
           [1651214861.208682][2702:2707] CHIP:TOO:   GeneratedCommandList: 0 entries
-      disabled: true
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
