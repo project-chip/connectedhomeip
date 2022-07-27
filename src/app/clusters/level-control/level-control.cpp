@@ -403,8 +403,8 @@ static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, uint8_t
 bool emberAfLevelControlClusterMoveToLevelCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                    const Commands::MoveToLevel::DecodableType & commandData)
 {
-    auto & level          = commandData.level;
-    auto & transitionTime = commandData.transitionTime;
+    auto & level           = commandData.level;
+    auto & transitionTime  = commandData.transitionTime;
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
@@ -423,15 +423,15 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler 
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::MoveToLevelWithOnOff::DecodableType & commandData)
 {
-    auto & level          = commandData.level;
-    auto & transitionTime = commandData.transitionTime;
+    auto & level           = commandData.level;
+    auto & transitionTime  = commandData.transitionTime;
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
     emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL_WITH_ON_OFF %x %2x", "RX level-control:", level, transitionTime);
-    EmberAfStatus status =
-        moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevelWithOnOff::Id, level, transitionTime, optionsMask, optionsOverride,
-                           INVALID_STORED_LEVEL); // Don't revert to the stored level
+    EmberAfStatus status = moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevelWithOnOff::Id, level, transitionTime,
+                                              optionsMask, optionsOverride,
+                                              INVALID_STORED_LEVEL); // Don't revert to the stored level
 
     emberAfSendImmediateDefaultResponse(status);
 
@@ -441,8 +441,8 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler 
 bool emberAfLevelControlClusterMoveCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                             const Commands::Move::DecodableType & commandData)
 {
-    auto & moveMode       = commandData.moveMode;
-    auto & rate           = commandData.rate;
+    auto & moveMode        = commandData.moveMode;
+    auto & rate            = commandData.rate;
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
@@ -454,8 +454,8 @@ bool emberAfLevelControlClusterMoveCallback(app::CommandHandler * commandObj, co
 bool emberAfLevelControlClusterMoveWithOnOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                      const Commands::MoveWithOnOff::DecodableType & commandData)
 {
-    auto & moveMode = commandData.moveMode;
-    auto & rate     = commandData.rate;
+    auto & moveMode        = commandData.moveMode;
+    auto & rate            = commandData.rate;
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
@@ -467,9 +467,9 @@ bool emberAfLevelControlClusterMoveWithOnOffCallback(app::CommandHandler * comma
 bool emberAfLevelControlClusterStepCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                             const Commands::Step::DecodableType & commandData)
 {
-    auto & stepMode       = commandData.stepMode;
-    auto & stepSize       = commandData.stepSize;
-    auto & transitionTime = commandData.transitionTime;
+    auto & stepMode        = commandData.stepMode;
+    auto & stepSize        = commandData.stepSize;
+    auto & transitionTime  = commandData.transitionTime;
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
@@ -481,14 +481,15 @@ bool emberAfLevelControlClusterStepCallback(app::CommandHandler * commandObj, co
 bool emberAfLevelControlClusterStepWithOnOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                      const Commands::StepWithOnOff::DecodableType & commandData)
 {
-    auto & stepMode       = commandData.stepMode;
-    auto & stepSize       = commandData.stepSize;
-    auto & transitionTime = commandData.transitionTime;
+    auto & stepMode        = commandData.stepMode;
+    auto & stepSize        = commandData.stepSize;
+    auto & transitionTime  = commandData.transitionTime;
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
     emberAfLevelControlClusterPrintln("%pSTEP_WITH_ON_OFF %x %x %2x", "RX level-control:", stepMode, stepSize, transitionTime);
-    stepHandler(commandPath.mEndpointId, Commands::StepWithOnOff::Id, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    stepHandler(commandPath.mEndpointId, Commands::StepWithOnOff::Id, stepMode, stepSize, transitionTime, optionsMask,
+                optionsOverride);
     return true;
 }
 
