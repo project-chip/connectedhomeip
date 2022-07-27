@@ -974,13 +974,13 @@ CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
     return CHIP_NO_ERROR;
 }
 
-void ReadClient::HandleDeviceConnected(void * context, OperationalDeviceProxy * device)
+void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
 {
     ReadClient * const _this = static_cast<ReadClient *>(context);
     VerifyOrDie(_this != nullptr);
 
-    ChipLogProgress(DataManagement, "HandleDeviceConnected %d\n", device->GetSecureSession().HasValue());
-    _this->mReadPrepareParams.mSessionHolder.Grab(device->GetSecureSession().Value());
+    ChipLogProgress(DataManagement, "HandleDeviceConnected");
+    _this->mReadPrepareParams.mSessionHolder.Grab(sessionHandle);
 
     auto err = _this->SendSubscribeRequest(_this->mReadPrepareParams);
     if (err != CHIP_NO_ERROR)
@@ -1032,11 +1032,7 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
         //       defunct has no effect on resident OperationalDeviceProxy instances that are already bound
         //       to a now-defunct CASE session.
         //
-        auto proxy = caseSessionManager->FindExistingSession(_this->mPeer);
-        if (proxy != nullptr)
-        {
-            proxy->Disconnect();
-        }
+        caseSessionManager->DisconnectSession(_this->mPeer);
 
         caseSessionManager->FindOrEstablishSession(_this->mPeer, &_this->mOnConnectedCallback,
                                                    &_this->mOnConnectionFailureCallback);
