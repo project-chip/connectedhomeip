@@ -273,7 +273,7 @@ void TestWriteChunking::TestListChunkingInvalidFabric(nlTestSuite * apSuite, voi
     registerAttributeAccessOverride(&testServer);
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute);
- 
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestWriteCallback writeCallback;
 
