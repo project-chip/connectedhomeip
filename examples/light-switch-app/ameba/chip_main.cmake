@@ -16,15 +16,16 @@ include(${pigweed_dir}/pw_protobuf_compiler/proto.cmake)
 
 set(dir_pw_third_party_nanopb "${chip_dir}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
+pw_set_module_config(pw_rpc_CONFIG pw_rpc.disable_global_mutex_config)
 pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert.check pw_assert_log.check_backend)
 pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
 pw_set_backend(pw_sys_io pw_sys_io.ameba)
 pw_set_backend(pw_trace pw_trace_tokenized)
 
-add_subdirectory(${chip_dir}/third_party/pigweed/repo ${chip_dir}/examples/all-clusters-minimal-app/ameba/out/pigweed)
-add_subdirectory(${chip_dir}/third_party/nanopb/repo ${chip_dir}/examples/all-clusters-minimal-app/ameba/out/nanopb)
-add_subdirectory(${chip_dir}/examples/platform/ameba/pw_sys_io ${chip_dir}/examples/all-clusters-minimal-app/ameba/out/pw_sys_io)
+add_subdirectory(${chip_dir}/third_party/pigweed/repo ${chip_dir}/examples/light-switch-app/ameba/out/pigweed)
+add_subdirectory(${chip_dir}/third_party/nanopb/repo ${chip_dir}/examples/light-switch-app/ameba/out/nanopb)
+add_subdirectory(${chip_dir}/examples/platform/ameba/pw_sys_io ${chip_dir}/examples/light-switch-app/ameba/out/pw_sys_io)
 
 pw_proto_library(attributes_service
   SOURCES
@@ -44,6 +45,17 @@ pw_proto_library(button_service
     ${chip_dir}/examples/common/pigweed/protos/button_service.proto
   PREFIX
     button_service
+  STRIP_PREFIX
+    ${chip_dir}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_proto
+)
+
+pw_proto_library(descriptor_service
+  SOURCES
+    ${chip_dir}/examples/common/pigweed/protos/descriptor_service.proto
+  PREFIX
+    descriptor_service
   STRIP_PREFIX
     ${chip_dir}/examples/common/pigweed/protos
   DEPS
@@ -113,6 +125,14 @@ list(
 )
 endif (matter_enable_rpc)
 
+if (matter_enable_shell)
+list(
+    APPEND ${list_chip_main_sources}
+    #shell
+    ${chip_dir}/examples/platform/ameba/shell/launch_shell.cpp
+)
+endif (matter_enable_shell)
+
 if (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
@@ -122,24 +142,25 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
+    ${chip_dir}/examples/platform/ameba/ota/OTAInitializer.cpp
 )
 endif (matter_enable_ota_requestor)
 
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/zzz_generated/all-clusters-minimal-app/zap-generated/callback-stub.cpp
-    ${chip_dir}/zzz_generated/all-clusters-minimal-app/zap-generated/IMClusterCommandHandler.cpp
+    ${chip_dir}/zzz_generated/light-switch-app/zap-generated/callback-stub.cpp
+    ${chip_dir}/zzz_generated/light-switch-app/zap-generated/IMClusterCommandHandler.cpp
 
-    ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/bridged-actions-stub.cpp
-    ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/static-supported-modes-manager.cpp
+    ${chip_dir}/examples/light-switch-app/ameba/main/chipinterface.cpp
+    ${chip_dir}/examples/light-switch-app/ameba/main/BindingHandler.cpp
+    ${chip_dir}/examples/light-switch-app/ameba/main/DeviceCallbacks.cpp
+    ${chip_dir}/examples/light-switch-app/ameba/main/CHIPDeviceManager.cpp
+    ${chip_dir}/examples/light-switch-app/ameba/main/Globals.cpp
+    ${chip_dir}/examples/light-switch-app/ameba/main/LEDWidget.cpp
+    ${chip_dir}/examples/light-switch-app/ameba/main/DsoHack.cpp
 
-    ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/chipinterface.cpp
-    ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/DeviceCallbacks.cpp
-    ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/CHIPDeviceManager.cpp
-    ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/Globals.cpp
-    ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/LEDWidget.cpp
-    ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/DsoHack.cpp
+    ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )
 
 add_library(
@@ -150,7 +171,7 @@ add_library(
 
 chip_configure_data_model(chip_main
     INCLUDE_SERVER
-    ZAP_FILE ${matter_example_path}/../all-clusters-common/all-clusters-minimal-app.zap
+    ZAP_FILE ${matter_example_path}/../light-switch-common/light-switch-app.zap
 )
 
 if (matter_enable_rpc)
@@ -173,12 +194,12 @@ target_include_directories(
     ${chip_main}
     PUBLIC
     ${inc_path}
-    ${chip_dir}/zzz_generated/all-clusters-minimal-app
-    ${chip_dir}/zzz_generated/all-clusters-minimal-app/zap-generated
+    ${chip_dir}/zzz_generated/light-switch-app
+    ${chip_dir}/zzz_generated/light-switch-app/zap-generated
     ${chip_dir}/zzz_generated/app-common
-    ${chip_dir}/examples/all-clusters-app/all-clusters-common
-    ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
-    ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/include
+    ${chip_dir}/examples/light-switch-app/ameba/main/include
+    ${chip_dir}/examples/platform/ameba
+    ${chip_dir}/examples/providers
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/
     ${chip_dir}/src/lib/
@@ -196,6 +217,7 @@ if (matter_enable_rpc)
 target_link_libraries(${chip_main} PUBLIC
     attributes_service.nanopb_rpc
     button_service.nanopb_rpc
+    descriptor_service.nanopb_rpc
     device_service.nanopb_rpc
     lighting_service.nanopb_rpc
     locking_service.nanopb_rpc
@@ -241,6 +263,7 @@ list(
 
     -DPW_RPC_ATTRIBUTE_SERVICE=1
     -DPW_RPC_BUTTON_SERVICE=1
+    -DPW_RPC_DESCRIPTOR_SERVICE=1
     -DPW_RPC_DEVICE_SERVICE=1
     -DPW_RPC_LIGHTING_SERVICE=1
     -DPW_RPC_LOCKING_SERVICE=1
@@ -248,13 +271,13 @@ list(
 )
 endif (matter_enable_rpc)
 
-if (matter_enable_ota_requestor)
+if (matter_enable_shell)
 list(
     APPEND chip_main_flags
 
-    -DCONFIG_ENABLE_OTA_REQUESTOR=1
+    -DCONFIG_ENABLE_CHIP_SHELL=1
 )
-endif (matter_enable_ota_requestor)
+endif (matter_enable_shell)
 
 list(
     APPEND chip_main_cpp_flags
