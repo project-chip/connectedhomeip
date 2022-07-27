@@ -1,11 +1,10 @@
-# CHIP Ameba All Clusters Example
+# CHIP Ameba Light Switch Example
 
-A prototype application that demonstrates device commissioning and cluster
-control.
+This example demonstrates Matter Light-Switch application on Ameba platform.
 
 ---
 
--   [CHIP Ameba All Clusters Example](#chip-ameba-all-clusters-example)
+-   [CHIP Ameba Light Switch Example](#chip-ameba-light-switch-example)
     -   [Supported Device](#supported-device)
     -   [Building the Example Application](#building-the-example-application)
     -   [Commissioning](#commissioning)
@@ -39,13 +38,13 @@ The CHIP demo application is supported on
 
 -   To build the demo application:
 
-          $ ./scripts/build/build_examples.py --target ameba-amebad-all-clusters build
+          $ ./scripts/build/build_examples.py --target ameba-amebad-light-switch build
 
     The output image files are stored in
-    `out/ameba-amebad-all-clusters/asdk/image` folder.
+    `out/ameba-amebad-light-switch/asdk/image` folder.
 
     The bootloader image files are stored in
-    `out/ameba-amebad-all-clusters/asdk/bootloader` folder.
+    `out/ameba-amebad-light-switch/asdk/bootloader` folder.
 
 -   After building the application, **Ameba Image Tool** is used to flash it to
     Ameba board.
@@ -63,7 +62,7 @@ There are two commissioning modes supported by Ameba platform:
 ### BLE mode
 
 1. Build and Flash
-2. The all-clusters example will run automatically after booting the Ameba
+2. The light-switch example will run automatically after booting the Ameba
    board.
 3. Test with
    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
@@ -71,7 +70,7 @@ There are two commissioning modes supported by Ameba platform:
 ### IP mode
 
 1. Build and Flash
-2. The all-clusters example will run automatically after booting the Ameba
+2. The light-switch example will run automatically after booting the Ameba
    board.
 3. Connect to AP using `ATW0, ATW1, ATWC` commands
 4. Test with
