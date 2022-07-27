@@ -24,9 +24,12 @@ config:
 
 tests:
     - label: "Commission DUT to TH"
-      verification: |
-
-      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "TH reads the ClusterRevision from DUT"
       verification: |
