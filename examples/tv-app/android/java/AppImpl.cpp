@@ -472,7 +472,7 @@ CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter, jobject con
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
-     // Disable last fixed endpoint, which is used as a placeholder for all of the
+    // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
     ChipLogDetail(DeviceLayer, "TV App: Disabling Fixed Content App Endpoints");
     emberAfEndpointEnableDisable(3, false);
