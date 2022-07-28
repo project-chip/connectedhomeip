@@ -269,7 +269,7 @@ public:
     {
 
         mThreadOperationalDataset.SetValue(threadOperationalDataset);
-        mAttemptThreadNetworkScan = MakeOptional(false);
+        mAttemptThreadNetworkScan = MakeOptional(static_cast<bool>(false));
         return *this;
     }
     // This parameter should be set with the information returned from kSendOpCertSigningRequest. It must be set before calling
