@@ -30,7 +30,8 @@
     MatterBindingPluginServerInitCallback();                                                                                       \
     MatterAccessControlPluginServerInitCallback();                                                                                 \
     MatterBasicPluginServerInitCallback();                                                                                         \
-    MatterOtaSoftwareUpdateProviderPluginServerInitCallback();                                                                     \
+    MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
+    MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \
     MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterTimeFormatLocalizationPluginServerInitCallback();                                                                        \
     MatterUnitLocalizationPluginServerInitCallback();                                                                              \
