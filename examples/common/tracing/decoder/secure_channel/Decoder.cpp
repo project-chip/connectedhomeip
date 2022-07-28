@@ -35,7 +35,6 @@ constexpr const char * kPBKDFParamResponse = "Password-Based Key Derivation Para
 constexpr const char * kPASE_Pake1         = "Password Authenticated Session Establishment '1'";
 constexpr const char * kPASE_Pake2         = "Password Authenticated Session Establishment '2'";
 constexpr const char * kPASE_Pake3         = "Password Authenticated Session Establishment '3'";
-constexpr const char * kPASE_PakeError     = "Password-authenticated key exchange Error";
 constexpr const char * kCASE_Sigma1        = "Certificate Authenticated Session Establishment Sigma '1'";
 constexpr const char * kCASE_Sigma2        = "Certificate Authenticated Session Establishment Sigma '2'";
 constexpr const char * kCASE_Sigma3        = "Certificate Authenticated Session Establishment Sigma '3'";
@@ -60,7 +59,6 @@ CHIP_ERROR DecodePBDFKParamResponse(TLV::TLVReader & reader);
 CHIP_ERROR DecodePASEPake1(TLV::TLVReader & reader);
 CHIP_ERROR DecodePASEPake2(TLV::TLVReader & reader);
 CHIP_ERROR DecodePASEPake3(TLV::TLVReader & reader);
-CHIP_ERROR DecodePASEPakeError(TLV::TLVReader & reader);
 CHIP_ERROR DecodeCASESigma1(TLV::TLVReader & reader);
 CHIP_ERROR DecodeCASESigma2(TLV::TLVReader & reader);
 CHIP_ERROR DecodeCASESigma3(TLV::TLVReader & reader);
@@ -92,8 +90,6 @@ const char * ToProtocolMessageTypeName(uint8_t protocolCode)
         return kPASE_Pake2;
     case to_underlying(MessageType::PASE_Pake3):
         return kPASE_Pake3;
-    case to_underlying(MessageType::PASE_PakeError):
-        return kPASE_PakeError;
     case to_underlying(MessageType::CASE_Sigma1):
         return kCASE_Sigma1;
     case to_underlying(MessageType::CASE_Sigma2):
@@ -132,8 +128,6 @@ CHIP_ERROR LogAsProtocolMessage(uint8_t protocolCode, const uint8_t * data, size
         return DecodePASEPake2(reader);
     case to_underlying(MessageType::PASE_Pake3):
         return DecodePASEPake3(reader);
-    case to_underlying(MessageType::PASE_PakeError):
-        return DecodePASEPakeError(reader);
     case to_underlying(MessageType::CASE_Sigma1):
         return DecodeCASESigma1(reader);
     case to_underlying(MessageType::CASE_Sigma2):
@@ -321,11 +315,6 @@ CHIP_ERROR DecodePASEPake3(TLV::TLVReader & reader)
     auto scopedIndent = ScopedLogIndent("Parameters");
     Log("cA", cA);
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodePASEPakeError(TLV::TLVReader & reader)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR DecodeCASESigma1(TLV::TLVReader & reader)
