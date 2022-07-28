@@ -77,6 +77,12 @@ void LayerImplSelect::Shutdown()
         }
     }
     mTimerPool.ReleaseAll();
+
+    for (auto & w : mSocketWatchPool)
+    {
+        w.DisableAndClear();
+    }
+
 #else  // CHIP_SYSTEM_CONFIG_USE_DISPATCH
     mTimerList.Clear();
     mTimerPool.ReleaseAll();
@@ -248,23 +254,32 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingRead(SocketWatchToken token)
     watch->mPendingIO.Set(SocketEventFlags::kRead);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t dispatchQueue = GetDispatchQueue();
-    if (watch->mWrSource)
+    if (watch->mRdSource == nullptr)
     {
-        dispatch_resume(watch->mRdSource);
-    }
-    else
-    {
-        if (dispatchQueue)
+        // First time requesting callback for read events: install a dispatch source
+        dispatch_queue_t dispatchQueue = GetDispatchQueue();
+        if (dispatchQueue == nullptr)
+        {
+            // Note: if no dispatch queue is available, callbacks most probably will not work,
+            //       unless, as in some tests from a test-specific local loop,
+            //       the select based event handling (Prepare/WaitFor/HandleEvents) is invoked.
+            ChipLogError(DeviceLayer,
+                         "RequestCallbackOnPendingRead with no dispatch queue: callback may not work (might be ok in tests)");
+        }
+        else
         {
             watch->mRdSource =
                 dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, static_cast<uintptr_t>(watch->mFD), 0, dispatchQueue);
             ReturnErrorCodeIf(watch->mRdSource == nullptr, CHIP_ERROR_NO_MEMORY);
             dispatch_source_set_event_handler(watch->mRdSource, ^{
-                SocketEvents events;
-                events.Set(SocketEventFlags::kRead);
-                watch->mCallback(events, watch->mCallbackData);
+                if (watch->mPendingIO.Has(SocketEventFlags::kRead) && watch->mCallback != nullptr)
+                {
+                    SocketEvents events;
+                    events.Set(SocketEventFlags::kRead);
+                    watch->mCallback(events, watch->mCallbackData);
+                }
             });
+            // only now we are sure the source exists and can become active
             dispatch_activate(watch->mRdSource);
         }
     }
@@ -281,23 +296,33 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingWrite(SocketWatchToken token
     watch->mPendingIO.Set(SocketEventFlags::kWrite);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    if (watch->mWrSource)
+    if (watch->mWrSource == nullptr)
     {
-        dispatch_resume(watch->mWrSource);
-    }
-    else
-    {
+        // First time requesting callback for read events: install a dispatch source
         dispatch_queue_t dispatchQueue = GetDispatchQueue();
-        if (dispatchQueue)
+        if (dispatchQueue == nullptr)
+        {
+            // Note: if no dispatch queue is available, callbacks most probably will not work,
+            //       unless, as in some tests from a test-specific local loop,
+            //       the select based event handling (Prepare/WaitFor/HandleEvents) is invoked.
+            ChipLogError(DeviceLayer,
+                         "RequestCallbackOnPendingWrite with no dispatch queue: callback may not work (might be ok in tests)");
+        }
+        else
         {
             watch->mWrSource =
                 dispatch_source_create(DISPATCH_SOURCE_TYPE_WRITE, static_cast<uintptr_t>(watch->mFD), 0, dispatchQueue);
             ReturnErrorCodeIf(watch->mWrSource == nullptr, CHIP_ERROR_NO_MEMORY);
             dispatch_source_set_event_handler(watch->mWrSource, ^{
-                SocketEvents events;
-                events.Set(SocketEventFlags::kWrite);
-                watch->mCallback(events, watch->mCallbackData);
+                if (watch->mPendingIO.Has(SocketEventFlags::kWrite) && watch->mCallback != nullptr)
+                {
+                    SocketEvents events;
+                    events.Set(SocketEventFlags::kWrite);
+                    watch->mCallback(events, watch->mCallbackData);
+                }
             });
+            // only now we are sure the source exists and can become active
+            watch->mPendingIO.Set(SocketEventFlags::kWrite);
             dispatch_activate(watch->mWrSource);
         }
     }
@@ -310,14 +335,8 @@ CHIP_ERROR LayerImplSelect::ClearCallbackOnPendingRead(SocketWatchToken token)
 {
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    watch->mPendingIO.Clear(SocketEventFlags::kRead);
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    if (watch->mRdSource)
-    {
-        dispatch_suspend(watch->mRdSource);
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    watch->mPendingIO.Clear(SocketEventFlags::kRead);
 
     return CHIP_NO_ERROR;
 }
@@ -326,14 +345,8 @@ CHIP_ERROR LayerImplSelect::ClearCallbackOnPendingWrite(SocketWatchToken token)
 {
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    watch->mPendingIO.Clear(SocketEventFlags::kWrite);
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    if (watch->mWrSource)
-    {
-        dispatch_suspend(watch->mWrSource);
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    watch->mPendingIO.Clear(SocketEventFlags::kWrite);
 
     return CHIP_NO_ERROR;
 }
@@ -347,21 +360,10 @@ CHIP_ERROR LayerImplSelect::StopWatchingSocket(SocketWatchToken * tokenInOut)
     VerifyOrReturnError(watch->mFD >= 0, CHIP_ERROR_INCORRECT_STATE);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    if (watch->mRdSource)
-    {
-        dispatch_cancel(watch->mRdSource);
-        dispatch_release(watch->mRdSource);
-    }
-    if (watch->mWrSource)
-    {
-        dispatch_cancel(watch->mWrSource);
-        dispatch_release(watch->mWrSource);
-    }
-#endif
-
+    watch->DisableAndClear();
+#else
     watch->Clear();
 
-#if !CHIP_SYSTEM_CONFIG_USE_DISPATCH
     // Wake the thread calling select so that it stops selecting on the socket.
     Signal();
 #endif
@@ -510,6 +512,23 @@ void LayerImplSelect::SocketWatch::Clear()
     mWrSource = nullptr;
 #endif
 }
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+void LayerImplSelect::SocketWatch::DisableAndClear()
+{
+    if (mRdSource)
+    {
+        dispatch_source_cancel(mRdSource);
+        dispatch_release(mRdSource);
+    }
+    if (mWrSource)
+    {
+        dispatch_source_cancel(mWrSource);
+        dispatch_release(mWrSource);
+    }
+    Clear();
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 } // namespace System
 } // namespace chip
