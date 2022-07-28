@@ -59,7 +59,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           constraints:
-              type: int16u
+              type: Percent100ths
               minValue: 0
               maxValue: 9999
 
@@ -72,7 +72,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       response:
           constraints:
-              type: int8u
+              type: Percent
               minValue: 0
               maxValue: 99
 
@@ -85,7 +85,7 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           constraints:
-              type: int16u
+              type: Percent100ths
               minValue: 0
               maxValue: 9999
 
@@ -98,7 +98,7 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       response:
           constraints:
-              type: int8u
+              type: Percent
               minValue: 0
               maxValue: 99
 
@@ -191,7 +191,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           constraints:
-              type: int16u
+              type: Percent100ths
               minValue: 1
               maxValue: 10000
 
@@ -204,7 +204,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       response:
           constraints:
-              type: int8u
+              type: Percent
               minValue: 1
               maxValue: 100
 
@@ -217,7 +217,7 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           constraints:
-              type: int16u
+              type: Percent100ths
               minValue: 1
               maxValue: 10000
 
@@ -230,7 +230,7 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       response:
           constraints:
-              type: int8u
+              type: Percent
               minValue: 1
               maxValue: 100
 
@@ -280,7 +280,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
       response:
           constraints:
-              type: int16u
+              type: Percent100ths
               minValue: 1
               maxValue: 10000
 
@@ -293,6 +293,6 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
       response:
           constraints:
-              type: int16u
+              type: Percent100ths
               minValue: 1
               maxValue: 10000
