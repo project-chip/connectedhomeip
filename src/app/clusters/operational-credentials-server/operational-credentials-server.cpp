@@ -48,7 +48,6 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/DeviceInfoProvider.h>
 #include <string.h>
 #include <trace/trace.h>
 
@@ -270,38 +269,9 @@ const FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
 
-void MatterRelatedDataCleanup()
-{
-    // Delete all user label data on the node which was added since it was commissioned.
-    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
-
-    if (provider)
-    {
-        for (auto endpoint : EnabledEndpointsWithServerCluster(UserLabel::Id))
-        {
-            // If UserLabel cluster is implemented on this endpoint
-            if (CHIP_NO_ERROR != provider->ClearUserLabelList(endpoint))
-            {
-                ChipLogError(Zcl, "OperationalCredentials: Failed to clear UserLabelList for endpoint:%d", endpoint);
-            }
-        }
-    }
-
-    // TODO: The device SHALL delete all other Matter related data on the node which was created since it was commissioned.
-    // This includes all Fabric-Scoped data, including Access Control List, bindings, scenes, group keys, operational
-    // certificates, etc.
-}
-
 CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
 {
     ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().Delete(fabricIndex));
-
-    // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
-    // related data on the node which was created since it was commissioned.
-    if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
-    {
-        MatterRelatedDataCleanup();
-    }
 
     // We need to withdraw the advertisement for the now-removed fabric, so need
     // to restart advertising altogether.

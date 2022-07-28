@@ -66,8 +66,9 @@ CHIP_ERROR DeviceInfoProvider::ClearUserLabelList(EndpointId endpoint)
 {
     size_t length;
 
-    ReturnErrorOnFailure(GetUserLabelLength(endpoint, length));
-    ReturnErrorOnFailure(SetUserLabelLength(endpoint, 0));
+    CHIP_ERROR err = GetUserLabelLength(endpoint, length);
+    VerifyOrReturnError(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(err);
 
     for (size_t i = 0; i < length; i++)
     {
