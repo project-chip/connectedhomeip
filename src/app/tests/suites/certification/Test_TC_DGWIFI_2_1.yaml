@@ -34,7 +34,7 @@ tests:
       attribute: "BSSID"
       response:
           constraints:
-              type: octstr
+              type: octet_string
 
     #issue #13645
     - label: "Reads SecurityType attribute constraints"

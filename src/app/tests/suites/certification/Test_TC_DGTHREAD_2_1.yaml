@@ -452,7 +452,7 @@ tests:
       attribute: "ChannelMask"
       response:
           constraints:
-              type: octstr
+              type: octet_string
 
     #issue #14097
     - label:
