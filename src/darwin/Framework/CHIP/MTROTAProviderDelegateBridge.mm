@@ -17,6 +17,7 @@
 
 #import "MTROTAProviderDelegateBridge.h"
 #import "NSDataSpanConversion.h"
+#import "NSStringSpanConversion.h"
 
 #include <app/clusters/ota-provider/ota-provider.h>
 #include <lib/support/TypeTraits.h>
@@ -362,7 +363,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
 
                 char uriBuffer[kMaxBDXURILen];
                 MutableCharSpan uri(uriBuffer);
-                err = bdx::MakeURI(targetNodeId.GetNodeId(), CharSpan::fromCharString([data.imageURI UTF8String]), uri);
+                err = bdx::MakeURI(targetNodeId.GetNodeId(), AsCharSpan(data.imageURI), uri);
                 if (CHIP_NO_ERROR != err) {
                     LogErrorOnFailure(err);
                     handler->AddStatus(cachedCommandPath, Protocols::InteractionModel::Status::Failure);
@@ -462,9 +463,7 @@ CHIP_ERROR MTROTAProviderDelegateBridge::ConvertToQueryImageParams(
     }
 
     if (commandData.location.HasValue()) {
-        commandParams.location = [[NSString alloc] initWithBytes:commandData.location.Value().data()
-                                                          length:commandData.location.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
+        commandParams.location = AsString(commandData.location.Value());
     }
 
     if (commandData.requestorCanConsent.HasValue()) {
@@ -488,7 +487,7 @@ void MTROTAProviderDelegateBridge::ConvertFromQueryImageResponseParms(
     }
 
     if (responseParams.imageURI) {
-        response.imageURI.SetValue(CharSpan([responseParams.imageURI UTF8String], responseParams.imageURI.length));
+        response.imageURI.SetValue(AsCharSpan(responseParams.imageURI));
     }
 
     if (responseParams.softwareVersion) {
@@ -496,8 +495,7 @@ void MTROTAProviderDelegateBridge::ConvertFromQueryImageResponseParms(
     }
 
     if (responseParams.softwareVersionString) {
-        response.softwareVersionString.SetValue(
-            CharSpan([responseParams.softwareVersionString UTF8String], responseParams.softwareVersionString.length));
+        response.softwareVersionString.SetValue(AsCharSpan(responseParams.softwareVersionString));
     }
 
     if (responseParams.updateToken) {
