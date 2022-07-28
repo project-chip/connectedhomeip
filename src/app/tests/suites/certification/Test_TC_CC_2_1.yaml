@@ -210,7 +210,7 @@ tests:
       response:
           value: FeatureMapValue
           constraints:
-              type: map16
+              type: bitmap16
               minValue: 0
               maxValue: 31
 

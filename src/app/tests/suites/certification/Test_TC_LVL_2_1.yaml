@@ -221,7 +221,7 @@ tests:
       response:
           value: 0
           constraints:
-              type: map8
+              type: bitmap8
 
     - label: "Reads the StartUpCurrentLevel attribute "
       PICS: LVL.S.A4000

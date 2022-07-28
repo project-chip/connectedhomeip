@@ -34,7 +34,7 @@ tests:
       attribute: "occupancy"
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 0
               maxValue: 1
 
@@ -54,7 +54,7 @@ tests:
       attribute: "occupancy sensor type bitmap"
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 1
               maxValue: 273
 

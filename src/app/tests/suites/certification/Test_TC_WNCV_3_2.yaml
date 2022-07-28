@@ -112,7 +112,7 @@ tests:
       maxInterval: 5
       response:
           constraints:
-              type: map8
+              type: bitmap8
 
     ### MANDATORY Command
     - label: "2a: TH sends DownOrClose command to DUT"
@@ -169,7 +169,7 @@ tests:
       PICS: WNCV.S.A000a
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 10
               maxValue: 42
 

@@ -123,7 +123,7 @@ tests:
       attribute: "HVACSystemTypeConfiguration"
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 0
               maxValue: 63
 
@@ -233,7 +233,7 @@ tests:
       attribute: "RemoteSensing"
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 0
               maxValue: 7
 
@@ -321,7 +321,7 @@ tests:
       attribute: "ThermostatProgrammingOperationMode"
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 0
               maxValue: 7
 
@@ -331,7 +331,7 @@ tests:
       attribute: "ThermostatRunningState"
       response:
           constraints:
-              type: map16
+              type: bitmap16
               minValue: 0
               maxValue: 127
 
@@ -479,7 +479,7 @@ tests:
       attribute: "ACErrorCode"
       response:
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "Read ACLouverPosition attribute from the DUT"
       PICS: TSTAT.S.A0045

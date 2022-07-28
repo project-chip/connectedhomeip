@@ -50,7 +50,7 @@ tests:
       PICS: WNCV.S.A0007
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 0
               maxValue: 63
 
@@ -61,7 +61,7 @@ tests:
       PICS: WNCV.S.A000a
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 0
               maxValue: 63
 
@@ -83,7 +83,7 @@ tests:
       PICS: WNCV.S.A0017
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 0
               maxValue: 15
 
@@ -203,7 +203,7 @@ tests:
       PICS: WNCV.S.A001a
       response:
           constraints:
-              type: map16
+              type: bitmap16
               minValue: 0
               maxValue: 2047
 
