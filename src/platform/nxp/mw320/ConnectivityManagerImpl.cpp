@@ -37,6 +37,7 @@ extern "C" {
 #include "wlan.h"
 void test_wlan_scan(int argc, char ** argv);
 void test_wlan_add(int argc, char ** argv);
+static struct wlan_network sta_network;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -142,26 +143,56 @@ void ConnectivityManagerImpl::StartWiFiManagement() {}
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
 {
-    uint8_t macAddress[6] = { '\x11', '\x22', '\x33', '\x44', '\x55', '\x66' };
-    PRINTF("===> hardcoded bssid: %02x:%02x:%02x:%02x:%02x:%02x \r\n", macAddress[0], macAddress[1], macAddress[2], macAddress[3],
-           macAddress[4], macAddress[5]);
+    int ret = wlan_get_current_network(&sta_network);
+    uint8_t macAddress[6];
+
+    if (ret == WM_SUCCESS) {
+        memcpy(macAddress, sta_network.bssid, 6);
+    } else {
+        memset(macAddress, 0, 6);
+    }
+    ChipLogProgress(DeviceLayer, "GetWiFiBssId: %02x:%02x:%02x:%02x:%02x:%02x", macAddress[0], macAddress[1], macAddress[2],
+           macAddress[3], macAddress[4], macAddress[5]);
     value = ByteSpan(macAddress, 6);
-    PRINTF("==> ConnectivityManagerImpl.cpp: GetWiFiBssId()\r\n");
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(uint8_t & securityType)
 {
-    securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+    int ret = wlan_get_current_network(&sta_network);
+    if (ret != WM_SUCCESS) {
+        // Set as no security by default
+        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
+        return CHIP_NO_ERROR;
+    }
+    switch (sta_network.security.type) {
+        case WLAN_SECURITY_WEP_OPEN:
+        case WLAN_SECURITY_WEP_SHARED:
+            securityType = EMBER_ZCL_SECURITY_TYPE_WEP;
+            break;
+        case WLAN_SECURITY_WPA:
+            securityType = EMBER_ZCL_SECURITY_TYPE_WPA;
+            break;
+        case WLAN_SECURITY_WPA2:
+            securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+            break;
+        case WLAN_SECURITY_WPA3_SAE:
+            securityType = EMBER_ZCL_SECURITY_TYPE_WPA3;
+            break;
+        case WLAN_SECURITY_NONE:
+        default: // Default: No_security
+            securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
 
-    PRINTF("==> ConnectivityManagerImpl.cpp: GetWiFiSecurityType()\r\n");
+    }
+
+    ChipLogProgress(DeviceLayer, "GetWiFiSecurityType: %u", securityType);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(uint8_t & wiFiVersion)
 {
-    PRINTF("==> ConnectivityManagerImpl.cpp: GetWiFiVersion()\r\n");
     wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+    ChipLogProgress(DeviceLayer, "GetWiFiVersion: %u", wiFiVersion);
     return CHIP_NO_ERROR;
 }
 
@@ -169,7 +200,6 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(uint8_t & wiFiVersion)
 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     CHIP_ERROR ret = CHIP_NO_ERROR;
     int ret_mcuXpresso;
     char arg0[] = "wlan-add";
@@ -203,9 +233,6 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
                         "current connection status.");
     }
     return ret;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
 }
 
 } // namespace DeviceLayer

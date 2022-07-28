@@ -31,11 +31,19 @@
 #include <platform/nxp/mw320/ConnectivityUtils.h>
 #include <platform/nxp/mw320/DiagnosticDataProviderImpl.h>
 
+
+extern "C" {
+#include "wlan.h"
+}
+
+
+
 //#include <openthread/platform/entropy.h>
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
+
 
 namespace chip {
 namespace DeviceLayer {
@@ -132,6 +140,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMax
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
     NetworkInterface * ifp = new NetworkInterface();
+    uint8_t size           = 0;
 
     strncpy(ifp->Name, "mlan0", Inet::InterfaceId::kMaxIfNameLength);
     ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
@@ -140,6 +149,20 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->type                                          = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
+    if (ConnectivityUtils::GetInterfaceIPv4Addrs("", size, ifp) == CHIP_NO_ERROR)
+    {
+        if (size > 0)
+        {
+            ifp->IPv4Addresses = DataModel::List<const chip::ByteSpan>(ifp->Ipv4AddressSpans, size);
+        }
+    }
+    if (ConnectivityUtils::GetInterfaceIPv6Addrs("", size, ifp) == CHIP_NO_ERROR)
+    {
+        if (size > 0)
+        {
+            ifp->IPv6Addresses = DataModel::List<const chip::ByteSpan>(ifp->Ipv6AddressSpans, size);
+        }
+    }
     ifp->Next = nullptr;
     *netifpp  = ifp;
 
@@ -148,15 +171,19 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
-    PRINTF("DiagnosticDataProviderImpl::GetWiFiChannelNumber() \r\n");
     return ConnectivityUtils::GetWiFiChannelNumber(ConnectivityMgrImpl().GetWiFiIfName(), channelNumber);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    PRINTF("DiagnosticDataProviderImpl::GetWiFiRssi() \r\n");
     return ConnectivityUtils::GetWiFiRssi(ConnectivityMgrImpl().GetWiFiIfName(), rssi);
 }
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
+{
+    return ConnectivityUtils::GetWiFiBeaconLostCount(ConnectivityMgrImpl().GetWiFiIfName(), beaconRxCount);
+}
+
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
 {
@@ -165,25 +192,65 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconL
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
 {
-    packetMulticastRxCount = 101;
+#ifdef GET_FROM_SDK
+    int ret;
+    wifi_pkt_stats_t stats;
+
+    ret = wifi_get_log(&stats);
+    if (ret != WM_SUCCESS) {
+        ChipLogError(DeviceLayer, "wifi_get_log failed ");
+    }
+    packetMulticastRxCount = stats.mcast_rx_frame;
+#else
+    packetMulticastRxCount = 0;
+#endif // GET_FROM_SDK
+    ChipLogProgress(DeviceLayer,"GetWiFiPacketMulticastRxCount: %lu ", packetMulticastRxCount);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
 {
-    packetMulticastTxCount = 101;
+#ifdef GET_FROM_SDK
+    int ret;
+    wifi_pkt_stats_t stats;
+
+    ret = wifi_get_log(&stats);
+    if (ret != WM_SUCCESS) {
+        ChipLogError(DeviceLayer, "wifi_get_log failed ");
+    }
+
+    packetMulticastTxCount = stats.mcast_tx_frame;
+#else
+    packetMulticastTxCount = 0;
+#endif // GET_FROM_SDK
+    ChipLogProgress(DeviceLayer,"GetWiFiPacketMulticastTxCount: %lu ", packetMulticastTxCount);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
 {
-    packetUnicastRxCount = 101;
+    // => Not support in SDK yet
+    packetUnicastRxCount = 0;
+    ChipLogProgress(DeviceLayer,"GetWiFiPacketUnicastRxCount: %lu (ToDo)", packetUnicastRxCount);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
 {
-    packetUnicastTxCount = 101;
+#ifdef GET_FROM_SDK
+    int ret;
+    wifi_pkt_stats_t stats;
+
+    ret = wifi_get_log(&stats);
+    if (ret != WM_SUCCESS) {
+        ChipLogError(DeviceLayer, "wifi_get_log failed ");
+    }
+
+    packetUnicastTxCount = stats.tx_frame;
+#else
+    packetUnicastTxCount = 0;
+#endif // #ifdef GET_FROM_SDK
+    ChipLogProgress(DeviceLayer,"GetWiFiPacketUnicastTxCount: %lu", packetUnicastTxCount);
     return CHIP_NO_ERROR;
 }
 
@@ -194,7 +261,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentM
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
 {
-    overrunCount = 101;
+    overrunCount = 0;
     return CHIP_NO_ERROR;
 }
 

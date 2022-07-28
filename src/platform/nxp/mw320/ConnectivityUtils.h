@@ -50,6 +50,7 @@ public:
     static CHIP_ERROR GetWiFiInterfaceName(char * ifname, size_t bufSize);
     static CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber);
     static CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi);
+    static CHIP_ERROR GetWiFiBeaconRxCount(const char * ifname, uint32_t & beaconRxCount);
     static CHIP_ERROR GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount);
     static CHIP_ERROR GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate);
     //    static CHIP_ERROR GetEthInterfaceName(char * ifname, size_t bufSize);
