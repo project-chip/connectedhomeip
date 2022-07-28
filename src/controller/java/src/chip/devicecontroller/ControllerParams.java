@@ -11,6 +11,9 @@ public final class ControllerParams {
   @Nullable private final byte[] intermediateCertificate;
   @Nullable private final byte[] operationalCertificate;
   @Nullable private final byte[] ipk;
+  private final int failsafeTimerSeconds = 30;
+  private final boolean attemptNetworkScanWiFi = false;
+  private final boolean attemptNetworkScanThread = true;
 
   private static final int LEGACY_GLOBAL_CHIP_PORT = 5540;
 
@@ -49,6 +52,18 @@ public final class ControllerParams {
     return ipk;
   }
 
+  public int getFailsafeTimerSeconds() {
+    return failsafeTimerSeconds;
+  }
+
+  public boolean getAttemptNetworkScanWiFi() {
+    return attemptNetworkScanWiFi;
+  }
+
+  public boolean getAttemptNetworkScanThread() {
+    return attemptNetworkScanThread;
+  }
+
   /** Returns parameters with ephemerally generated operational credentials */
   public static Builder newBuilder() {
     return new Builder();
@@ -75,6 +90,9 @@ public final class ControllerParams {
     @Nullable private byte[] intermediateCertificate = null;
     @Nullable private byte[] operationalCertificate = null;
     @Nullable private byte[] ipk = null;
+    private int failsafeTimerSeconds = 30;
+    private boolean attemptNetworkScanWiFi = false;
+    private boolean attemptNetworkScanThread = true;
 
     private Builder() {}
 
@@ -83,6 +101,29 @@ public final class ControllerParams {
         throw new IllegalArgumentException("udpListenPort must be >= 0");
       }
       this.udpListenPort = udpListenPort;
+      return this;
+    }
+
+    public Builder setControllerVendorId(int controllerVendorId) {
+      this.controllerVendorId = controllerVendorId;
+      return this;
+    }
+
+    public Builder setFailsafeTimerSeconds(int failsafeTimerSeconds) {
+      if (failsafeTimerSeconds < 1 || failsafeTimerSeconds > 900) {
+        throw new IllegalArgumentException("failsafeTimerSeconds must be between 0 and 900");
+      }
+      this.failsafeTimerSeconds = failsafeTimerSeconds;
+      return this;
+    }
+
+    public Builder setAttemptNetworkScanWiFi(boolean attemptNetworkScanWiFi) {
+      this.attemptNetworkScanWiFi = attemptNetworkScanWiFi;
+      return this;
+    }
+
+    public Builder setAttemptNetworkScanThread(boolean attemptNetworkScanThread) {
+      this.attemptNetworkScanThread = attemptNetworkScanThread;
       return this;
     }
 
