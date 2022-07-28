@@ -629,7 +629,7 @@ void DoorLockServer::setCredentialCommandHandler(
         status = createCredential(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
                                   existingCredential, credentialData, userIndex, userStatus, userType, createdUserIndex);
 
-        sendSetCredentialResponse(commandObj, commandPath, status, userIndex.Value(), nextAvailableCredentialSlot);
+        sendSetCredentialResponse(commandObj, commandPath, status, createdUserIndex, nextAvailableCredentialSlot);
         return;
     }
     case DlDataOperationType::kModify: {
@@ -661,7 +661,7 @@ void DoorLockServer::setCredentialCommandHandler(
     case DlDataOperationType::kClear:
     default:
         // appclusters, 5.2.4.40: set credential command supports only Add and Modify operational type.
-        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, userIndex.Value(), nextAvailableCredentialSlot);
+        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
     }
 }
 
@@ -684,7 +684,7 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
     EmberAfPluginDoorLockCredentialInfo credentialInfo;
     if (!credentialIndexValid(commandPath.mEndpointId, credentialType, credentialIndex, maxNumberOfCredentials))
     {
-        sendGetCredentialStatusResponse(commandObj, commandPath, credentialType, credentialIndex, 0, credentialInfo, false);
+        sendGetCredentialResponse(commandObj, commandPath, credentialType, credentialIndex, 0, credentialInfo, false);
         return;
     }
 
@@ -715,11 +715,11 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
         }
     }
 
-    sendGetCredentialStatusResponse(commandObj, commandPath, credentialType, credentialIndex, userIndexWithCredential,
+    sendGetCredentialResponse(commandObj, commandPath, credentialType, credentialIndex, userIndexWithCredential,
                                     credentialInfo, credentialExists);
 }
 
-void DoorLockServer::sendGetCredentialStatusResponse(chip::app::CommandHandler * commandObj,
+void DoorLockServer::sendGetCredentialResponse(chip::app::CommandHandler * commandObj,
                                                      const chip::app::ConcreteCommandPath & commandPath,
                                                      DlCredentialType credentialType, uint16_t credentialIndex,
                                                      uint16_t userIndexWithCredential,

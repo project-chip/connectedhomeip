@@ -305,7 +305,7 @@ private:
                                            const chip::app::ConcreteCommandPath & commandPath, DlCredentialType credentialType,
                                            uint16_t credentialIndex);
 
-    void sendGetCredentialStatusResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    void sendGetCredentialResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                          DlCredentialType credentialType, uint16_t credentialIndex,
                                          uint16_t userIndexWithCredential, EmberAfPluginDoorLockCredentialInfo credentialInfo,
                                          bool credentialExists);
