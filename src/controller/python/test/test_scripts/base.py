@@ -34,6 +34,7 @@ import chip.clusters as Clusters
 import chip.clusters.Attribute as Attribute
 from chip.utils import CommissioningBuildingBlocks
 from chip.ChipStack import *
+import chip.native
 import chip.FabricAdmin
 import copy
 import secrets
@@ -170,6 +171,8 @@ class TestResult:
 
 class BaseTestHelper:
     def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False):
+        chip.native.Init()
+
         self.chipStack = ChipStack('/tmp/repl_storage.json')
         self.fabricAdmin = chip.FabricAdmin.FabricAdmin(vendorId=0XFFF1,
                                                         fabricId=1, fabricIndex=1)
