@@ -414,6 +414,8 @@ CHIP_ERROR WriteClient::SendWriteRequest()
 CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                           System::PacketBufferHandle && aPayload)
 {
+    using namespace Protocols::InteractionModel;
+
     if (mState == State::AwaitingResponse &&
         // We had sent the last chunk of data, and received all responses
         mChunks.IsNull())
@@ -431,6 +433,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
     if (mState == State::AwaitingTimedStatus)
     {
+        VerifyOrExit(aPayloadHeader.HasMessageType(MsgType::StatusResponse), err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
         CHIP_ERROR statusError = CHIP_NO_ERROR;
         SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
         SuccessOrExit(err = statusError);
@@ -441,7 +444,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
         goto exit;
     }
 
-    if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponse))
+    if (aPayloadHeader.HasMessageType(MsgType::WriteResponse))
     {
         err = ProcessWriteResponseMessage(std::move(aPayload));
         SuccessOrExit(err);
@@ -451,7 +454,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
             SuccessOrExit(SendWriteRequest());
         }
     }
-    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+    else if (aPayloadHeader.HasMessageType(MsgType::StatusResponse))
     {
         CHIP_ERROR statusError = CHIP_NO_ERROR;
         SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));

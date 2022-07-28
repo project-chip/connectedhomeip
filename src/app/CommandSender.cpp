@@ -120,6 +120,8 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
 CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                             System::PacketBufferHandle && aPayload)
 {
+    using namespace Protocols::InteractionModel;
+
     if (mState == State::CommandSent)
     {
         MoveToState(State::ResponseReceived);
@@ -130,6 +132,7 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
 
     if (mState == State::AwaitingTimedStatus)
     {
+        VerifyOrExit(aPayloadHeader.HasMessageType(MsgType::StatusResponse), err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
         CHIP_ERROR statusError = CHIP_NO_ERROR;
         SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
         SuccessOrExit(err = statusError);
@@ -139,12 +142,12 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
         goto exit;
     }
 
-    if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse))
+    if (aPayloadHeader.HasMessageType(MsgType::InvokeCommandResponse))
     {
         err = ProcessInvokeResponse(std::move(aPayload));
         SuccessOrExit(err);
     }
-    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+    else if (aPayloadHeader.HasMessageType(MsgType::StatusResponse))
     {
         CHIP_ERROR statusError = CHIP_NO_ERROR;
         SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
