@@ -269,7 +269,7 @@ CHIP_ERROR CryptoContext::PrivacyObfuscate(const uint8_t * input, size_t input_l
     VerifyOrReturnError(input_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Confirm group key is available. Privacy obfuscation is not supported on session keys.
+    // Confirm group key is available. Privacy obfuscation is not supported on unicast session keys.
     VerifyOrReturnError(mKeyContext != nullptr, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
 
     ByteSpan plaintext(input, input_length);
