@@ -9975,14 +9975,6 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface CurrentFabricIndexAttributeCallback {
-      void onSuccess(Integer value);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished() {}
-    }
-
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -10053,12 +10045,12 @@ public class ChipClusters {
       subscribeTrustedRootCertificatesAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readCurrentFabricIndexAttribute(CurrentFabricIndexAttributeCallback callback) {
+    public void readCurrentFabricIndexAttribute(IntegerAttributeCallback callback) {
       readCurrentFabricIndexAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeCurrentFabricIndexAttribute(
-        CurrentFabricIndexAttributeCallback callback, int minInterval, int maxInterval) {
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeCurrentFabricIndexAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -10140,13 +10132,10 @@ public class ChipClusters {
         int maxInterval);
 
     private native void readCurrentFabricIndexAttribute(
-        long chipClusterPtr, CurrentFabricIndexAttributeCallback callback);
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void subscribeCurrentFabricIndexAttribute(
-        long chipClusterPtr,
-        CurrentFabricIndexAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
@@ -21027,6 +21016,14 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
+    public interface VendorIDAttributeCallback {
+      void onSuccess(Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface AllowedVendorListAttributeCallback {
       void onSuccess(List<Integer> valueList);
 
@@ -21068,12 +21065,12 @@ public class ChipClusters {
       subscribeVendorNameAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readVendorIDAttribute(IntegerAttributeCallback callback) {
+    public void readVendorIDAttribute(VendorIDAttributeCallback callback) {
       readVendorIDAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeVendorIDAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        VendorIDAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeVendorIDAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -21177,10 +21174,10 @@ public class ChipClusters {
         int maxInterval);
 
     private native void readVendorIDAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, VendorIDAttributeCallback callback);
 
     private native void subscribeVendorIDAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr, VendorIDAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readApplicationNameAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
