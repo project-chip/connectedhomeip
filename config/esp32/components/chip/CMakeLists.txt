@@ -166,6 +166,10 @@ if (CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER)
     chip_gn_arg_append("chip_use_factory_data_provider"                     "true")
 endif()
 
+if (CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER)
+    chip_gn_arg_append("chip_use_device_info_provider"                     "true")
+endif()
+
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
 
