@@ -125,6 +125,14 @@ public:
     // and then writes it to destinationApp
     CHIP_ERROR ConvertToPlatformCatalogVendorApp(const CatalogVendorApp & sourceApp, CatalogVendorApp * destinationApp) override;
 
+    // Get the privilege this vendorId should have on endpoints 1, 2, and content app endpoints
+    // In the case of casting video clients, this should usually be Access::Privilege::kOperate
+    // and for voice agents, this may be Access::Privilege::kAdminister
+    // When a vendor has admin privileges, it will get access to all clusters on ep1
+    Access::Privilege GetVendorPrivilege(uint16_t vendorId) override;
+
+    void AddAdminVendorId(uint16_t vendorId);
+
 protected:
     ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = {
         ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "34567890"),
@@ -132,9 +140,13 @@ protected:
         ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021"),
         ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021")
     };
+
+    std::vector<uint16_t> mAdminVendorIds{};
 };
 
 } // namespace AppPlatform
 } // namespace chip
+
+chip::AppPlatform::ContentAppFactoryImpl * GetContentAppFactoryImpl();
 
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

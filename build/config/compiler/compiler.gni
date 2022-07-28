@@ -50,4 +50,7 @@ declare_args() {
 
   # Generate code coverage analysis artifacts when enabled.
   use_coverage = false
+
+  # Enable address sanitizer
+  is_asan = false
 }

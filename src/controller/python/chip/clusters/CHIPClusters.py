@@ -480,8 +480,8 @@ class ChipClusters:
                     "args": {
                         "level": "int",
                         "transitionTime": "int",
-                        "optionMask": "int",
-                        "optionOverride": "int",
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             0x00000001: {
@@ -490,8 +490,8 @@ class ChipClusters:
                     "args": {
                         "moveMode": "int",
                         "rate": "int",
-                        "optionMask": "int",
-                        "optionOverride": "int",
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             0x00000002: {
@@ -501,16 +501,16 @@ class ChipClusters:
                         "stepMode": "int",
                         "stepSize": "int",
                         "transitionTime": "int",
-                        "optionMask": "int",
-                        "optionOverride": "int",
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             0x00000003: {
                     "commandId": 0x00000003,
                     "commandName": "Stop",
                     "args": {
-                        "optionMask": "int",
-                        "optionOverride": "int",
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             0x00000004: {
@@ -519,6 +519,8 @@ class ChipClusters:
                     "args": {
                         "level": "int",
                         "transitionTime": "int",
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             0x00000005: {
@@ -527,6 +529,8 @@ class ChipClusters:
                     "args": {
                         "moveMode": "int",
                         "rate": "int",
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             0x00000006: {
@@ -536,12 +540,16 @@ class ChipClusters:
                         "stepMode": "int",
                         "stepSize": "int",
                         "transitionTime": "int",
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             0x00000007: {
                     "commandId": 0x00000007,
                     "commandName": "StopWithOnOff",
                     "args": {
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             },

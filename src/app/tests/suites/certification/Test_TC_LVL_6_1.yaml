@@ -68,9 +68,9 @@ tests:
                 value: 1
               - name: "transitionTime"
                 value: 0
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Reads CurrentLevel attribute from DUT"
@@ -92,9 +92,9 @@ tests:
                 value: 0
               - name: "rate"
                 value: 5
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Wait 5000ms"
@@ -110,9 +110,9 @@ tests:
       command: "Stop"
       arguments:
           values:
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Physically verify that the device has stopped transitioning"
@@ -145,9 +145,9 @@ tests:
                 value: 0
               - name: "rate"
                 value: 5
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Wait 5000ms"
@@ -163,9 +163,9 @@ tests:
       command: "StopWithOnOff"
       arguments:
           values:
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Physically verify that the device has stopped transitioning"

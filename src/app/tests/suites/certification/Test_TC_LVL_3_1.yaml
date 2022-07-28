@@ -77,9 +77,9 @@ tests:
                 value: 64
               - name: "transitionTime"
                 value: 0
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 100ms"
@@ -106,9 +106,9 @@ tests:
                 value: 100
               - name: "transitionTime"
                 value: 0
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 100 ms"
@@ -135,9 +135,9 @@ tests:
                 value: 128
               - name: "transitionTime"
                 value: 100
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 11000ms"
@@ -175,9 +175,9 @@ tests:
                 value: 64
               - name: "transitionTime"
                 value: 0xFFFF
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 1000ms"
