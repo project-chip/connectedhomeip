@@ -175,23 +175,9 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
     }
 }
 
-static void ScanNetworksNow(System::Layer *, void * callbackPtr)
-{
-    ThreadDriver::ScanCallback * callback = static_cast<ThreadDriver::ScanCallback *>(callbackPtr);
-
-    if (DeviceLayer::ThreadStackMgrImpl().StartThreadScan(callback) != CHIP_NO_ERROR)
-    {
-        callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
-    }
-}
-
 void GenericThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
 {
-    using namespace System::Clock::Literals;
-
-    // While the Thread network discovery is happening, the communication over Thread can be disrupted,
-    // so introduce a delay to help deliver an ACK for the ScanNetwork command before the discovery begins.
-    if (DeviceLayer::SystemLayer().StartTimer(CHIP_DEVICE_CONFIG_THREAD_SCAN_DELAY, ScanNetworksNow, callback) != CHIP_NO_ERROR)
+    if (DeviceLayer::ThreadStackMgrImpl().StartThreadScan(callback) != CHIP_NO_ERROR)
     {
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
     }
