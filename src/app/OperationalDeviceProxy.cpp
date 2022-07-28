@@ -24,12 +24,11 @@
  *    messages to and from the corresponding CHIP devices.
  */
 
-#include "OperationalDeviceProxy.h"
+#include <app/OperationalDeviceProxy.h>
 
-#include "CASEClient.h"
-#include "CommandSender.h"
-#include "ReadPrepareParams.h"
-#include "transport/SecureSession.h"
+#include <app/CASEClient.h>
+#include <app/InteractionModelEngine.h>
+#include <transport/SecureSession.h>
 
 #include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPCore.h>

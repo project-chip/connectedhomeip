@@ -121,3 +121,7 @@ group("linux") {
     deps += [ ":chip-all-clusters-app" ]
   }
 }
+
+group("default") {
+  deps = [ ":linux" ]
+}
