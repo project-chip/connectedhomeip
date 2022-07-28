@@ -526,6 +526,7 @@ server cluster Basic = 40 {
   }
 
   info event Leave = 2 {
+    fabric_idx fabricIndex = 0;
   }
 
   info event ReachableChanged = 3 {
