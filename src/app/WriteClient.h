@@ -340,15 +340,6 @@ private:
      */
     void Abort();
 
-    // Handle a message received when we are expecting a status response to a
-    // Timed Request.  The caller is assumed to have already checked that our
-    // exchange context member is the one the message came in on.
-    //
-    // If the server returned an error status response its status will be
-    // encapsulated in the CHIP_ERROR this returns.  In that case,
-    // StatusIB::InitFromChipError can be used to extract the status.
-    CHIP_ERROR HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-
     // Send our queued-up Write Request message.  Assumes the exchange is ready
     // and mPendingWriteData is populated.
     CHIP_ERROR SendWriteRequest();

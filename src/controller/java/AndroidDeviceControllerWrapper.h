@@ -70,16 +70,34 @@ public:
      */
     CHIP_ERROR ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params, jobject networkCredentials);
 
+    /**
+     * Update the CommissioningParameters used by the active device commissioner
+     */
+    CHIP_ERROR UpdateCommissioningParameters(const chip::Controller::CommissioningParameters & params);
+
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
+    void OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted,
+                                     CHIP_ERROR error) override;
+    void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
+    void OnScanNetworksSuccess(
+        const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse) override;
+    void OnScanNetworksFailure(CHIP_ERROR error) override;
 
     // PersistentStorageDelegate implementation
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
+
+    chip::Controller::AutoCommissioner * GetAutoCommissioner() { return &mAutoCommissioner; }
+
+    const chip::Controller::CommissioningParameters & GetCommissioningParameters() const
+    {
+        return mAutoCommissioner.GetCommissioningParameters();
+    }
 
     static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {
@@ -114,6 +132,9 @@ public:
      * @param[in] ipkEpochKey the IPK epoch key to use for this node
      * @param[in] listenPort the UDP port to listen on
      * @param[in] controllerVendorId the vendor ID identifying the controller
+     * @param[in] failsafeTimerSeconds the failsafe timer in seconds
+     * @param[in] attemptNetworkScanWiFi whether to attempt a network scan when configuring the network for a WiFi device
+     * @param[in] attemptNetworkScanThread whether to attempt a network scan when configuring the network for a Thread device
      * @param[out] errInfoOnFailure a pointer to a CHIP_ERROR that will be populated if this method returns nullptr
      */
     static AndroidDeviceControllerWrapper *
@@ -122,7 +143,8 @@ public:
                 chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
                 AndroidOperationalCredentialsIssuerPtr opCredsIssuer, jobject keypairDelegate, jbyteArray rootCertificate,
                 jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey,
-                uint16_t listenPort, uint16_t controllerVendorId, CHIP_ERROR * errInfoOnFailure);
+                uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi,
+                bool attemptNetworkScanThread, CHIP_ERROR * errInfoOnFailure);
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
@@ -145,6 +167,8 @@ private:
     const char * password              = nullptr;
     jbyteArray operationalDatasetBytes = nullptr;
     jbyte * operationalDataset         = nullptr;
+
+    chip::Controller::AutoCommissioner mAutoCommissioner;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidOperationalCredentialsIssuerPtr opCredsIssuer) :
         mController(std::move(controller)), mOpCredsIssuer(std::move(opCredsIssuer))

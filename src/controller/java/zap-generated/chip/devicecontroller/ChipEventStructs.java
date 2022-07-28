@@ -210,13 +210,19 @@ public class ChipEventStructs {
   }
 
   public static class BasicClusterLeaveEvent {
+    public Integer fabricIndex;
 
-    public BasicClusterLeaveEvent() {}
+    public BasicClusterLeaveEvent(Integer fabricIndex) {
+      this.fabricIndex = fabricIndex;
+    }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("BasicClusterLeaveEvent {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
       output.append("}\n");
       return output.toString();
     }

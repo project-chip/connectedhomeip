@@ -653,6 +653,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
+            jobject value_fabricIndex;
+            std::string value_fabricIndexClassName     = "java/lang/Integer";
+            std::string value_fabricIndexCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_fabricIndexClassName.c_str(),
+                                                                          value_fabricIndexCtorSignature.c_str(),
+                                                                          cppValue.fabricIndex, value_fabricIndex);
+
             jclass leaveStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$BasicClusterLeaveEvent", leaveStructClass);
@@ -661,14 +668,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 ChipLogError(Zcl, "Could not find class ChipEventStructs$BasicClusterLeaveEvent");
                 return nullptr;
             }
-            jmethodID leaveStructCtor = env->GetMethodID(leaveStructClass, "<init>", "()V");
+            jmethodID leaveStructCtor = env->GetMethodID(leaveStructClass, "<init>", "(Ljava/lang/Integer;)V");
             if (leaveStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$BasicClusterLeaveEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(leaveStructClass, leaveStructCtor);
+            jobject value = env->NewObject(leaveStructClass, leaveStructCtor, value_fabricIndex);
 
             return value;
         }

@@ -23,7 +23,9 @@ import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -31,6 +33,7 @@ public class ChipDeviceController {
   private long deviceControllerPtr;
   private int connectionId;
   private CompletionListener completionListener;
+  private ScanNetworksListener scanNetworksListener;
 
   /**
    * To load class and jni, we need to new AndroidChipPlatform after jni load but before new
@@ -52,6 +55,10 @@ public class ChipDeviceController {
 
   public void setCompletionListener(CompletionListener listener) {
     completionListener = listener;
+  }
+
+  public void setScanNetworksListener(ScanNetworksListener listener) {
+    scanNetworksListener = listener;
   }
 
   public void pairDevice(
@@ -168,6 +175,28 @@ public class ChipDeviceController {
     commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials);
   }
 
+  public void pauseCommissioning() {
+    pauseCommissioning(deviceControllerPtr);
+  }
+
+  public void resumeCommissioning() {
+    resumeCommissioning(deviceControllerPtr);
+  }
+
+  /**
+   * Update the network credentials held by the commissioner for the current commissioning session.
+   * The updated values will be used by the commissioner if the network credentials haven't already
+   * been sent to the device.
+   *
+   * <p>Its expected that this method will be called in response to the NetworkScan or the
+   * ReadCommissioningInfo callbacks.
+   *
+   * @param networkCredentials the credentials (Wi-Fi or Thread) to use in commissioning
+   */
+  public void updateCommissioningNetworkCredentials(NetworkCredentials networkCredentials) {
+    updateCommissioningNetworkCredentials(deviceControllerPtr, networkCredentials);
+  }
+
   public void unpairDevice(long deviceId) {
     unpairDevice(deviceControllerPtr, deviceId);
   }
@@ -217,6 +246,39 @@ public class ChipDeviceController {
   public void onCommissioningComplete(long nodeId, int errorCode) {
     if (completionListener != null) {
       completionListener.onCommissioningComplete(nodeId, errorCode);
+    }
+  }
+
+  public void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode) {
+    if (completionListener != null) {
+      completionListener.onCommissioningStatusUpdate(nodeId, stage, errorCode);
+    }
+  }
+
+  public void onReadCommissioningInfo(
+      int vendorId, int productId, int wifiEndpointId, int threadEndpointId) {
+    if (completionListener != null) {
+      completionListener.onReadCommissioningInfo(
+          vendorId, productId, wifiEndpointId, threadEndpointId);
+    }
+  }
+
+  public void onScanNetworksFailure(int errorCode) {
+    if (scanNetworksListener != null) {
+      scanNetworksListener.onScanNetworksFailure(errorCode);
+    }
+  }
+
+  public void onScanNetworksSuccess(
+      Integer networkingStatus,
+      Optional<String> debugText,
+      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
+          wiFiScanResults,
+      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
+          threadScanResults) {
+    if (scanNetworksListener != null) {
+      scanNetworksListener.onScanNetworksSuccess(
+          networkingStatus, debugText, wiFiScanResults, threadScanResults);
     }
   }
 
@@ -567,6 +629,13 @@ public class ChipDeviceController {
 
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
 
+  private native void pauseCommissioning(long deviceControllerPtr);
+
+  private native void resumeCommissioning(long deviceControllerPtr);
+
+  private native void updateCommissioningNetworkCredentials(
+      long deviceControllerPtr, NetworkCredentials networkCredentials);
+
   private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
 
   private native void shutdownCommissioning(long deviceControllerPtr);
@@ -586,6 +655,20 @@ public class ChipDeviceController {
   }
 
   /** Interface to listen for callbacks from CHIPDeviceController. */
+  public interface ScanNetworksListener {
+    /** Notifies when scan networks call fails. */
+    void onScanNetworksFailure(int errorCode);
+
+    void onScanNetworksSuccess(
+        Integer networkingStatus,
+        Optional<String> debugText,
+        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
+            wiFiScanResults,
+        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
+            threadScanResults);
+  }
+
+  /** Interface to listen for callbacks from CHIPDeviceController. */
   public interface CompletionListener {
 
     /** Notifies the completion of "ConnectDevice" command. */
@@ -602,6 +685,13 @@ public class ChipDeviceController {
 
     /** Notifies the completion of commissioning. */
     void onCommissioningComplete(long nodeId, int errorCode);
+
+    /** Notifies the completion of each stage of commissioning. */
+    void onReadCommissioningInfo(
+        int vendorId, int productId, int wifiEndpointId, int threadEndpointId);
+
+    /** Notifies the completion of each stage of commissioning. */
+    void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode);
 
     /** Notifies that the Chip connection has been closed. */
     void onNotifyChipConnectionClosed();

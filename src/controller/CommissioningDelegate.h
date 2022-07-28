@@ -52,6 +52,9 @@ enum CommissioningStage : uint8_t
     kFindOperational,
     kSendComplete,
     kCleanup,
+    // ScanNetworks can happen anytime after kArmFailsafe.
+    // However, the circ tests fail if it is earlier in the list
+    kScanNetworks,
 };
 
 const char * StageToString(CommissioningStage stage);
@@ -261,10 +264,12 @@ public:
         return *this;
     }
 
+    // If a ThreadOperationalDataset is provided, then the ThreadNetworkScan will not be attempted
     CommissioningParameters & SetThreadOperationalDataset(ByteSpan threadOperationalDataset)
     {
 
         mThreadOperationalDataset.SetValue(threadOperationalDataset);
+        mAttemptThreadNetworkScan = MakeOptional(static_cast<bool>(false));
         return *this;
     }
     // This parameter should be set with the information returned from kSendOpCertSigningRequest. It must be set before calling
@@ -352,6 +357,26 @@ public:
 
     Credentials::DeviceAttestationDelegate * GetDeviceAttestationDelegate() const { return mDeviceAttestationDelegate; }
 
+    // If an SSID is provided, and AttemptWiFiNetworkScan is true,
+    // then a directed scan will be performed using the SSID provided in the WiFiCredentials object
+    Optional<bool> GetAttemptWiFiNetworkScan() const { return mAttemptWiFiNetworkScan; }
+    CommissioningParameters & SetAttemptWiFiNetworkScan(bool attemptWiFiNetworkScan)
+    {
+        mAttemptWiFiNetworkScan = MakeOptional(attemptWiFiNetworkScan);
+        return *this;
+    }
+
+    // If a ThreadOperationalDataset is provided, then the ThreadNetworkScan will not be attempted
+    Optional<bool> GetAttemptThreadNetworkScan() const { return mAttemptThreadNetworkScan; }
+    CommissioningParameters & SetAttemptThreadNetworkScan(bool attemptThreadNetworkScan)
+    {
+        if (!mThreadOperationalDataset.HasValue())
+        {
+            mAttemptThreadNetworkScan = MakeOptional(attemptThreadNetworkScan);
+        }
+        return *this;
+    }
+
 private:
     // Items that can be set by the commissioner
     Optional<uint16_t> mFailsafeTimerSeconds;
@@ -379,6 +404,8 @@ private:
     CompletionStatus completionStatus;
     Credentials::DeviceAttestationDelegate * mDeviceAttestationDelegate =
         nullptr; // Delegate to handle device attestation failures during commissioning
+    Optional<bool> mAttemptWiFiNetworkScan;
+    Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
 };
 
 struct RequestedCertificate
