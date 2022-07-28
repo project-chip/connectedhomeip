@@ -259,7 +259,7 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error)
     mConnectionFailure.DequeueAll(failureReady);
     mConnectionSuccess.DequeueAll(successReady);
 
-    // TODO (#20452) For now we need to make a copy of member fields inside `this` before calling any of the
+    // TODO Issue #20452: For now we need to make a copy of member fields inside `this` before calling any of the
     // callbacks since the callbacks themselves can potentially release `this` OperationalSessionSetup.
     auto * exchangeMgr = mInitParams.exchangeMgr;
     auto sessionHandle = mSecureSession.Get();

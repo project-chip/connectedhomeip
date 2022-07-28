@@ -70,10 +70,19 @@ struct DeviceProxyInitParams
     }
 };
 
+/**
+ * @brief Delegate provided when creating OperationalSessionSetup.
+ *
+ * Once OperationalSessionSetup establishes a connection (or errors out) and has notified all
+ * registered application via callback via OnDeviceConnected/OnDeviceConnectionFailure, this delegate
+ * is used to tell the entity managing pool of OperationalSessionSetup to free itself.
+ */
 class OperationalSessionReleaseDelegate
 {
 public:
     virtual ~OperationalSessionReleaseDelegate()             = default;
+    // TODO Issue #20452: Once cleanup from #20452 takes place we can provide OperationalSessionSetup *
+    // instead of ScopedNodeId here.
     virtual void ReleaseSession(const ScopedNodeId & peerId) = 0;
 };
 
@@ -97,6 +106,7 @@ public:
     {}
     OperationalDeviceProxy() {}
 
+    // Recommended to use InteractionModelEngine::ShutdownSubscriptions directly.
     void ShutdownSubscriptions() override { VerifyOrDie(false); } // Currently not implemented.
     void Disconnect() override
     {

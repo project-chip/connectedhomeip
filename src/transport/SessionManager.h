@@ -178,6 +178,8 @@ public:
     void ExpireAllSessionsForFabric(FabricIndex fabricIndex);
     void ExpireAllPASESessions();
 
+    bool MarkSessionAsDefunctMark(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type);
+
     /**
      * @brief
      *   Return the System Layer pointer used by current SessionManager.

@@ -1027,13 +1027,6 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
             _this->mReadPrepareParams.mSessionHolder->AsSecureSession()->MarkAsDefunct();
         }
 
-        //
-        // TODO: Until #19259 is merged, we cannot actually just get by with the above logic since marking sessions
-        //       defunct has no effect on resident OperationalDeviceProxy instances that are already bound
-        //       to a now-defunct CASE session.
-        //
-        caseSessionManager->DisconnectSession(_this->mPeer);
-
         caseSessionManager->FindOrEstablishSession(_this->mPeer, &_this->mOnConnectedCallback,
                                                    &_this->mOnConnectionFailureCallback);
         return;

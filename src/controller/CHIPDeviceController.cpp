@@ -328,7 +328,7 @@ CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
 {
     ChipLogProgress(Controller, "Force close session for node 0x%" PRIx64, nodeId);
 
-    if (mSystemState->CASESessionMgr()->DisconnectSession(GetPeerScopedId(nodeId)))
+    if (SessionMgr()->MarkSessionAsDefunctMark(GetPeerScopedId(nodeId), MakeOptional(Transport::SecureSession::Type::kCASE)))
     {
         return CHIP_NO_ERROR;
     }

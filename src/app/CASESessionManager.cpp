@@ -84,17 +84,6 @@ OperationalSessionSetup * CASESessionManager::FindExistingSessionSetup(const Sco
     return mConfig.sessionSetupPool->FindDevice(peerId);
 }
 
-bool CASESessionManager::DisconnectSession(const ScopedNodeId & peerId) const
-{
-    auto optionalSessionHandle = FindExistingSession(peerId);
-    if (optionalSessionHandle.HasValue())
-    {
-        optionalSessionHandle.Value()->AsSecureSession()->MarkAsDefunct();
-        return true;
-    }
-    return false;
-}
-
 Optional<SessionHandle> CASESessionManager::FindExistingSession(const ScopedNodeId & peerId) const
 {
     return mConfig.sessionInitParams.sessionManager->FindSecureSessionForNode(peerId,

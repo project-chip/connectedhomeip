@@ -387,8 +387,8 @@ void DefaultOTARequestor::DisconnectFromProvider()
     }
 
     auto providerNodeId = GetProviderScopedId();
-    mCASESessionManager->DisconnectSession(providerNodeId);
-    mCASESessionManager->ReleaseSession(providerNodeId);
+    mServer->GetSecureSessionManager().MarkSessionAsDefunctMark(providerNodeId,
+                                                                MakeOptional(Transport::SecureSession::Type::kCASE));
 }
 
 // Requestor is directed to cancel image update in progress. All the Requestor state is

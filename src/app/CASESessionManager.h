@@ -73,8 +73,6 @@ public:
 
     OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId) const;
 
-    bool DisconnectSession(const ScopedNodeId & peerId) const;
-
     void ReleaseSession(const ScopedNodeId & peerId);
 
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
