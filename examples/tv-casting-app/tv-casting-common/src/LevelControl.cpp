@@ -25,9 +25,9 @@ CHIP_ERROR StepCommand::Invoke(LevelControl::StepMode stepMode, uint8_t stepSize
                                uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback)
 {
     LevelControl::Commands::Step::Type request;
-    request.stepMode       = stepMode;
-    request.stepSize       = stepSize;
-    request.transitionTime = transitionTime;
+    request.stepMode        = stepMode;
+    request.stepSize        = stepSize;
+    request.transitionTime  = transitionTime;
     request.optionsMask     = optionMask;
     request.optionsOverride = optionOverride;
     return MediaCommandBase::Invoke(request, responseCallback);
@@ -37,8 +37,8 @@ CHIP_ERROR MoveToLevelCommand::Invoke(uint8_t level, uint16_t transitionTime, ui
                                       std::function<void(CHIP_ERROR)> responseCallback)
 {
     LevelControl::Commands::MoveToLevel::Type request;
-    request.level          = level;
-    request.transitionTime = transitionTime;
+    request.level           = level;
+    request.transitionTime  = transitionTime;
     request.optionsMask     = optionMask;
     request.optionsOverride = optionOverride;
     return MediaCommandBase::Invoke(request, responseCallback);
