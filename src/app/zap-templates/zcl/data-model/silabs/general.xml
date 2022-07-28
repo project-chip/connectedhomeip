@@ -194,7 +194,7 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="CURRENT_LEVEL"                 type="INT8U"  isNullable="true"           writable="false" default="0x00"   optional="false">CurrentLevel</attribute>
     <attribute side="server" code="0x0001" define="LEVEL_CONTROL_REMAINING_TIME"  type="INT16U" min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">RemainingTime</attribute>
     <attribute side="server" code="0x0002" define="MINIMUM_LEVEL"                 type="INT8U"  min="0x00"    max="0xFF"    writable="false" default="0x00"   optional="true">MinLevel</attribute>
-    <attribute side="server" code="0x0003" define="MAXIMUM_LEVEL"                 type="INT8U"  min="0x00"    max="0xFF"    writable="false" default="0xFE"   optional="true">Maxlevel</attribute>
+    <attribute side="server" code="0x0003" define="MAXIMUM_LEVEL"                 type="INT8U"  min="0x00"    max="0xFF"    writable="false" default="0xFE"   optional="true">MaxLevel</attribute>
     <attribute side="server" code="0x0004" define="CURRENT_FREQUENCY"             type="INT16U" min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">CurrentFrequency</attribute>
     <attribute side="server" code="0x0005" define="MIN_FREQUENCY"                 type="INT16U" min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">MinFrequency</attribute>
     <attribute side="server" code="0x0006" define="MAX_FREQUENCY"                 type="INT16U" min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">MaxFrequency</attribute>
@@ -215,7 +215,7 @@ limitations under the License.
         Command description for MoveToLevel
       </description>
       <arg name="Level"           type="INT8U"/>
-      <arg name="TransitionTime"  type="INT16U"/>
+      <arg name="TransitionTime"  type="INT16U" isNullable="true"/>
       <arg name="OptionsMask"     type="BITMAP8"/>
       <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
@@ -224,7 +224,7 @@ limitations under the License.
         Command description for Move
       </description>
       <arg name="MoveMode" type="ENUM8"/>
-      <arg name="Rate" type="INT8U"/>
+      <arg name="Rate" type="INT8U" isNullable="true"/>
       <arg name="OptionsMask" type="BITMAP8"/>
       <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
@@ -234,7 +234,7 @@ limitations under the License.
       </description>
       <arg name="StepMode" type="ENUM8"/>
       <arg name="StepSize" type="INT8U"/>
-      <arg name="TransitionTime" type="INT16U"/>
+      <arg name="TransitionTime" type="INT16U" isNullable="true"/>
       <arg name="OptionsMask" type="BITMAP8"/>
       <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
@@ -250,7 +250,7 @@ limitations under the License.
         Command description for MoveToLevelWithOnOff
       </description>
       <arg name="Level"           type="INT8U"/>
-      <arg name="TransitionTime"  type="INT16U"/>
+      <arg name="TransitionTime"  type="INT16U" isNullable="true"/>
       <arg name="OptionsMask"     type="BITMAP8"/>
       <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
@@ -259,7 +259,7 @@ limitations under the License.
         Command description for MoveWithOnOff
       </description>
       <arg name="MoveMode" type="ENUM8"/>
-      <arg name="Rate" type="INT8U"/>
+      <arg name="Rate" type="INT8U" isNullable="true"/>
       <arg name="OptionsMask" type="BITMAP8"/>
       <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
@@ -269,7 +269,7 @@ limitations under the License.
       </description>
       <arg name="StepMode" type="ENUM8"/>
       <arg name="StepSize" type="INT8U"/>
-      <arg name="TransitionTime" type="INT16U"/>
+      <arg name="TransitionTime" type="INT16U" isNullable="true"/>
       <arg name="OptionsMask" type="BITMAP8"/>
       <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
