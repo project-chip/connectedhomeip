@@ -34,6 +34,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
+#include <platform/ConnectivityManager.h>
 
 using namespace chip::System::Clock::Literals;
 
@@ -247,6 +248,18 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     // 3. Calculate `mrpBackoffTime *= (1.0 + random(0,1) * MRP_BACKOFF_JITTER)`
     uint32_t jitter = MRP_BACKOFF_JITTER_BASE + Crypto::GetRandU8();
     mrpBackoffTime  = mrpBackoffTime * jitter / MRP_BACKOFF_JITTER_BASE;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    // Implement:
+    //   "A sleepy sender SHOULD increase t to also account for its own sleepy interval
+    //   required to receive the acknowledgment"
+    DeviceLayer::ConnectivityManager::SEDIntervalsConfig sedIntervals;
+
+    if (DeviceLayer::ConnectivityMgr().GetSEDIntervalsConfig(sedIntervals) == CHIP_NO_ERROR)
+    {
+        mrpBackoffTime += System::Clock::Timestamp(sedIntervals.ActiveIntervalMS);
+    }
+#endif
 
     return mrpBackoffTime;
 }
