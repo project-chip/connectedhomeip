@@ -150,7 +150,7 @@ char* AppPlatformHandler(int argc, char ** argv)
         if (app->GetAccountLoginDelegate() == nullptr)
         {
             ChipLogProgress(DeviceLayer, "no AccountLogin cluster for app with endpoint id=%d ", endpoint);
-            
+
             strcpy(response,"no AccountLogin cluster for app with endpoint");
             return response;
         }
