@@ -112,7 +112,6 @@ function install_dependencies() {
 # ------------------------------------------------------------------------------
 # Function clean on EXIT
 function cleanup() {
-    echo "Clean removing $TMP_DIR"
     rm -rf "${TMP_DIR:?}"
 }
 
