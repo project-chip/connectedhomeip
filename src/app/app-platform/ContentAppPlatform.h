@@ -57,6 +57,12 @@ public:
     // Converts application (any catalog) into the platform's catalog Vendor
     // and then writes it to destinationApp
     virtual CHIP_ERROR ConvertToPlatformCatalogVendorApp(const CatalogVendorApp & sourceApp, CatalogVendorApp * destinationApp) = 0;
+
+    // Get the privilege this vendorId should have on endpoints 1, 2, and content app endpoints
+    // In the case of casting video clients, this should usually be Access::Privilege::kOperate
+    // and for voice agents, this may be Access::Privilege::kAdminister
+    // When a vendor has admin privileges, it will get access to all clusters on ep1
+    virtual Access::Privilege GetVendorPrivilege(uint16_t vendorId) = 0;
 };
 
 class DLL_EXPORT ContentAppPlatform

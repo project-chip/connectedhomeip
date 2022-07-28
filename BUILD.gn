@@ -244,9 +244,11 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Enable building chip with clang & boringssl
     enable_host_clang_boringssl_build = false
 
-    # Enable limited testing with clang & boringssl
+    # Enable limited testing with clang & boringssl.  On Mac, boringssl does
+    # not compile with ASAN enabled.
     enable_host_clang_boringssl_crypto_tests =
-        enable_default_builds && host_os != "win"
+        enable_default_builds && host_os != "win" &&
+        !(is_asan == true && host_os == "mac")
 
     # Build the chip-cert tool.
     enable_standalone_chip_cert_build =

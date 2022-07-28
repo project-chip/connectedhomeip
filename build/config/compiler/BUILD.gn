@@ -348,9 +348,6 @@ declare_args() {
   # Enable Thread sanitizer
   is_tsan = false
 
-  # Enable address sanitizer
-  is_asan = false
-
   # Enable memory sanitizer
   is_msan = false
 
