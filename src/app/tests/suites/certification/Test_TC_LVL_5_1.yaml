@@ -57,7 +57,7 @@ tests:
           constraints:
               type: uint8
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "Sends MoveToLevelWithOnOff command to DUT"
       PICS: LVL.S.C04.Rsp && LVL.S.A0002
@@ -97,7 +97,7 @@ tests:
           constraints:
               type: uint8
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "Reads current level attribute from DUT"
       PICS: LVL.S.A0000 && !LVL.S.A0002 && LVL.S.C04.Rsp
@@ -108,7 +108,7 @@ tests:
           constraints:
               type: uint8
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "Sends step up command to DUT"
       PICS: LVL.S.C02.Rsp && LVL.S.M.VarRate
@@ -126,23 +126,47 @@ tests:
               - name: "optionOverride"
                 value: 0
 
-    - label: "Wait 4000ms"
+    - label: "Sends step up command to DUT"
+      PICS: LVL.S.C02.Rsp && !LVL.S.M.VarRate
+      command: "Step"
+      arguments:
+          values:
+              - name: "stepMode"
+                value: 0
+              - name: "stepSize"
+                value: 64
+              - name: "transitionTime"
+                value: 20
+              - name: "optionMask"
+                value: 0
+              - name: "optionOverride"
+                value: 0
+
+    - label: "Wait 2500ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 4000
+                value: 2500
 
     - label: "Reads current level attribute from DUT"
       PICS: LVL.S.A0000 && LVL.S.C02.Rsp && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "current level"
       response:
+          value: 66
           constraints:
               type: uint8
-              minValue: 60
-              maxValue: 68
+
+    - label: "Reads current level attribute from DUT"
+      PICS: LVL.S.A0000 && LVL.S.C02.Rsp && !LVL.S.M.VarRate
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: 66
+          constraints:
+              type: uint8
 
     - label: "Sends a StepWithOnOff command"
       PICS: LVL.S.C06.Rsp && LVL.S.M.VarRate
@@ -160,13 +184,29 @@ tests:
               - name: "optionOverride"
                 value: 0
 
-    - label: "Wait 4000ms"
+    - label: "Sends a StepWithOnOff command"
+      PICS: LVL.S.C06.Rsp && !LVL.S.M.VarRate
+      command: "StepWithOnOff"
+      arguments:
+          values:
+              - name: "stepMode"
+                value: 1
+              - name: "stepSize"
+                value: 64
+              - name: "transitionTime"
+                value: 20
+              - name: "optionMask"
+                value: 0
+              - name: "optionOverride"
+                value: 0
+
+    - label: "Wait 2500ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 4000
+                value: 2500
 
     - label: "Reads current level attribute from DUT"
       PICS: LVL.S.C06.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
@@ -176,7 +216,21 @@ tests:
           value: CurrentlevelValue
 
     - label: "Reads current level attribute from DUT"
+      PICS: LVL.S.C06.Rsp && LVL.S.A0000 && !LVL.S.M.VarRate
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: CurrentlevelValue
+
+    - label: "Reads current level attribute from DUT"
       PICS: LVL.S.C06.Rsp && LVL.S.A0000 && !LVL.S.A0002 && LVL.S.M.VarRate
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: 2
+
+    - label: "Reads current level attribute from DUT"
+      PICS: LVL.S.C06.Rsp && LVL.S.A0000 && !LVL.S.A0002 && !LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "current level"
       response:
