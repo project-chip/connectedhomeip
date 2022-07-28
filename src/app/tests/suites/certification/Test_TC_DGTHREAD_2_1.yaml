@@ -44,7 +44,7 @@ tests:
       attribute: "RoutingRole"
       response:
           constraints:
-              type: RoutingRole
+              type: enum8
               minValue: 0
               maxValue: 6
 
