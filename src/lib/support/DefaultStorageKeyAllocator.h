@@ -43,7 +43,7 @@ public:
     const char * KeyName() { return mKeyName; }
 
     // Fabric Table
-    const char * FabricIndexInfo() { return Format("g/fidx"); }
+    const char * FabricIndexInfo() { return SetConst("g/fidx"); }
     const char * FabricNOC(FabricIndex fabric) { return Format("f/%x/n", fabric); }
     const char * FabricICAC(FabricIndex fabric) { return Format("f/%x/i", fabric); }
     const char * FabricRCAC(FabricIndex fabric) { return Format("f/%x/r", fabric); }
@@ -51,18 +51,18 @@ public:
     const char * FabricOpKey(FabricIndex fabric) { return Format("f/%x/o", fabric); }
 
     // Fail-safe handling
-    const char * FailSafeCommitMarkerKey() { return Format("g/fs/c"); }
-    static const char * FailSafeNetworkConfig() { return "g/fs/n"; }
+    const char * FailSafeCommitMarkerKey() { return SetConst("g/fs/c"); }
+    const char * FailSafeNetworkConfig() { return SetConst("g/fs/n"); }
 
     // LastKnownGoodTime
-    const char * LastKnownGoodTimeKey() { return Format("g/lkgt"); }
+    const char * LastKnownGoodTimeKey() { return SetConst("g/lkgt"); }
 
     // Session resumption
     const char * FabricSession(FabricIndex fabric, NodeId nodeId)
     {
         return Format("f/%x/s/%08" PRIX32 "%08" PRIX32, fabric, static_cast<uint32_t>(nodeId >> 32), static_cast<uint32_t>(nodeId));
     }
-    const char * SessionResumptionIndex() { return Format("g/sri"); }
+    const char * SessionResumptionIndex() { return SetConst("g/sri"); }
     const char * SessionResumption(const char * resumptionIdBase64) { return Format("g/s/%s", resumptionIdBase64); }
 
     // Access Control
@@ -73,8 +73,8 @@ public:
     const char * AccessControlExtensionEntry(FabricIndex fabric) { return Format("f/%x/ac/1", fabric); }
 
     // Group Message Counters
-    const char * GroupDataCounter() { return Format("g/gdc"); }
-    const char * GroupControlCounter() { return Format("g/gcc"); }
+    const char * GroupDataCounter() { return SetConst("g/gdc"); }
+    const char * GroupControlCounter() { return SetConst("g/gcc"); }
 
     // Device Information Provider
     const char * UserLabelLengthKey(EndpointId endpoint) { return Format("g/userlbl/%x", endpoint); }
@@ -83,7 +83,7 @@ public:
     // Group Data Provider
 
     // List of fabric indices that have endpoint-to-group associations defined.
-    const char * GroupFabricList() { return Format("g/gfl"); }
+    const char * GroupFabricList() { return SetConst("g/gfl"); }
     const char * FabricGroups(chip::FabricIndex fabric) { return Format("f/%x/g", fabric); }
     const char * FabricGroup(chip::FabricIndex fabric, chip::GroupId group) { return Format("f/%x/g/%x", fabric, group); }
     const char * FabricGroupKey(chip::FabricIndex fabric, uint16_t index) { return Format("f/%x/gk/%x", fabric, index); }
@@ -102,17 +102,17 @@ public:
 
     // TODO: Should store fabric-specific parts of the binding list under keys
     // starting with "f/%x/".
-    const char * BindingTable() { return Format("g/bt"); }
+    const char * BindingTable() { return SetConst("g/bt"); }
     const char * BindingTableEntry(uint8_t index) { return Format("g/bt/%x", index); }
 
-    static const char * OTADefaultProviders() { return "g/o/dp"; }
-    static const char * OTACurrentProvider() { return "g/o/cp"; }
-    static const char * OTAUpdateToken() { return "g/o/ut"; }
-    static const char * OTACurrentUpdateState() { return "g/o/us"; }
-    static const char * OTATargetVersion() { return "g/o/tv"; }
+    const char * OTADefaultProviders() { return SetConst("g/o/dp"); }
+    const char * OTACurrentProvider() { return SetConst("g/o/cp"); }
+    const char * OTAUpdateToken() { return SetConst("g/o/ut"); }
+    const char * OTACurrentUpdateState() { return SetConst("g/o/us"); }
+    const char * OTATargetVersion() { return SetConst("g/o/tv"); }
 
     // Event number counter.
-    const char * IMEventNumber() { return Format("g/im/ec"); }
+    const char * IMEventNumber() { return SetConst("g/im/ec"); }
 
 protected:
     // The ENFORCE_FORMAT args are "off by one" because this is a class method,
@@ -121,13 +121,16 @@ protected:
     {
         va_list args;
         va_start(args, format);
-        vsnprintf(mKeyName, sizeof(mKeyName), format, args);
+        vsnprintf(mKeyNameBuffer, sizeof(mKeyNameBuffer), format, args);
         va_end(args);
-        return mKeyName;
+        return mKeyName = mKeyNameBuffer;
     }
 
+    const char * SetConst(const char * keyName) { return mKeyName = keyName; }
+
 private:
-    char mKeyName[PersistentStorageDelegate::kKeyLengthMax + 1] = { 0 };
+    const char * mKeyName                                             = nullptr;
+    char mKeyNameBuffer[PersistentStorageDelegate::kKeyLengthMax + 1] = { 0 };
 };
 
 } // namespace chip

@@ -477,9 +477,19 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
 {
-    return CHIP_NO_ERROR;
+    int32_t err = wfx_reset_counts();
+    if (err == 0)
+    {
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 #endif // SL_WIFI
+
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
+}
 
 } // namespace DeviceLayer
 } // namespace chip

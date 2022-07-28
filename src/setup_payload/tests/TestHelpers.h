@@ -50,8 +50,8 @@ inline SetupPayload GetDefaultPayload()
     payload.productID             = 1;
     payload.commissioningFlow     = CommissioningFlow::kStandard;
     payload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP);
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
+    payload.discriminator.SetLongValue(128);
+    payload.setUpPINCode = 2048;
 
     return payload;
 }

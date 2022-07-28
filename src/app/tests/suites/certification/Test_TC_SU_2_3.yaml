@@ -111,6 +111,9 @@ tests:
           [1651259701990] [18726:35135506] CHIP: [DMG]         SuppressResponse = true,
           [1651259701990] [18726:35135506] CHIP: [DMG]         InteractionModelRevision = 1
           [1651259701990] [18726:35135506] CHIP: [DMG] }
+          [1653645452.044092][15281:15286] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Attribute 0x0000_0002 DataVersion: 1306504521
+          [1653645452.044186][15281:15286] CHIP:TOO:   UpdateState: 1
+
 
           Relaunch the OTA Provider App and initiate another query
           chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0

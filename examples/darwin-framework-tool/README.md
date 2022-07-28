@@ -114,3 +114,48 @@ To get the list of parameters for a specific command, run the built executable
 with the target cluster name and the target command name
 
     $ darwin-framework-tool onoff on
+
+## Using Interactive mode
+
+To start the interactive mode run the following command:
+
+    $ darwin-framework-tool interactive start
+
+Once in interactive mode, 'help' will display commands available
+
+## Using the OTA Software Update app
+
+OTA SW app will only work in interactive mode. In interactive mode there will be
+an additional command 'otasoftwareupdateapp'. Running the following command in
+interactive will display available commands.
+
+    $ otasoftwareupdateapp
+
+The following json is an example of a list of candidates to set in interactive
+mode with `otasoftwareupdateapp candidate-file-path`:
+
+```json
+{
+    "deviceSoftwareVersionModel": [
+        {
+            "vendorId": 65521,
+            "productId": 32769,
+            "softwareVersion": 10,
+            "softwareVersionString": "1.0.0",
+            "cDVersionNumber": 18,
+            "softwareVersionValid": true,
+            "minApplicableSoftwareVersion": 0,
+            "maxApplicableSoftwareVersion": 100,
+            "otaURL": "/Users/josh/Desktop/OTACandidates/ota_v10.bin"
+        }
+    ]
+}
+```
+
+darwin-framework-tool allows to set the consent status on the Provider side with
+the following command:
+
+    $ otasoftwareupdateapp set-consent-status [granted, obtaining, denied]
+
+By default, the consent will be set to unknown and the requestor will have to
+consent. If the requestor cannot consent, the update will be denied.

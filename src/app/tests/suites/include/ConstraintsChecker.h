@@ -59,11 +59,49 @@ protected:
     {
         if (current > expected)
         {
-            Exit(std::string(itemName) + " length > minLength: " + std::to_string(current) + " > " + std::to_string(expected));
+            Exit(std::string(itemName) + " length > maxLength: " + std::to_string(current) + " > " + std::to_string(expected));
             return false;
         }
 
         return true;
+    }
+
+    template <typename T>
+    bool CheckConstraintMinLength(const char * itemName, const chip::Span<T> & current, uint64_t expected)
+    {
+        return CheckConstraintMinLength(itemName, current.size(), expected);
+    }
+
+    template <typename T>
+    bool CheckConstraintMaxLength(const char * itemName, const chip::Span<T> & current, uint64_t expected)
+    {
+        return CheckConstraintMaxLength(itemName, current.size(), expected);
+    }
+
+    template <typename T>
+    bool CheckConstraintMinLength(const char * itemName, const chip::app::DataModel::DecodableList<T> & current, uint64_t expected)
+    {
+        size_t size;
+        CHIP_ERROR err = current.ComputeSize(&size);
+        if (err != CHIP_NO_ERROR)
+        {
+            Exit(std::string(itemName) + " length cannot be extracted: " + err.AsString());
+            return false;
+        }
+        return CheckConstraintMinLength(itemName, size, expected);
+    }
+
+    template <typename T>
+    bool CheckConstraintMaxLength(const char * itemName, const chip::app::DataModel::DecodableList<T> & current, uint64_t expected)
+    {
+        size_t size;
+        CHIP_ERROR err = current.ComputeSize(&size);
+        if (err != CHIP_NO_ERROR)
+        {
+            Exit(std::string(itemName) + " length cannot be extracted: " + err.AsString());
+            return false;
+        }
+        return CheckConstraintMaxLength(itemName, size, expected);
     }
 
     bool CheckConstraintStartsWith(const char * itemName, const chip::CharSpan current, const char * expected)

@@ -13,25 +13,38 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 119.3.1. [TC-G-3.1] Attributes [DUT-Client]
+name: 121.3.1. [TC-G-3.1] Attributes [DUT-Client]
 
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
     - label: "DUT reads NameSupport attribute from TH"
       PICS: G.C.A0000
       verification: |
-          [1651217683.754603][2825:2825] CHIP:IM: Received Read request
-          [1651217683.754677][2825:2825] CHIP:DMG: ReadRequestMessage =
-          [1651217683.754708][2825:2825] CHIP:DMG: {
-          [1651217683.754733][2825:2825] CHIP:DMG:        AttributePathIBs =
-          [1651217683.754764][2825:2825] CHIP:DMG:        [
-          [1651217683.754795][2825:2825] CHIP:DMG:                AttributePathIB =
-          [1651217683.754837][2825:2825] CHIP:DMG:                {
-          [1651217683.754891][2825:2825] CHIP:DMG:                        Endpoint = 0x0,
-          [1651217683.754934][2825:2825] CHIP:DMG:                        Cluster = 0x4,
-          [1651217683.754975][2825:2825] CHIP:DMG:                        Attribute = 0x0000_0000,
-          [1651217683.755014][2825:2825] CHIP:DMG:                }
+          ./chip-tool groups read name-support 1 1
+
+          Verify on the TH Log:
+
+          [1657706054.756051][5404:5409] CHIP:DMG:                                DataVersion = 0x80c3ec09,
+          [1657706054.756108][5404:5409] CHIP:DMG:                                AttributePathIB =
+          [1657706054.756162][5404:5409] CHIP:DMG:                                {
+          [1657706054.756218][5404:5409] CHIP:DMG:                                        Endpoint = 0x1,
+          [1657706054.756274][5404:5409] CHIP:DMG:                                        Cluster = 0x4,
+          [1657706054.756330][5404:5409] CHIP:DMG:                                        Attribute = 0x0000_0000,
+          [1657706054.756384][5404:5409] CHIP:DMG:                                }
+          [1657706054.756435][5404:5409] CHIP:DMG:
+          [1657706054.756491][5404:5409] CHIP:DMG:                                Data = 128,
+          [1657706054.756536][5404:5409] CHIP:DMG:                        },
+          [1657706054.756635][5404:5409] CHIP:DMG:                },
+          [1657706054.756684][5404:5409] CHIP:DMG:
+          [1657706054.756723][5404:5409] CHIP:DMG:        ],
+          [1657706054.756770][5404:5409] CHIP:DMG:
+          [1657706054.756810][5404:5409] CHIP:DMG:        SuppressResponse = true,
+          [1657706054.756851][5404:5409] CHIP:DMG:        InteractionModelRevision = 1
+          [1657706054.756890][5404:5409] CHIP:DMG: }
+          [1657706054.757195][5404:5409] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Attribute 0x0000_0000 DataVersion: 2160323593
+          [1657706054.757284][5404:5409] CHIP:TOO:   name support: 128
       disabled: true

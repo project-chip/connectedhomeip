@@ -84,7 +84,7 @@ OptionSet *gCmdOptionSets[] =
 // clang-format on
 
 const char * gInFileName  = nullptr;
-const char * gOutFileName = nullptr;
+const char * gOutFileName = "-";
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {

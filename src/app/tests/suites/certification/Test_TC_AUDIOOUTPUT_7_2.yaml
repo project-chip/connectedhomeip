@@ -29,7 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Reads the OutputList attribute from the DUT"
-      PICS: MC_AUDIOOUTPUT.S.A0000
+      PICS: AUDIOOUTPUT.S.A0000
       command: "readAttribute"
       attribute: "OutputList"
       response:
@@ -38,7 +38,7 @@ tests:
               type: OutPutInfo
 
     - label: "Sends a RenameOutput command"
-      PICS: MC_AUDIOOUTPUT.S.C0001
+      PICS: AUDIOOUTPUT.S.C0001
       command: "RenameOutput"
       arguments:
           values:
@@ -62,7 +62,7 @@ tests:
           [1651061821.366651][156898:156903] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MC_AUDIOOUTPUT.S.A0001
+      PICS: PICS_USER_PROMPT && AUDIOOUTPUT.S.A0001
       arguments:
           values:
               - name: "message"

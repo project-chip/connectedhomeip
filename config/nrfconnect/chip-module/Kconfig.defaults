@@ -289,6 +289,10 @@ config MBEDTLS_SHA512_C
     bool
     default n
 
+config PSA_WANT_ALG_SHA_512
+    bool
+    default n
+
 config MBEDTLS_CIPHER_MODE_XTS
     bool
     default n

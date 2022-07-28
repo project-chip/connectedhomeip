@@ -79,10 +79,7 @@ bool PayloadContents::isValidQRCodePayload() const
         return false;
     }
 
-    if (discriminator >= 1 << kPayloadDiscriminatorFieldLengthInBits)
-    {
-        return false;
-    }
+    // Discriminator validity is enforced by the SetupDiscriminator class.
 
     if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
     {
@@ -94,15 +91,8 @@ bool PayloadContents::isValidQRCodePayload() const
 
 bool PayloadContents::isValidManualCode() const
 {
-    // The discriminator for manual setup code is 4 most significant bits
-    // in a regular 12 bit discriminator. Let's make sure that the provided
-    // discriminator fits within 12 bits (kPayloadDiscriminatorFieldLengthInBits).
-    // The manual setup code generator will only use 4 most significant bits from
-    // it.
-    if (discriminator >= 1 << kPayloadDiscriminatorFieldLengthInBits)
-    {
-        return false;
-    }
+    // Discriminator validity is enforced by the SetupDiscriminator class.
+
     if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
     {
         return false;

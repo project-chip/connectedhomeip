@@ -136,9 +136,14 @@ private:
             {
                 sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
             }
-            ReturnErrorOnFailure(mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType,
-                                                           event.MsgData.Retain(), sendFlags));
-            return CHIP_NO_ERROR;
+            CHIP_ERROR err = mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType,
+                                                       event.MsgData.Retain(), sendFlags);
+            if (err != CHIP_NO_ERROR)
+            {
+                Reset();
+            }
+
+            return err;
         }
 
         CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
@@ -150,13 +155,14 @@ private:
                 return CHIP_NO_ERROR;
             }
 
-            mDownloader->OnMessageReceived(payloadHeader, payload.Retain());
+            mDownloader->OnMessageReceived(payloadHeader, std::move(payload));
 
             // For a receiver using BDX Protocol, all received messages will require a response except for a StatusReport
             if (!payloadHeader.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
             {
                 ec->WillSendMessage();
             }
+
             return CHIP_NO_ERROR;
         }
 
@@ -169,10 +175,19 @@ private:
             }
         }
 
+        void OnExchangeClosing(Messaging::ExchangeContext * ec) override { mExchangeCtx = nullptr; }
+
         void Init(chip::BDXDownloader * downloader, chip::Messaging::ExchangeContext * ec)
         {
             mExchangeCtx = ec;
             mDownloader  = downloader;
+        }
+
+        void Reset()
+        {
+            VerifyOrReturn(mExchangeCtx != nullptr);
+            mExchangeCtx->Close();
+            mExchangeCtx = nullptr;
         }
 
     private:
@@ -189,6 +204,12 @@ private:
      * Map a CHIP_ERROR to an IdleStateReason enum type
      */
     IdleStateReason MapErrorToIdleStateReason(CHIP_ERROR error);
+
+    ScopedNodeId GetProviderScopedId() const
+    {
+        VerifyOrDie(mProviderLocation.HasValue());
+        return ScopedNodeId(mProviderLocation.Value().providerNodeID, mProviderLocation.Value().fabricIndex);
+    }
 
     /**
      * Record the new update state by updating the corresponding server attribute and logging a StateTransition event
@@ -265,7 +286,7 @@ private:
      * Session connection callbacks
      */
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
-    static void OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
@@ -292,13 +313,12 @@ private:
      */
     static void OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
-    OTARequestorStorage * mStorage            = nullptr;
-    OTARequestorDriver * mOtaRequestorDriver  = nullptr;
-    CASESessionManager * mCASESessionManager  = nullptr;
-    OnConnectedAction mOnConnectedAction      = kQueryImage;
-    Messaging::ExchangeContext * mExchangeCtx = nullptr;
-    BDXDownloader * mBdxDownloader            = nullptr; // TODO: this should be OTADownloader
-    BDXMessenger mBdxMessenger;                          // TODO: ideally this is held by the application
+    OTARequestorStorage * mStorage           = nullptr;
+    OTARequestorDriver * mOtaRequestorDriver = nullptr;
+    CASESessionManager * mCASESessionManager = nullptr;
+    OnConnectedAction mOnConnectedAction     = kQueryImage;
+    BDXDownloader * mBdxDownloader           = nullptr; // TODO: this should be OTADownloader
+    BDXMessenger mBdxMessenger;                         // TODO: ideally this is held by the application
     uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
     ByteSpan mUpdateToken;
     uint32_t mCurrentVersion = 0;

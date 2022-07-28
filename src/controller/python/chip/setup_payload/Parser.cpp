@@ -39,7 +39,14 @@ void YieldSetupPayloadAttributes(const SetupPayload & payload, AttributeVisitor 
     attrVisitor("ProductID", std::to_string(payload.productID).c_str());
     attrVisitor("CommissioningFlow", std::to_string(static_cast<uint8_t>(payload.commissioningFlow)).c_str());
     attrVisitor("RendezvousInformation", std::to_string(payload.rendezvousInformation.Raw()).c_str());
-    attrVisitor("Discriminator", std::to_string(payload.discriminator).c_str());
+    if (payload.discriminator.IsShortDiscriminator())
+    {
+        attrVisitor("Short discriminator", std::to_string(payload.discriminator.GetShortValue()).c_str());
+    }
+    else
+    {
+        attrVisitor("Long discriminator", std::to_string(payload.discriminator.GetLongValue()).c_str());
+    }
     attrVisitor("SetUpPINCode", std::to_string(payload.setUpPINCode).c_str());
 
     std::string serialNumber;

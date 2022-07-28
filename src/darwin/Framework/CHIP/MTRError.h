@@ -50,6 +50,7 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
     MTRErrorCodeWrongAddressType     = 7,
     MTRErrorCodeIntegrityCheckFailed = 8,
     MTRErrorCodeTimeout              = 9,
+    MTRErrorCodeBufferTooSmall       = 10,
 };
 // clang-format on
 
@@ -98,6 +99,9 @@ typedef NS_ERROR_ENUM(MTRInteractionErrorDomain, MTRInteractionErrorCode){
     MTRInteractionErrorCodeNoUpstreamSubscription = 0xc5,
     MTRInteractionErrorCodeNeedsTimedInteraction  = 0xc6,
     MTRInteractionErrorCodeUnsupportedEvent       = 0xc7,
+    MTRInteractionErrorCodePathsExhausted         = 0xc8,
+    MTRInteractionErrorCodeTimedRequestMismatch   = 0xc9,
+    MTRInteractionErrorCodeFailsafeRequired       = 0xca,
 };
 // clang-format on
 

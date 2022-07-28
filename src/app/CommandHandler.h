@@ -33,7 +33,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeHolder.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
@@ -46,16 +46,9 @@
 namespace chip {
 namespace app {
 
-class CommandHandler
+class CommandHandler : public Messaging::ExchangeDelegate
 {
 public:
-    /*
-     * Destructor - as part of destruction, it will abort the exchange context
-     * if a valid one still exists.
-     *
-     * See Abort() for details on when that might occur.
-     */
-    virtual ~CommandHandler() { Abort(); }
     class Callback
     {
     public:
@@ -221,11 +214,15 @@ public:
     /**
      * Gets the inner exchange context object, without ownership.
      *
+     * WARNING: This is dangerous, since it is directly interacting with the
+     *          exchange being managed automatically by mExchangeCtx and
+     *          if not done carefully, may end up with use-after-free errors.
+     *
      * @return The inner exchange context, might be nullptr if no
      *         exchange context has been assigned or the context
      *         has been released.
      */
-    Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+    Messaging::ExchangeContext * GetExchangeContext() const { return mExchangeCtx.Get(); }
 
     /**
      * @brief Flush acks right away for a slow command
@@ -240,17 +237,34 @@ public:
      */
     void FlushAcksRightAwayOnSlowCommand()
     {
-        VerifyOrReturn(mpExchangeCtx != nullptr);
-        auto * msgContext = mpExchangeCtx->GetReliableMessageContext();
+        VerifyOrReturn(mExchangeCtx);
+        auto * msgContext = mExchangeCtx->GetReliableMessageContext();
         VerifyOrReturn(msgContext != nullptr);
         msgContext->FlushAcks();
     }
 
-    Access::SubjectDescriptor GetSubjectDescriptor() const { return mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor(); }
+    Access::SubjectDescriptor GetSubjectDescriptor() const { return mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor(); }
 
 private:
     friend class TestCommandInteraction;
     friend class CommandHandler::Handle;
+
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override
+    {
+        //
+        // We shouldn't be receiving any further messages on this exchange.
+        //
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override
+    {
+        //
+        // We're not expecting responses to any messages we send out on this EC.
+        //
+        VerifyOrDie(false);
+    }
 
     enum class State
     {
@@ -343,13 +357,15 @@ private:
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
-    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    Callback * mpCallback                      = nullptr;
+    Messaging::ExchangeHolder mExchangeCtx;
+    Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     size_t mPendingWork                    = 0;
     bool mSuppressResponse                 = false;
     bool mTimedRequest                     = false;
+
+    bool mSentStatusResponse = false;
 
     State mState = State::Idle;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;

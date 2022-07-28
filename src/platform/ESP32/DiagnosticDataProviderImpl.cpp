@@ -198,6 +198,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 {
     esp_netif_t * netif     = esp_netif_next(NULL);
     NetworkInterface * head = NULL;
+    uint8_t ipv6_addr_count = 0;
+    esp_ip6_addr_t ip6_addr[kMaxIPv6AddrCount];
     if (netif == NULL)
     {
         ChipLogError(DeviceLayer, "Failed to get network interfaces");
@@ -207,6 +209,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         for (esp_netif_t * ifa = netif; ifa != NULL; ifa = esp_netif_next(ifa))
         {
             NetworkInterface * ifp = new NetworkInterface();
+            esp_netif_ip_info_t ipv4_info;
             strncpy(ifp->Name, esp_netif_get_ifkey(ifa), Inet::InterfaceId::kMaxIfNameLength);
             ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
             ifp->name                                          = CharSpan::fromCharString(ifp->Name);
@@ -222,6 +225,20 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
             }
+            if (esp_netif_get_ip_info(ifa, &ipv4_info) == ESP_OK)
+            {
+                memcpy(ifp->Ipv4AddressesBuffer[0], &(ipv4_info.ip.addr), kMaxIPv4AddrSize);
+                ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
+                ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
+            }
+            ipv6_addr_count = esp_netif_get_all_ip6(ifa, ip6_addr);
+            for (uint8_t idx = 0; idx < ipv6_addr_count; ++idx)
+            {
+                memcpy(ifp->Ipv6AddressesBuffer[idx], ip6_addr[idx].addr, kMaxIPv6AddrSize);
+                ifp->Ipv6AddressSpans[idx] = ByteSpan(ifp->Ipv6AddressesBuffer[idx], kMaxIPv6AddrSize);
+            }
+            ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, ipv6_addr_count);
+
             ifp->Next = head;
             head      = ifp;
         }
@@ -352,6 +369,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
+}
 
 } // namespace DeviceLayer
 } // namespace chip

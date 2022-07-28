@@ -19,16 +19,19 @@
 // Included for the default AccessControlDelegate logging enables/disables.
 // See `chip_access_control_policy_logging_verbosity` in `src/app/BUILD.gn` for
 // the levels available.
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 #include "AccessControl.h"
 
-namespace {
+namespace chip {
+namespace Access {
 
 using chip::CATValues;
 using chip::FabricIndex;
 using chip::NodeId;
 using namespace chip::Access;
+
+namespace {
 
 AccessControl defaultAccessControl;
 AccessControl * globalAccessControl = &defaultAccessControl;
@@ -68,12 +71,22 @@ bool CheckRequestPrivilegeAgainstEntryPrivilege(Privilege requestPrivilege, Priv
 
 constexpr bool IsValidCaseNodeId(NodeId aNodeId)
 {
-    return chip::IsOperationalNodeId(aNodeId) || (chip::IsCASEAuthTag(aNodeId) && ((aNodeId & chip::kTagVersionMask) != 0));
+    if (IsOperationalNodeId(aNodeId))
+    {
+        return true;
+    }
+
+    if (IsCASEAuthTag(aNodeId) && (GetCASEAuthTagVersion(CASEAuthTagFromNodeId(aNodeId)) != 0))
+    {
+        return true;
+    }
+
+    return false;
 }
 
 constexpr bool IsValidGroupNodeId(NodeId aNodeId)
 {
-    return chip::IsGroupId(aNodeId) && chip::IsValidGroupId(chip::GroupIdFromNodeId(aNodeId));
+    return IsGroupId(aNodeId) && IsValidGroupId(GroupIdFromNodeId(aNodeId));
 }
 
 #if CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
@@ -160,9 +173,6 @@ char GetPrivilegeStringForLogging(Privilege privilege)
 #endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
 } // namespace
-
-namespace chip {
-namespace Access {
 
 AccessControl::Entry::Delegate AccessControl::Entry::mDefaultDelegate;
 AccessControl::EntryIterator::Delegate AccessControl::EntryIterator::mDefaultDelegate;

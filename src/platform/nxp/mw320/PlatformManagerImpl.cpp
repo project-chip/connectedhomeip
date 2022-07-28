@@ -61,9 +61,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::MW320Config::Init();
     SuccessOrExit(err);
 
-    // SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-
     // Initialize LwIP.
     // tcpip_init(NULL, NULL);
 

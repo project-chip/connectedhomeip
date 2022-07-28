@@ -23,7 +23,7 @@
  *
  */
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
@@ -515,15 +515,8 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
                   mCurReadHandlerIdx, hasMoreChunks ? "more messages" : "no more messages");
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        //
-        // WillSendMessage() was called on this EC well before it got here (since there was an intention to generate reports, which
-        // occurs asynchronously. Consequently, if any error occurs, it's on us to close down the exchange.
-        //
-        apReadHandler->Abort();
-    }
-    else if ((apReadHandler->IsType(ReadHandler::InteractionType::Read) && !hasMoreChunks) || needCloseReadHandler)
+    if (err != CHIP_NO_ERROR || (apReadHandler->IsType(ReadHandler::InteractionType::Read) && !hasMoreChunks) ||
+        needCloseReadHandler)
     {
         //
         // In the case of successful report generation and we're on the last chunk of a read, we don't expect
@@ -539,6 +532,7 @@ exit:
 void Engine::Run(System::Layer * aSystemLayer, void * apAppState)
 {
     Engine * const pEngine = reinterpret_cast<Engine *>(apAppState);
+    pEngine->mRunScheduled = false;
     pEngine->Run();
 }
 
@@ -574,8 +568,6 @@ void Engine::Run()
     uint32_t numReadHandled = 0;
 
     InteractionModelEngine * imEngine = InteractionModelEngine::GetInstance();
-
-    mRunScheduled = false;
 
     // We may be deallocating read handlers as we go.  Track how many we had
     // initially, so we make sure to go through all of them.

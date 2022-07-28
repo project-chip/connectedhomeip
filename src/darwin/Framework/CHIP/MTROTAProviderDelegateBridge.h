@@ -24,10 +24,11 @@ NS_ASSUME_NONNULL_BEGIN
 class MTROTAProviderDelegateBridge : public chip::app::Clusters::OTAProviderDelegate
 {
 public:
-    MTROTAProviderDelegateBridge();
+    MTROTAProviderDelegateBridge(id<MTROTAProviderDelegate> delegate);
     ~MTROTAProviderDelegateBridge();
 
-    void setDelegate(id<MTROTAProviderDelegate> delegate, dispatch_queue_t queue);
+    void Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager);
+    void Shutdown();
 
     void HandleQueryImage(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -42,24 +43,24 @@ public:
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
 
 private:
-    void ConvertToQueryImageParams(
+    static CHIP_ERROR ConvertToQueryImageParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
         MTROtaSoftwareUpdateProviderClusterQueryImageParams * commandParams);
-    void ConvertFromQueryImageResponseParms(
+    static void ConvertFromQueryImageResponseParms(
         const MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
         chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Type & response);
-    void ConvertToApplyUpdateRequestParams(
+    static void ConvertToApplyUpdateRequestParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData,
         MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * commandParams);
-    void ConvertFromApplyUpdateRequestResponseParms(
+    static void ConvertFromApplyUpdateRequestResponseParms(
         const MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * responseParams,
         chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Type & response);
-    void ConvertToNotifyUpdateAppliedParams(
+    static void ConvertToNotifyUpdateAppliedParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData,
         MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams);
 
     _Nullable id<MTROTAProviderDelegate> mDelegate;
-    _Nullable dispatch_queue_t mQueue;
+    dispatch_queue_t mWorkQueue;
 };
 
 NS_ASSUME_NONNULL_END

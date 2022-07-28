@@ -309,6 +309,19 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     mFlags.Set(Flags::kFlagEphemeralExchange, isEphemeralExchange);
     mDelegate = delegate;
 
+    //
+    // If we're an initiator and we just created this exchange, we obviously did so to send a message. Let's go ahead and
+    // set the flag on this to correctly mark it as so.
+    //
+    // This only applies to non-ephemeral exchanges. Ephemeral exchanges do not have an intention of sending out a message
+    // since they're created expressly for the purposes of sending out a standalone ACK when the message could not be handled
+    // through normal means.
+    //
+    if (Initiator && !isEphemeralExchange)
+    {
+        WillSendMessage();
+    }
+
     SetAckPending(false);
 
     // Do not request Ack for multicast
@@ -448,6 +461,17 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
 void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
 {
     SetResponseExpected(false);
+
+    // mSession might be null if this timeout is due to the session being
+    // evicted.
+    if (mSession)
+    {
+        if (mSession->IsSecureSession() && mSession->AsSecureSession()->IsCASESession())
+        {
+            mSession->AsSecureSession()->MarkAsDefunct();
+        }
+        mSession->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
+    }
 
     ExchangeDelegate * delegate = GetDelegate();
 

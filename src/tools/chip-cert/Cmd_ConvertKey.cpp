@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -40,11 +40,16 @@ bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[]);
 // clang-format off
 OptionDef gCmdOptionDefs[] =
 {
-    { "x509-pem",       kNoArgument, 'p' },
-    { "x509-der",       kNoArgument, 'd' },
-    { "chip",           kNoArgument, 'c' },
-    { "chip-hex",       kNoArgument, 'x' },
-    { "chip-b64",       kNoArgument, 'b' },
+    { "x509-pem",        kNoArgument, 'p' },
+    { "x509-der",        kNoArgument, 'd' },
+    { "x509-hex",        kNoArgument, 'x' },
+    { "x509-pubkey-pem", kNoArgument, 'P' },
+    { "chip",            kNoArgument, 'c' },
+    { "chip-b64",        kNoArgument, 'b' },
+    { "chip-hex",        kNoArgument, 'e' },
+    { "chip-pubkey",     kNoArgument, 'C' },
+    { "chip-pubkey-b64", kNoArgument, 'B' },
+    { "chip-pubkey-hex", kNoArgument, 'E' },
     { }
 };
 
@@ -57,6 +62,14 @@ const char * const gCmdOptionHelp =
     "\n"
     "       Output the private key in SEC1/RFC-5915 DER format. \n"
     "\n"
+    "   -x, --x509-hex\n"
+    "\n"
+    "       Output the private key in SEC1/RFC-5915 DER hex encoded format.\n"
+    "\n"
+    "   -P, --x509-pubkey-pem\n"
+    "\n"
+    "       Output the public key in SEC1/RFC-5915 PEM format.\n"
+    "\n"
     "   -c, --chip\n"
     "\n"
     "       Output the private key in raw CHIP serialized format.\n"
@@ -68,6 +81,22 @@ const char * const gCmdOptionHelp =
     "\n"
     "       Output the private key in base-64 encoded CHIP serialized format.\n"
     "       This is the default.\n"
+    "\n"
+    "   -e, --chip-hex\n"
+    "\n"
+    "       Output the private key in hex encoded CHIP serialized format.\n"
+    "\n"
+    "   -C, --chip-pubkey\n"
+    "\n"
+    "       Output the raw public key.\n"
+    "\n"
+    "   -B, --chip-pubkey-b64\n"
+    "\n"
+    "       Output the public key in base-64 encoded format.\n"
+    "\n"
+    "   -E, --chip-pubkey-hex\n"
+    "\n"
+    "       Output the public key in hex encoded format.\n"
     "\n"
     ;
 
@@ -122,14 +151,29 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
     case 'd':
         gOutFormat = kKeyFormat_X509_DER;
         break;
-    case 'b':
-        gOutFormat = kKeyFormat_Chip_Base64;
-        break;
     case 'x':
-        gOutFormat = kKeyFormat_Chip_Hex;
+        gOutFormat = kKeyFormat_X509_Hex;
+        break;
+    case 'P':
+        gOutFormat = kKeyFormat_X509_Pubkey_PEM;
         break;
     case 'c':
         gOutFormat = kKeyFormat_Chip_Raw;
+        break;
+    case 'b':
+        gOutFormat = kKeyFormat_Chip_Base64;
+        break;
+    case 'e':
+        gOutFormat = kKeyFormat_Chip_Hex;
+        break;
+    case 'C':
+        gOutFormat = kKeyFormat_Chip_Pubkey_Raw;
+        break;
+    case 'B':
+        gOutFormat = kKeyFormat_Chip_Pubkey_Base64;
+        break;
+    case 'E':
+        gOutFormat = kKeyFormat_Chip_Pubkey_Hex;
         break;
     default:
         PrintArgError("%s: Unhandled option: %s\n", progName, name);
@@ -187,7 +231,13 @@ bool Cmd_ConvertKey(int argc, char * argv[])
     res = ReadKey(gInFileName, key.get());
     VerifyTrueOrExit(res);
 
-    res = WritePrivateKey(gOutFileName, key.get(), gOutFormat);
+    if (IsPrivateKeyFormat(gOutFormat) && EC_KEY_get0_private_key(EVP_PKEY_get1_EC_KEY(key.get())) == nullptr)
+    {
+        fprintf(stderr, "Cannot convert to the private key format as the original key doesn't include private key.\n");
+        return false;
+    }
+
+    res = WriteKey(gOutFileName, key.get(), gOutFormat);
     VerifyTrueOrExit(res);
 
 exit:

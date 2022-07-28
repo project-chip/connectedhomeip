@@ -80,7 +80,7 @@ tests:
               - name: "nextUserIndex"
                 value: null
 
-    - label: "Get Max number of year Day schedules for user"
+    - label: "TH reads NumberOfYearDay SchedulesSupportedPerUser attribute"
       PICS: DRLK.S.F04 && DRLK.S.A0015
       command: "readAttribute"
       attribute: "NumberOfYearDaySchedulesSupportedPerUser"
@@ -90,7 +90,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Get number of supported users"
+    - label: "TH reads NumberOfTotalUsers Supported attribute"
       PICS: DRLK.C.F08 && DRLK.S.A0011
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
@@ -100,8 +100,8 @@ tests:
               minValue: 0
               maxValue: 65534
 
-    - label: "Send Set Year Day Schedule Command to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C0E.Rsp
+    - label: "TH sends Set Year Day Schedule Command to DUT"
+      PICS: DRLK.S.F04 && DRLK.S.C0e.Rsp
       command: "SetYearDaySchedule"
       arguments:
           values:
@@ -115,8 +115,8 @@ tests:
                 value: 1980
 
     #issue #18591
-    - label: "send Get Year Day Schedule Command"
-      PICS: DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx
+    - label: "TH sends Get Year Day Schedule Command to DUT"
+      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
@@ -127,28 +127,20 @@ tests:
       response:
           values:
               - name: "YearDayIndex"
-                constraints:
-                    minValue: 1
-                    maxValue: NumberOfYearDaySchedulesSupportedPerUser
+                value: 1
               - name: "userIndex"
-                constraints:
-                    minValue: 1
-                    maxValue: NumberOfTotalUsersSupported
+                value: 1
               - name: "status"
                 value: 0x0
               - name: "LocalStartTime"
-                constraints:
-                    hasValue: true
-                    type: epoch-s
+                value: 960
               - name: "LocalEndTime"
+                value: 1980
                 constraints:
-                    hasValue: true
-                    type: epoch-s
+                    minValue: 961
 
-    - label:
-          "Send Set Year Day Schedule Command to DUT and verify INVALID_COMMAND
-          response"
-      PICS: DRLK.S.C0E.Rsp
+    - label: "TH send Set Year Day Schedule Command to DUT"
+      PICS: DRLK.S.C0e.Rsp
       command: "SetYearDaySchedule"
       arguments:
           values:
@@ -163,10 +155,8 @@ tests:
       response:
           error: INVALID_COMMAND
 
-    - label:
-          "send Get Year Day Schedule Command to DUT and Verify INVALID_FIELD
-          response"
-      PICS: DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx
+    - label: "TH sends Get Year Day Schedule Command to DUT"
+      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
@@ -189,9 +179,28 @@ tests:
                 constraints:
                     hasValue: false
 
-    - label:
-          "send Get Year Day Schedule Command to DUT and verify FAILURE response"
-      PICS: DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx
+    - label: "Create a user with userIndex as 5"
+      command: "SetUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "userIndex"
+                value: 5
+              - name: "userName"
+                value: "xxx"
+              - name: "userUniqueId"
+                value: 6452
+              - name: "userStatus"
+                value: 1
+              - name: "userType"
+                value: 0
+              - name: "credentialRule"
+                value: 0
+
+    - label: "TH sends Get Year Day Schedule Command to DUT"
+      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
@@ -206,7 +215,7 @@ tests:
               - name: "userIndex"
                 value: 5
               - name: "status"
-                value: 0x01
+                value: 0x8B
               - name: "LocalStartTime"
                 constraints:
                     hasValue: false
@@ -214,7 +223,7 @@ tests:
                 constraints:
                     hasValue: false
 
-    - label: "Clear a year day schedule for the first user"
+    - label: "TH sends Clear Year Day Schedule to DUT"
       PICS: DRLK.S.C10.Rsp
       command: "ClearYearDaySchedule"
       arguments:
@@ -224,10 +233,8 @@ tests:
               - name: "userIndex"
                 value: 1
 
-    - label:
-          "send Get Year Day Schedule Command to DUT and verify NOT_FOUND
-          response"
-      PICS: DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx && DRLK.S.C10.Rsp
+    - label: "TH sends Get Year Day Schedule Command to DUT"
+      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx && DRLK.S.C10.Rsp
       command: "GetYearDaySchedule"
       arguments:
           values:
@@ -242,7 +249,7 @@ tests:
               - name: "userIndex"
                 value: 1
               - name: "status"
-                value: 0x01
+                value: 0x8B
               - name: "LocalStartTime"
                 constraints:
                     hasValue: false
@@ -250,8 +257,8 @@ tests:
                 constraints:
                     hasValue: false
 
-    - label: "Send Set Year Day Schedule Command to DUT "
-      PICS: DRLK.S.C0E.Rsp
+    - label: "TH sends Set Year Day Schedule Command to DUT"
+      PICS: DRLK.S.C0e.Rsp
       command: "SetYearDaySchedule"
       arguments:
           values:
@@ -264,8 +271,8 @@ tests:
               - name: "LocalEndTime"
                 value: 2100
 
-    - label: "send Get Year Day Schedule Command"
-      PICS: DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx
+    - label: "TH sends Get Year Day Schedule Command to DUT"
+      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
@@ -285,6 +292,20 @@ tests:
                 value: 1080
               - name: "LocalEndTime"
                 value: 2100
+                constraints:
+                    minValue: 1081
+
+    - label: "TH sends Clear Year Day Schedule to DUT"
+      PICS: DRLK.S.F04 && DRLK.S.C10.Rsp
+      command: "ClearYearDaySchedule"
+      arguments:
+          values:
+              - name: "yearDayIndex"
+                value: 0
+              - name: "userIndex"
+                value: 0
+      response:
+          error: INVALID_COMMAND
 
     - label: "Clear a year day schedule for the first user"
       PICS: DRLK.S.F04 && DRLK.S.C10.Rsp

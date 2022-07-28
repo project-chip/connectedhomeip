@@ -30,6 +30,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
+#include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -206,6 +207,24 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId end
             ReturnErrorOnFailure(encoder.Encode(ByteSpan{ cert }));
         }
 
+        {
+            uint8_t certBuf[kMaxCHIPCertLength];
+            MutableByteSpan cert{ certBuf };
+            CHIP_ERROR err = fabricTable.FetchPendingNonFabricAssociatedRootCert(cert);
+            if (err == CHIP_ERROR_NOT_FOUND)
+            {
+                // No pending root cert, do nothing
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                return err;
+            }
+            else
+            {
+                ReturnErrorOnFailure(encoder.Encode(ByteSpan{ cert }));
+            }
+        }
+
         return CHIP_NO_ERROR;
     });
 }
@@ -325,25 +344,18 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
 // As per specifications section 11.22.5.1. Constant RESP_MAX
 constexpr size_t kMaxRspLen = 900;
 
-// TODO: The code currently has two sources of truths for fabrics, the fabricInfo table + the attributes. There should only be one,
-// the attributes list. Currently the attributes are not persisted so we are keeping the fabric table to have the
-// fabrics/admrins be persisted. Once attributes are persisted, there should only be one sorce of truth, the attributes list and
-// only that should be modifed to perosst/read/write fabrics.
-// TODO: Once attributes are persisted, implement reading/writing/manipulation fabrics around that and remove fabricTable
-// logic.
 class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
 {
 public:
-    // Gets called when a fabric is deleted from KVS store
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    // Gets called when a fabric is about to be deleted
+    void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
-
         // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
         for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
         {
             // If Basic cluster is implemented on this endpoint
             Basic::Events::Leave::Type event;
+            event.fabricIndex = fabricIndex;
             EventNumber eventNumber;
 
             if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
@@ -359,8 +371,14 @@ public:
         // - removing the fabric removes all associated access control entries, so generating
         //   subsequent reports containing the leave event will fail the access control check.
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync();
-        EventManagement::GetInstance().FabricRemoved(fabricIndex);
+    }
 
+    // Gets called when a fabric is deleted
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
+
+        EventManagement::GetInstance().FabricRemoved(fabricIndex);
         NotifyFabricTableChanged();
     }
 
@@ -490,22 +508,11 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
         }
     }
 
-    CHIP_ERROR err = CHIP_ERROR_INTERNAL;
-
-    // Fetch current fabric
-    const FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
-    if (fabric == nullptr)
-    {
-        SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kInsufficientPrivilege, ourFabricIndex,
-                        CharSpan::fromCharString("Current fabric not found"));
-        return true;
-    }
-
     // Set Label on fabric. Any error on this is basically an internal error...
     // NOTE: if an UpdateNOC had caused a pending fabric, that pending fabric is
     //       the one updated thereafter. Otherwise, the data is committed to storage
     //       as soon as the update is done.
-    err = fabricTable.SetFabricLabel(ourFabricIndex, label);
+    CHIP_ERROR err = fabricTable.SetFabricLabel(ourFabricIndex, label);
     VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
 
     finalStatus = Status::Success;
@@ -564,6 +571,10 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     {
         return OperationalCertStatus::kInvalidNOC;
     }
+    if (err == CHIP_ERROR_WRONG_CERT_DN)
+    {
+        return OperationalCertStatus::kInvalidNOC;
+    }
     if (err == CHIP_ERROR_INCORRECT_STATE)
     {
         return OperationalCertStatus::kMissingCsr;
@@ -583,10 +594,6 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     if (err == CHIP_ERROR_INVALID_ADMIN_SUBJECT)
     {
         return OperationalCertStatus::kInvalidAdminSubject;
-    }
-    if (err == CHIP_ERROR_INSUFFICIENT_PRIVILEGE)
-    {
-        return OperationalCertStatus::kInsufficientPrivilege;
     }
 
     return OperationalCertStatus::kInvalidNOC;
@@ -645,9 +652,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     // Flush acks before really slow work
     commandObj->FlushAcksRightAwayOnSlowCommand();
-
-    // TODO: Add support for calling AddNOC without a prior AddTrustedRootCertificate if
-    //       the root properly matches an existing one.
 
     // We can't possibly have a matching root based on the fact that we don't have
     // a shared root store. Therefore we would later fail path validation due to
@@ -1175,9 +1179,9 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     // Flush acks before really slow work
     commandObj->FlushAcksRightAwayOnSlowCommand();
 
-    // TODO(#17208): Handle checking for byte-to-byte match with existing fabrics before allowing the add
+    err = ValidateChipRCAC(rootCertificate);
+    VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::InvalidCommand);
 
-    // TODO(#17208): Validate cert signature prior to setting.
     err = fabricTable.AddNewPendingTrustedRootCert(rootCertificate);
     VerifyOrExit(err != CHIP_ERROR_NO_MEMORY, finalStatus = Status::ResourceExhausted);
 

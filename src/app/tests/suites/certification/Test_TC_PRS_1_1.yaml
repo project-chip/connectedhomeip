@@ -36,7 +36,7 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Read the global attribute constraints: FeatureMap"
+    - label: "Read the global attribute: FeatureMap"
       PICS: PRS.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -45,13 +45,76 @@ tests:
           constraints:
               type: map32
 
-    - label: "Read the global mandatory attribute constraints: AttributeList"
+    - label: "Read the global attribute: FeatureMap"
+      PICS: " !PRS.S.F00 "
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
+
+    - label: "Read the global mandatory attribute: AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
+
+    - label: "Read the optional attribute(ScaledValue) in AttributeList"
+      PICS: PRS.S.A0010
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16]
+
+    - label: "Read the optional attribute(MinScaledValue) in AttributeList"
+      PICS: PRS.S.A0011
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [17]
+
+    - label: "Read the optional attribute(MaxScaledValue) in AttributeList"
+      PICS: PRS.S.A0012
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [18]
+
+    - label: "Read the optional attribute(Scale) in AttributeList"
+      PICS: PRS.S.A0014
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [20]
+
+    - label: "Read the optional attribute(Tolerance) in AttributeList"
+      PICS: PRS.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label: "Read the optional attribute(ScaledTolerance) in AttributeList"
+      PICS: PRS.S.A0013
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [19]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"

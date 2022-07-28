@@ -350,6 +350,8 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWiFiStatsCounters(void)
     uint16_t freq;
     uint16_t bssid;
 
+    IgnoreUnusedVariable(freq);
+    IgnoreUnusedVariable(bssid);
     err = esp_wifi_get_config(WIFI_IF_STA, &wifiConfig);
     if (err != ESP_OK)
     {

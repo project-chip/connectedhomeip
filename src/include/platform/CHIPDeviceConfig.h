@@ -960,7 +960,7 @@
 #error "Non-default Spake2+ salt configured but verifier left unchanged"
 #endif
 
-// Generated with: spake2p gen-verifier -o - -i 1000 -s "SPAKE2P Key Salt" -p 20202021
+// Generated with: spake2p gen-verifier -o - -i 1000 -s "U1BBS0UyUCBLZXkgU2FsdA==" -p 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER                                                                               \
     "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/"  \
     "NH6Rmzw=="

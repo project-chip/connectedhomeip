@@ -30,6 +30,8 @@ const uint16_t kListenPort = 5541;
 static CHIPToolPersistentStorageDelegate * storage = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
 std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;
+dispatch_queue_t CHIPCommandBridge::mOTAProviderCallbackQueue;
+OTAProviderDelegate * CHIPCommandBridge::mOTADelegate;
 
 CHIP_ERROR CHIPCommandBridge::Run()
 {
@@ -62,6 +64,8 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     CHIPToolKeypair * nocSigner = [[CHIPToolKeypair alloc] init];
     storage = [[CHIPToolPersistentStorageDelegate alloc] init];
 
+    mOTADelegate = [[OTAProviderDelegate alloc] init];
+
     auto factory = [MTRControllerFactory sharedInstance];
     if (factory == nil) {
         ChipLogError(chipTool, "Controller factory is nil");
@@ -71,6 +75,7 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     auto params = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
     params.port = @(kListenPort);
     params.startServer = YES;
+    params.otaProviderDelegate = mOTADelegate;
 
     if ([factory startup:params] == NO) {
         ChipLogError(chipTool, "Controller factory startup failed");

@@ -63,85 +63,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRPowerProfileClusterPowerProfileRecord
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _powerProfileId = @(0);
-
-        _energyPhaseId = @(0);
-
-        _powerProfileRemoteControl = @(0);
-
-        _powerProfileState = @(0);
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: powerProfileId:%@; energyPhaseId:%@; powerProfileRemoteControl:%@; powerProfileState:%@; >",
-        NSStringFromClass([self class]), _powerProfileId, _energyPhaseId, _powerProfileRemoteControl, _powerProfileState];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRPowerProfileClusterScheduledPhase
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _energyPhaseId = @(0);
-
-        _scheduledTime = @(0);
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: energyPhaseId:%@; scheduledTime:%@; >",
-                                             NSStringFromClass([self class]), _energyPhaseId, _scheduledTime];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRPowerProfileClusterTransferredPhase
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _energyPhaseId = @(0);
-
-        _macroPhaseId = @(0);
-
-        _expectedDuration = @(0);
-
-        _peakPower = @(0);
-
-        _energy = @(0);
-
-        _maxActivationDelay = @(0);
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString
-        stringWithFormat:
-            @"<%@: energyPhaseId:%@; macroPhaseId:%@; expectedDuration:%@; peakPower:%@; energy:%@; maxActivationDelay:%@; >",
-        NSStringFromClass([self class]), _energyPhaseId, _macroPhaseId, _expectedDuration, _peakPower, _energy,
-        _maxActivationDelay];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRDescriptorClusterDeviceType
 - (instancetype)init
 {
@@ -275,16 +196,16 @@ NS_ASSUME_NONNULL_BEGIN
 
         _latestValue = nil;
 
-        _adminFabricIndex = @(0);
+        _fabricIndex = @(0);
     }
     return self;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: adminNodeID:%@; adminPasscodeID:%@; changeType:%@; latestValue:%@; adminFabricIndex:%@; >",
-        NSStringFromClass([self class]), _adminNodeID, _adminPasscodeID, _changeType, _latestValue, _adminFabricIndex];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: adminNodeID:%@; adminPasscodeID:%@; changeType:%@; latestValue:%@; fabricIndex:%@; >",
+                  NSStringFromClass([self class]), _adminNodeID, _adminPasscodeID, _changeType, _latestValue, _fabricIndex];
     return descriptionString;
 }
 
@@ -303,16 +224,16 @@ NS_ASSUME_NONNULL_BEGIN
 
         _latestValue = nil;
 
-        _adminFabricIndex = @(0);
+        _fabricIndex = @(0);
     }
     return self;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: adminNodeID:%@; adminPasscodeID:%@; changeType:%@; latestValue:%@; adminFabricIndex:%@; >",
-        NSStringFromClass([self class]), _adminNodeID, _adminPasscodeID, _changeType, _latestValue, _adminFabricIndex];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: adminNodeID:%@; adminPasscodeID:%@; changeType:%@; latestValue:%@; fabricIndex:%@; >",
+                  NSStringFromClass([self class]), _adminNodeID, _adminPasscodeID, _changeType, _latestValue, _fabricIndex];
     return descriptionString;
 }
 
@@ -481,13 +402,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _fabricIndex = @(0);
     }
     return self;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: fabricIndex:%@; >", NSStringFromClass([self class]), _fabricIndex];
     return descriptionString;
 }
 
@@ -2678,14 +2602,15 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _arg1 = @(0);
+        _fabricIndex = @(0);
     }
     return self;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: fabricIndex:%@; >", NSStringFromClass([self class]), _fabricIndex];
     return descriptionString;
 }
 

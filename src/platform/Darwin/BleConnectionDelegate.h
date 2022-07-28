@@ -26,7 +26,7 @@ namespace Internal {
 class BleConnectionDelegateImpl : public Ble::BleConnectionDelegate
 {
 public:
-    virtual void NewConnection(Ble::BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator);
+    virtual void NewConnection(Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator);
     virtual CHIP_ERROR CancelConnection();
 };
 

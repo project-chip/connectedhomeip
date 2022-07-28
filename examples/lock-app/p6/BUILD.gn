@@ -139,8 +139,8 @@ p6_executable("lock_app") {
     "${examples_plat_dir}/init_p6Platform.cpp",
     "${p6_project_dir}/include/CHIPProjectConfig.h",
     "src/AppTask.cpp",
-    "src/BoltLockManager.cpp",
     "src/ButtonHandler.cpp",
+    "src/LockManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]

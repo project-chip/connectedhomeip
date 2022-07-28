@@ -35,33 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRPowerProfileClusterPowerProfileRecord : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull powerProfileId;
-@property (strong, nonatomic) NSNumber * _Nonnull energyPhaseId;
-@property (strong, nonatomic) NSNumber * _Nonnull powerProfileRemoteControl;
-@property (strong, nonatomic) NSNumber * _Nonnull powerProfileState;
-- (instancetype)init;
-
-@end
-
-@interface MTRPowerProfileClusterScheduledPhase : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull energyPhaseId;
-@property (strong, nonatomic) NSNumber * _Nonnull scheduledTime;
-- (instancetype)init;
-
-@end
-
-@interface MTRPowerProfileClusterTransferredPhase : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull energyPhaseId;
-@property (strong, nonatomic) NSNumber * _Nonnull macroPhaseId;
-@property (strong, nonatomic) NSNumber * _Nonnull expectedDuration;
-@property (strong, nonatomic) NSNumber * _Nonnull peakPower;
-@property (strong, nonatomic) NSNumber * _Nonnull energy;
-@property (strong, nonatomic) NSNumber * _Nonnull maxActivationDelay;
-- (instancetype)init;
-
-@end
-
 @interface MTRDescriptorClusterDeviceType : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull type;
 @property (strong, nonatomic) NSNumber * _Nonnull revision;
@@ -109,7 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable adminPasscodeID;
 @property (strong, nonatomic) NSNumber * _Nonnull changeType;
 @property (strong, nonatomic) MTRAccessControlClusterAccessControlEntry * _Nullable latestValue;
-@property (strong, nonatomic) NSNumber * _Nonnull adminFabricIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @end
 
 @interface MTRAccessControlClusterAccessControlExtensionChangedEvent : NSObject
@@ -117,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable adminPasscodeID;
 @property (strong, nonatomic) NSNumber * _Nonnull changeType;
 @property (strong, nonatomic) MTRAccessControlClusterExtensionEntry * _Nullable latestValue;
-@property (strong, nonatomic) NSNumber * _Nonnull adminFabricIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @end
 
 @interface MTRBridgedActionsClusterActionStruct : NSObject
@@ -168,6 +141,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRBasicClusterLeaveEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @end
 
 @interface MTRBasicClusterReachableChangedEvent : NSObject
@@ -817,7 +791,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRTestClusterClusterTestFabricScopedEventEvent : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull arg1;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @end
 
 NS_ASSUME_NONNULL_END

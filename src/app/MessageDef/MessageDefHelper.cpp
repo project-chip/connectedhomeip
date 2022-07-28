@@ -23,7 +23,7 @@
 
 #include "MessageDefHelper.h"
 #include <algorithm>
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/InteractionModelRevision.h>
 #include <app/util/basic-types.h>
 #include <inttypes.h>
@@ -171,16 +171,19 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
     case TLV::kTLVType_UTF8String: {
         char value_s[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
+#if CHIP_DETAIL_LOGGING
+        uint32_t readerLen = aReader.GetLength();
+#endif // CHIP_DETAIL_LOGGING
         CHIP_ERROR err = aReader.GetString(value_s, sizeof(value_s));
         VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, err);
 
         if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
         {
-            PRETTY_PRINT_SAMELINE("... (byte string too long) ...");
+            PRETTY_PRINT_SAMELINE("... (char string too long: %" PRIu32 " chars) ...", readerLen);
         }
         else
         {
-            PRETTY_PRINT_SAMELINE("\"%s\", ", value_s);
+            PRETTY_PRINT_SAMELINE("\"%s\" (%" PRIu32 " chars), ", value_s, readerLen);
         }
         break;
     }
@@ -218,7 +221,7 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
             }
         }
 
-        PRETTY_PRINT("]");
+        PRETTY_PRINT("] (%" PRIu32 " bytes)", readerLen);
         break;
     }
 

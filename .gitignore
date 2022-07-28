@@ -64,3 +64,4 @@ compile_commands.json
 
 # log files
 *.log
+examples/thermostat/ameba/build

@@ -210,7 +210,8 @@ private:
 
     void Finish();
 
-    Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_PakeError;
+    // mNextExpectedMsg is set when we are expecting a message.
+    Optional<Protocols::SecureChannel::MsgType> mNextExpectedMsg;
 
 #ifdef ENABLE_HSM_SPAKE
     Spake2pHSM_P256_SHA256_HKDF_HMAC mSpake2p;

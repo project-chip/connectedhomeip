@@ -29,9 +29,10 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceControlServer.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
-#include <platform/webos/DeviceInfoProviderImpl.h>
+#include <platform/webos/DeviceInstanceInfoProviderImpl.h>
 #include <platform/webos/DiagnosticDataProviderImpl.h>
 
 #include <thread>
@@ -163,13 +164,14 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     // Initialize the configuration system.
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack());
+
+    // Now set up our device instance info provider.  We couldn't do that
+    // earlier, because the generic implementation sets a generic one.
+    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 

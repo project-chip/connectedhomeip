@@ -24,64 +24,33 @@ config:
 
 tests:
     - label:
-          "If (PICS_DT_CTRL_CONCATENATED_QR_CODE_1), scan larger QR code that
-          will support the commissioning of all the devices"
+          "Scan larger QR code that will support the commissioning of all the TH
+          devices"
       PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
       verification: |
-          '' ./chip-all-clusters-app
+          Out of Scope for V1.0 as Concatenated QR codes are not supported yet
+          https://github.com/project-chip/connectedhomeip/issues/5331
 
+          1. Lauch TH chip-all-clusters-app
+          ubuntu@matter-7:~/Apr18_dut/connectedhomeip/examples/all-clusters-app/linux/out/all-clusters-app$ sudo ./chip-all-clusters-app --wifi
 
-          [1646286638.375844][11651:11651] CHIP:DL: Device Configuration:
-          [1646286638.375960][11651:11651] CHIP:DL:   Serial Number: TEST_SN
-          [1646286638.376016][11651:11651] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1646286638.376066][11651:11651] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1646286638.376153][11651:11651] CHIP:DL:   Hardware Version: 0
-          [1646286638.377458][11651:11651] CHIP:DL:   Setup Pin Code: 20202021
-          [1646286638.377541][11651:11651] CHIP:DL:   Setup Discriminator: 3840 (0xF00)
-          [1646286638.377611][11651:11651] CHIP:DL:   Manufacturing Date: (not set)
-          [1646286638.377664][11651:11651] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1646286638.377771][11651:11651] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
-          [1646286638.377865][11651:11651] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1646286638.377915][11651:11651] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
-          [1646286638.377986][11651:11651] CHIP:SVR: Manual pairing code: [34970112332]
-          [1646286638.378089][11651:11651] CHIP:SVR: Long manual pairing code: [749701123365521327694]
-
-
-
-
-           ./chip-tool payload parse-setup-payload MT:-24J042C00KA0648G00
-          [1646287790.029238][8190:8190] CHIP:SPL: Parsing base38Representation: MT:-24J042C00KA0648G00
-          [1646287790.029368][8190:8190] CHIP:SPL: CommissioningFlow: 0
-          [1646287790.029393][8190:8190] CHIP:SPL: VendorID: 65521
-          [1646287790.029413][8190:8190] CHIP:SPL: Version: 0
-          [1646287790.029432][8190:8190] CHIP:SPL: ProductID: 32769
-          [1646287790.029451][8190:8190] CHIP:SPL: Discriminator: 3840
-          [1646287790.029469][8190:8190] CHIP:SPL: SetUpPINCode: 20202021
-          [1646287790.029488][8190:8190] CHIP:SPL: RendezvousInformation: 2
-      disabled: true
-
-    - label: "If (PICS_DT_CTRL_CONCATENATED_QR_CODE_1)"
-      PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
-      verification: |
-          Vendor specific field testcase
-      disabled: true
-
-    - label:
-          "If !(PICS_DT_CTRL_CONCATENATED_QR_CODE_1) &&
-          PICS_DT_CTRL_CONCATENATED_QR_CODE_2"
-      PICS:
-          "!MCORE.DD.CTRL_CONCATENATED_QR_CODE_1 &&
-          MCORE.DD.CTRL_CONCATENATED_QR_CODE_2"
-      verification: |
-          Vendor specific field testcase
-      disabled: true
-
-    - label:
-          "If !(PICS_DT_CTRL_CONCATENATED_QR_CODE_1) &&
-          !(PICS_DT_CTRL_CONCATENATED_QR_CODE_2)"
-      PICS:
-          "!MCORE.DD.CTRL_CONCATENATED_QR_CODE_1 &&
-          !MCORE.DD.CTRL_CONCATENATED_QR_CODE_2"
-      verification: |
-          Vendor specific field testcase
+          [13293:13293] CHIP:DL: Device Configuration:
+          [1653306603.740569][13293:13293] CHIP:DL:   Serial Number: TEST_SN
+          [1653306603.740607][13293:13293] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1653306603.740644][13293:13293] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1653306603.740676][13293:13293] CHIP:DL:   Hardware Version: 0
+          [1653306603.740700][13293:13293] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1653306603.740722][13293:13293] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1653306603.740752][13293:13293] CHIP:DL:   Manufacturing Date: (not set)
+          [1653306603.740777][13293:13293] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1653306603.740798][13293:13293] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1653306603.740846][13293:13293] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
+          [1653306603.740877][13293:13293] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1653306603.740898][13293:13293] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          [1653306603.740929][13293:13293] CHIP:SVR: Manual pairing code: [34970112332]
+          [1653306603.740951][13293:13293] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
+          [1653306603.741000][13293:13293] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
+          [1653306603.741028][13293:13293] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1653306603.741049][13293:13293] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
+          [1653306603.741081][13293:13293] CHIP:SVR: Manual pairing code: [749701123365521327694]
       disabled: true

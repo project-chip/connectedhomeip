@@ -83,10 +83,9 @@ jobs:
               # enable it for various reasons.  Keep whatever Xcode settings
               # for OTHER_CFLAGS exist by using ${inherited}.
               #
-              # Disable -Wmacro-redefined because CHIP_DEVICE_CONFIG_ENABLE_MDNS
-              # seems to be unconditionally defined in CHIPDeviceBuildConfig.h,
-              # which is apparently being included after CHIPDeviceConfig.h.
-              run: xcodebuild -target "Matter" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wno-macro-redefined'
+              # Enable -Wconversion by hand as well, because it seems to not be
+              # enabled by default in the Xcode config.
+              run: xcodebuild -target "Matter" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wconversion'
               working-directory: src/darwin/Framework
             - name: Clean Build
               run: xcodebuild clean
@@ -111,7 +110,7 @@ jobs:
               run: |
                   mkdir -p /tmp/darwin/framework-tests
                   ../../../out/debug/chip-all-clusters-app --interface-id -1 > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
-                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wno-incomplete-umbrella' > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
+                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-incomplete-umbrella' > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
               working-directory: src/darwin/Framework
             - name: Uploading log files
               uses: actions/upload-artifact@v2

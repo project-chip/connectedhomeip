@@ -269,3 +269,6 @@
 [submodule "editline"]
 	path = third_party/editline/repo
 	url = https://github.com/troglobit/editline.git
+[submodule "third_party/boringssl/repo/src"]
+	path = third_party/boringssl/repo/src
+	url = https://github.com/google/boringssl.git

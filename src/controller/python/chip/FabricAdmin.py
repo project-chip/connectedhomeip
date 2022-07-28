@@ -64,12 +64,15 @@ class FabricAdmin:
         boot for a given fabric and ensuring it automatically picks up the right ICAC/RCAC details as well.
     '''
 
-    _handle = chip.native.GetLibraryHandle()
     _isActive = False
     activeFabricIndexList = set()
     activeFabricIdList = set()
     activeAdmins = set()
     vendorId = None
+
+    @classmethod
+    def _Handle(cls):
+        return chip.native.GetLibraryHandle()
 
     def AllocateNextFabricIndex(self):
         ''' Allocate the next un-used fabric index.
@@ -133,10 +136,10 @@ class FabricAdmin:
 
         print(
             f"New FabricAdmin: FabricId: {self._fabricId}({self._fabricIndex}), VendorId = {hex(self.vendorId)}")
-        self._handle.pychip_OpCreds_InitializeDelegate.restype = c_void_p
+        self._Handle().pychip_OpCreds_InitializeDelegate.restype = c_void_p
 
         self.closure = builtins.chipStack.Call(
-            lambda: self._handle.pychip_OpCreds_InitializeDelegate(
+            lambda: self._Handle().pychip_OpCreds_InitializeDelegate(
                 ctypes.py_object(self), ctypes.c_uint32(self._fabricIndex))
         )
 
@@ -195,7 +198,7 @@ class FabricAdmin:
         '''
         if (self._isActive):
             builtins.chipStack.Call(
-                lambda: self._handle.pychip_OpCreds_FreeDelegate(
+                lambda: self._Handle().pychip_OpCreds_FreeDelegate(
                     ctypes.c_void_p(self.closure))
             )
 

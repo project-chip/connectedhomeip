@@ -135,26 +135,26 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
     ChipLogProgress(chipTool, "Endpoint: %u Cluster: " ChipLogFormatMEI " Event " ChipLogFormatMEI, header.mPath.mEndpointId,
                     ChipLogValueMEI(header.mPath.mClusterId), ChipLogValueMEI(header.mPath.mEventId));
 
-    ChipLogProgress(chipTool, "\t Event number: %" PRIu64, header.mEventNumber);
+    ChipLogProgress(chipTool, "  Event number: %" PRIu64, header.mEventNumber);
 
     if (header.mPriorityLevel == chip::app::PriorityLevel::Info)
     {
-        ChipLogProgress(chipTool, "\t Priority: Info");
+        ChipLogProgress(chipTool, "  Priority: Info");
     }
     else if (header.mPriorityLevel == chip::app::PriorityLevel::Critical)
     {
-        ChipLogProgress(chipTool, "\t Priority: Critical");
+        ChipLogProgress(chipTool, "  Priority: Critical");
     }
     else if (header.mPriorityLevel == chip::app::PriorityLevel::Debug)
     {
-        ChipLogProgress(chipTool, "\t Priority: Debug");
+        ChipLogProgress(chipTool, "  Priority: Debug");
     }
     else
     {
-        ChipLogProgress(chipTool, "\t Priority: Unknown");
+        ChipLogProgress(chipTool, "  Priority: Unknown");
     }
 
-    ChipLogProgress(chipTool, "\t Timestamp: %" PRIu64, header.mTimestamp.mValue);
+    ChipLogProgress(chipTool, "  Timestamp: %" PRIu64, header.mTimestamp.mValue);
 
     switch (header.mPath.mClusterId)
     {
@@ -168,7 +168,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
 {{/first}}
             case {{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::Id:
             {
-                {{zapTypeToDecodableClusterObjectType name ns=parent.name}} value;
+                {{zapTypeToDecodableClusterObjectType name ns=parent.name forceNotOptional=true}} value;
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
                 return DataModelLogger::LogValue("{{name}}", 1, value);
             }

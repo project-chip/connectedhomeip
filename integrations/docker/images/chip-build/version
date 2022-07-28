@@ -1,1 +1,1 @@
-0.5.85 Version bump reason: remove two Yocto SDKs to decrease the imx docker image size
+0.5.91 Version bump reason: [nRF Connect] Update nRF Connect SDK version

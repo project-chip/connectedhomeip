@@ -129,7 +129,7 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, const SetupPayloadPa
         break;
     case SetupPayloadKey_Discriminator:
         ChipLogDetail(SetupPayload, "Loaded discriminator: %u", (uint16_t) parameter.uintValue);
-        setupPayload.discriminator = static_cast<uint16_t>(parameter.uintValue);
+        setupPayload.discriminator.SetLongValue(static_cast<uint16_t>(parameter.uintValue));
         break;
     case SetupPayloadKey_SetupPINCode:
         ChipLogDetail(SetupPayload, "Loaded setupPinCode: %lu", (unsigned long) parameter.uintValue);

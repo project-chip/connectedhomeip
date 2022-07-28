@@ -43,10 +43,13 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
     }
 
     uint32_t currentVersion;
+    uint32_t targetVersion = requestor->GetTargetVersion();
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
 
-    if (currentVersion != requestor->GetTargetVersion())
+    if (currentVersion != targetVersion)
     {
+        ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32, currentVersion,
+                     targetVersion);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -122,18 +125,17 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
-    CHIP_ERROR err;
-
     if ((block.data() == nullptr) || block.empty())
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    // Process block header info
-    err = ProcessHeader(block);
+    CHIP_ERROR err = ProcessHeader(block);
+
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Cannot process block header: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(SoftwareUpdate, "Matter image header parser error %s", chip::ErrorStr(err));
+        this->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
         return err;
     }
 
@@ -223,7 +225,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    ChipLogProgress(SoftwareUpdate, "Q: HandleProcessBlock");
+    ChipLogDetail(SoftwareUpdate, "Q: HandleProcessBlock");
 
     status =
         qvCHIP_OtaWriteChunk(imageProcessor->mParams.downloadedBytes, static_cast<std::uint16_t>(imageProcessor->mBlock.size()),

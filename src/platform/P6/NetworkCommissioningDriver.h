@@ -133,7 +133,6 @@ private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
     CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
 
-    WiFiNetworkIterator mWiFiIterator = WiFiNetworkIterator(this);
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
     ScanCallback * mpScanCallback;

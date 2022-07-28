@@ -19,6 +19,7 @@
 #include "AppTask.h"
 #include "BoltLockManager.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -27,13 +28,22 @@
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
+using namespace ::chip::app::Clusters::DoorLock;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t type, uint16_t size, uint8_t * value)
 {
-    if (path.mClusterId != OnOff::Id)
+    VerifyOrReturn(path.mClusterId == DoorLock::Id && path.mAttributeId == DoorLock::Attributes::LockState::Id);
+
+    switch (*value)
     {
-        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(path.mClusterId));
-        return;
+    case to_underlying(DlLockState::kLocked):
+        BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+        break;
+    case to_underlying(DlLockState::kUnlocked):
+        BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+        break;
+    default:
+        break;
     }
 
     if (path.mAttributeId != OnOff::Attributes::OnOff::Id)
@@ -45,22 +55,62 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     BoltLockMgr().InitiateAction(0, *value ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
 }
 
-/** @brief OnOff Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- * TODO Issue #3841
- * emberAfOnOffClusterInitCallback happens before the stack initialize the cluster
- * attributes to the default value.
- * The logic here expects something similar to the deprecated Plugins callback
- * emberAfPluginOnOffClusterServerPostInitCallback.
- *
- */
-void emberAfOnOffClusterInitCallback(EndpointId endpoint)
+bool emberAfPluginDoorLockGetUser(EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
 {
-    GetAppTask().UpdateClusterState();
+    return BoltLockMgr().GetUser(userIndex, user);
+}
+
+bool emberAfPluginDoorLockSetUser(EndpointId endpointId, uint16_t userIndex, FabricIndex creator, FabricIndex modifier,
+                                  const CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType userType,
+                                  DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials)
+{
+    return BoltLockMgr().SetUser(userIndex, creator, modifier, userName, uniqueId, userStatus, userType, credentialRule,
+                                 credentials, totalCredentials);
+}
+
+bool emberAfPluginDoorLockGetCredential(EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+                                        EmberAfPluginDoorLockCredentialInfo & credential)
+{
+    return BoltLockMgr().GetCredential(credentialIndex, credentialType, credential);
+}
+
+bool emberAfPluginDoorLockSetCredential(EndpointId endpointId, uint16_t credentialIndex, FabricIndex creator, FabricIndex modifier,
+                                        DlCredentialStatus credentialStatus, DlCredentialType credentialType,
+                                        const ByteSpan & secret)
+{
+    return BoltLockMgr().SetCredential(credentialIndex, creator, modifier, credentialStatus, credentialType, secret);
+}
+
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
+{
+    return BoltLockMgr().ValidatePIN(pinCode, err);
+}
+
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
+                                              DlOperationError & err)
+{
+    return BoltLockMgr().ValidatePIN(pinCode, err);
+}
+
+void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
+{
+    DoorLockServer::Instance().InitServer(endpoint);
+
+    const auto logOnFailure = [](EmberAfStatus status, const char * attributeName) {
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            ChipLogError(Zcl, "Failed to set DoorLock %s: %x", attributeName, status);
+        }
+    };
+
+    logOnFailure(DoorLock::Attributes::LockType::Set(endpoint, DlLockType::kDeadBolt), "type");
+    logOnFailure(DoorLock::Attributes::NumberOfTotalUsersSupported::Set(endpoint, CONFIG_LOCK_NUM_USERS), "number of users");
+    logOnFailure(DoorLock::Attributes::NumberOfPINUsersSupported::Set(endpoint, CONFIG_LOCK_NUM_USERS), "number of PIN users");
+    logOnFailure(DoorLock::Attributes::NumberOfRFIDUsersSupported::Set(endpoint, 0), "number of RFID users");
+    logOnFailure(DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Set(endpoint, CONFIG_LOCK_NUM_CREDENTIALS_PER_USER),
+                 "number of credentials per user");
+
+    // Set FeatureMap to (kUsersManagement|kPINCredentials), default is:
+    // (kUsersManagement|kAccessSchedules|kRFIDCredentials|kPINCredentials) 0x113
+    logOnFailure(DoorLock::Attributes::FeatureMap::Set(endpoint, 0x101), "feature map");
 }

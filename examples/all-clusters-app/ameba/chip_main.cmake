@@ -125,6 +125,14 @@ list(
 )
 endif (matter_enable_rpc)
 
+if (matter_enable_shell)
+list(
+    APPEND ${list_chip_main_sources}
+    #shell
+    ${chip_dir}/examples/platform/ameba/shell/launch_shell.cpp
+)
+endif (matter_enable_shell)
+
 if (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
@@ -148,6 +156,7 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
     ${chip_dir}/examples/all-clusters-app/ameba/main/chipinterface.cpp
+    ${chip_dir}/examples/all-clusters-app/ameba/main/BindingHandler.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/DeviceCallbacks.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/CHIPDeviceManager.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/Globals.cpp
@@ -243,8 +252,15 @@ list(
     -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
-    -DMATTER_ALL_CLUSTERS_APP=1
 )
+
+if (matter_enable_persistentstorage_audit)
+list(
+    APPEND chip_main_flags
+
+    -DCHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT
+)
+endif (matter_enable_persistentstorage_audit)
 
 if (matter_enable_rpc)
 list(
@@ -259,6 +275,14 @@ list(
     -DCONFIG_ENABLE_PW_RPC=1
 )
 endif (matter_enable_rpc)
+
+if (matter_enable_shell)
+list(
+    APPEND chip_main_flags
+
+    -DCONFIG_ENABLE_CHIP_SHELL=1
+)
+endif (matter_enable_shell)
 
 list(
     APPEND chip_main_cpp_flags

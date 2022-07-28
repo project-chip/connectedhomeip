@@ -151,10 +151,17 @@ class AsyncCallableHandle:
             self._cv.notify_all()
         pythonapi.Py_DecRef(py_object(self))
 
-    def Wait(self):
+    def Wait(self, timeoutMs: int = None):
+        timeout = None
+        if timeoutMs is not None:
+            timeout = float(timeoutMs) / 1000
+
         with self._cv:
             while self._finish is False:
-                self._cv.wait()
+                res = self._cv.wait(timeout)
+                if res is False:
+                    raise TimeoutError("Timed out waiting for task to finish executing on the Matter thread")
+
             if self._exc is not None:
                 raise self._exc
             return self._res
@@ -258,11 +265,8 @@ class ChipStack(object):
         #
         self._persistentStorage = PersistentStorage(persistentStoragePath)
 
-        if (bluetoothAdapter is None):
-            bluetoothAdapter = 0
-
         # Initialize the chip stack.
-        res = self._ChipStackLib.pychip_DeviceController_StackInit(bluetoothAdapter)
+        res = self._ChipStackLib.pychip_DeviceController_StackInit()
         if res != 0:
             raise self.ErrorToException(res)
 
@@ -335,7 +339,7 @@ class ChipStack(object):
         self.devMgr = None
         self.callbackRes = None
 
-    def Call(self, callFunct):
+    def Call(self, callFunct, timeoutMs: int = None):
         '''Run a Python function on CHIP stack, and wait for the response.
         This function is a wrapper of PostTaskOnChipThread, which includes some handling of application specific logics.
         Calling this function on CHIP on CHIP mainloop thread will cause deadlock.
@@ -344,7 +348,7 @@ class ChipStack(object):
         self.callbackRes = None
         self.completeEvent.clear()
         with self.networkLock:
-            res = self.PostTaskOnChipThread(callFunct).Wait()
+            res = self.PostTaskOnChipThread(callFunct).Wait(timeoutMs)
         self.completeEvent.set()
         if res == 0 and self.callbackRes != None:
             return self.callbackRes
@@ -433,7 +437,7 @@ class ChipStack(object):
             self._ChipStackLib = chip.native.GetLibraryHandle()
             self._chipDLLPath = chip.native.FindNativeLibraryPath()
 
-            self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = [c_uint32]
+            self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = []
             self._ChipStackLib.pychip_DeviceController_StackInit.restype = c_uint32
             self._ChipStackLib.pychip_DeviceController_StackShutdown.argtypes = []
             self._ChipStackLib.pychip_DeviceController_StackShutdown.restype = c_uint32
