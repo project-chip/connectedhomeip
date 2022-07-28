@@ -127,7 +127,6 @@ tests:
                       65532,
                       65533,
                   ]
-      disabled: true
 
     - label: "TH reads EventList from DUT"
       verification: |
