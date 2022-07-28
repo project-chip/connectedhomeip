@@ -31,7 +31,7 @@ tests:
     - label: "Reads the CurrentLevel attribute"
       PICS: LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           saveAs: CurrentLevelValue
           constraints:
@@ -42,7 +42,7 @@ tests:
     - label: "Reads the RemainingTime attribute"
       PICS: LVL.S.A0001
       command: "readAttribute"
-      attribute: "remaining time"
+      attribute: "RemainingTime"
       response:
           constraints:
               type: int16u
@@ -52,7 +52,7 @@ tests:
     - label: "Reads the MinLevel attribute"
       PICS: LVL.S.A0002 && LVL.S.F01
       command: "readAttribute"
-      attribute: "min level"
+      attribute: "MinLevel"
       response:
           value: 1
           saveAs: MinLevelValue
@@ -62,7 +62,7 @@ tests:
     - label: "Reads the MinLevel attribute"
       PICS: LVL.S.A0002 && !LVL.S.F01
       command: "readAttribute"
-      attribute: "min level"
+      attribute: "MinLevel"
       response:
           saveAs: MinLevelFeatureMapNotSupportedValue
           constraints:
@@ -73,7 +73,7 @@ tests:
     - label: "Reads the MaxLevel attribute"
       PICS: LVL.S.A0003 && LVL.S.F01
       command: "readAttribute"
-      attribute: "max level"
+      attribute: "MaxLevel"
       response:
           value: 254
           saveAs: MaxLevelValue
@@ -84,7 +84,7 @@ tests:
     - label: "Reads the MaxLevel attribute"
       PICS: LVL.S.A0003 && !LVL.S.F01
       command: "readAttribute"
-      attribute: "max level"
+      attribute: "MaxLevel"
       response:
           saveAs: MaxLevelFeatureMapNotSupportedValue
           constraints:
@@ -95,7 +95,7 @@ tests:
     - label: "Step 4b & 4C Reads the CurrentLevel attribute"
       PICS: LVL.S.F01 && LVL.S.A0002 && LVL.S.A0003
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           constraints:
               type: int8u
@@ -105,7 +105,7 @@ tests:
     - label: "Step 4b & 4C Reads the CurrentLevel attribute"
       PICS: LVL.S.A0002 && LVL.S.A0003 && !LVL.S.F01
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           constraints:
               type: int8u
@@ -115,7 +115,7 @@ tests:
     - label: "Reads the CurrentFrequency attribute"
       PICS: LVL.S.A0004
       command: "readAttribute"
-      attribute: "current frequency"
+      attribute: "CurrentFrequency"
       response:
           constraints:
               type: int16u
@@ -125,7 +125,7 @@ tests:
     - label: "Reads the MinFrequency attribute"
       PICS: LVL.S.A0005
       command: "readAttribute"
-      attribute: "min frequency"
+      attribute: "MinFrequency"
       response:
           saveAs: MinFrequencyValue
           constraints:
@@ -136,7 +136,7 @@ tests:
     - label: "Reads the MaxFrequency attribute"
       PICS: LVL.S.A0006
       command: "readAttribute"
-      attribute: "max frequency"
+      attribute: "MaxFrequency"
       response:
           saveAs: MaxFrequencyValue
           constraints:
@@ -147,7 +147,7 @@ tests:
     - label: "Step 7b & 7C Reads the CurrentFrequency attribute"
       PICS: LVL.S.A0004 && LVL.S.A0005 && LVL.S.A0006
       command: "readAttribute"
-      attribute: "current frequency"
+      attribute: "CurrentFrequency"
       response:
           constraints:
               type: int16u
@@ -157,7 +157,7 @@ tests:
     - label: "Reads the OnOffTransitionTime attribute"
       PICS: LVL.S.A0010
       command: "readAttribute"
-      attribute: "on off transition time"
+      attribute: "OnOffTransitionTime"
       response:
           constraints:
               type: int16u
@@ -167,7 +167,7 @@ tests:
     - label: "Reads the OnLevel attribute "
       PICS: LVL.S.F01 && LVL.S.A0011
       command: "readAttribute"
-      attribute: "on level"
+      attribute: "OnLevel"
       response:
           constraints:
               type: int8u
@@ -177,7 +177,7 @@ tests:
     - label: "Reads the OnLevel attribute "
       PICS: LVL.S.A0011 && !LVL.S.F01
       command: "readAttribute"
-      attribute: "on level"
+      attribute: "OnLevel"
       response:
           constraints:
               type: int8u
@@ -187,7 +187,7 @@ tests:
     - label: "Reads the OnTransitionTime attribute "
       PICS: LVL.S.A0012
       command: "readAttribute"
-      attribute: "on transition time"
+      attribute: "OnTransitionTime"
       response:
           constraints:
               type: int16u
@@ -197,7 +197,7 @@ tests:
     - label: "Reads the OffTransitionTime attribute "
       PICS: LVL.S.A0013
       command: "readAttribute"
-      attribute: "off transition time"
+      attribute: "OffTransitionTime"
       response:
           constraints:
               type: int16u
@@ -207,7 +207,7 @@ tests:
     - label: "Reads the DefaultMoveRate attribute "
       PICS: LVL.S.A0014
       command: "readAttribute"
-      attribute: "default move rate"
+      attribute: "DefaultMoveRate"
       response:
           constraints:
               type: int8u
@@ -217,7 +217,7 @@ tests:
     - label: "Reads the Options attribute "
       PICS: LVL.S.A000f
       command: "readAttribute"
-      attribute: "options"
+      attribute: "Options"
       response:
           value: 0
           constraints:
@@ -226,7 +226,7 @@ tests:
     - label: "Reads the StartUpCurrentLevel attribute "
       PICS: LVL.S.A4000
       command: "readAttribute"
-      attribute: "start up current level"
+      attribute: "StartUpCurrentLevel"
       response:
           constraints:
               type: int8u
