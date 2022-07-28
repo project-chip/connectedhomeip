@@ -150,8 +150,9 @@ private:
     // ===== Private members for use by this class only.
 
     otInstance * mOTInst;
-    uint64_t mOverrunCount = 0;
-    bool mIsAttached       = false;
+    uint64_t mOverrunCount      = 0;
+    bool mIsAttached            = false;
+    bool mTemporaryRxOnWhenIdle = false;
 
     NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;

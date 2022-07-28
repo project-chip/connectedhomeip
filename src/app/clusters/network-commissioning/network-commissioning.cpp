@@ -271,12 +271,14 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
         }
         mCurrentOperationBreadcrumb = req.breadcrumb;
         mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
+        ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
         mpDriver.Get<WiFiDriver *>()->ScanNetworks(ssid, this);
     }
     else if (mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface))
     {
         mCurrentOperationBreadcrumb = req.breadcrumb;
         mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
+        ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
         mpDriver.Get<ThreadDriver *>()->ScanNetworks(this);
     }
     else
