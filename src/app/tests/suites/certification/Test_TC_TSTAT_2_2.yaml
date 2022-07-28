@@ -706,7 +706,7 @@ tests:
       response:
           value: 25
           constraints:
-              type: temp-s8
+              type: int8s
               minValue: 0
               maxValue: 25
 
