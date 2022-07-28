@@ -351,8 +351,8 @@ CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
                              out_buffer.size(),
                              &output_length);
 
-    VerifyOrExit(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-    VerifyOrExit(output_length == PSA_HASH_LENGTH(PSA_ALG_SHA_256), CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == PSA_SUCCESS, result = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(output_length == PSA_HASH_LENGTH(PSA_ALG_SHA_256), result = CHIP_ERROR_INTERNAL);
 exit:
     psa_hash_abort(&digest_context);
     return result;
