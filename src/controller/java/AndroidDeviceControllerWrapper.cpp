@@ -496,7 +496,6 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
         while (iter_WiFiScanResultsInsideOptional.Next())
         {
             auto & entry = iter_WiFiScanResultsInsideOptional.GetValue();
-            jobject newElement;
             jobject newElement_security;
             std::string newElement_securityClassName     = "java/lang/Integer";
             std::string newElement_securityCtorSignature = "(I)V";
@@ -540,7 +539,7 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
                 return;
             }
 
-            newElement =
+            jobject newElement =
                 env->NewObject(wiFiInterfaceScanResultStructClass, wiFiInterfaceScanResultStructCtor, newElement_security,
                                newElement_ssid, newElement_bssid, newElement_channel, newElement_wiFiBand, newElement_rssi);
             chip::JniReferences::GetInstance().AddToList(WiFiScanResultsInsideOptional, newElement);
@@ -561,7 +560,6 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
         while (iter_ThreadScanResultsInsideOptional.Next())
         {
             auto & entry = iter_ThreadScanResultsInsideOptional.GetValue();
-            jobject newElement;
             jobject newElement_panId;
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>("java/lang/Integer", "(I)V", entry.panId,
                                                                            newElement_panId);
@@ -605,9 +603,10 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
                 return;
             }
 
-            newElement = env->NewObject(threadInterfaceScanResultStructClass, threadInterfaceScanResultStructCtor, newElement_panId,
-                                        newElement_extendedPanId, newElement_networkName, newElement_channel, newElement_version,
-                                        newElement_extendedAddress, newElement_rssi, newElement_lqi);
+            jobject newElement =
+                env->NewObject(threadInterfaceScanResultStructClass, threadInterfaceScanResultStructCtor, newElement_panId,
+                               newElement_extendedPanId, newElement_networkName, newElement_channel, newElement_version,
+                               newElement_extendedAddress, newElement_rssi, newElement_lqi);
             chip::JniReferences::GetInstance().AddToList(ThreadScanResultsInsideOptional, newElement);
         }
         chip::JniReferences::GetInstance().CreateOptional(ThreadScanResultsInsideOptional, ThreadScanResults);
