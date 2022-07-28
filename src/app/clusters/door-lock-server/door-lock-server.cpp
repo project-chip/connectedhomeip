@@ -553,7 +553,7 @@ void DoorLockServer::setCredentialCommandHandler(
         emberAfDoorLockClusterPrintln("[SetCredential] Credential index is out of range [endpointId=%d,credentialType=%u"
                                       ",credentialIndex=%d]",
                                       commandPath.mEndpointId, to_underlying(credentialType), credentialIndex);
-        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, userIndex.Value(), nextAvailableCredentialSlot);
+        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
         return;
     }
 
@@ -561,7 +561,7 @@ void DoorLockServer::setCredentialCommandHandler(
     auto status = credentialLengthWithinRange(commandPath.mEndpointId, credentialType, credentialData);
     if (DlStatus::kSuccess != status)
     {
-        sendSetCredentialResponse(commandObj, commandPath, status, userIndex.Value(), nextAvailableCredentialSlot);
+        sendSetCredentialResponse(commandObj, commandPath, status, 0, nextAvailableCredentialSlot);
         return;
     }
 
@@ -574,7 +574,7 @@ void DoorLockServer::setCredentialCommandHandler(
             emberAfDoorLockClusterPrintln("[SetCredential] Unable to get the credential to exclude duplicated entry "
                                           "[endpointId=%d,credentialType=%u,credentialIndex=%d]",
                                           commandPath.mEndpointId, to_underlying(credentialType), i);
-            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kFailure, userIndex.Value(), nextAvailableCredentialSlot);
+            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
             return;
         }
         if (DlCredentialStatus::kAvailable != currentCredential.status && currentCredential.credentialType == credentialType &&
@@ -585,7 +585,7 @@ void DoorLockServer::setCredentialCommandHandler(
                 "[endpointId=%d,credentialType=%u,dataLength=%u,existingCredentialIndex=%d,credentialIndex=%d]",
                 commandPath.mEndpointId, to_underlying(credentialType), static_cast<unsigned int>(credentialData.size()), i,
                 credentialIndex);
-            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kDuplicate, userIndex.Value(),
+            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kDuplicate, 0,
                                       nextAvailableCredentialSlot);
             return;
         }
@@ -598,7 +598,7 @@ void DoorLockServer::setCredentialCommandHandler(
             "[SetCredential] Unable to check if credential exists: app error [endpointId=%d,credentialIndex=%d]",
             commandPath.mEndpointId, credentialIndex);
 
-        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kFailure, userIndex.Value(), nextAvailableCredentialSlot);
+        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
         return;
     }
 
@@ -609,7 +609,7 @@ void DoorLockServer::setCredentialCommandHandler(
         emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: user status is out of range "
                                       "[endpointId=%d,credentialIndex=%d,userStatus=%u]",
                                       commandPath.mEndpointId, credentialIndex, to_underlying(userStatus.Value()));
-        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, userIndex.Value(), nextAvailableCredentialSlot);
+        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
         return;
     }
 
@@ -618,7 +618,7 @@ void DoorLockServer::setCredentialCommandHandler(
         emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: user type is out of range "
                                       "[endpointId=%d,credentialIndex=%d,userType=%u]",
                                       commandPath.mEndpointId, credentialIndex, to_underlying(userType.Value()));
-        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, userIndex.Value(), nextAvailableCredentialSlot);
+        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
         return;
     }
 
@@ -629,6 +629,7 @@ void DoorLockServer::setCredentialCommandHandler(
 
         status = createCredential(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
                                   existingCredential, credentialData, userIndex, userStatus, userType, createdUserIndex);
+
         sendSetCredentialResponse(commandObj, commandPath, status, userIndex.Value(), nextAvailableCredentialSlot);
         return;
     }
@@ -640,7 +641,7 @@ void DoorLockServer::setCredentialCommandHandler(
                                           "[endpointId=%d,credentialIndex=%d]",
                                           commandPath.mEndpointId, credentialIndex);
 
-            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, userIndex.Value(),
+            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0,
                                       nextAvailableCredentialSlot);
             return;
         }
@@ -650,13 +651,13 @@ void DoorLockServer::setCredentialCommandHandler(
         {
             status = modifyProgrammingPIN(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
                                           existingCredential, credentialData);
-            sendSetCredentialResponse(commandObj, commandPath, status, userIndex.Value(), nextAvailableCredentialSlot);
+            sendSetCredentialResponse(commandObj, commandPath, status, 0, nextAvailableCredentialSlot);
             return;
         }
 
         status = modifyCredential(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
                                   existingCredential, credentialData, userIndex.Value(), userStatus, userType);
-        sendSetCredentialResponse(commandObj, commandPath, status, userIndex.Value(), nextAvailableCredentialSlot);
+        sendSetCredentialResponse(commandObj, commandPath, status, 0, nextAvailableCredentialSlot);
         return;
     }
     case DlDataOperationType::kClear:
