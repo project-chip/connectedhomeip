@@ -262,7 +262,7 @@ config("strict_warnings") {
     ]
   }
 
-  if (current_os == "linux" || current_os == "android") {
+  if (!is_asan && (current_os == "linux" || current_os == "android")) {
     ldflags += [ "-Wl,-z,defs" ]
   }
 }
