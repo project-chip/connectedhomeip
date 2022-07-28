@@ -172,6 +172,20 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     jmethodID getControllerVendorId;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getControllerVendorId", "()I",
                                                         &getControllerVendorId);
+
+    jmethodID getFailsafeTimerSeconds;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getFailsafeTimerSeconds", "()I",
+                                                        &getFailsafeTimerSeconds);
+    SuccessOrExit(err);
+
+    jmethodID getAttemptNetworkScanWiFi;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAttemptNetworkScanWiFi", "()Z",
+                                                        &getAttemptNetworkScanWiFi);
+    SuccessOrExit(err);
+
+    jmethodID getAttemptNetworkScanThread;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAttemptNetworkScanThread", "()Z",
+                                                        &getAttemptNetworkScanThread);
     SuccessOrExit(err);
 
     jmethodID getKeypairDelegate;
@@ -205,13 +219,17 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         jbyteArray intermediateCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getIntermediateCertificate);
         jbyteArray operationalCertificate  = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
         jbyteArray ipk                     = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
+        uint16_t failsafeTimerSeconds      = env->CallIntMethod(controllerParams, getFailsafeTimerSeconds);
+        bool attemptNetworkScanWiFi        = env->CallIntMethod(controllerParams, getAttemptNetworkScanWiFi);
+        bool attemptNetworkScanThread      = env->CallIntMethod(controllerParams, getAttemptNetworkScanThread);
 
         std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
             new chip::Controller::AndroidOperationalCredentialsIssuer());
         wrapper = AndroidDeviceControllerWrapper::AllocateNew(
             sJVM, self, kLocalDeviceId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(), DeviceLayer::TCPEndPointManager(),
             DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate, rootCertificate, intermediateCertificate,
-            operationalCertificate, ipk, listenPort, controllerVendorId, &err);
+            operationalCertificate, ipk, listenPort, controllerVendorId, failsafeTimerSeconds, attemptNetworkScanWiFi,
+            attemptNetworkScanThread, &err);
         SuccessOrExit(err);
     }
 
@@ -380,6 +398,48 @@ JNI_METHOD(void, establishPaseConnectionByAddress)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to establish PASE connection.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
+JNI_METHOD(void, pauseCommissioning)
+(JNIEnv * env, jobject self, jlong handle)
+{
+    ChipLogProgress(Controller, "pauseCommissioning() called");
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    wrapper->GetAutoCommissioner()->PauseCommissioning();
+}
+
+JNI_METHOD(void, resumeCommissioning)
+(JNIEnv * env, jobject self, jlong handle)
+{
+    ChipLogProgress(Controller, "resumeCommissioning() called");
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    wrapper->GetAutoCommissioner()->ResumeCommissioning();
+}
+
+JNI_METHOD(void, updateCommissioningNetworkCredentials)
+(JNIEnv * env, jobject self, jlong handle, jobject networkCredentials)
+{
+    ChipLogProgress(Controller, "updateCommissioningNetworkCredentials() called");
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+    CHIP_ERROR err                              = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "ApplyNetworkCredentials failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+    err = wrapper->UpdateCommissioningParameters(commissioningParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
 }

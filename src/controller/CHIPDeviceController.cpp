@@ -1556,6 +1556,7 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     {
         mPairingDelegate->OnCommissioningStatusUpdate(PeerId(GetCompressedFabricId(), nodeId), mCommissioningStage, err);
     }
+
     if (mCommissioningDelegate == nullptr)
     {
         return;
@@ -1711,20 +1712,27 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
                 {
                     if (features.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
                     {
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has WiFi. endpointid = %u",
+                                        path.mEndpointId);
                         info.network.wifi.endpoint = path.mEndpointId;
                     }
                     else if (features.Has(
                                  app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
                     {
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Thread. endpointid = %u",
+                                        path.mEndpointId);
                         info.network.thread.endpoint = path.mEndpointId;
                     }
                     else if (features.Has(
                                  app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kEthernetNetworkInterface))
                     {
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Ethernet. endpointid = %u",
+                                        path.mEndpointId);
                         info.network.eth.endpoint = path.mEndpointId;
                     }
                     else
                     {
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: no features.");
                         // TODO: Gross workaround for the empty feature map on all clusters. Remove.
                         if (info.network.thread.endpoint == kInvalidEndpointId)
                         {
@@ -1773,6 +1781,12 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     }
     mAttributeCache = nullptr;
     mReadClient     = nullptr;
+
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnReadCommissioningInfo(info);
+    }
+
     CommissioningDelegate::CommissioningReport report;
     report.Set<ReadCommissioningInfo>(info);
     CommissioningStageComplete(return_err, report);
@@ -1809,6 +1823,39 @@ void DeviceCommissioner::OnSetRegulatoryConfigResponse(
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
+}
+
+void DeviceCommissioner::OnScanNetworksFailure(void * context, CHIP_ERROR error)
+{
+    ChipLogProgress(Controller, "Received ScanNetworks failure response %" CHIP_ERROR_FORMAT, error.Format());
+
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    if (commissioner->GetPairingDelegate() != nullptr)
+    {
+        commissioner->GetPairingDelegate()->OnScanNetworksFailure(error);
+    }
+    // need to advance to next step
+    // clear error so that we don't abort the commissioning when ScanNetworks fails
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+}
+
+void DeviceCommissioner::OnScanNetworksResponse(void * context,
+                                                const NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data)
+{
+    CommissioningDelegate::CommissioningReport report;
+
+    ChipLogProgress(Controller, "Received ScanNetwork response, networkingStatus=%u debugText=%s",
+                    to_underlying(data.networkingStatus),
+                    (data.debugText.HasValue() ? std::string(data.debugText.Value().data(), data.debugText.Value().size()).c_str()
+                                               : "none provided"));
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+
+    if (commissioner->GetPairingDelegate() != nullptr)
+    {
+        commissioner->GetPairingDelegate()->OnScanNetworksSuccess(data);
+    }
+    // need to advance to next step
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
 }
 
 void DeviceCommissioner::OnNetworkConfigResponse(void * context,
@@ -1940,6 +1987,16 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         mReadClient     = std::move(readClient);
     }
     break;
+    case CommissioningStage::kScanNetworks: {
+        NetworkCommissioning::Commands::ScanNetworks::Type request;
+        if (params.GetWiFiCredentials().HasValue())
+        {
+            request.ssid.Emplace(params.GetWiFiCredentials().Value().ssid);
+        }
+        request.breadcrumb.Emplace(breadcrumb);
+        SendCommand<NetworkCommissioningCluster>(proxy, request, OnScanNetworksResponse, OnScanNetworksFailure, endpoint, timeout);
+        break;
+    }
     case CommissioningStage::kConfigRegulatory: {
         // To set during config phase:
         // UTC time
