@@ -689,17 +689,13 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
     }
 
     uint16_t maxNumberOfCredentials = 0;
+    EmberAfPluginDoorLockCredentialInfo credentialInfo;
     if (!credentialIndexValid(commandPath.mEndpointId, credentialType, credentialIndex, maxNumberOfCredentials))
     {
-        emberAfDoorLockClusterPrintln("[GetCredentialStatus] Credential index is out of range "
-                                      "[endpointId=%d,credentialType=%u,credentialIndex=%d,maxNumberOfCredentials=%d]",
-                                      commandPath.mEndpointId, to_underlying(credentialType), credentialIndex,
-                                      maxNumberOfCredentials);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        sendGetCredentialStatusResponse(commandObj, commandPath, credentialType, credentialIndex, 0, credentialInfo, false);
         return;
     }
 
-    EmberAfPluginDoorLockCredentialInfo credentialInfo;
     if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, credentialIndex, credentialType, credentialInfo))
     {
         emberAfDoorLockClusterPrintln("[GetCredentialStatus] Unable to get the credential: app error "
@@ -710,7 +706,7 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
         return;
     }
 
-    auto credentialExists            = DlCredentialStatus::kAvailable != credentialInfo.status;
+    bool credentialExists            = DlCredentialStatus::kAvailable != credentialInfo.status;
     uint16_t userIndexWithCredential = 0;
     if (credentialExists)
     {
@@ -727,6 +723,16 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
         }
     }
 
+    sendGetCredentialStatusResponse(commandObj, commandPath, credentialType, credentialIndex, userIndexWithCredential,
+                                    credentialInfo, credentialExists);
+}
+
+void DoorLockServer::sendGetCredentialStatusResponse(chip::app::CommandHandler * commandObj,
+                                                     const chip::app::ConcreteCommandPath & commandPath,
+                                                     DlCredentialType credentialType, uint16_t credentialIndex,
+                                                     uint16_t userIndexWithCredential,
+                                                     EmberAfPluginDoorLockCredentialInfo credentialInfo, bool credentialExists)
+{
     Commands::GetCredentialStatusResponse::Type response{ .credentialExists = credentialExists };
     if (credentialExists)
     {
@@ -742,6 +748,10 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
         {
             response.lastModifiedFabricIndex.SetNonNull(credentialInfo.lastModifiedBy);
         }
+    }
+    else
+    {
+        response.userIndex.SetNull();
     }
     uint16_t nextCredentialIndex = 0;
     if (findOccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
