@@ -152,15 +152,18 @@ protected:
     public:
         GroupKeyContext(GroupDataProviderImpl & provider) : mProvider(provider) {}
 
-        GroupKeyContext(GroupDataProviderImpl & provider, const ByteSpan & key, uint16_t hash) : mProvider(provider)
+        GroupKeyContext(GroupDataProviderImpl & provider, const ByteSpan & encryptionKey, uint16_t hash,
+                        const ByteSpan & privacyKey) :
+            mProvider(provider)
         {
-            SetKey(key, hash);
+            SetKey(encryptionKey, hash, privacyKey);
         }
 
-        void SetKey(const ByteSpan & key, uint16_t hash)
+        void SetKey(const ByteSpan & encryptionKey, uint16_t hash, const ByteSpan & privacyKey)
         {
             mKeyHash = hash;
-            memcpy(mKeyValue, key.data(), std::min(key.size(), sizeof(mKeyValue)));
+            memcpy(mEncryptionKey, encryptionKey.data(), std::min(encryptionKey.size(), sizeof(mEncryptionKey)));
+            memcpy(mPrivacyKey, privacyKey.data(), std::min(privacyKey.size(), sizeof(mPrivacyKey)));
         }
 
         uint16_t GetKeyHash() override { return mKeyHash; }
@@ -176,8 +179,9 @@ protected:
 
     protected:
         GroupDataProviderImpl & mProvider;
-        uint16_t mKeyHash                                                 = 0;
-        uint8_t mKeyValue[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
+        uint16_t mKeyHash                                                      = 0;
+        uint8_t mEncryptionKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
+        uint8_t mPrivacyKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES]    = { 0 };
     };
 
     class KeySetIteratorImpl : public KeySetIterator

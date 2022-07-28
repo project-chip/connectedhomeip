@@ -699,12 +699,14 @@ struct EndpointData : GroupDataProvider::GroupEndpoint, PersistentData<kPersiste
 
 struct OperationalKey
 {
-    // Validity start time in microseconds since 2000-01-01T00:00:00 UTC ("the Epoch")
+    /// Validity start time in microseconds since 2000-01-01T00:00:00 UTC ("the Epoch")
     uint64_t start_time;
-    // Session Id
+    /// Session Id
     uint16_t hash;
-    // Operational group key
+    /// Operational group key
     uint8_t value[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    /// Privacy key
+    uint8_t privacy_key[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
 };
 
 struct KeySetData : PersistentData<kPersistentBufferMax>
@@ -1600,8 +1602,10 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     {
         ByteSpan epoch_key(in_keyset.epoch_keys[i].key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
         MutableByteSpan key_span(keyset.operational_keys[i].value);
+        MutableByteSpan privacy_key(keyset.operational_keys[i].privacy_key);
         ReturnErrorOnFailure(Crypto::DeriveGroupOperationalKey(epoch_key, compressed_fabric_id, key_span));
         ReturnErrorOnFailure(Crypto::DeriveGroupSessionId(key_span, keyset.operational_keys[i].hash));
+        ReturnErrorOnFailure(Crypto::DeriveGroupPrivacyKey(key_span, privacy_key));
     }
 
     if (found)
@@ -1795,7 +1799,8 @@ Crypto::SymmetricKeyContext * GroupDataProviderImpl::GetKeyContext(FabricIndex f
             if (nullptr != key)
             {
                 return mKeyContexPool.CreateObject(*this, ByteSpan(key->value, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES),
-                                                   key->hash);
+                                                   key->hash,
+                                                   ByteSpan(key->privacy_key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES));
             }
         }
     }
@@ -1835,7 +1840,8 @@ CHIP_ERROR GroupDataProviderImpl::GetIpkKeySet(FabricIndex fabric_index, KeySet 
 
 void GroupDataProviderImpl::GroupKeyContext::Release()
 {
-    memset(mKeyValue, 0, sizeof(mKeyValue));
+    memset(mEncryptionKey, 0, sizeof(mEncryptionKey));
+    memset(mPrivacyKey, 0, sizeof(mPrivacyKey));
     mProvider.mKeyContexPool.ReleaseObject(this);
 }
 
@@ -1844,7 +1850,7 @@ CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::EncryptMessage(const ByteSpan
                                                                   MutableByteSpan & ciphertext) const
 {
     uint8_t * output = ciphertext.data();
-    return Crypto::AES_CCM_encrypt(plaintext.data(), plaintext.size(), aad.data(), aad.size(), mKeyValue,
+    return Crypto::AES_CCM_encrypt(plaintext.data(), plaintext.size(), aad.data(), aad.size(), mEncryptionKey,
                                    Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output, mic.data(), mic.size());
 }
 
@@ -1853,21 +1859,21 @@ CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::DecryptMessage(const ByteSpan
                                                                   MutableByteSpan & plaintext) const
 {
     uint8_t * output = plaintext.data();
-    return Crypto::AES_CCM_decrypt(ciphertext.data(), ciphertext.size(), aad.data(), aad.size(), mic.data(), mic.size(), mKeyValue,
-                                   Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output);
+    return Crypto::AES_CCM_decrypt(ciphertext.data(), ciphertext.size(), aad.data(), aad.size(), mic.data(), mic.size(),
+                                   mEncryptionKey, Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output);
 }
 
 CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyEncrypt(const ByteSpan & input, const ByteSpan & nonce,
                                                                   MutableByteSpan & output) const
 {
-    return Crypto::AES_CCM_encrypt(input.data(), input.size(), nullptr, 0, mKeyValue, Crypto::kAES_CCM128_Key_Length, nonce.data(),
-                                   nonce.size(), output.data(), nullptr, 0);
+    return Crypto::AES_CCM_encrypt(input.data(), input.size(), nullptr, 0, mPrivacyKey, Crypto::kAES_CCM128_Key_Length,
+                                   nonce.data(), nonce.size(), output.data(), nullptr, 0);
 }
 
 CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyDecrypt(const ByteSpan & input, const ByteSpan & nonce,
                                                                   MutableByteSpan & output) const
 {
-    return Crypto::AES_CCM_decrypt(input.data(), input.size(), nullptr, 0, nullptr, 0, mKeyValue, Crypto::kAES_CCM128_Key_Length,
+    return Crypto::AES_CCM_decrypt(input.data(), input.size(), nullptr, 0, nullptr, 0, mPrivacyKey, Crypto::kAES_CCM128_Key_Length,
                                    nonce.data(), nonce.size(), output.data());
 }
 
@@ -1973,7 +1979,8 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
         OperationalKey & key = keyset.operational_keys[mKeyIndex++];
         if (key.hash == mSessionId)
         {
-            mKeyContext.SetKey(ByteSpan(key.value, sizeof(key.value)), mSessionId);
+            mKeyContext.SetKey(ByteSpan(key.value, sizeof(key.value)), mSessionId,
+                               ByteSpan(key.privacy_key, sizeof(key.privacy_key)));
             output.fabric_index    = fabric.fabric_index;
             output.group_id        = mapping.group_id;
             output.security_policy = keyset.policy;
