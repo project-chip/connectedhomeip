@@ -204,11 +204,20 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
 
 System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp baseInterval, uint8_t sendCount)
 {
+    // See section "4.11.8. Parameters and Constants" for the parameters below:
+    // MRP_BACKOFF_JITTER = 0.25
     constexpr uint32_t MRP_BACKOFF_JITTER_BASE = 1024;
-    // MRP_BACKOFF_BASE = 1.6; see section "4.11.8. Parameters and Constants"
+    // MRP_BACKOFF_MARGIN = 1.1
+    constexpr uint32_t MRP_BACKOFF_MARGIN_NUMERATOR   = 1127;
+    constexpr uint32_t MRP_BACKOFF_MARGIN_DENOMINATOR = 1024;
+    // MRP_BACKOFF_BASE = 1.6
     constexpr uint32_t MRP_BACKOFF_BASE_NUMERATOR   = 16;
     constexpr uint32_t MRP_BACKOFF_BASE_DENOMINATOR = 10;
     constexpr int MRP_BACKOFF_THRESHOLD             = 1;
+
+    // Implement `i = MRP_BACKOFF_MARGIN * i` from section "4.11.2.1. Retransmissions", where:
+    //   i == baseInterval
+    baseInterval = baseInterval * MRP_BACKOFF_MARGIN_NUMERATOR / MRP_BACKOFF_MARGIN_DENOMINATOR;
 
     // Implement:
     //   mrpBackoffTime = i * MRP_BACKOFF_BASE^(max(0,n-MRP_BACKOFF_THRESHOLD)) * (1.0 + random(0,1) * MRP_BACKOFF_JITTER)
@@ -216,14 +225,14 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     //   i == baseInterval
     //   n == sendCount
 
-    // Calculate exponent `max(0,n−MRP_BACKOFF_THRESHOLD)`
+    // 1. Calculate exponent `max(0,n−MRP_BACKOFF_THRESHOLD)`
     int exponent = sendCount - MRP_BACKOFF_THRESHOLD;
     if (exponent < 0)
         exponent = 0; // Enforce floor
     if (exponent > 4)
         exponent = 4; // Enforce reasonable maximum after 5 tries
 
-    // Calculate `mrpBackoffTime = i * MRP_BACKOFF_BASE^(max(0,n-MRP_BACKOFF_THRESHOLD))`
+    // 2. Calculate `mrpBackoffTime = i * MRP_BACKOFF_BASE^(max(0,n-MRP_BACKOFF_THRESHOLD))`
     uint32_t backoffNum   = 1;
     uint32_t backoffDenom = 1;
 
@@ -235,8 +244,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
 
     System::Clock::Timestamp mrpBackoffTime = baseInterval * backoffNum / backoffDenom;
 
-    // Multiply `mrpBackoffTime` by `(1.0 + random(0,1) * MRP_BACKOFF_JITTER)`,
-    // where MRP_BACKOFF_JITTER = 0.25; see section "4.11.8. Parameters and Constants".
+    // 3. Calculate `mrpBackoffTime *= (1.0 + random(0,1) * MRP_BACKOFF_JITTER)`
     uint32_t jitter = MRP_BACKOFF_JITTER_BASE + Crypto::GetRandU8();
     mrpBackoffTime  = mrpBackoffTime * jitter / MRP_BACKOFF_JITTER_BASE;
 
