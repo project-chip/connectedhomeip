@@ -216,8 +216,8 @@ limitations under the License.
       </description>
       <arg name="level" type="INT8U"/>
       <arg name="transitionTime" type="INT16U"/>
-      <arg name="optionsMask" type="BITMAP8" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" optional="1"/>
+      <arg name="OptionsMask" type="BITMAP8" optional="1"/>
+      <arg name="OptionsOverride" type="BITMAP8" optional="1"/>
     </command>
     <command source="client" code="0x01" name="Move" optional="false" cli="zcl level-control move">
       <description>
@@ -225,8 +225,8 @@ limitations under the License.
       </description>
       <arg name="moveMode" type="MoveMode"/>
       <arg name="rate" type="INT8U"/>
-      <arg name="optionsMask" type="BITMAP8" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" optional="1"/>
+      <arg name="OptionsMask" type="BITMAP8" optional="1"/>
+      <arg name="OptionsOverride" type="BITMAP8" optional="1"/>
     </command>
     <command source="client" code="0x02" name="Step" optional="false" cli="zcl level-control step">
       <description>
@@ -235,15 +235,15 @@ limitations under the License.
       <arg name="stepMode" type="StepMode"/>
       <arg name="stepSize" type="INT8U"/>
       <arg name="transitionTime" type="INT16U"/>
-      <arg name="optionsMask" type="BITMAP8" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" optional="1"/>
+      <arg name="OptionsMask" type="BITMAP8" optional="1"/>
+      <arg name="OptionsOverride" type="BITMAP8" optional="1"/>
     </command>
     <command source="client" code="0x03" name="Stop" optional="false" cli="zcl level-control stop">
       <description>
         Command description for Stop
       </description>
-      <arg name="optionsMask" type="BITMAP8" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" optional="1"/>
+      <arg name="OptionsMask" type="BITMAP8" optional="1"/>
+      <arg name="OptionsOverride" type="BITMAP8" optional="1"/>
     </command>
     <command source="client" code="0x04" name="MoveToLevelWithOnOff" optional="false" cli="zcl level-control o-mv-to-level">
       <description>
@@ -251,8 +251,8 @@ limitations under the License.
       </description>
       <arg name="level" type="INT8U"/>
       <arg name="transitionTime" type="INT16U"/>
-      <arg name="optionsMask" type="BITMAP8" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" optional="1"/>
+      <arg name="OptionsMask" type="BITMAP8" optional="1"/>
+      <arg name="OptionsOverride" type="BITMAP8" optional="1"/>
     </command>
     <command source="client" code="0x05" name="MoveWithOnOff" optional="false" cli="zcl level-control o-move">
       <description>
@@ -260,8 +260,8 @@ limitations under the License.
       </description>
       <arg name="moveMode" type="MoveMode"/>
       <arg name="rate" type="INT8U"/>
-      <arg name="optionsMask" type="BITMAP8" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" optional="1"/>
+      <arg name="OptionsMask" type="BITMAP8" optional="1"/>
+      <arg name="OptionsOverride" type="BITMAP8" optional="1"/>
     </command>
     <command source="client" code="0x06" name="StepWithOnOff" optional="false" cli="zcl level-control o-step">
       <description>
@@ -270,15 +270,15 @@ limitations under the License.
       <arg name="stepMode" type="StepMode"/>
       <arg name="stepSize" type="INT8U"/>
       <arg name="transitionTime" type="INT16U"/>
-      <arg name="optionsMask" type="BITMAP8" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" optional="1"/>
+      <arg name="OptionsMask" type="BITMAP8" optional="1"/>
+      <arg name="OptionsOverride" type="BITMAP8" optional="1"/>
     </command>
     <command source="client" code="0x07" name="StopWithOnOff" optional="false" cli="zcl level-control o-stop">
       <description>
         Command description for StopWithOnOff
       </description>
-      <arg name="optionsMask" type="BITMAP8" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" optional="1"/>
+      <arg name="OptionsMask" type="BITMAP8" optional="1"/>
+      <arg name="OptionsOverride" type="BITMAP8" optional="1"/>
     </command>
     <command source="client" code="0x08" name="MoveToClosestFrequency" optional="true">
       <description>
