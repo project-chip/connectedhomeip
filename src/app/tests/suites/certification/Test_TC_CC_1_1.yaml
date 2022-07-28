@@ -34,7 +34,7 @@ tests:
       response:
           value: 5
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "Read the global attribute: FeatureMap"
       PICS: (CC.S.F00 || CC.S.F01 || CC.S.F02 || CC.S.F03)

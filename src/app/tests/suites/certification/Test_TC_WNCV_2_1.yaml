@@ -155,7 +155,7 @@ tests:
       PICS: WNCV.S.A0010
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -167,7 +167,7 @@ tests:
       PICS: WNCV.S.A0011
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -179,7 +179,7 @@ tests:
       PICS: WNCV.S.A0012
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -191,7 +191,7 @@ tests:
       PICS: WNCV.S.A0013
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -215,7 +215,7 @@ tests:
       PICS: WNCV.S.A0001
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -227,7 +227,7 @@ tests:
       PICS: WNCV.S.A0002
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -238,7 +238,7 @@ tests:
       PICS: WNCV.S.A0003
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -249,7 +249,7 @@ tests:
       PICS: WNCV.S.A0004
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -261,7 +261,7 @@ tests:
       PICS: WNCV.S.A0005
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -273,7 +273,7 @@ tests:
       PICS: WNCV.S.A0006
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 

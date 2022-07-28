@@ -26,7 +26,7 @@ config:
         type: NODE_ID
         defaultValue: 0x43211234
     discriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 3840
     payload:
         type: CHAR_STRING

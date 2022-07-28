@@ -26,10 +26,10 @@ config:
         type: CHAR_STRING
         defaultValue: "MT:-24J0IX4122-.548G00" # This value needs to be generated
     providerDiscriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 50
     providerPort:
-        type: INT16U
+        type: int16u
         defaultValue: 5560
     providerKvs:
         type: CHAR_STRING

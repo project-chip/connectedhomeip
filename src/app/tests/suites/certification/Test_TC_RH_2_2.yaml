@@ -76,5 +76,5 @@ tests:
       PICS: RH.S.A0000 && RH.M.ManuallyControlled
       response:
           constraints:
-              type: uint16
+              type: int16u
               notValue: ValueBeforeChange

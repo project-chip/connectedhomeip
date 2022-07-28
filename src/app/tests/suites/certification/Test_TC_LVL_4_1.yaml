@@ -55,7 +55,7 @@ tests:
       response:
           saveAs: MinlevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -80,7 +80,7 @@ tests:
       response:
           saveAs: MaxlevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -180,7 +180,7 @@ tests:
       response:
           saveAs: DefaultMoveRateValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 

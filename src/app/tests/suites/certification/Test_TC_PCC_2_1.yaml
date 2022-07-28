@@ -44,7 +44,7 @@ tests:
       attribute: "MaxSpeed"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -54,7 +54,7 @@ tests:
       attribute: "MaxFlow"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -104,7 +104,7 @@ tests:
       attribute: "MinConstSpeed"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -114,7 +114,7 @@ tests:
       attribute: "MaxConstSpeed"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -124,7 +124,7 @@ tests:
       attribute: "MinConstFlow"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -134,7 +134,7 @@ tests:
       attribute: "MaxConstFlow"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -204,7 +204,7 @@ tests:
       attribute: "Speed"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -214,7 +214,7 @@ tests:
       attribute: "LifetimeRunningHours"
       response:
           constraints:
-              type: uint24
+              type: int24u
               minValue: 0
               maxValue: 16777215
 
@@ -224,7 +224,7 @@ tests:
       attribute: "Power"
       response:
           constraints:
-              type: uint24
+              type: int24u
               minValue: 0
               maxValue: 16777215
 
@@ -234,7 +234,7 @@ tests:
       attribute: "LifetimeEnergyConsumed"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0
               maxValue: 4294967295
 

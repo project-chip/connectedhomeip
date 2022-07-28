@@ -36,7 +36,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "Read the global attribute: FeatureMap"
       PICS: CONTENTLAUNCHER.S.CS || CONTENTLAUNCHER.S.UP

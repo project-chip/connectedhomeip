@@ -62,7 +62,7 @@ tests:
       response:
           saveAs: DataModelRevisionValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65534
 
@@ -115,7 +115,7 @@ tests:
       response:
           saveAs: VendorIDValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 1
               maxValue: 65521
 
@@ -168,7 +168,7 @@ tests:
       response:
           saveAs: ProductIDValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 1
               maxValue: 65534
 
@@ -263,7 +263,7 @@ tests:
       response:
           saveAs: HardwareVersionValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65534
 

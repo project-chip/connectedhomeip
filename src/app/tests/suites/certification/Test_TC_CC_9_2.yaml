@@ -178,7 +178,7 @@ tests:
       PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueValue
               maxValue: 65535
 
@@ -196,7 +196,7 @@ tests:
       PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueValue
               maxValue: 65535
 
@@ -248,7 +248,7 @@ tests:
       PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHue
               maxValue: 65535
 
@@ -266,7 +266,7 @@ tests:
       PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHue
               maxValue: 65535
 

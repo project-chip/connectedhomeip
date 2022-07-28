@@ -55,7 +55,7 @@ tests:
       response:
           saveAs: ColorTempPhysicalMinMiredsValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -66,7 +66,7 @@ tests:
       response:
           saveAs: ColorTempPhysicalMaxMiredsValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -76,7 +76,7 @@ tests:
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -109,7 +109,7 @@ tests:
       response:
           value: ColorTempPhysicalMaxMiredsValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 

@@ -31,7 +31,7 @@ config:
         defaultValue: 0xC00FEE
     endpoint: 0
     discriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 3840
     payload:
         type: CHAR_STRING
