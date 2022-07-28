@@ -81,7 +81,7 @@ public:
      * @brief
      *  Called with the ReadCommissioningInfo returned from the target
      */
-    virtual void OnReadCommissioningInfo(ReadCommissioningInfo info) {}
+    virtual void OnReadCommissioningInfo(const ReadCommissioningInfo & info) {}
 
     /**
      * @brief

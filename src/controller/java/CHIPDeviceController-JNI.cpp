@@ -436,10 +436,10 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
         ChipLogError(Controller, "ApplyNetworkCredentials failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
-    err = wrapper->UpdateNetworkCredentials(commissioningParams);
+    err = wrapper->UpdateCommissioningParameters(commissioningParams);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "UpdateNetworkCredentials failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
 }

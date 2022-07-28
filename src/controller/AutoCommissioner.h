@@ -48,6 +48,13 @@ public:
      *
      */
     void PauseCommissioning();
+
+    /**
+     * @brief
+     *   An error return value means resume failed, for example:
+     *   - AutoCommissioner was not in a paused state.
+     *   - AutoCommissioner was unable to continue (no DeviceProxy)
+     */
     CHIP_ERROR ResumeCommissioning();
 
 protected:
@@ -56,6 +63,7 @@ protected:
     CHIP_ERROR PerformStep(CommissioningStage nextStage);
 
 private:
+    DeviceProxy * GetDeviceProxyForStep(CommissioningStage nextStage);
     void ReleaseDAC();
     void ReleasePAI();
 

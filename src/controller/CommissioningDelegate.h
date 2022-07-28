@@ -269,7 +269,7 @@ public:
     {
 
         mThreadOperationalDataset.SetValue(threadOperationalDataset);
-        mAttemptThreadNetworkScan = false;
+        mAttemptThreadNetworkScan = MakeOptional(false);
         return *this;
     }
     // This parameter should be set with the information returned from kSendOpCertSigningRequest. It must be set before calling
@@ -359,20 +359,20 @@ public:
 
     // If an SSID is provided, and AttemptWiFiNetworkScan is true,
     // then a directed scan will be performed using the SSID provided in the WiFiCredentials object
-    bool GetAttemptWiFiNetworkScan() const { return mAttemptWiFiNetworkScan; }
+    Optional<bool> GetAttemptWiFiNetworkScan() const { return mAttemptWiFiNetworkScan; }
     CommissioningParameters & SetAttemptWiFiNetworkScan(bool attemptWiFiNetworkScan)
     {
-        mAttemptWiFiNetworkScan = attemptWiFiNetworkScan;
+        mAttemptWiFiNetworkScan = MakeOptional(attemptWiFiNetworkScan);
         return *this;
     }
 
     // If a ThreadOperationalDataset is provided, then the ThreadNetworkScan will not be attempted
-    bool GetAttemptThreadNetworkScan() const { return mAttemptThreadNetworkScan; }
+    Optional<bool> GetAttemptThreadNetworkScan() const { return mAttemptThreadNetworkScan; }
     CommissioningParameters & SetAttemptThreadNetworkScan(bool attemptThreadNetworkScan)
     {
         if (!mThreadOperationalDataset.HasValue())
         {
-            mAttemptThreadNetworkScan = attemptThreadNetworkScan;
+            mAttemptThreadNetworkScan = MakeOptional(attemptThreadNetworkScan);
         }
         return *this;
     }
@@ -404,8 +404,8 @@ private:
     CompletionStatus completionStatus;
     Credentials::DeviceAttestationDelegate * mDeviceAttestationDelegate =
         nullptr; // Delegate to handle device attestation failures during commissioning
-    bool mAttemptWiFiNetworkScan   = false;
-    bool mAttemptThreadNetworkScan = true; // This changes to false when a ThreadOperationalDataset is set
+    Optional<bool> mAttemptWiFiNetworkScan;
+    Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
 };
 
 struct RequestedCertificate

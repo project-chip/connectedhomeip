@@ -71,9 +71,9 @@ public:
     CHIP_ERROR ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params, jobject networkCredentials);
 
     /**
-     * Update the network credentials used by the active device commissioner
+     * Update the CommissioningParameters used by the active device commissioner
      */
-    CHIP_ERROR UpdateNetworkCredentials(const chip::Controller::CommissioningParameters & params);
+    CHIP_ERROR UpdateCommissioningParameters(const chip::Controller::CommissioningParameters & params);
 
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
@@ -82,7 +82,7 @@ public:
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
     void OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted,
                                      CHIP_ERROR error) override;
-    void OnReadCommissioningInfo(chip::Controller::ReadCommissioningInfo info) override;
+    void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
     void OnScanNetworksSuccess(
         const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse) override;
     void OnScanNetworksFailure(CHIP_ERROR error) override;

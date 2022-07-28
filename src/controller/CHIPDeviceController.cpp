@@ -1712,20 +1712,22 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
                 {
                     if (features.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
                     {
-                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has WiFi. endpointid = %d",
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has WiFi. endpointid = %" PRIu32,
                                         path.mEndpointId);
                         info.network.wifi.endpoint = path.mEndpointId;
                     }
                     else if (features.Has(
                                  app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
                     {
-                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Thread.");
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Thread. endpointid = %" PRIu32,
+                                        path.mEndpointId);
                         info.network.thread.endpoint = path.mEndpointId;
                     }
                     else if (features.Has(
                                  app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kEthernetNetworkInterface))
                     {
-                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Ethernet.");
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Ethernet. endpointid = %" PRIu32,
+                                        path.mEndpointId);
                         info.network.eth.endpoint = path.mEndpointId;
                     }
                     else
