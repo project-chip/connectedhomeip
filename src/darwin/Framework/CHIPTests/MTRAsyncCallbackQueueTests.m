@@ -109,7 +109,7 @@
         sleep(1);
         counter++;
         NSLog(@"Item 1 woke after sleep with counter %d", counter);
-        
+
         if (retryCount) {
             // only end after retried once
             [workItem1 endWork];
