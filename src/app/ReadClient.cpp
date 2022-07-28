@@ -439,6 +439,8 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        // TODO: if we get here with a ReportData that has an incorrect subscription id, we need to send status with
+        // InvalidSubscription
         StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     }
 
