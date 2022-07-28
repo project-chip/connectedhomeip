@@ -36,6 +36,7 @@
 
 namespace chip {
 namespace app {
+using Status = Protocols::InteractionModel::Status;
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType) :
@@ -114,11 +115,14 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
     return err;
 }
 
-CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
+                                         bool & aSendStatusResponse)
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
+    aSendStatusResponse    = true;
     CHIP_ERROR statusError = CHIP_NO_ERROR;
     SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
+    aSendStatusResponse = false;
     SuccessOrExit(err = statusError);
     switch (mState)
     {
@@ -162,11 +166,6 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
     }
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        Close();
-    }
-
     return err;
 }
 
@@ -249,15 +248,26 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                           System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    bool sendStatusResponse = true;
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
-        err = OnStatusResponse(apExchangeContext, std::move(aPayload));
+        err = OnStatusResponse(apExchangeContext, std::move(aPayload), sendStatusResponse);
     }
     else
     {
-        err = OnUnknownMsgType(apExchangeContext, aPayloadHeader, std::move(aPayload));
+        ChipLogDetail(DataManagement, "ReadHandler:: Msg type %d not supported", aPayloadHeader.GetMessageType());
+        err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
+    }
+
+    if (sendStatusResponse)
+    {
+        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        Close();
     }
     return err;
 }
@@ -267,14 +277,6 @@ bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContex
     return (IsType(InteractionType::Subscribe) &&
             GetInitiatorNodeId() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
             GetAccessingFabricIndex() == apExchangeContext.GetSessionHandle()->GetFabricIndex());
-}
-
-CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                         System::PacketBufferHandle && aPayload)
-{
-    ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
-    Close();
-    return CHIP_ERROR_INVALID_MESSAGE_TYPE;
 }
 
 void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)

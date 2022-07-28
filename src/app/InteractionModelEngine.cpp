@@ -406,7 +406,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         reader.Init(aPayload.Retain());
 
         ReadRequestMessage::Parser readRequestParser;
-        VerifyOrReturnError(readRequestParser.Init(reader) == CHIP_NO_ERROR, Status::Failure);
+        VerifyOrReturnError(readRequestParser.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
         {
             size_t requestedAttributePathCount = 0;
