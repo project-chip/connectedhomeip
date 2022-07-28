@@ -121,7 +121,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: int16u
+              type: int8u
               minValue: 1
               maxValue: 254
 
