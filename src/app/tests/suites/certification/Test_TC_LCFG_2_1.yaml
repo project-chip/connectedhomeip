@@ -26,9 +26,8 @@ tests:
     - label: "TH reads SupportedLocales attribute from DUT"
       PICS: LCFG.S.A0001
       verification: |
-          Verify in TH Log
-
           ./chip-tool localizationconfiguration read supported-locales 1 0
+          On TH verify that the entry values in the SupportedLocales attribute are not repeated
 
           [1651129546.170573][174082:174087] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0002 DataVersion: 3111654481
           [1651129546.170622][174082:174087] CHIP:TOO:   SupportedLocales: 8 entries
@@ -44,19 +43,18 @@ tests:
 
     - label: 'TH writes "xx-XX" to SupportedLocales attribute'
       verification: |
-          Verify in TH Log
+          ./chip-tool any write-by-id 0x002B 1 '"xx-XX"' 1 0
+          On TH verify that DUT responds as UNSUPPORTED_WRITE
 
-           ./chip-tool any write-by-id 0x002B 1 xx-XX 1 0
-           [1653996674.832226][7281:7286] CHIP:DMG: WriteClient moving to [AwaitingDe]
-           [1653996674.832300][7281:7286] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-           [1653996674.832411][7281:7286] CHIP:EM: Sending Standalone Ack for MessageCounter:12567655 on exchange 10797i
+          [1653996674.832226][7281:7286] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1653996674.832300][7281:7286] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
+          [1653996674.832411][7281:7286] CHIP:EM: Sending Standalone Ack for MessageCounter:12567655 on exchange 10797i
       disabled: true
 
     - label: "TH reads SupportedLocales attribute"
       verification: |
-          Verify in TH Log
-
           ./chip-tool localizationconfiguration read supported-locales 1 0
+          On TH verify that the entries same as step 1
           [1645772065.848431][3762:3767] CHIP:TOO:   SupportedLocales: 8 entries
           [1645772065.850249][3762:3767] CHIP:TOO:     [1]: en-US
           [1645772065.850298][3762:3767] CHIP:TOO:     [2]: de-DE
@@ -72,10 +70,8 @@ tests:
     - label: "TH reads ActiveLocale Attribute from the DUT"
       PICS: LCFG.S.A0000
       verification: |
-          Verify in TH Log
-
           ./chip-tool localizationconfiguration read active-locale 1 0
-
+          On TH verify  that the ActiveLocale Attribute value is present in the SupportedLocales attribute list
 
           [1651035208.064278][2761:2766] CHIP:DMG:        SuppressResponse = true,
           [1651035208.064316][2761:2766] CHIP:DMG:        InteractionModelRevision = 1
@@ -88,10 +84,8 @@ tests:
           "TH writes new string not present in SupportedLocale attribute to
           ActiveLocale Attribute."
       verification: |
-          Verify in TH Log
-
           ./chip-tool localizationconfiguration write active-locale fw-GB 1 0
-
+          On TH verify that DUT responds as CONSTRAINT_ERROR
 
           [[1651130076.882814][174458:174463] CHIP:DMG: WriteResponseMessage =
           [1651130076.882819][174458:174463] CHIP:DMG: {
@@ -126,9 +120,8 @@ tests:
           "TH writes new string present in SupportedLocale attribute to
           ActiveLocale Attribute"
       verification: |
-          Verify in TH Log
-
           ./chip-tool localizationconfiguration write active-locale fr-FR 1 0
+          On TH verify that DUT responds as SUCCESS
 
           [1651035259.959116][2776:2781] CHIP:DMG:                        StatusIB =
           [1651035259.959158][2776:2781] CHIP:DMG:                        {
@@ -146,9 +139,8 @@ tests:
 
     - label: "TH Reads ActiveLocale"
       verification: |
-          Verify in TH Log
-
           ./chip-tool localizationconfiguration read active-locale 1 0
+          On TH Verify that the value of the ActiveLocale attribute is changed
 
           [1645772597.252904][3816:3821] CHIP:DMG:
           [1645772597.252948][3816:3821] CHIP:DMG:        SuppressResponse = true,

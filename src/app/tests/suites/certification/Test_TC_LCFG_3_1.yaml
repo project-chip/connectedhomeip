@@ -27,7 +27,7 @@ tests:
       PICS: LCFG.C.A0001
       verification: |
           ./chip-tool localizationconfiguration read supported-locales 1 0
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify in DUT as client side: verify that DUT reads SupportedLocales attribute from the TH successfully
 
           [1657111931.771994][5357:5363] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0001 DataVersion: 3168433155
           [1657111931.772105][5357:5363] CHIP:TOO:   SupportedLocales: 8 entries
@@ -45,8 +45,7 @@ tests:
       PICS: LCFG.C.A0000
       verification: |
           ./chip-tool localizationconfiguration read active-locale 1 0
-
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify in DUT as client side: verify that DUT reads  ActiveLocale attribute from the TH successfully
 
           [1651564394.281211][8392:8397] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0001 DataVersion: 1726343234
           [1651564394.281289][8392:8397] CHIP:TOO:   ActiveLocale: en-US

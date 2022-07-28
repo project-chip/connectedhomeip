@@ -374,11 +374,6 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-    if (mAppDelegate != nullptr)
-    {
-        mAppDelegate->OnCommissioningWindowOpened();
-    }
-
     if (mUseECM)
     {
         mWindowStatus = AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen;
@@ -386,6 +381,11 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     else
     {
         mWindowStatus = AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen;
+    }
+
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCommissioningWindowOpened();
     }
 
     // reset all advertising, switching to our new commissioning mode.

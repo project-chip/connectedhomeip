@@ -27,7 +27,6 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 
 @class MTRCommissioningParameters;
 @protocol MTRDevicePairingDelegate;
-@protocol MTROTAProviderDelegate;
 
 @interface MTRDeviceController : NSObject
 
@@ -119,15 +118,6 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * @param[in] queue The queue on which the callbacks will be delivered
  */
 - (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
-
-/**
- * Set the Delegate for the OTA Provider as well as the Queue on which the Delegate callbacks will be triggered
- *
- * @param[in] delegate The delegate the OTA Provider should use
- *
- * @param[in] queue The queue on which the callbacks will be delivered
- */
-- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 /**
  * Shutdown the controller. Calls to shutdown after the first one are NO-OPs.

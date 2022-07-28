@@ -24,6 +24,7 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/reporting/reporting.h>
@@ -364,24 +365,31 @@ std::vector<Action *> GetActionListInfo(chip::EndpointId parentId)
     return gActions;
 }
 
+namespace {
+void CallReportingCallback(intptr_t closure)
+{
+    auto path = reinterpret_cast<app::ConcreteAttributePath *>(closure);
+    MatterReportingAttributeChangeCallback(*path);
+    Platform::Delete(path);
+}
+
+void ScheduleReportingCallback(Device * dev, ClusterId cluster, AttributeId attribute)
+{
+    auto * path = Platform::New<app::ConcreteAttributePath>(dev->GetEndpointId(), cluster, attribute);
+    PlatformMgr().ScheduleWork(CallReportingCallback, reinterpret_cast<intptr_t>(path));
+}
+} // anonymous namespace
+
 void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
 {
     if (itemChangedMask & Device::kChanged_Reachable)
     {
-        uint8_t reachable = dev->IsReachable() ? 1 : 0;
-        DeviceLayer::StackLock lock;
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                               ZCL_REACHABLE_ATTRIBUTE_ID, ZCL_BOOLEAN_ATTRIBUTE_TYPE, &reachable);
+        ScheduleReportingCallback(dev, BridgedDeviceBasic::Id, BridgedDeviceBasic::Attributes::Reachable::Id);
     }
 
     if (itemChangedMask & Device::kChanged_Name)
     {
-        uint8_t zclName[kNodeLabelSize];
-        MutableByteSpan zclNameSpan(zclName);
-        MakeZclCharString(zclNameSpan, dev->GetName());
-        DeviceLayer::StackLock lock;
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                               ZCL_NODE_LABEL_ATTRIBUTE_ID, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, zclNameSpan.data());
+        ScheduleReportingCallback(dev, BridgedDeviceBasic::Id, BridgedDeviceBasic::Attributes::NodeLabel::Id);
     }
 }
 
@@ -394,10 +402,7 @@ void HandleDeviceOnOffStatusChanged(DeviceOnOff * dev, DeviceOnOff::Changed_t it
 
     if (itemChangedMask & DeviceOnOff::kChanged_OnOff)
     {
-        uint8_t isOn = dev->IsOn() ? 1 : 0;
-        DeviceLayer::StackLock lock;
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
-                                               ZCL_BOOLEAN_ATTRIBUTE_TYPE, &isOn);
+        ScheduleReportingCallback(dev, OnOff::Id, OnOff::Attributes::OnOff::Id);
     }
 }
 
@@ -413,14 +418,12 @@ void HandleDevicePowerSourceStatusChanged(DevicePowerSource * dev, DevicePowerSo
     if (itemChangedMask & DevicePowerSource::kChanged_BatLevel)
     {
         uint8_t batChargeLevel = dev->GetBatChargeLevel();
-        DeviceLayer::StackLock lock;
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), PowerSource::Id, PowerSource::Attributes::BatChargeLevel::Id,
                                                ZCL_INT8U_ATTRIBUTE_TYPE, &batChargeLevel);
     }
 
     if (itemChangedMask & DevicePowerSource::kChanged_Description)
     {
-        DeviceLayer::StackLock lock;
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), PowerSource::Id, PowerSource::Attributes::Description::Id);
     }
 }
@@ -434,9 +437,7 @@ void HandleDeviceTempSensorStatusChanged(DeviceTempSensor * dev, DeviceTempSenso
     }
     if (itemChangedMask & DeviceTempSensor::kChanged_MeasurementValue)
     {
-        DeviceLayer::StackLock lock;
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), TemperatureMeasurement::Id,
-                                               TemperatureMeasurement::Attributes::MeasuredValue::Id);
+        ScheduleReportingCallback(dev, TemperatureMeasurement::Id, TemperatureMeasurement::Attributes::MeasuredValue::Id);
     }
 }
 
@@ -860,48 +861,42 @@ int main(int argc, char * argv[])
     memset(gDevices, 0, sizeof(gDevices));
 
     // Setup Mock Devices
+    Light1.SetReachable(true);
+    Light2.SetReachable(true);
+
     Light1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
     Light2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
 
-    Light1.SetReachable(true);
-    Light2.SetReachable(true);
+    TempSensor1.SetReachable(true);
+    TempSensor1.SetReachable(true);
 
     TempSensor1.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
     TempSensor2.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
 
-    TempSensor1.SetReachable(true);
-    TempSensor1.SetReachable(true);
-
-    TempSensor1.SetMeasuredValue(100);
-    TempSensor2.SetMeasuredValue(100);
-
     // Setup devices for action cluster tests
-    ActionLight1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-    ActionLight2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-    ActionLight3.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-    ActionLight4.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-
     ActionLight1.SetReachable(true);
     ActionLight2.SetReachable(true);
     ActionLight3.SetReachable(true);
     ActionLight4.SetReachable(true);
 
-    // Define composed device with two temperature sensors
+    ActionLight1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+    ActionLight2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+    ActionLight3.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+    ActionLight4.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+
+    // Setup composed device with two temperature sensors and a power source
     ComposedDevice ComposedDevice("Composed Device", "Bedroom");
     DevicePowerSource ComposedPowerSource("Composed Power Source", "Bedroom", EMBER_AF_POWER_SOURCE_FEATURE_BATTERY);
-
-    ComposedTempSensor1.SetMeasuredValue(100);
-    ComposedTempSensor2.SetMeasuredValue(100);
-
-    ComposedTempSensor1.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
-    ComposedTempSensor2.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
-    ComposedPowerSource.SetChangeCallback(&HandleDevicePowerSourceStatusChanged);
 
     ComposedDevice.SetReachable(true);
     ComposedTempSensor1.SetReachable(true);
     ComposedTempSensor2.SetReachable(true);
     ComposedPowerSource.SetReachable(true);
     ComposedPowerSource.SetBatChargeLevel(58);
+
+    ComposedTempSensor1.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
+    ComposedTempSensor2.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
+    ComposedPowerSource.SetChangeCallback(&HandleDevicePowerSourceStatusChanged);
 
     if (ChipLinuxAppInit(argc, argv) != 0)
     {
@@ -942,7 +937,8 @@ int main(int argc, char * argv[])
                       Span<DataVersion>(gTempSensor1DataVersions), 1);
     AddDeviceEndpoint(&TempSensor2, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gBridgedTempSensorDeviceTypes),
                       Span<DataVersion>(gTempSensor2DataVersions), 1);
-
+    TempSensor1.SetMeasuredValue(100);
+    TempSensor2.SetMeasuredValue(100);
 
     // Add composed Device with two temperature sensors and a power source
     AddDeviceEndpoint(&ComposedDevice, &bridgedComposedDeviceEndpoint, Span<const EmberAfDeviceType>(gBridgedComposedDeviceTypes),
@@ -954,6 +950,8 @@ int main(int argc, char * argv[])
     AddDeviceEndpoint(&ComposedPowerSource, &bridgedPowerSourceEndpoint,
                       Span<const EmberAfDeviceType>(gComposedPowerSourceDeviceTypes),
                       Span<DataVersion>(gComposedPowerSourceDataVersions), ComposedDevice.GetEndpointId());
+    ComposedTempSensor1.SetMeasuredValue(100);
+    ComposedTempSensor2.SetMeasuredValue(100);
 
     // Add 4 lights for the Action Clusters tests
     AddDeviceEndpoint(&ActionLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
