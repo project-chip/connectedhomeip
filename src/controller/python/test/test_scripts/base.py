@@ -756,6 +756,52 @@ class BaseTestHelper:
         if (expectedDataFabric1 != readListDataFabric1):
             raise AssertionError("Got back mismatched data")
 
+    async def TestResubscription(self, nodeid: int):
+        ''' This validates the re-subscription logic by triggering a liveness failure caused by the expiration
+            of the underlying CASE session and the resultant failure to receive reports from the server. This should
+            trigger CASE session establishment and subscription restablishment. Both the attempt and successful
+            restablishment of the subscription are validated.
+        '''
+        cv = asyncio.Condition()
+        resubAttempted = False
+        resubSucceeded = True
+
+        async def OnResubscriptionAttempted(transaction, errorEncountered: int, nextResubscribeIntervalMsec: int):
+            self.logger.info("Re-subscription Attempted")
+            nonlocal resubAttempted
+            resubAttempted = True
+
+        async def OnResubscriptionSucceeded(transaction):
+            self.logger.info("Re-subscription Succeeded")
+            nonlocal cv
+            async with cv:
+                cv.notify()
+
+        subscription = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)], reportInterval=(0, 5))
+
+        #
+        # Register async callbacks that will fire when a re-sub is attempted or succeeds.
+        #
+        subscription.SetResubscriptionAttemptedCallback(OnResubscriptionAttempted, True)
+        subscription.SetResubscriptionSucceededCallback(OnResubscriptionSucceeded, True)
+
+        #
+        # Over-ride the default liveness timeout (which is set quite high to accomodate for
+        # transport delays) to something very small. This ensures that our liveness timer will
+        # fire quickly and cause a re-subscription to occur naturally.
+        #
+        subscription.OverrideLivenessTimeoutMs(100)
+
+        async with cv:
+            if (not(resubAttempted) or not(resubSucceeded)):
+                res = await asyncio.wait_for(cv.wait(), 3)
+                if not res:
+                    self.logger.error("Timed out waiting for resubscription to succeed")
+                    return False
+
+        subscription.Shutdown()
+        return True
+
     def TestCloseSession(self, nodeid: int):
         self.logger.info(f"Closing sessions with device {nodeid}")
         try:

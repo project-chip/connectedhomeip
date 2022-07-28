@@ -35,6 +35,7 @@
 #include <lib/support/ErrorStr.h>
 #include <lib/support/ZclString.h>
 
+#include <app/InteractionModelEngine.h>
 #include <app/server/Server.h>
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER

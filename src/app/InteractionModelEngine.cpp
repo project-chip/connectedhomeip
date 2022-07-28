@@ -43,13 +43,17 @@ InteractionModelEngine * InteractionModelEngine::GetInstance()
     return &sInteractionModelEngine;
 }
 
-CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable)
+CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
+                                        CASESessionManager * apCASESessionMgr)
 {
-    mpExchangeMgr = apExchangeMgr;
-    mpFabricTable = apFabricTable;
+    VerifyOrReturnError(apFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mpExchangeMgr    = apExchangeMgr;
+    mpFabricTable    = apFabricTable;
+    mpCASESessionMgr = apCASESessionMgr;
 
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
-    VerifyOrReturnError(mpFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mReportingEngine.Init();
     mMagic++;
@@ -122,6 +126,16 @@ void InteractionModelEngine::Shutdown()
     mEventPathPool.ReleaseAll();
     mDataVersionFilterPool.ReleaseAll();
     mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
+
+    mpCASESessionMgr = nullptr;
+
+    //
+    // We _should_ be clearing these out, but doing so invites a world
+    // of trouble. #21233 tracks fixing the underlying assumptions to make
+    // this possible.
+    //
+    // mpFabricTable    = nullptr;
+    // mpExchangeMgr    = nullptr;
 }
 
 uint32_t InteractionModelEngine::GetNumActiveReadHandlers() const
