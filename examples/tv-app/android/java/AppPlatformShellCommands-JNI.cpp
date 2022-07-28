@@ -17,8 +17,8 @@
 
 #include "AppPlatformShellCommands-JNI.h"
 #include "AppImpl.h"
-#include <access/AccessControl.h>
 #include "TvApp-JNI.h"
+#include <access/AccessControl.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
@@ -33,7 +33,6 @@ using namespace chip;
 
 char response[1024];
 
-
 using namespace ::chip::Controller;
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
@@ -43,16 +42,13 @@ using namespace chip::app::Clusters;
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-
-
 static CHIP_ERROR pairApp(bool printHeader, size_t index)
 {
     // TODO: add pair app
     return CHIP_NO_ERROR;
 }
 
-
-char* AppPlatformHandler(int argc, char ** argv)
+char * AppPlatformHandler(int argc, char ** argv)
 {
     if (argc == 0 || strcmp(argv[0], "help") == 0)
     {
@@ -94,14 +90,14 @@ char* AppPlatformHandler(int argc, char ** argv)
 
         ChipLogProgress(DeviceLayer, "added app");
 
-        strcpy(response,"added app");
+        strcpy(response, "added app");
 
         return response;
     }
     else if (strcmp(argv[0], "remove-app-access") == 0)
     {
         Access::GetAccessControl().DeleteAllEntriesForFabric(GetDeviceCommissioner()->GetFabricIndex());
-        strcpy(response,"removed app access");
+        strcpy(response, "removed app access");
 
         return response;
     }
@@ -119,7 +115,7 @@ char* AppPlatformHandler(int argc, char ** argv)
         {
             ChipLogProgress(DeviceLayer, "app not found");
 
-            strcpy(response,"app not found");
+            strcpy(response, "app not found");
             return response;
         }
         ContentAppPlatform::GetInstance().RemoveContentApp(app);
@@ -144,18 +140,17 @@ char* AppPlatformHandler(int argc, char ** argv)
         if (app == nullptr)
         {
             ChipLogProgress(DeviceLayer, "app not found");
-            strcpy(response,"app not found");
+            strcpy(response, "app not found");
             return response;
         }
         if (app->GetAccountLoginDelegate() == nullptr)
         {
             ChipLogProgress(DeviceLayer, "no AccountLogin cluster for app with endpoint id=%d ", endpoint);
-            
-            strcpy(response,"no AccountLogin cluster for app with endpoint");
+
+            strcpy(response, "no AccountLogin cluster for app with endpoint");
             return response;
         }
         app->GetAccountLoginDelegate()->SetSetupPin(pincode);
-
 
         ChipLogProgress(DeviceLayer, "set pin success");
 
@@ -185,29 +180,29 @@ char* AppPlatformHandler(int argc, char ** argv)
 
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-
 #define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_com_matter_tv_server_tvapp_AppPlatformShellCommands_##METHOD_NAME
 
-JNI_METHOD(jstring, OnExecuteCommand)(JNIEnv *env, jobject, jobjectArray stringArray)
+JNI_METHOD(jstring, OnExecuteCommand)(JNIEnv * env, jobject, jobjectArray stringArray)
 {
-    int argc = env->GetArrayLength(stringArray);
-    char ** argv = new char *[(uint)argc];
+    int argc     = env->GetArrayLength(stringArray);
+    char ** argv = new char *[(uint) argc];
 
     // Fill in argv
-    for (int i=0; i<argc; i++) {
-        jstring string = (jstring) (env->GetObjectArrayElement(stringArray, i));
-        argv[i] = (char*) env->GetStringUTFChars(string, 0);
+    for (int i = 0; i < argc; i++)
+    {
+        jstring string = (jstring)(env->GetObjectArrayElement(stringArray, i));
+        argv[i]        = (char *) env->GetStringUTFChars(string, 0);
     }
 
     // Store response to show it to the users
-    char* buf = AppPlatformHandler(argc, argv);
-
+    char * buf = AppPlatformHandler(argc, argv);
 
     // Release UTF Chars
-    for (int i=0; i<argc; i++) {
+    for (int i = 0; i < argc; i++)
+    {
         ChipLogProgress(DeviceLayer, " Value=%s ", argv[i]);
-        jstring string = (jstring) (env->GetObjectArrayElement(stringArray, i));
+        jstring string = (jstring)(env->GetObjectArrayElement(stringArray, i));
         env->ReleaseStringUTFChars(string, argv[i]);
     }
 
