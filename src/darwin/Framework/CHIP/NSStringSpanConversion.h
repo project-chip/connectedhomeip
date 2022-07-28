@@ -26,7 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
  * Utilities for converting between NSString and chip::CharSpan.
  */
 
-inline chip::CharSpan AsCharSpan(NSString * str) { return chip::CharSpan([str UTF8String], [str length]); }
+inline chip::CharSpan AsCharSpan(NSString * str)
+{
+    return chip::CharSpan([str UTF8String], [str lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+}
 
 inline NSString * AsString(chip::CharSpan span)
 {
