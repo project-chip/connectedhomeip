@@ -715,15 +715,14 @@ void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler
         }
     }
 
-    sendGetCredentialResponse(commandObj, commandPath, credentialType, credentialIndex, userIndexWithCredential,
-                                    credentialInfo, credentialExists);
+    sendGetCredentialResponse(commandObj, commandPath, credentialType, credentialIndex, userIndexWithCredential, credentialInfo,
+                              credentialExists);
 }
 
 void DoorLockServer::sendGetCredentialResponse(chip::app::CommandHandler * commandObj,
-                                                     const chip::app::ConcreteCommandPath & commandPath,
-                                                     DlCredentialType credentialType, uint16_t credentialIndex,
-                                                     uint16_t userIndexWithCredential,
-                                                     EmberAfPluginDoorLockCredentialInfo credentialInfo, bool credentialExists)
+                                               const chip::app::ConcreteCommandPath & commandPath, DlCredentialType credentialType,
+                                               uint16_t credentialIndex, uint16_t userIndexWithCredential,
+                                               EmberAfPluginDoorLockCredentialInfo credentialInfo, bool credentialExists)
 {
     Commands::GetCredentialStatusResponse::Type response{ .credentialExists = credentialExists };
     if (credentialExists)
