@@ -81,8 +81,9 @@ void ApplicationInit()
 
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
-    ChipLogDetail(DeviceLayer, "TV Linux App: Disabling Fixed Content App Endpoints");
-    emberAfEndpointEnableDisable(3, false);
+    ChipLogDetail(DeviceLayer, "TV Linux App: Warning - Fixed Content App Endpoint Not Disabled");
+    // Can't disable this without breaking CI unit tests that act upon account login cluster (only available on ep3)
+    // emberAfEndpointEnableDisable(3, false);
 }
 
 int main(int argc, char * argv[])
