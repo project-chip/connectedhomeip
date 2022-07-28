@@ -448,7 +448,7 @@ tests:
       response:
           saveAs: ProductURLValue
           constraints:
-              type: char_string
+              type: long_char_string
               maxLength: 256
 
     - label:
