@@ -288,7 +288,7 @@ done
 # Prepare a temporary directory and cleanup
 trap cleanup EXIT
 TMP_DIR=$(mktemp -d)
-echo "Create tmp directory $TMP_DIR"
+info "Created tmp directory $TMP_DIR"
 
 # ------------------------------------------------------------------------------
 # Checks if the user need install dependencies
