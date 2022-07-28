@@ -64,7 +64,7 @@ tests:
       attribute: "Tolerance"
       response:
           constraints:
-              type: int16s
+              type: int16u
               minValue: 0
               maxValue: 2048
 
@@ -104,7 +104,7 @@ tests:
       attribute: "ScaledTolerance"
       response:
           constraints:
-              type: int16s
+              type: int16u
               minValue: 0
               maxValue: 2048
 
