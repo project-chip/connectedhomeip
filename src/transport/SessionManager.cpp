@@ -340,6 +340,59 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
+#if CHIP_SYSTEM_CONFIG_MULTICAST_HOMING
+    if (sessionHandle->GetSessionType() == Transport::Session::SessionType::kGroupOutgoing)
+    {
+        chip::Inet::InterfaceIterator interfaceIt;
+        chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
+        chip::Inet::IPAddress addr;
+
+        while (interfaceIt.Next())
+        {
+            char name[255];
+            interfaceIt.GetInterfaceName(name, 255);
+            if (interfaceIt.SupportsMulticast() && interfaceIt.IsUp())
+            {
+                interfaceId = interfaceIt.GetInterfaceId();
+                if (CHIP_NO_ERROR == interfaceId.GetLinkLocalAddr(&addr))
+                {
+                    char address_string[255];
+                    addr.ToString(address_string, 255);
+                    ChipLogDetail(Inet, "Interface %s has a link local address : %s", name, address_string);
+
+                    multicastAddress.GetIPAddress().ToString(address_string, 255);
+                    destination = &(multicastAddress.SetInterface(interfaceId));
+                    if (mTransportMgr != nullptr)
+                    {
+                        CHIP_TRACE_PREPARED_MESSAGE_SENT(destination, &msgBuf);
+                        if (CHIP_NO_ERROR != mTransportMgr->SendMessage(*destination, std::move(msgBuf)))
+                        {
+                            ChipLogError(Inet, "Failed to send Multicast MSG to addr : %s on interface %s", address_string, name);
+                        }
+                        else
+                        {
+                            ChipLogDetail(Inet, "Successfully send Multicast MSG to addr %s on interface %s", address_string, name);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Always return No error, because we expect some interface to fails and others to always succeed (e.g. lo interface)
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+#endif // CHIP_SYSTEM_CONFIG_MULTICAST_HOMING
+        if (mTransportMgr != nullptr)
+        {
+            CHIP_TRACE_PREPARED_MESSAGE_SENT(destination, &msgBuf);
+            return mTransportMgr->SendMessage(*destination, std::move(msgBuf));
+        }
+#if CHIP_SYSTEM_CONFIG_MULTICAST_HOMING
+    }
+#endif // CHIP_SYSTEM_CONFIG_MULTICAST_HOMING
+
     if (mTransportMgr != nullptr)
     {
         CHIP_TRACE_PREPARED_MESSAGE_SENT(destination, &msgBuf);
