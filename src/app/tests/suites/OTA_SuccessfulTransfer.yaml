@@ -17,10 +17,10 @@ name: Test OTA Software Update Successful Transfer
 config:
     endpoint: 0
     requestorNodeId:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0x12344321
     providerNodeId:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0xC0FFEE
     providerPayload:
         type: char_string

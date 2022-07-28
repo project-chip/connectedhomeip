@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     timeout: 300
     nodeId2:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0xCAFE
     endpoint: 0
     discriminator:
