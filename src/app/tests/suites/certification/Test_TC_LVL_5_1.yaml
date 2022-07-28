@@ -51,7 +51,7 @@ tests:
     - label: "Reads Minlevel attribute from DUT"
       PICS: LVL.S.A0002
       command: "readAttribute"
-      attribute: "min level"
+      attribute: "MinLevel"
       response:
           saveAs: MinlevelValue
           constraints:
@@ -87,10 +87,10 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Reads current level attribute from DUT"
+    - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.A0000 && LVL.S.C04.Rsp
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: MinlevelValue + 1
           saveAs: CurrentlevelValue
@@ -99,10 +99,10 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Reads current level attribute from DUT"
+    - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.A0000 && !LVL.S.A0002 && LVL.S.C04.Rsp
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 2
           constraints:
@@ -150,19 +150,19 @@ tests:
               - name: "ms"
                 value: 2500
 
-    - label: "Reads current level attribute from DUT"
+    - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.A0000 && LVL.S.C02.Rsp && LVL.S.M.VarRate
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 66
           constraints:
               type: int8u
 
-    - label: "Reads current level attribute from DUT"
+    - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.A0000 && LVL.S.C02.Rsp && !LVL.S.M.VarRate
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 66
           constraints:
@@ -208,31 +208,31 @@ tests:
               - name: "ms"
                 value: 2500
 
-    - label: "Reads current level attribute from DUT"
+    - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C06.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: CurrentlevelValue
 
-    - label: "Reads current level attribute from DUT"
+    - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C06.Rsp && LVL.S.A0000 && !LVL.S.M.VarRate
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: CurrentlevelValue
 
-    - label: "Reads current level attribute from DUT"
+    - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C06.Rsp && LVL.S.A0000 && !LVL.S.A0002 && LVL.S.M.VarRate
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 2
 
-    - label: "Reads current level attribute from DUT"
+    - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C06.Rsp && LVL.S.A0000 && !LVL.S.A0002 && !LVL.S.M.VarRate
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 2
 

@@ -31,7 +31,7 @@ tests:
            ./chip-tool levelcontrol read min-level 1 1
 
           [1654065563.003862][10039:10044] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0002 DataVersion: 540248549
-          [1654065563.003916][10039:10044] CHIP:TOO:   min level: 0
+          [1654065563.003916][10039:10044] CHIP:TOO:   MinLevel: 0
           [1654065563.003992][10039:10044] CHIP:EM: Sending Standalone Ack for MessageCounter:10228121 on exchange 38337i
       disabled: true
 
@@ -44,7 +44,7 @@ tests:
 
 
           [1654065684.869569][10048:10053] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0003 DataVersion: 540248549
-          [1654065684.869621][10048:10053] CHIP:TOO:   max level: 254
+          [1654065684.869621][10048:10053] CHIP:TOO:   MaxLevel: 254
           [1654065684.869737][10048:10053] CHIP:EM: Sending Standalone Ack for MessageCounter:9018536 on exchange 12814i
       disabled: true
 
@@ -99,7 +99,7 @@ tests:
           ./chip-tool levelcontrol read current-level 1 1
 
           [1654065859.401140][10188:10193] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0000 DataVersion: 540248551
-          [1654065859.401197][10188:10193] CHIP:TOO:   current level: 253
+          [1654065859.401197][10188:10193] CHIP:TOO:   CurrentLevel: 253
           [1654065859.401268][10188:10193] CHIP:EM: Sending Standalone Ack for MessageCounter:2942065 on exchange 21982i
       disabled: true
 

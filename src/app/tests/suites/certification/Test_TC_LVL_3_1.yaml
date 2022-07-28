@@ -51,7 +51,7 @@ tests:
     - label: "Reads the MinLevel attribute"
       PICS: LVL.S.A0002
       command: "readAttribute"
-      attribute: "min level"
+      attribute: "MinLevel"
       response:
           constraints:
               type: int8u
@@ -61,7 +61,7 @@ tests:
     - label: "Reads the MaxLevel attribute"
       PICS: LVL.S.A0003
       command: "readAttribute"
-      attribute: "max level"
+      attribute: "MaxLevel"
       response:
           constraints:
               type: int8u
@@ -93,7 +93,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C04.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 64
 
@@ -122,7 +122,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 100
 
@@ -151,14 +151,14 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 128
 
     - label: "Reads the OnOffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0010
       command: "readAttribute"
-      attribute: "on off transition time"
+      attribute: "OnOffTransitionTime"
       response:
           constraints:
               type: int16u
@@ -191,7 +191,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 64
 
