@@ -62,7 +62,7 @@ tests:
       response:
           saveAs: DataModelRevisionValue
           constraints:
-              type: vendor_id
+              type: int16u
               minValue: 0
               maxValue: 65534
 
