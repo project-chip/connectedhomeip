@@ -68,9 +68,9 @@ tests:
                 value: 1
               - name: "transitionTime"
                 value: 0
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 1
 
     - label: "reads max level attribute from DUT"
@@ -93,9 +93,9 @@ tests:
                 value: 0
               - name: "rate"
                 value: 32
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 1
 
     - label:
@@ -136,9 +136,9 @@ tests:
                 value: 1
               - name: "rate"
                 value: 64
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 1
 
     - label:
@@ -193,9 +193,9 @@ tests:
                 value: 0
               - name: "rate"
                 value: 255
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 1
 
     - label: "Wait 500ms"
