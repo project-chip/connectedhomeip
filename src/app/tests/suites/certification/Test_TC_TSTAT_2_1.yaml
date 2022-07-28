@@ -53,7 +53,7 @@ tests:
       attribute: "Occupancy"
       response:
           constraints:
-              type: int16s
+              type: bitmap8
               minValue: 0
               maxValue: 1
 
