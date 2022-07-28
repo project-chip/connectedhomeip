@@ -64,7 +64,8 @@ class LoopbackTransportDelegate
 public:
     virtual ~LoopbackTransportDelegate() {}
 
-    // Called by the loopback transport when it drops a message due to a nonzero mNumMessagesToDrop/mNumMessagesToAllowBeforeDropping
+    // Called by the loopback transport when it drops a message due to a nonzero
+    // mNumMessagesToDrop/mNumMessagesToAllowBeforeDropping
     virtual void OnMessageDropped() {}
 };
 
