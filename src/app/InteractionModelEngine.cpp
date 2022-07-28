@@ -537,7 +537,7 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
         return Status::Success;
     }
 
-    return Status::InvalidAction;
+    return Status::InvalidSubscription;
 }
 
 CHIP_ERROR InteractionModelEngine::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
