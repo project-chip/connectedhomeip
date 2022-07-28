@@ -115,10 +115,11 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
     return err;
 }
 
-CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload, bool & aSendStatusResponse)
+CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
+                                         bool & aSendStatusResponse)
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
-    aSendStatusResponse = true;
+    aSendStatusResponse    = true;
     CHIP_ERROR statusError = CHIP_NO_ERROR;
     SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
     aSendStatusResponse = false;
@@ -247,7 +248,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                           System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
     bool sendStatusResponse = true;
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {

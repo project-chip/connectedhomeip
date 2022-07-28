@@ -2799,15 +2799,15 @@ void TestReadInteraction::TestSubscribeSendUnknownMessage(nlTestSuite * apSuite,
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
-        ctx.GetLoopback().mSentMessageCount            = 0;
-        ctx.GetLoopback().mNumMessagesToDrop           = 1;
+        ctx.GetLoopback().mSentMessageCount                 = 0;
+        ctx.GetLoopback().mNumMessagesToDrop                = 1;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
 
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
 
-        ctx.GetLoopback().mSentMessageCount            = 0;
+        ctx.GetLoopback().mSentMessageCount = 0;
         rm->ClearRetransTable(readClient.mExchange.Get());
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
@@ -2864,15 +2864,15 @@ void TestReadInteraction::TestSubscribeSendInvalidStatusReport(nlTestSuite * apS
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
-        ctx.GetLoopback().mSentMessageCount            = 0;
-        ctx.GetLoopback().mNumMessagesToDrop           = 1;
+        ctx.GetLoopback().mSentMessageCount                 = 0;
+        ctx.GetLoopback().mNumMessagesToDrop                = 1;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
 
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
 
-        ctx.GetLoopback().mSentMessageCount            = 0;
+        ctx.GetLoopback().mSentMessageCount = 0;
         rm->ClearRetransTable(readClient.mExchange.Get());
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
