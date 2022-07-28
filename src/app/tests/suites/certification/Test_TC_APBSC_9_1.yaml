@@ -43,7 +43,7 @@ tests:
       attribute: "VendorID"
       response:
           constraints:
-              type: vendor-id
+              type: vendor_id
           saveAs: vendorID
 
     - label: "Reads the ApplicationName attribute"
