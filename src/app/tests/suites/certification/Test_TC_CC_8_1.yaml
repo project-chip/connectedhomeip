@@ -22,10 +22,10 @@ config:
         type: int8u
         defaultValue: 50
     RateXConfigValue:
-        type: INT16S
+        type: int16s
         defaultValue: 50
     RateYConfigValue:
-        type: INT16S
+        type: int16s
         defaultValue: 50
     ColorTemperatureMinMiredsConfigValue:
         type: int16u

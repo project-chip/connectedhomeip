@@ -19,10 +19,10 @@ config:
     cluster: "Color Control"
     endpoint: 1
     StepXConfigValue:
-        type: INT16S
+        type: int16s
         defaultValue: 100
     StepYConfigValue:
-        type: INT16S
+        type: int16s
         defaultValue: 100
 
 tests:

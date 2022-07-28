@@ -33,7 +33,7 @@ tests:
       attribute: "LocalTemperature"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -43,7 +43,7 @@ tests:
       attribute: "OutdoorTemperature"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -53,7 +53,7 @@ tests:
       attribute: "Occupancy"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 0
               maxValue: 1
 
@@ -63,7 +63,7 @@ tests:
       attribute: "AbsMinHeatSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -73,7 +73,7 @@ tests:
       attribute: "AbsMaxHeatSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -83,7 +83,7 @@ tests:
       attribute: "AbsMinCoolSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -93,7 +93,7 @@ tests:
       attribute: "AbsMaxCoolSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -133,7 +133,7 @@ tests:
       attribute: "LocalTemperatureCalibration"
       response:
           constraints:
-              type: int8
+              type: int8s
               minValue: 25
               maxValue: -25
 
@@ -143,7 +143,7 @@ tests:
       attribute: "OccupiedCoolingSetpoint"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 1600
               maxValue: 3200
 
@@ -153,7 +153,7 @@ tests:
       attribute: "OccupiedHeatingSetpoint"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 700
               maxValue: 3000
 
@@ -163,7 +163,7 @@ tests:
       attribute: "UnoccupiedCoolingSetpoint"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 1600
               maxValue: 3200
 
@@ -173,7 +173,7 @@ tests:
       attribute: "UnoccupiedHeatingSetpoint"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 700
               maxValue: 3000
 
@@ -183,7 +183,7 @@ tests:
       attribute: "MinHeatSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 700
               maxValue: 3000
 
@@ -193,7 +193,7 @@ tests:
       attribute: "MaxHeatSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -203,7 +203,7 @@ tests:
       attribute: "MinCoolSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -213,7 +213,7 @@ tests:
       attribute: "MaxCoolSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -223,7 +223,7 @@ tests:
       attribute: "MinSetpointDeadBand"
       response:
           constraints:
-              type: int8
+              type: int8s
               minValue: 0
               maxValue: 25
 
@@ -351,7 +351,7 @@ tests:
       attribute: "SetpointChangeAmount"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -497,7 +497,7 @@ tests:
       attribute: "ACCoilTemperature"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 

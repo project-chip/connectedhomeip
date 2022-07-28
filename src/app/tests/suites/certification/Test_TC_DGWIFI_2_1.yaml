@@ -71,7 +71,7 @@ tests:
       attribute: "RSSI"
       response:
           constraints:
-              type: int8
+              type: int8s
               minValue: -120
               maxValue: 0
 

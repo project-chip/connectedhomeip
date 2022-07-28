@@ -34,7 +34,7 @@ tests:
       attribute: "measured value"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 0
               maxValue: 10000
 
@@ -44,7 +44,7 @@ tests:
       attribute: "min measured value"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 0
               maxValue: 9999
 
@@ -54,7 +54,7 @@ tests:
       attribute: "max measured value"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 1
               maxValue: 10000
 

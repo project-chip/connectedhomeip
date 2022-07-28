@@ -34,7 +34,7 @@ tests:
       attribute: "MaxPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -64,7 +64,7 @@ tests:
       attribute: "MinConstPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -74,7 +74,7 @@ tests:
       attribute: "MaxConstPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -84,7 +84,7 @@ tests:
       attribute: "MinCompPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -94,7 +94,7 @@ tests:
       attribute: "MaxCompPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -144,7 +144,7 @@ tests:
       attribute: "MinConstTemp"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -154,7 +154,7 @@ tests:
       attribute: "MaxConstTemp"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -194,7 +194,7 @@ tests:
       attribute: "Capacity"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 

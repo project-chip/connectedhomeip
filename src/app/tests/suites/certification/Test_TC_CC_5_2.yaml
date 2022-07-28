@@ -19,10 +19,10 @@ config:
     cluster: "Color Control"
     endpoint: 1
     RateXValue:
-        type: INT16S
+        type: int16s
         defaultValue: 50
     RateYValue:
-        type: INT16S
+        type: int16s
         defaultValue: 50
 
 tests:
