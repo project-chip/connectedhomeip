@@ -135,6 +135,14 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     ESP32 based device types, please refer
     [examples/all-clusters-app/esp32](https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/esp32)
 
+-   Enable Ccache for faster IDF builds
+
+    It is recommended to have Ccache installed for faster builds
+
+    ```
+    $ export IDF_CCACHE_ENABLE=1
+    ```
+
 -   To build the demo application.
 
           ```
