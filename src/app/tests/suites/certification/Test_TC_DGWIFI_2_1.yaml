@@ -43,7 +43,7 @@ tests:
       attribute: "SecurityType"
       response:
           constraints:
-              type: enum
+              type: enum8
 
     - label: "Reads WiFiVersion attribute constraints"
       PICS: DGWIFI.S.A0002
@@ -51,7 +51,7 @@ tests:
       attribute: "WiFiVersion"
       response:
           constraints:
-              type: enum
+              type: enum8
               minValue: 0
               maxValue: 5
 
