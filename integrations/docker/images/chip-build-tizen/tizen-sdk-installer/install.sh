@@ -233,7 +233,7 @@ function install_tizen_sdk() {
     # Configure tizen cli
     echo "TIZEN_SDK_INSTALLED_PATH=$TIZEN_SDK_ROOT" >"$TIZEN_SDK_ROOT/sdk.info"
     echo "TIZEN_SDK_DATA_PATH=$TIZEN_SDK_DATA_PATH" >>"$TIZEN_SDK_ROOT/sdk.info"
-    ln -sf $TIZEN_SDK_DATA_PATH/.tizen-cli-config "$TIZEN_SDK_ROOT/tools/.tizen-cli-config"
+    ln -sf "$TIZEN_SDK_DATA_PATH"/.tizen-cli-config "$TIZEN_SDK_ROOT/tools/.tizen-cli-config"
 
     # Make symbolic links relative
     find "$TIZEN_SDK_SYSROOT/usr/lib" -maxdepth 1 -type l | while IFS= read -r LNK; do
