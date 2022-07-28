@@ -26,7 +26,7 @@ SECRET_TOOL=false
 
 SCRIPT_NAME=$(basename -- "$(readlink -f "${BASH_SOURCE:?}")")
 SCRIPT_DIR=$(dirname -- "$(readlink -f "${BASH_SOURCE:?}")")
-DEPENDENCIES="cpio openjdk-8-jre-headless obs-build  wget zip"
+DEPENDENCIES=('cpio' 'openjdk-8-jre-headless' 'obs-build' 'wget' 'zip')
 
 # If color is available use colors
 if which tput >/dev/null 2>&1 && [[ $(tput -T $TERM colors) -ge 8 ]]; then
@@ -42,7 +42,7 @@ fi
 function show_help() {
     echo "Usage: $SCRIPT_NAME [ options .. ]"
     echo "Example: $SCRIPT_NAME --tizen-sdk-path ~/tizen-sdk --tizen-version 6.0 --install-dependencies"
-    echo $SCRIPT_DIR
+    echo
     echo "Options:"
     echo "  --help                     Display this information"
     echo "  --tizen-sdk-path           Set directory where Tizen will be installed. Default is $TIZEN_SDK_ROOT"
@@ -60,19 +60,19 @@ function show_help() {
 # ------------------------------------------------------------------------------
 # Error print function
 function error() {
-    echo "${COLOR_RED}[ERROR]: $1${COLOR_NONE}"
+    echo "$COLOR_RED[ERROR]: $1$COLOR_NONE"
 }
 
 # ------------------------------------------------------------------------------
 # Info print function
 function info() {
-    echo "${COLOR_GREEN}$1${COLOR_NONE}"
+    echo "$COLOR_GREEN$1$COLOR_NONE"
 }
 
 # ------------------------------------------------------------------------------
 # Warning print function
 function warning() {
-    echo "${COLOR_YELLOW}[WARNING]: $1${COLOR_NONE}"
+    echo "$COLOR_YELLOW[WARNING]: $1$COLOR_NONE"
 }
 
 # ------------------------------------------------------------------------------
@@ -106,12 +106,12 @@ function install_dependencies() {
 
     info "Installing dependencies"
     apt-get update
-    DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends $DEPENDENCIES || return
+    DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends "${DEPENDENCIES[@]}" || return
 }
 
 # ------------------------------------------------------------------------------
 # Function clean on EXIT
-function cleanup {
+function cleanup() {
     echo "Clean removing $TMP_DIR"
     rm -rf "${TMP_DIR:?}"
 }
@@ -218,69 +218,69 @@ function install_tizen_sdk() {
     info "Installation Tizen SDK [...]"
 
     unzip -o '*.zip'
-    cp -rf data/* $TIZEN_SDK_ROOT
+    cp -rf data/* "$TIZEN_SDK_ROOT"
 
     unrpm *.rpm
-    cp -rf lib usr $TIZEN_SDK_SYSROOT
+    cp -rf lib usr "$TIZEN_SDK_SYSROOT"
 
     # Install secret tool or not
-    if ($SECRET_TOOL); then
+    if ("$SECRET_TOOL"); then
         info "Override secret tool"
         cp "$SCRIPT_DIR/secret-tool.py" "$TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool"
-        chmod 0755 $TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool
+        chmod 0755 "$TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool"
     fi
 
     # Configure tizen cli
-    echo "TIZEN_SDK_INSTALLED_PATH=$TIZEN_SDK_ROOT" >$TIZEN_SDK_ROOT/sdk.info
-    echo "TIZEN_SDK_DATA_PATH=$TIZEN_SDK_DATA_PATH" >>$TIZEN_SDK_ROOT/sdk.info
-    ln -sf $TIZEN_SDK_DATA_PATH/.tizen-cli-config $TIZEN_SDK_ROOT/tools/.tizen-cli-config
+    echo "TIZEN_SDK_INSTALLED_PATH=$TIZEN_SDK_ROOT" >"$TIZEN_SDK_ROOT/sdk.info"
+    echo "TIZEN_SDK_DATA_PATH=$TIZEN_SDK_DATA_PATH" >>"$TIZEN_SDK_ROOT/sdk.info"
+    ln -sf "$TIZEN_SDK_DATA_PATH/.tizen-cli-config" "$TIZEN_SDK_ROOT/tools/.tizen-cli-config"
 
     # Make symbolic links relative
     find "$TIZEN_SDK_SYSROOT/usr/lib" -maxdepth 1 -type l | while IFS= read -r LNK; do
         ln -sf "$(basename "$(readlink "$LNK")")" "$LNK"
     done
-    ln -sf ../../lib/libcap.so.2 $TIZEN_SDK_SYSROOT/usr/lib/libcap.so
-    ln -sf openssl1.1.pc $TIZEN_SDK_SYSROOT/usr/lib/pkgconfig/openssl.pc
+    ln -sf ../../lib/libcap.so.2 "$TIZEN_SDK_SYSROOT/usr/lib/libcap.so"
+    ln -sf openssl1.1.pc "$TIZEN_SDK_SYSROOT/usr/lib/pkgconfig/openssl.pc"
 
     # Information on necessary environment variables
     warning "You must add the appropriate environment variables before proceeding with matter."
-    echo "${COLOR_YELLOW}"
+    echo "$COLOR_YELLOW"
     echo "export TIZEN_VESRSION=\"$TIZEN_VERSION\""
-    echo "export TIZEN_SDK_ROOT=\"$(realpath $TIZEN_SDK_ROOT)\""
+    echo "export TIZEN_SDK_ROOT=\"$(realpath "$TIZEN_SDK_ROOT")\""
     echo "export TIZEN_SDK_TOOLCHAIN=\"\$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2\""
     echo "export TIZEN_SDK_SYSROOT=\"\$TIZEN_SDK_ROOT/platforms/tizen-\"$TIZEN_VERSION\"/mobile/rootstraps/mobile-\"$TIZEN_VERSION\"-device.core\""
     echo "export PATH=\"\$TIZEN_SDK_ROOT/tools/ide/bin:\$TIZEN_SDK_ROOT/tools:\$PATH\""
-    echo -n "${COLOR_NONE}"
+    echo -n "$COLOR_NONE"
 }
 
 while (($#)); do
     case $1 in
-    --help)
-        show_help
-        exit 0
-        ;;
-    --tizen-sdk-path)
-        TIZEN_SDK_ROOT="$2"
-        shift
-        ;;
-    --tizen-sdk-data-path)
-        TIZEN_SDK_DATA_PATH="$2"
-        shift
-        ;;
-    --tizen-version)
-        TIZEN_VERSION=$2
-        shift
-        ;;
-    --install-dependencies)
-        INSTALL_DEPENDENCIES=true
-        ;;
-    --override-secret-tool)
-        SECRET_TOOL=true
-        ;;
-    *)
-        error "Wrong options usage!"
-        exit 1
-        ;;
+        --help)
+            show_help
+            exit 0
+            ;;
+        --tizen-sdk-path)
+            TIZEN_SDK_ROOT="$2"
+            shift
+            ;;
+        --tizen-sdk-data-path)
+            TIZEN_SDK_DATA_PATH="$2"
+            shift
+            ;;
+        --tizen-version)
+            TIZEN_VERSION=$2
+            shift
+            ;;
+        --install-dependencies)
+            INSTALL_DEPENDENCIES=true
+            ;;
+        --override-secret-tool)
+            SECRET_TOOL=true
+            ;;
+        *)
+            error "Wrong options usage!"
+            exit 1
+            ;;
     esac
     shift
 done
@@ -306,13 +306,13 @@ fi
 # ------------------------------------------------------------------------------
 # Checking dependencies needed to install the tizen platform
 for PKG in 'cpio' 'unzip' 'wget' 'unrpm'; do
-    if ! command -v $PKG &>/dev/null; then
+    if ! command -v "$PKG" &>/dev/null; then
         warning "Not found $PKG"
         dep_lost=1
     fi
 done
 if [[ $dep_lost ]]; then
-    error "You need install dependencies before [HINT]: On Ubuntu-like distro run: sudo apt install $DEPENDENCIES"
+    error "You need install dependencies before [HINT]: On Ubuntu-like distro run: sudo apt install ${DEPENDENCIES[@]}"
     exit 1
 fi
 
