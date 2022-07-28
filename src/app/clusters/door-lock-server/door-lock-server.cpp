@@ -585,7 +585,8 @@ void DoorLockServer::setCredentialCommandHandler(
                 "[endpointId=%d,credentialType=%u,dataLength=%u,existingCredentialIndex=%d,credentialIndex=%d]",
                 commandPath.mEndpointId, to_underlying(credentialType), static_cast<unsigned int>(credentialData.size()), i,
                 credentialIndex);
-            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kDuplicate, userIndex.Value(), nextAvailableCredentialSlot);
+            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kDuplicate, userIndex.Value(),
+                                      nextAvailableCredentialSlot);
             return;
         }
     }
@@ -639,7 +640,8 @@ void DoorLockServer::setCredentialCommandHandler(
                                           "[endpointId=%d,credentialIndex=%d]",
                                           commandPath.mEndpointId, credentialIndex);
 
-            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, userIndex.Value(), nextAvailableCredentialSlot);
+            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, userIndex.Value(),
+                                      nextAvailableCredentialSlot);
             return;
         }
 
