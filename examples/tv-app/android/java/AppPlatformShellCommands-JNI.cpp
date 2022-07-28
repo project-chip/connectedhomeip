@@ -200,6 +200,7 @@ JNI_METHOD(jstring, OnExecuteCommand)(JNIEnv *env, jobject, jobjectArray stringA
         argv[i] = (char*) env->GetStringUTFChars(string, 0);
     }
 
+    // Store response to show it to the users
     char* buf = AppPlatformHandler(argc, argv);
 
 
