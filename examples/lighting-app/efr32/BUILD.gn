@@ -82,7 +82,8 @@ if (chip_enable_wifi) {
 }
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
-if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A" || efr32_board == "BRD4186A" || efr32_board == "BRD4187A") {
+if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A" ||
+    efr32_board == "BRD4186A" || efr32_board == "BRD4187A") {
   show_qr_code = false
   disable_lcd = true
 }
