@@ -135,7 +135,7 @@ public:
         kChanged_MeasurementValue = kChanged_Last << 1,
     } Changed;
 
-    DeviceTempSensor(const char * szDeviceName, std::string szLocation, int16_t min, int16_t max);
+    DeviceTempSensor(const char * szDeviceName, std::string szLocation, int16_t min, int16_t max, int16_t measuredValue);
 
     inline int16_t GetMeasuredValue() { return mMeasurement; };
     void SetMeasuredValue(int16_t measurement);

@@ -192,11 +192,9 @@ void DeviceSwitch::HandleDeviceChange(Device * device, Device::Changed_t changeM
     }
 }
 
-DeviceTempSensor::DeviceTempSensor(const char * szDeviceName, std::string szLocation, int16_t min, int16_t max) :
-    Device(szDeviceName, szLocation),mMin(min),mMax(max)
-{
-    mMeasurement = 0;
-}
+DeviceTempSensor::DeviceTempSensor(const char * szDeviceName, std::string szLocation, int16_t min, int16_t max,
+                                   int16_t measuredValue) :
+    Device(szDeviceName, szLocation), mMin(min), mMax(max), mMeasurement(measuredValue) {}
 
 void DeviceTempSensor::SetMeasuredValue(int16_t measurement)
 {

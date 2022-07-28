@@ -74,6 +74,7 @@ std::vector<Action *> gActions;
 
 const int16_t minMeasuredValue = -27315;
 const int16_t maxMeasuredValue = 32766;
+const int16_t initialMeasuredValue = 100;
 
 // ENDPOINT DEFINITIONS:
 // =================================================================================
@@ -154,11 +155,11 @@ DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
 DeviceOnOff Light1("Light 1", "Office");
 DeviceOnOff Light2("Light 2", "Office");
 
-DeviceTempSensor TempSensor1("TempSensor 1", "Office", minMeasuredValue, maxMeasuredValue);
-DeviceTempSensor TempSensor2("TempSensor 2", "Office", minMeasuredValue, maxMeasuredValue);
+DeviceTempSensor TempSensor1("TempSensor 1", "Office", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
+DeviceTempSensor TempSensor2("TempSensor 2", "Office", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
 
-DeviceTempSensor ComposedTempSensor1("Composed TempSensor 1", "Bedroom", minMeasuredValue, maxMeasuredValue);
-DeviceTempSensor ComposedTempSensor2("Composed TempSensor 2", "Bedroom", minMeasuredValue, maxMeasuredValue);
+DeviceTempSensor ComposedTempSensor1("Composed TempSensor 1", "Bedroom", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
+DeviceTempSensor ComposedTempSensor2("Composed TempSensor 2", "Bedroom", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
 
 // Declare Bridged endpoints used for Action clusters
 DataVersion gActionLight1DataVersions[ArraySize(bridgedLightClusters)];
@@ -203,10 +204,10 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nul
 DECLARE_DYNAMIC_ENDPOINT(bridgedPowerSourceEndpoint, bridgedPowerSourceClusters);
 
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(tempSensorAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID, INT16S, 2, 0),              /* Measured Value */
-    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_TEMP_MIN_MEASURED_VALUE_ATTRIBUTE_ID, INT16S, 2, 0),      /* Min Measured Value */
-    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_TEMP_MAX_MEASURED_VALUE_ATTRIBUTE_ID, INT16S, 2, 0),      /* Max Measured Value */
-    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID, BITMAP32, 4, 0),         /* FeatureMap */
+DECLARE_DYNAMIC_ATTRIBUTE(ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID, INT16S, 2, 0),         /* Measured Value */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_TEMP_MIN_MEASURED_VALUE_ATTRIBUTE_ID, INT16S, 2, 0), /* Min Measured Value */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_TEMP_MAX_MEASURED_VALUE_ATTRIBUTE_ID, INT16S, 2, 0), /* Max Measured Value */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID, BITMAP32, 4, 0),    /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // ---------------------------------------------------------------------------
@@ -255,6 +256,7 @@ DataVersion gComposedPowerSourceDataVersions[ArraySize(bridgedPowerSourceCluster
 #define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 #define ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION (1u)
+#define ZCL_TEMPERATURE_SENSOR_FEATURE_MAP (0u)
 #define ZCL_POWER_SOURCE_CLUSTER_REVISION (1u)
 
 // ---------------------------------------------------------------------------
@@ -271,6 +273,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
             EmberAfStatus ret;
             while (1)
             {
+                // Todo: Update this to schedule the work rather than use this lock
                 DeviceLayer::StackLock lock;
                 dev->SetEndpointId(gCurrentEndpointId);
                 dev->SetParentEndpointId(parentEndpointId);
@@ -306,6 +309,7 @@ int RemoveDeviceEndpoint(Device * dev)
     {
         if (gDevices[index] == dev)
         {
+            // Todo: Update this to schedule the work rather than use this lock
             DeviceLayer::StackLock lock;
             EndpointId ep   = emberAfClearDynamicEndpoint(index);
             gDevices[index] = nullptr;
@@ -553,27 +557,33 @@ EmberAfStatus HandleReadPowerSourceAttribute(DevicePowerSource * dev, chip::Attr
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
+EmberAfStatus HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::AttributeId attributeId, uint8_t * buffer,
+                                                 uint16_t maxReadLength)
 {
     if ((attributeId == ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID) && (maxReadLength == 2))
     {
-        *(int16_t *) buffer = dev->GetMeasuredValue();
+        int16_t measuredValue = dev->GetMeasuredValue();
+        memcpy(buffer, &measuredValue, sizeof(measuredValue));
     }
     else if ((attributeId == ZCL_TEMP_MIN_MEASURED_VALUE_ATTRIBUTE_ID) && (maxReadLength == 2))
     {
-        *(int16_t *) buffer = dev->mMin;
+        int16_t minMeasuredValue = dev->mMin;
+        memcpy(buffer, &minMeasuredValue, sizeof(minMeasuredValue));
     }
     else if ((attributeId == ZCL_TEMP_MAX_MEASURED_VALUE_ATTRIBUTE_ID) && (maxReadLength == 2))
     {
-        *(int16_t *) buffer = dev->mMax;
+        int16_t maxMeasuredValue = dev->mMax;
+        memcpy(buffer, &maxMeasuredValue, sizeof(maxMeasuredValue));
     }
     else if ((attributeId == ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID) && (maxReadLength == 4))
     {
-        *buffer = (uint32_t) ZCL_BRIDGED_DEVICE_BASIC_FEATURE_MAP;
+        uint32_t featureMap = ZCL_TEMPERATURE_SENSOR_FEATURE_MAP;
+        memcpy(buffer, &featureMap, sizeof(featureMap));
     }
     else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
     {
-        *buffer = (uint16_t) ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION;
+        uint16_t clusterRevision = ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION;
+        memcpy(buffer, &clusterRevision, sizeof(clusterRevision));
     }
     else
     {
@@ -937,21 +947,19 @@ int main(int argc, char * argv[])
                       Span<DataVersion>(gTempSensor1DataVersions), 1);
     AddDeviceEndpoint(&TempSensor2, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gBridgedTempSensorDeviceTypes),
                       Span<DataVersion>(gTempSensor2DataVersions), 1);
-    TempSensor1.SetMeasuredValue(100);
-    TempSensor2.SetMeasuredValue(100);
 
     // Add composed Device with two temperature sensors and a power source
     AddDeviceEndpoint(&ComposedDevice, &bridgedComposedDeviceEndpoint, Span<const EmberAfDeviceType>(gBridgedComposedDeviceTypes),
                       Span<DataVersion>(gComposedDeviceDataVersions), 1);
-    AddDeviceEndpoint(&ComposedTempSensor1, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
+    AddDeviceEndpoint(&ComposedTempSensor1, &bridgedTempSensorEndpoint,
+                      Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
                       Span<DataVersion>(gComposedTempSensor1DataVersions), ComposedDevice.GetEndpointId());
-    AddDeviceEndpoint(&ComposedTempSensor2, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
+    AddDeviceEndpoint(&ComposedTempSensor2, &bridgedTempSensorEndpoint,
+                      Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
                       Span<DataVersion>(gComposedTempSensor2DataVersions), ComposedDevice.GetEndpointId());
     AddDeviceEndpoint(&ComposedPowerSource, &bridgedPowerSourceEndpoint,
                       Span<const EmberAfDeviceType>(gComposedPowerSourceDeviceTypes),
                       Span<DataVersion>(gComposedPowerSourceDataVersions), ComposedDevice.GetEndpointId());
-    ComposedTempSensor1.SetMeasuredValue(100);
-    ComposedTempSensor2.SetMeasuredValue(100);
 
     // Add 4 lights for the Action Clusters tests
     AddDeviceEndpoint(&ActionLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
