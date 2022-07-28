@@ -33,10 +33,10 @@ config:
         type: int16u
         defaultValue: 3840
     payload:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"
     payload2:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "MT:0000000000I.0648G00"
 
 tests:

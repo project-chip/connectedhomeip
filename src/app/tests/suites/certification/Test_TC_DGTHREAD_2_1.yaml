@@ -56,7 +56,7 @@ tests:
       attribute: "NetworkName"
       response:
           constraints:
-              type: string
+              type: char_string
 
     - label:
           "Read NetworkName attribute from DUT and verify response value, If

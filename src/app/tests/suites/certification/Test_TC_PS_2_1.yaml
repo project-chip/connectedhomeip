@@ -54,7 +54,7 @@ tests:
       attribute: "Description"
       response:
           constraints:
-              type: string
+              type: char_string
 
     - label:
           "Test Harness Client reads WiredAssessedInputVoltage attribue from
@@ -222,7 +222,7 @@ tests:
       attribute: "BatReplacementDescription"
       response:
           constraints:
-              type: string
+              type: char_string
               maxLength: 60
 
     - label: "Test Harness Client reads BatCommonDesignation from Server DUT"
@@ -241,7 +241,7 @@ tests:
       attribute: "BatANSIDesignation"
       response:
           constraints:
-              type: string
+              type: char_string
               maxLength: 20
 
     - label: "Test Harness Client reads BatIECDesignation from Server DUT"
@@ -250,7 +250,7 @@ tests:
       attribute: "BatIECDesignation"
       response:
           constraints:
-              type: string
+              type: char_string
               maxLength: 20
 
     - label: "Test Harness Client reads BatApprovedChemistry from Server DUT"

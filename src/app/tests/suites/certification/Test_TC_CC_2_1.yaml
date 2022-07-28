@@ -94,7 +94,7 @@ tests:
       attribute: "CompensationText"
       response:
           constraints:
-              type: string
+              type: char_string
               maxLength: 254
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT"

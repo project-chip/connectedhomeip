@@ -22,7 +22,7 @@ config:
         type: int16u
         defaultValue: 123
     applicationId:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "exampleid"
 
 tests:
