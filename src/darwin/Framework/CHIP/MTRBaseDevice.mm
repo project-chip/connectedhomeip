@@ -63,7 +63,7 @@ NSString * const MTRNullValueType = @"Null";
 NSString * const MTRStructureValueType = @"Structure";
 NSString * const MTRArrayValueType = @"Array";
 
-class NSObjectDataValueCallbackBridge;
+class MTRDataValueDictionaryCallbackBridge;
 
 @interface MTRBaseDevice ()
 
@@ -71,19 +71,6 @@ class NSObjectDataValueCallbackBridge;
 @property (readonly) chip::DeviceProxy * cppDevice;
 @property (nonatomic, readwrite) NSMutableDictionary * reportHandlerBridges;
 
-@end
-
-@interface MTRAttributeReport ()
-- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(nullable id)value error:(nullable NSError *)error;
-@end
-
-@interface MTREventReport ()
-- (instancetype)initWithPath:(const ConcreteEventPath &)path
-                 eventNumber:(NSNumber *)eventNumber
-                    priority:(NSNumber *)priority
-                   timestamp:(NSNumber *)timestamp
-                       value:(nullable id)value
-                       error:(nullable NSError *)error;
 @end
 
 @interface MTRReadClientContainer : NSObject
@@ -430,8 +417,8 @@ private:
     });
 }
 
-// Convert TLV data into NSObject
-id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
+// Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
+id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data)
 {
     chip::TLV::TLVType dataTLVType = data->GetType();
     switch (dataTLVType) {
@@ -529,7 +516,7 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
         NSMutableArray * array = [[NSMutableArray alloc] init];
         while ((err = data->Next()) == CHIP_NO_ERROR) {
             chip::TLV::Tag tag = data->GetTag();
-            id value = NSObjectFromCHIPTLV(data);
+            id value = MTRDecodeDataValueDictionaryFromCHIPTLV(data);
             if (value == nullptr) {
                 MTR_LOG_ERROR("Error when decoding TLV container");
                 return nil;
@@ -558,7 +545,7 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
     }
 }
 
-static CHIP_ERROR EncodeTLVFromObject(id object, chip::TLV::TLVWriter & writer, chip::TLV::Tag tag)
+static CHIP_ERROR MTREncodeTLVFromDataValueDictionary(id object, chip::TLV::TLVWriter & writer, chip::TLV::Tag tag)
 {
     if (![object isKindOfClass:[NSDictionary class]]) {
         MTR_LOG_ERROR("Error: Unsupported object to encode: %@", [object class]);
@@ -640,7 +627,8 @@ static CHIP_ERROR EncodeTLVFromObject(id object, chip::TLV::TLVWriter & writer, 
                 MTR_LOG_ERROR("Error: Structure element to encode has corrupt value: %@", element);
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-            ReturnErrorOnFailure(EncodeTLVFromObject(elementValue, writer, chip::TLV::ContextTag([elementTag unsignedCharValue])));
+            ReturnErrorOnFailure(
+                MTREncodeTLVFromDataValueDictionary(elementValue, writer, chip::TLV::ContextTag([elementTag unsignedCharValue])));
         }
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
@@ -662,7 +650,7 @@ static CHIP_ERROR EncodeTLVFromObject(id object, chip::TLV::TLVWriter & writer, 
                 MTR_LOG_ERROR("Error: Array element to encode has corrupt value: %@", element);
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-            ReturnErrorOnFailure(EncodeTLVFromObject(elementValue, writer, chip::TLV::AnonymousTag()));
+            ReturnErrorOnFailure(MTREncodeTLVFromDataValueDictionary(elementValue, writer, chip::TLV::AnonymousTag()));
         }
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
@@ -672,24 +660,24 @@ static CHIP_ERROR EncodeTLVFromObject(id object, chip::TLV::TLVWriter & writer, 
 }
 
 // Callback type to pass data value as an NSObject
-typedef void (*NSObjectDataValueCallback)(void * context, id value);
+typedef void (*MTRDataValueDictionaryCallback)(void * context, id value);
 typedef void (*MTRErrorCallback)(void * context, CHIP_ERROR error);
 
 // Rename to be generic for decode and encode
-class NSObjectData {
+class MTRDataValueDictionaryDecodableType {
 public:
-    NSObjectData()
+    MTRDataValueDictionaryDecodableType()
         : decodedObj(nil)
     {
     }
-    NSObjectData(id obj)
+    MTRDataValueDictionaryDecodableType(id obj)
         : decodedObj(obj)
     {
     }
 
     CHIP_ERROR Decode(chip::TLV::TLVReader & data)
     {
-        decodedObj = NSObjectFromCHIPTLV(&data);
+        decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&data);
         if (decodedObj == nil) {
             MTR_LOG_ERROR("Error: Failed to get value from TLV data for attribute reading response");
         }
@@ -698,7 +686,7 @@ public:
 
     CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
     {
-        return EncodeTLVFromObject(decodedObj, writer, tag);
+        return MTREncodeTLVFromDataValueDictionary(decodedObj, writer, tag);
     }
 
     static constexpr bool kIsFabricScoped = false;
@@ -711,12 +699,12 @@ private:
     id _Nullable decodedObj;
 };
 
-// Callback bridge for NSObjectDataValueCallback
-class NSObjectDataValueCallbackBridge : public MTRCallbackBridge<NSObjectDataValueCallback> {
+// Callback bridge for MTRDataValueDictionaryCallback
+class MTRDataValueDictionaryCallbackBridge : public MTRCallbackBridge<MTRDataValueDictionaryCallback> {
 public:
-    NSObjectDataValueCallbackBridge(
+    MTRDataValueDictionaryCallbackBridge(
         dispatch_queue_t queue, MTRDeviceResponseHandler handler, MTRActionBlock action, bool keepAlive = false)
-        : MTRCallbackBridge<NSObjectDataValueCallback>(queue, handler, action, OnSuccessFn, keepAlive) {};
+        : MTRCallbackBridge<MTRDataValueDictionaryCallback>(queue, handler, action, OnSuccessFn, keepAlive) {};
 
     static void OnSuccessFn(void * context, id value) { DispatchSuccess(context, value); }
 };
@@ -805,9 +793,9 @@ private:
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
 {
-    new NSObjectDataValueCallbackBridge(
+    new MTRDataValueDictionaryCallbackBridge(
         clientQueue, completion, ^(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure) {
-            auto successFn = chip::Callback::Callback<NSObjectDataValueCallback>::FromCancelable(success);
+            auto successFn = chip::Callback::Callback<MTRDataValueDictionaryCallback>::FromCancelable(success);
             auto failureFn = chip::Callback::Callback<MTRErrorCallback>::FromCancelable(failure);
             auto context = successFn->mContext;
             auto successCb = successFn->mCall;
@@ -815,16 +803,16 @@ private:
             auto resultArray = [[NSMutableArray alloc] init];
             auto resultSuccess = [[NSMutableArray alloc] init];
             auto resultFailure = [[NSMutableArray alloc] init];
-            auto onSuccessCb
-                = [resultArray, resultSuccess](const app::ConcreteAttributePath & attribPath, const NSObjectData & aData) {
-                      [resultArray addObject:@ {
-                          MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath],
-                          MTRDataKey : aData.GetDecodedObject()
-                      }];
-                      if ([resultSuccess count] == 0) {
-                          [resultSuccess addObject:[NSNumber numberWithBool:YES]];
-                      }
-                  };
+            auto onSuccessCb = [resultArray, resultSuccess](const app::ConcreteAttributePath & attribPath,
+                                   const MTRDataValueDictionaryDecodableType & aData) {
+                [resultArray addObject:@ {
+                    MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath],
+                    MTRDataKey : aData.GetDecodedObject()
+                }];
+                if ([resultSuccess count] == 0) {
+                    [resultSuccess addObject:[NSNumber numberWithBool:YES]];
+                }
+            };
 
             auto onFailureCb = [resultArray, resultFailure](const app::ConcreteAttributePath * attribPath, CHIP_ERROR aError) {
                 if (attribPath) {
@@ -856,7 +844,7 @@ private:
             readParams.mIsFabricFiltered = params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue];
 
             auto onDone = [resultArray, resultSuccess, resultFailure, context, successCb, failureCb](
-                              BufferedReadAttributeCallback<NSObjectData> * callback) {
+                              BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType> * callback) {
                 if ([resultFailure count] > 0 || [resultSuccess count] == 0) {
                     // Failure
                     if (failureCb) {
@@ -877,7 +865,7 @@ private:
                 chip::Platform::Delete(callback);
             };
 
-            auto callback = chip::Platform::MakeUnique<BufferedReadAttributeCallback<NSObjectData>>(
+            auto callback = chip::Platform::MakeUnique<BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType>>(
                 attributePath.mClusterId, attributePath.mAttributeId, onSuccessCb, onFailureCb, onDone, nullptr);
             VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -910,9 +898,9 @@ private:
                          clientQueue:(dispatch_queue_t)clientQueue
                           completion:(MTRDeviceResponseHandler)completion
 {
-    new NSObjectDataValueCallbackBridge(
+    new MTRDataValueDictionaryCallbackBridge(
         clientQueue, completion, ^(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure) {
-            auto successFn = chip::Callback::Callback<NSObjectDataValueCallback>::FromCancelable(success);
+            auto successFn = chip::Callback::Callback<MTRDataValueDictionaryCallback>::FromCancelable(success);
             auto failureFn = chip::Callback::Callback<MTRErrorCallback>::FromCancelable(failure);
             auto context = successFn->mContext;
             auto successCb = successFn->mCall;
@@ -961,18 +949,19 @@ private:
                       }
                   };
 
-            return chip::Controller::WriteAttribute<NSObjectData>([self internalDevice]->GetSecureSession().Value(),
-                static_cast<chip::EndpointId>([endpointId unsignedShortValue]),
+            return chip::Controller::WriteAttribute<MTRDataValueDictionaryDecodableType>(
+                [self internalDevice]->GetSecureSession().Value(), static_cast<chip::EndpointId>([endpointId unsignedShortValue]),
                 static_cast<chip::ClusterId>([clusterId unsignedLongValue]),
-                static_cast<chip::AttributeId>([attributeId unsignedLongValue]), NSObjectData(value), onSuccessCb, onFailureCb,
-                (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]), onDoneCb, NullOptional);
+                static_cast<chip::AttributeId>([attributeId unsignedLongValue]), MTRDataValueDictionaryDecodableType(value),
+                onSuccessCb, onFailureCb, (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]),
+                onDoneCb, NullOptional);
         });
 }
 
 class NSObjectCommandCallback final : public app::CommandSender::Callback {
 public:
     using OnSuccessCallbackType
-        = std::function<void(const app::ConcreteCommandPath &, const app::StatusIB &, const NSObjectData &)>;
+        = std::function<void(const app::ConcreteCommandPath &, const app::StatusIB &, const MTRDataValueDictionaryDecodableType &)>;
     using OnErrorCallbackType = std::function<void(CHIP_ERROR aError)>;
     using OnDoneCallbackType = std::function<void(app::CommandSender * commandSender)>;
 
@@ -1013,7 +1002,7 @@ private:
 void NSObjectCommandCallback::OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aCommandPath,
     const app::StatusIB & aStatus, TLV::TLVReader * aReader)
 {
-    NSObjectData response;
+    MTRDataValueDictionaryDecodableType response;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     //
@@ -1042,9 +1031,9 @@ exit:
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
 {
-    new NSObjectDataValueCallbackBridge(
+    new MTRDataValueDictionaryCallbackBridge(
         clientQueue, completion, ^(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure) {
-            auto successFn = chip::Callback::Callback<NSObjectDataValueCallback>::FromCancelable(success);
+            auto successFn = chip::Callback::Callback<MTRDataValueDictionaryCallback>::FromCancelable(success);
             auto failureFn = chip::Callback::Callback<MTRErrorCallback>::FromCancelable(failure);
             auto context = successFn->mContext;
             auto successCb = successFn->mCall;
@@ -1053,7 +1042,7 @@ exit:
             auto resultSuccess = [[NSMutableArray alloc] init];
             auto resultFailure = [[NSMutableArray alloc] init];
             auto onSuccessCb = [resultArray, resultSuccess](const app::ConcreteCommandPath & commandPath,
-                                   const app::StatusIB & status, const NSObjectData & responseData) {
+                                   const app::StatusIB & status, const MTRDataValueDictionaryDecodableType & responseData) {
                 if (responseData.GetDecodedObject()) {
                     [resultArray addObject:@ {
                         MTRCommandPathKey : [[MTRCommandPath alloc] initWithPath:commandPath],
@@ -1109,7 +1098,7 @@ exit:
                 = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), [self internalDevice]->GetExchangeManager(), false);
             VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-            ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, NSObjectData(commandFields),
+            ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, MTRDataValueDictionaryDecodableType(commandFields),
                 (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue])));
             ReturnErrorOnFailure(commandSender->SendCommandRequest([self internalDevice]->GetSecureSession().Value()));
 
@@ -1130,7 +1119,8 @@ exit:
                  subscriptionEstablished:(SubscriptionEstablishedHandler)subscriptionEstablishedHandler
 {
     dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-        auto onReportCb = [clientQueue, reportHandler](const app::ConcreteAttributePath & attribPath, const NSObjectData & data) {
+        auto onReportCb = [clientQueue, reportHandler](
+                              const app::ConcreteAttributePath & attribPath, const MTRDataValueDictionaryDecodableType & data) {
             id valueObject = data.GetDecodedObject();
             app::ConcreteAttributePath pathCopy = attribPath;
             dispatch_async(clientQueue, ^{
@@ -1191,12 +1181,12 @@ exit:
         readParams.mKeepSubscriptions
             = (params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
 
-        auto onDone = [container](BufferedReadAttributeCallback<NSObjectData> * callback) {
+        auto onDone = [container](BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType> * callback) {
             chip::Platform::Delete(callback);
             [container onDone];
         };
 
-        auto callback = chip::Platform::MakeUnique<BufferedReadAttributeCallback<NSObjectData>>(
+        auto callback = chip::Platform::MakeUnique<BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType>>(
             container.pathParams->mClusterId, container.pathParams->mAttributeId, onReportCb, onFailureCb, onDone, onEstablishedCb);
 
         auto readClient = Platform::New<app::ReadClient>(engine, [self internalDevice]->GetExchangeManager(),
@@ -1240,7 +1230,7 @@ exit:
 // The following method is for unit testing purpose only
 + (id)CHIPEncodeAndDecodeNSObject:(id)object
 {
-    NSObjectData originalData(object);
+    MTRDataValueDictionaryDecodableType originalData(object);
     chip::TLV::TLVWriter writer;
     uint8_t buffer[1024];
     writer.Init(buffer, sizeof(buffer));
@@ -1268,7 +1258,7 @@ exit:
         MTR_LOG_ERROR("Error: TLV reader did not read the tag correctly: %llu", tag.mVal);
         return nil;
     }
-    NSObjectData decodedData;
+    MTRDataValueDictionaryDecodableType decodedData;
     error = decodedData.Decode(reader);
     if (error != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Error: Data decoding failed: %s", error.AsString());
@@ -1290,6 +1280,13 @@ exit:
     return self;
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MTRAttributePath> endpoint %u cluster %u attribute %u",
+                     (uint16_t) _endpoint.unsignedShortValue, (uint32_t) _cluster.unsignedLongValue,
+                     (uint32_t) _attribute.unsignedLongValue];
+}
+
 + (instancetype)attributePathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId attributeId:(NSNumber *)attributeId
 {
     ConcreteDataAttributePath path(static_cast<chip::EndpointId>([endpoint unsignedShortValue]),
@@ -1297,6 +1294,30 @@ exit:
         static_cast<chip::AttributeId>([attributeId unsignedLongValue]));
 
     return [[MTRAttributePath alloc] initWithPath:path];
+}
+
+- (BOOL)isEqualToAttributePath:(MTRAttributePath *)attributePath
+{
+    return [_endpoint isEqualToNumber:attributePath.endpoint] && [_cluster isEqualToNumber:attributePath.cluster] &&
+        [_attribute isEqualToNumber:attributePath.attribute];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    if (![object isKindOfClass:[self class]]) {
+        return NO;
+    }
+    return [self isEqualToAttributePath:object];
+}
+
+- (NSUInteger)hash
+{
+    return _endpoint.unsignedShortValue ^ _cluster.unsignedLongValue ^ _attribute.unsignedLongValue;
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [MTRAttributePath attributePathWithEndpointId:_endpoint clusterId:_cluster attributeId:_attribute];
 }
 @end
 
