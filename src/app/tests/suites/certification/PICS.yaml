@@ -1342,6 +1342,9 @@ PICS:
       id: LVL.S.M.VarRate
 
     #Groups Cluster
+    - label: "Does the DUT(Server) support Group Names feature?"
+      id: G.S.F00
+
     - label: "Does the DUT(Server) support NameSupport attribute?"
       id: G.S.A0000
 
@@ -2129,54 +2132,41 @@ PICS:
       id: MEDIAPLAYBACK.S.C0B.Rsp
 
     - label:
-          "Does the DUT support the Media Playback client cluster Play command?"
-      id: MEDIAPLAYBACK.C.C0000
+          "Does the DUT support the Media Playback client cluster, Play command?"
+      id: MEDIAPLAYBACK.C.C00.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster Pause command?"
-      id: MEDIAPLAYBACK.C.C0001
-
-    - label:
-          "Does the DUT support the Media Playback client cluster Stop command?"
-      id: MEDIAPLAYBACK.C.C0002
-
-    - label:
-          "Does the DUT support the Media Playback client cluster StartOver
+          "Does the DUT support the Media Playback client cluster, Pause
           command?"
-      id: MEDIAPLAYBACK.C.C0003
+      id: MEDIAPLAYBACK.C.C01.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster Previous
+          "Does the DUT support the Media Playback client cluster, Stop command?"
+      id: MEDIAPLAYBACK.C.C02.Tx
+
+    - label:
+          "Does the DUT support the Media Playback client cluster, StartOver
           command?"
-      id: MEDIAPLAYBACK.C.C0004
+      id: MEDIAPLAYBACK.C.C03.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster Next command?"
-      id: MEDIAPLAYBACK.C.C0005
-
-    - label:
-          "Does the DUT support the Media Playback client cluster Rewind
+          "Does the DUT support the Media Playback client cluster, Previous
           command?"
-      id: MEDIAPLAYBACK.C.C0006
+      id: MEDIAPLAYBACK.C.C04.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster FastForward
+          "Does the DUT support the Media Playback client cluster, Next command?"
+      id: MEDIAPLAYBACK.C.C05.Tx
+
+    - label:
+          "Does the DUT support the Media Playback client cluster, SkipForward
           command?"
-      id: MEDIAPLAYBACK.C.C0007
+      id: MEDIAPLAYBACK.C.C08.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster SkipForward
+          "Does the DUT support the Media Playback client cluster, SkipBackward
           command?"
-      id: MEDIAPLAYBACK.C.C0008
-
-    - label:
-          "Does the DUT support the Media Playback client cluster SkipBackward
-          command?"
-      id: MEDIAPLAYBACK.C.C0009
-
-    - label:
-          "Does the DUT support the Media Playback client cluster Seek command?"
-      id: MEDIAPLAYBACK.C.C000B
+      id: MEDIAPLAYBACK.C.C09.Tx
 
     - label:
           "Does the DUT support the Audio Output server cluster OutputList
