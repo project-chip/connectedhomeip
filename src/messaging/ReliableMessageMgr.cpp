@@ -202,40 +202,45 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
     return CHIP_NO_ERROR;
 }
 
-System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp backoffBase, uint8_t sendCount)
+System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp baseInterval, uint8_t sendCount)
 {
-    static constexpr uint32_t MRP_BACKOFF_JITTER_BASE      = 1024;
-    static constexpr uint32_t MRP_BACKOFF_BASE_NUMERATOR   = 16;
-    static constexpr uint32_t MRP_BACKOFF_BASE_DENOMENATOR = 10;
-    static constexpr uint32_t MRP_BACKOFF_THRESHOLD        = 1;
+    constexpr uint32_t MRP_BACKOFF_JITTER_BASE = 1024;
+    // MRP_BACKOFF_BASE = 1.6; see section "4.11.8. Parameters and Constants"
+    constexpr uint32_t MRP_BACKOFF_BASE_NUMERATOR   = 16;
+    constexpr uint32_t MRP_BACKOFF_BASE_DENOMINATOR = 10;
+    constexpr int MRP_BACKOFF_THRESHOLD             = 1;
 
-    System::Clock::Timestamp backoff = backoffBase;
+    // Implement:
+    //   mrpBackoffTime = i * MRP_BACKOFF_BASE^(max(0,n-MRP_BACKOFF_THRESHOLD)) * (1.0 + random(0,1) * MRP_BACKOFF_JITTER)
+    // from section "4.11.2.1. Retransmissions", where:
+    //   i == baseInterval
+    //   n == sendCount
 
-    // Implement `t = i⋅MRP_BACKOFF_BASE^max(0,n−MRP_BACKOFF_THRESHOLD)` from Section 4.11.2.1. Retransmissions
+    // Calculate exponent `max(0,n−MRP_BACKOFF_THRESHOLD)`
+    int exponent = sendCount - MRP_BACKOFF_THRESHOLD;
+    if (exponent < 0)
+        exponent = 0; // Enforce floor
+    if (exponent > 4)
+        exponent = 4; // Enforce reasonable maximum after 5 tries
 
-    // Generate fixed point equivalent of `retryCount = max(0,n−MRP_BACKOFF_THRESHOLD)`
-    int retryCount = sendCount - MRP_BACKOFF_THRESHOLD;
-    if (retryCount < 0)
-        retryCount = 0; // Enforce floor
-    if (retryCount > 4)
-        retryCount = 4; // Enforce reasonable maximum after 5 tries
-
-    // Generate fixed point equivalent of `backoff = i⋅1.6^retryCount`
+    // Calculate `mrpBackoffTime = i * MRP_BACKOFF_BASE^(max(0,n-MRP_BACKOFF_THRESHOLD))`
     uint32_t backoffNum   = 1;
     uint32_t backoffDenom = 1;
-    for (int i = 0; i < retryCount; i++)
+
+    for (int i = 0; i < exponent; i++)
     {
         backoffNum *= MRP_BACKOFF_BASE_NUMERATOR;
-        backoffDenom *= MRP_BACKOFF_BASE_DENOMENATOR;
+        backoffDenom *= MRP_BACKOFF_BASE_DENOMINATOR;
     }
-    backoff = backoff * backoffNum / backoffDenom;
 
-    // Implement jitter scaler: `t *= (1.0+random(0,1)⋅MRP_BACKOFF_JITTER)`
-    // where jitter is random multiplier from 1.000 to 1.250:
+    System::Clock::Timestamp mrpBackoffTime = baseInterval * backoffNum / backoffDenom;
+
+    // Multiply `mrpBackoffTime` by `(1.0 + random(0,1) * MRP_BACKOFF_JITTER)`,
+    // where MRP_BACKOFF_JITTER = 0.25; see section "4.11.8. Parameters and Constants".
     uint32_t jitter = MRP_BACKOFF_JITTER_BASE + Crypto::GetRandU8();
-    backoff         = backoff * jitter / MRP_BACKOFF_JITTER_BASE;
+    mrpBackoffTime  = mrpBackoffTime * jitter / MRP_BACKOFF_JITTER_BASE;
 
-    return backoff;
+    return mrpBackoffTime;
 }
 
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
