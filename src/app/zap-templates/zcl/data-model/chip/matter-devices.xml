@@ -1991,6 +1991,12 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0028</deviceId>
         <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
             <include cluster="Media Playback" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Keypad Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Media Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
