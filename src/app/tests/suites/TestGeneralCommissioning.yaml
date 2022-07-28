@@ -271,4 +271,4 @@ tests:
       attribute: "SupportsConcurrentConnection"
       response:
           constraints:
-              type: bool
+              type: boolean

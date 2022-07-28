@@ -34,7 +34,7 @@ tests:
       attribute: "OnOff"
       response:
           constraints:
-              type: bool
+              type: boolean
 
     - label: "Read LT attribute: GlobalSceneControl"
       PICS: OO.S.A4000
@@ -42,7 +42,7 @@ tests:
       attribute: "GlobalSceneControl"
       response:
           constraints:
-              type: bool
+              type: boolean
 
     - label: "Read LT attribute: OnTime"
       PICS: OO.S.A4001

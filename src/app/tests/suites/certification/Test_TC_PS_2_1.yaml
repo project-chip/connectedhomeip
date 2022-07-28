@@ -129,7 +129,7 @@ tests:
       attribute: "WiredPresent"
       response:
           constraints:
-              type: bool
+              type: boolean
 
     - label: "Test Harness Client reads ActiveWiredFaults from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000a
@@ -186,7 +186,7 @@ tests:
       attribute: "BatReplacementNeeded"
       response:
           constraints:
-              type: bool
+              type: boolean
 
     - label: "Test Harness Client reads BatReplaceability from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0010
@@ -204,7 +204,7 @@ tests:
       attribute: "BatPresent"
       response:
           constraints:
-              type: bool
+              type: boolean
 
     - label: "Test Harness Client readsActiveBatFaults from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0012
@@ -310,7 +310,7 @@ tests:
       attribute: "BatFunctionalWhileCharging"
       response:
           constraints:
-              type: bool
+              type: boolean
 
     - label: "Test Harness Client reads BatChargingCurrent from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001d

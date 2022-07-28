@@ -44,7 +44,7 @@ tests:
       attribute: "FullDuplex"
       response:
           constraints:
-              type: bool
+              type: boolean
 
     #issue #13648
     - label: "Read PacketRxCount attribute constraints"
@@ -189,7 +189,7 @@ tests:
       attribute: "CarrierDetect"
       response:
           constraints:
-              type: bool
+              type: boolean
 
     - label:
           "Read CarrierDetect value from DUT and verify value indicates the
