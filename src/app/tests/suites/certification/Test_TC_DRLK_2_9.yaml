@@ -92,6 +92,7 @@ tests:
               minValue: 0
               maxValue: 255
 
+    #Issues 20930
     - label: "TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
@@ -132,9 +133,7 @@ tests:
                 constraints:
                     type: boolean
               - name: "userIndex"
-                constraints:
-                    minValue: 1
-                    maxValue: NumberOfTotalUsersSupported
+                value: 1
               - name: "creatorFabricIndex"
                 value: 1
               - name: "lastModifiedFabricIndex"
@@ -142,9 +141,7 @@ tests:
               - name: "nextCredentialIndex"
                 value: null
 
-    - label:
-          "TH sends Set Credential Command to DUT and  verify the
-          INVALID_COMMAND if any of the fields are invalid"
+    - label: "TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -155,7 +152,7 @@ tests:
               - name: "credential"
                 value: { CredentialType: 1, CredentialIndex: 2 }
               - name: "credentialData"
-                value: "1234"
+                value: "4321"
               - name: "userIndex"
                 value: 2
               - name: "userStatus"
@@ -171,9 +168,7 @@ tests:
               - name: "nextCredentialIndex"
                 value: 3
 
-    - label:
-          "TH sends Set Credential Command to DUT and verify response as
-          DUPLICATE if CredentialData is repeated"
+    - label: "TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -200,9 +195,8 @@ tests:
               - name: "nextCredentialIndex"
                 value: 3
 
-    - label:
-          "TH sends Set Credential Command to DUT and verify response as
-          OCCUPIED if CredentialIndex is repeated"
+    #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
+    - label: "TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -229,9 +223,86 @@ tests:
               - name: "nextCredentialIndex"
                 value: 2
 
+    #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
     - label:
-          "TH sends Set Credential Command to DUT and verify the DUT response as
-          OCCUPIED if the CredentialIndex is not associated with the UserIndex"
+          "TH sends Set Credential Command to DUT and Verify that the DUT sends
+          Set Credential Response command with response as OCCUPIED if the
+          CredentialIndex is repeated"
+      verification: |
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 1 }' 123456 2 0 0 1 1 --timedInteractionTimeoutMs 1000
+
+          [1656506733.767451][27276:27281] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
+          [1656506733.767542][27276:27281] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
+          [1656506733.767663][27276:27281] CHIP:TOO:   SetCredentialResponse: {
+          [1656506733.767731][27276:27281] CHIP:TOO:     status: 2
+          [1656506733.767779][27276:27281] CHIP:TOO:     userIndex: null
+          [1656506733.767826][27276:27281] CHIP:TOO:     nextCredentialIndex: 2
+          [1656506733.767871][27276:27281] CHIP:TOO:    }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
+    - label: "TH sends Set Credential Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 3 }
+              - name: "credentialData"
+                value: "123456"
+              - name: "userIndex"
+                value: 3
+              - name: "userStatus"
+                value: 0
+              - name: "userType"
+                value: 0
+      response:
+          values:
+              - name: "status"
+                value: 0x02
+              - name: "userIndex"
+                value: null
+              - name: "nextCredentialIndex"
+                value: 4
+
+    #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
+    - label:
+          "TH sends Set Credential Command to DUT and Verify that the DUT sends
+          Set Credential Response command with response as OCCUPIED if the
+          CredentialIndex is repeated"
+      verification: |
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 3 }' 123456 3 0 0 1 1 --timedInteractionTimeoutMs 1000
+
+          [1656506733.767451][27276:27281] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
+          [1656506733.767542][27276:27281] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
+          [1656506733.767663][27276:27281] CHIP:TOO:   SetCredentialResponse: {
+          [1656506733.767731][27276:27281] CHIP:TOO:     status: 2
+          [1656506733.767779][27276:27281] CHIP:TOO:     userIndex: null
+          [1656506733.767826][27276:27281] CHIP:TOO:     nextCredentialIndex: 4
+          [1656506733.767871][27276:27281] CHIP:TOO:    }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
+    - label: "TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -258,6 +329,31 @@ tests:
               - name: "nextCredentialIndex"
                 value: 4
 
+    #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
+    - label:
+          "TH sends Set Credential Command to DUT and Verify that the DUT sends
+          Set Credential Response command with response as OCCUPIED if the
+          CredentialIndex is repeated"
+      verification: |
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 3 }' 123456 2 0 0 1 1 --timedInteractionTimeoutMs 1000
+
+          [1656506733.767451][27276:27281] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
+          [1656506733.767542][27276:27281] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
+          [1656506733.767663][27276:27281] CHIP:TOO:   SetCredentialResponse: {
+          [1656506733.767731][27276:27281] CHIP:TOO:     status: 2
+          [1656506733.767779][27276:27281] CHIP:TOO:     userIndex: null
+          [1656506733.767826][27276:27281] CHIP:TOO:     nextCredentialIndex: 4
+          [1656506733.767871][27276:27281] CHIP:TOO:    }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
@@ -267,9 +363,7 @@ tests:
               - name: "credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
 
-    - label:
-          "TH sends Get Credential Status Command and verify that the
-          CredentialType and  CredentialIndex for the provided value is cleared"
+    - label: "TH sends Get Credential Status Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -318,7 +412,7 @@ tests:
               - name: "operationType"
                 value: 0
               - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 3 }
+                value: { CredentialType: 1, CredentialIndex: 1 }
               - name: "credentialData"
                 value: "123456"
               - name: "userIndex"
@@ -334,7 +428,7 @@ tests:
               - name: "userIndex"
                 value: null
               - name: "nextCredentialIndex"
-                value: 4
+                value: 2
 
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
@@ -345,6 +439,7 @@ tests:
               - name: "credential"
                 value: { CredentialType: 1, CredentialIndex: 65534 }
 
+    #Issue 20991 expected NULL values but got INVALID_COMMAND response fix script once the issue is fixed.
     - label: "TH sends Get Credential Status Command"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
@@ -354,6 +449,39 @@ tests:
                 value: { CredentialType: 1, CredentialIndex: 65534 }
       response:
           error: INVALID_COMMAND
+
+    #Issue 20991 expected NULL values but got INVALID_COMMAND response fix script once the issue is fixed.
+    - label:
+          "TH sends Get Credential command to DUT and Verify that the
+          CredentialType for the provided value is cleared Verify that the
+          CredentialIndex is cleared"
+      verification: |
+          ./chip-tool doorlock get-credential-status '{ "credentialType" : 1 , "credentialIndex" : 65534 }'  1 1 --timedInteractionTimeoutMs 1000
+          Verify on the TH Log:
+
+          [1654698175.243889][5478:5483] CHIP:DMG:
+          [1654698175.243965][5478:5483] CHIP:DMG:                                StatusIB =
+          [1654698175.244054][5478:5483] CHIP:DMG:                                {
+          [1654698175.244136][5478:5483] CHIP:DMG:                                        status = 0x85 (INVALID_COMMAND),
+          [1654698175.244218][5478:5483] CHIP:DMG:                                },
+          [1654698175.244307][5478:5483] CHIP:DMG:
+          [1654698175.244388][5478:5483] CHIP:DMG:                        },
+          [1654698175.244473][5478:5483] CHIP:DMG:
+          [1654698175.244541][5478:5483] CHIP:DMG:                },
+          [1654698175.244621][5478:5483] CHIP:DMG:
+          [1654698175.244681][5478:5483] CHIP:DMG:        ],
+          [1654698175.244755][5478:5483] CHIP:DMG:
+          [1654698175.244814][5478:5483] CHIP:DMG:        InteractionModelRevision = 1
+          [1654698175.244872][5478:5483] CHIP:DMG: }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH sends Get Credential Status Command"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
@@ -385,3 +513,11 @@ tests:
                 value: { CredentialType: 8, CredentialIndex: 2 }
       response:
           error: INVALID_COMMAND
+
+    - label: "Cleanup the created user"
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 1
