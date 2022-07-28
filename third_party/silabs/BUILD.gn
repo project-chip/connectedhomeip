@@ -86,7 +86,6 @@ if (use_thread_cert_lib)
     public_configs = [ ":openthread_efr32_config" ]
   }
 
-
   source_set("ot-efr32-cert")
   {
     include_dirs = [
@@ -110,6 +109,34 @@ if (use_thread_cert_lib)
     ]
 
     sources = [
+      "${sl_openthread_root}/src/cli/cli.cpp",
+      "${sl_openthread_root}/src/cli/cli.hpp",
+      "${sl_openthread_root}/src/cli/cli_coap.cpp",
+      "${sl_openthread_root}/src/cli/cli_coap.hpp",
+      "${sl_openthread_root}/src/cli/cli_coap_secure.cpp",
+      "${sl_openthread_root}/src/cli/cli_coap_secure.hpp",
+      "${sl_openthread_root}/src/cli/cli_commissioner.cpp",
+      "${sl_openthread_root}/src/cli/cli_commissioner.hpp",
+      "${sl_openthread_root}/src/cli/cli_config.h",
+      "${sl_openthread_root}/src/cli/cli_dataset.cpp",
+      "${sl_openthread_root}/src/cli/cli_dataset.hpp",
+      "${sl_openthread_root}/src/cli/cli_history.cpp",
+      "${sl_openthread_root}/src/cli/cli_history.hpp",
+      "${sl_openthread_root}/src/cli/cli_joiner.cpp",
+      "${sl_openthread_root}/src/cli/cli_joiner.hpp",
+      "${sl_openthread_root}/src/cli/cli_network_data.cpp",
+      "${sl_openthread_root}/src/cli/cli_network_data.hpp",
+      "${sl_openthread_root}/src/cli/cli_output.cpp",
+      "${sl_openthread_root}/src/cli/cli_output.hpp",
+      "${sl_openthread_root}/src/cli/cli_srp_client.cpp",
+      "${sl_openthread_root}/src/cli/cli_srp_client.hpp",
+      "${sl_openthread_root}/src/cli/cli_srp_server.cpp",
+      "${sl_openthread_root}/src/cli/cli_srp_server.hpp",
+      "${sl_openthread_root}/src/cli/cli_tcp.cpp",
+      "${sl_openthread_root}/src/cli/cli_tcp.hpp",
+      "${sl_openthread_root}/src/cli/cli_udp.cpp",
+      "${sl_openthread_root}/src/cli/cli_udp.hpp",
+      "${sl_openthread_root}/src/cli/x509_cert_key.hpp",
       #"${sl_openthread_root}/src/core/openthread-core-config.h",
       #"${sl_openthread_root}/src/core/config/announce_sender.h",
       #"${sl_openthread_root}/src/core/config/backbone_router.h",
@@ -122,7 +149,7 @@ if (use_thread_cert_lib)
       #"${sl_openthread_root}/examples/platforms/utils/settings.h",
       #"${sl_openthread_root}/examples/platforms/utils/soft_source_match_table.h",
       #"${sl_openthread_root}/examples/platforms/utils/uart.h",
-      #"${sl_openthread_root}/examples/apps/cli/cli_uart.cpp",
+      "${sl_openthread_root}/examples/apps/cli/cli_uart.cpp",
       #"${sl_openthread_root}/src/cli/cli_config.h",
       #"${sl_openthread_root}/src/cli/cli.cpp",
       #"${sl_openthread_root}/src/cli/cli.hpp",
@@ -146,6 +173,7 @@ if (use_thread_cert_lib)
 
     # selected thread device type FTD or MTD
     XTD = "ftd"
+    public_configs += [ "${sl_openthread_root}:openthread_ftd_config" ]
 
     libs = [
       "${sl_ot_efr32_root}/libs/libsl_ot_stack_${XTD}_${efr32_family}_gcc.a",

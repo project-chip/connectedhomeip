@@ -102,6 +102,7 @@ if [ "$#" == "0" ]; then
             build wifi example variant for given exansion board
         --additional_data_advertising
             enable Addition data advertissing and rotating device ID
+        --use_ot_lib
     "
 elif [ "$#" -lt "2" ]; then
     echo "Invalid number of arguments
@@ -147,6 +148,10 @@ else
                 ;;
             --additional_data_advertising)
                 optArgs+="chip_enable_additional_data_advertising=true chip_enable_rotating_device_id=true "
+                shift
+                ;;
+            --use_ot_lib)
+                optArgs+="use_thread_cert_lib=true openthread_external_platform=\"""\" "
                 shift
                 ;;
             *)

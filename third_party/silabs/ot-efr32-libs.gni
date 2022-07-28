@@ -19,5 +19,5 @@ declare_args() {
   # Enable the silabs openthread certified libs *IN CERTIFICATION PHASE*
   use_thread_cert_lib = false
   sl_ot_efr32_root = "${chip_root}/third_party/openthread/ot-efr32"
-  sl_openthread_root =  "${chip_root}/third_party/openthread/repo"
+  sl_openthread_root =  "${chip_root}/third_party/openthread/ot-efr32/openthread"
 }

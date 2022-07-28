@@ -104,25 +104,25 @@ static void PrintLog(const char * msg)
 /**
  * Initialize Segger RTT for logging
  */
-extern "C" void efr32LogInit(void)
-{
-#if EFR32_LOG_ENABLED
-#if LOG_RTT_BUFFER_INDEX != 0
-    SEGGER_RTT_ConfigUpBuffer(LOG_RTT_BUFFER_INDEX, LOG_RTT_BUFFER_NAME, sLogBuffer, LOG_RTT_BUFFER_SIZE,
-                              SEGGER_RTT_MODE_NO_BLOCK_TRIM);
+// extern "C" void efr32LogInit(void)
+// {
+// #if EFR32_LOG_ENABLED
+// #if LOG_RTT_BUFFER_INDEX != 0
+//     SEGGER_RTT_ConfigUpBuffer(LOG_RTT_BUFFER_INDEX, LOG_RTT_BUFFER_NAME, sLogBuffer, LOG_RTT_BUFFER_SIZE,
+//                               SEGGER_RTT_MODE_NO_BLOCK_TRIM);
 
-    SEGGER_RTT_ConfigDownBuffer(LOG_RTT_BUFFER_INDEX, LOG_RTT_BUFFER_NAME, sCmdLineBuffer, LOG_RTT_BUFFER_SIZE,
-                                SEGGER_RTT_MODE_NO_BLOCK_SKIP);
-#else
-    SEGGER_RTT_SetFlagsUpBuffer(LOG_RTT_BUFFER_INDEX, SEGGER_RTT_MODE_NO_BLOCK_TRIM);
-#endif
+//     SEGGER_RTT_ConfigDownBuffer(LOG_RTT_BUFFER_INDEX, LOG_RTT_BUFFER_NAME, sCmdLineBuffer, LOG_RTT_BUFFER_SIZE,
+//                                 SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+// #else
+//     SEGGER_RTT_SetFlagsUpBuffer(LOG_RTT_BUFFER_INDEX, SEGGER_RTT_MODE_NO_BLOCK_TRIM);
+// #endif
 
-#ifdef PW_RPC_ENABLED
-    PigweedLogger::init();
-#endif
-    sLogInitialized = true;
-#endif // EFR32_LOG_ENABLED
-}
+// #ifdef PW_RPC_ENABLED
+//     PigweedLogger::init();
+// #endif
+//     sLogInitialized = true;
+// #endif // EFR32_LOG_ENABLED
+// }
 
 /**
  * General-purpose logging function
@@ -342,10 +342,10 @@ extern "C" void debugHardfault(uint32_t * sp)
     uint32_t psr   = sp[7];
     char formattedMsg[32];
 
-    if (sLogInitialized == false)
-    {
-        efr32LogInit();
-    }
+    // if (sLogInitialized == false)
+    // {
+    //     efr32LogInit();
+    // }
 
     snprintf(formattedMsg, sizeof formattedMsg, LOG_ERROR "HardFault:\n");
     PrintLog(formattedMsg);

@@ -76,7 +76,8 @@ void init_efrPlatform(void)
 #endif
 
 #if EFR32_LOG_ENABLED
-    efr32LogInit();
+    // TO DO IF DEF
+    //  efr32LogInit();
 #endif
 }
 
