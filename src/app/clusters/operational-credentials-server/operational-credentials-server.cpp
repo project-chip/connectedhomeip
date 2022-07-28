@@ -355,6 +355,7 @@ public:
         {
             // If Basic cluster is implemented on this endpoint
             Basic::Events::Leave::Type event;
+            event.fabricIndex = fabricIndex;
             EventNumber eventNumber;
 
             if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))

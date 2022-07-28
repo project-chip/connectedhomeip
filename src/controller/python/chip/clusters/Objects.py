@@ -4179,8 +4179,10 @@ class Basic(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
+                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=0, Type=uint),
                     ])
 
+            fabricIndex: 'uint' = 0
 
         @dataclass
         class ReachableChanged(ClusterEvent):

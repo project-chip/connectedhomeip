@@ -416,6 +416,12 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
 
             MTRBasicClusterLeaveEvent * value = [MTRBasicClusterLeaveEvent new];
 
+            do {
+                NSNumber * _Nonnull memberValue;
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+                value.fabricIndex = memberValue;
+            } while (0);
+
             return value;
         }
 

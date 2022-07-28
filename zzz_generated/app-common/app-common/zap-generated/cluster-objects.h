@@ -4812,6 +4812,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields
 {
+    kFabricIndex = 0,
 };
 
 struct Type
@@ -4822,6 +4823,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr bool kIsFabricScoped = false;
 
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
@@ -4831,6 +4834,8 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::Leave::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
