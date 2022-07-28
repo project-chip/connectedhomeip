@@ -80,7 +80,7 @@ struct DeviceProxyInitParams
 class OperationalSessionReleaseDelegate
 {
 public:
-    virtual ~OperationalSessionReleaseDelegate()             = default;
+    virtual ~OperationalSessionReleaseDelegate() = default;
     // TODO Issue #20452: Once cleanup from #20452 takes place we can provide OperationalSessionSetup *
     // instead of ScopedNodeId here.
     virtual void ReleaseSession(const ScopedNodeId & peerId) = 0;
