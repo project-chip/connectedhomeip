@@ -26,6 +26,7 @@ static_library("helpers") {
   sources = [
     "AppTestContext.cpp",
     "AppTestContext.h",
+    "integration/RequiredPrivilegeStubs.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
