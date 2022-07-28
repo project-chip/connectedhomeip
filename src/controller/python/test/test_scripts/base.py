@@ -845,7 +845,7 @@ class BaseTestHelper:
         self.logger.info(
             f"Sending MoveToLevel command to device {nodeid} endpoint {endpoint}")
         try:
-            commonArgs = dict(transitionTime=0, optionMask=1, optionOverride=1)
+            commonArgs = dict(transitionTime=0, optionsMask=1, optionsOverride=1)
 
             # Move to 1
             self.devCtrl.ZCLSend("LevelControl", "MoveToLevel", nodeid,
