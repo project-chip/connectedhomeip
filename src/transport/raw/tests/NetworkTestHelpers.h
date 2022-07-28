@@ -64,8 +64,8 @@ class LoopbackTransportDelegate
 public:
     virtual ~LoopbackTransportDelegate() {}
 
-    // Called by the loopback transport when it drops a configurable number of messages(mDroppedMessageCount) after a configurable
-    // allowed number of message(mNumMessagesToAllowBeforeDropping)
+    // Called by the loopback transport when it drops one of a configurable number of messages (mDroppedMessageCount) after a configurable
+    // allowed number of messages (mNumMessagesToAllowBeforeDropping)
     virtual void OnMessageDropped() {}
 };
 
