@@ -27,6 +27,7 @@ tests:
       PICS: LTIME.S.A0000
       verification: |
           ./chip-tool timeformatlocalization read hour-format 1 0
+          On TH, verify that  HourFormat attribute value is of Enum8 datatype
           [1651191944157] [13649:182326] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530441
           [1651191944158] [13649:182326] CHIP: [TOO]   HourFormat: 0
       disabled: true
@@ -35,6 +36,9 @@ tests:
       PICS: LTIME.S.A0000.12HR
       verification: |
           ./chip-tool timeformatlocalization write hour-format 0 1 0
+
+          On TH verify that DUT sends a success response
+
           [1651192743588] [14026:192208] CHIP: [DMG] WriteResponseMessage =
           [1651192743588] [14026:192208] CHIP: [DMG] {
           [1651192743588] [14026:192208] CHIP: [DMG]         AttributeStatusIBs =
@@ -73,6 +77,9 @@ tests:
       PICS: LTIME.S.A0000.24HR
       verification: |
           ./chip-tool timeformatlocalization write hour-format 1 1 0
+
+          On TH verify that  HourFormat attribute value changed as  0
+
           [1651193043035] [14140:195730] CHIP: [DMG] WriteResponseMessage =
           [1651193043035] [14140:195730] CHIP: [DMG] {
           [1651193043035] [14140:195730] CHIP: [DMG]         AttributeStatusIBs =
@@ -103,7 +110,9 @@ tests:
     - label: "TH reads HourFormat attribute"
       PICS: LTIME.S.A0000
       verification: |
-          ./chip-tool timeformatlocalization read hour-format 1 0
+          ./chip-tool timeformatlocalization read hour-format 1
+
+          On TH verify that DUT sends a success response
           [1651193120969] [14169:196901] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530443
           [1651193120969] [14169:196901] CHIP: [TOO]   HourFormat: 1
       disabled: true
@@ -112,6 +121,9 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          On TH, verify that  ActiveCalendarType attribute value is in between 0 to 11
+
           [1651193250602] [14215:198406] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3316530443
           [1651193250602] [14215:198406] CHIP: [TOO]   ActiveCalendarType: 0
       disabled: true
@@ -120,6 +132,9 @@ tests:
       PICS: LTIME.S.A0002
       verification: |
           ./chip-tool timeformatlocalization read supported-calendar-types 1 0
+
+          On TH, verify that  SupportedCalendarTypes attribute value is in between 0 to 11
+
           [1651194334793] [14653:210647] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0002 DataVersion: 3316530443
           [1651194334794] [14653:210647] CHIP: [TOO]   SupportedCalendarTypes: 12 entries
           [1651194334794] [14653:210647] CHIP: [TOO]     [1]: 0
@@ -142,6 +157,9 @@ tests:
       PICS: LTIME.S.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 0 1 0
+
+          On TH, verify that  ActiveCalendarType attribute value is in between 0 to 11
+
           [1651194449245] [14699:212201] CHIP: [DMG] WriteResponseMessage =
           [1651194449245] [14699:212201] CHIP: [DMG] {
           [1651194449245] [14699:212201] CHIP: [DMG]         AttributeStatusIBs =
@@ -172,6 +190,9 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          On TH verify that DUT sends a success response
+
           [1651194544627] [14736:213553] CHIP: [DMG] ReportDataMessage =
           [1651194544627] [14736:213553] CHIP: [DMG] {
           [1651194544627] [14736:213553] CHIP: [DMG]         AttributeReportIBs =
@@ -206,6 +227,9 @@ tests:
       PICS: LTIME.S.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 1 1 0
+
+          On TH verify that ActiveCalendarType attribute value changed as  0
+
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
           [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
@@ -236,6 +260,8 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          On TH verify that DUT sends a success response
           [1651194544627] [14736:213553] CHIP: [DMG] ReportDataMessage =
           [1651194544627] [14736:213553] CHIP: [DMG] {
           [1651194544627] [14736:213553] CHIP: [DMG]         AttributeReportIBs =
@@ -270,6 +296,9 @@ tests:
       PICS: LTIME.S.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 2 1 0
+
+          On TH verify that DUT sends a success response
+
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
           [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
@@ -300,6 +329,9 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          On TH verify that ActiveCalendarType attribute value changed as  2
+
           [1655184715.197446][2276:2281] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477121
           [1655184715.197524][2276:2281] CHIP:TOO:   ActiveCalendarType: 2
           [1655184715.197650][2276:2281] CHIP:EM: Sending Standalone Ack for MessageCounter:27645137 on exchange 37300i
@@ -313,6 +345,9 @@ tests:
       PICS: LTIME.S.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 3 1 0
+
+          On TH verify that DUT sends a success response
+
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
           [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
@@ -343,6 +378,9 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          On TH verify that ActiveCalendarType attribute value changed as  3
+
           [1655184753.237947][2289:2294] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477122
           [1655184753.238025][2289:2294] CHIP:TOO:   ActiveCalendarType: 3
           [1655184753.238126][2289:2294] CHIP:EM: Sending Standalone Ack for MessageCounter:167097094 on exchange 10188i
@@ -355,6 +393,8 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 4 1 0
 
+          On TH verify that DUT sends a success response
+
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
           [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
@@ -385,6 +425,9 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          On TH verify that ActiveCalendarType attribute value changed as  4
+
           [1655184774.541839][2301:2306] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477123
           [1655184774.541949][2301:2306] CHIP:TOO:   ActiveCalendarType: 4
           [1655184774.542080][2301:2306] CHIP:EM: Sending Standalone Ack for MessageCounter:20884820 on exchange 35148i
@@ -396,6 +439,8 @@ tests:
       PICS: LTIME.S.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 5 1 0
+
+          On TH verify that DUT sends a success response
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
           [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
@@ -426,6 +471,9 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          On TH verify that ActiveCalendarType attribute value changed as  5
+
           [1655184794.906220][2314:2319] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477124
           [1655184794.906340][2314:2319] CHIP:TOO:   ActiveCalendarType: 5
           [1655184794.906501][2314:2319] CHIP:EM: Sending Standalone Ack for MessageCounter:238991245 on exchange 63616i
@@ -437,6 +485,9 @@ tests:
       PICS: LTIME.S.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 6 1 0
+
+          On TH verify that DUT sends a success response
+
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
           [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
@@ -467,6 +518,9 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          On TH verify that ActiveCalendarType attribute value changed as  6
+
           [1655184813.727744][2327:2332] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477125
           [1655184813.727848][2327:2332] CHIP:TOO:   ActiveCalendarType: 6
           [1655184813.727986][2327:2332] CHIP:EM: Sending Standalone Ack for MessageCounter:89082324 on exchange 59020i
@@ -478,6 +532,9 @@ tests:
       PICS: LTIME.S.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 7 1 0
+
+          On TH verify that DUT sends a success response
+
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
           [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
@@ -508,6 +565,8 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          On TH verify that ActiveCalendarType attribute value changed as  7
           [1655184842.351575][2339:2344] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477126
           [1655184842.351697][2339:2344] CHIP:TOO:   ActiveCalendarType: 7
           [1655184842.351855][2339:2344] CHIP:EM: Sending Standalone Ack for MessageCounter:117380134 on exchange 31303i
@@ -519,6 +578,8 @@ tests:
       PICS: LTIME.S.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 8 1 0
+
+          On TH verify that DUT sends a success response
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
           [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
@@ -590,6 +651,9 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          On TH verify that ActiveCalendarType attribute value changed as  8
+
           [1655184888.113826][2364:2369] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477128
           [1655184888.113934][2364:2369] CHIP:TOO:   ActiveCalendarType: 9
           [1655184888.114068][2364:2369] CHIP:EM: Sending Standalone Ack for MessageCounter:236846127 on exchange 9207i
@@ -631,6 +695,9 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          On TH verify that ActiveCalendarType attribute value changed as  10
+
           [1655184911.317297][2377:2383] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477129
           [1655184911.317407][2377:2383] CHIP:TOO:   ActiveCalendarType: 10
           [1655184911.317542][2377:2383] CHIP:EM: Sending Standalone Ack for MessageCounter:69288389 on exchange 58126i
@@ -642,6 +709,9 @@ tests:
       PICS: LTIME.S.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 11 1 0
+
+          On TH verify that DUT sends a success response
+
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
           [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
@@ -672,6 +742,9 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          On TH verify that DUT sends a success response
+
           [1651194544627] [14736:213553] CHIP: [DMG] ReportDataMessage =
           [1651194544627] [14736:213553] CHIP: [DMG] {
           [1651194544627] [14736:213553] CHIP: [DMG]         AttributeReportIBs =
@@ -703,9 +776,9 @@ tests:
     - label: "TH writes 50 to ActiveCalendarType attribute"
       PICS: LTIME.S.A0001
       verification: |
-          Verify in TH log:
-
           ./chip-tool timeformatlocalization write active-calendar-type 50  1 0
+
+          On TH verify that DUT sends a success response
 
           [1656934134.261135][6359:6364] CHIP:DMG: WriteResponseMessage =
           [1656934134.261172][6359:6364] CHIP:DMG: {
@@ -737,9 +810,9 @@ tests:
     - label: "TH writes 5 to HourFormat attribute"
       PICS: LTIME.S.A0000
       verification: |
-          Verify in TH log:
+          ./chip-tool timeformatlocalization write   hour-format  5 1 0
 
-           ./chip-tool timeformatlocalization write   hour-format  5 1 0
+          On TH verify that DUT sends a success response
 
           [1656934321.910991][6387:6392] CHIP:DMG: WriteResponseMessage =
           [1656934321.911025][6387:6392] CHIP:DMG: {
