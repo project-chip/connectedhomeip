@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,12 +15,24 @@
  *    limitations under the License.
  */
 
-#include "RequiredPrivilege.h"
+#include <app/util/privilege-storage.h>
 
-namespace chip {
-namespace app {
+int MatterGetAccessPrivilegeForReadAttribute(chip::ClusterId cluster, chip::AttributeId attribute)
+{
+    return kMatterAccessPrivilegeAdminister;
+}
 
-constexpr Access::Privilege RequiredPrivilege::kPrivilegeMapper[];
+int MatterGetAccessPrivilegeForWriteAttribute(chip::ClusterId cluster, chip::AttributeId attribute)
+{
+    return kMatterAccessPrivilegeAdminister;
+}
 
-} // namespace app
-} // namespace chip
+int MatterGetAccessPrivilegeForInvokeCommand(chip::ClusterId cluster, chip::CommandId command)
+{
+    return kMatterAccessPrivilegeAdminister;
+}
+
+int MatterGetAccessPrivilegeForReadEvent(chip::ClusterId cluster, chip::EventId event)
+{
+    return kMatterAccessPrivilegeAdminister;
+}
