@@ -12,6 +12,7 @@ import chip.logging
 import argparse
 import builtins
 import chip.FabricAdmin
+import chip.native
 from chip.utils import CommissioningBuildingBlocks
 import atexit
 
@@ -139,6 +140,8 @@ parser.add_argument(
 parser.add_argument(
     "-d", "--debug", help="Set default logging level to debug.", action="store_true")
 args = parser.parse_args()
+
+chip.native.Init()
 
 ReplInit(args.debug)
 chipStack = ChipStack(persistentStoragePath=args.storagepath)
