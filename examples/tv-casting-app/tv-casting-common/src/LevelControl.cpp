@@ -28,8 +28,8 @@ CHIP_ERROR StepCommand::Invoke(LevelControl::StepMode stepMode, uint8_t stepSize
     request.stepMode       = stepMode;
     request.stepSize       = stepSize;
     request.transitionTime = transitionTime;
-    request.optionMask     = optionMask;
-    request.optionOverride = optionOverride;
+    request.optionsMask     = optionMask;
+    request.optionsOverride = optionOverride;
     return MediaCommandBase::Invoke(request, responseCallback);
 }
 
@@ -39,7 +39,7 @@ CHIP_ERROR MoveToLevelCommand::Invoke(uint8_t level, uint16_t transitionTime, ui
     LevelControl::Commands::MoveToLevel::Type request;
     request.level          = level;
     request.transitionTime = transitionTime;
-    request.optionMask     = optionMask;
-    request.optionOverride = optionOverride;
+    request.optionsMask     = optionMask;
+    request.optionsOverride = optionOverride;
     return MediaCommandBase::Invoke(request, responseCallback);
 }
