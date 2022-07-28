@@ -19,7 +19,7 @@ config:
     cluster: "Color Control"
     endpoint: 1
     RateConfigValue:
-        type: ENUM8
+        type: enum8
         defaultValue: 50
 
 tests:
