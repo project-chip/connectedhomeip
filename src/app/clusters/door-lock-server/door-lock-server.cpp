@@ -29,6 +29,7 @@
 #include <app/server/Server.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
+#include <app/util/error-mapping.h>
 #include <cinttypes>
 
 #include <app/CommandHandler.h>
@@ -246,7 +247,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
     if (!SupportsUSR(commandPath.mEndpointId))
     {
         emberAfDoorLockClusterPrintln("[SetUser] User management is not supported [endpointId=%d]", commandPath.mEndpointId);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        sendClusterResponse(commandObj, commandPath, EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
         return;
     }
 
@@ -255,7 +256,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
     {
         ChipLogError(Zcl, "[SetUser] Unable to get the fabric IDX [endpointId=%d,userIndex=%d]", commandPath.mEndpointId,
                      userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        sendClusterResponse(commandObj, commandPath, EMBER_ZCL_STATUS_FAILURE);
         return;
     }
 
@@ -264,7 +265,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
     {
         ChipLogError(Zcl, "[SetUser] Unable to get the source node index [endpointId=%d,userIndex=%d]", commandPath.mEndpointId,
                      userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        sendClusterResponse(commandObj, commandPath, EMBER_ZCL_STATUS_FAILURE);
         return;
     }
 
@@ -279,7 +280,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
     {
         emberAfDoorLockClusterPrintln("[SetUser] User index out of bounds [endpointId=%d,userIndex=%d]", commandPath.mEndpointId,
                                       userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        sendClusterResponse(commandObj, commandPath, EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
 
@@ -290,7 +291,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
             "[SetUser] Unable to set user: userName too long [endpointId=%d,userIndex=%d,userNameSize=%u]", commandPath.mEndpointId,
             userIndex, static_cast<unsigned int>(userName.Value().size()));
 
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        sendClusterResponse(commandObj, commandPath, EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
 
@@ -301,7 +302,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
             "[SetUser] Unable to set the user: user status is out of range [endpointId=%d,userIndex=%d,userStatus=%u]",
             commandPath.mEndpointId, userIndex, to_underlying(userStatus.Value()));
 
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        sendClusterResponse(commandObj, commandPath, EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
 
@@ -311,7 +312,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
             "[SetUser] Unable to set the user: user type is out of range [endpointId=%d,userIndex=%d,userType=%u]",
             commandPath.mEndpointId, userIndex, to_underlying(userType.Value()));
 
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        sendClusterResponse(commandObj, commandPath, EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
 
@@ -336,7 +337,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
         break;
     }
 
-    emberAfSendImmediateDefaultResponse(status);
+    sendClusterResponse(commandObj, commandPath, status);
 }
 
 void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandObj,
@@ -1669,8 +1670,7 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
     {
         emberAfDoorLockClusterPrintln("[createUser] Unable to overwrite existing user [endpointId=%d,userIndex=%d]", endpointId,
                                       userIndex);
-        // TODO: Add cluster-specific failure of DlStatus::kOccupied
-        return EMBER_ZCL_STATUS_FAILURE;
+        return static_cast<EmberAfStatus>(DlStatus::kOccupied);
     }
 
     const auto & newUserName            = !userName.IsNull() ? userName.Value() : chip::CharSpan::fromCharString("");
@@ -2380,7 +2380,7 @@ DlStatus DoorLockServer::clearSchedules(chip::EndpointId endpointId, uint16_t us
         return status;
     }
 
-    // TODO: Clear holiday schedules when they're implemented
+    // No need to clear the holiday schedules here as they are not specific for user.
     return DlStatus::kSuccess;
 }
 
@@ -3115,6 +3115,25 @@ bool DoorLockServer::RemoteOperationEnabled(chip::EndpointId endpointId) const
 
     return GetAttribute(endpointId, Attributes::OperatingMode::Id, Attributes::OperatingMode::Get, mode) &&
         mode != DlOperatingMode::kPrivacy && mode != DlOperatingMode::kNoRemoteLockUnlock;
+}
+
+CHIP_ERROR DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj,
+                                               const chip::app::ConcreteCommandPath & commandPath, EmberAfStatus status)
+{
+    VerifyOrDie(nullptr != commandObj);
+
+    auto err             = CHIP_NO_ERROR;
+    auto statusAsInteger = to_underlying(status);
+    if (statusAsInteger == to_underlying(DlStatus::kOccupied) || statusAsInteger == to_underlying(DlStatus::kDuplicate))
+    {
+        err = commandObj->AddClusterSpecificFailure(commandPath, static_cast<chip::ClusterStatus>(status));
+    }
+    else
+    {
+        err = commandObj->AddStatus(commandPath, ToInteractionModelStatus(status));
+    }
+
+    return err;
 }
 
 bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * commandObj,
