@@ -72,8 +72,8 @@ Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 std::vector<Room *> gRooms;
 std::vector<Action *> gActions;
 
-const int16_t minMeasuredValue = -27315;
-const int16_t maxMeasuredValue = 32766;
+const int16_t minMeasuredValue     = -27315;
+const int16_t maxMeasuredValue     = 32766;
 const int16_t initialMeasuredValue = 100;
 
 // ENDPOINT DEFINITIONS:
