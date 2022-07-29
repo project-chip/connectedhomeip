@@ -567,13 +567,13 @@ EmberAfStatus HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::A
     }
     else if ((attributeId == ZCL_TEMP_MIN_MEASURED_VALUE_ATTRIBUTE_ID) && (maxReadLength == 2))
     {
-        int16_t minMeasuredValue = dev->mMin;
-        memcpy(buffer, &minMeasuredValue, sizeof(minMeasuredValue));
+        int16_t minValue = dev->mMin;
+        memcpy(buffer, &minValue, sizeof(minValue));
     }
     else if ((attributeId == ZCL_TEMP_MAX_MEASURED_VALUE_ATTRIBUTE_ID) && (maxReadLength == 2))
     {
-        int16_t maxMeasuredValue = dev->mMax;
-        memcpy(buffer, &maxMeasuredValue, sizeof(maxMeasuredValue));
+        int16_t maxValue = dev->mMax;
+        memcpy(buffer, &maxValue, sizeof(maxValue));
     }
     else if ((attributeId == ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID) && (maxReadLength == 4))
     {
