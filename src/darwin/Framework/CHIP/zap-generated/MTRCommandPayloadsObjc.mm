@@ -824,9 +824,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-        _optionMask = @(0);
+        _optionsMask = @(0);
 
-        _optionOverride = @(0);
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -835,8 +835,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: level:%@; transitionTime:%@; optionMask:%@; optionOverride:%@; >",
-                  NSStringFromClass([self class]), _level, _transitionTime, _optionMask, _optionOverride];
+        [NSString stringWithFormat:@"<%@: level:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _level, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -850,9 +850,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _rate = @(0);
 
-        _optionMask = @(0);
+        _optionsMask = @(0);
 
-        _optionOverride = @(0);
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -860,8 +860,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionMask:%@; optionOverride:%@; >",
-                                             NSStringFromClass([self class]), _moveMode, _rate, _optionMask, _optionOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >",
+                                             NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -877,9 +877,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-        _optionMask = @(0);
+        _optionsMask = @(0);
 
-        _optionOverride = @(0);
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -888,8 +888,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionMask:%@; optionOverride:%@; >",
-                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionMask, _optionOverride];
+        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -899,9 +899,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _optionMask = @(0);
+        _optionsMask = @(0);
 
-        _optionOverride = @(0);
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -909,8 +909,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: optionMask:%@; optionOverride:%@; >",
-                                             NSStringFromClass([self class]), _optionMask, _optionOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: optionsMask:%@; optionsOverride:%@; >",
+                                             NSStringFromClass([self class]), _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -923,6 +923,10 @@ NS_ASSUME_NONNULL_BEGIN
         _level = @(0);
 
         _transitionTime = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -930,8 +934,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: level:%@; transitionTime:%@; >", NSStringFromClass([self class]), _level, _transitionTime];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: level:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _level, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -944,6 +949,10 @@ NS_ASSUME_NONNULL_BEGIN
         _moveMode = @(0);
 
         _rate = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -951,8 +960,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; >", NSStringFromClass([self class]), _moveMode, _rate];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >",
+                                             NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -967,6 +976,10 @@ NS_ASSUME_NONNULL_BEGIN
         _stepSize = @(0);
 
         _transitionTime = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -974,8 +987,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; >",
-                                             NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -984,6 +998,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -991,7 +1009,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: optionsMask:%@; optionsOverride:%@; >",
+                                             NSStringFromClass([self class]), _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
