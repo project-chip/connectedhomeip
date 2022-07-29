@@ -2899,7 +2899,7 @@ void TestReadInteraction::TestSubscribeClientReceiveWellFormedStatusResponse(nlT
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    
+
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
