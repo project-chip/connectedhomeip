@@ -21,6 +21,7 @@
 namespace chip {
 namespace Access {
 namespace Examples {
+
 AccessControl::Delegate * GetPermissiveAccessControlDelegate();
 
 } // namespace Examples
