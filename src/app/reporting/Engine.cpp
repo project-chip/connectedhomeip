@@ -322,8 +322,7 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
                 break;
             }
             aHasEncodedData = true;
-            ChipLogDetail(InteractionModel,
-                          "Acces to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by ACL",
+            ChipLogDetail(InteractionModel, "Acces to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by ACL",
                           current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId),
                           ChipLogValueMEI(current->mValue.mEventId));
         }
@@ -336,8 +335,8 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
 CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder & aReportDataBuilder, ReadHandler * apReadHandler,
                                                      bool aBufferIsUsed, bool * apHasMoreChunks, bool * apHasEncodedData)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    size_t eventCount   = 0;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
+    size_t eventCount     = 0;
     bool hasEncodedStatus = false;
     TLV::TLVWriter backup;
     bool eventClean                = true;
@@ -426,7 +425,8 @@ exit:
     }
 
     // Maybe encoding the attributes has already used up all space.
-    if ((err == CHIP_NO_ERROR || err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL) && !(hasEncodedStatus || (eventCount != 0)))
+    if ((err == CHIP_NO_ERROR || err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL) &&
+        !(hasEncodedStatus || (eventCount != 0)))
     {
         aReportDataBuilder.Rollback(backup);
         aReportDataBuilder.ResetError();
