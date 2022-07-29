@@ -175,7 +175,7 @@ class BaseTestHelper:
 
         self.chipStack = ChipStack('/tmp/repl_storage.json')
         self.fabricAdmin = chip.FabricAdmin.FabricAdmin(vendorId=0XFFF1,
-                                                        fabricId=1, fabricIndex=1)
+                                                        fabricId=1, adminIndex=1)
         self.devCtrl = self.fabricAdmin.NewController(
             nodeid, paaTrustStorePath, testCommissioner)
         self.controllerNodeId = nodeid
@@ -365,6 +365,79 @@ class BaseTestHelper:
             return True
         return False
 
+    async def TestMultiControllerFabric(self, nodeid: int):
+        ''' This tests having multiple controller instances on the same fabric.
+        '''
+
+        # Create two new controllers on the same fabric with no privilege on the target node.
+        newControllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=self.fabricAdmin, adminDevCtrl=self.devCtrl, controllerNodeIds=[100, 200], targetNodeId=nodeid, privilege=None)
+
+        #
+        # Read out the ACL list from one of the newly minted controllers which has no access. This should return an IM error.
+        #
+        res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+            self.logger.error(f"1: Received data instead of an error:{res}")
+            return False
+
+        #
+        # Read out the ACL list from an existing controller with admin privileges. This should return back valid data.
+        # Doing this ensures that we're not somehow aliasing the CASE sessions.
+        #
+        res = await self.devCtrl.ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+            self.logger.error(f"2: Received something other than data:{res}")
+            return False
+
+        #
+        # Re-do the previous read from the unprivileged controller just to do an ABA test to prove we haven't switched the CASE sessions
+        # under-neath.
+        #
+        res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+            self.logger.error(f"3: Received data instead of an error:{res}")
+            return False
+
+        #
+        # Grant the new controller admin privileges. Reading out the ACL cluster should now yield data.
+        #
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=nodeid)
+        res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+            self.logger.error(f"4: Received something other than data:{res}")
+            return False
+
+        #
+        # Grant the second new controller admin privileges as well. Reading out the ACL cluster should now yield data.
+        #
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[1], privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=nodeid)
+        res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+            self.logger.error(f"5: Received something other than data:{res}")
+            return False
+
+        #
+        # Grant the second new controller just view privilege. Reading out the ACL cluster should return no data.
+        #
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[1], privilege=Clusters.AccessControl.Enums.Privilege.kView, targetNodeId=nodeid)
+        res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+            self.logger.error(f"6: Received data5 instead of an error:{res}")
+            return False
+
+        #
+        # Read the Basic cluster from the 2nd controller. This is possible with just view privileges.
+        #
+        res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.Basic.Attributes.ClusterRevision)])
+        if (type(res[0][Clusters.Basic][Clusters.Basic.Attributes.ClusterRevision]) != Clusters.Basic.Attributes.ClusterRevision.attribute_type.Type):
+            self.logger.error(f"7: Received something other than data:{res}")
+            return False
+
+        newControllers[0].Shutdown()
+        newControllers[1].Shutdown()
+
+        return True
+
     async def TestAddUpdateRemoveFabric(self, nodeid: int):
         logger.info("Testing AddNOC, UpdateNOC and RemoveFabric")
 
@@ -537,7 +610,7 @@ class BaseTestHelper:
 
         self.logger.info("Creating 2nd Fabric Admin")
         self.fabricAdmin2 = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1,
-                                                         fabricId=2, fabricIndex=2)
+                                                         fabricId=2, adminIndex=2)
 
         self.logger.info("Creating Device Controller on 2nd Fabric")
         self.devCtrl2 = self.fabricAdmin2.NewController(
@@ -560,9 +633,9 @@ class BaseTestHelper:
         self.logger.info("Shutdown completed, starting new controllers...")
 
         self.fabricAdmin = chip.FabricAdmin.FabricAdmin(vendorId=0XFFF1,
-                                                        fabricId=1, fabricIndex=1)
+                                                        fabricId=1, adminIndex=1)
         fabricAdmin2 = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1,
-                                                    fabricId=2, fabricIndex=2)
+                                                    fabricId=2, adminIndex=2)
 
         self.devCtrl = self.fabricAdmin.NewController(
             self.controllerNodeId, self.paaTrustStorePath)

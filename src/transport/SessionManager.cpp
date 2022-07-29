@@ -352,25 +352,30 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
 void SessionManager::ExpireAllSessions(const ScopedNodeId & node)
 {
-    mSecureSessions.ForEachSession([&](auto session) {
-        if (session->GetPeer() == node)
-        {
-            session->MarkForEviction();
-        }
-        return Loop::Continue;
-    });
+    ChipLogDetail(Inet, "Expiring all sessions for node " ChipLogFormatScopedNodeId "!!", ChipLogValueScopedNodeId(node));
+
+    ForEachMatchingSession(node, [](auto * session) { session->MarkForEviction(); });
 }
 
 void SessionManager::ExpireAllSessionsForFabric(FabricIndex fabricIndex)
 {
     ChipLogDetail(Inet, "Expiring all sessions for fabric 0x%x!!", static_cast<unsigned>(fabricIndex));
-    mSecureSessions.ForEachSession([&](auto session) {
-        if (session->GetFabricIndex() == fabricIndex)
-        {
-            session->MarkForEviction();
-        }
-        return Loop::Continue;
-    });
+
+    ForEachMatchingSession(fabricIndex, [](auto * session) { session->MarkForEviction(); });
+}
+
+CHIP_ERROR SessionManager::ExpireAllCollidingSessions(const ScopedNodeId & node)
+{
+    ChipLogDetail(Inet, "Expiring all colliding sessions for node " ChipLogFormatScopedNodeId "!!", ChipLogValueScopedNodeId(node));
+
+    return ForEachCollidingSession(node, [](auto * session) { session->MarkForEviction(); });
+}
+
+CHIP_ERROR SessionManager::ExpireAllCollidingSessionsForFabric(FabricIndex fabricIndex)
+{
+    ChipLogDetail(Inet, "Expiring all colliding sessions for fabric 0x%x!!", static_cast<unsigned>(fabricIndex));
+
+    return ForEachCollidingSession(fabricIndex, [](auto * session) { session->MarkForEviction(); });
 }
 
 void SessionManager::ExpireAllPASESessions()

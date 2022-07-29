@@ -120,7 +120,7 @@ class DCState(enum.IntEnum):
 class ChipDeviceController():
     activeList = set()
 
-    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, fabricIndex: int, nodeId: int, adminVendorId: int, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
+    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         self._ChipStack = builtins.chipStack
@@ -134,8 +134,10 @@ class ChipDeviceController():
 
         res = self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateController(ctypes.c_void_p(
-                opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId, adminVendorId, ctypes.c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
+                opCredsContext), pointer(devCtrl), fabricId, nodeId, adminVendorId, ctypes.c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
         )
+
+        self.nodeId = nodeId
 
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
@@ -144,6 +146,9 @@ class ChipDeviceController():
 
         self._Cluster = ChipClusters(builtins.chipStack)
         self._Cluster.InitLib(self._dmLib)
+
+        def GetNodeId(self):
+            return self.nodeId
 
         def HandleKeyExchangeComplete(err):
             if err != 0:
