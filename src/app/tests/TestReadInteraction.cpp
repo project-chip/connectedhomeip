@@ -2762,7 +2762,10 @@ void TestReadInteraction::TestReadHandlerInvalidReadRequest(nlTestSuite * apSuit
                                                 Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
-        NL_TEST_ASSERT(apSuite, delegate.mError == ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(Protocols::InteractionModel::Status::InvalidAction)));
+        NL_TEST_ASSERT(
+            apSuite,
+            delegate.mError ==
+                ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(Protocols::InteractionModel::Status::InvalidAction)));
     }
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
     engine->Shutdown();
@@ -2802,8 +2805,8 @@ void TestReadInteraction::TestSubscribeSendUnknownMessage(nlTestSuite * apSuite,
         ctx.GetLoopback().mSentMessageCount                 = 0;
         ctx.GetLoopback().mNumMessagesToDrop                = 1;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-        ctx.GetLoopback().mDroppedMessageCount = 0;
-        err = readClient.SendRequest(readPrepareParams);
+        ctx.GetLoopback().mDroppedMessageCount              = 0;
+        err                                                 = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
 
@@ -2870,7 +2873,7 @@ void TestReadInteraction::TestSubscribeSendInvalidStatusReport(nlTestSuite * apS
         ctx.GetLoopback().mSentMessageCount                 = 0;
         ctx.GetLoopback().mNumMessagesToDrop                = 1;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-        ctx.GetLoopback().mDroppedMessageCount = 0;
+        ctx.GetLoopback().mDroppedMessageCount              = 0;
 
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -2942,7 +2945,10 @@ void TestReadInteraction::TestReadHandlerInvalidSubscribeRequest(nlTestSuite * a
                                                 Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
-        NL_TEST_ASSERT(apSuite, delegate.mError == ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(Protocols::InteractionModel::Status::InvalidAction)));
+        NL_TEST_ASSERT(
+            apSuite,
+            delegate.mError ==
+                ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(Protocols::InteractionModel::Status::InvalidAction)));
     }
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
     engine->Shutdown();
