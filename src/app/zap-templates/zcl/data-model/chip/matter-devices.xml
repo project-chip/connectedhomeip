@@ -2015,7 +2015,7 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0029</deviceId>
         <clusters lockOthers="true">
-            <include cluster="Media Playback" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Media Playback" client="true" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Content Launcher" client="true" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Keypad Input" client="true" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Account Login" client="true" server="false" clientLocked="false" serverLocked="false"></include>
