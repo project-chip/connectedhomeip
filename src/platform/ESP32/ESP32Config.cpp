@@ -185,19 +185,24 @@ CHIP_ERROR ESP32Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
 
     ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READONLY, GetPartitionLabelByNamespace(key.Namespace)));
 
-    outLen        = bufSize;
+    outLen = bufSize;
+
+    // If buf is null, nvs_get_str() sets the outLen to required length to fit the string
     esp_err_t err = nvs_get_str(handle, key.Name, buf, &outLen);
     if (err == ESP_ERR_NVS_NOT_FOUND)
     {
         outLen = 0;
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    if (err == ESP_ERR_NVS_INVALID_LENGTH && buf != NULL)
+    if (buf != NULL)
     {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
+        if (err == ESP_ERR_NVS_INVALID_LENGTH)
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        ReturnErrorCodeIf(buf[outLen - 1] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+        ReturnMappedErrorOnFailure(err);
     }
-    ReturnErrorCodeIf(buf[outLen - 1] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
-    ReturnMappedErrorOnFailure(err);
 
     outLen -= 1; // Don't count trailing nul.
 
@@ -210,18 +215,22 @@ CHIP_ERROR ESP32Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSiz
 
     ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READONLY, GetPartitionLabelByNamespace(key.Namespace)));
 
-    outLen        = bufSize;
+    outLen = bufSize;
+    // If buf is null, nvs_get_blob() sets the outLen to required length to fit the blob
     esp_err_t err = nvs_get_blob(handle, key.Name, buf, &outLen);
     if (err == ESP_ERR_NVS_NOT_FOUND)
     {
         outLen = 0;
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    else if (err == ESP_ERR_NVS_INVALID_LENGTH && buf != NULL)
+    if (buf != NULL)
     {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
+        if (err == ESP_ERR_NVS_INVALID_LENGTH)
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        ReturnMappedErrorOnFailure(err);
     }
-    ReturnMappedErrorOnFailure(err);
 
     return CHIP_NO_ERROR;
 }
