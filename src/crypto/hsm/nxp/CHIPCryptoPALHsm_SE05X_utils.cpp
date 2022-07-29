@@ -23,6 +23,7 @@
  */
 
 #include "CHIPCryptoPALHsm_SE05X_utils.h"
+#include "fsl_sss_policy.h"
 
 ex_sss_boot_ctx_t gex_sss_chip_ctx;
 
@@ -157,6 +158,25 @@ CHIP_ERROR se05x_set_key(uint32_t keyid, const uint8_t * key, size_t keylen, sss
                           0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00 };
     size_t bitlen     = 0;
 
+    static sss_policy_u commonPol;
+    commonPol.type                     = KPolicy_Common;
+    commonPol.auth_obj_id              = 0;
+    commonPol.policy.common.req_Sm     = 0;
+    commonPol.policy.common.can_Delete = 1;
+    commonPol.policy.common.can_Read   = 0;
+    commonPol.policy.common.can_Write  = 1;
+
+    static sss_policy_u hmac_withPol;
+    hmac_withPol.type                      = KPolicy_Asym_Key;
+    hmac_withPol.auth_obj_id               = 0;
+    hmac_withPol.policy.asymmkey.can_Write = 1;
+    hmac_withPol.policy.asymmkey.can_KA    = 1;
+
+    sss_policy_t policy_for_hmac_key;
+    policy_for_hmac_key.nPolicies   = 2;
+    policy_for_hmac_key.policies[0] = &hmac_withPol;
+    policy_for_hmac_key.policies[1] = &commonPol;
+
     if (cipherType == kSSS_CipherType_EC_NIST_P)
     {
         VerifyOrReturnError(keylen < (sizeof(keyBuf) - sizeof(header1)), CHIP_ERROR_INTERNAL);
@@ -184,7 +204,8 @@ CHIP_ERROR se05x_set_key(uint32_t keyid, const uint8_t * key, size_t keylen, sss
     status = sss_key_object_allocate_handle(&keyObject, keyid, keyPart, cipherType, keyBufLen, kKeyObject_Mode_Persistent);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, keyBuf, keyBufLen, bitlen, NULL, 0);
+    status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, keyBuf, keyBufLen, bitlen, &policy_for_hmac_key,
+                                   sizeof(policy_for_hmac_key));
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
