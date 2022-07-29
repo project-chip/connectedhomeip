@@ -24,7 +24,7 @@
 
 #include <cinttypes>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/Encode.h>
 #include <app/tests/AppTestContext.h>
@@ -452,8 +452,8 @@ void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSu
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     TestExchangeDelegate delegate;
-    commandHandler.mpExchangeCtx = ctx.NewExchangeToAlice(&delegate);
-    err                          = commandHandler.SendCommandResponse();
+    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+    err = commandHandler.SendCommandResponse();
 
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 }
@@ -488,7 +488,7 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     TestExchangeDelegate delegate;
-    commandHandler.mpExchangeCtx = ctx.NewExchangeToAlice(&delegate);
+    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
 
     err = commandHandler.PrepareCommand(path);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -521,7 +521,7 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
-    commandHandler.mpExchangeCtx = ctx.NewExchangeToAlice(&delegate);
+    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
 
     AddInvokeResponseData(apSuite, apContext, &commandHandler, aNeedStatusCode);
     err = commandHandler.Finalize(commandPacket);
@@ -581,7 +581,7 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
     System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
-    commandHandler.mpExchangeCtx = ctx.NewExchangeToAlice(&delegate);
+    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
 
     auto path = MakeTestCommandPath();
 
@@ -608,7 +608,7 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
     System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
-    commandHandler.mpExchangeCtx = ctx.NewExchangeToAlice(&delegate);
+    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
 
     auto path = MakeTestCommandPath();
 
@@ -635,7 +635,7 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
     System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
-    commandHandler.mpExchangeCtx = ctx.NewExchangeToAlice(&delegate);
+    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
 
     auto path = MakeTestCommandPath();
 
@@ -672,7 +672,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedMsg(nlTestSuit
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     TestExchangeDelegate delegate;
-    commandHandler.mpExchangeCtx = ctx.NewExchangeToAlice(&delegate);
+    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
 
     GenerateInvokeRequest(apSuite, apContext, commandDatabuf, /* aIsTimedRequest = */ false, kTestCommandIdWithData);
     err = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
@@ -711,7 +711,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
             System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
             TestExchangeDelegate delegate;
-            commandHandler.mpExchangeCtx = ctx.NewExchangeToAlice(&delegate);
+            commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
 
             chip::isCommandDispatched = false;
             GenerateInvokeRequest(apSuite, apContext, commandDatabuf, messageIsTimed, kTestCommandIdNoData);

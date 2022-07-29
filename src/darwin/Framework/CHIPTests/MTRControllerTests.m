@@ -24,6 +24,7 @@
 #import <XCTest/XCTest.h>
 
 #import "MTRTestKeys.h"
+#import "MTRTestOTAProvider.h"
 #import "MTRTestStorage.h"
 
 static uint16_t kTestVendorId = 0xFFF1u;
@@ -153,6 +154,62 @@ static uint16_t kTestVendorId = 0xFFF1u;
         [controller shutdown];
         XCTAssertFalse([controller isRunning]);
     }
+
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
+}
+
+- (void)testControllerWithOTAProviderDelegate
+{
+    __auto_type * factory = [MTRControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * otaProvider = [[MTRTestOTAProvider alloc] init];
+    __auto_type * storage = [[MTRTestStorage alloc] init];
+    __auto_type * factoryParams = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
+    factoryParams.otaProviderDelegate = otaProvider;
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
+
+    __auto_type * testKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    XCTAssertNotNil(params);
+
+    params.vendorId = @(kTestVendorId);
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
+    XCTAssertTrue([controller isRunning]);
+    [controller shutdown];
+
+    // OTA Provider depends on the system state maintained by CHIPDeviceControllerFactory that is destroyed when
+    // the controller count goes down to 0. Make sure that a new controller can still be started successfully onto the
+    // same fabric.
+    MTRDeviceController * controller2 = [factory startControllerOnExistingFabric:params];
+    XCTAssertTrue([controller2 isRunning]);
+    [controller2 shutdown];
+
+    // Check that a new controller can be started on a different fabric too.
+    __auto_type * params2 = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:2 ipk:testKeys.ipk];
+    XCTAssertNotNil(params2);
+
+    params2.vendorId = @(kTestVendorId);
+
+    MTRDeviceController * controller3 = [factory startControllerOnNewFabric:params2];
+    XCTAssertTrue([controller3 isRunning]);
+    [controller3 shutdown];
+
+    // Stop the factory, start it up again and create a controller to ensure that no dead state from the previous
+    // ota provider delegate is staying around.
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
+
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
+
+    MTRDeviceController * controller4 = [factory startControllerOnExistingFabric:params2];
+    XCTAssertTrue([controller4 isRunning]);
+    [controller4 shutdown];
 
     [factory shutdown];
     XCTAssertFalse([factory isRunning]);

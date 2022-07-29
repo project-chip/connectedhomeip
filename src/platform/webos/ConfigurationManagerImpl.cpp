@@ -390,5 +390,10 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
     return err;
 }
 
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

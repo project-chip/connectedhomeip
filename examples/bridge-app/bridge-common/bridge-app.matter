@@ -125,44 +125,55 @@ server cluster LevelControl = 8 {
   request struct MoveToLevelRequest {
     INT8U level = 0;
     INT16U transitionTime = 1;
-    BITMAP8 optionMask = 2;
-    BITMAP8 optionOverride = 3;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct MoveRequest {
     MoveMode moveMode = 0;
     INT8U rate = 1;
-    BITMAP8 optionMask = 2;
-    BITMAP8 optionOverride = 3;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct StepRequest {
     StepMode stepMode = 0;
     INT8U stepSize = 1;
     INT16U transitionTime = 2;
-    BITMAP8 optionMask = 3;
-    BITMAP8 optionOverride = 4;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
   }
 
   request struct StopRequest {
-    BITMAP8 optionMask = 0;
-    BITMAP8 optionOverride = 1;
+    BITMAP8 optionsMask = 0;
+    BITMAP8 optionsOverride = 1;
   }
 
   request struct MoveToLevelWithOnOffRequest {
     INT8U level = 0;
     INT16U transitionTime = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct MoveWithOnOffRequest {
     MoveMode moveMode = 0;
     INT8U rate = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct StepWithOnOffRequest {
     StepMode stepMode = 0;
     INT8U stepSize = 1;
     INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
+  }
+
+  request struct StopWithOnOffRequest {
+    BITMAP8 optionsMask = 0;
+    BITMAP8 optionsOverride = 1;
   }
 
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
@@ -172,7 +183,7 @@ server cluster LevelControl = 8 {
   command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
   command MoveWithOnOff(MoveWithOnOffRequest): DefaultSuccess = 5;
   command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
-  command StopWithOnOff(): DefaultSuccess = 7;
+  command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
 }
 
 server cluster Descriptor = 29 {
@@ -254,7 +265,7 @@ client cluster AccessControl = 31 {
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable AccessControlEntry latestValue = 4;
-    fabric_idx adminFabricIndex = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   info event access(read: administer) AccessControlExtensionChanged = 1 {
@@ -262,7 +273,7 @@ client cluster AccessControl = 31 {
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable ExtensionEntry latestValue = 4;
-    fabric_idx adminFabricIndex = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   attribute access(read: administer, write: administer) AccessControlEntry acl[] = 0;
@@ -322,7 +333,7 @@ server cluster AccessControl = 31 {
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable AccessControlEntry latestValue = 4;
-    fabric_idx adminFabricIndex = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   info event access(read: administer) AccessControlExtensionChanged = 1 {
@@ -330,7 +341,7 @@ server cluster AccessControl = 31 {
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable ExtensionEntry latestValue = 4;
-    fabric_idx adminFabricIndex = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   attribute access(read: administer, write: administer) AccessControlEntry acl[] = 0;
@@ -449,6 +460,7 @@ server cluster Basic = 40 {
   }
 
   info event Leave = 2 {
+    fabric_idx fabricIndex = 0;
   }
 
   info event ReachableChanged = 3 {
@@ -873,7 +885,7 @@ server cluster GeneralDiagnostics = 51 {
     INT64U eventTrigger = 1;
   }
 
-  command TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
+  command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
 }
 
 server cluster SoftwareDiagnostics = 52 {
@@ -1255,7 +1267,7 @@ server cluster OperationalCredentials = 62 {
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
-  readonly attribute fabric_idx currentFabricIndex = 5;
+  readonly attribute int8u currentFabricIndex = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;

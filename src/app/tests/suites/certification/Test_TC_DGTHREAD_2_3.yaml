@@ -34,7 +34,7 @@ tests:
       attribute: "RxTotalCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -44,7 +44,7 @@ tests:
       attribute: "RxUnicastCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -54,7 +54,7 @@ tests:
       attribute: "RxBroadcastCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -64,7 +64,7 @@ tests:
       attribute: "RxDataCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -74,7 +74,7 @@ tests:
       attribute: "RxDataPollCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -84,7 +84,7 @@ tests:
       attribute: "RxBeaconCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -94,7 +94,7 @@ tests:
       attribute: "RxBeaconRequestCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -104,7 +104,7 @@ tests:
       attribute: "RxOtherCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -114,7 +114,7 @@ tests:
       attribute: "RxAddressFilteredCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -124,7 +124,7 @@ tests:
       attribute: "RxDestAddrFilteredCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -134,7 +134,7 @@ tests:
       attribute: "RxDuplicatedCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -144,7 +144,7 @@ tests:
       attribute: "RxErrNoFrameCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -154,7 +154,7 @@ tests:
       attribute: "RxErrUnknownNeighborCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -186,7 +186,7 @@ tests:
       attribute: "RxErrSecCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -196,7 +196,7 @@ tests:
       attribute: "RxErrFcsCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -206,6 +206,6 @@ tests:
       attribute: "RxErrOtherCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF

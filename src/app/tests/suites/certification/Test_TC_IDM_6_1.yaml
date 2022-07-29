@@ -27,7 +27,8 @@ tests:
           specific node that is, [Node = Specific, Endpoint = Specific, Cluster
           = Specific, Event = Specific]."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
+
 
           sudo ./chip-tool basic read-event start-up 1  0
 
@@ -79,7 +80,7 @@ tests:
           node that is, [Node = Specific, Endpoint = Specific, Cluster =
           Specific, Event = Wildcard]."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
            ./chip-tool any read-event-by-id 0x0028 0x0FFFFFFFF 1 0
           On TH verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
@@ -129,8 +130,6 @@ tests:
           that is, [Node = Specific, Endpoint = Specific, Cluster = Wildcard,
           Event = Wildcard]."
       verification: |
-          In case of chip tool, here is an example command to use
-
           ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0
 
           On TH verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
@@ -174,7 +173,7 @@ tests:
           node that is, [Node = Specific, Endpoint = Wildcard, Cluster =
           Specific, Event = Specific]."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo ./chip-tool basic read-event start-up 1  0xFFFF
 
@@ -226,7 +225,7 @@ tests:
           that is, [Node = Specific, Endpoint = Wildcard, Cluster = Specific,
           Event = Wildcard]."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo ./chip-tool basic read-event-by-id 0xFFFFFFFF 1  0xFFFF
           On TH verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
@@ -277,8 +276,6 @@ tests:
           [Node = Specific, Endpoint = Wildcard, Cluster = Wildcard, Event =
           Wildcard]."
       verification: |
-          In case of chip tool, here is an example command to use
-
           sudo ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1  0xFFFF
           On TH verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
           [1653051769.144914][11706:11711] CHIP:DMG: ReportDataMessage =
@@ -415,11 +412,13 @@ tests:
           which requires a privilege that is not granted for the cluster in the
           path."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
-          To Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
 
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
+
            ./chip-tool any read-event-by-id 0x28 0 1 0
 
           verify DUT is responsds with UNSUPPORTED_ACCESS  for the data sent in the above command
@@ -453,6 +452,8 @@ tests:
           [1653054249.515083][12265:12270] CHIP:DMG:         SuppressResponse = true,
           [1653054249.515090][12265:12270] CHIP:DMG:         InteractionModelRevision = 1
           [1653054249.515102][12265:12270] CHIP:DMG: }
+
+          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
       disabled: true
 
     - label:
@@ -460,8 +461,6 @@ tests:
           Wildcard path where reading an event in the path requires a privilege
           that is not granted for the cluster in the path."
       verification: |
-          In case of chip tool, here is an example command to use
-
           To Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
@@ -473,6 +472,9 @@ tests:
           [1653054297.608292][12300:12305] CHIP:DMG:         SuppressResponse = true,
           [1653054297.608306][12300:12305] CHIP:DMG:         InteractionModelRevision = 1
           [1653054297.608317][12300:12305] CHIP:DMG: }
+
+
+          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
       disabled: true
 
     - label:
@@ -482,8 +484,6 @@ tests:
           EventMin field set to a number less than what was received in the
           previous step."
       verification: |
-          here is the example command you can use
-
           sudo ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
 
 
@@ -556,8 +556,7 @@ tests:
           EventMin field set to a number much greater than what was received in
           the previous step."
       verification: |
-          In case of chip tool, here is an example command to use
-
+          The cluster used in the below command is an example, User can use any supported chip cluster.
           sudo ./chip-tool basic read-event start-up 1 0 --event-min 131073
 
           On TH verify that the DUT sends  Report Data Message with empty EventReports
@@ -574,15 +573,78 @@ tests:
           event data. For every chunked data message received, DUT sends a
           status response."
       verification: |
-          tried in doorlock app, Sent wildcard read-event command from TH to DUT to verify this test-step,
-          On TH verify that  The last chunked message should not receive any status response from the DUT.
+          Try to verify this step in  doorlock app, below mentioned  wildcard command to  read-event  from TH to DUT.
 
            ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
-          The message flow I would expect here is:
+          The message flow  can expect as mentioned below
             TH -> DUT ReadRequest
               DUT -> TH ReportData, not last chunk
               TH -> DUT StatusResponse
               Possibly repeat steps 2 & 3 a few times
               DUT -> TH ReportData, last chunk, SuppressResponse set to true
               TH -> DUT standalone ack
+
+          On TH verify that  The last chunked message should not receive any status response from the DUT
+
+          [1656510389.524811][20396:20396] CHIP:DMG: Fetched 16 events
+          [1656510389.524838][20396:20396] CHIP:DMG: <RE> Sending report (payload has 973 bytes)...
+          [1656510389.524864][20396:20396] CHIP:DMG: IM RH moving to [AwaitingReportResponse]
+
+          [1656510389.553113][20396:20396] CHIP:EM: Found matching exchange: 51910r, Delegate: 0xaaab0b90c330
+          [1656510389.553190][20396:20396] CHIP:EM: Rxd Ack; Removing MessageCounter:206023646 from Retrans Table on exchange 51910r
+          [1656510389.553248][20396:20396] CHIP:EM: Removed CHIP MessageCounter:206023646 from RetransTable on exchange 51910r
+          [1656510389.553347][20396:20396] CHIP:DMG: StatusResponseMessage =
+          [1656510389.553413][20396:20396] CHIP:DMG: {
+          [1656510389.553472][20396:20396] CHIP:DMG:      Status = 0x00 (SUCCESS),
+          [1656510389.553534][20396:20396] CHIP:DMG:      InteractionModelRevision = 1
+          [1656510389.553592][20396:20396] CHIP:DMG: }
+          [1656510389.553648][20396:20396] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+          [1656510389.553711][20396:20396] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
+          [1656510389.553770][20396:20396] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1656510389.553924][20396:20396] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1656510389.555237][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.555318][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.555503][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.555570][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.555749][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.555814][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.555990][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.556054][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.556221][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.556285][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.556456][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.556627][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.556808][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.556875][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.557055][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.557122][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.557300][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.557365][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.557538][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.557602][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.557777][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.557842][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.558015][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.558081][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.558288][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.558332][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.558515][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.558561][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.558677][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.558721][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.558836][20396:20396] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1656510389.558878][20396:20396] CHIP:DMG: AccessControl: allowed
+          [1656510389.558964][20396:20396] CHIP:DMG: Fetched 16 events
+          [1656510389.559007][20396:20396] CHIP:DMG: <RE> Sending report (payload has 911 bytes)...
+          [1656510389.559061][20396:20396] CHIP:EM: Piggybacking Ack for MessageCounter:90464643 on exchange: 51910r
+          [1656510389.559228][20396:20396] CHIP:IN: Prepared secure message 0xaaab0b95c688 to 0x000000000001B669 (1)  of type 0x5 and protocolId (0, 1) on exchange 51910r with MessageCounter:206023647.
+          [1656510389.559287][20396:20396] CHIP:IN: Sending encrypted msg 0xaaab0b95c688 with MessageCounter:206023647 to 0x000000000001B669 (1) at monotonic time: 0000000001ECA505 msec
+          [1656510389.559519][20396:20396] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
+          [1656510389.559563][20396:20396] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
+          [1656510389.559597][20396:20396] CHIP:DMG: IM RH moving to [AwaitingDestruction]
+          [1656510389.559639][20396:20396] CHIP:DMG: All ReadHandler-s are clean, clear GlobalDirtySet
+          [1656510389.586362][20396:20396] CHIP:EM: Received message of type 0x10 with protocolId (0, 0) and MessageCounter:90464644 on exchange 51910r
+          [1656510389.586431][20396:20396] CHIP:EM: Found matching exchange: 51910r, Delegate: (nil)
+          [1656510389.586492][20396:20396] CHIP:EM: Rxd Ack; Removing MessageCounter:206023647 from Retrans Table on exchange 51910r
+          [1656510389.586535][20396:20396] CHIP:EM: Removed CHIP MessageCounter:206023647 from RetransTable on exchange 51910r
       disabled: true

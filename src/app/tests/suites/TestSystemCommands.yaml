@@ -19,7 +19,7 @@ config:
     cluster: "SystemCommands"
     endpoint: 0
     payload:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "MT:-24J0IX4122-.548G00" # This value needs to be generated
 
 tests:

@@ -19,10 +19,10 @@ config:
     cluster: "Target Navigator"
     endpoint: 1
     targetvalue1:
-        type: INT8U
+        type: int8u
         defaultValue: 1
     targetvalue2:
-        type: INT8U
+        type: int8u
         defaultValue: 2
 
 tests:
@@ -40,7 +40,7 @@ tests:
       attribute: "CurrentTarget"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -62,7 +62,7 @@ tests:
                 value: targetvalue1
 
     - label: "Reads the CurrentTarget attribute"
-      PICS: TGTNAV.S.A0001
+      PICS: TGTNAV.S.A0001 && TGTNAV.S.C0000
       command: "readAttribute"
       attribute: "CurrentTarget"
       response:

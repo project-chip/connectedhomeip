@@ -18,6 +18,9 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    StepSizeConfigValue:
+        type: int8u
+        defaultValue: 15
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -39,13 +42,20 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F00 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -57,7 +67,7 @@ tests:
               - name: "StepMode"
                 value: 1
               - name: "StepSize"
-                value: 15
+                value: StepSizeConfigValue
               - name: "TransitionTime"
                 value: 10
               - name: "OptionsMask"
@@ -75,12 +85,12 @@ tests:
                 value: 1000
 
     - label: "Over TransitionTime,TH read CurrentSaturation attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C05.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -92,7 +102,7 @@ tests:
               - name: "StepMode"
                 value: 3
               - name: "StepSize"
-                value: 20
+                value: StepSizeConfigValue
               - name: "TransitionTime"
                 value: 10
               - name: "OptionsMask"
@@ -109,12 +119,12 @@ tests:
                 value: 1000
 
     - label: "Over TransitionTime,TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C05.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 

@@ -518,30 +518,6 @@ CHIP_ERROR EventManagement::CopyEvent(const TLVReader & aReader, TLVWriter & aWr
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EventManagement::WriteEventStatusIB(TLVWriter & aWriter, const ConcreteEventPath & aEvent, StatusIB aStatus)
-{
-    TLVType containerType;
-    ReturnErrorOnFailure(aWriter.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
-
-    EventStatusIB::Builder builder;
-    builder.Init(&aWriter, to_underlying(EventReportIB::Tag::kEventStatus));
-
-    ReturnErrorOnFailure(builder.CreatePath()
-                             .Endpoint(aEvent.mEndpointId)
-                             .Cluster(aEvent.mClusterId)
-                             .Event(aEvent.mEventId)
-                             .EndOfEventPathIB()
-                             .GetError());
-
-    ReturnErrorOnFailure(builder.CreateErrorStatus().EncodeStatusIB(aStatus).GetError());
-
-    ReturnErrorOnFailure(builder.EndOfEventStatusIB().GetError());
-
-    ReturnErrorOnFailure(aWriter.EndContainer(containerType));
-    ReturnErrorOnFailure(aWriter.Finalize());
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOutContext,
                                               const EventManagement::EventEnvelopeContext & event)
 {
@@ -560,19 +536,13 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
     ConcreteEventPath path(event.mEndpointId, event.mClusterId, event.mEventId);
     CHIP_ERROR ret = CHIP_ERROR_UNEXPECTED_EVENT;
 
-    bool eventReadViaConcretePath = false;
-
     for (auto * interestedPath = eventLoadOutContext->mpInterestedEventPaths; interestedPath != nullptr;
          interestedPath        = interestedPath->mpNext)
     {
         if (interestedPath->mValue.IsEventPathSupersetOf(path))
         {
             ret = CHIP_NO_ERROR;
-            if (!interestedPath->mValue.HasEventWildcard())
-            {
-                eventReadViaConcretePath = true;
-                break;
-            }
+            break;
         }
     }
 
@@ -582,18 +552,10 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
     Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
     CHIP_ERROR accessControlError =
         Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
-
     if (accessControlError != CHIP_NO_ERROR)
     {
         ReturnErrorCodeIf(accessControlError != CHIP_ERROR_ACCESS_DENIED, accessControlError);
-        if (eventReadViaConcretePath)
-        {
-            ret = CHIP_ERROR_ACCESS_DENIED;
-        }
-        else
-        {
-            ret = CHIP_ERROR_UNEXPECTED_EVENT;
-        }
+        ret = CHIP_ERROR_UNEXPECTED_EVENT;
     }
 
     return ret;
@@ -659,24 +621,6 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
         // writer state back to the checkpoint, i.e., the state
         // before we began the copy operation.
         if ((err != CHIP_NO_ERROR) && (err != CHIP_END_OF_TLV))
-        {
-            loadOutContext->mWriter = checkpoint;
-            return err;
-        }
-
-        loadOutContext->mPreviousTime.mValue = loadOutContext->mCurrentTime.mValue;
-        loadOutContext->mFirst               = false;
-        loadOutContext->mEventCount++;
-    }
-    else if (err == CHIP_ERROR_ACCESS_DENIED)
-    {
-        // checkpoint the writer
-        TLV::TLVWriter checkpoint = loadOutContext->mWriter;
-
-        err = WriteEventStatusIB(loadOutContext->mWriter, ConcreteEventPath(event.mEndpointId, event.mClusterId, event.mEventId),
-                                 StatusIB(Protocols::InteractionModel::Status::UnsupportedAccess));
-
-        if (err != CHIP_NO_ERROR)
         {
             loadOutContext->mWriter = checkpoint;
             return err;

@@ -41,6 +41,13 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: LVL.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "Reads Minlevel attribute from DUT"
       PICS: LVL.S.A0002
       command: "readAttribute"
@@ -48,7 +55,7 @@ tests:
       response:
           saveAs: MinlevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -61,13 +68,13 @@ tests:
                 value: 1
               - name: "transitionTime"
                 value: 0
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0000
+      PICS: LVL.S.A0000 && LVL.S.C04.Rsp
       command: "readAttribute"
       attribute: "current level"
       response:
@@ -85,9 +92,9 @@ tests:
                 value: 0
               - name: "rate"
                 value: 5
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Wait 5000ms"
@@ -103,15 +110,15 @@ tests:
       command: "Stop"
       arguments:
           values:
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && LVL.S.C03.Rsp
       arguments:
           values:
               - name: "message"
@@ -125,8 +132,8 @@ tests:
       attribute: "current level"
       response:
           constraints:
-              minValue: 22
-              maxValue: 28
+              minValue: 21
+              maxValue: 29
               notValue: CurrentLevelValue
 
     - label: "Sends a move up command to DUT"
@@ -138,9 +145,9 @@ tests:
                 value: 0
               - name: "rate"
                 value: 5
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Wait 5000ms"
@@ -151,19 +158,20 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "Sends stop command to DUT"
-      command: "Stop"
+    - label: "Sends StopWithOnOff command to DUT"
+      PICS: LVL.S.C07.Rsp
+      command: "StopWithOnOff"
       arguments:
           values:
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && LVL.S.C07.Rsp
       arguments:
           values:
               - name: "message"
@@ -177,8 +185,8 @@ tests:
       attribute: "current level"
       response:
           constraints:
-              minValue: 45
-              maxValue: 55
+              minValue: 43
+              maxValue: 57
               notValue: CurrentLevelValue
 
     - label: "Precondition send Off Command"

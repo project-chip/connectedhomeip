@@ -25,76 +25,64 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          ./chip-tool thermostatuserinterfaceconfiguration read temperature-display-mode 12345 1
+          ./chip-tool thermostatuserinterfaceconfiguration read temperature-display-mode 1 1
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          [1658142864.198892][13946:13946] CHIP:IM: Received Read request
+          [1658142864.198979][13946:13946] CHIP:DMG: ReadRequestMessage =
+          [1658142864.199008][13946:13946] CHIP:DMG: {
+          [1658142864.199032][13946:13946] CHIP:DMG:         AttributePathIBs =
+          [1658142864.199059][13946:13946] CHIP:DMG:         [
+          [1658142864.199085][13946:13946] CHIP:DMG:                 AttributePathIB =
+          [1658142864.199114][13946:13946] CHIP:DMG:                 {
+          [1658142864.199144][13946:13946] CHIP:DMG:                         Endpoint = 0x1,
+          [1658142864.199181][13946:13946] CHIP:DMG:                         Cluster = 0x204,
+          [1658142864.199221][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1658142864.199253][13946:13946] CHIP:DMG:                 }
+          [1658142864.199284][13946:13946] CHIP:DMG:
+          [1658142864.199311][13946:13946] CHIP:DMG:         ],
+          [1658142864.199341][13946:13946] CHIP:DMG:
+          [1658142864.199369][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142864.199396][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658142864.199421][13946:13946] CHIP:DMG: },
+          [1658142864.199502][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-
-          Verify in TH all-clusters-app Log:
-
-          [1650966000.959191][11186:11191] CHIP:DMG: ReportDataMessage =
-          [1650966000.959287][11186:11191] CHIP:DMG: {
-          [1650966000.959338][11186:11191] CHIP:DMG:         AttributeReportIBs =
-          [1650966000.959390][11186:11191] CHIP:DMG:         [
-          [1650966000.959430][11186:11191] CHIP:DMG:                 AttributeReportIB =
-          [1650966000.959504][11186:11191] CHIP:DMG:                 {
-          [1650966000.959548][11186:11191] CHIP:DMG:                         AttributeDataIB =
-          [1650966000.959613][11186:11191] CHIP:DMG:                         {
-          [1650966000.959682][11186:11191] CHIP:DMG:                                 DataVersion = 0x90d9261a,
-          [1650966000.959736][11186:11191] CHIP:DMG:                                 AttributePathIB =
-          [1650966000.959803][11186:11191] CHIP:DMG:                                 {
-          [1650966000.959861][11186:11191] CHIP:DMG:                                         Endpoint = 0x1,
-          [1650966000.959934][11186:11191] CHIP:DMG:                                         Cluster = 0x204,
-          [1650966000.960001][11186:11191] CHIP:DMG:                                         Attribute = 0x0000_0000,
-          [1650966000.960055][11186:11191] CHIP:DMG:                                 }
-          [1650966000.960128][11186:11191] CHIP:DMG:
-          [1650966000.960191][11186:11191] CHIP:DMG:                                         Data = 0,
-          [1650966000.960259][11186:11191] CHIP:DMG:                         },
-          [1650966000.960328][11186:11191] CHIP:DMG:
-          [1650966000.960374][11186:11191] CHIP:DMG:                 },
-          [1650966000.960441][11186:11191] CHIP:DMG:
-          [1650966000.960481][11186:11191] CHIP:DMG:         ],
-          [1650966000.960545][11186:11191] CHIP:DMG:
-          [1650966000.960588][11186:11191] CHIP:DMG:         SuppressResponse = true,
-          [1650966000.960645][11186:11191] CHIP:DMG:         InteractionModelRevision = 1
-          [1650966000.960684][11186:11191] CHIP:DMG: }
-          [1650966000.960934][11186:11191] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 2430150170
-          [1650966000.961031][11186:11191] CHIP:TOO:   temperature display mode: 0
+          On DUT as a client side, verify that TH all-clusters-app sent  temperature display mode attribute value
+          [1658142864.203659][8868:8873] CHIP:DMG: }
+          [1658142864.203865][8868:8873] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 682086754
+          [1658142864.203966][8868:8873] CHIP:TOO:   temperature display mode: 0
+          [1658142864.204082][8868:8873] CHIP:EM: Sending Standalone Ack for MessageCounter:26677540 on exchange 12305i
 
 
 
 
-          ./chip-tool thermostatuserinterfaceconfiguration read keypad-lockout 12345 1
 
-          Verify in TH all-clusters-app Log:
+          ./chip-tool thermostatuserinterfaceconfiguration read keypad-lockout 1 1
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          [1658142905.390042][13946:13946] CHIP:IM: Received Read request
+          [1658142905.390148][13946:13946] CHIP:DMG: ReadRequestMessage =
+          [1658142905.390177][13946:13946] CHIP:DMG: {
+          [1658142905.390199][13946:13946] CHIP:DMG:         AttributePathIBs =
+          [1658142905.390225][13946:13946] CHIP:DMG:         [
+          [1658142905.390249][13946:13946] CHIP:DMG:                 AttributePathIB =
+          [1658142905.390276][13946:13946] CHIP:DMG:                 {
+          [1658142905.390304][13946:13946] CHIP:DMG:                         Endpoint = 0x1,
+          [1658142905.390335][13946:13946] CHIP:DMG:                         Cluster = 0x204,
+          [1658142905.390370][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1658142905.390400][13946:13946] CHIP:DMG:                 }
+          [1658142905.390430][13946:13946] CHIP:DMG:
+          [1658142905.390455][13946:13946] CHIP:DMG:         ],
+          [1658142905.390483][13946:13946] CHIP:DMG:
+          [1658142905.390509][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142905.390534][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658142905.390557][13946:13946] CHIP:DMG: },
+          [1658142905.390634][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658142905.390718][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
-
-          [1650966035.736227][11195:11200] CHIP:DMG: ReportDataMessage =
-          [1650966035.736277][11195:11200] CHIP:DMG: {
-          [1650966035.736317][11195:11200] CHIP:DMG:         AttributeReportIBs =
-          [1650966035.736374][11195:11200] CHIP:DMG:         [
-          [1650966035.736419][11195:11200] CHIP:DMG:                 AttributeReportIB =
-          [1650966035.736484][11195:11200] CHIP:DMG:                 {
-          [1650966035.736532][11195:11200] CHIP:DMG:                         AttributeDataIB =
-          [1650966035.736589][11195:11200] CHIP:DMG:                         {
-          [1650966035.736649][11195:11200] CHIP:DMG:                                 DataVersion = 0x90d9261a,
-          [1650966035.736708][11195:11200] CHIP:DMG:                                 AttributePathIB =
-          [1650966035.736770][11195:11200] CHIP:DMG:                                 {
-          [1650966035.736832][11195:11200] CHIP:DMG:                                         Endpoint = 0x1,
-          [1650966035.736892][11195:11200] CHIP:DMG:                                         Cluster = 0x204,
-          [1650966035.736962][11195:11200] CHIP:DMG:                                         Attribute = 0x0000_0001,
-          [1650966035.737028][11195:11200] CHIP:DMG:                                 }
-          [1650966035.737092][11195:11200] CHIP:DMG:
-          [1650966035.737155][11195:11200] CHIP:DMG:                                         Data = 0,
-          [1650966035.737216][11195:11200] CHIP:DMG:                         },
-          [1650966035.737279][11195:11200] CHIP:DMG:
-          [1650966035.737328][11195:11200] CHIP:DMG:                 },
-          [1650966035.737387][11195:11200] CHIP:DMG:
-          [1650966035.737431][11195:11200] CHIP:DMG:         ],
-          [1650966035.737486][11195:11200] CHIP:DMG:
-          [1650966035.737532][11195:11200] CHIP:DMG:         SuppressResponse = true,
-          [1650966035.737579][11195:11200] CHIP:DMG:         InteractionModelRevision = 1
-          [1650966035.737622][11195:11200] CHIP:DMG: }
-          [1650966035.737848][11195:11200] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0001 DataVersion: 2430150170
-          [1650966035.737952][11195:11200] CHIP:TOO:   keypad lockout: 0"
+          On DUT as a client side, verify that TH all-clusters-app sent  keypad lockout attribute value
+          [1658142905.393178][8876:8881] CHIP:DMG: }
+          [1658142905.393364][8876:8881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0001 DataVersion: 682086754
+          [1658142905.393454][8876:8881] CHIP:TOO:   keypad lockout: 0
+          [1658142905.393558][8876:8881] CHIP:EM: Sending Standalone Ack for MessageCounter:118574768 on exchange 20562i
       disabled: true
 
     - label:
@@ -102,88 +90,107 @@ tests:
           a manufacturer specific order"
       verification: |
           ./chip-tool thermostatuserinterfaceconfiguration read  schedule-programming-visibility  1 1
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          [1658143293.502829][13946:13946] CHIP:EM: Handling via exchange: 655r, Delegate: 0xaaaad3403ed0
+          [1658143293.502867][13946:13946] CHIP:IM: Received Read request
+          [1658143293.502943][13946:13946] CHIP:DMG: ReadRequestMessage =
+          [1658143293.502969][13946:13946] CHIP:DMG: {
+          [1658143293.503018][13946:13946] CHIP:DMG:         AttributePathIBs =
+          [1658143293.503046][13946:13946] CHIP:DMG:         [
+          [1658143293.503069][13946:13946] CHIP:DMG:                 AttributePathIB =
+          [1658143293.503097][13946:13946] CHIP:DMG:                 {
+          [1658143293.503125][13946:13946] CHIP:DMG:                         Endpoint = 0x1,
+          [1658143293.503159][13946:13946] CHIP:DMG:                         Cluster = 0x204,
+          [1658143293.503190][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1658143293.503218][13946:13946] CHIP:DMG:                 }
+          [1658143293.503248][13946:13946] CHIP:DMG:
+          [1658143293.503273][13946:13946] CHIP:DMG:         ],
+          [1658143293.503300][13946:13946] CHIP:DMG:
+          [1658143293.503326][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658143293.503351][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658143293.503374][13946:13946] CHIP:DMG: },
+          [1658143293.503450][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-          Verify in TH all-clusters-app Log:
-          [1654689278.722504][8215:8215] CHIP:DMG: ReadRequestMessage =
-          [1654689278.722531][8215:8215] CHIP:DMG: {
-          [1654689278.722552][8215:8215] CHIP:DMG:         AttributePathIBs =
-          [1654689278.722578][8215:8215] CHIP:DMG:         [
-          [1654689278.722602][8215:8215] CHIP:DMG:                 AttributePathIB =
-          [1654689278.722638][8215:8215] CHIP:DMG:                 {
-          [1654689278.722667][8215:8215] CHIP:DMG:                         Endpoint = 0x1,
-          [1654689278.722703][8215:8215] CHIP:DMG:                         Cluster = 0x204,
-          [1654689278.722739][8215:8215] CHIP:DMG:                         Attribute = 0x0000_0002,
-          [1654689278.722766][8215:8215] CHIP:DMG:                 }
-          [1654689278.722792][8215:8215] CHIP:DMG:
-          [1654689278.722814][8215:8215] CHIP:DMG:         ],
-          [1654689278.722843][8215:8215] CHIP:DMG:
-          [1654689278.722870][8215:8215] CHIP:DMG:         isFabricFiltered = true,
-          [1654689278.722895][8215:8215] CHIP:DMG:         InteractionModelRevision = 1
-          [1654689278.722919][8215:8215] CHIP:DMG: },
-          [1654689278.723033][8215:8215] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1654689278.723134][8215:8215] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          On DUT as a client side, verify that TH all-clusters-app sent  schedule programming visibility attribute value
+          [1658143293.447125][8901:8906] CHIP:DMG: }
+          [1658143293.447279][8901:8906] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0002 DataVersion: 682086754
+          [1658143293.447352][8901:8906] CHIP:TOO:   schedule programming visibility: 0
+          [1658143293.447431][8901:8906] CHIP:EM: Sending Standalone Ack for MessageCounter:142018492 on exchange 655i
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          ./chip-tool thermostatuserinterfaceconfiguration write temperature-display-mode 1  1 1
-
-          Verify in TH all-clusters-app Log:
-          [1649674212.150303][2241:2241] CHIP:DMG: WriteRequestMessage =
-          [1649674212.150341][2241:2241] CHIP:DMG: {
-          [1649674212.150375][2241:2241] CHIP:DMG:         suppressResponse = false,
-          [1649674212.150414][2241:2241] CHIP:DMG:         timedRequest = false,
-          [1649674212.150464][2241:2241] CHIP:DMG:         AttributeDataIBs =
-          [1649674212.150509][2241:2241] CHIP:DMG:         [
-          [1649674212.150558][2241:2241] CHIP:DMG:                 AttributeDataIB =
-          [1649674212.150616][2241:2241] CHIP:DMG:                 {
-          [1649674212.150656][2241:2241] CHIP:DMG:                         AttributePathIB =
-          [1649674212.150714][2241:2241] CHIP:DMG:                         {
-          [1649674212.150766][2241:2241] CHIP:DMG:                                 Endpoint = 0x1,
-          [1649674212.150830][2241:2241] CHIP:DMG:                                 Cluster = 0x204,
-          [1649674212.150893][2241:2241] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1649674212.150945][2241:2241] CHIP:DMG:                         }
-          [1649674212.151007][2241:2241] CHIP:DMG:
-          [1649674212.151057][2241:2241] CHIP:DMG:                                 Data = 1,
-          [1649674212.151114][2241:2241] CHIP:DMG:                 },
-          [1649674212.151199][2241:2241] CHIP:DMG:
-          [1649674212.151239][2241:2241] CHIP:DMG:         ],
-          [1649674212.151284][2241:2241] CHIP:DMG:
-          [1649674212.151333][2241:2241] CHIP:DMG:         moreChunkedMessages = false,
-          [1649674212.151371][2241:2241] CHIP:DMG:         InteractionModelRevision = 1
-          [1649674212.151417][2241:2241] CHIP:DMG: },
-
-
-
           ./chip-tool thermostatuserinterfaceconfiguration write keypad-lockout 1 1 1
+          verify On TH(Reference app) receives the right write Request Message for the data sent in the above command
+          [1658143515.699171][13946:13946] CHIP:DMG: WriteRequestMessage =
+          [1658143515.699197][13946:13946] CHIP:DMG: {
+          [1658143515.699221][13946:13946] CHIP:DMG:         suppressResponse = false,
+          [1658143515.699248][13946:13946] CHIP:DMG:         timedRequest = false,
+          [1658143515.699272][13946:13946] CHIP:DMG:         AttributeDataIBs =
+          [1658143515.699302][13946:13946] CHIP:DMG:         [
+          [1658143515.699326][13946:13946] CHIP:DMG:                 AttributeDataIB =
+          [1658143515.699362][13946:13946] CHIP:DMG:                 {
+          [1658143515.699388][13946:13946] CHIP:DMG:                         AttributePathIB =
+          [1658143515.699419][13946:13946] CHIP:DMG:                         {
+          [1658143515.699451][13946:13946] CHIP:DMG:                                 Endpoint = 0x1,
+          [1658143515.699484][13946:13946] CHIP:DMG:                                 Cluster = 0x204,
+          [1658143515.699514][13946:13946] CHIP:DMG:                                 Attribute = 0x0000_0001,
+          [1658143515.699544][13946:13946] CHIP:DMG:                         }
+          [1658143515.699577][13946:13946] CHIP:DMG:
+          [1658143515.699609][13946:13946] CHIP:DMG:                         Data = 1,
+          [1658143515.699638][13946:13946] CHIP:DMG:                 },
+          [1658143515.699667][13946:13946] CHIP:DMG:
+          [1658143515.699690][13946:13946] CHIP:DMG:         ],
+          [1658143515.699719][13946:13946] CHIP:DMG:
+          [1658143515.699743][13946:13946] CHIP:DMG:         moreChunkedMessages = false,
+          [1658143515.699768][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658143515.699792][13946:13946] CHIP:DMG: },
+          [1658143515.699876][13946:13946] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=m
+
+          On DUT as a client side, verify that TH all-clusters-app sent  success response
+          [1658143515.619630][8919:8924] CHIP:DMG:                         StatusIB =
+          [1658143515.619669][8919:8924] CHIP:DMG:                         {
+          [1658143515.619707][8919:8924] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658143515.619747][8919:8924] CHIP:DMG:                         },
 
 
-          Verify in TH all-clusters-app Log:
-          [1649674352.430976][2241:2241] CHIP:DMG: WriteRequestMessage =
-          [1649674352.431028][2241:2241] CHIP:DMG: {
-          [1649674352.431064][2241:2241] CHIP:DMG:         suppressResponse = false,
-          [1649674352.431116][2241:2241] CHIP:DMG:         timedRequest = false,
-          [1649674352.431153][2241:2241] CHIP:DMG:         AttributeDataIBs =
-          [1649674352.431227][2241:2241] CHIP:DMG:         [
-          [1649674352.431277][2241:2241] CHIP:DMG:                 AttributeDataIB =
-          [1649674352.431342][2241:2241] CHIP:DMG:                 {
-          [1649674352.431382][2241:2241] CHIP:DMG:                         AttributePathIB =
-          [1649674352.431440][2241:2241] CHIP:DMG:                         {
-          [1649674352.431491][2241:2241] CHIP:DMG:                                 Endpoint = 0x1,
-          [1649674352.431555][2241:2241] CHIP:DMG:                                 Cluster = 0x204,
-          [1649674352.431618][2241:2241] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1649674352.431665][2241:2241] CHIP:DMG:                         }
-          [1649674352.431728][2241:2241] CHIP:DMG:
-          [1649674352.431778][2241:2241] CHIP:DMG:                                 Data = 1,
-          [1649674352.431823][2241:2241] CHIP:DMG:                 },
-          [1649674352.431883][2241:2241] CHIP:DMG:
-          [1649674352.431919][2241:2241] CHIP:DMG:         ],
-          [1649674352.431975][2241:2241] CHIP:DMG:
-          [1649674352.432012][2241:2241] CHIP:DMG:         moreChunkedMessages = false,
-          [1649674352.432062][2241:2241] CHIP:DMG:         InteractionModelRevision = 1
-          [1649674352.432097][2241:2241] CHIP:DMG: },
+
+
+           ./chip-tool thermostatuserinterfaceconfiguration write keypad-lockout 1  1 1
+          verify On TH(Reference app) receives the right write Request Message for the data sent in the above command
+          [1658143708.436060][13946:13946] CHIP:DMG: WriteRequestMessage =
+          [1658143708.436090][13946:13946] CHIP:DMG: {
+          [1658143708.436115][13946:13946] CHIP:DMG:         suppressResponse = false,
+          [1658143708.436148][13946:13946] CHIP:DMG:         timedRequest = false,
+          [1658143708.436176][13946:13946] CHIP:DMG:         AttributeDataIBs =
+          [1658143708.436210][13946:13946] CHIP:DMG:         [
+          [1658143708.436238][13946:13946] CHIP:DMG:                 AttributeDataIB =
+          [1658143708.436269][13946:13946] CHIP:DMG:                 {
+          [1658143708.436295][13946:13946] CHIP:DMG:                         AttributePathIB =
+          [1658143708.436330][13946:13946] CHIP:DMG:                         {
+          [1658143708.436368][13946:13946] CHIP:DMG:                                 Endpoint = 0x1,
+          [1658143708.436406][13946:13946] CHIP:DMG:                                 Cluster = 0x204,
+          [1658143708.436444][13946:13946] CHIP:DMG:                                 Attribute = 0x0000_0001,
+          [1658143708.436483][13946:13946] CHIP:DMG:                         }
+          [1658143708.436520][13946:13946] CHIP:DMG:
+          [1658143708.436561][13946:13946] CHIP:DMG:                         Data = 1,
+          [1658143708.436592][13946:13946] CHIP:DMG:                 },
+          [1658143708.436627][13946:13946] CHIP:DMG:
+          [1658143708.436654][13946:13946] CHIP:DMG:         ],
+          [1658143708.436686][13946:13946] CHIP:DMG:
+          [1658143708.436714][13946:13946] CHIP:DMG:         moreChunkedMessages = false,
+          [1658143708.436743][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658143708.436770][13946:13946] CHIP:DMG: },
+          [1658143708.436862][13946:13946] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=m
+          [1658143708.436903][13946:13946] CHIP:DMG: AccessControl: allowed
+
+          On DUT as a client side, verify that TH all-clusters-app sent  success response
+          [1658143708.341102][8933:8938] CHIP:DMG:                         StatusIB =
+          [1658143708.341156][8933:8938] CHIP:DMG:                         {
+          [1658143708.341211][8933:8938] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658143708.341257][8933:8938] CHIP:DMG:                         },
       disabled: true
 
     - label:
@@ -191,20 +198,40 @@ tests:
           the TH one at a time in a manufacturer specific order"
       verification: |
           ./chip-tool thermostatuserinterfaceconfiguration write schedule-programming-visibility 1 1 1
+          verify On TH(Reference app) receives the right write Request Message for the data sent in the above command
+          [1658143828.619738][13946:13946] CHIP:DMG: WriteRequestMessage =
+          [1658143828.619764][13946:13946] CHIP:DMG: {
+          [1658143828.619787][13946:13946] CHIP:DMG:         suppressResponse = false,
+          [1658143828.619814][13946:13946] CHIP:DMG:         timedRequest = false,
+          [1658143828.619838][13946:13946] CHIP:DMG:         AttributeDataIBs =
+          [1658143828.619867][13946:13946] CHIP:DMG:         [
+          [1658143828.619891][13946:13946] CHIP:DMG:                 AttributeDataIB =
+          [1658143828.619919][13946:13946] CHIP:DMG:                 {
+          [1658143828.619944][13946:13946] CHIP:DMG:                         AttributePathIB =
+          [1658143828.619980][13946:13946] CHIP:DMG:                         {
+          [1658143828.620011][13946:13946] CHIP:DMG:                                 Endpoint = 0x1,
+          [1658143828.620045][13946:13946] CHIP:DMG:                                 Cluster = 0x204,
+          [1658143828.620078][13946:13946] CHIP:DMG:                                 Attribute = 0x0000_0002,
+          [1658143828.620108][13946:13946] CHIP:DMG:                         }
+          [1658143828.620140][13946:13946] CHIP:DMG:
+          [1658143828.620172][13946:13946] CHIP:DMG:                         Data = 1,
+          [1658143828.620200][13946:13946] CHIP:DMG:                 },
+          [1658143828.620228][13946:13946] CHIP:DMG:
+          [1658143828.620252][13946:13946] CHIP:DMG:         ],
+          [1658143828.620280][13946:13946] CHIP:DMG:
+          [1658143828.620305][13946:13946] CHIP:DMG:         moreChunkedMessages = false,
+          [1658143828.620330][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658143828.620353][13946:13946] CHIP:DMG: },
+          [1658143828.620434][13946:13946] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=m
 
 
-          Verify in TH all-clusters-app Log:
-          [1649673609.998586][2338:2344] CHIP:DMG:                         AttributePathIB =
-          [1649673609.998644][2338:2344] CHIP:DMG:                         {
-          [1649673609.998690][2338:2344] CHIP:DMG:                                 Endpoint = 0x1,
-          [1649673609.998748][2338:2344] CHIP:DMG:                                 Cluster = 0x204,
-          [1649673609.998805][2338:2344] CHIP:DMG:                                 Attribute = 0x0000_0002,
-          [1649673609.998844][2338:2344] CHIP:DMG:                         }
-          [1649673609.998902][2338:2344] CHIP:DMG:
-          [1649673609.998945][2338:2344] CHIP:DMG:                         StatusIB =
-          [1649673609.999000][2338:2344] CHIP:DMG:                         {
-          [1649673609.999057][2338:2344] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1649673609.999101][2338:2344] CHIP:DMG:                         },
+          On DUT as a client side, verify that TH all-clusters-app sent  success response
+          [1658143828.519585][8944:8949] CHIP:DMG:
+          [1658143828.519632][8944:8949] CHIP:DMG:                         StatusIB =
+          [1658143828.519683][8944:8949] CHIP:DMG:                         {
+          [1658143828.519734][8944:8949] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658143828.519784][8944:8949] CHIP:DMG:                         },
+          [1658143828.519834][8944:8949] CHIP:DMG:
       disabled: true
 
     - label:
@@ -213,73 +240,64 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          ./chip-tool thermostatuserinterfaceconfiguration read attribute-list  1 1
+          ./chip-tool thermostatuserinterfaceconfiguration read temperature-display-mode 1 1
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          [1658142864.198892][13946:13946] CHIP:IM: Received Read request
+          [1658142864.198979][13946:13946] CHIP:DMG: ReadRequestMessage =
+          [1658142864.199008][13946:13946] CHIP:DMG: {
+          [1658142864.199032][13946:13946] CHIP:DMG:         AttributePathIBs =
+          [1658142864.199059][13946:13946] CHIP:DMG:         [
+          [1658142864.199085][13946:13946] CHIP:DMG:                 AttributePathIB =
+          [1658142864.199114][13946:13946] CHIP:DMG:                 {
+          [1658142864.199144][13946:13946] CHIP:DMG:                         Endpoint = 0x1,
+          [1658142864.199181][13946:13946] CHIP:DMG:                         Cluster = 0x204,
+          [1658142864.199221][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1658142864.199253][13946:13946] CHIP:DMG:                 }
+          [1658142864.199284][13946:13946] CHIP:DMG:
+          [1658142864.199311][13946:13946] CHIP:DMG:         ],
+          [1658142864.199341][13946:13946] CHIP:DMG:
+          [1658142864.199369][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142864.199396][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658142864.199421][13946:13946] CHIP:DMG: },
+          [1658142864.199502][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+          On DUT as a client side, verify that TH all-clusters-app sent  temperature display mode attribute value
+          [1658142864.203659][8868:8873] CHIP:DMG: }
+          [1658142864.203865][8868:8873] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 682086754
+          [1658142864.203966][8868:8873] CHIP:TOO:   temperature display mode: 0
+          [1658142864.204082][8868:8873] CHIP:EM: Sending Standalone Ack for MessageCounter:26677540 on exchange 12305i
 
 
-          Verify in TH all-clusters-minimal-app Log:
-          [1654248197885] [91899:4015040] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_FFFB DataVersion: 2039959817
-          [1654248197885] [91899:4015040] CHIP: [TOO]   AttributeList: 7 entries
-          [1654248197885] [91899:4015040] CHIP: [TOO]     [1]: 0
-          [1654248197885] [91899:4015040] CHIP: [TOO]     [2]: 1
-          [1654248197885] [91899:4015040] CHIP: [TOO]     [3]: 65528
-          [1654248197885] [91899:4015040] CHIP: [TOO]     [4]: 65529
-          [1654248197885] [91899:4015040] CHIP: [TOO]     [5]: 65531
-          [1654248197885] [91899:4015040] CHIP: [TOO]     [6]: 65532
-          [1654248197885] [91899:4015040] CHIP: [TOO]     [7]: 65533
 
 
-           ./chip-tool thermostatuserinterfaceconfiguration write temperature-display-mode 1  1 1
-          Verify in TH all-clusters-minimal-app Log:
-          [1649674212.150303][2241:2241] CHIP:DMG: WriteRequestMessage =
-          [1649674212.150341][2241:2241] CHIP:DMG: {
-          [1649674212.150375][2241:2241] CHIP:DMG:         suppressResponse = false,
-          [1649674212.150414][2241:2241] CHIP:DMG:         timedRequest = false,
-          [1649674212.150464][2241:2241] CHIP:DMG:         AttributeDataIBs =
-          [1649674212.150509][2241:2241] CHIP:DMG:         [
-          [1649674212.150558][2241:2241] CHIP:DMG:                 AttributeDataIB =
-          [1649674212.150616][2241:2241] CHIP:DMG:                 {
-          [1649674212.150656][2241:2241] CHIP:DMG:                         AttributePathIB =
-          [1649674212.150714][2241:2241] CHIP:DMG:                         {
-          [1649674212.150766][2241:2241] CHIP:DMG:                                 Endpoint = 0x1,
-          [1649674212.150830][2241:2241] CHIP:DMG:                                 Cluster = 0x204,
-          [1649674212.150893][2241:2241] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1649674212.150945][2241:2241] CHIP:DMG:                         }
-          [1649674212.151007][2241:2241] CHIP:DMG:
-          [1649674212.151057][2241:2241] CHIP:DMG:                                 Data = 1,
-          [1649674212.151114][2241:2241] CHIP:DMG:                 },
-          [1649674212.151199][2241:2241] CHIP:DMG:
-          [1649674212.151239][2241:2241] CHIP:DMG:         ],
-          [1649674212.151284][2241:2241] CHIP:DMG:
-          [1649674212.151333][2241:2241] CHIP:DMG:         moreChunkedMessages = false,
-          [1649674212.151371][2241:2241] CHIP:DMG:         InteractionModelRevision = 1
-          [1649674212.151417][2241:2241] CHIP:DMG: },
 
+          ./chip-tool thermostatuserinterfaceconfiguration read keypad-lockout 1 1
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          [1658142905.390042][13946:13946] CHIP:IM: Received Read request
+          [1658142905.390148][13946:13946] CHIP:DMG: ReadRequestMessage =
+          [1658142905.390177][13946:13946] CHIP:DMG: {
+          [1658142905.390199][13946:13946] CHIP:DMG:         AttributePathIBs =
+          [1658142905.390225][13946:13946] CHIP:DMG:         [
+          [1658142905.390249][13946:13946] CHIP:DMG:                 AttributePathIB =
+          [1658142905.390276][13946:13946] CHIP:DMG:                 {
+          [1658142905.390304][13946:13946] CHIP:DMG:                         Endpoint = 0x1,
+          [1658142905.390335][13946:13946] CHIP:DMG:                         Cluster = 0x204,
+          [1658142905.390370][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1658142905.390400][13946:13946] CHIP:DMG:                 }
+          [1658142905.390430][13946:13946] CHIP:DMG:
+          [1658142905.390455][13946:13946] CHIP:DMG:         ],
+          [1658142905.390483][13946:13946] CHIP:DMG:
+          [1658142905.390509][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142905.390534][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658142905.390557][13946:13946] CHIP:DMG: },
+          [1658142905.390634][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658142905.390718][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
-          ./chip-tool thermostatuserinterfaceconfiguration write keypad-lockout 1 1 1
-          Verify in TH all-clusters-minimal-app Log:
-          [1649674352.430976][2241:2241] CHIP:DMG: WriteRequestMessage =
-          [1649674352.431028][2241:2241] CHIP:DMG: {
-          [1649674352.431064][2241:2241] CHIP:DMG:         suppressResponse = false,
-          [1649674352.431116][2241:2241] CHIP:DMG:         timedRequest = false,
-          [1649674352.431153][2241:2241] CHIP:DMG:         AttributeDataIBs =
-          [1649674352.431227][2241:2241] CHIP:DMG:         [
-          [1649674352.431277][2241:2241] CHIP:DMG:                 AttributeDataIB =
-          [1649674352.431342][2241:2241] CHIP:DMG:                 {
-          [1649674352.431382][2241:2241] CHIP:DMG:                         AttributePathIB =
-          [1649674352.431440][2241:2241] CHIP:DMG:                         {
-          [1649674352.431491][2241:2241] CHIP:DMG:                                 Endpoint = 0x1,
-          [1649674352.431555][2241:2241] CHIP:DMG:                                 Cluster = 0x204,
-          [1649674352.431618][2241:2241] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1649674352.431665][2241:2241] CHIP:DMG:                         }
-          [1649674352.431728][2241:2241] CHIP:DMG:
-          [1649674352.431778][2241:2241] CHIP:DMG:                                 Data = 1,
-          [1649674352.431823][2241:2241] CHIP:DMG:                 },
-          [1649674352.431883][2241:2241] CHIP:DMG:
-          [1649674352.431919][2241:2241] CHIP:DMG:         ],
-          [1649674352.431975][2241:2241] CHIP:DMG:
-          [1649674352.432012][2241:2241] CHIP:DMG:         moreChunkedMessages = false,
-          [1649674352.432062][2241:2241] CHIP:DMG:         InteractionModelRevision = 1
-          [1649674352.432097][2241:2241] CHIP:DMG: },"
+          On DUT as a client side, verify that TH all-clusters-app sent  keypad lockout attribute value
+          [1658142905.393178][8876:8881] CHIP:DMG: }
+          [1658142905.393364][8876:8881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0001 DataVersion: 682086754
+          [1658142905.393454][8876:8881] CHIP:TOO:   keypad lockout: 0
+          [1658142905.393558][8876:8881] CHIP:EM: Sending Standalone Ack for MessageCounter:118574768 on exchange 20562i
       disabled: true
 
     - label:
@@ -288,6 +306,7 @@ tests:
       verification: |
           ./chip-tool thermostatuserinterfaceconfiguration read  schedule-programming-visibility  1 1
 
+          On DUT as a client side, verify that TH all-clusters-app sent  UNSUPPORTED_ATTRIBUTE response
            General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
@@ -296,6 +315,6 @@ tests:
           the TH one at a time in a manufacturer specific order"
       verification: |
           ./chip-tool thermostatuserinterfaceconfiguration write schedule-programming-visibility 1 1 1
-
+          On DUT as a client side, verify that TH all-clusters-app sent  UNSUPPORTED_ATTRIBUTE response
            General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true

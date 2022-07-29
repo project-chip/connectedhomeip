@@ -23,6 +23,7 @@
  */
 
 #include "lib/support/CHIPMem.h"
+#include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -41,9 +42,8 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
-#include <protocols/interaction_model/Constants.h>
-
 #include <nlunit-test.h>
+#include <protocols/interaction_model/Constants.h>
 
 #include <type_traits>
 
@@ -299,7 +299,6 @@ public:
     static void TestReadRoundtripWithNoMatchPathDataVersionFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadRoundtripWithSameDifferentPathsDataVersionFilter(nlTestSuite * apSuite, void * apContext);
-    static void TestReadRoundtripWithEventStatusIBInEventReport(nlTestSuite * apSuite, void * apContext);
     static void TestReadWildcard(nlTestSuite * apSuite, void * apContext);
     static void TestReadChunking(nlTestSuite * apSuite, void * apContext);
     static void TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * apContext);
@@ -1043,84 +1042,6 @@ void TestReadInteraction::TestReadRoundtripWithSameDifferentPathsDataVersionFilt
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
 
         delegate.mNumAttributeResponse = 0;
-    }
-
-    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
-    engine->Shutdown();
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
-}
-
-void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTestSuite * apSuite, void * apContext)
-{
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-    // Shouldn't have anything in the retransmit table when starting the test.
-    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
-
-    GenerateEvents(apSuite, apContext);
-
-    auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    // When reading events with concrete paths without enough privilege, we will get a EventStatusIB
-    {
-        chip::app::EventPathParams eventPathParams[1];
-        eventPathParams[0].mEndpointId = kTestEndpointId;
-        eventPathParams[0].mClusterId  = kTestClusterId;
-        eventPathParams[0].mEventId    = kTestEventIdDebug;
-
-        ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-        readPrepareParams.mpEventPathParamsList    = eventPathParams;
-        readPrepareParams.mEventPathParamsListSize = 1;
-        readPrepareParams.mEventNumber.SetValue(1);
-
-        MockInteractionModelApp delegate;
-        NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
-
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
-                                   chip::app::ReadClient::InteractionType::Read);
-
-        err = readClient.SendRequest(readPrepareParams);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        ctx.DrainAndServiceIO();
-
-        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
-        NL_TEST_ASSERT(apSuite, delegate.mNumReadEventFailureStatusReceived > 0);
-        NL_TEST_ASSERT(apSuite, delegate.mLastStatusReceived.mStatus == Protocols::InteractionModel::Status::UnsupportedAccess);
-        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
-    }
-
-    GenerateEvents(apSuite, apContext);
-
-    // When reading events with withcard paths without enough privilege for reading one or more event, we will exclude the events
-    // when generating the report.
-    {
-        chip::app::EventPathParams eventPathParams[1];
-        eventPathParams[0].mEndpointId = kTestEndpointId;
-        eventPathParams[0].mClusterId  = kTestClusterId;
-
-        ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-        readPrepareParams.mpEventPathParamsList    = eventPathParams;
-        readPrepareParams.mEventPathParamsListSize = 1;
-        readPrepareParams.mEventNumber.SetValue(1);
-
-        MockInteractionModelApp delegate;
-        NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
-
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
-                                   chip::app::ReadClient::InteractionType::Read);
-
-        err = readClient.SendRequest(readPrepareParams);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        ctx.DrainAndServiceIO();
-        NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
-        NL_TEST_ASSERT(apSuite, delegate.mNumReadEventFailureStatusReceived == 0);
-        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
     }
 
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
@@ -2736,9 +2657,6 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadRoundtripWithNoMatchPathDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithNoMatchPathDataVersionFilter),
     NL_TEST_DEF("TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter),
     NL_TEST_DEF("TestReadRoundtripWithSameDifferentPathsDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithSameDifferentPathsDataVersionFilter),
-    // TODO(#10253): In unit tests, the access control delegate will always pass, in this case, we will never get a StatusIB for
-    // UnsupportedAccess status code, the test below can be re-enabled after we have a better access control function in unit tests.
-    // NL_TEST_DEF("TestReadRoundtripWithEventStatusIBInEventReport", chip::app::TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport),
     NL_TEST_DEF("TestReadWildcard", chip::app::TestReadInteraction::TestReadWildcard),
     NL_TEST_DEF("TestReadChunking", chip::app::TestReadInteraction::TestReadChunking),
     NL_TEST_DEF("TestSetDirtyBetweenChunks", chip::app::TestReadInteraction::TestSetDirtyBetweenChunks),

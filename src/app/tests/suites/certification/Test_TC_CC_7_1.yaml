@@ -19,6 +19,21 @@ config:
     cluster: "Color Control"
     endpoint: 1
     timeout: 150
+    EnhancedHueConfigValue:
+        type: int16u
+        defaultValue: 1025
+    EnhancedHueShortestDistanceConfigValue:
+        type: int16u
+        defaultValue: 1050
+    EnhancedHueLongestDistanceConfigValue:
+        type: int16u
+        defaultValue: 1200
+    EnhancedHueDirectionUpConfigValue:
+        type: int16u
+        defaultValue: 1300
+    EnhancedHueDirectionDownConfigValue:
+        type: int16u
+        defaultValue: 1100
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -40,13 +55,20 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F01 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "TH sends EnhancedMoveToHue command to DUT"
       PICS: CC.S.F01 && CC.S.C40.Rsp
       command: "EnhancedMoveToHue"
       arguments:
           values:
               - name: "EnhancedHue"
-                value: 1025
+                value: EnhancedHueConfigValue
               - name: "Direction"
                 value: 0
               - name: "TransitionTime"
@@ -57,12 +79,13 @@ tests:
                 value: 0
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
+          value: EnhancedHueConfigValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -72,7 +95,7 @@ tests:
       arguments:
           values:
               - name: "EnhancedHue"
-                value: 1100
+                value: EnhancedHueShortestDistanceConfigValue
               - name: "Direction"
                 value: 0
               - name: "TransitionTime"
@@ -91,12 +114,12 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -109,12 +132,12 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -127,13 +150,13 @@ tests:
                 value: 20000
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
-          value: 1100
+          value: EnhancedHueShortestDistanceConfigValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -143,7 +166,7 @@ tests:
       arguments:
           values:
               - name: "EnhancedHue"
-                value: 1150
+                value: EnhancedHueLongestDistanceConfigValue
               - name: "Direction"
                 value: 1
               - name: "TransitionTime"
@@ -162,12 +185,12 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -180,12 +203,12 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -198,13 +221,13 @@ tests:
                 value: 20000
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
-          value: 1150
+          value: EnhancedHueLongestDistanceConfigValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -214,7 +237,7 @@ tests:
       arguments:
           values:
               - name: "EnhancedHue"
-                value: 1200
+                value: EnhancedHueDirectionUpConfigValue
               - name: "Direction"
                 value: 2
               - name: "TransitionTime"
@@ -233,12 +256,12 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -251,12 +274,12 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -269,13 +292,13 @@ tests:
                 value: 20000
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
-          value: 1200
+          value: EnhancedHueDirectionUpConfigValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -285,7 +308,7 @@ tests:
       arguments:
           values:
               - name: "EnhancedHue"
-                value: 1300
+                value: EnhancedHueDirectionDownConfigValue
               - name: "Direction"
                 value: 3
               - name: "TransitionTime"
@@ -304,12 +327,12 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -322,12 +345,12 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -340,13 +363,13 @@ tests:
                 value: 20000
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
-          value: 1300
+          value: EnhancedHueDirectionDownConfigValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 

@@ -298,12 +298,9 @@ ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controlle
                                                                  uint16_t * outPort)
 {
     Inet::IPAddress address;
-    ReturnErrorOnFailure(
-        devCtrl
-            ->GetPeerAddressAndPort(PeerId().SetCompressedFabricId(devCtrl->GetCompressedFabricId()).SetNodeId(nodeId), address,
-                                    *outPort)
-            .AsInteger());
-    VerifyOrReturnError(address.ToString(outAddress, maxAddressLen), CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger());
+    ReturnErrorOnFailure(devCtrl->GetPeerAddressAndPort(nodeId, address, *outPort).AsInteger());
+    VerifyOrReturnError(address.ToString(outAddress, static_cast<uint32_t>(maxAddressLen)),
+                        CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger());
 
     return CHIP_NO_ERROR.AsInteger();
 }
@@ -621,7 +618,7 @@ struct GetDeviceCallbacks
         delete self;
     }
 
-    static void OnConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
+    static void OnConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
     {
         auto * self = static_cast<GetDeviceCallbacks *>(context);
         self->mCallback(nullptr, error.AsInteger());

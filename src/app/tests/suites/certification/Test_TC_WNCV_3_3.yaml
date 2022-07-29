@@ -71,7 +71,7 @@ tests:
       maxInterval: 5
       response:
           constraints:
-              type: map8
+              type: bitmap8
 
     ### MANDATORY Command
     - label: "2a: TH sends a StopMotion command to DUT"

@@ -37,26 +37,35 @@ A prototype application that demonstrates OTA Requestor capabilities.
 
 ## Testing the Example Application
 
-Launch the linux [ota-provider-app](../../ota-provider-app/linux) and provide
-the SW_IMAGE_FILE
+1.  Commission Ameba (ota-requestor-app) using chip-tool
 
-    $ ./chip-ota-provider-app -f ${SW_IMAGE_FILE}
+          $ ./chip-tool pairing ble-wifi 1 <SSID> <PASSWORD> 20202021 3840
 
-Commission the ota-provider-app using
-[chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
+2.  Launch the linux [ota-provider-app](../../ota-provider-app/linux) and
+    provide the SW_IMAGE_FILE
 
-    $ ./chip-tool pairing onnetwork 1 20202021
+              $ ./chip-ota-provider-app -f ${SW_IMAGE_FILE}
 
-Input `ATS$` command to start the CHIP ota-requestor task, then use chip-tool to
-commission it
+3.  Commission the ota-provider-app using
+    [chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
 
-    $ ./chip-tool pairing ble-wifi 2 <SSID> <PASSWORD> 20202021 3840
+              $ ./chip-tool pairing onnetwork 2 20202021
 
-After commissioning the ota-requestor, use the chip-tool to announce the
-ota-provider-app to start the OTA process
+4.  Write the Default OTA providers into Ameba
 
-    $ ./chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+          $ ./chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 2, "endpoint": 0}]' 1 0
 
-The OTA process should include downloading the image, verification of image
-header, erasing upgraded flash partition, writing to flash and checksum
-verification
+5.  Configure the ACL of the ota-provider-app to allow access for Ameba
+
+          $ ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 1235 0
+
+6.  Use the chip-tool to announce the ota-provider-app to start the OTA process
+
+          $ ./chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+
+7.  The OTA process should include downloading the image, verification of image
+    header, erasing upgraded flash partition, writing to flash and checksum
+    verification.
+
+8) Once OTA signature is updated, Ameba will reboot into the new image after 10
+   seconds countdown.

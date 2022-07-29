@@ -24,12 +24,11 @@
  *    messages to and from the corresponding CHIP devices.
  */
 
-#include "OperationalDeviceProxy.h"
+#include <app/OperationalDeviceProxy.h>
 
-#include "CASEClient.h"
-#include "CommandSender.h"
-#include "ReadPrepareParams.h"
-#include "transport/SecureSession.h"
+#include <app/CASEClient.h>
+#include <app/InteractionModelEngine.h>
+#include <transport/SecureSession.h>
 
 #include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPCore.h>
@@ -50,8 +49,8 @@ void OperationalDeviceProxy::MoveToState(State aTargetState)
 {
     if (mState != aTargetState)
     {
-        ChipLogDetail(Controller, "OperationalDeviceProxy[" ChipLogFormatX64 ":" ChipLogFormatX64 "]: State change %d --> %d",
-                      ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()), to_underlying(mState),
+        ChipLogDetail(Controller, "OperationalDeviceProxy[%u:" ChipLogFormatX64 "]: State change %d --> %d",
+                      mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()), to_underlying(mState),
                       to_underlying(aTargetState));
         mState = aTargetState;
 
@@ -66,14 +65,14 @@ bool OperationalDeviceProxy::AttachToExistingSecureSession()
 {
     VerifyOrReturnError(mState == State::NeedsAddress || mState == State::ResolvingAddress || mState == State::HasAddress, false);
 
-    ScopedNodeId peerNodeId(mPeerId.GetNodeId(), mFabricIndex);
     auto sessionHandle =
-        mInitParams.sessionManager->FindSecureSessionForNode(peerNodeId, MakeOptional(Transport::SecureSession::Type::kCASE));
+        mInitParams.sessionManager->FindSecureSessionForNode(mPeerId, MakeOptional(Transport::SecureSession::Type::kCASE));
     if (!sessionHandle.HasValue())
         return false;
 
-    ChipLogProgress(Controller, "Found an existing secure session to [" ChipLogFormatX64 "-" ChipLogFormatX64 "]!",
-                    ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
+    ChipLogProgress(Controller, "Found an existing secure session to [%u:" ChipLogFormatX64 "]!", mPeerId.GetFabricIndex(),
+                    ChipLogValueX64(mPeerId.GetNodeId()));
+
     mDeviceAddress = sessionHandle.Value()->AsSecureSession()->GetPeerAddress();
     if (!mSecureSession.Grab(sessionHandle.Value()))
         return false;
@@ -169,7 +168,8 @@ void OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & add
     char peerAddrBuff[Transport::PeerAddress::kMaxToStringSize];
     addr.ToString(peerAddrBuff);
 
-    ChipLogDetail(Controller, "Updating device address to %s while in state %d", peerAddrBuff, static_cast<int>(mState));
+    ChipLogDetail(Discovery, "OperationalDeviceProxy[%u:" ChipLogFormatX64 "]: Updating device address to %s while in state %d",
+                  mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()), peerAddrBuff, static_cast<int>(mState));
 #endif
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -212,7 +212,7 @@ CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
 {
     mCASEClient = mInitParams.clientPool->Allocate(CASEClientInitParams{
         mInitParams.sessionManager, mInitParams.sessionResumptionStorage, mInitParams.certificateValidityPolicy,
-        mInitParams.exchangeMgr, mFabricTable, mFabricIndex, mInitParams.groupDataProvider, mInitParams.mrpLocalConfig });
+        mInitParams.exchangeMgr, mFabricTable, mInitParams.groupDataProvider, mInitParams.mrpLocalConfig });
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err = mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mRemoteMRPConfig, this);
@@ -359,14 +359,17 @@ void OperationalDeviceProxy::OnSessionHang()
 
 void OperationalDeviceProxy::ShutdownSubscriptions()
 {
-    app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricIndex, GetDeviceId());
+    app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mPeerId.GetFabricIndex(), GetDeviceId());
 }
 
 OperationalDeviceProxy::~OperationalDeviceProxy()
 {
     if (mAddressLookupHandle.IsActive())
     {
-        ChipLogProgress(Discovery, "Cancelling incomplete address resolution as device is being deleted.");
+        ChipLogDetail(Discovery,
+                      "OperationalDeviceProxy[%u:" ChipLogFormatX64
+                      "]: Cancelling incomplete address resolution as device is being deleted.",
+                      mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()));
 
         // Skip cancel callback since the destructor is being called, so we assume that this object is
         // obviously not used anymore
@@ -391,11 +394,19 @@ CHIP_ERROR OperationalDeviceProxy::LookupPeerAddress()
     // MoveToState calls in this method.
     if (mAddressLookupHandle.IsActive())
     {
-        ChipLogProgress(Discovery, "Operational node lookup already in progress. Will NOT start a new one.");
+        ChipLogProgress(Discovery,
+                        "OperationalDeviceProxy[%u:" ChipLogFormatX64
+                        "]: Operational node lookup already in progress. Will NOT start a new one.",
+                        mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()));
         return CHIP_NO_ERROR;
     }
 
-    NodeLookupRequest request(mPeerId);
+    auto const * fabricInfo = mFabricTable->FindFabricWithIndex(mPeerId.GetFabricIndex());
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    PeerId peerId(fabricInfo->GetCompressedFabricId(), mPeerId.GetNodeId());
+
+    NodeLookupRequest request(peerId);
 
     return Resolver::Instance().LookupNode(request, mAddressLookupHandle);
 }
@@ -407,8 +418,8 @@ void OperationalDeviceProxy::OnNodeAddressResolved(const PeerId & peerId, const 
 
 void OperationalDeviceProxy::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason)
 {
-    ChipLogError(Discovery, "Operational discovery failed for 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
-                 ChipLogValueX64(peerId.GetNodeId()), reason.Format());
+    ChipLogError(Discovery, "OperationalDeviceProxy[%u:" ChipLogFormatX64 "]: operational discovery failed: %" CHIP_ERROR_FORMAT,
+                 mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()), reason.Format());
 
     if (IsResolvingAddress())
     {

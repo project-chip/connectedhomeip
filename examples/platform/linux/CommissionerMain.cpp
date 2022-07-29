@@ -234,7 +234,7 @@ public:
 private:
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
-    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
@@ -333,7 +333,7 @@ void PairingCommand::OnDeviceConnectedFn(void * context, chip::OperationalDevice
     }
 }
 
-void PairingCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
+void PairingCommand::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
 {
     ChipLogProgress(Controller, "OnDeviceConnectionFailureFn - attempt to get OperationalDeviceProxy failed");
     CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();

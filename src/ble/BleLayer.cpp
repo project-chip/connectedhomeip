@@ -371,7 +371,7 @@ CHIP_ERROR BleLayer::CancelBleIncompleteConnection()
     return err;
 }
 
-CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(uint16_t connDiscriminator, void * appState,
+CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState,
                                                      BleConnectionDelegate::OnConnectionCompleteFunct onSuccess,
                                                      BleConnectionDelegate::OnConnectionErrorFunct onError)
 {

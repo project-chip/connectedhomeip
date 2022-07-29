@@ -41,6 +41,13 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F04 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
       PICS: CC.S.F04 && CC.S.A400b
       command: "readAttribute"
@@ -48,7 +55,7 @@ tests:
       response:
           saveAs: ColorTempPhysicalMinMiredsValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -59,7 +66,7 @@ tests:
       response:
           saveAs: ColorTempPhysicalMaxMiredsValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -69,7 +76,7 @@ tests:
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -79,7 +86,7 @@ tests:
       arguments:
           values:
               - name: "colorTemperature"
-                value: 100
+                value: ColorTempPhysicalMaxMiredsValue
               - name: "TransitionTime"
                 value: 10
               - name: "OptionsMask"
@@ -100,9 +107,9 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
-          value: 100
+          value: ColorTempPhysicalMaxMiredsValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 

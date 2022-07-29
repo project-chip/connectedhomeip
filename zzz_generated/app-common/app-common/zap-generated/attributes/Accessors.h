@@ -1745,8 +1745,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace CommissionedFabrics
 
 namespace CurrentFabricIndex {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::FabricIndex * value); // fabric_idx
-EmberAfStatus Set(chip::EndpointId endpoint, chip::FabricIndex value);
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace CurrentFabricIndex
 
 namespace FeatureMap {
@@ -2706,7 +2706,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace SetpointChangeAmount
 
 namespace SetpointChangeSourceTimestamp {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // epoch_s
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // utc
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace SetpointChangeSourceTimestamp
 
@@ -3866,8 +3866,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace VendorName
 
 namespace VendorID {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::VendorId * value); // vendor_id
+EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value);
 } // namespace VendorID
 
 namespace ApplicationName {

@@ -212,5 +212,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     wiced_hal_wdog_reset_system();
 }
 
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

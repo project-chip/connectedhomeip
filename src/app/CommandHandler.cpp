@@ -40,7 +40,7 @@
 namespace chip {
 namespace app {
 
-CommandHandler::CommandHandler(Callback * apCallback) : mpCallback(apCallback), mSuppressResponse(false) {}
+CommandHandler::CommandHandler(Callback * apCallback) : mExchangeCtx(*this), mpCallback(apCallback), mSuppressResponse(false) {}
 
 CHIP_ERROR CommandHandler::AllocateBuffer()
 {
@@ -73,7 +73,7 @@ CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * e
 
     // NOTE: we already know this is an InvokeCommand Request message because we explicitly registered with the
     // Exchange Manager for unsolicited InvokeCommand Requests.
-    mpExchangeCtx = ec;
+    mExchangeCtx.Grab(ec);
 
     // Use the RAII feature, if this is the only Handle when this function returns, DecrementHoldOff will trigger sending response.
     // TODO: This is broken!  If something under here returns error, we will try
@@ -81,7 +81,7 @@ CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * e
     // response too.  Figure out at what point it's our responsibility to
     // handler errors vs our caller's.
     Handle workHandle(this);
-    mpExchangeCtx->WillSendMessage();
+    mExchangeCtx->WillSendMessage();
     ReturnErrorOnFailure(ProcessInvokeRequest(std::move(payload), isTimedInvoke));
 
     return CHIP_NO_ERROR;
@@ -103,26 +103,19 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     ReturnErrorOnFailure(invokeRequestMessage.GetTimedRequest(&mTimedRequest));
     ReturnErrorOnFailure(invokeRequestMessage.GetInvokeRequests(&invokeRequests));
 
-    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
 
     if (mTimedRequest != isTimedInvoke)
     {
         // The message thinks it should be part of a timed interaction but it's
         // not, or vice versa.  Spec says to Respond with UNSUPPORTED_ACCESS.
-        err = StatusResponse::Send(Protocols::InteractionModel::Status::UnsupportedAccess, mpExchangeCtx,
+        err = StatusResponse::Send(Protocols::InteractionModel::Status::UnsupportedAccess, mExchangeCtx.Get(),
                                    /* aExpectResponse = */ false);
-
-        if (err != CHIP_NO_ERROR)
+        if (err == CHIP_NO_ERROR)
         {
-            // We have to manually close the exchange, because we called
-            // WillSendMessage already.
-            mpExchangeCtx->Close();
+            mSentStatusResponse = true;
         }
 
-        // Null out the (now-closed) exchange, so that when we try to
-        // SendCommandResponse() later (when our holdoff count drops to 0) it
-        // just fails and we don't double-respond.
-        mpExchangeCtx = nullptr;
         return err;
     }
 
@@ -142,7 +135,7 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
         CommandDataIB::Parser commandData;
         ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
 
-        if (mpExchangeCtx->IsGroupExchangeContext())
+        if (mExchangeCtx->IsGroupExchangeContext())
         {
             ReturnErrorOnFailure(ProcessGroupCommandDataIB(commandData));
         }
@@ -172,18 +165,6 @@ void CommandHandler::Close()
     VerifyOrDieWithMsg(mPendingWork == 0, DataManagement, "CommandHandler::Close() called with %u unfinished async work items",
                        static_cast<unsigned int>(mPendingWork));
 
-    // OnDone below can destroy us before we unwind all the way back into the
-    // exchange code and it tries to close itself.  Make sure that it doesn't
-    // try to notify us that it's closing, since we will be dead.
-    //
-    // For more details, see #10344.
-    if (mpExchangeCtx != nullptr)
-    {
-        mpExchangeCtx->SetDelegate(nullptr);
-    }
-
-    mpExchangeCtx = nullptr;
-
     if (mpCallback)
     {
         mpCallback->OnDone(*this);
@@ -205,21 +186,12 @@ void CommandHandler::DecrementHoldOff()
         return;
     }
 
-    if (mpExchangeCtx->IsGroupExchangeContext())
-    {
-        mpExchangeCtx->Close();
-    }
-    else
+    if (!mExchangeCtx->IsGroupExchangeContext() && !mSentStatusResponse)
     {
         CHIP_ERROR err = SendCommandResponse();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
-            // We marked the exchange as "WillSendMessage", need to shutdown the exchange manually to avoid leaking exchanges.
-            if (mpExchangeCtx != nullptr)
-            {
-                mpExchangeCtx->Close();
-            }
         }
     }
 
@@ -232,11 +204,11 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
 
     VerifyOrReturnError(mPendingWork == 0, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(Finalize(commandPacket));
     ReturnErrorOnFailure(
-        mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket)));
+        mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket)));
     // The ExchangeContext is automatically freed here, and it makes mpExchangeCtx be temporarily dangling, but in
     // all cases, we are going to call Close immediately after this function, which nulls out mpExchangeCtx.
 
@@ -290,7 +262,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         }
     }
 
-    VerifyOrExit(mpExchangeCtx != nullptr && mpExchangeCtx->HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mExchangeCtx && mExchangeCtx->HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
 
     {
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
@@ -379,7 +351,7 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     err = commandPath.GetCommandId(&commandId);
     SuccessOrExit(err);
 
-    groupId = mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
+    groupId = mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     fabric  = GetAccessingFabricIndex();
 
     ChipLogDetail(DataManagement, "Received group command for Group=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
@@ -596,7 +568,7 @@ TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
 
 FabricIndex CommandHandler::GetAccessingFabricIndex() const
 {
-    return mpExchangeCtx->GetSessionHandle()->GetFabricIndex();
+    return mExchangeCtx->GetSessionHandle()->GetFabricIndex();
 }
 
 CommandHandler * CommandHandler::Handle::Get()
@@ -666,27 +638,6 @@ void CommandHandler::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
 }
 
-void CommandHandler::Abort()
-{
-    //
-    // If the exchange context hasn't already been gracefully closed
-    // (signaled by setting it to null), then we need to forcibly
-    // tear it down.
-    //
-    if (mpExchangeCtx != nullptr)
-    {
-        // We might be a delegate for this exchange, and we don't want the
-        // OnExchangeClosing notification in that case.  Null out the delegate
-        // to avoid that.
-        //
-        // TODO: This makes all sorts of assumptions about what the delegate is
-        // (notice the "might" above!) that might not hold in practice.  We
-        // really need a better solution here....
-        mpExchangeCtx->SetDelegate(nullptr);
-        mpExchangeCtx->Abort();
-        mpExchangeCtx = nullptr;
-    }
-}
 } // namespace app
 } // namespace chip
 

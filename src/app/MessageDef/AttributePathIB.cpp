@@ -23,7 +23,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/Nullable.h>
 

@@ -941,9 +941,8 @@ NS_ASSUME_NONNULL_BEGIN
               completionHandler:(StatusCompletion)completionHandler;
 - (void)stepWithOnOffWithParams:(MTRLevelControlClusterStepWithOnOffParams *)params
               completionHandler:(StatusCompletion)completionHandler;
-- (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams * _Nullable)params
+- (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams *)params
               completionHandler:(StatusCompletion)completionHandler;
-- (void)stopWithOnOffWithCompletionHandler:(StatusCompletion)completionHandler;
 - (void)moveToClosestFrequencyWithParams:(MTRLevelControlClusterMoveToClosestFrequencyParams *)params
                        completionHandler:(StatusCompletion)completionHandler;
 

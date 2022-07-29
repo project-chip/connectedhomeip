@@ -50,6 +50,7 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
     MTRErrorCodeWrongAddressType     = 7,
     MTRErrorCodeIntegrityCheckFailed = 8,
     MTRErrorCodeTimeout              = 9,
+    MTRErrorCodeBufferTooSmall       = 10,
 };
 // clang-format on
 

@@ -174,7 +174,6 @@ public:
      * @param initData  Data for initializing this object and for populating a TransferInit message
      *                  The role parameter will determine whether to populate a ReceiveInit or SendInit
      * @param timeout   The amount of time to wait for a response before considering the transfer failed
-     * @param curTime   The current time since epoch. Needed to set a start time for the transfer timeout.
      *
      * @return CHIP_ERROR Result of initialization and preparation of a TransferInit message. May also indicate if the
      *                    TransferSession object is unable to handle this request.

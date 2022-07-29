@@ -361,6 +361,13 @@ public:
         virtual ~Delegate() {}
 
         /**
+         * Gets called when a fabric is about to be deleted, such as on
+         * FabricTable::Delete().  This allows actions to be taken that need the
+         * fabric to still be around before we delete it.
+         **/
+        virtual void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) {}
+
+        /**
          * Gets called when a fabric is deleted, such as on FabricTable::Delete().
          **/
         virtual void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) {}

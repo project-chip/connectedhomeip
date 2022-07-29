@@ -47,7 +47,7 @@ private:
     chip::Optional<uint16_t> mTimeoutSecs;
 
     static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
-    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     // Try to send the action CloseSession status report.
     CHIP_ERROR CloseSession(chip::DeviceProxy * device);
