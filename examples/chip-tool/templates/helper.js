@@ -116,14 +116,7 @@ async function structs_with_cluster_name(options)
       continue;
     }
 
-    s.items.forEach(i => {
-      if (i.type.toLowerCase() == "fabric_idx") {
-        s.struct_fabric_idx_field = i.label;
-      }
-    })
-
-    if (s.struct_cluster_count == 1)
-    {
+    if (s.struct_cluster_count == 1) {
       const clusters = await zclQuery.selectStructClusters(this.global.db, s.id);
       blocks.push(
           { id : s.id, name : s.name, struct_fabric_idx_field : s.struct_fabric_idx_field, clusterName : clusters[0].name });
@@ -137,6 +130,19 @@ async function structs_with_cluster_name(options)
   return templateUtil.collectBlocks(blocks, options, this);
 }
 
+async function assertSameTestType(current, expected)
+{
+  if (current == expected) {
+    return '';
+  }
+
+  const filename = this.parent.parent.parent.filename;
+  const testName = this.parent.parent.parent.testName;
+  const error = `\nFile: ${filename}\nTest: ${testName}\nCluster ${this.parent.cluster} Attribute: ${this.name}: Constraint type "${
+      expected}" does not match the current type "${current}".`;
+  throw error;
+}
+
 //
 // Module exports
 //
@@ -144,3 +150,4 @@ exports.asDelimitedCommand        = asDelimitedCommand;
 exports.asTypeMinValue            = asTypeMinValue;
 exports.asTypeMaxValue            = asTypeMaxValue;
 exports.structs_with_cluster_name = structs_with_cluster_name;
+exports.assertSameTestType        = assertSameTestType;

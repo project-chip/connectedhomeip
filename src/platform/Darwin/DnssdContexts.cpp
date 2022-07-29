@@ -302,10 +302,7 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
     protocol = GetProtocol(cbAddressType);
 }
 
-ResolveContext::~ResolveContext()
-{
-    RemoveInterfaces();
-}
+ResolveContext::~ResolveContext() {}
 
 void ResolveContext::DispatchFailure(DNSServiceErrorType err)
 {
@@ -377,8 +374,8 @@ bool ResolveContext::HasAddress()
 void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostnameWithDomain, uint16_t port,
                                     uint16_t txtLen, const unsigned char * txtRecord)
 {
-    ChipLogDetail(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32, __func__, hostnameWithDomain, fullname,
-                  interfaceId);
+    ChipLogDetail(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%.*s\"", __func__,
+                  hostnameWithDomain, fullname, interfaceId, port, static_cast<int>(txtLen), txtRecord);
 
     InterfaceInfo interface;
     interface.service.mPort = ntohs(port);
@@ -406,7 +403,7 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     // resolving.
     interface.fullyQualifiedDomainName = hostnameWithDomain;
 
-    interfaces.insert(std::pair<uint32_t, InterfaceInfo>(interfaceId, interface));
+    interfaces.insert(std::make_pair(interfaceId, std::move(interface)));
 }
 
 bool ResolveContext::HasInterface()
@@ -414,21 +411,37 @@ bool ResolveContext::HasInterface()
     return interfaces.size();
 }
 
-void ResolveContext::RemoveInterfaces()
+InterfaceInfo::InterfaceInfo()
 {
-    for (auto & interface : interfaces)
+    service.mTextEntrySize = 0;
+    service.mTextEntries   = nullptr;
+}
+
+InterfaceInfo::InterfaceInfo(InterfaceInfo && other) :
+    service(std::move(other.service)), addresses(std::move(other.addresses)),
+    fullyQualifiedDomainName(std::move(other.fullyQualifiedDomainName))
+{
+    // Make sure we're not trying to free any state from the other DnssdService,
+    // since we took over ownership of its allocated bits.
+    other.service.mTextEntrySize = 0;
+    other.service.mTextEntries   = nullptr;
+}
+
+InterfaceInfo::~InterfaceInfo()
+{
+    if (service.mTextEntries == nullptr)
     {
-        size_t count = interface.second.service.mTextEntrySize;
-        for (size_t i = 0; i < count; i++)
-        {
-            const auto & textEntry = interface.second.service.mTextEntries[i];
-            free(const_cast<char *>(textEntry.mKey));
-            free(const_cast<uint8_t *>(textEntry.mData));
-        }
-        Platform::MemoryFree(const_cast<TextEntry *>(interface.second.service.mTextEntries));
+        return;
     }
 
-    interfaces.clear();
+    const size_t count = service.mTextEntrySize;
+    for (size_t i = 0; i < count; i++)
+    {
+        const auto & textEntry = service.mTextEntries[i];
+        free(const_cast<char *>(textEntry.mKey));
+        free(const_cast<uint8_t *>(textEntry.mData));
+    }
+    Platform::MemoryFree(const_cast<TextEntry *>(service.mTextEntries));
 }
 
 } // namespace Dnssd

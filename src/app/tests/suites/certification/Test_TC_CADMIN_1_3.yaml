@@ -18,14 +18,14 @@ config:
     nodeId: 0x12344321
     timeout: 300
     nodeId2:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0xCAFE
     endpoint: 0
     discriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 3840
     payload:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "MT:0000000000I31506010" # This value needs to be generated automatically
 
 tests:
@@ -76,11 +76,12 @@ tests:
       response:
           value: "chiptest"
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
-    - label: "Commission from beta"
+    - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
+      PICS: CADMIN.S
       cluster: "CommissionerCommands"
       command: "PairWithCode"
       arguments:
@@ -90,7 +91,7 @@ tests:
               - name: "payload"
                 value: payload
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
+    - label: "DUT_CE is commissioned by TH_CR2 on Fabric ID2"
       PICS: CADMIN.S
       identity: "beta"
       cluster: "DelayCommands"
@@ -100,7 +101,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
 
-    - label: "Query fabrics list"
+    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "Fabrics"
@@ -110,7 +111,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Query fabrics list"
+    - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
       identity: "beta"
       command: "readAttribute"
       cluster: "Operational Credentials"
@@ -142,7 +143,7 @@ tests:
       response:
           value: "chiptest1"
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label:
@@ -167,10 +168,10 @@ tests:
       response:
           value: "chiptest2"
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
-    - label: "TH_CR2 opens a commissioning window on DUT_CE"
+    - label: "TH_CR2 opens a commissioning window on DUT_CE using ECM"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
@@ -206,7 +207,7 @@ tests:
       response:
           value: 0
 
-    - label: "TH_CR2 opens a commissioning window on DUT_CE"
+    - label: "TH_CR2 opens a commissioning window on DUT_CE using ECM"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
@@ -234,7 +235,7 @@ tests:
       arguments:
           values:
               - name: "nodeId"
-                value: nodeId2
+                value: nodeId
               - name: "payload"
                 value: payload
       response:

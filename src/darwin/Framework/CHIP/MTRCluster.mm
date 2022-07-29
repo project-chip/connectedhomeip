@@ -18,6 +18,7 @@
 #import "MTRBaseDevice.h"
 #import "MTRCluster_internal.h"
 #import "NSDataSpanConversion.h"
+#import "NSStringSpanConversion.h"
 
 using namespace ::chip;
 
@@ -37,8 +38,7 @@ using namespace ::chip;
 
 - (chip::CharSpan)asCharSpan:(NSString *)value
 {
-    return chip::CharSpan(static_cast<const char *>([value dataUsingEncoding:NSUTF8StringEncoding].bytes),
-        [value lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+    return AsCharSpan(value);
 }
 @end
 

@@ -35,7 +35,7 @@ tests:
       response:
           saveAs: ValueBeforeChange
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -51,12 +51,12 @@ tests:
                 value: "y"
 
     - label: "read the mandatory attribute: MeasuredValue"
-      PICS: FLW.S.A0000
+      PICS: FLW.S.A0000 && FLW.M.FlowChange
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
               notValue: ValueBeforeChange

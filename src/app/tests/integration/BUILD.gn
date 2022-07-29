@@ -21,6 +21,7 @@ assert(chip_build_tools)
 
 executable("chip-im-initiator") {
   sources = [
+    "RequiredPrivilegeStubs.cpp",
     "chip_im_initiator.cpp",
     "common.cpp",
   ]
@@ -41,6 +42,7 @@ executable("chip-im-initiator") {
 executable("chip-im-responder") {
   sources = [
     "MockEvents.cpp",
+    "RequiredPrivilegeStubs.cpp",
     "chip_im_responder.cpp",
     "common.cpp",
   ]

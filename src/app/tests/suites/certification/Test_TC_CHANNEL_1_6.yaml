@@ -35,7 +35,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "Read the global attribute: FeatureMap"
       PICS: CHANNEL.S.CL || CHANNEL.S.LI
@@ -43,12 +43,11 @@ tests:
       attribute: "FeatureMap"
       response:
           constraints:
-              type: map32
+              type: bitmap32
               minValue: 0
               maxValue: 3
 
     - label: "Read the global attribute: AttributeList"
-      PICS: CHANNEL.S.A0000 && CHANNEL.S.A0001 && CHANNEL.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -111,6 +110,15 @@ tests:
           constraints:
               type: list
               contains: [3]
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      PICS: " !CHANNEL.S.C01.Tx "
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
     - label: "Read the global attribute: GeneratedCommandList"
       PICS: CHANNEL.S.C01.Tx

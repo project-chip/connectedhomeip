@@ -36,7 +36,7 @@ tests:
       PICS: TSTAT.S.F01
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 1600
               maxValue: 3200
 
@@ -117,7 +117,7 @@ tests:
       PICS: TSTAT.S.F00
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 700
               maxValue: 3000
 
@@ -208,7 +208,7 @@ tests:
       response:
           value: 2600
           constraints:
-              type: int16
+              type: int16s
               minValue: 1600
               maxValue: 3200
 
@@ -279,7 +279,7 @@ tests:
       response:
           value: 2000
           constraints:
-              type: int16
+              type: int16s
               minValue: 700
               maxValue: 3000
 
@@ -351,7 +351,7 @@ tests:
       response:
           value: 700
           constraints:
-              type: int16
+              type: int16s
               minValue: 700
               maxValue: 3000
 
@@ -431,7 +431,7 @@ tests:
       response:
           value: 3000
           constraints:
-              type: int16
+              type: int16s
               minValue: 700
               maxValue: 3000
 
@@ -522,7 +522,7 @@ tests:
       response:
           value: 1600
           constraints:
-              type: int16
+              type: int16s
               minValue: 1600
               maxValue: 3200
 
@@ -601,7 +601,7 @@ tests:
       response:
           value: 3200
           constraints:
-              type: int16
+              type: int16s
               minValue: 1600
               maxValue: 3200
 
@@ -706,7 +706,7 @@ tests:
       response:
           value: 25
           constraints:
-              type: temp-s8
+              type: int8s
               minValue: 0
               maxValue: 25
 

@@ -36,7 +36,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "Read the global attribute: FeatureMap"
       PICS: APPLAUNCHER.S.AP
@@ -45,7 +45,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "Read the global attribute: FeatureMap"
       PICS: " !APPLAUNCHER.S.AP "
@@ -54,10 +54,9 @@ tests:
       response:
           value: 0
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "Read the global attribute: AttributeList"
-      PICS: APPLAUNCHER.S.A0000 && APPLAUNCHER.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:

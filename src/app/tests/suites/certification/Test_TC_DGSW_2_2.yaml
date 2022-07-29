@@ -51,7 +51,7 @@ tests:
           [1649682271.390714][9722:9727] CHIP:EM: Sending Standalone Ack for MessageCounter:4574884 on exchange 14495i
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && DGSW.S.E00
       arguments:
           values:
               - name: "message"

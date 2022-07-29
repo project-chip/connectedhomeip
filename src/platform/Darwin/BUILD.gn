@@ -94,7 +94,7 @@ static_library("Darwin") {
   ]
 
   public_deps = [
-    "${chip_root}/src/app:app_buildconfig",
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/platform:platform_base",
   ]
 

@@ -18,15 +18,15 @@ config:
     nodeId: 0x12344321
     timeout: 300
     nodeId2:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0xCAFE
     endpoint: 0
     discriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 3840
     payload:
-        type: CHAR_STRING
-        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
 
 tests:
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
@@ -38,7 +38,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+    - label: "TH_CR1 opens a commissioning window on DUT_CE using BCM"
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       PICS: CADMIN.S.C01.Rsp
@@ -47,6 +47,8 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "discriminator"
+                value: discriminator
 
     - label:
           "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
@@ -67,13 +69,14 @@ tests:
       PICS: BINFO.S.A0005
       response:
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
-    - label: "Commission from beta"
+    - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
+      PICS: CADMIN.S
       arguments:
           values:
               - name: "nodeId"
@@ -81,7 +84,7 @@ tests:
               - name: "payload"
                 value: payload
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
+    - label: "DUT_CE is commissioned by TH_CR2 on Fabric ID2 "
       identity: "beta"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -91,7 +94,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
 
-    - label: "Query fabrics list"
+    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
       command: "readAttribute"
       cluster: "Operational Credentials"
       PICS: OPCREDS.S.A0001
@@ -101,7 +104,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Query fabrics list"
+    - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
       identity: "beta"
       command: "readAttribute"
       cluster: "Operational Credentials"
@@ -130,8 +133,9 @@ tests:
       attribute: "NodeLabel"
       PICS: BINFO.S.A0005
       response:
+          value: "chiptest"
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label:
@@ -154,11 +158,12 @@ tests:
       attribute: "NodeLabel"
       PICS: BINFO.S.A0005
       response:
+          value: "chiptest"
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
-    - label: "TH_CR2 opens a commissioning window on DUT_CE"
+    - label: "TH_CR2 opens a commissioning window on DUT_CE using BCM"
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       identity: "beta"
@@ -168,6 +173,8 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "discriminator"
+                value: discriminator
 
     - label: "Wait for the commissioning window in step 13 to timeout"
       cluster: "DelayCommands"
@@ -186,7 +193,7 @@ tests:
       response:
           value: 0
 
-    - label: "TH_CR2 opens a commissioning window on DUT_CE"
+    - label: "TH_CR2 opens a commissioning window on DUT_CE using BCM"
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       identity: "beta"
@@ -196,6 +203,8 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "discriminator"
+                value: discriminator
 
     - label:
           "TH_CR1 starts a commissioning process with DUT_CE before the timeout
@@ -206,7 +215,7 @@ tests:
       arguments:
           values:
               - name: "nodeId"
-                value: nodeId2
+                value: nodeId
               - name: "payload"
                 value: payload
       response:

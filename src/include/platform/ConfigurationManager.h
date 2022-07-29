@@ -26,12 +26,15 @@
 
 #include <cstdint>
 
+#if CHIP_HAVE_CONFIG_H
+#include <platform/CHIPDeviceBuildConfig.h>
+#include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
+#endif
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
-#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/PersistedStorage.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
 
 namespace chip {
 namespace Ble {
@@ -178,9 +181,18 @@ protected:
 /**
  * Returns a reference to a ConfigurationManager object.
  *
- * Applications should use this to access the features of the ConfigurationManager.
+ * Applications should use this to access features of the ConfigurationManager object
+ * that are common to all platforms.
  */
-extern ConfigurationManager & ConfigurationMgr();
+ConfigurationManager & ConfigurationMgr();
+
+/**
+ * Returns the platform-specific implementation of the ConfigurationManager object.
+ *
+ * Applications can use this to gain access to features of the ConfigurationManager
+ * that are specific to the selected platform.
+ */
+extern ConfigurationManager & ConfigurationMgrImpl();
 
 /**
  * Sets a reference to a ConfigurationManager object.
@@ -188,7 +200,7 @@ extern ConfigurationManager & ConfigurationMgr();
  * This must be called before any calls to ConfigurationMgr. If a nullptr is passed in,
  * no changes will be made.
  */
-extern void SetConfigurationMgr(ConfigurationManager * configurationManager);
+void SetConfigurationMgr(ConfigurationManager * configurationManager);
 
 inline CHIP_ERROR ConfigurationManager::GetLocationCapability(uint8_t & location)
 {

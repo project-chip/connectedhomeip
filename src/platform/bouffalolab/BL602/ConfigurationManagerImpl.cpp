@@ -180,5 +180,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     hal_reboot();
 }
 
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

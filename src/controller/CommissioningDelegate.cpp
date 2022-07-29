@@ -41,6 +41,10 @@ const char * StageToString(CommissioningStage stage)
         return "ArmFailSafe";
         break;
 
+    case kScanNetworks:
+        return "ScanNetworks";
+        break;
+
     case kConfigRegulatory:
         return "ConfigRegulatory";
         break;

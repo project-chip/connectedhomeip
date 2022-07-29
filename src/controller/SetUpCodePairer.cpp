@@ -154,10 +154,17 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(SetupPayload & payload)
 {
     ChipLogProgress(Controller, "Starting commissioning discovery over DNS-SD");
 
-    currentFilter.type = payload.isShortDiscriminator ? Dnssd::DiscoveryFilterType::kShortDiscriminator
-                                                      : Dnssd::DiscoveryFilterType::kLongDiscriminator;
-    currentFilter.code =
-        payload.isShortDiscriminator ? static_cast<uint16_t>((payload.discriminator >> 8) & 0x0F) : payload.discriminator;
+    auto & discriminator = payload.discriminator;
+    if (discriminator.IsShortDiscriminator())
+    {
+        currentFilter.type = Dnssd::DiscoveryFilterType::kShortDiscriminator;
+        currentFilter.code = discriminator.GetShortValue();
+    }
+    else
+    {
+        currentFilter.type = Dnssd::DiscoveryFilterType::kLongDiscriminator;
+        currentFilter.code = discriminator.GetLongValue();
+    }
     // Handle possibly-sync callbacks.
     mWaitingForDiscovery[kIPTransport] = true;
     CHIP_ERROR err                     = mCommissioner->DiscoverCommissionableNodes(currentFilter);

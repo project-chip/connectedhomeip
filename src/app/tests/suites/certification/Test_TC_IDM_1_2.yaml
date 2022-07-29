@@ -75,17 +75,20 @@ tests:
 
 
           To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
 
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
+           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
 
 
           ./chip-tool onoff on 1 1
 
           On TH, verify DUT  responsds as UNSUPPORTED_ACCESS  for the data sent in the above command
+          [1657869005.834700][2816:2821] CHIP:DMG: },
+          [1657869005.834790][2816:2821] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x7e
+          [1657869005.834841][2816:2821] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1657869005.834899][2816:2821] CHIP:DMG: ICR moving to [AwaitingDe]
 
-          [1654079683.774619][14540:14546] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x7e
-          [1654079683.774630][14540:14546] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1654079683.774643][14540:14546] CHIP:DMG: ICR moving to [AwaitingDe]
+          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
       disabled: true
 
     - label:
@@ -95,7 +98,11 @@ tests:
       verification: |
           To Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
 
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
+
+           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
+
 
           The cluster used in the below command is an example, User can use any supported chip cluster.
           ./chip-tool  generalcommissioning commissioning-complete  1 0
@@ -105,6 +112,8 @@ tests:
           [1654079608.667986][14525:14530] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0004 Status=0x7e
           [1654079608.668000][14525:14530] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
           [1654079608.668011][14525:14530] CHIP:DMG: ICR moving to [AwaitingDe]
+
+          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
       disabled: true
 
     - label:
@@ -161,17 +170,21 @@ tests:
           CommandDataIB and SuppressResponse set to True"
       verification: |
           Out of Scope for V1.0
+          https://github.com/project-chip/connectedhomeip/issues/8043
       disabled: true
 
     - label:
           "TH sends a Invoke Request Message to the DUT with the TimedRequest
           set as TRUE.(There should be no previous Timed Invoke action.)"
       verification: |
-          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
-
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
-
           The cluster used in the below command is an example, User can use any supported chip cluster.
+
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
+
+           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
+
+
           ./chip-tool onoff on 1 1 --timedInteractionTimeoutMs 100
 
           On TH,  verify DUT responsds as UNSUPPORTED_ACCESS  for the data sent in the above command
@@ -180,6 +193,8 @@ tests:
           [1657613026.975513][10484:10489] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
           [1657613026.975556][10484:10489] CHIP:DMG: ICR moving to [AwaitingDe]
           [1657613026.975622][10484:10489] CHIP:EM: Sending Standalone Ack for MessageCounter:99688132 on exchange 24183i
+
+          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
       disabled: true
 
     - label:
@@ -187,7 +202,13 @@ tests:
           path that requires a Timed Invoke transaction to invoke and this
           action is not part of a Timed Invoke transaction"
       verification: |
+          As in the previous step, we enabled accesscontrol to a specific cluster, we need to remove the accesscontrol using below command.
+          As the EP used here is an example, user needs to provide the endpoint id, which they use.
+
+
+
           The cluster used in the below command is an example, User can use any supported chip cluster.
+
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0
 
           On TH,  verify DUT responsds as NEEDS_TIMED_INTERACTION for the data sent in the above command

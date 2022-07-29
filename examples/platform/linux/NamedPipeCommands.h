@@ -24,8 +24,8 @@
 class NamedPipeCommandDelegate
 {
 public:
-    virtual ~NamedPipeCommandDelegate()                       = default;
-    virtual void OnEventCommandReceived(const char * payload) = 0;
+    virtual ~NamedPipeCommandDelegate()                    = default;
+    virtual void OnEventCommandReceived(const char * json) = 0;
 };
 
 class NamedPipeCommands

@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 117.1.1. [TC-BIND-1.1] Global Attributes [DUT-Controller]
+name: 118.1.1. [TC-BIND-1.1] Global Attributes [DUT-Controllee]
 
 config:
     nodeId: 0x12344321
@@ -30,14 +30,17 @@ tests:
       verification: |
           ./chip-tool binding read cluster-revision 1 0
 
+          On TH, verify  DUT responsds ClusterRevision attribute as the value 1
+
           [1649417989.863435][3040:3045] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_FFFD DataVersion: 1411817517
           [1649417989.863557][3040:3045] CHIP:TOO:   ClusterRevision: 1
-          [1649417989.863691][3040:3045] CHIP:EM: Sending Standalone Ack for MessageCounter:2888019 on exchange 4263i
       disabled: true
 
     - label: "TH1 reads the FeatureMap from DUT"
       verification: |
-          ./chip-tool binding read feature-map 1 0
+          ./chip-tool binding read  feature-map 1 0
+
+          Verify on the TH Log:
 
           [1653560808.265422][3439:3444] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_FFFC DataVersion: 2519252823
           [1653560808.265507][3439:3444] CHIP:TOO:   FeatureMap: 0
@@ -46,6 +49,8 @@ tests:
     - label: "TH1 reads AttributeList from DUT"
       verification: |
           ./chip-tool binding read attribute-list 1 0
+
+          Verify on the TH Log:
 
           [1653560826.815841][3445:3450] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_FFFB DataVersion: 2519252823
           [1653560826.816170][3445:3450] CHIP:TOO:   AttributeList: 6 entries
@@ -59,12 +64,14 @@ tests:
 
     - label: "TH1 reads EventList from DUT"
       verification: |
-          No Event-list is on attributes list
+          Out of scope for V1.0
       disabled: true
 
     - label: "TH1 reads AcceptedCommandList from DUT"
       verification: |
           ./chip-tool binding read accepted-command-list 1 0
+
+          Verify on the TH Log:
 
           [1653560851.890988][3451:3456] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_FFF9 DataVersion: 2519252823
           [1653560851.891077][3451:3456] CHIP:TOO:   AcceptedCommandList: 0 entries
@@ -74,6 +81,8 @@ tests:
       verification: |
           ./chip-tool binding read generated-command-list 1 0
 
-          [1653560872.884952][3458:3463] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_FFF8 DataVersion: 2519252823
-          [1653560872.885073][3458:3463] CHIP:TOO:   GeneratedCommandList: 0 entries
+           Verify on the TH Log:
+
+           [1653560872.884952][3458:3463] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_FFF8 DataVersion: 2519252823
+           [1653560872.885073][3458:3463] CHIP:TOO:   GeneratedCommandList: 0 entries
       disabled: true

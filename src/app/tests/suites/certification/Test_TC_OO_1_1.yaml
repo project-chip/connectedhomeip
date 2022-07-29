@@ -34,7 +34,7 @@ tests:
       response:
           value: 4
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
@@ -43,7 +43,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
@@ -52,31 +52,9 @@ tests:
       response:
           value: 0
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "Read the global attribute: AttributeList"
-      PICS: OO.S.F00
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains:
-                  [
-                      0,
-                      16384,
-                      16385,
-                      16386,
-                      16387,
-                      65528,
-                      65529,
-                      65531,
-                      65532,
-                      65533,
-                  ]
-
-    - label: "Read the global attribute: AttributeList"
-      PICS: " !OO.S.F00 "
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -84,23 +62,32 @@ tests:
               type: list
               contains: [0, 65528, 65529, 65531, 65532, 65533]
 
+    - label: "Read the feature dependent(OO.S.F00) attribute in AttributeList"
+      PICS: OO.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16384, 16385, 16386, 16387]
+
     - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2]
+
+    - label:
+          "Read the feature dependent(OO.S.F00) commands in AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       PICS: OO.S.F00
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 64, 65, 66]
-
-    - label: "Read the global attribute: AcceptedCommandList"
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      PICS: " !OO.S.F00 "
-      response:
-          constraints:
-              type: list
-              contains: [0, 1, 2]
+              contains: [64, 65, 66]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"

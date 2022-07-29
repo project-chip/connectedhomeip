@@ -53,6 +53,12 @@ buildconfig_header("app_buildconfig") {
   ]
 }
 
+source_set("app_config") {
+  sources = [ "AppConfig.h" ]
+
+  public_deps = [ ":app_buildconfig" ]
+}
+
 static_library("app") {
   output_name = "libCHIPDataModel"
 
@@ -179,7 +185,7 @@ static_library("app") {
   ]
 
   public_deps = [
-    ":app_buildconfig",
+    ":app_config",
     "${chip_root}/src/access",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",

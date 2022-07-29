@@ -41,6 +41,13 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: LVL.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "Reads Minlevel attribute from DUT"
       PICS: LVL.S.A0002
       command: "readAttribute"
@@ -48,7 +55,7 @@ tests:
       response:
           saveAs: MinlevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -61,9 +68,9 @@ tests:
                 value: 1
               - name: "transitionTime"
                 value: 0
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 1
 
     - label: "reads max level attribute from DUT"
@@ -73,7 +80,7 @@ tests:
       response:
           saveAs: MaxlevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -86,9 +93,9 @@ tests:
                 value: 0
               - name: "rate"
                 value: 32
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 1
 
     - label:
@@ -97,7 +104,7 @@ tests:
           maximum level"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && LVL.S.C01.Rsp
       arguments:
           values:
               - name: "message"
@@ -120,18 +127,18 @@ tests:
       response:
           value: MaxlevelValue
 
-    - label: "sends a MoveWithOnOff command"
+    - label: "sends a Move command"
       PICS: LVL.S.C05.Rsp
-      command: "MoveWithOnOff"
+      command: "Move"
       arguments:
           values:
               - name: "moveMode"
                 value: 1
               - name: "rate"
                 value: 64
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 1
 
     - label:
@@ -140,7 +147,7 @@ tests:
           minimum level"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && LVL.S.C05.Rsp
       arguments:
           values:
               - name: "message"
@@ -173,7 +180,7 @@ tests:
       response:
           saveAs: DefaultMoveRateValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -186,25 +193,25 @@ tests:
                 value: 0
               - name: "rate"
                 value: 255
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 1
 
-    - label: "Wait 100ms"
+    - label: "Wait 500ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 100
+                value: 500
 
     - label:
           "Physically verify that the device moves at the rate recorded in step
           3a and completes moving to its maximum level"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && LVL.S.C05.Rsp && LVL.S.A0014
       arguments:
           values:
               - name: "message"

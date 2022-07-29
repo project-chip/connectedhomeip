@@ -34,7 +34,7 @@ struct GetConnectedDeviceCallback
     ~GetConnectedDeviceCallback();
 
     static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
-    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     Callback::Callback<OnDeviceConnected> mOnSuccess;
     Callback::Callback<OnDeviceConnectionFailure> mOnFailure;
@@ -98,7 +98,7 @@ struct ReportEventCallback : public app::ReadClient::Callback
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override;
 
-    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override;
+    CHIP_ERROR OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 
     /** Report errors back to Java layer. attributePath may be nullptr for general errors. */
     void ReportError(jobject eventPath, CHIP_ERROR err);

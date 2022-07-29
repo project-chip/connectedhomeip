@@ -8007,15 +8007,15 @@ public class ClusterInfoMapping {
     levelControlmoveToLevelCommandParams.put(
         "transitionTime", levelControlmoveToLeveltransitionTimeCommandParameterInfo);
 
-    CommandParameterInfo levelControlmoveToLeveloptionMaskCommandParameterInfo =
-        new CommandParameterInfo("optionMask", Integer.class, Integer.class);
+    CommandParameterInfo levelControlmoveToLeveloptionsMaskCommandParameterInfo =
+        new CommandParameterInfo("optionsMask", Integer.class, Integer.class);
     levelControlmoveToLevelCommandParams.put(
-        "optionMask", levelControlmoveToLeveloptionMaskCommandParameterInfo);
+        "optionsMask", levelControlmoveToLeveloptionsMaskCommandParameterInfo);
 
-    CommandParameterInfo levelControlmoveToLeveloptionOverrideCommandParameterInfo =
-        new CommandParameterInfo("optionOverride", Integer.class, Integer.class);
+    CommandParameterInfo levelControlmoveToLeveloptionsOverrideCommandParameterInfo =
+        new CommandParameterInfo("optionsOverride", Integer.class, Integer.class);
     levelControlmoveToLevelCommandParams.put(
-        "optionOverride", levelControlmoveToLeveloptionOverrideCommandParameterInfo);
+        "optionsOverride", levelControlmoveToLeveloptionsOverrideCommandParameterInfo);
 
     InteractionInfo levelControlmoveToLevelInteractionInfo =
         new InteractionInfo(
@@ -8025,8 +8025,8 @@ public class ClusterInfoMapping {
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("level"),
                       (Integer) commandArguments.get("transitionTime"),
-                      (Integer) commandArguments.get("optionMask"),
-                      (Integer) commandArguments.get("optionOverride"));
+                      (Integer) commandArguments.get("optionsMask"),
+                      (Integer) commandArguments.get("optionsOverride"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             levelControlmoveToLevelCommandParams);
@@ -8042,14 +8042,15 @@ public class ClusterInfoMapping {
         new CommandParameterInfo("rate", Integer.class, Integer.class);
     levelControlmoveCommandParams.put("rate", levelControlmoverateCommandParameterInfo);
 
-    CommandParameterInfo levelControlmoveoptionMaskCommandParameterInfo =
-        new CommandParameterInfo("optionMask", Integer.class, Integer.class);
-    levelControlmoveCommandParams.put("optionMask", levelControlmoveoptionMaskCommandParameterInfo);
-
-    CommandParameterInfo levelControlmoveoptionOverrideCommandParameterInfo =
-        new CommandParameterInfo("optionOverride", Integer.class, Integer.class);
+    CommandParameterInfo levelControlmoveoptionsMaskCommandParameterInfo =
+        new CommandParameterInfo("optionsMask", Integer.class, Integer.class);
     levelControlmoveCommandParams.put(
-        "optionOverride", levelControlmoveoptionOverrideCommandParameterInfo);
+        "optionsMask", levelControlmoveoptionsMaskCommandParameterInfo);
+
+    CommandParameterInfo levelControlmoveoptionsOverrideCommandParameterInfo =
+        new CommandParameterInfo("optionsOverride", Integer.class, Integer.class);
+    levelControlmoveCommandParams.put(
+        "optionsOverride", levelControlmoveoptionsOverrideCommandParameterInfo);
 
     InteractionInfo levelControlmoveInteractionInfo =
         new InteractionInfo(
@@ -8059,8 +8060,8 @@ public class ClusterInfoMapping {
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("moveMode"),
                       (Integer) commandArguments.get("rate"),
-                      (Integer) commandArguments.get("optionMask"),
-                      (Integer) commandArguments.get("optionOverride"));
+                      (Integer) commandArguments.get("optionsMask"),
+                      (Integer) commandArguments.get("optionsOverride"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             levelControlmoveCommandParams);
@@ -8080,14 +8081,15 @@ public class ClusterInfoMapping {
     levelControlstepCommandParams.put(
         "transitionTime", levelControlsteptransitionTimeCommandParameterInfo);
 
-    CommandParameterInfo levelControlstepoptionMaskCommandParameterInfo =
-        new CommandParameterInfo("optionMask", Integer.class, Integer.class);
-    levelControlstepCommandParams.put("optionMask", levelControlstepoptionMaskCommandParameterInfo);
-
-    CommandParameterInfo levelControlstepoptionOverrideCommandParameterInfo =
-        new CommandParameterInfo("optionOverride", Integer.class, Integer.class);
+    CommandParameterInfo levelControlstepoptionsMaskCommandParameterInfo =
+        new CommandParameterInfo("optionsMask", Integer.class, Integer.class);
     levelControlstepCommandParams.put(
-        "optionOverride", levelControlstepoptionOverrideCommandParameterInfo);
+        "optionsMask", levelControlstepoptionsMaskCommandParameterInfo);
+
+    CommandParameterInfo levelControlstepoptionsOverrideCommandParameterInfo =
+        new CommandParameterInfo("optionsOverride", Integer.class, Integer.class);
+    levelControlstepCommandParams.put(
+        "optionsOverride", levelControlstepoptionsOverrideCommandParameterInfo);
 
     InteractionInfo levelControlstepInteractionInfo =
         new InteractionInfo(
@@ -8098,22 +8100,23 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("stepMode"),
                       (Integer) commandArguments.get("stepSize"),
                       (Integer) commandArguments.get("transitionTime"),
-                      (Integer) commandArguments.get("optionMask"),
-                      (Integer) commandArguments.get("optionOverride"));
+                      (Integer) commandArguments.get("optionsMask"),
+                      (Integer) commandArguments.get("optionsOverride"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             levelControlstepCommandParams);
     levelControlClusterInteractionInfoMap.put("step", levelControlstepInteractionInfo);
     Map<String, CommandParameterInfo> levelControlstopCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo levelControlstopoptionMaskCommandParameterInfo =
-        new CommandParameterInfo("optionMask", Integer.class, Integer.class);
-    levelControlstopCommandParams.put("optionMask", levelControlstopoptionMaskCommandParameterInfo);
-
-    CommandParameterInfo levelControlstopoptionOverrideCommandParameterInfo =
-        new CommandParameterInfo("optionOverride", Integer.class, Integer.class);
+    CommandParameterInfo levelControlstopoptionsMaskCommandParameterInfo =
+        new CommandParameterInfo("optionsMask", Integer.class, Integer.class);
     levelControlstopCommandParams.put(
-        "optionOverride", levelControlstopoptionOverrideCommandParameterInfo);
+        "optionsMask", levelControlstopoptionsMaskCommandParameterInfo);
+
+    CommandParameterInfo levelControlstopoptionsOverrideCommandParameterInfo =
+        new CommandParameterInfo("optionsOverride", Integer.class, Integer.class);
+    levelControlstopCommandParams.put(
+        "optionsOverride", levelControlstopoptionsOverrideCommandParameterInfo);
 
     InteractionInfo levelControlstopInteractionInfo =
         new InteractionInfo(
@@ -8121,8 +8124,8 @@ public class ClusterInfoMapping {
               ((ChipClusters.LevelControlCluster) cluster)
                   .stop(
                       (DefaultClusterCallback) callback,
-                      (Integer) commandArguments.get("optionMask"),
-                      (Integer) commandArguments.get("optionOverride"));
+                      (Integer) commandArguments.get("optionsMask"),
+                      (Integer) commandArguments.get("optionsOverride"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             levelControlstopCommandParams);
@@ -8139,6 +8142,16 @@ public class ClusterInfoMapping {
     levelControlmoveToLevelWithOnOffCommandParams.put(
         "transitionTime", levelControlmoveToLevelWithOnOfftransitionTimeCommandParameterInfo);
 
+    CommandParameterInfo levelControlmoveToLevelWithOnOffoptionsMaskCommandParameterInfo =
+        new CommandParameterInfo("optionsMask", Integer.class, Integer.class);
+    levelControlmoveToLevelWithOnOffCommandParams.put(
+        "optionsMask", levelControlmoveToLevelWithOnOffoptionsMaskCommandParameterInfo);
+
+    CommandParameterInfo levelControlmoveToLevelWithOnOffoptionsOverrideCommandParameterInfo =
+        new CommandParameterInfo("optionsOverride", Integer.class, Integer.class);
+    levelControlmoveToLevelWithOnOffCommandParams.put(
+        "optionsOverride", levelControlmoveToLevelWithOnOffoptionsOverrideCommandParameterInfo);
+
     InteractionInfo levelControlmoveToLevelWithOnOffInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -8146,7 +8159,9 @@ public class ClusterInfoMapping {
                   .moveToLevelWithOnOff(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("level"),
-                      (Integer) commandArguments.get("transitionTime"));
+                      (Integer) commandArguments.get("transitionTime"),
+                      (Integer) commandArguments.get("optionsMask"),
+                      (Integer) commandArguments.get("optionsOverride"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             levelControlmoveToLevelWithOnOffCommandParams);
@@ -8164,6 +8179,16 @@ public class ClusterInfoMapping {
     levelControlmoveWithOnOffCommandParams.put(
         "rate", levelControlmoveWithOnOffrateCommandParameterInfo);
 
+    CommandParameterInfo levelControlmoveWithOnOffoptionsMaskCommandParameterInfo =
+        new CommandParameterInfo("optionsMask", Integer.class, Integer.class);
+    levelControlmoveWithOnOffCommandParams.put(
+        "optionsMask", levelControlmoveWithOnOffoptionsMaskCommandParameterInfo);
+
+    CommandParameterInfo levelControlmoveWithOnOffoptionsOverrideCommandParameterInfo =
+        new CommandParameterInfo("optionsOverride", Integer.class, Integer.class);
+    levelControlmoveWithOnOffCommandParams.put(
+        "optionsOverride", levelControlmoveWithOnOffoptionsOverrideCommandParameterInfo);
+
     InteractionInfo levelControlmoveWithOnOffInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -8171,7 +8196,9 @@ public class ClusterInfoMapping {
                   .moveWithOnOff(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("moveMode"),
-                      (Integer) commandArguments.get("rate"));
+                      (Integer) commandArguments.get("rate"),
+                      (Integer) commandArguments.get("optionsMask"),
+                      (Integer) commandArguments.get("optionsOverride"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             levelControlmoveWithOnOffCommandParams);
@@ -8194,6 +8221,16 @@ public class ClusterInfoMapping {
     levelControlstepWithOnOffCommandParams.put(
         "transitionTime", levelControlstepWithOnOfftransitionTimeCommandParameterInfo);
 
+    CommandParameterInfo levelControlstepWithOnOffoptionsMaskCommandParameterInfo =
+        new CommandParameterInfo("optionsMask", Integer.class, Integer.class);
+    levelControlstepWithOnOffCommandParams.put(
+        "optionsMask", levelControlstepWithOnOffoptionsMaskCommandParameterInfo);
+
+    CommandParameterInfo levelControlstepWithOnOffoptionsOverrideCommandParameterInfo =
+        new CommandParameterInfo("optionsOverride", Integer.class, Integer.class);
+    levelControlstepWithOnOffCommandParams.put(
+        "optionsOverride", levelControlstepWithOnOffoptionsOverrideCommandParameterInfo);
+
     InteractionInfo levelControlstepWithOnOffInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -8202,7 +8239,9 @@ public class ClusterInfoMapping {
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("stepMode"),
                       (Integer) commandArguments.get("stepSize"),
-                      (Integer) commandArguments.get("transitionTime"));
+                      (Integer) commandArguments.get("transitionTime"),
+                      (Integer) commandArguments.get("optionsMask"),
+                      (Integer) commandArguments.get("optionsOverride"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             levelControlstepWithOnOffCommandParams);
@@ -8210,11 +8249,24 @@ public class ClusterInfoMapping {
         "stepWithOnOff", levelControlstepWithOnOffInteractionInfo);
     Map<String, CommandParameterInfo> levelControlstopWithOnOffCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo levelControlstopWithOnOffoptionsMaskCommandParameterInfo =
+        new CommandParameterInfo("optionsMask", Integer.class, Integer.class);
+    levelControlstopWithOnOffCommandParams.put(
+        "optionsMask", levelControlstopWithOnOffoptionsMaskCommandParameterInfo);
+
+    CommandParameterInfo levelControlstopWithOnOffoptionsOverrideCommandParameterInfo =
+        new CommandParameterInfo("optionsOverride", Integer.class, Integer.class);
+    levelControlstopWithOnOffCommandParams.put(
+        "optionsOverride", levelControlstopWithOnOffoptionsOverrideCommandParameterInfo);
+
     InteractionInfo levelControlstopWithOnOffInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .stopWithOnOff((DefaultClusterCallback) callback);
+                  .stopWithOnOff(
+                      (DefaultClusterCallback) callback,
+                      (Integer) commandArguments.get("optionsMask"),
+                      (Integer) commandArguments.get("optionsOverride"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             levelControlstopWithOnOffCommandParams);

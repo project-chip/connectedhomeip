@@ -30,31 +30,31 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  The CSRNonce
  */
-@property (nonatomic, nullable, copy, readwrite) NSData * CSRNonce;
+@property (nonatomic, copy, nullable) NSData * CSRNonce;
 /**
  *  The AttestationNonce
  */
-@property (nonatomic, nullable, copy, readwrite) NSData * attestationNonce;
+@property (nonatomic, copy, nullable) NSData * attestationNonce;
 /**
  *  The Wi-Fi SSID
  */
-@property (nonatomic, nullable, copy, readwrite) NSData * wifiSSID;
+@property (nonatomic, copy, nullable) NSData * wifiSSID;
 /**
  *  The Wi-Fi Credentials
  */
-@property (nonatomic, nullable, copy, readwrite) NSData * wifiCredentials;
+@property (nonatomic, copy, nullable) NSData * wifiCredentials;
 /**
  *  The Thread operational dataset
  */
-@property (nonatomic, nullable, copy, readwrite) NSData * threadOperationalDataset;
+@property (nonatomic, copy, nullable) NSData * threadOperationalDataset;
 /**
  *  The Device Attestation status delegate
  */
-@property (nonatomic, nullable, strong, readwrite) id<MTRDeviceAttestationDelegate> deviceAttestationDelegate;
+@property (nonatomic, strong, nullable) id<MTRDeviceAttestationDelegate> deviceAttestationDelegate;
 /**
  *  The timeout in secs to set for fail-safe when attestation fails
  */
-@property (nonatomic, nullable, copy, readwrite) NSNumber * failSafeExpiryTimeoutSecs;
+@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeoutSecs;
 
 @end
 

@@ -28,43 +28,43 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the mandatory attribute: OnOff"
+    - label: "Read the mandatory attribute: OnOff"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           constraints:
-              type: bool
+              type: boolean
 
-    - label: "read LT attribute: GlobalSceneControl"
+    - label: "Read LT attribute: GlobalSceneControl"
       PICS: OO.S.A4000
       command: "readAttribute"
       attribute: "GlobalSceneControl"
       response:
           constraints:
-              type: bool
+              type: boolean
 
-    - label: "read LT attribute: OnTime"
+    - label: "Read LT attribute: OnTime"
       PICS: OO.S.A4001
       command: "readAttribute"
       attribute: "OnTime"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
-    - label: "read LT attribute: OffWaitTime"
+    - label: "Read LT attribute: OffWaitTime"
       PICS: OO.S.A4002
       command: "readAttribute"
       attribute: "OffWaitTime"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
-    - label: "read LT attribute: StartUpOnOff"
+    - label: "Read LT attribute: StartUpOnOff"
       PICS: OO.S.A4003
       command: "readAttribute"
       attribute: "StartUpOnOff"

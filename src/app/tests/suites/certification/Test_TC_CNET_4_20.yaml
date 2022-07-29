@@ -22,10 +22,17 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
+      verification: |
+
+      disabled: true
+
     - label: "DUT sends the ScanNetwork command to the TH"
       PICS: CNET.C.C00.Tx
       verification: |
           ./chip-tool networkcommissioning scan-networks 1 0 --Ssid null --Breadcrumb 1
+
+          Verify ScanNetworksResponse status on the TH Log:
 
           [1653475026.012811][29937:29942] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
           [1653475026.012942][29937:29942] CHIP:TOO:   ScanNetworksResponse: {
@@ -160,6 +167,8 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
 
+          Verify ArmFailSafeResponse on the TH Log:
+
           [1650371269.889246][42481:42486] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1650371269.889331][42481:42486] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1650371269.889471][42481:42486] CHIP:TOO:   ArmFailSafeResponse: {
@@ -173,7 +182,11 @@ tests:
     - label: "DUT sends the AddOrUpdateWiFiNetwork command to the TH"
       PICS: CNET.C.C03.Tx
       verification: |
+          ./chip-tool networkcommissioning add-or-update-wi-fi-network-network hex:<your network id in hex> 1 0
+          Below is an example:
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
+
+          Verify NetworkConfigResponse and its arguments on the TH Log:
 
           [1650371276.622265][42488:42493] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1650371276.622332][42488:42493] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
@@ -185,25 +198,14 @@ tests:
           [1650371276.622728][42488:42493] CHIP:EM: Sending Standalone Ack for MessageCounter:9593846 on exchange 33754i
       disabled: true
 
-    - label: "DUT sends the RemoveNetwork command to the TH"
+    - label: "DUT sends the ConnectNetwork command to the TH"
       PICS: CNET.C.C06.Tx
       verification: |
-          ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
+          ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
+          Below is an example:
+           ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
 
-          [1650373300.704806][42697:42702] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
-          [1650373300.704864][42697:42702] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
-          [1650373300.704957][42697:42702] CHIP:TOO:   NetworkConfigResponse: {
-          [1650373300.705012][42697:42702] CHIP:TOO:     networkingStatus: 0
-          [1650373300.705044][42697:42702] CHIP:TOO:     networkIndex: 0
-          [1650373300.705073][42697:42702] CHIP:TOO:    }
-          [1650373300.705120][42697:42702] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1650373300.705181][42697:42702] CHIP:EM: Sending Standalone Ack for MessageCounter:9924068 on exchange 3557i
-      disabled: true
-
-    - label: "DUT sends the ConnectNetwork command to the TH"
-      PICS: CNET.C.C08.Tx
-      verification: |
-          ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
+          Verify ConnectNetworkResponse and its arguments on the TH Log:
 
           [1650376217.124606][42876:42881] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1650376217.124707][42876:42881] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
@@ -216,9 +218,13 @@ tests:
       disabled: true
 
     - label: "DUT sends the ReorderNetwork command to the TH"
-      PICS: CNET.C.C04.Tx
+      PICS: CNET.C.C08.Tx
       verification: |
+          ./chip-tool networkcommissioning reorder-network hex:<your network id in hex> 1 0
+          Below is an example:
           ./chip-tool networkcommissioning reorder-network hex:47524C50726976617465 3 1 0
+
+          Verify NetworkConfigResponse and its arguments on the TH Log:
 
           [1650381494.820649][44087:44092] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1650381494.820749][44087:44092] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
@@ -228,4 +234,23 @@ tests:
           [1650381494.821016][44087:44092] CHIP:TOO:    }
           [1650381494.821087][44087:44092] CHIP:DMG: ICR moving to [AwaitingDe]
           [1650381494.821174][44087:44092] CHIP:EM: Sending Standalone Ack for MessageCounter:5656346 on exchange 4849i
+      disabled: true
+
+    - label: "DUT sends the RemoveNetwork command to the TH"
+      PICS: CNET.C.C04.Tx
+      verification: |
+          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
+          Below is an example:
+          ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
+
+          Verify NetworkConfigResponse and its arguments on the TH Log:
+
+          [1650373300.704806][42697:42702] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1650373300.704864][42697:42702] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1650373300.704957][42697:42702] CHIP:TOO:   NetworkConfigResponse: {
+          [1650373300.705012][42697:42702] CHIP:TOO:     networkingStatus: 0
+          [1650373300.705044][42697:42702] CHIP:TOO:     networkIndex: 0
+          [1650373300.705073][42697:42702] CHIP:TOO:    }
+          [1650373300.705120][42697:42702] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650373300.705181][42697:42702] CHIP:EM: Sending Standalone Ack for MessageCounter:9924068 on exchange 3557i
       disabled: true

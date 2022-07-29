@@ -34,6 +34,7 @@
 #import <Matter/MTRError.h>
 #import <Matter/MTRKeypair.h>
 #import <Matter/MTRManualSetupPayloadParser.h>
+#import <Matter/MTROTAHeaderParser.h>
 #import <Matter/MTROTAProviderDelegate.h>
 #import <Matter/MTRPersistentStorageDelegate.h>
 #import <Matter/MTRQRCodeSetupPayloadParser.h>

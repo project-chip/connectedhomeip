@@ -78,7 +78,7 @@ void CloseSessionCommand::OnDeviceConnectedFn(void * context, OperationalDeviceP
     VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
 }
 
-void CloseSessionCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
+void CloseSessionCommand::OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR err)
 {
     LogErrorOnFailure(err);
 

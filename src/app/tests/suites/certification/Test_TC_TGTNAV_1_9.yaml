@@ -36,7 +36,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
@@ -44,25 +44,24 @@ tests:
       response:
           value: 0
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "Read the global attribute: AttributeList"
-      PICS: TGTNAV.S.A0001
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
-
-    - label: "Read the global attribute: AttributeList"
-      PICS: " !TGTNAV.S.A0001 "
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [0, 65528, 65529, 65531, 65532, 65533]
+
+    - label: "Read the optional attribute(CurrentTarget) in AttributeList"
+      PICS: TGTNAV.S.A0001
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"

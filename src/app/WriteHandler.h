@@ -25,7 +25,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
@@ -41,6 +41,8 @@ namespace app {
 class WriteHandler : public Messaging::ExchangeDelegate
 {
 public:
+    WriteHandler() : mExchangeCtx(*this) {}
+
     /**
      *  Initialize the WriteHandler. Within the lifetime
      *  of this instance, this method is invoked once after object
@@ -96,7 +98,7 @@ public:
 
     bool MatchesExchangeContext(Messaging::ExchangeContext * apExchangeContext) const
     {
-        return !IsFree() && mpExchangeCtx == apExchangeContext;
+        return !IsFree() && mExchangeCtx.Get() == apExchangeContext;
     }
 
     void CacheACLCheckResult(const AttributeAccessToken & aToken) { mACLCheckCache.SetValue(aToken); }
@@ -158,7 +160,7 @@ private:
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
-    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
+    Messaging::ExchangeHolder mExchangeCtx;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     State mState           = State::Uninitialized;
     bool mIsTimedRequest   = false;

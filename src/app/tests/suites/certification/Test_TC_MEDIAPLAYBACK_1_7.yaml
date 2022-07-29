@@ -36,7 +36,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "Read the global attribute: FeatureMap"
       PICS: MEDIAPLAYBACK.S.AS || MEDIAPLAYBACK.S.VS
@@ -44,7 +44,7 @@ tests:
       attribute: "FeatureMap"
       response:
           constraints:
-              type: map32
+              type: bitmap32
               minValue: 0
               maxValue: 3
 
@@ -153,6 +153,7 @@ tests:
           constraints:
               type: list
               contains: [6]
+
     - label: "Read the optional command(FastForward) in AcceptedCommandList"
       PICS: MEDIAPLAYBACK.S.C07.Rsp
       command: "readAttribute"

@@ -18,6 +18,9 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    RateConfigValue:
+        type: int8u
+        defaultValue: 50
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -39,13 +42,20 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F00 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -57,7 +67,7 @@ tests:
               - name: "MoveMode"
                 value: 1
               - name: "Rate"
-                value: 15
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -72,12 +82,12 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -90,12 +100,12 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -108,12 +118,12 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -125,7 +135,7 @@ tests:
               - name: "MoveMode"
                 value: 3
               - name: "Rate"
-                value: 10
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -140,12 +150,12 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times."
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -158,12 +168,12 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times."
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -176,12 +186,12 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times."
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -195,7 +205,7 @@ tests:
               - name: "MoveMode"
                 value: 1
               - name: "Rate"
-                value: 100
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -210,12 +220,12 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -229,7 +239,7 @@ tests:
               - name: "MoveMode"
                 value: 0
               - name: "Rate"
-                value: 50
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -244,13 +254,13 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT."
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           saveAs: CurrentSaturationStep4d
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -263,7 +273,7 @@ tests:
                 value: 1000
 
     - label: "CurrentSaturation value Stops incrementing"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -279,7 +289,7 @@ tests:
               - name: "MoveMode"
                 value: 3
               - name: "Rate"
-                value: 10
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -294,13 +304,13 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times."
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           saveAs: CurrentSaturationStep5b
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -313,12 +323,12 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times."
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: CurrentSaturationStep5b
 
@@ -332,7 +342,7 @@ tests:
               - name: "MoveMode"
                 value: 0
               - name: "Rate"
-                value: 10
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -347,13 +357,13 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           saveAs: CurrentSaturationStep5d
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -366,7 +376,7 @@ tests:
                 value: 1000
 
     - label: "CurrentSaturation value Stops decrementing"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:

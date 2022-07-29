@@ -123,8 +123,6 @@ function getManualTests() {
         "Test_TC_CNET_4_4",
         "Test_TC_CNET_4_5",
         "Test_TC_CNET_4_6",
-        "Test_TC_CNET_4_7",
-        "Test_TC_CNET_4_8",
         "Test_TC_CNET_4_9",
         "Test_TC_CNET_4_10",
         "Test_TC_CNET_4_11",
@@ -161,7 +159,6 @@ function getManualTests() {
 
     const GeneralCommissioning = [
         "Test_TC_CGEN_2_2",
-        "Test_TC_CGEN_2_3",
         "Test_TC_CGEN_2_4",
     ];
 
@@ -245,8 +242,6 @@ function getManualTests() {
         "Test_TC_CADMIN_1_20",
         "Test_TC_CADMIN_1_21",
         "Test_TC_CADMIN_1_22",
-        "Test_TC_CADMIN_1_23",
-        "Test_TC_CADMIN_1_24",
         // Slow tests that should not run in CI because they take many minutes each
         "Test_TC_CADMIN_1_3",
         "Test_TC_CADMIN_1_4",
@@ -255,8 +250,8 @@ function getManualTests() {
         "Test_TC_CADMIN_1_9",
         "Test_TC_CADMIN_1_10",
         "Test_TC_CADMIN_1_13",
-        "Test_TC_CADMIN_1_25",
-        "Test_TC_CADMIN_1_26",
+        "Test_TC_CADMIN_1_23",
+        "Test_TC_CADMIN_1_24",
     ];
 
     const ModeSelect = [
@@ -415,7 +410,6 @@ function getManualTests() {
     ];
 
     const Switch = [
-        "Test_TC_SWTCH_1_1",
         "Test_TC_SWTCH_2_2",
         "Test_TC_SWTCH_3_1",
         "Test_TC_SWTCH_3_2",
@@ -751,6 +745,7 @@ function getTests() {
     ];
 
     const Switch = [
+        "Test_TC_SWTCH_1_1",
         "Test_TC_SWTCH_2_1",
     ];
 

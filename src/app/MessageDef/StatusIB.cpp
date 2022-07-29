@@ -29,7 +29,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <lib/core/CHIPCore.h>
 
 using namespace chip;

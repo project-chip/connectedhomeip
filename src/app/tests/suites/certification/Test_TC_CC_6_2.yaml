@@ -40,6 +40,13 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F04 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
       PICS: CC.S.F04 && CC.S.A400b
       command: "readAttribute"
@@ -47,7 +54,7 @@ tests:
       response:
           saveAs: ColorTempPhysicalMinMiredsValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -58,7 +65,7 @@ tests:
       response:
           saveAs: ColorTempPhysicalMaxMiredsValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -68,7 +75,7 @@ tests:
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -99,12 +106,12 @@ tests:
                 value: 1000
 
     - label: "Read current color temprature attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4B.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -117,12 +124,12 @@ tests:
                 value: 1000
 
     - label: "Read current color temprature attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4B.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -135,12 +142,12 @@ tests:
                 value: 1000
 
     - label: "Read current color temprature attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4B.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -171,12 +178,12 @@ tests:
                 value: 1000
 
     - label: "Read current color temprature attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4B.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -189,12 +196,12 @@ tests:
                 value: 1000
 
     - label: "Read current color temprature attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4B.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -207,12 +214,12 @@ tests:
                 value: 1000
 
     - label: "Read current color temprature attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4B.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -224,7 +231,7 @@ tests:
               - name: "MoveMode"
                 value: 1
               - name: "Rate"
-                value: 10
+                value: 20
               - name: "ColorTemperatureMinimumMireds"
                 value: ColorTempPhysicalMinMiredsValue
               - name: "ColorTemperatureMaximumMireds"
@@ -242,11 +249,11 @@ tests:
               - name: "MoveMode"
                 value: 0
               - name: "Rate"
-                value: 10
+                value: 20
               - name: "ColorTemperatureMinimumMireds"
-                value: 1
+                value: ColorTempPhysicalMinMiredsValue
               - name: "ColorTemperatureMaximumMireds"
-                value: 255
+                value: ColorTempPhysicalMaxMiredsValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -261,13 +268,13 @@ tests:
                 value: 1000
 
     - label: "Read current color temprature attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4B.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
           saveAs: ColorTemperatureValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -280,13 +287,13 @@ tests:
                 value: 1000
 
     - label: "Read current color temprature attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4B.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
           value: ColorTemperatureValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -299,13 +306,13 @@ tests:
                 value: 1000
 
     - label: "Read current color temprature attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4B.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
           value: ColorTemperatureValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -335,7 +342,7 @@ tests:
               - name: "MoveMode"
                 value: 0
               - name: "Rate"
-                value: 10
+                value: 20
               - name: "ColorTemperatureMinimumMireds"
                 value: ColorTempPhysicalMinMiredsValue
               - name: "ColorTemperatureMaximumMireds"
@@ -354,13 +361,13 @@ tests:
                 value: 1000
 
     - label: "Read current color temprature attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4B.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
           saveAs: ColorTemperatureMoveModeStop
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -373,13 +380,13 @@ tests:
                 value: 1000
 
     - label: "Read current color temprature attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4B.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
           value: ColorTemperatureMoveModeStop
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -392,13 +399,13 @@ tests:
                 value: 1000
 
     - label: "Read current color temprature attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4B.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
           value: ColorTemperatureValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
