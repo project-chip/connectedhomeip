@@ -34,7 +34,7 @@ tests:
       response:
           value: 3
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "TH reads the FeatureMap attribute from the DUT"
       command: "readAttribute"
@@ -42,7 +42,7 @@ tests:
       response:
           value: 0
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "TH reads the AttributeList attribute from the DUT"
       command: "readAttribute"

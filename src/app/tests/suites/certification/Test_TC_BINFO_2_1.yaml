@@ -62,7 +62,7 @@ tests:
       response:
           saveAs: DataModelRevisionValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65534
 
@@ -89,7 +89,7 @@ tests:
       response:
           saveAs: VendorNameValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes VendorName from the DUT."
@@ -115,7 +115,7 @@ tests:
       response:
           saveAs: VendorIDValue
           constraints:
-              type: uint16
+              type: vendor_id
               minValue: 1
               maxValue: 65521
 
@@ -142,7 +142,7 @@ tests:
       response:
           saveAs: ProductNameValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes ProductName from the DUT."
@@ -168,7 +168,7 @@ tests:
       response:
           saveAs: ProductIDValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 1
               maxValue: 65534
 
@@ -195,7 +195,7 @@ tests:
       response:
           saveAs: NodeLabelValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes NodeLabel from the DUT."
@@ -218,7 +218,7 @@ tests:
       attribute: "Location"
       response:
           constraints:
-              type: string
+              type: char_string
               maxLength: 16
 
     - label:
@@ -263,7 +263,7 @@ tests:
       response:
           saveAs: HardwareVersionValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65534
 
@@ -290,7 +290,7 @@ tests:
       response:
           saveAs: HardwareVersionStringValue
           constraints:
-              type: string
+              type: char_string
               minLength: 1
               maxLength: 64
 
@@ -382,7 +382,7 @@ tests:
       response:
           saveAs: ManufacturingDateValue
           constraints:
-              type: string
+              type: char_string
               minLength: 8
               maxLength: 16
 
@@ -422,7 +422,7 @@ tests:
       response:
           saveAs: PartNumberValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes PartNumber from the DUT."
@@ -448,7 +448,7 @@ tests:
       response:
           saveAs: ProductURLValue
           constraints:
-              type: string
+              type: long_char_string
               maxLength: 256
 
     - label:
@@ -487,7 +487,7 @@ tests:
       response:
           saveAs: ProductLabelValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 64
 
     - label:
@@ -526,7 +526,7 @@ tests:
       response:
           saveAs: SerialNumberValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes SerialNumber from the DUT."
@@ -595,7 +595,7 @@ tests:
       response:
           saveAs: UniqueIDValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes UniqueID from the DUT."

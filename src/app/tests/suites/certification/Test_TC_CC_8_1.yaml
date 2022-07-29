@@ -19,19 +19,19 @@ config:
     cluster: "Color Control"
     endpoint: 1
     RateConfigValue:
-        type: INT8U
+        type: int8u
         defaultValue: 50
     RateXConfigValue:
-        type: INT16S
+        type: int16s
         defaultValue: 50
     RateYConfigValue:
-        type: INT16S
+        type: int16s
         defaultValue: 50
     ColorTemperatureMinMiredsConfigValue:
-        type: INT16U
+        type: int16u
         defaultValue: 1
     ColorTemperatureMaxMiredsConfigValue:
-        type: INT16U
+        type: int16u
         defaultValue: 255
 
 tests:
@@ -81,7 +81,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -102,7 +102,7 @@ tests:
       response:
           saveAs: CurrentHueValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -121,7 +121,7 @@ tests:
       response:
           value: CurrentHueValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -145,7 +145,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -166,7 +166,7 @@ tests:
       response:
           saveAs: CurrentSaturationValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -185,7 +185,7 @@ tests:
       response:
           value: CurrentSaturationValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -217,7 +217,7 @@ tests:
       attribute: "CurrentX"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -227,7 +227,7 @@ tests:
       attribute: "CurrentY"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -248,7 +248,7 @@ tests:
       response:
           saveAs: CurrentXValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -259,7 +259,7 @@ tests:
       response:
           saveAs: CurrentYValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -278,7 +278,7 @@ tests:
       response:
           value: CurrentXValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -289,7 +289,7 @@ tests:
       response:
           value: CurrentYValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -325,7 +325,7 @@ tests:
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -346,7 +346,7 @@ tests:
       response:
           saveAs: ColorTemperatureMiredsValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -367,7 +367,7 @@ tests:
       response:
           value: ColorTemperatureMiredsValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -391,7 +391,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -412,7 +412,7 @@ tests:
       response:
           saveAs: EnhancedCurrentHueValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -431,7 +431,7 @@ tests:
       response:
           value: EnhancedCurrentHueValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 

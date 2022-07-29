@@ -18,14 +18,14 @@ config:
     nodeId: 0x12344321
     timeout: 300
     nodeId2:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0xCAFE
     endpoint: 0
     discriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 3840
     payload:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"
 
 tests:
@@ -69,7 +69,7 @@ tests:
       PICS: BINFO.S.A0005
       response:
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
@@ -135,7 +135,7 @@ tests:
       response:
           value: "chiptest"
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label:
@@ -160,7 +160,7 @@ tests:
       response:
           value: "chiptest"
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH_CR2 opens a commissioning window on DUT_CE using BCM"
