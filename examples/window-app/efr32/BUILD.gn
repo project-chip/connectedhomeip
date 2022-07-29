@@ -24,6 +24,10 @@ import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 assert(current_os == "freertos")
 
+if(chip_enable_openthread){
+  import("//build_overrides/openthread.gni")
+}
+
 project_dir = "${chip_root}/examples/window-app"
 efr32_project_dir = "${project_dir}/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
@@ -186,21 +190,29 @@ efr32_executable("window_app") {
 
   # OpenThread Settings
   if (chip_enable_openthread) {
-    deps += [
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+    deps += [ 
+      "${chip_root}/src/platform:ot_device_deps",
       "${examples_plat_dir}:efr-matter-shell",
     ]
-    if (chip_openthread_ftd) {
+
+    if (chip_use_ot_lib) {
       deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+        "${efr32_sdk_build_root}:openthread_system",
       ]
     } else {
       deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+        "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+        "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
       ]
+      if (chip_openthread_ftd) {
+        deps += [
+          "${openthread_root}:libopenthread-cli-ftd",
+        ]
+      } else {
+        deps += [
+          "$${openthread_root}:libopenthread-cli-mtd",
+        ]
+      }
     }
   }
 

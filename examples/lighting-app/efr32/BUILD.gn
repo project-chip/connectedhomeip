@@ -25,6 +25,10 @@ import("${efr32_sdk_build_root}/efr32_sdk.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
 
+if(chip_enable_openthread){
+  import("//build_overrides/openthread.gni")
+}
+
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
   import("$dir_pw_build/target_types.gni")
@@ -220,11 +224,11 @@ efr32_executable("lighting_app") {
       ]
       if (chip_openthread_ftd) {
         deps += [
-          "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+          "${openthread_root}:libopenthread-cli-ftd",
         ]
       } else {
         deps += [
-          "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+          "${openthread_root}:libopenthread-cli-mtd",
         ]
       }
     }
