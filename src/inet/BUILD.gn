@@ -108,9 +108,7 @@ static_library("inet") {
   }
 
   if (chip_system_config_use_open_thread_inet_endpoints) {
-    public_deps += [ 
-      "${chip_root}/src/platform:ot_device_deps",
-    ]
+    public_deps += [ "${chip_root}/src/platform:ot_device_deps" ]
   }
 
   if (chip_inet_config_enable_tcp_endpoint) {

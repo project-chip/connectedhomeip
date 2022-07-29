@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/jlink.gni")
 import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/jlink.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
@@ -22,7 +22,7 @@ declare_args() {
   # Build target to use for efr32 SDK. Use this to set global SDK defines.
   efr32_sdk_target = ""
   sl_ot_efr32_root = "${chip_root}/third_party/openthread/ot-efr32"
-  sl_openthread_root =  "${chip_root}/third_party/openthread/ot-efr32/openthread"
+  sl_openthread_root = "${chip_root}/third_party/openthread/ot-efr32/openthread"
 }
 
 assert(efr32_sdk_target != "", "efr32_sdk_target must be specified")
@@ -31,8 +31,7 @@ group("efr32_sdk") {
   public_deps = [ efr32_sdk_target ]
 }
 
-if (chip_use_ot_lib)
-{
+if (chip_use_ot_lib) {
   config("libopenthread-platform_config") {
     include_dirs = [ "${sl_openthread_root}/examples/platforms" ]
   }
@@ -74,24 +73,26 @@ if (chip_use_ot_lib)
       "${sl_ot_efr32_root}/src/cli",
       "${sl_ot_efr32_root}/src/src",
     ]
-
   }
 
   source_set("openthread_core_config_efr32") {
     sources = [
+      "${sl_openthread_root}/src/cli/cli_config.h",
       "${sl_ot_efr32_root}/src/src/openthread-core-efr32-config-check.h",
       "${sl_ot_efr32_root}/src/src/openthread-core-efr32-config.h",
-      "${sl_openthread_root}/src/cli/cli_config.h",
     ]
 
-    public_deps = [ "${efr32_sdk_build_root}:efr32_sdk", ":libopenthread-platform", ]
+    public_deps = [
+      ":libopenthread-platform",
+      "${efr32_sdk_build_root}:efr32_sdk",
+    ]
 
     public_configs = [ ":openthread_efr32_config" ]
   }
 
-  source_set("ot-efr32-cert")
-  {
+  source_set("ot-efr32-cert") {
     sources = [
+      "${sl_openthread_root}/examples/apps/cli/cli_uart.cpp",
       "${sl_openthread_root}/src/cli/cli.cpp",
       "${sl_openthread_root}/src/cli/cli.hpp",
       "${sl_openthread_root}/src/cli/cli_coap.cpp",
@@ -120,32 +121,28 @@ if (chip_use_ot_lib)
       "${sl_openthread_root}/src/cli/cli_udp.cpp",
       "${sl_openthread_root}/src/cli/cli_udp.hpp",
       "${sl_openthread_root}/src/cli/x509_cert_key.hpp",
-      "${sl_openthread_root}/examples/apps/cli/cli_uart.cpp",
     ]
 
-    public_configs = [ 
+    public_configs = [
       ":openthread_efr32_config",
       ":libopenthread-platform_config",
     ]
 
     public_deps = [
+      ":libopenthread-platform",
       ":openthread_core_config_efr32",
-      ":libopenthread-platform", 
-      "${sl_openthread_root}/src/core/:libopenthread_core_headers",
       "${segger_rtt_root}:segger_rtt",
+      "${sl_openthread_root}/src/core/:libopenthread_core_headers",
     ]
 
-    deps = [ 
-      "${efr32_sdk_build_root}:efr32_sdk",
-    ]
+    deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
 
     # selected thread device type FTD or MTD
     XTD = "ftd"
-    if (chip_openthread_ftd == false)
-    {
+    if (chip_openthread_ftd == false) {
       XTD = "mtd"
     }
-    
+
     public_configs += [ "${sl_openthread_root}:openthread_${XTD}_config" ]
 
     libs = [

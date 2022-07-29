@@ -458,21 +458,19 @@ if (chip_device_platform != "none") {
   }
 }
 
-if (chip_enable_openthread)
-{
-  group("ot_device_deps")
-  {
-    if (chip_use_ot_lib){
-      assert(chip_ot_lib_source_set != "", "Provide the location of your ot lib source set using the arg chip_ot_lib_source_set")
-       public_deps = chip_ot_lib_source_set
+if (chip_enable_openthread) {
+  group("ot_device_deps") {
+    if (chip_use_ot_lib) {
+      assert(
+          chip_ot_lib_source_set != "",
+          "Provide the location of your ot lib source set using the arg chip_ot_lib_source_set")
+      public_deps = chip_ot_lib_source_set
     } else {
       if (chip_openthread_ftd) {
-        public_deps =
-            [ "${openthread_root}:libopenthread-ftd" ]
+        public_deps = [ "${openthread_root}:libopenthread-ftd" ]
       } else {
-        public_deps =
-            [ "${openthread_root}:libopenthread-mtd" ]
+        public_deps = [ "${openthread_root}:libopenthread-mtd" ]
       }
     }
   }
-} 
+}

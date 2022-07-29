@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
 import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
@@ -99,12 +99,11 @@ static_library("EFR32") {
     "$dir_pw_kvs",
   ]
   if (chip_enable_openthread) {
-    public_deps += [ 
-      "${chip_root}/src/platform:ot_device_deps",
-    ]
-    
-    if (chip_use_ot_lib == false){
-      public_deps += [ "${chip_root}/third_party/openthread/platforms:openthread_system"]
+    public_deps += [ "${chip_root}/src/platform:ot_device_deps" ]
+
+    if (chip_use_ot_lib == false) {
+      public_deps +=
+          [ "${chip_root}/third_party/openthread/platforms:openthread_system" ]
     }
 
     sources += [

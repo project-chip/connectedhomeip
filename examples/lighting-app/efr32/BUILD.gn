@@ -18,14 +18,14 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
-import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_board.gni")
+import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
 
-if(chip_enable_openthread){
+if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -208,28 +208,22 @@ efr32_executable("lighting_app") {
 
   # OpenThread Settings
   if (chip_enable_openthread) {
-    deps += [ 
+    deps += [
       "${chip_root}/src/platform:ot_device_deps",
       "${examples_plat_dir}:efr-matter-shell",
     ]
 
     if (chip_use_ot_lib) {
-      deps += [
-        "${efr32_sdk_build_root}:openthread_system",
-      ]
+      deps += [ "${efr32_sdk_build_root}:openthread_system" ]
     } else {
       deps += [
         "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
         "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
       ]
       if (chip_openthread_ftd) {
-        deps += [
-          "${openthread_root}:libopenthread-cli-ftd",
-        ]
+        deps += [ "${openthread_root}:libopenthread-cli-ftd" ]
       } else {
-        deps += [
-          "${openthread_root}:libopenthread-cli-mtd",
-        ]
+        deps += [ "${openthread_root}:libopenthread-cli-mtd" ]
       }
     }
   }

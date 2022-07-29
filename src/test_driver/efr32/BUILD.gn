@@ -15,8 +15,8 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
-import("//build_overrides/pigweed.gni")
 import("//build_overrides/openthread.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
 import("${efr32_sdk_build_root}/efr32_executable.gni")
@@ -97,28 +97,22 @@ efr32_executable("efr32_device_tests") {
 
   # OpenThread Settings
   if (chip_enable_openthread) {
-    deps += [ 
+    deps += [
       "${chip_root}/src/platform:ot_device_deps",
       "${examples_plat_dir}:efr-matter-shell",
     ]
 
     if (chip_use_ot_lib) {
-      deps += [
-        "${efr32_sdk_build_root}:openthread_system",
-      ]
+      deps += [ "${efr32_sdk_build_root}:openthread_system" ]
     } else {
       deps += [
         "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
         "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
       ]
       if (chip_openthread_ftd) {
-        deps += [
-          "${openthread_root}:libopenthread-cli-ftd",
-        ]
+        deps += [ "${openthread_root}:libopenthread-cli-ftd" ]
       } else {
-        deps += [
-          "$${openthread_root}:libopenthread-cli-mtd",
-        ]
+        deps += [ "$${openthread_root}:libopenthread-cli-mtd" ]
       }
     }
   }
