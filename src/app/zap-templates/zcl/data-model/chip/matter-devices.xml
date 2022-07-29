@@ -1957,13 +1957,6 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0023</deviceId>
         <clusters lockOthers="true">
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>IDENTIFY_TIME</requireAttribute>
-                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
-                <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
-            </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
                 <requireAttribute>SERVER_LIST</requireAttribute>
@@ -2000,7 +1993,7 @@ limitations under the License.
             <include cluster="Media Playback" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Keypad Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Media Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
-            <include cluster="On/Off" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Channel" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Audio Output" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Low Power" client="false" server="true" clientLocked="false" serverLocked="false"></include>
@@ -2015,6 +2008,15 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0029</deviceId>
         <clusters lockOthers="true">
+            <include cluster="Descriptor" client="true" server="false" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
             <include cluster="Media Playback" client="true" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Content Launcher" client="true" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Keypad Input" client="true" server="false" clientLocked="true" serverLocked="false"></include>
@@ -2038,6 +2040,15 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002A</deviceId>
         <clusters lockOthers="true">
+            <include cluster="Descriptor" client="true" server="false" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
             <include cluster="Media Playback" client="true" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Content Launcher" client="true" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Keypad Input" client="true" server="false" clientLocked="true" serverLocked="false"></include>
