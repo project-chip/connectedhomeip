@@ -88,8 +88,18 @@ function show_dependencies() {
 function download() {
     echo "$COLOR_BLUE"
 
-    for package in "${@:2}"; do
-        wget -r -nd --no-parent --progress=dot:mega -A "$package" "$1"
+    PKGS=()
+    for PKG in "${@:2}"; do
+        PKGS+=("-A" "$PKG")
+    done
+    wget -r -nd --no-parent --progress=dot:mega "${PKGS[@]}" "$1"
+
+    # Check if the files have been downloaded
+    for PKG in "${@:2}"; do
+        if [[ ! $(find . -type f -name "$PKG") ]]; then
+            error "PKG is missing: $PKG"
+            return 1
+        fi
     done
 
     echo -n "$COLOR_NONE"
