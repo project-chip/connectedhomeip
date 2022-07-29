@@ -361,14 +361,17 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
                     addr.ToString(address_string, 255);
                     ChipLogDetail(Inet, "Interface %s has a link local address : %s", name, address_string);
 
-                    interfaceFound = true;
+                    interfaceFound             = true;
+                    PacketBufferHandle tempBuf = msgBuf.CloneData();
+                    VerifyOrReturnError(!tempBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+                    VerifyOrReturnError(!tempBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
                     multicastAddress.GetIPAddress().ToString(address_string, 255);
                     destination = &(multicastAddress.SetInterface(interfaceId));
                     if (mTransportMgr != nullptr)
                     {
-                        CHIP_TRACE_PREPARED_MESSAGE_SENT(destination, &msgBuf);
-                        if (CHIP_NO_ERROR != mTransportMgr->SendMessage(*destination, std::move(msgBuf)))
+                        CHIP_TRACE_PREPARED_MESSAGE_SENT(destination, &tempBuf);
+                        if (CHIP_NO_ERROR != mTransportMgr->SendMessage(*destination, std::move(tempBuf)))
                         {
                             ChipLogError(Inet, "Failed to send Multicast MSG to addr : %s on interface %s", address_string, name);
                         }
