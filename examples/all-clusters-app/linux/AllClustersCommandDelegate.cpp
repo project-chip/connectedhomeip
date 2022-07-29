@@ -32,27 +32,39 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
-void AllClustersCommandDelegate::OnEventCommandReceived(const char * json)
+AllClustersAppCommandHandler * AllClustersAppCommandHandler::FromJSON(const char * json)
 {
     Json::Reader reader;
+    Json::Value value;
 
-    if (!reader.parse(json, mJsonValue))
+    if (!reader.parse(json, value))
     {
-        ChipLogError(NotSpecified, "Error parsing JSON with error %s:", reader.getFormattedErrorMessages().c_str());
+        ChipLogError(NotSpecified,
+                     "AllClusters App: Error parsing JSON with error %s:", reader.getFormattedErrorMessages().c_str());
+        return nullptr;
     }
-    else
+
+    if (value.empty() || !value.isObject())
     {
-        DeviceLayer::PlatformMgr().ScheduleWork(HandleEventCommand, reinterpret_cast<intptr_t>(this));
+        ChipLogError(NotSpecified, "AllClusters App: Invalid JSON command received");
+        return nullptr;
     }
+
+    if (!value.isMember("Name") || !value["Name"].isString())
+    {
+        ChipLogError(NotSpecified, "AllClusters App: Invalid JSON command received: command name is missing");
+        return nullptr;
+    }
+
+    return Platform::New<AllClustersAppCommandHandler>(value);
 }
 
-void AllClustersCommandDelegate::HandleEventCommand(intptr_t context)
+void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
 {
-    auto * self = reinterpret_cast<AllClustersCommandDelegate *>(context);
-
-    VerifyOrReturn(!self->mJsonValue.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
-
+    auto * self      = reinterpret_cast<AllClustersAppCommandHandler *>(context);
     std::string name = self->mJsonValue["Name"].asString();
+
+    VerifyOrExit(!self->mJsonValue.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
 
     if (name == "SoftwareFault")
     {
@@ -136,17 +148,18 @@ void AllClustersCommandDelegate::HandleEventCommand(intptr_t context)
         ChipLogError(NotSpecified, "Unhandled command: Should never happens");
     }
 
-    self->mJsonValue.clear();
+exit:
+    Platform::Delete(self);
 }
 
-bool AllClustersCommandDelegate::IsClusterPresentOnAnyEndpoint(ClusterId clusterId)
+bool AllClustersAppCommandHandler::IsClusterPresentOnAnyEndpoint(ClusterId clusterId)
 {
     EnabledEndpointsWithServerCluster enabledEndpoints(clusterId);
 
     return (enabledEndpoints.begin() != enabledEndpoints.end());
 }
 
-void AllClustersCommandDelegate::OnRebootSignalHandler(BootReasonType bootReason)
+void AllClustersAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReason)
 {
     if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) != CHIP_NO_ERROR)
     {
@@ -158,7 +171,7 @@ void AllClustersCommandDelegate::OnRebootSignalHandler(BootReasonType bootReason
     }
 }
 
-void AllClustersCommandDelegate::OnGeneralFaultEventHandler(uint32_t eventId)
+void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
 {
     if (!IsClusterPresentOnAnyEndpoint(Clusters::GeneralDiagnostics::Id))
         return;
@@ -219,7 +232,7 @@ void AllClustersCommandDelegate::OnGeneralFaultEventHandler(uint32_t eventId)
     }
 }
 
-void AllClustersCommandDelegate::OnSoftwareFaultEventHandler(uint32_t eventId)
+void AllClustersAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
 {
     VerifyOrReturn(eventId == Clusters::SoftwareDiagnostics::Events::SoftwareFault::Id,
                    ChipLogError(NotSpecified, "Unknown software fault event received"));
@@ -242,7 +255,7 @@ void AllClustersCommandDelegate::OnSoftwareFaultEventHandler(uint32_t eventId)
     Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
 }
 
-void AllClustersCommandDelegate::OnSwitchLatchedHandler(uint8_t newPosition)
+void AllClustersAppCommandHandler::OnSwitchLatchedHandler(uint8_t newPosition)
 {
     EndpointId endpoint = 1;
 
@@ -253,7 +266,7 @@ void AllClustersCommandDelegate::OnSwitchLatchedHandler(uint8_t newPosition)
     Clusters::SwitchServer::Instance().OnSwitchLatch(endpoint, newPosition);
 }
 
-void AllClustersCommandDelegate::OnSwitchInitialPressedHandler(uint8_t newPosition)
+void AllClustersAppCommandHandler::OnSwitchInitialPressedHandler(uint8_t newPosition)
 {
     EndpointId endpoint = 1;
 
@@ -264,7 +277,7 @@ void AllClustersCommandDelegate::OnSwitchInitialPressedHandler(uint8_t newPositi
     Clusters::SwitchServer::Instance().OnInitialPress(endpoint, newPosition);
 }
 
-void AllClustersCommandDelegate::OnSwitchLongPressedHandler(uint8_t newPosition)
+void AllClustersAppCommandHandler::OnSwitchLongPressedHandler(uint8_t newPosition)
 {
     EndpointId endpoint = 1;
 
@@ -275,7 +288,7 @@ void AllClustersCommandDelegate::OnSwitchLongPressedHandler(uint8_t newPosition)
     Clusters::SwitchServer::Instance().OnLongPress(endpoint, newPosition);
 }
 
-void AllClustersCommandDelegate::OnSwitchShortReleasedHandler(uint8_t previousPosition)
+void AllClustersAppCommandHandler::OnSwitchShortReleasedHandler(uint8_t previousPosition)
 {
     EndpointId endpoint = 1;
 
@@ -287,7 +300,7 @@ void AllClustersCommandDelegate::OnSwitchShortReleasedHandler(uint8_t previousPo
     Clusters::SwitchServer::Instance().OnShortRelease(endpoint, previousPosition);
 }
 
-void AllClustersCommandDelegate::OnSwitchLongReleasedHandler(uint8_t previousPosition)
+void AllClustersAppCommandHandler::OnSwitchLongReleasedHandler(uint8_t previousPosition)
 {
     EndpointId endpoint = 1;
 
@@ -301,7 +314,7 @@ void AllClustersCommandDelegate::OnSwitchLongReleasedHandler(uint8_t previousPos
     Clusters::SwitchServer::Instance().OnLongRelease(endpoint, previousPosition);
 }
 
-void AllClustersCommandDelegate::OnSwitchMultiPressOngoingHandler(uint8_t newPosition, uint8_t count)
+void AllClustersAppCommandHandler::OnSwitchMultiPressOngoingHandler(uint8_t newPosition, uint8_t count)
 {
     EndpointId endpoint = 1;
 
@@ -314,7 +327,7 @@ void AllClustersCommandDelegate::OnSwitchMultiPressOngoingHandler(uint8_t newPos
     Clusters::SwitchServer::Instance().OnMultiPressOngoing(endpoint, newPosition, count);
 }
 
-void AllClustersCommandDelegate::OnSwitchMultiPressCompleteHandler(uint8_t previousPosition, uint8_t count)
+void AllClustersAppCommandHandler::OnSwitchMultiPressCompleteHandler(uint8_t previousPosition, uint8_t count)
 {
     EndpointId endpoint = 1;
 
@@ -325,4 +338,16 @@ void AllClustersCommandDelegate::OnSwitchMultiPressCompleteHandler(uint8_t previ
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
 
     Clusters::SwitchServer::Instance().OnMultiPressComplete(endpoint, previousPosition, count);
+}
+
+void AllClustersCommandDelegate::OnEventCommandReceived(const char * json)
+{
+    auto handler = AllClustersAppCommandHandler::FromJSON(json);
+    if (nullptr == handler)
+    {
+        ChipLogError(NotSpecified, "AllClusters App: Unable to instantiate a command handler");
+        return;
+    }
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(AllClustersAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
 }
