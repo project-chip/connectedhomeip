@@ -314,9 +314,9 @@ MTROTAProviderDelegateBridge::~MTROTAProviderDelegateBridge()
     Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, nullptr);
 }
 
-void MTROTAProviderDelegateBridge::Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeManager)
+CHIP_ERROR MTROTAProviderDelegateBridge::Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeManager)
 {
-    gOtaSender.Init(systemLayer, exchangeManager);
+    return gOtaSender.Init(systemLayer, exchangeManager);
 }
 
 void MTROTAProviderDelegateBridge::Shutdown() { gOtaSender.Shutdown(); }

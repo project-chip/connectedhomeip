@@ -76,6 +76,8 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
                     params:(MTRDeviceControllerStartupParams *)params
                     fabric:(const FabricInfo * _Nullable * _Nonnull)fabric;
+
+- (MTRDeviceController * _Nullable)maybeInitializeOTAProvider:(MTRDeviceController * _Nonnull)controller;
 @end
 
 @implementation MTRControllerFactory
@@ -387,7 +389,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         return nil;
     }
 
-    return controller;
+    return [self maybeInitializeOTAProvider:controller];
 }
 
 - (MTRDeviceController * _Nullable)startControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
@@ -447,7 +449,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         return nil;
     }
 
-    return controller;
+    return [self maybeInitializeOTAProvider:controller];
 }
 
 - (MTRDeviceController * _Nullable)createController
@@ -462,11 +464,6 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         // Bringing up the first controller.  Start the event loop now.  If we
         // fail to bring it up, its cleanup will stop the event loop again.
         chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
-
-        if (_otaProviderDelegateBridge) {
-            auto systemState = _controllerFactory->GetSystemState();
-            _otaProviderDelegateBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr());
-        }
     }
 
     // Add the controller to _controllers now, so if we fail partway through its
@@ -514,6 +511,27 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
     *fabric = fabricTable.FindFabric(pubKey, params.fabricId);
     return YES;
+}
+
+// Initialize the MTROTAProviderDelegateBridge if it has not been initialized already
+//
+// Returns nil on failure, the input controller on success.
+// If the provider has been initialized already, it is not considered as a failure.
+//
+- (MTRDeviceController * _Nullable)maybeInitializeOTAProvider:(MTRDeviceController * _Nonnull)controller
+{
+    VerifyOrReturnValue(_otaProviderDelegateBridge != nil, controller);
+    VerifyOrReturnValue([_controllers count] == 1, controller);
+
+    auto systemState = _controllerFactory->GetSystemState();
+    CHIP_ERROR err = _otaProviderDelegateBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr());
+    if (CHIP_NO_ERROR != err) {
+        MTR_LOG_ERROR("Failed to init provider delegate bridge: %" CHIP_ERROR_FORMAT, err.Format());
+        [controller shutdown];
+        return nil;
+    }
+
+    return controller;
 }
 
 @end
