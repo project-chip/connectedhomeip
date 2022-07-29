@@ -2,10 +2,14 @@
     "name": "CHIP README Templates",
     "version": "chip-v1",
     "helpers": [
-        "../../../../zap-templates/common/ClusterTestGeneration.js",
-        "tests.js"
+        "common/ClusterTestGeneration.js",
+        "app/tests/suites/examples/templates/tests.js"
     ],
-
+    "resources": {
+        "pics-metafile": "../../../../app/tests/suites/certification/PICS.yaml",
+        "certification-metadir": "../../../../app/tests/suites/certification",
+        "test-metadir": "../../../../app/tests/suites"
+    },
     "templates": [
         {
             "path": "../TestGenExample.zapt",
