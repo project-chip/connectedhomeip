@@ -26,10 +26,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
-#if defined(PW_RPC_ENABLED)
-#include "Rpc.h"
-#endif // PW_RPC_ENABLED
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -79,10 +75,6 @@ void ApplicationInit()
 
 int main(int argc, char * argv[])
 {
-#if PW_RPC_ENABLED
-    chip::rpc::Init();
-#endif
-
     if (ChipLinuxAppInit(argc, argv) != 0)
     {
         return -1;
