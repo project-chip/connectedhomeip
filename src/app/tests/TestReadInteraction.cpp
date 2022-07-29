@@ -2794,9 +2794,7 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage(nlTestSuite * apSu
         // the ReadHandler's exchange is still open. The ReadClient responds to the unexpected message with a StatusResponse,
         // and then the ReadHandler also responds to the unexpected message it gets with a ACK.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
-        NL_TEST_ASSERT(
-            apSuite,
-            delegate.mError == CHIP_IM_GLOBAL_STATUS(Busy));
+        NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_IM_GLOBAL_STATUS(Busy));
     }
 
     engine->Shutdown();
@@ -2884,9 +2882,7 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse(nlTest
         // and then the ReadHandler also responds to the unexpected message it gets with a ACK.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
-        NL_TEST_ASSERT(
-            apSuite,
-            delegate.mError == CHIP_IM_GLOBAL_STATUS(Busy));
+        NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_IM_GLOBAL_STATUS(Busy));
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 0);
     }
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
