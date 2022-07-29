@@ -141,7 +141,6 @@ const char * const gCmdOptionHelp =
     "           x509-der  - X.509 DER raw format\n"
     "           x509-hex  - X.509 DER hex encoded format\n"
     "           chip      - raw CHIP TLV format\n"
-    "           chip-hex  - hex encoded CHIP TLV format\n"
     "           chip-b64  - base-64 encoded CHIP TLV format (default)\n"
     "           chip-hex  - hex encoded CHIP TLV format\n"
     "\n"

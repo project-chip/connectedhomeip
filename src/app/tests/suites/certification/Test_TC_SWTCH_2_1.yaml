@@ -34,7 +34,7 @@ tests:
       response:
           value: 2
           constraints:
-              type: uint8
+              type: int8u
               minValue: 2
 
     - label: "Read CurrentPosition attribute"
@@ -43,7 +43,7 @@ tests:
       response:
           value: 0
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -54,6 +54,6 @@ tests:
       response:
           value: 2
           constraints:
-              type: uint8
+              type: int8u
               minValue: 2
               maxValue: 255

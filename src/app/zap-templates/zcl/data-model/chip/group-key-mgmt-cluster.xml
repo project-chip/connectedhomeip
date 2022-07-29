@@ -17,19 +17,17 @@ limitations under the License.
 <configurator>
   <domain name="CHIP" />
 
-  <struct name="GroupKeyMapStruct">
+  <struct name="GroupKeyMapStruct" isFabricScoped="true">
     <cluster code="0x003F"/>
     <item fieldId="1" name="GroupId" type="group_id"/>
     <item fieldId="2" name="GroupKeySetID" type="INT16U"/>
-    <item fieldId="0xFE" name="FabricIndex" type="fabric_idx"/>
   </struct>
 
-  <struct name="GroupInfoMapStruct">
+  <struct name="GroupInfoMapStruct" isFabricScoped="true">
     <cluster code="0x003F"/>
     <item fieldId="1" name="GroupId" type="group_id"/>
     <item fieldId="2" name="Endpoints" type="endpoint_no" array="true"/>
     <item fieldId="3" name="GroupName" type="CHAR_STRING" length="16" optional="true"/>
-    <item fieldId="0xFE" name="FabricIndex" type="fabric_idx"/>
   </struct>
 
   <struct name="GroupKeySetStruct">
@@ -65,13 +63,13 @@ limitations under the License.
     <attribute side="server" code="0x0002" define="MAX_GROUPS_PER_FABRIC" type="INT16U" writable="false" optional="false">MaxGroupsPerFabric</attribute>
     <attribute side="server" code="0x0003" define="MAX_GROUP_KEYS_PER_FABRIC" type="INT16U" writable="false" optional="false">MaxGroupKeysPerFabric</attribute>
 
-    <command source="client" code="0x00" name="KeySetWrite" optional="false" cli="zcl GroupKeyManagement KeySetWrite">
+    <command source="client" code="0x00" name="KeySetWrite" isFabricScoped="true" optional="false" cli="zcl GroupKeyManagement KeySetWrite">
       <description>Revoke a Root Key from a Group</description>
       <arg name="GroupKeySet" type="GroupKeySetStruct"/>
       <access op="invoke" privilege="administer"/>
     </command>
 
-    <command source="client" code="0x01" name="KeySetRead" response="KeySetReadResponse" optional="false" cli="zcl GroupKeyManagement KeySetRead">
+    <command source="client" code="0x01" name="KeySetRead" isFabricScoped="true" response="KeySetReadResponse" optional="false" cli="zcl GroupKeyManagement KeySetRead">
       <description>Revoke a Root Key from a Group</description>
       <arg name="GroupKeySetID" type="INT16U"/>
       <access op="invoke" privilege="administer"/>
@@ -84,13 +82,13 @@ limitations under the License.
       <arg name="GroupKeySet" type="GroupKeySetStruct"/>
     </command>
 
-    <command source="client" code="0x03" name="KeySetRemove" optional="false" cli="zcl GroupKeyManagement KeySetRemove">
+    <command source="client" code="0x03" name="KeySetRemove" isFabricScoped="true" optional="false" cli="zcl GroupKeyManagement KeySetRemove">
       <description>Revoke a Root Key from a Group</description>
       <arg name="GroupKeySetID" type="INT16U"/>
       <access op="invoke" privilege="administer"/>
     </command>
 
-    <command source="client" code="0x04" name="KeySetReadAllIndices" response="KeySetReadAllIndicesResponse" optional="false" cli="zcl GroupKeyManagement KeySetReadAllIndices">
+    <command source="client" code="0x04" name="KeySetReadAllIndices" response="KeySetReadAllIndicesResponse" isFabricScoped="true" optional="false" cli="zcl GroupKeyManagement KeySetReadAllIndices">
       <description>Return the list of Group Key Sets associated with the accessing fabric</description>
       <arg name="GroupKeySetIDs" type="INT16U" array="true"/>
       <access op="invoke" privilege="administer"/>

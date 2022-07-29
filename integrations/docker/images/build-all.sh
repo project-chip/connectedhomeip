@@ -21,7 +21,7 @@
 #  https://github.com/project-chip/connectedhomeip/issues/710
 #
 set -e
-find "$(git rev-parse --show-toplevel)"/integrations/docker/images/ -name Dockerfile | while read -r dockerfile; do
+find "$(git rev-parse --show-toplevel)"/integrations/docker/images/ -name Dockerfile ! -path "*chip-cert-bins/*" | while read -r dockerfile; do
     pushd "$(dirname "$dockerfile")" >/dev/null
     ./build.sh "$@"
     popd >/dev/null

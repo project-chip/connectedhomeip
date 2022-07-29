@@ -127,7 +127,7 @@ private:
     static void OnOpenCommissioningWindowSuccess(void * context, const app::DataModel::NullObjectType &);
     static void OnOpenCommissioningWindowFailure(void * context, CHIP_ERROR error);
     static void OnDeviceConnectedCallback(void * context, OperationalDeviceProxy * device);
-    static void OnDeviceConnectionFailureCallback(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnDeviceConnectionFailureCallback(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     DeviceController * const mController = nullptr;
     Step mNextStep                       = Step::kAcceptCommissioningStart;

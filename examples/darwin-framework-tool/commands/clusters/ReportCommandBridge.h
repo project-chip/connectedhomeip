@@ -94,7 +94,6 @@ public:
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
@@ -107,7 +106,6 @@ public:
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
@@ -119,7 +117,6 @@ public:
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
@@ -144,9 +141,7 @@ public:
                         NSLog(@"Response Item: %@", [item description]);
                     }
                 }
-                if (error || !mWait) {
-                    SetCommandExitStatus(error);
-                }
+                SetCommandExitStatus(error);
             }
             subscriptionEstablished:^() {
                 mSubscriptionEstablished = YES;
@@ -155,10 +150,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
 protected:
     chip::Optional<bool> mKeepSubscriptions;
@@ -166,7 +158,6 @@ protected:
     bool mSubscriptionEstablished = NO;
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    bool mWait;
 
     void Shutdown() override
     {
@@ -189,7 +180,6 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
@@ -208,22 +198,16 @@ public:
             params:params
             cacheContainer:nil
             attributeReportHandler:^(NSArray * value) {
-                if (!mWait) {
-                    SetCommandExitStatus(CHIP_NO_ERROR);
-                }
+                SetCommandExitStatus(CHIP_NO_ERROR);
             }
             eventReportHandler:^(NSArray * value) {
                 for (id item in value) {
                     NSLog(@"Response Item: %@", [item description]);
                 }
-                if (!mWait) {
-                    SetCommandExitStatus(CHIP_NO_ERROR);
-                }
+                SetCommandExitStatus(CHIP_NO_ERROR);
             }
             errorHandler:^(NSError * error) {
-                if (error && !mWait) {
-                    SetCommandExitStatus(error);
-                }
+                SetCommandExitStatus(error);
             }
             subscriptionEstablished:^() {
                 mSubscriptionEstablished = YES;
@@ -232,10 +216,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
 protected:
     chip::Optional<bool> mKeepSubscriptions;
@@ -243,5 +224,4 @@ protected:
     bool mSubscriptionEstablished = NO;
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    bool mWait;
 };

@@ -26,7 +26,7 @@ tests:
 
       disabled: true
 
-    - label: "DUT reads NetworkInterface structure attribute from TH."
+    - label: "TH reads BSSID attribute from DUT."
       PICS: DGWIFI.S.A0000
       verification: |
           verify on Reference app receives the right response for the data sent in the below commands

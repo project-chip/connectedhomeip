@@ -26,12 +26,14 @@ static_library("helpers") {
   sources = [
     "AppTestContext.cpp",
     "AppTestContext.h",
+    "integration/RequiredPrivilegeStubs.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
   deps = [
     "${chip_root}/src/access",
+    "${chip_root}/src/app",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/transport/raw/tests:helpers",
@@ -69,6 +71,7 @@ chip_test_suite("tests") {
   output_name = "libAppTests"
 
   test_sources = [
+    "TestAclEvent.cpp",
     "TestAttributePathExpandIterator.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",

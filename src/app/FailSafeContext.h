@@ -75,6 +75,11 @@ public:
 
     bool IsFailSafeArmed() const { return mFailSafeArmed; }
 
+    // True if it is possible to do an initial arming of the failsafe if needed.
+    // To be used in places where some action should take place only if the
+    // fail-safe could be armed after that action.
+    bool IsFailSafeFullyDisarmed() const { return !IsFailSafeArmed() && !IsFailSafeBusy(); }
+
     bool MatchesFabricIndex(FabricIndex accessingFabricIndex) const
     {
         VerifyOrDie(mFailSafeArmed);

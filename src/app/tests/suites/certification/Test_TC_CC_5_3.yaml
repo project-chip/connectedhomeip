@@ -18,6 +18,12 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    StepXConfigValue:
+        type: int16s
+        defaultValue: 100
+    StepYConfigValue:
+        type: int16s
+        defaultValue: 100
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -39,72 +45,77 @@ tests:
       response:
           value: 1
 
-    - label: "Check current x attribute value  matched before any change"
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F03 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "TH reads CurrentX attribute from DUT"
       command: "readAttribute"
-      PICS: CC.S.A0003
+      PICS: CC.S.F03 && CC.S.A0003
       attribute: "CurrentX"
       response:
+          saveAs: CurrentXValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
-    - label: "Check current y attribute  value  matched before any change"
+    - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
-      PICS: CC.S.A0004
+      PICS: CC.S.F03 && CC.S.A0004
       attribute: "CurrentY"
       response:
+          saveAs: CurrentYValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
-    - label: "Step Color command"
+    - label: "TH sends StepColor command to DUT"
       command: "StepColor"
-      PICS: CC.S.C09.Rsp
+      PICS: CC.S.F03 && CC.S.C09.Rsp
       arguments:
           values:
               - name: "stepX"
-                value: 15
+                value: StepXConfigValue
               - name: "stepY"
-                value: 20
+                value: StepYConfigValue
               - name: "TransitionTime"
-                value: 50
+                value: 10
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 50ms"
+    - label: "Wait 1500ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 50
+                value: 1500
 
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0003
+    - label: "Over TransitionTime, TH reads CurrentX attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C09.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
       response:
           constraints:
-              type: uint16
-              minValue: 0
+              type: int16u
+              minValue: CurrentXValue
               maxValue: 65279
 
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0004
+    - label: "Over TransitionTime, TH reads CurrentY attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C09.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
       response:
           constraints:
-              type: uint16
-              minValue: 0
+              type: int16u
+              minValue: CurrentYValue
               maxValue: 65279
 
     - label: "Turn off light that we turned on"

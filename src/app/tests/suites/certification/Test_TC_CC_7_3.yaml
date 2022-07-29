@@ -18,6 +18,9 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    StepSizeConfigValue:
+        type: int16u
+        defaultValue: 50
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -39,81 +42,88 @@ tests:
       response:
           value: 1
 
-    - label: "Reads EnhancedCurrentHue attribute from DUT"
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F01 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      PICS: CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
-    - label: "Enhanced Step Hue Up command"
-      PICS: CC.S.C42.Rsp
+    - label: "TH sends EnhancedStepHue command to DUT with StepMode Up"
+      PICS: CC.S.F01 && CC.S.C42.Rsp
       command: "EnhancedStepHue"
       arguments:
           values:
               - name: "StepMode"
                 value: 0
               - name: "StepSize"
-                value: 50
+                value: StepSizeConfigValue
               - name: "TransitionTime"
-                value: 1
+                value: 10
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 10ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10
+                value: 1000
 
     - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      PICS: CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C42.Rsp
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
-    - label: "Enhanced Step Hue Down command"
-      PICS: CC.S.C42.Rsp
+    - label: "TH sends EnhancedStepHue command to DUT with StepMode Down"
+      PICS: CC.S.F01 && CC.S.C42.Rsp
       command: "EnhancedStepHue"
       arguments:
           values:
               - name: "StepMode"
                 value: 1
               - name: "StepSize"
-                value: 75
+                value: StepSizeConfigValue
               - name: "TransitionTime"
-                value: 1
+                value: 10
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 10ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10
+                value: 1000
 
     - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      PICS: CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C42.Rsp
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 

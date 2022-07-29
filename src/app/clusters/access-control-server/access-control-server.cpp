@@ -86,7 +86,7 @@ CHIP_ERROR LogExtensionChangedEvent(const AccessControlCluster::Structs::Extensi
                                     const Access::SubjectDescriptor & subjectDescriptor,
                                     AccessControlCluster::ChangeTypeEnum changeType)
 {
-    ExtensionEvent event{ .changeType = changeType, .adminFabricIndex = subjectDescriptor.fabricIndex };
+    ExtensionEvent event{ .changeType = changeType, .fabricIndex = subjectDescriptor.fabricIndex };
 
     if (subjectDescriptor.authMode == Access::AuthMode::kCase)
     {
@@ -387,7 +387,7 @@ void AccessControlAttribute::OnEntryChanged(const SubjectDescriptor * subjectDes
     }
 
     CHIP_ERROR err;
-    AclEvent event{ .changeType = ChangeTypeEnum::kChanged, .adminFabricIndex = subjectDescriptor->fabricIndex };
+    AclEvent event{ .changeType = ChangeTypeEnum::kChanged, .fabricIndex = subjectDescriptor->fabricIndex };
 
     if (changeType == ChangeType::kAdded)
     {

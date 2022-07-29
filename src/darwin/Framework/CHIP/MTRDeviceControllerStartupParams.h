@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
  * must be initialized using initWithOperationalKeypair (to provide the
  * operational credentials for the controller itself).
  */
-@property (strong, nonatomic, readonly, nullable) id<MTRKeypair> nocSigner;
+@property (nonatomic, copy, readonly, nullable) id<MTRKeypair> nocSigner;
 /**
  * Fabric id for the controller.  Must be set to a nonzero value.  This is
  * scoped by the root public key, which is determined as follows:
@@ -42,13 +42,13 @@ NS_ASSUME_NONNULL_BEGIN
  *   key of the nocSigner keypair, since in this case we are not using an
  *   intermediate certificate.
  */
-@property (nonatomic, readonly) uint64_t fabricId;
+@property (nonatomic, assign, readonly) uint64_t fabricId;
 /**
  * IPK to use for the controller's fabric.  Allowed to change from the last time
  * a controller was started on this fabric if a new IPK has been distributed to
  * all the devices the controller wants to interact with.
  */
-@property (strong, nonatomic, readonly) NSData * ipk;
+@property (nonatomic, copy, readonly) NSData * ipk;
 
 /**
  * Vendor ID (allocated by the Connectivity Standards Alliance) for
@@ -65,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
  * * Will override existing value if not nil. Otherwise existing value will be
  *   used.
  */
-@property (strong, nonatomic, nullable) NSNumber * vendorId;
+@property (nonatomic, copy, nullable) NSNumber * vendorId;
 
 /**
  * Node id for this controller.
@@ -95,7 +95,7 @@ NS_ASSUME_NONNULL_BEGIN
  *    generated operational key.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * nodeId;
+@property (nonatomic, copy, nullable) NSNumber * nodeId;
 
 // TODO: Add something here for CATs?
 
@@ -130,7 +130,7 @@ NS_ASSUME_NONNULL_BEGIN
  *   2) The subject DN must match the subject DN of the existing root
  *      certificate.
  */
-@property (strong, nonatomic, nullable) NSData * rootCertificate;
+@property (nonatomic, copy, nullable) NSData * rootCertificate;
 
 /**
  * Intermediate certificate, in X.509 DER form, to use.
@@ -162,7 +162,7 @@ NS_ASSUME_NONNULL_BEGIN
  *     allows switching from using an intermediate CA to not using one.
  *
  */
-@property (strong, nonatomic, nullable) NSData * intermediateCertificate;
+@property (nonatomic, copy, nullable) NSData * intermediateCertificate;
 
 /**
  * Operational certificate, in X.509 DER form, to use.
@@ -173,7 +173,7 @@ NS_ASSUME_NONNULL_BEGIN
  * If nil, an operational certificate will be determined as described in the
  * documentation for nodeId.
  */
-@property (strong, nonatomic, nullable, readonly) NSData * operationalCertificate;
+@property (nonatomic, copy, readonly, nullable) NSData * operationalCertificate;
 
 /**
  * Operational keypair to use.  If operationalCertificate is not nil, the public
@@ -184,7 +184,7 @@ NS_ASSUME_NONNULL_BEGIN
  * will for that certificated will be determined as described in the
  * documentation for nodeId.
  */
-@property (strong, nonatomic, nullable) id<MTRKeypair> operationalKeypair;
+@property (nonatomic, strong, nullable) id<MTRKeypair> operationalKeypair;
 
 - (instancetype)init NS_UNAVAILABLE;
 

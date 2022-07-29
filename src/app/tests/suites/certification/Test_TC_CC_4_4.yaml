@@ -19,6 +19,12 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    hueConfigValue:
+        type: int8u
+        defaultValue: 40
+    SaturationConfigValue:
+        type: int8u
+        defaultValue: 160
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -40,35 +46,42 @@ tests:
       response:
           value: 1
 
-    - label: "Check current hue attribute value matched before any change"
-      PICS: CC.S.A0000
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F00 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "TH reads CurrentHue attribute from DUT."
+      PICS: CC.S.F01 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Check Saturation attribute value matched before any change"
-      PICS: CC.S.A0001
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F01 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Move To current hue and saturation command"
-      PICS: CC.S.C06.Rsp
+    - label: "TH sends MoveToHueAndSaturation command to DUT."
+      PICS: CC.S.F01 && CC.S.C06.Rsp
       command: "MoveToHueAndSaturation"
       arguments:
           values:
               - name: "hue"
-                value: 40
+                value: hueConfigValue
               - name: "Saturation"
-                value: 160
+                value: SaturationConfigValue
               - name: "TransitionTime"
                 value: 10
               - name: "OptionsMask"
@@ -76,35 +89,34 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 10ms"
+    - label: "Wait 1500ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10
+                value: 1500
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F01 && CC.S.A0000 && CC.S.C06.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
+          value: hueConfigValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
     - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
+          "Over TransitionTime, TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F01 && CC.S.A0001 && CC.S.C06.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
+          value: SaturationConfigValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 

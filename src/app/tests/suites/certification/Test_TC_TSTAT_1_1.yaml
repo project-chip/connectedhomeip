@@ -34,7 +34,7 @@ tests:
       response:
           value: 5
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "Read the global attribute: FeatureMap"
       PICS:
@@ -44,8 +44,8 @@ tests:
       attribute: "FeatureMap"
       response:
           constraints:
-              type: map32
-              minValue: 0
+              type: bitmap32
+              minValue: 1
               maxValue: 63
 
     - label: "Read the global attribute: AttributeList"
@@ -57,6 +57,16 @@ tests:
               contains: [0, 27, 28, 65528, 65529, 65531, 65532, 65533]
 
     - label:
+          "Read the Feature dependent(TSTAT.S.F00(HEAT)) attribute in
+          AttributeList"
+      PICS: TSTAT.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [18]
+    - label:
           "Read the Feature dependent(TSTAT.S.F01(COOL)) attribute in
           AttributeList"
       PICS: TSTAT.S.F01
@@ -65,7 +75,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [5, 6, 7, 17, 23, 24]
+              contains: [17]
 
     - label:
           "Read the Feature dependent(TSTAT.S.F02(OCC)) attribute in
@@ -79,28 +89,6 @@ tests:
               contains: [2]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F00(HEAT)) attribute in
-          AttributeList"
-      PICS: TSTAT.S.F00
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [3, 4, 8, 18, 21, 22]
-
-    - label:
-          "Read the Feature dependent(TSTAT.S.F01(COOL) & TSTAT.S.F02(OCC))
-          attribute in AttributeList"
-      PICS: TSTAT.S.F01 && TSTAT.S.F01
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [19]
-
-    - label:
           "Read the Feature dependent(TSTAT.S.F00(HEAT) & TSTAT.S.F02(OCC))
           attribute in AttributeList"
       PICS: TSTAT.S.F00 && TSTAT.S.F02
@@ -112,6 +100,17 @@ tests:
               contains: [20]
 
     - label:
+          "Read the Feature dependent(TSTAT.S.F01(COOL) & TSTAT.S.F02(OCC))
+          attribute in AttributeList"
+      PICS: TSTAT.S.F01 && TSTAT.S.F02
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [19]
+
+    - label:
           "Read the Feature dependent(TSTAT.S.F05(AUTO)) attribute in
           AttributeList"
       PICS: TSTAT.S.F05
@@ -120,7 +119,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [25, 30]
+              contains: [17, 18, 25]
 
     - label:
           "Read the Feature dependent(TSTAT.S.F03(SCH)) attribute in
@@ -182,6 +181,7 @@ tests:
 
     #issue #15011 disabled steps below Global attributes missing from YAML framework
     - label: "Read the global attribute: EventList"
+      disabled: true
       verification: |
           Not implemented in chip-tool
       cluster: "LogCommands"

@@ -262,7 +262,7 @@ config("strict_warnings") {
     ]
   }
 
-  if (current_os == "linux" || current_os == "android") {
+  if (!is_asan && (current_os == "linux" || current_os == "android")) {
     ldflags += [ "-Wl,-z,defs" ]
   }
 }
@@ -347,9 +347,6 @@ config("runtime_default") {
 declare_args() {
   # Enable Thread sanitizer
   is_tsan = false
-
-  # Enable address sanitizer
-  is_asan = false
 
   # Enable memory sanitizer
   is_msan = false

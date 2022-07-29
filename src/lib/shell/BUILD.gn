@@ -89,6 +89,11 @@ static_library("shell") {
       "MainLoopMW320.cpp",
       "streamer_mw320.cpp",
     ]
+  } else if (chip_device_platform == "ameba") {
+    sources += [
+      "MainLoopDefault.cpp",
+      "streamer_ameba.cpp",
+    ]
   } else {
     sources += [ "MainLoopDefault.cpp" ]
   }

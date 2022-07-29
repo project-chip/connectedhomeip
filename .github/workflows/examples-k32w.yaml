@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-k32w:0.5.84
+            image: connectedhomeip/chip-build-k32w:0.5.89
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -82,15 +82,15 @@ jobs:
               timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w061+release light \
-                    out/artifacts/k32w-light-release-no-ota/chip-k32w061-light-example \
+                    k32w k32w0+release light \
+                    out/artifacts/k32w-light-release-no-ota/chip-k32w0x-light-example \
                     /tmp/bloat_reports/
             - name: Get lock size stats
               timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w061+release lock \
-                    out/artifacts/k32w-lock-low-power-release/chip-k32w061-lock-example \
+                    k32w k32w0+release lock \
+                    out/artifacts/k32w-lock-low-power-release/chip-k32w0x-lock-example \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2

@@ -1972,8 +1972,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLevel)), level));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitionTime)), transitionTime));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionMask)), optionMask));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionOverride)), optionOverride));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsMask)), optionsMask));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsOverride)), optionsOverride));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -1998,11 +1998,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kTransitionTime):
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
             break;
-        case to_underlying(Fields::kOptionMask):
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionMask));
+        case to_underlying(Fields::kOptionsMask):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
             break;
-        case to_underlying(Fields::kOptionOverride):
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionOverride));
+        case to_underlying(Fields::kOptionsOverride):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
             break;
         default:
             break;
@@ -2021,8 +2021,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMoveMode)), moveMode));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kRate)), rate));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionMask)), optionMask));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionOverride)), optionOverride));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsMask)), optionsMask));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsOverride)), optionsOverride));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -2047,11 +2047,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kRate):
             ReturnErrorOnFailure(DataModel::Decode(reader, rate));
             break;
-        case to_underlying(Fields::kOptionMask):
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionMask));
+        case to_underlying(Fields::kOptionsMask):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
             break;
-        case to_underlying(Fields::kOptionOverride):
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionOverride));
+        case to_underlying(Fields::kOptionsOverride):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
             break;
         default:
             break;
@@ -2071,8 +2071,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStepMode)), stepMode));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStepSize)), stepSize));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitionTime)), transitionTime));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionMask)), optionMask));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionOverride)), optionOverride));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsMask)), optionsMask));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsOverride)), optionsOverride));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -2100,11 +2100,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kTransitionTime):
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
             break;
-        case to_underlying(Fields::kOptionMask):
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionMask));
+        case to_underlying(Fields::kOptionsMask):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
             break;
-        case to_underlying(Fields::kOptionOverride):
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionOverride));
+        case to_underlying(Fields::kOptionsOverride):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
             break;
         default:
             break;
@@ -2121,8 +2121,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionMask)), optionMask));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionOverride)), optionOverride));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsMask)), optionsMask));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsOverride)), optionsOverride));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -2141,11 +2141,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kOptionMask):
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionMask));
+        case to_underlying(Fields::kOptionsMask):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
             break;
-        case to_underlying(Fields::kOptionOverride):
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionOverride));
+        case to_underlying(Fields::kOptionsOverride):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
             break;
         default:
             break;
@@ -2164,6 +2164,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLevel)), level));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitionTime)), transitionTime));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsMask)), optionsMask));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsOverride)), optionsOverride));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -2188,6 +2190,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kTransitionTime):
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
             break;
+        case to_underlying(Fields::kOptionsMask):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            break;
+        case to_underlying(Fields::kOptionsOverride):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            break;
         default:
             break;
         }
@@ -2205,6 +2213,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMoveMode)), moveMode));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kRate)), rate));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsMask)), optionsMask));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsOverride)), optionsOverride));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -2229,6 +2239,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kRate):
             ReturnErrorOnFailure(DataModel::Decode(reader, rate));
             break;
+        case to_underlying(Fields::kOptionsMask):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            break;
+        case to_underlying(Fields::kOptionsOverride):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            break;
         default:
             break;
         }
@@ -2247,6 +2263,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStepMode)), stepMode));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStepSize)), stepSize));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitionTime)), transitionTime));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsMask)), optionsMask));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsOverride)), optionsOverride));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -2274,6 +2292,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kTransitionTime):
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
             break;
+        case to_underlying(Fields::kOptionsMask):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            break;
+        case to_underlying(Fields::kOptionsOverride):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            break;
         default:
             break;
         }
@@ -2289,6 +2313,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsMask)), optionsMask));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsOverride)), optionsOverride));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -2307,6 +2333,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
+        case to_underlying(Fields::kOptionsMask):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            break;
+        case to_underlying(Fields::kOptionsOverride):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            break;
         default:
             break;
         }
@@ -2989,7 +3021,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kChangeType)), changeType));
     ReturnErrorOnFailure(
         DataModel::EncodeForRead(writer, TLV::ContextTag(to_underlying(Fields::kLatestValue)), GetFabricIndex(), latestValue));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminFabricIndex)), adminFabricIndex));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -3020,8 +3052,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kLatestValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, latestValue));
             break;
-        case to_underlying(Fields::kAdminFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         default:
             break;
@@ -3043,7 +3075,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kChangeType)), changeType));
     ReturnErrorOnFailure(
         DataModel::EncodeForRead(writer, TLV::ContextTag(to_underlying(Fields::kLatestValue)), GetFabricIndex(), latestValue));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminFabricIndex)), adminFabricIndex));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -3074,8 +3106,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kLatestValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, latestValue));
             break;
-        case to_underlying(Fields::kAdminFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         default:
             break;
@@ -4106,6 +4138,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -4124,6 +4157,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            break;
         default:
             break;
         }
@@ -20598,7 +20634,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kArg1)), arg1));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -20617,8 +20653,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kArg1):
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         default:
             break;
@@ -20695,35 +20731,103 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
     return false;
 }
 
-// TODO(#20811): Actually generate the following based on ZAP metadata
-// See https://github.com/project-chip/zap/issues/609
 bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
 {
     // Maybe it would be smaller code to codegen a table and walk over it?
     // Not sure.
     switch (aCluster)
     {
+    case Clusters::Identify::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
     case Clusters::Groups::Id: {
         switch (aCommand)
         {
         case Clusters::Groups::Commands::AddGroup::Id:
+            return true;
         case Clusters::Groups::Commands::ViewGroup::Id:
+            return true;
         case Clusters::Groups::Commands::GetGroupMembership::Id:
+            return true;
         case Clusters::Groups::Commands::RemoveGroup::Id:
+            return true;
         case Clusters::Groups::Commands::RemoveAllGroups::Id:
+            return true;
+        case Clusters::Groups::Commands::AddGroupIfIdentifying::Id:
             return true;
         default:
             return false;
         }
     }
-    case Clusters::GroupKeyManagement::Id: {
+    case Clusters::Scenes::Id: {
         switch (aCommand)
         {
-        case Clusters::GroupKeyManagement::Commands::KeySetWrite::Id:
-        case Clusters::GroupKeyManagement::Commands::KeySetRead::Id:
-        case Clusters::GroupKeyManagement::Commands::KeySetRemove::Id:
-        case Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Id:
+        case Clusters::Scenes::Commands::AddScene::Id:
             return true;
+        case Clusters::Scenes::Commands::ViewScene::Id:
+            return true;
+        case Clusters::Scenes::Commands::RemoveScene::Id:
+            return true;
+        case Clusters::Scenes::Commands::RemoveAllScenes::Id:
+            return true;
+        case Clusters::Scenes::Commands::StoreScene::Id:
+            return true;
+        case Clusters::Scenes::Commands::RecallScene::Id:
+            return true;
+        case Clusters::Scenes::Commands::GetSceneMembership::Id:
+            return true;
+        case Clusters::Scenes::Commands::EnhancedAddScene::Id:
+            return true;
+        case Clusters::Scenes::Commands::EnhancedViewScene::Id:
+            return true;
+        case Clusters::Scenes::Commands::CopyScene::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::OnOff::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::LevelControl::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::BridgedActions::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::Basic::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::OtaSoftwareUpdateProvider::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::OtaSoftwareUpdateRequestor::Id: {
+        switch (aCommand)
+        {
         default:
             return false;
         }
@@ -20737,24 +20841,215 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::Scenes::Id: {
-        // Entire cluster is fabric-scoped.
-        return true;
+    case Clusters::NetworkCommissioning::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::DiagnosticLogs::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::GeneralDiagnostics::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::SoftwareDiagnostics::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::ThreadNetworkDiagnostics::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::WiFiNetworkDiagnostics::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::EthernetNetworkDiagnostics::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::AdministratorCommissioning::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
     }
     case Clusters::OperationalCredentials::Id: {
         switch (aCommand)
         {
         case Clusters::OperationalCredentials::Commands::UpdateNOC::Id:
+            return true;
         case Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Id:
             return true;
         default:
             return false;
         }
     }
-    default:
-        break;
+    case Clusters::GroupKeyManagement::Id: {
+        switch (aCommand)
+        {
+        case Clusters::GroupKeyManagement::Commands::KeySetWrite::Id:
+            return true;
+        case Clusters::GroupKeyManagement::Commands::KeySetRead::Id:
+            return true;
+        case Clusters::GroupKeyManagement::Commands::KeySetRemove::Id:
+            return true;
+        case Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Id:
+            return true;
+        default:
+            return false;
+        }
     }
-
+    case Clusters::ModeSelect::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::DoorLock::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::WindowCovering::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::BarrierControl::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::Thermostat::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::ColorControl::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::Channel::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::TargetNavigator::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::MediaPlayback::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::MediaInput::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::LowPower::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::KeypadInput::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::ContentLauncher::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::AudioOutput::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::ApplicationLauncher::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::AccountLogin::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::ElectricalMeasurement::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::TestCluster::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    }
     return false;
 }
 

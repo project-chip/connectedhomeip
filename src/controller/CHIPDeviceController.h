@@ -165,18 +165,20 @@ public:
         return nullptr;
     }
 
-    CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
+    CHIP_ERROR GetPeerAddressAndPort(NodeId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**
      * @brief
      *   Looks up the PeerAddress for an established CASE session.
      *
-     * @param[in] nodeId the PeerId of the session to be found
+     * @param[in] nodeId the NodeId of the target.
      * @param[out] addr the PeerAddress to be filled on success
      *
      * @return CHIP_ERROR CHIP_ERROR_NOT_CONNECTED if no CASE session exists for the device
      */
     CHIP_ERROR GetPeerAddress(NodeId nodeId, Transport::PeerAddress & addr);
+
+    ScopedNodeId GetPeerScopedId(NodeId nodeId) { return ScopedNodeId(nodeId, GetFabricIndex()); }
 
     /**
      * This function finds the device corresponding to deviceId, and establishes
@@ -196,8 +198,7 @@ public:
                                   chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        mSystemState->CASESessionMgr()->FindOrEstablishSession(PeerId(GetCompressedFabricId(), peerNodeId), onConnection,
-                                                               onFailure);
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure);
         return CHIP_NO_ERROR;
     }
 
@@ -358,7 +359,7 @@ protected:
 
     /// Fetches the session to use for the current device. Allows overriding
     /// in case subclasses want to create the session if it does not yet exist
-    virtual OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId);
+    virtual OperationalDeviceProxy * GetDeviceSession(const ScopedNodeId & peerId);
 
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 
@@ -648,7 +649,7 @@ public:
     void OnDone(app::ReadClient *) override;
 
     // Commissioner will establish new device connections after PASE.
-    OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId) override;
+    OperationalDeviceProxy * GetDeviceSession(const ScopedNodeId & peerId) override;
 
     // Issue an NOC chain using the associated OperationalCredentialsDelegate. The NOC chain will
     // be provided in X509 DER format.
@@ -676,10 +677,6 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
-
-    void OnSessionEstablishmentTimeout();
-
-    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
     /* This function sends a Device Attestation Certificate chain request to the device.
        The function does not hold a reference to the device object.
@@ -752,7 +749,7 @@ private:
     static void OnRootCertFailureResponse(void * context, CHIP_ERROR error);
 
     static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
-    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     static void OnDeviceAttestationInformationVerification(void * context, Credentials::AttestationVerificationResult result);
 
@@ -764,8 +761,12 @@ private:
         void * context,
         const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
     static void
+    OnScanNetworksResponse(void * context,
+                           const app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data);
+    static void OnScanNetworksFailure(void * context, CHIP_ERROR err);
+    static void
     OnNetworkConfigResponse(void * context,
-                            const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
+                            const app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
     static void OnConnectNetworkResponse(
         void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
     static void OnCommissioningCompleteResponse(

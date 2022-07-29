@@ -1020,7 +1020,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalCredentials:
     case EnumType::kMissingCsr:
     case EnumType::kTableFull:
     case EnumType::kInvalidAdminSubject:
-    case EnumType::kInsufficientPrivilege:
     case EnumType::kFabricConflict:
     case EnumType::kLabelConflict:
     case EnumType::kInvalidFabricIndex:

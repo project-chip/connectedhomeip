@@ -18,6 +18,19 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    timeout: 150
+    hueShortestDistance:
+        type: int8u
+        defaultValue: 150
+    hueLongestDistance:
+        type: int8u
+        defaultValue: 200
+    hueDirectionUp:
+        type: int8u
+        defaultValue: 250
+    hueDirectionDown:
+        type: int8u
+        defaultValue: 170
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -39,23 +52,32 @@ tests:
       response:
           value: 1
 
-    - label: "Reads CurrentHue attribute from DUT"
-      PICS: CC.S.A0000
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F00 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Move to hue shortest distance command"
-      PICS: CC.S.C00.Rsp
+    - label:
+          "TH sends MoveToHue command to DUT another Hue with Direction Shortest
+          distance and TransitionTime 300"
+      PICS: CC.S.F00 && CC.S.C00.Rsp
       command: "MoveToHue"
       arguments:
           values:
               - name: "hue"
-                value: 150
+                value: hueShortestDistance
               - name: "Direction"
                 value: 0
               - name: "TransitionTime"
@@ -65,73 +87,66 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 290ms"
+    - label: "Wait 5000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 290
+                value: 5000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 295ms"
+    - label: "Wait 5000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 295
+                value: 5000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 300ms"
+    - label: "Wait 20s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 300
+                value: 20000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+          value: hueShortestDistance
 
-    - label: "Move to hue longest distance command"
+    - label:
+          "TH sends MoveToHue command to DUT another Hue with Direction Longest
+          distance and TransitionTime 300"
       command: "MoveToHue"
-      PICS: CC.S.C00.Rsp
+      PICS: CC.S.F00 && CC.S.C00.Rsp
       arguments:
           values:
               - name: "hue"
-                value: 200
+                value: hueLongestDistance
               - name: "Direction"
                 value: 1
               - name: "TransitionTime"
@@ -141,73 +156,66 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 290ms"
+    - label: "Wait 5000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 290
+                value: 5000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT."
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 295ms"
+    - label: "Wait 5000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 295
+                value: 5000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT."
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 300ms"
+    - label: "Wait 20s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 300
+                value: 20000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT."
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+          value: hueLongestDistance
 
-    - label: "Move to hue up command"
+    - label:
+          "TH sends MoveToHue command to DUT another Hue with Direction Up and
+          TransitionTime 300"
       command: "MoveToHue"
-      PICS: CC.S.C00.Rsp
+      PICS: CC.S.F00 && CC.S.C00.Rsp
       arguments:
           values:
               - name: "hue"
-                value: 250
+                value: hueDirectionUp
               - name: "Direction"
                 value: 2
               - name: "TransitionTime"
@@ -217,73 +225,66 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 290ms"
+    - label: "Wait 5000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 290
+                value: 5000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 295ms"
+    - label: "Wait 5000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 295
+                value: 5000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 300ms"
+    - label: "Wait 20s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 300
+                value: 20000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+          value: hueDirectionUp
 
-    - label: "Move to hue down command"
+    - label:
+          "TH sends MoveToHue command to DUT another Hue with Direction Down and
+          TransitionTime 300"
       command: "MoveToHue"
-      PICS: CC.S.C00.Rsp
+      PICS: CC.S.F00 && CC.S.C00.Rsp
       arguments:
           values:
               - name: "hue"
-                value: 225
+                value: hueDirectionDown
               - name: "Direction"
                 value: 3
               - name: "TransitionTime"
@@ -293,65 +294,56 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 290ms"
+    - label: "Wait 5000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 290
+                value: 5000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 295ms"
+    - label: "Wait 5000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 295
+                value: 5000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 300ms"
+    - label: "Wait 20s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 300
+                value: 20000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+          value: hueDirectionDown
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

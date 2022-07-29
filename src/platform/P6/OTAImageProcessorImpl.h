@@ -33,6 +33,7 @@ extern "C" {
 }
 
 namespace chip {
+namespace DeviceLayer {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
@@ -43,8 +44,8 @@ public:
     CHIP_ERROR Apply() override;
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
-    bool IsFirstImageRun() override { return false; }
-    CHIP_ERROR ConfirmCurrentImage() override { return CHIP_NO_ERROR; }
+    bool IsFirstImageRun() override;
+    CHIP_ERROR ConfirmCurrentImage() override;
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
 
@@ -80,5 +81,6 @@ private:
     OTAImageHeaderParser mHeaderParser;
 };
 
+} // namespace DeviceLayer
 } // namespace chip
 #endif

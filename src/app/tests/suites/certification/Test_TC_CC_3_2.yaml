@@ -18,6 +18,9 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    RateConfigValue:
+        type: enum8
+        defaultValue: 50
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -39,311 +42,254 @@ tests:
       response:
           value: 1
 
-    - label: "Reads CurrentHue attribute from DUT"
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F00 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "TH reads CurrentHue attribute from DUT"
       command: "readAttribute"
-      PICS: CC.S.A0000
+      PICS: CC.S.F00 && CC.S.A0000
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Move hue up command"
-      PICS: CC.S.C01.Rsp
+    - label: "TH sends MoveHue command to DUT with MoveMode Up"
+      PICS: CC.S.F00 && CC.S.C01.Rsp
       command: "MoveHue"
       arguments:
           values:
               - name: "MoveMode"
                 value: 1
               - name: "Rate"
-                value: 50
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 140ms"
+    - label: "Wait 3000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 140
+                value: 3000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 145ms"
+    - label: "Wait 2000"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 145
+                value: 2000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 150ms"
+    - label: "Wait 3000"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 150
+                value: 3000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Move hue stop command"
-      PICS: CC.S.C01.Rsp
+    - label: "TH sends MoveHue command to DUT with MoveMode Stop"
+      PICS: CC.S.F00 && CC.S.C01.Rsp
       command: "MoveHue"
       arguments:
           values:
               - name: "MoveMode"
                 value: 0
               - name: "Rate"
-                value: 50
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 140ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 140
+                value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
+          saveAs: CurrentHueValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 145ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 145
+                value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+          value: CurrentHueValue
 
-    - label: "Wait 150ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 150
-
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
-
-    - label: "Move hue down command"
-      PICS: CC.S.C01.Rsp
+    - label: "TH sends MoveHue command to DUT with MoveMode Down"
+      PICS: CC.S.F00 && CC.S.C01.Rsp
       command: "MoveHue"
       arguments:
           values:
               - name: "MoveMode"
                 value: 3
               - name: "Rate"
-                value: 50
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 140ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 140
+                value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 145ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 145
+                value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 150ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 150
+                value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Move hue stop command"
-      PICS: CC.S.C01.Rsp
+    - label: "TH sends MoveHue command to DUT with MoveMode Stop"
+      PICS: CC.S.F00 && CC.S.C01.Rsp
       command: "MoveHue"
       arguments:
           values:
               - name: "MoveMode"
                 value: 0
               - name: "Rate"
-                value: 50
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 140ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 140
+                value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
+          saveAs: CurrentHueValueAfterStopmode
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 145ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 145
+                value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 150ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 150
-
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+          value: CurrentHueValueAfterStopmode
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

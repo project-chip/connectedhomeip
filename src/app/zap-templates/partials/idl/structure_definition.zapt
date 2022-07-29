@@ -1,5 +1,6 @@
-{{#if struct_is_fabric_scoped}}
-{{indent extraIndent~}} [fabric_scoped_by={{asUpperCamelCase struct_fabric_idx_field}}]
+{{! TODO: IDL consumers can't parse the square bracket syntax }}
+{{#if isFabricScoped_DISABLED_FOR_NOW}}
+{{indent extraIndent~}} [fabric_scoped_by=FabricIndex]
 {{/if}}
 {{indent extraIndent~}} struct {{name}} {
 {{#zcl_struct_items}}

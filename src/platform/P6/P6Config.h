@@ -80,6 +80,14 @@ public:
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
+    static const Key kConfigKey_LockUser;
+    static const Key kConfigKey_Credential;
+    static const Key kConfigKey_LockUserName;
+    static const Key kConfigKey_CredentialData;
+    static const Key kConfigKey_UserCredentials;
+    static const Key kConfigKey_WeekDaySchedules;
+    static const Key kConfigKey_YearDaySchedules;
+    static const Key kConfigKey_HolidaySchedules;
 
     // CHIP Counter keys
     static const Key kCounterKey_RebootCount;

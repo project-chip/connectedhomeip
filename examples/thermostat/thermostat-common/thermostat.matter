@@ -128,12 +128,12 @@ server cluster Groups = 4 {
     group_id groupId = 1;
   }
 
-  command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
-  command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
-  command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
-  command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
-  command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
+  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
+  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
+  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
+  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
+  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
+  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
 server cluster Scenes = 5 {
@@ -235,13 +235,13 @@ server cluster Scenes = 5 {
     optional INT8U sceneList[] = 3;
   }
 
-  command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
-  command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-  command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
-  command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
+  fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
+  fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
+  fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
+  fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
+  fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
+  fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
+  fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
 }
 
 server cluster Descriptor = 29 {
@@ -317,7 +317,7 @@ server cluster AccessControl = 31 {
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable AccessControlEntry latestValue = 4;
-    fabric_idx adminFabricIndex = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   info event access(read: administer) AccessControlExtensionChanged = 1 {
@@ -325,7 +325,7 @@ server cluster AccessControl = 31 {
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable ExtensionEntry latestValue = 4;
-    fabric_idx adminFabricIndex = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   attribute access(read: administer, write: administer) AccessControlEntry acl[] = 0;
@@ -352,6 +352,7 @@ server cluster Basic = 40 {
   }
 
   info event Leave = 2 {
+    fabric_idx fabricIndex = 0;
   }
 
   info event ReachableChanged = 3 {
@@ -382,7 +383,7 @@ server cluster Basic = 40 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster OtaSoftwareUpdateProvider = 41 {
+client cluster OtaSoftwareUpdateProvider = 41 {
   enum OTAApplyUpdateAction : ENUM8 {
     kProceed = 0;
     kAwaitNextAction = 1;
@@ -446,6 +447,76 @@ server cluster OtaSoftwareUpdateProvider = 41 {
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
+}
+
+server cluster OtaSoftwareUpdateRequestor = 42 {
+  enum OTAAnnouncementReason : ENUM8 {
+    kSimpleAnnouncement = 0;
+    kUpdateAvailable = 1;
+    kUrgentUpdateAvailable = 2;
+  }
+
+  enum OTAChangeReasonEnum : ENUM8 {
+    kUnknown = 0;
+    kSuccess = 1;
+    kFailure = 2;
+    kTimeOut = 3;
+    kDelayByProvider = 4;
+  }
+
+  enum OTAUpdateStateEnum : ENUM8 {
+    kUnknown = 0;
+    kIdle = 1;
+    kQuerying = 2;
+    kDelayedOnQuery = 3;
+    kDownloading = 4;
+    kApplying = 5;
+    kDelayedOnApply = 6;
+    kRollingBack = 7;
+    kDelayedOnUserConsent = 8;
+  }
+
+  struct ProviderLocation {
+    node_id providerNodeID = 1;
+    endpoint_no endpoint = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  info event StateTransition = 0 {
+    OTAUpdateStateEnum previousState = 0;
+    OTAUpdateStateEnum newState = 1;
+    OTAChangeReasonEnum reason = 2;
+    nullable INT32U targetSoftwareVersion = 3;
+  }
+
+  critical event VersionApplied = 1 {
+    INT32U softwareVersion = 0;
+    INT16U productID = 1;
+  }
+
+  info event DownloadError = 2 {
+    INT32U softwareVersion = 0;
+    INT64U bytesDownloaded = 1;
+    nullable INT8U progressPercent = 2;
+    nullable INT64S platformCode = 3;
+  }
+
+  attribute ProviderLocation defaultOtaProviders[] = 0;
+  readonly attribute boolean updatePossible = 1;
+  readonly attribute OTAUpdateStateEnum updateState = 2;
+  readonly attribute nullable int8u updateStateProgress = 3;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AnnounceOtaProviderRequest {
+    node_id providerNodeId = 0;
+    vendor_id vendorId = 1;
+    OTAAnnouncementReason announcementReason = 2;
+    optional OCTET_STRING metadataForNode = 3;
+    endpoint_no endpoint = 4;
+  }
+
+  command AnnounceOtaProvider(AnnounceOtaProviderRequest): DefaultSuccess = 0;
 }
 
 server cluster LocalizationConfiguration = 43 {
@@ -555,7 +626,7 @@ server cluster GeneralCommissioning = 48 {
 
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
-  command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
+  fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -821,7 +892,7 @@ server cluster GeneralDiagnostics = 51 {
     INT64U eventTrigger = 1;
   }
 
-  command TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
+  command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
 }
 
 server cluster SoftwareDiagnostics = 52 {
@@ -1135,7 +1206,6 @@ server cluster OperationalCredentials = 62 {
     kMissingCsr = 4;
     kTableFull = 5;
     kInvalidAdminSubject = 6;
-    kInsufficientPrivilege = 8;
     kFabricConflict = 9;
     kLabelConflict = 10;
     kInvalidFabricIndex = 11;
@@ -1161,7 +1231,7 @@ server cluster OperationalCredentials = 62 {
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
-  readonly attribute fabric_idx currentFabricIndex = 5;
+  readonly attribute int8u currentFabricIndex = 5;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -1227,8 +1297,8 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+  fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
@@ -1385,6 +1455,7 @@ server cluster Thermostat = 513 {
 
 endpoint 0 {
   device type rootdevice = 22;
+  binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Identify {
     ram      attribute identifyTime;
@@ -1443,7 +1514,11 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster OtaSoftwareUpdateProvider {
+  server cluster OtaSoftwareUpdateRequestor {
+    callback attribute defaultOtaProviders;
+    ram      attribute updatePossible default = 1;
+    ram      attribute updateState;
+    ram      attribute updateStateProgress;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }

@@ -37,7 +37,7 @@ tests:
       response:
           value: 5
           constraints:
-              type: uint16
+              type: int16u
               minValue: 5
               maxValue: 200
 
@@ -47,7 +47,7 @@ tests:
       attribute: "FeatureMap"
       response:
           constraints:
-              type: uint32
+              type: bitmap32
               minValue: 0
               maxValue: 32768
 

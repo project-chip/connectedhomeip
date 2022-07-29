@@ -37,7 +37,7 @@ tests:
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
           timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
-      PICS: CADMIN.S.C0001
+      PICS: CADMIN.C.C01.Tx
       verification: |
           On 1st controller chip tool, open commissioning window
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
@@ -89,7 +89,7 @@ tests:
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
           timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
-      PICS: CADMIN.S.C0001
+      PICS: CADMIN.C.C01.Tx
       verification: |
           On 1st controller chip tool, open commissioning window
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
@@ -246,7 +246,7 @@ tests:
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
           timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
-      PICS: CADMIN.S.C0001
+      PICS: CADMIN.C.C01.Tx
       verification: |
           On 1st controller chip tool, open commissioning window
 

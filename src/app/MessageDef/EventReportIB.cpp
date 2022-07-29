@@ -24,7 +24,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {
@@ -148,6 +148,28 @@ EventReportIB::Builder & EventReportIB::Builder::EndOfEventReportIB()
 {
     EndOfContainer();
     return *this;
+}
+
+CHIP_ERROR EventReportIB::ConstructEventStatusIB(TLV::TLVWriter & aWriter, const ConcreteEventPath & aEvent, StatusIB aStatus)
+{
+    Builder eventReportIBBuilder;
+    ReturnErrorOnFailure(eventReportIBBuilder.Init(&aWriter));
+    EventStatusIB::Builder & eventStatusIBBuilder = eventReportIBBuilder.CreateEventStatus();
+    ReturnErrorOnFailure(eventReportIBBuilder.GetError());
+    EventPathIB::Builder & eventPathIBBuilder = eventStatusIBBuilder.CreatePath();
+    ReturnErrorOnFailure(eventStatusIBBuilder.GetError());
+    ReturnErrorOnFailure(eventPathIBBuilder.Endpoint(aEvent.mEndpointId)
+                             .Cluster(aEvent.mClusterId)
+                             .Event(aEvent.mEventId)
+                             .EndOfEventPathIB()
+                             .GetError());
+
+    ReturnErrorOnFailure(eventStatusIBBuilder.CreateErrorStatus().EncodeStatusIB(aStatus).GetError());
+
+    ReturnErrorOnFailure(eventStatusIBBuilder.EndOfEventStatusIB().GetError());
+    ReturnErrorOnFailure(eventReportIBBuilder.EndOfEventReportIB().GetError());
+    ReturnErrorOnFailure(aWriter.Finalize());
+    return CHIP_NO_ERROR;
 }
 } // namespace app
 } // namespace chip

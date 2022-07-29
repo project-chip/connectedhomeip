@@ -608,38 +608,23 @@ PICS:
       id: DGSW.S.C00.Rsp
 
       # Thermostat cluster
-    - label: "Does the device implement the Heating feature"
+    - label: "Thermostat is capable of managing a heating device"
       id: TSTAT.S.F00
 
-    - label: "Does the device implement the Cooling feature"
+    - label: "Thermostat is capable of managing a cooling device"
       id: TSTAT.S.F01
 
-    - label: "Does the device implement the Occupancy feature"
+    - label: "Supports Occupied and Unoccupied setpoints"
       id: TSTAT.S.F02
 
-    - label: "Does the device implement the Auto feature"
+    - label: "Supports a weekly schedule of setpoint transitions(Schedule)"
+      id: TSTAT.S.F03
+
+    - label: "Supports configurable setback (or span)"
+      id: TSTAT.S.F04
+
+    - label: "Supports a System Mode of Auto"
       id: TSTAT.S.F05
-
-    - label: "Does the device implement the MinHeatSetpointLimit attribute"
-      id: A_MINHEATSETPOINTLIMIT
-
-    - label: "Does the device implement the MaxHeatSetpointLimit attribute"
-      id: A_MAXHEATSETPOINTLIMIT
-
-    - label: "Does the device implement the MinCoolSetpointLimit attribute"
-      id: A_MINCOOLSETPOINTLIMIT
-
-    - label: "Does the device implement the MaxCoolSetpointLimit attribute"
-      id: A_MAXCOOLSETPOINTLIMIT
-
-    - label: "Does the device implement the Tolerance attribute?"
-      id: A_TEMPERATURE_TOLERANCE
-
-    - label: "Does the device implement the OccupiedCoolingSetpoint attribute?"
-      id: A_OCCUPIEDCOOLINGSETPOINT
-
-    - label: "Does the device implement the OccupiedHeatingSetpoint attribute?"
-      id: A_OCCUPIEDHEATINGSETPOINT
 
     - label: "Does the device implement the LocalTemperature attribute?"
       id: TSTAT.S.A0000
@@ -818,24 +803,6 @@ PICS:
 
     - label: "Does the device implement the GetRelayStatusLog command?"
       id: TSTAT.S.C04.Rsp
-
-    - label: "Thermostat is capable of managing a heating device"
-      id: TSTAT.S.F00
-
-    - label: "Thermostat is capable of managing a cooling device"
-      id: TSTAT.S.F01
-
-    - label: "Supports Occupied and Unoccupied setpoints"
-      id: TSTAT.S.F02
-
-    - label: "Supports a weekly schedule of setpoint transitions"
-      id: TSTAT.S.F03
-
-    - label: "Supports configurable setback (or span)"
-      id: TSTAT.S.F04
-
-    - label: "Supports a System Mode of Auto"
-      id: TSTAT.S.F05
 
     #Client Commands
     - label: "Does the device implement sending the SetpointRaiseLower command?"
@@ -1375,6 +1342,9 @@ PICS:
       id: LVL.S.M.VarRate
 
     #Groups Cluster
+    - label: "Does the DUT(Server) support Group Names feature?"
+      id: G.S.F00
+
     - label: "Does the DUT(Server) support NameSupport attribute?"
       id: G.S.A0000
 
@@ -1766,13 +1736,13 @@ PICS:
       id: CADMIN.AudioInterface
     #server
     - label: "Does the Device support Enhanced Commissioning Method (ECM)?"
-      id: CADMIN.S.C0000
+      id: CADMIN.S.C00.Rsp
 
     - label: "Does the Device support Basic Commissioning Method (BCM)?"
-      id: CADMIN.S.C0001
+      id: CADMIN.S.C01.Rsp
 
     - label: "Does the Device support revoking commissioning window?"
-      id: CADMIN.S.C0002
+      id: CADMIN.S.C02.Rsp
 
     - label: "Does the Device implement receiving the RemoveFabric command?"
       id: OPCREDS.S.C0a.Rsp
@@ -1788,13 +1758,13 @@ PICS:
 
     #client
     - label: "Does the Device support Enhanced Commissioning Method (ECM)?"
-      id: CADMIN.C.C0000
+      id: CADMIN.C.C00.Tx
 
     - label: "Does the Device support Basic Commissioning Method (BCM)?"
-      id: CADMIN.C.C0001
+      id: CADMIN.C.C01.Tx
 
     - label: "Does the Device support revoking commissioning window?"
-      id: CADMIN.C.C0002
+      id: CADMIN.C.C02.Tx
 
     - label: "Does the Device implement receiving the RemoveFabric command?"
       id: OPCREDS.C.C0a.Tx
@@ -1807,6 +1777,12 @@ PICS:
 
     - label: "Does the Device support WindowStatus attribute?"
       id: CADMIN.C.A0000
+
+    - label: "Does the Device implement the Multi Fabric cluster as a server?"
+      id: CADMIN.S
+
+    - label: "Does the Device implement the Multi Fabric cluster as a client?"
+      id: CADMIN.C
 
     #User Label cluster
     - label: "Does the DUT Server support LabelList attribute?"
@@ -1890,16 +1866,16 @@ PICS:
     - label:
           "Does the DUT support the Channel server cluster ChangeChannel
           command?"
-      id: CHANNEL.S.C0000
+      id: CHANNEL.S.C00.Rsp
 
     - label:
           "Does the DUT support the Channel server cluster ChangeChannelByNumber
           command?"
-      id: CHANNEL.S.C0002
+      id: CHANNEL.S.C02.Rsp
 
     - label:
           "Does the DUT support the Channel server cluster SkipChannel command?"
-      id: CHANNEL.S.C0003
+      id: CHANNEL.S.C03.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Advanced Seek
@@ -2056,18 +2032,9 @@ PICS:
       id: CHANNEL.S.A0002
 
     - label:
-          "Does the DUT support the Channel server cluster ChangeChannel
+          "Does the DUT support the Channel server cluster ChangeChannelResponse
           command?"
-      id: CHANNEL.S.C0000
-
-    - label:
-          "Does the DUT support the Channel server cluster ChangeChannelByNumber
-          command?"
-      id: CHANNEL.S.C0002
-
-    - label:
-          "Does the DUT support the Channel server cluster SkipChannel command?"
-      id: CHANNEL.S.C0003
+      id: CHANNEL.S.C01.Tx
 
     - label:
           "Does the DUT support the Media Playback server cluster Advanced Seek
@@ -2116,103 +2083,90 @@ PICS:
 
     - label:
           "Does the DUT support the Media Playback server cluster Play command?"
-      id: MEDIAPLAYBACK.S.C0000
+      id: MEDIAPLAYBACK.S.C00.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Pause command?"
-      id: MEDIAPLAYBACK.S.C0001
+      id: MEDIAPLAYBACK.S.C01.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Stop command?"
-      id: MEDIAPLAYBACK.S.C0002
+      id: MEDIAPLAYBACK.S.C02.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster StartOver
           command?"
-      id: MEDIAPLAYBACK.S.C0003
+      id: MEDIAPLAYBACK.S.C03.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Previous
           command?"
-      id: MEDIAPLAYBACK.S.C0004
+      id: MEDIAPLAYBACK.S.C04.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Next command?"
-      id: MEDIAPLAYBACK.S.C0005
+      id: MEDIAPLAYBACK.S.C05.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Rewind
           command?"
-      id: MEDIAPLAYBACK.S.C0006
+      id: MEDIAPLAYBACK.S.C06.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster FastForward
           command?"
-      id: MEDIAPLAYBACK.S.C0007
+      id: MEDIAPLAYBACK.S.C07.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster SkipForward
           command?"
-      id: MEDIAPLAYBACK.S.C0008
+      id: MEDIAPLAYBACK.S.C08.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster SkipBackward
           command?"
-      id: MEDIAPLAYBACK.S.C0009
+      id: MEDIAPLAYBACK.S.C09.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Seek command?"
-      id: MEDIAPLAYBACK.S.C000B
+      id: MEDIAPLAYBACK.S.C0B.Rsp
 
     - label:
-          "Does the DUT support the Media Playback client cluster Play command?"
-      id: MEDIAPLAYBACK.C.C0000
+          "Does the DUT support the Media Playback client cluster, Play command?"
+      id: MEDIAPLAYBACK.C.C00.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster Pause command?"
-      id: MEDIAPLAYBACK.C.C0001
-
-    - label:
-          "Does the DUT support the Media Playback client cluster Stop command?"
-      id: MEDIAPLAYBACK.C.C0002
-
-    - label:
-          "Does the DUT support the Media Playback client cluster StartOver
+          "Does the DUT support the Media Playback client cluster, Pause
           command?"
-      id: MEDIAPLAYBACK.C.C0003
+      id: MEDIAPLAYBACK.C.C01.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster Previous
+          "Does the DUT support the Media Playback client cluster, Stop command?"
+      id: MEDIAPLAYBACK.C.C02.Tx
+
+    - label:
+          "Does the DUT support the Media Playback client cluster, StartOver
           command?"
-      id: MEDIAPLAYBACK.C.C0004
+      id: MEDIAPLAYBACK.C.C03.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster Next command?"
-      id: MEDIAPLAYBACK.C.C0005
-
-    - label:
-          "Does the DUT support the Media Playback client cluster Rewind
+          "Does the DUT support the Media Playback client cluster, Previous
           command?"
-      id: MEDIAPLAYBACK.C.C0006
+      id: MEDIAPLAYBACK.C.C04.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster FastForward
+          "Does the DUT support the Media Playback client cluster, Next command?"
+      id: MEDIAPLAYBACK.C.C05.Tx
+
+    - label:
+          "Does the DUT support the Media Playback client cluster, SkipForward
           command?"
-      id: MEDIAPLAYBACK.C.C0007
+      id: MEDIAPLAYBACK.C.C08.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster SkipForward
+          "Does the DUT support the Media Playback client cluster, SkipBackward
           command?"
-      id: MEDIAPLAYBACK.C.C0008
-
-    - label:
-          "Does the DUT support the Media Playback client cluster SkipBackward
-          command?"
-      id: MEDIAPLAYBACK.C.C0009
-
-    - label:
-          "Does the DUT support the Media Playback client cluster Seek command?"
-      id: MEDIAPLAYBACK.C.C000B
+      id: MEDIAPLAYBACK.C.C09.Tx
 
     - label:
           "Does the DUT support the Audio Output server cluster OutputList
@@ -2812,10 +2766,10 @@ PICS:
       id: MCORE.DD.CONTROLLER
 
     - label: "Does the DUT support Discovery Capability over IP Network?"
-      id: MCORE.DD.DT_IP
+      id: MCORE.DD.DISCOVERY_IP
 
     - label: "Does the DUT support Discovery Capability over SoftAP?"
-      id: MCORE.DD.DT_SOFTAP
+      id: MCORE.DD.DISCOVERY_SOFTAP
 
     - label: "Does the DUT support Standard Commissioning Flow?"
       id: MCORE.DD.STANDARD_COMM_FLOW
@@ -2856,6 +2810,62 @@ PICS:
 
     - label: "Does the device support Wifi or Thread interfaces?"
       id: MCORE.DD.WIRELESS
+
+    - label:
+          "Does the device support TXT Key 'VP' (Vendor ID / Product ID) in it’s
+          DNS-SD TXT Records for Commissionable Node Discovery?"
+      id: MCORE.DD.TXT_KEY_VP
+
+    - label:
+          "Does the device support TXT Key 'DT' (Device Type) in it’s DNS-SD TXT
+          Records for Commissionable Node Discovery?"
+      id: MCORE.DD.TXT_KEY_DT
+
+    - label: "Does the Commissioner support Discovery Capability over BLE?"
+      id: MCORE.DD.DISCOVERY_BLE
+
+    - label: "Does the device support discovery over Wi-Fi?"
+      id: MCORE.DD.WIFI
+
+    - label: "Does the device have a vendor specific information element (IE)?"
+      id: MCORE.DD.IE
+
+    - label:
+          "Does the device support TXT Key 'DN' (Device Name) in it’s DNS-SD TXT
+          Records for Commissionable Node Discovery?"
+      id: MCORE.DD.TXT_KEY_DN
+
+    - label:
+          "Does the device support TXT Key 'RI' (Rotating Identifier) in it’s
+          DNS-SD TXT Records for Commissionable Node Discovery?"
+      id: MCORE.DD.TXT_KEY_RI
+
+    - label:
+          "Does the device support TXT Key 'PH' (Pairing Hint) in it’s DNS-SD
+          TXT Records for Commissionable Node Discovery?"
+      id: MCORE.DD.TXT_KEY_PH
+
+    - label:
+          "Does the device support TXT Key 'PI' (Pairing Instruction) in it’s
+          DNS-SD TXT Records for Commissionable Node Discovery?"
+      id: MCORE.DD.TXT_KEY_PI
+
+    - label:
+          "Does the device support Extended Discovery through DNS-SD
+          advertisements when device is not in commissioning mode?"
+      id: MCORE.DD.EXTENDED_DISCOVERY
+
+    - label:
+          "Does the device support advertising the Vendor ID Commissioning
+          Subtype in Commissionable Node Discovery through DNS-SD
+          advertisements?"
+      id: MCORE.DD.COMMISSIONING_SUBTYPE_V
+
+    - label:
+          "Does the device support advertising the Device Type Commissioning
+          Subtype in Commissionable Node Discovery through DNS-SD
+          advertisements?"
+      id: MCORE.DD.COMMISSIONING_SUBTYPE_T
 
     #Ethernet Network Diagnostics Cluster
     - label: "Does the device implement the ResetCounts command?"
@@ -4338,6 +4348,11 @@ PICS:
 
     #Node Operational Credential
     #Server Attributes
+    - label:
+          "Factory Reset DUT (to ensure NOC list is empty at the beginning of
+          the following steps)"
+      id: MCORE.FACTORY_RESET
+
     - label: "Does the DUT(server) support the NOC list attribute?"
       id: OPCREDS.S.A0000
 
@@ -4520,7 +4535,6 @@ PICS:
       id: ACL.S.E01
 
     #Mode select
-    #Mode select
     - label: "Does the DUT support the StartUpMode attribute?"
       id: MOD.S.A0004
 
@@ -4557,3 +4571,101 @@ PICS:
           "Does commissionee provide a Firmware Information field in the
           AttestationResponse?"
       id: MCORE.DA.ATTESTELEMENT_FW_INFO
+
+    #Descriptor Cluster TestPlan
+    #server
+    - label: "Does the DUT(server) support the DEVICETYPELIST attribute?"
+      id: DESC.S.A0000
+
+    - label: "Does the DUT(server) support the SERVERLIST attribute?"
+      id: DESC.S.A0001
+
+    - label: "Does the DUT(server) support the CLIENTLIST attribute?"
+      id: DESC.S.A0002
+
+    - label: "Does the DUT(server) support the PARTSLIST attribute?"
+      id: DESC.S.A0003
+
+    - label: "Does the DUT(server) support the REVISIONFIELD attribute?"
+      id: DESC.S.A0004
+
+    #cluster
+    - label: "Does the DUT(client) support the DEVICETYPELIST attribute?"
+      id: DESC.C.A0000
+
+    - label: "Does the DUT(client) support the SERVERLIST attribute?"
+      id: DESC.C.A0001
+
+    - label: "Does the DUT(client) support the CLIENTLIST attribute?"
+      id: DESC.C.A0002
+
+    - label: "Does the DUT(client) support the PARTSLIST attribute?"
+      id: DESC.C.A0003
+
+    - label: "Does the DUT(client) support the REVISIONFIELD attribute?"
+      id: DESC.C.A0004
+
+    #Secure Channel
+    - label:
+          "Does device support optional key SII in operational discovery mDNS?"
+      id: MCORE.SC.SII_OP_DISCOVERY_KEY
+
+    - label:
+          "Does device support optional key SII in operational discovery mDNS?"
+      id: MCORE.SC.SAI_OP_DISCOVERY_KEY
+
+    - label:
+          "Does device support optional key SII in operational discovery mDNS?"
+      id: MCORE.SC.T_KEY
+
+    - label: "Does the device support discovery over Bluetooth Low Power (BLE)?"
+      id: MCORE.SC.BLE
+
+    - label: "Does the device support discovery over Wi-Fi?"
+      id: MCORE.SC.WIFI
+
+    - label: "Does the device support discovery over Ethernet?"
+      id: MCORE.SC.ETH
+
+    - label: "Does the device support discovery over Thread?"
+      id: MCORE.SC.THR
+
+    - label:
+          "Does device support optional subtype _V in commissionable node
+          discovery mDNS?"
+      id: MCORE.SC.VENDOR_SUBTYPE
+
+    - label:
+          "Does device support optional subtype _T in commissionable node
+          discovery mDNS?"
+      id: MCORE.SC.DEVTYPE_SUBTYPE
+
+    - label:
+          "Does device support optional key VP in commissionable node discovery
+          mDNS?"
+      id: MCORE.SC.VP_KEY
+
+    - label:
+          "Does device support optional key DT in commissionable node discovery
+          mDNS?"
+      id: MCORE.SC.DT_KEY
+
+    - label:
+          "Does device support optional key DN in commissionable node discovery
+          mDNS?"
+      id: MCORE.SC.DN_KEY
+
+    - label:
+          "Does device support optional key RI in commissionable node discovery
+          mDNS?"
+      id: MCORE.SC.RI_KEY
+
+    - label:
+          "Does device support optional key PH in commissionable node discovery
+          mDNS?"
+      id: MCORE.SC.PH_KEY
+
+    - label:
+          "Does device support optional key PI in commissionable node discovery
+          mDNS?"
+      id: MCORE.SC.PI_KEY

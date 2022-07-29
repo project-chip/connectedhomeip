@@ -45,7 +45,7 @@ tests:
           "Precondition : Set DUT EnhancedCurrentHue to 0x4000 using
           EnhancedMoveToHue command"
       command: "EnhancedMoveToHue"
-      PICS: CC.S.C40.Rsp
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.C40.Rsp
       arguments:
           values:
               - name: "enhancedHue"
@@ -67,9 +67,16 @@ tests:
               - name: "ms"
                 value: 1000
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.A000f && CC.S.F02 && CC.S.F01
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
-      PICS: CC.S.C44.Rsp
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
       arguments:
           values:
               - name: "updateFlags"
@@ -90,34 +97,34 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
       attribute: "ColorLoopActive"
-      PICS: CC.S.A4002
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4002 && CC.S.C44.Rsp
       response:
           value: 0
 
     - label: "Read ColorLoopDirection attribute from DUT."
       command: "readAttribute"
       attribute: "ColorLoopDirection"
-      PICS: CC.S.A4003
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4003 && CC.S.C44.Rsp
       response:
           value: 0
 
     - label: "Read ColorLoopTime attribute from DUT."
       command: "readAttribute"
       attribute: "ColorLoopTime"
-      PICS: CC.S.A4004
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4004 && CC.S.C44.Rsp
       response:
           value: 30
 
     - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
       command: "readAttribute"
       attribute: "ColorLoopStartEnhancedHue"
-      PICS: CC.S.A4005
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4005 && CC.S.C44.Rsp
       response:
           value: 160
 
     - label: "Color Loop Set Command - Set all Attributes"
       command: "ColorLoopSet"
-      PICS: CC.S.C44.Rsp
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
       arguments:
           values:
               - name: "updateFlags"
@@ -138,14 +145,14 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT."
       command: "readAttribute"
       attribute: "ColorLoopActive"
-      PICS: CC.S.A4002
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4002 && CC.S.C44.Rsp
       response:
           value: 1
 
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
-      PICS: CC.S.A4006
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4006 && CC.S.C40.Rsp
       response:
           value: 16384
 
@@ -160,17 +167,17 @@ tests:
     - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
       command: "readAttribute"
       attribute: "ColorLoopStartEnhancedHue"
-      PICS: CC.S.A4005
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4005 && CC.S.C44.Rsp
       response:
           saveAs: ColorLoopStartEnhancedHueValue
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
-      PICS: CC.S.A4000
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueValue
               maxValue: 65535
 
@@ -185,16 +192,16 @@ tests:
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
-      PICS: CC.S.A4000
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueValue
               maxValue: 65535
 
     - label: "Color Loop Set Command - Start Color Loop"
       command: "ColorLoopSet"
-      PICS: CC.S.C44.Rsp
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
       arguments:
           values:
               - name: "updateFlags"
@@ -215,7 +222,7 @@ tests:
     - label: "Read ColorLoopTime attribute from DUT."
       command: "readAttribute"
       attribute: "ColorLoopTime"
-      PICS: CC.S.A4004
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4004 && CC.S.C44.Rsp
       response:
           value: 60
 
@@ -230,10 +237,10 @@ tests:
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
-      PICS: CC.S.A4000
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -248,16 +255,16 @@ tests:
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
-      PICS: CC.S.A4000
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     - label: "Color Loop Set Command - Start Color Loop"
       command: "ColorLoopSet"
-      PICS: CC.S.C44.Rsp
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
       arguments:
           values:
               - name: "updateFlags"
@@ -278,21 +285,21 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
       attribute: "ColorLoopActive"
-      PICS: CC.S.A4002
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4002 && CC.S.C44.Rsp
       response:
           value: 0
 
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
-      PICS: CC.S.A4006
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4006 && CC.S.C44.Rsp
       response:
           saveAs: ColorLoopStoredEnhancedHueValue
 
     - label: "Read EnhancedCurrentHue attribute from DUT."
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
-      PICS: CC.S.A4000
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           value: ColorLoopStoredEnhancedHueValue
 

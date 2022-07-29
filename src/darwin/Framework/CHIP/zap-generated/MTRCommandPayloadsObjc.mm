@@ -32,6 +32,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRIdentifyClusterIdentifyParams alloc] init];
+
+    other.identifyTime = self.identifyTime;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -51,6 +61,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRIdentifyClusterTriggerEffectParams alloc] init];
+
+    other.effectIdentifier = self.effectIdentifier;
+    other.effectVariant = self.effectVariant;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -74,6 +95,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupsClusterAddGroupParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.groupName = self.groupName;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -95,6 +127,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupsClusterAddGroupResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupId = self.groupId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -112,6 +155,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupsClusterViewGroupParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -136,6 +189,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupsClusterViewGroupResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupId = self.groupId;
+    other.groupName = self.groupName;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; groupName:%@; >",
@@ -153,6 +218,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupsClusterGetGroupMembershipParams alloc] init];
+
+    other.groupList = self.groupList;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -175,6 +250,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupsClusterGetGroupMembershipResponseParams alloc] init];
+
+    other.capacity = self.capacity;
+    other.groupList = self.groupList;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -192,6 +278,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupsClusterRemoveGroupParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -214,6 +310,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupsClusterRemoveGroupResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupId = self.groupId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -229,6 +336,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupsClusterRemoveAllGroupsParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -249,6 +365,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupsClusterAddGroupIfIdentifyingParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.groupName = self.groupName;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -278,6 +405,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterAddSceneParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.sceneId = self.sceneId;
+    other.transitionTime = self.transitionTime;
+    other.sceneName = self.sceneName;
+    other.extensionFieldSets = self.extensionFieldSets;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -302,6 +443,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterAddSceneResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupId = self.groupId;
+    other.sceneId = self.sceneId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
@@ -321,6 +474,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterViewSceneParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.sceneId = self.sceneId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -352,6 +516,21 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterViewSceneResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupId = self.groupId;
+    other.sceneId = self.sceneId;
+    other.transitionTime = self.transitionTime;
+    other.sceneName = self.sceneName;
+    other.extensionFieldSets = self.extensionFieldSets;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -372,6 +551,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterRemoveSceneParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.sceneId = self.sceneId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -397,6 +587,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterRemoveSceneResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupId = self.groupId;
+    other.sceneId = self.sceneId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
@@ -414,6 +616,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterRemoveAllScenesParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -436,6 +648,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterRemoveAllScenesResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupId = self.groupId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -455,6 +678,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterStoreSceneParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.sceneId = self.sceneId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -480,6 +714,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterStoreSceneResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupId = self.groupId;
+    other.sceneId = self.sceneId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
@@ -503,6 +749,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterRecallSceneParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.sceneId = self.sceneId;
+    other.transitionTime = self.transitionTime;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; transitionTime:%@; >",
@@ -520,6 +778,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterGetSceneMembershipParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -544,6 +812,19 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterGetSceneMembershipResponseParams alloc] init];
+
+    other.status = self.status;
+    other.capacity = self.capacity;
+    other.groupId = self.groupId;
+    other.sceneList = self.sceneList;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -573,6 +854,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterEnhancedAddSceneParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.sceneId = self.sceneId;
+    other.transitionTime = self.transitionTime;
+    other.sceneName = self.sceneName;
+    other.extensionFieldSets = self.extensionFieldSets;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -597,6 +892,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterEnhancedAddSceneResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupId = self.groupId;
+    other.sceneId = self.sceneId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
@@ -616,6 +923,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterEnhancedViewSceneParams alloc] init];
+
+    other.groupId = self.groupId;
+    other.sceneId = self.sceneId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -647,6 +965,21 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterEnhancedViewSceneResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupId = self.groupId;
+    other.sceneId = self.sceneId;
+    other.transitionTime = self.transitionTime;
+    other.sceneName = self.sceneName;
+    other.extensionFieldSets = self.extensionFieldSets;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -675,6 +1008,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterCopySceneParams alloc] init];
+
+    other.mode = self.mode;
+    other.groupIdFrom = self.groupIdFrom;
+    other.sceneIdFrom = self.sceneIdFrom;
+    other.groupIdTo = self.groupIdTo;
+    other.sceneIdTo = self.sceneIdTo;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -699,6 +1046,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRScenesClusterCopySceneResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupIdFrom = self.groupIdFrom;
+    other.sceneIdFrom = self.sceneIdFrom;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupIdFrom:%@; sceneIdFrom:%@; >",
@@ -714,6 +1073,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROnOffClusterOffParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -732,6 +1100,15 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROnOffClusterOnParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
@@ -746,6 +1123,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROnOffClusterToggleParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -768,6 +1154,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROnOffClusterOffWithEffectParams alloc] init];
+
+    other.effectId = self.effectId;
+    other.effectVariant = self.effectVariant;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -783,6 +1180,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROnOffClusterOnWithRecallGlobalSceneParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -807,6 +1213,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROnOffClusterOnWithTimedOffParams alloc] init];
+
+    other.onOffControl = self.onOffControl;
+    other.onTime = self.onTime;
+    other.offWaitTime = self.offWaitTime;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: onOffControl:%@; onTime:%@; offWaitTime:%@; >",
@@ -824,19 +1242,32 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-        _optionMask = @(0);
+        _optionsMask = @(0);
 
-        _optionOverride = @(0);
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRLevelControlClusterMoveToLevelParams alloc] init];
+
+    other.level = self.level;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: level:%@; transitionTime:%@; optionMask:%@; optionOverride:%@; >",
-                  NSStringFromClass([self class]), _level, _transitionTime, _optionMask, _optionOverride];
+        [NSString stringWithFormat:@"<%@: level:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _level, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -850,18 +1281,31 @@ NS_ASSUME_NONNULL_BEGIN
 
         _rate = @(0);
 
-        _optionMask = @(0);
+        _optionsMask = @(0);
 
-        _optionOverride = @(0);
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRLevelControlClusterMoveParams alloc] init];
+
+    other.moveMode = self.moveMode;
+    other.rate = self.rate;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionMask:%@; optionOverride:%@; >",
-                                             NSStringFromClass([self class]), _moveMode, _rate, _optionMask, _optionOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >",
+                                             NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -877,19 +1321,33 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-        _optionMask = @(0);
+        _optionsMask = @(0);
 
-        _optionOverride = @(0);
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRLevelControlClusterStepParams alloc] init];
+
+    other.stepMode = self.stepMode;
+    other.stepSize = self.stepSize;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionMask:%@; optionOverride:%@; >",
-                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionMask, _optionOverride];
+        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -899,18 +1357,29 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _optionMask = @(0);
+        _optionsMask = @(0);
 
-        _optionOverride = @(0);
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRLevelControlClusterStopParams alloc] init];
+
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: optionMask:%@; optionOverride:%@; >",
-                                             NSStringFromClass([self class]), _optionMask, _optionOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: optionsMask:%@; optionsOverride:%@; >",
+                                             NSStringFromClass([self class]), _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -923,15 +1392,33 @@ NS_ASSUME_NONNULL_BEGIN
         _level = @(0);
 
         _transitionTime = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRLevelControlClusterMoveToLevelWithOnOffParams alloc] init];
+
+    other.level = self.level;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: level:%@; transitionTime:%@; >", NSStringFromClass([self class]), _level, _transitionTime];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: level:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _level, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -944,15 +1431,32 @@ NS_ASSUME_NONNULL_BEGIN
         _moveMode = @(0);
 
         _rate = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRLevelControlClusterMoveWithOnOffParams alloc] init];
+
+    other.moveMode = self.moveMode;
+    other.rate = self.rate;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; >", NSStringFromClass([self class]), _moveMode, _rate];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >",
+                                             NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -967,15 +1471,34 @@ NS_ASSUME_NONNULL_BEGIN
         _stepSize = @(0);
 
         _transitionTime = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRLevelControlClusterStepWithOnOffParams alloc] init];
+
+    other.stepMode = self.stepMode;
+    other.stepSize = self.stepSize;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; >",
-                                             NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -984,14 +1507,30 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRLevelControlClusterStopWithOnOffParams alloc] init];
+
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: optionsMask:%@; optionsOverride:%@; >",
+                                             NSStringFromClass([self class]), _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -1005,6 +1544,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRLevelControlClusterMoveToClosestFrequencyParams alloc] init];
+
+    other.frequency = self.frequency;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1025,6 +1574,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBridgedActionsClusterInstantActionParams alloc] init];
+
+    other.actionID = self.actionID;
+    other.invokeID = self.invokeID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1050,6 +1610,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBridgedActionsClusterInstantActionWithTransitionParams alloc] init];
+
+    other.actionID = self.actionID;
+    other.invokeID = self.invokeID;
+    other.transitionTime = self.transitionTime;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; transitionTime:%@; >",
@@ -1069,6 +1641,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBridgedActionsClusterStartActionParams alloc] init];
+
+    other.actionID = self.actionID;
+    other.invokeID = self.invokeID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1094,6 +1677,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBridgedActionsClusterStartActionWithDurationParams alloc] init];
+
+    other.actionID = self.actionID;
+    other.invokeID = self.invokeID;
+    other.duration = self.duration;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >",
@@ -1115,6 +1710,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBridgedActionsClusterStopActionParams alloc] init];
+
+    other.actionID = self.actionID;
+    other.invokeID = self.invokeID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -1134,6 +1740,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBridgedActionsClusterPauseActionParams alloc] init];
+
+    other.actionID = self.actionID;
+    other.invokeID = self.invokeID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1159,6 +1776,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBridgedActionsClusterPauseActionWithDurationParams alloc] init];
+
+    other.actionID = self.actionID;
+    other.invokeID = self.invokeID;
+    other.duration = self.duration;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >",
@@ -1180,6 +1809,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBridgedActionsClusterResumeActionParams alloc] init];
+
+    other.actionID = self.actionID;
+    other.invokeID = self.invokeID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -1199,6 +1839,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBridgedActionsClusterEnableActionParams alloc] init];
+
+    other.actionID = self.actionID;
+    other.invokeID = self.invokeID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1224,6 +1875,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBridgedActionsClusterEnableActionWithDurationParams alloc] init];
+
+    other.actionID = self.actionID;
+    other.invokeID = self.invokeID;
+    other.duration = self.duration;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >",
@@ -1243,6 +1906,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBridgedActionsClusterDisableActionParams alloc] init];
+
+    other.actionID = self.actionID;
+    other.invokeID = self.invokeID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1268,6 +1942,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBridgedActionsClusterDisableActionWithDurationParams alloc] init];
+
+    other.actionID = self.actionID;
+    other.invokeID = self.invokeID;
+    other.duration = self.duration;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >",
@@ -1283,6 +1969,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBasicClusterMfgSpecificPingParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1315,6 +2010,23 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROtaSoftwareUpdateProviderClusterQueryImageParams alloc] init];
+
+    other.vendorId = self.vendorId;
+    other.productId = self.productId;
+    other.softwareVersion = self.softwareVersion;
+    other.protocolsSupported = self.protocolsSupported;
+    other.hardwareVersion = self.hardwareVersion;
+    other.location = self.location;
+    other.requestorCanConsent = self.requestorCanConsent;
+    other.metadataForProvider = self.metadataForProvider;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1353,6 +2065,23 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams alloc] init];
+
+    other.status = self.status;
+    other.delayedActionTime = self.delayedActionTime;
+    other.imageURI = self.imageURI;
+    other.softwareVersion = self.softwareVersion;
+    other.softwareVersionString = self.softwareVersionString;
+    other.updateToken = self.updateToken;
+    other.userConsentNeeded = self.userConsentNeeded;
+    other.metadataForRequestor = self.metadataForRequestor;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -1378,6 +2107,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
+
+    other.updateToken = self.updateToken;
+    other.newVersion = self.newVersion;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -1400,6 +2140,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
+
+    other.action = self.action;
+    other.delayedActionTime = self.delayedActionTime;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -1419,6 +2170,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
+
+    other.updateToken = self.updateToken;
+    other.softwareVersion = self.softwareVersion;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1449,6 +2211,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams alloc] init];
+
+    other.providerNodeId = self.providerNodeId;
+    other.vendorId = self.vendorId;
+    other.announcementReason = self.announcementReason;
+    other.metadataForNode = self.metadataForNode;
+    other.endpoint = self.endpoint;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -1472,6 +2248,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGeneralCommissioningClusterArmFailSafeParams alloc] init];
+
+    other.expiryLengthSeconds = self.expiryLengthSeconds;
+    other.breadcrumb = self.breadcrumb;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: expiryLengthSeconds:%@; breadcrumb:%@; >",
@@ -1491,6 +2278,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGeneralCommissioningClusterArmFailSafeResponseParams alloc] init];
+
+    other.errorCode = self.errorCode;
+    other.debugText = self.debugText;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1516,6 +2314,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGeneralCommissioningClusterSetRegulatoryConfigParams alloc] init];
+
+    other.newRegulatoryConfig = self.newRegulatoryConfig;
+    other.countryCode = self.countryCode;
+    other.breadcrumb = self.breadcrumb;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: newRegulatoryConfig:%@; countryCode:%@; breadcrumb:%@; >",
@@ -1537,6 +2347,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams alloc] init];
+
+    other.errorCode = self.errorCode;
+    other.debugText = self.debugText;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -1552,6 +2373,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGeneralCommissioningClusterCommissioningCompleteParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1574,6 +2404,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGeneralCommissioningClusterCommissioningCompleteResponseParams alloc] init];
+
+    other.errorCode = self.errorCode;
+    other.debugText = self.debugText;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -1593,6 +2434,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRNetworkCommissioningClusterScanNetworksParams alloc] init];
+
+    other.ssid = self.ssid;
+    other.breadcrumb = self.breadcrumb;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1620,6 +2472,19 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRNetworkCommissioningClusterScanNetworksResponseParams alloc] init];
+
+    other.networkingStatus = self.networkingStatus;
+    other.debugText = self.debugText;
+    other.wiFiScanResults = self.wiFiScanResults;
+    other.threadScanResults = self.threadScanResults;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -1644,6 +2509,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams alloc] init];
+
+    other.ssid = self.ssid;
+    other.credentials = self.credentials;
+    other.breadcrumb = self.breadcrumb;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -1666,6 +2543,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams alloc] init];
+
+    other.operationalDataset = self.operationalDataset;
+    other.breadcrumb = self.breadcrumb;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -1686,6 +2574,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRNetworkCommissioningClusterRemoveNetworkParams alloc] init];
+
+    other.networkID = self.networkID;
+    other.breadcrumb = self.breadcrumb;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1712,6 +2611,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRNetworkCommissioningClusterNetworkConfigResponseParams alloc] init];
+
+    other.networkingStatus = self.networkingStatus;
+    other.debugText = self.debugText;
+    other.networkIndex = self.networkIndex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkingStatus:%@; debugText:%@; networkIndex:%@; >",
@@ -1731,6 +2642,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRNetworkCommissioningClusterConnectNetworkParams alloc] init];
+
+    other.networkID = self.networkID;
+    other.breadcrumb = self.breadcrumb;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1757,6 +2679,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRNetworkCommissioningClusterConnectNetworkResponseParams alloc] init];
+
+    other.networkingStatus = self.networkingStatus;
+    other.debugText = self.debugText;
+    other.errorValue = self.errorValue;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkingStatus:%@; debugText:%@; errorValue:%@; >",
@@ -1778,6 +2712,18 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRNetworkCommissioningClusterReorderNetworkParams alloc] init];
+
+    other.networkID = self.networkID;
+    other.networkIndex = self.networkIndex;
+    other.breadcrumb = self.breadcrumb;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1802,6 +2748,18 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDiagnosticLogsClusterRetrieveLogsRequestParams alloc] init];
+
+    other.intent = self.intent;
+    other.requestedProtocol = self.requestedProtocol;
+    other.transferFileDesignator = self.transferFileDesignator;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1830,6 +2788,19 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDiagnosticLogsClusterRetrieveLogsResponseParams alloc] init];
+
+    other.status = self.status;
+    other.content = self.content;
+    other.timeStamp = self.timeStamp;
+    other.timeSinceBoot = self.timeSinceBoot;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; content:%@; timeStamp:%@; timeSinceBoot:%@; >",
@@ -1852,6 +2823,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGeneralDiagnosticsClusterTestEventTriggerParams alloc] init];
+
+    other.enableKey = self.enableKey;
+    other.eventTrigger = self.eventTrigger;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -1870,6 +2852,15 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRSoftwareDiagnosticsClusterResetWatermarksParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
@@ -1884,6 +2875,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRThreadNetworkDiagnosticsClusterResetCountsParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1902,6 +2902,15 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRWiFiNetworkDiagnosticsClusterResetCountsParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
@@ -1916,6 +2925,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTREthernetNetworkDiagnosticsClusterResetCountsParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1944,6 +2962,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRAdministratorCommissioningClusterOpenCommissioningWindowParams alloc] init];
+
+    other.commissioningTimeout = self.commissioningTimeout;
+    other.pakeVerifier = self.pakeVerifier;
+    other.discriminator = self.discriminator;
+    other.iterations = self.iterations;
+    other.salt = self.salt;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -1965,6 +2997,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams alloc] init];
+
+    other.commissioningTimeout = self.commissioningTimeout;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -1980,6 +3022,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRAdministratorCommissioningClusterRevokeCommissioningParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -1998,6 +3049,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROperationalCredentialsClusterAttestationRequestParams alloc] init];
+
+    other.attestationNonce = self.attestationNonce;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2021,6 +3082,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROperationalCredentialsClusterAttestationResponseParams alloc] init];
+
+    other.attestationElements = self.attestationElements;
+    other.signature = self.signature;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -2041,6 +3113,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROperationalCredentialsClusterCertificateChainRequestParams alloc] init];
+
+    other.certificateType = self.certificateType;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -2058,6 +3140,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROperationalCredentialsClusterCertificateChainResponseParams alloc] init];
+
+    other.certificate = self.certificate;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2081,6 +3173,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROperationalCredentialsClusterCSRRequestParams alloc] init];
+
+    other.csrNonce = self.csrNonce;
+    other.isForUpdateNOC = self.isForUpdateNOC;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -2101,6 +3204,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROperationalCredentialsClusterCSRResponseParams alloc] init];
+
+    other.nocsrElements = self.nocsrElements;
+    other.attestationSignature = self.attestationSignature;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2131,6 +3245,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROperationalCredentialsClusterAddNOCParams alloc] init];
+
+    other.nocValue = self.nocValue;
+    other.icacValue = self.icacValue;
+    other.ipkValue = self.ipkValue;
+    other.caseAdminSubject = self.caseAdminSubject;
+    other.adminVendorId = self.adminVendorId;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -2153,6 +3281,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROperationalCredentialsClusterUpdateNOCParams alloc] init];
+
+    other.nocValue = self.nocValue;
+    other.icacValue = self.icacValue;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2179,6 +3318,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROperationalCredentialsClusterNOCResponseParams alloc] init];
+
+    other.statusCode = self.statusCode;
+    other.fabricIndex = self.fabricIndex;
+    other.debugText = self.debugText;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: statusCode:%@; fabricIndex:%@; debugText:%@; >",
@@ -2198,6 +3349,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROperationalCredentialsClusterUpdateFabricLabelParams alloc] init];
+
+    other.label = self.label;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; >", NSStringFromClass([self class]), _label];
@@ -2214,6 +3375,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
+
+    other.fabricIndex = self.fabricIndex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2235,6 +3406,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTROperationalCredentialsClusterAddTrustedRootCertificateParams alloc] init];
+
+    other.rootCertificate = self.rootCertificate;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: rootCertificate:%@; >", NSStringFromClass([self class]),
@@ -2252,6 +3433,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupKeyManagementClusterKeySetWriteParams alloc] init];
+
+    other.groupKeySet = self.groupKeySet;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2273,6 +3464,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupKeyManagementClusterKeySetReadParams alloc] init];
+
+    other.groupKeySetID = self.groupKeySetID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -2290,6 +3491,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupKeyManagementClusterKeySetReadResponseParams alloc] init];
+
+    other.groupKeySet = self.groupKeySet;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2311,6 +3522,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupKeyManagementClusterKeySetRemoveParams alloc] init];
+
+    other.groupKeySetID = self.groupKeySetID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -2328,6 +3549,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupKeyManagementClusterKeySetReadAllIndicesParams alloc] init];
+
+    other.groupKeySetIDs = self.groupKeySetIDs;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2349,6 +3580,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams alloc] init];
+
+    other.groupKeySetIDs = self.groupKeySetIDs;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -2368,6 +3609,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRModeSelectClusterChangeToModeParams alloc] init];
+
+    other.newMode = self.newMode;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: newMode:%@; >", NSStringFromClass([self class]), _newMode];
@@ -2384,6 +3635,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterLockDoorParams alloc] init];
+
+    other.pinCode = self.pinCode;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2405,6 +3666,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterUnlockDoorParams alloc] init];
+
+    other.pinCode = self.pinCode;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -2424,6 +3695,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterUnlockWithTimeoutParams alloc] init];
+
+    other.timeout = self.timeout;
+    other.pinCode = self.pinCode;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2457,6 +3739,22 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterSetWeekDayScheduleParams alloc] init];
+
+    other.weekDayIndex = self.weekDayIndex;
+    other.userIndex = self.userIndex;
+    other.daysMask = self.daysMask;
+    other.startHour = self.startHour;
+    other.startMinute = self.startMinute;
+    other.endHour = self.endHour;
+    other.endMinute = self.endMinute;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -2478,6 +3776,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterGetWeekDayScheduleParams alloc] init];
+
+    other.weekDayIndex = self.weekDayIndex;
+    other.userIndex = self.userIndex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2513,6 +3822,23 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterGetWeekDayScheduleResponseParams alloc] init];
+
+    other.weekDayIndex = self.weekDayIndex;
+    other.userIndex = self.userIndex;
+    other.status = self.status;
+    other.daysMask = self.daysMask;
+    other.startHour = self.startHour;
+    other.startMinute = self.startMinute;
+    other.endHour = self.endHour;
+    other.endMinute = self.endMinute;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: weekDayIndex:%@; userIndex:%@; status:%@; daysMask:%@; "
@@ -2534,6 +3860,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterClearWeekDayScheduleParams alloc] init];
+
+    other.weekDayIndex = self.weekDayIndex;
+    other.userIndex = self.userIndex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2561,6 +3898,19 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterSetYearDayScheduleParams alloc] init];
+
+    other.yearDayIndex = self.yearDayIndex;
+    other.userIndex = self.userIndex;
+    other.localStartTime = self.localStartTime;
+    other.localEndTime = self.localEndTime;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -2581,6 +3931,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterGetYearDayScheduleParams alloc] init];
+
+    other.yearDayIndex = self.yearDayIndex;
+    other.userIndex = self.userIndex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2610,6 +3971,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterGetYearDayScheduleResponseParams alloc] init];
+
+    other.yearDayIndex = self.yearDayIndex;
+    other.userIndex = self.userIndex;
+    other.status = self.status;
+    other.localStartTime = self.localStartTime;
+    other.localEndTime = self.localEndTime;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -2630,6 +4005,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterClearYearDayScheduleParams alloc] init];
+
+    other.yearDayIndex = self.yearDayIndex;
+    other.userIndex = self.userIndex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2657,6 +4043,19 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterSetHolidayScheduleParams alloc] init];
+
+    other.holidayIndex = self.holidayIndex;
+    other.localStartTime = self.localStartTime;
+    other.localEndTime = self.localEndTime;
+    other.operatingMode = self.operatingMode;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -2675,6 +4074,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterGetHolidayScheduleParams alloc] init];
+
+    other.holidayIndex = self.holidayIndex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2704,6 +4113,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterGetHolidayScheduleResponseParams alloc] init];
+
+    other.holidayIndex = self.holidayIndex;
+    other.status = self.status;
+    other.localStartTime = self.localStartTime;
+    other.localEndTime = self.localEndTime;
+    other.operatingMode = self.operatingMode;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -2722,6 +4145,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterClearHolidayScheduleParams alloc] init];
+
+    other.holidayIndex = self.holidayIndex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2755,6 +4188,22 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterSetUserParams alloc] init];
+
+    other.operationType = self.operationType;
+    other.userIndex = self.userIndex;
+    other.userName = self.userName;
+    other.userUniqueId = self.userUniqueId;
+    other.userStatus = self.userStatus;
+    other.userType = self.userType;
+    other.credentialRule = self.credentialRule;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -2775,6 +4224,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterGetUserParams alloc] init];
+
+    other.userIndex = self.userIndex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2813,6 +4272,25 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterGetUserResponseParams alloc] init];
+
+    other.userIndex = self.userIndex;
+    other.userName = self.userName;
+    other.userUniqueId = self.userUniqueId;
+    other.userStatus = self.userStatus;
+    other.userType = self.userType;
+    other.credentialRule = self.credentialRule;
+    other.credentials = self.credentials;
+    other.creatorFabricIndex = self.creatorFabricIndex;
+    other.lastModifiedFabricIndex = self.lastModifiedFabricIndex;
+    other.nextUserIndex = self.nextUserIndex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -2833,6 +4311,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterClearUserParams alloc] init];
+
+    other.userIndex = self.userIndex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2863,6 +4351,21 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterSetCredentialParams alloc] init];
+
+    other.operationType = self.operationType;
+    other.credential = self.credential;
+    other.credentialData = self.credentialData;
+    other.userIndex = self.userIndex;
+    other.userStatus = self.userStatus;
+    other.userType = self.userType;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -2888,6 +4391,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterSetCredentialResponseParams alloc] init];
+
+    other.status = self.status;
+    other.userIndex = self.userIndex;
+    other.nextCredentialIndex = self.nextCredentialIndex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; userIndex:%@; nextCredentialIndex:%@; >",
@@ -2905,6 +4420,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterGetCredentialStatusParams alloc] init];
+
+    other.credential = self.credential;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2934,6 +4459,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterGetCredentialStatusResponseParams alloc] init];
+
+    other.credentialExists = self.credentialExists;
+    other.userIndex = self.userIndex;
+    other.creatorFabricIndex = self.creatorFabricIndex;
+    other.lastModifiedFabricIndex = self.lastModifiedFabricIndex;
+    other.nextCredentialIndex = self.nextCredentialIndex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -2956,6 +4495,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRDoorLockClusterClearCredentialParams alloc] init];
+
+    other.credential = self.credential;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -2971,6 +4520,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRWindowCoveringClusterUpOrOpenParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -2989,6 +4547,15 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRWindowCoveringClusterDownOrCloseParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
@@ -3003,6 +4570,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRWindowCoveringClusterStopMotionParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3023,6 +4599,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRWindowCoveringClusterGoToLiftValueParams alloc] init];
+
+    other.liftValue = self.liftValue;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: liftValue:%@; >", NSStringFromClass([self class]), _liftValue];
@@ -3039,6 +4625,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRWindowCoveringClusterGoToLiftPercentageParams alloc] init];
+
+    other.liftPercent100thsValue = self.liftPercent100thsValue;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3060,6 +4656,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRWindowCoveringClusterGoToTiltValueParams alloc] init];
+
+    other.tiltValue = self.tiltValue;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: tiltValue:%@; >", NSStringFromClass([self class]), _tiltValue];
@@ -3076,6 +4682,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRWindowCoveringClusterGoToTiltPercentageParams alloc] init];
+
+    other.tiltPercent100thsValue = self.tiltPercent100thsValue;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3097,6 +4713,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBarrierControlClusterBarrierControlGoToPercentParams alloc] init];
+
+    other.percentOpen = self.percentOpen;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -3112,6 +4738,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRBarrierControlClusterBarrierControlStopParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3132,6 +4767,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRThermostatClusterSetpointRaiseLowerParams alloc] init];
+
+    other.mode = self.mode;
+    other.amount = self.amount;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3157,6 +4803,19 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRThermostatClusterGetWeeklyScheduleResponseParams alloc] init];
+
+    other.numberOfTransitionsForSequence = self.numberOfTransitionsForSequence;
+    other.dayOfWeekForSequence = self.dayOfWeekForSequence;
+    other.modeForSequence = self.modeForSequence;
+    other.transitions = self.transitions;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3185,6 +4844,19 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRThermostatClusterSetWeeklyScheduleParams alloc] init];
+
+    other.numberOfTransitionsForSequence = self.numberOfTransitionsForSequence;
+    other.dayOfWeekForSequence = self.dayOfWeekForSequence;
+    other.modeForSequence = self.modeForSequence;
+    other.transitions = self.transitions;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -3207,6 +4879,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRThermostatClusterGetWeeklyScheduleParams alloc] init];
+
+    other.daysToReturn = self.daysToReturn;
+    other.modeToReturn = self.modeToReturn;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: daysToReturn:%@; modeToReturn:%@; >",
@@ -3222,6 +4905,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRThermostatClusterClearWeeklyScheduleParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3250,6 +4942,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterMoveToHueParams alloc] init];
+
+    other.hue = self.hue;
+    other.direction = self.direction;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -3274,6 +4980,19 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterMoveHueParams alloc] init];
+
+    other.moveMode = self.moveMode;
+    other.rate = self.rate;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3303,6 +5022,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterStepHueParams alloc] init];
+
+    other.stepMode = self.stepMode;
+    other.stepSize = self.stepSize;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -3327,6 +5060,19 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterMoveToSaturationParams alloc] init];
+
+    other.saturation = self.saturation;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3355,6 +5101,19 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterMoveSaturationParams alloc] init];
+
+    other.moveMode = self.moveMode;
+    other.rate = self.rate;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >",
@@ -3380,6 +5139,20 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterStepSaturationParams alloc] init];
+
+    other.stepMode = self.stepMode;
+    other.stepSize = self.stepSize;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3410,6 +5183,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterMoveToHueAndSaturationParams alloc] init];
+
+    other.hue = self.hue;
+    other.saturation = self.saturation;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -3438,6 +5225,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterMoveToColorParams alloc] init];
+
+    other.colorX = self.colorX;
+    other.colorY = self.colorY;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -3462,6 +5263,19 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterMoveColorParams alloc] init];
+
+    other.rateX = self.rateX;
+    other.rateY = self.rateY;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3491,6 +5305,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterStepColorParams alloc] init];
+
+    other.stepX = self.stepX;
+    other.stepY = self.stepY;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -3515,6 +5343,19 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterMoveToColorTemperatureParams alloc] init];
+
+    other.colorTemperature = self.colorTemperature;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3545,6 +5386,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterEnhancedMoveToHueParams alloc] init];
+
+    other.enhancedHue = self.enhancedHue;
+    other.direction = self.direction;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -3569,6 +5424,19 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterEnhancedMoveHueParams alloc] init];
+
+    other.moveMode = self.moveMode;
+    other.rate = self.rate;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3598,6 +5466,20 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterEnhancedStepHueParams alloc] init];
+
+    other.stepMode = self.stepMode;
+    other.stepSize = self.stepSize;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -3624,6 +5506,20 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterEnhancedMoveToHueAndSaturationParams alloc] init];
+
+    other.enhancedHue = self.enhancedHue;
+    other.saturation = self.saturation;
+    other.transitionTime = self.transitionTime;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3658,6 +5554,22 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterColorLoopSetParams alloc] init];
+
+    other.updateFlags = self.updateFlags;
+    other.action = self.action;
+    other.direction = self.direction;
+    other.time = self.time;
+    other.startHue = self.startHue;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -3679,6 +5591,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterStopMoveStepParams alloc] init];
+
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3708,6 +5631,21 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterMoveColorTemperatureParams alloc] init];
+
+    other.moveMode = self.moveMode;
+    other.rate = self.rate;
+    other.colorTemperatureMinimumMireds = self.colorTemperatureMinimumMireds;
+    other.colorTemperatureMaximumMireds = self.colorTemperatureMaximumMireds;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3744,6 +5682,22 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRColorControlClusterStepColorTemperatureParams alloc] init];
+
+    other.stepMode = self.stepMode;
+    other.stepSize = self.stepSize;
+    other.transitionTime = self.transitionTime;
+    other.colorTemperatureMinimumMireds = self.colorTemperatureMinimumMireds;
+    other.colorTemperatureMaximumMireds = self.colorTemperatureMaximumMireds;
+    other.optionsMask = self.optionsMask;
+    other.optionsOverride = self.optionsOverride;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -3766,6 +5720,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRChannelClusterChangeChannelParams alloc] init];
+
+    other.match = self.match;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: match:%@; >", NSStringFromClass([self class]), _match];
@@ -3784,6 +5748,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRChannelClusterChangeChannelResponseParams alloc] init];
+
+    other.status = self.status;
+    other.data = self.data;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3807,6 +5782,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRChannelClusterChangeChannelByNumberParams alloc] init];
+
+    other.majorNumber = self.majorNumber;
+    other.minorNumber = self.minorNumber;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -3824,6 +5810,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRChannelClusterSkipChannelParams alloc] init];
+
+    other.count = self.count;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3844,6 +5840,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTargetNavigatorClusterNavigateTargetParams alloc] init];
+
+    other.target = self.target;
+    other.data = self.data;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3867,6 +5874,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTargetNavigatorClusterNavigateTargetResponseParams alloc] init];
+
+    other.status = self.status;
+    other.data = self.data;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -3882,6 +5900,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaPlaybackClusterPlayParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3900,6 +5927,15 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaPlaybackClusterPauseParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
@@ -3914,6 +5950,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaPlaybackClusterStopPlaybackParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3932,6 +5977,15 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaPlaybackClusterStartOverParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
@@ -3946,6 +6000,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaPlaybackClusterPreviousParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -3964,6 +6027,15 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaPlaybackClusterNextParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
@@ -3980,6 +6052,15 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaPlaybackClusterRewindParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
@@ -3994,6 +6075,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaPlaybackClusterFastForwardParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4014,6 +6104,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaPlaybackClusterSkipForwardParams alloc] init];
+
+    other.deltaPositionMilliseconds = self.deltaPositionMilliseconds;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -4031,6 +6131,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaPlaybackClusterSkipBackwardParams alloc] init];
+
+    other.deltaPositionMilliseconds = self.deltaPositionMilliseconds;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4054,6 +6164,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaPlaybackClusterPlaybackResponseParams alloc] init];
+
+    other.status = self.status;
+    other.data = self.data;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -4071,6 +6192,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaPlaybackClusterSeekParams alloc] init];
+
+    other.position = self.position;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4091,6 +6222,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaInputClusterSelectInputParams alloc] init];
+
+    other.index = self.index;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: index:%@; >", NSStringFromClass([self class]), _index];
@@ -4107,6 +6248,15 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaInputClusterShowInputStatusParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
@@ -4121,6 +6271,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaInputClusterHideInputStatusParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4143,6 +6302,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRMediaInputClusterRenameInputParams alloc] init];
+
+    other.index = self.index;
+    other.name = self.name;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -4158,6 +6328,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRLowPowerClusterSleepParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4178,6 +6357,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRKeypadInputClusterSendKeyParams alloc] init];
+
+    other.keyCode = self.keyCode;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: keyCode:%@; >", NSStringFromClass([self class]), _keyCode];
@@ -4194,6 +6383,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRKeypadInputClusterSendKeyResponseParams alloc] init];
+
+    other.status = self.status;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4216,6 +6415,18 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRContentLauncherClusterLaunchContentParams alloc] init];
+
+    other.search = self.search;
+    other.autoPlay = self.autoPlay;
+    other.data = self.data;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4241,6 +6452,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRContentLauncherClusterLaunchURLParams alloc] init];
+
+    other.contentURL = self.contentURL;
+    other.displayString = self.displayString;
+    other.brandingInformation = self.brandingInformation;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentURL:%@; displayString:%@; brandingInformation:%@; >",
@@ -4262,6 +6485,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRContentLauncherClusterLaunchResponseParams alloc] init];
+
+    other.status = self.status;
+    other.data = self.data;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -4279,6 +6513,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRAudioOutputClusterSelectOutputParams alloc] init];
+
+    other.index = self.index;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4299,6 +6543,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRAudioOutputClusterRenameOutputParams alloc] init];
+
+    other.index = self.index;
+    other.name = self.name;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4322,6 +6577,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRApplicationLauncherClusterLaunchAppParams alloc] init];
+
+    other.application = self.application;
+    other.data = self.data;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: application:%@; data:%@; >", NSStringFromClass([self class]),
@@ -4341,6 +6607,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRApplicationLauncherClusterStopAppParams alloc] init];
+
+    other.application = self.application;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -4358,6 +6634,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRApplicationLauncherClusterHideAppParams alloc] init];
+
+    other.application = self.application;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4381,6 +6667,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRApplicationLauncherClusterLauncherResponseParams alloc] init];
+
+    other.status = self.status;
+    other.data = self.data;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]),
@@ -4400,6 +6697,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRAccountLoginClusterGetSetupPINParams alloc] init];
+
+    other.tempAccountIdentifier = self.tempAccountIdentifier;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -4417,6 +6724,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRAccountLoginClusterGetSetupPINResponseParams alloc] init];
+
+    other.setupPIN = self.setupPIN;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4439,6 +6756,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRAccountLoginClusterLoginParams alloc] init];
+
+    other.tempAccountIdentifier = self.tempAccountIdentifier;
+    other.setupPIN = self.setupPIN;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: tempAccountIdentifier:%@; setupPIN:%@; >",
@@ -4454,6 +6782,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRAccountLoginClusterLogoutParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4480,6 +6817,19 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams alloc] init];
+
+    other.profileCount = self.profileCount;
+    other.profileIntervalPeriod = self.profileIntervalPeriod;
+    other.maxNumberOfIntervals = self.maxNumberOfIntervals;
+    other.listOfAttributes = self.listOfAttributes;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -4496,6 +6846,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRElectricalMeasurementClusterGetProfileInfoCommandParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4526,6 +6885,21 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams alloc] init];
+
+    other.startTime = self.startTime;
+    other.status = self.status;
+    other.profileIntervalPeriod = self.profileIntervalPeriod;
+    other.numberOfIntervalsDelivered = self.numberOfIntervalsDelivered;
+    other.attributeId = self.attributeId;
+    other.intervals = self.intervals;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTime:%@; status:%@; profileIntervalPeriod:%@; "
@@ -4551,6 +6925,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams alloc] init];
+
+    other.attributeId = self.attributeId;
+    other.startTime = self.startTime;
+    other.numberOfIntervals = self.numberOfIntervals;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeId:%@; startTime:%@; numberOfIntervals:%@; >",
@@ -4566,6 +6952,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4586,6 +6981,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestSpecificResponseParams alloc] init];
+
+    other.returnValue = self.returnValue;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -4601,6 +7006,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestNotHandledParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4621,6 +7035,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestAddArgumentsResponseParams alloc] init];
+
+    other.returnValue = self.returnValue;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -4636,6 +7060,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestSpecificParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4656,6 +7089,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestSimpleArgumentResponseParams alloc] init];
+
+    other.returnValue = self.returnValue;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -4671,6 +7114,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestUnknownCommandParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4701,6 +7153,21 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestStructArrayArgumentResponseParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.arg2 = self.arg2;
+    other.arg3 = self.arg3;
+    other.arg4 = self.arg4;
+    other.arg5 = self.arg5;
+    other.arg6 = self.arg6;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; arg3:%@; arg4:%@; arg5:%@; arg6:%@; >",
@@ -4722,6 +7189,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestAddArgumentsParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.arg2 = self.arg2;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -4739,6 +7217,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestListInt8UReverseResponseParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4759,6 +7247,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestSimpleArgumentRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
@@ -4777,6 +7275,17 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestEnumsResponseParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.arg2 = self.arg2;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4808,6 +7317,21 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestStructArrayArgumentRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.arg2 = self.arg2;
+    other.arg3 = self.arg3;
+    other.arg4 = self.arg4;
+    other.arg5 = self.arg5;
+    other.arg6 = self.arg6;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; arg3:%@; arg4:%@; arg5:%@; arg6:%@; >",
@@ -4833,6 +7357,19 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestNullableOptionalResponseParams alloc] init];
+
+    other.wasPresent = self.wasPresent;
+    other.wasNull = self.wasNull;
+    other.value = self.value;
+    other.originalValue = self.originalValue;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: wasPresent:%@; wasNull:%@; value:%@; originalValue:%@; >",
@@ -4850,6 +7387,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestStructArgumentRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4924,6 +7471,43 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestComplexNullableOptionalResponseParams alloc] init];
+
+    other.nullableIntWasNull = self.nullableIntWasNull;
+    other.nullableIntValue = self.nullableIntValue;
+    other.optionalIntWasPresent = self.optionalIntWasPresent;
+    other.optionalIntValue = self.optionalIntValue;
+    other.nullableOptionalIntWasPresent = self.nullableOptionalIntWasPresent;
+    other.nullableOptionalIntWasNull = self.nullableOptionalIntWasNull;
+    other.nullableOptionalIntValue = self.nullableOptionalIntValue;
+    other.nullableStringWasNull = self.nullableStringWasNull;
+    other.nullableStringValue = self.nullableStringValue;
+    other.optionalStringWasPresent = self.optionalStringWasPresent;
+    other.optionalStringValue = self.optionalStringValue;
+    other.nullableOptionalStringWasPresent = self.nullableOptionalStringWasPresent;
+    other.nullableOptionalStringWasNull = self.nullableOptionalStringWasNull;
+    other.nullableOptionalStringValue = self.nullableOptionalStringValue;
+    other.nullableStructWasNull = self.nullableStructWasNull;
+    other.nullableStructValue = self.nullableStructValue;
+    other.optionalStructWasPresent = self.optionalStructWasPresent;
+    other.optionalStructValue = self.optionalStructValue;
+    other.nullableOptionalStructWasPresent = self.nullableOptionalStructWasPresent;
+    other.nullableOptionalStructWasNull = self.nullableOptionalStructWasNull;
+    other.nullableOptionalStructValue = self.nullableOptionalStructValue;
+    other.nullableListWasNull = self.nullableListWasNull;
+    other.nullableListValue = self.nullableListValue;
+    other.optionalListWasPresent = self.optionalListWasPresent;
+    other.optionalListValue = self.optionalListValue;
+    other.nullableOptionalListWasPresent = self.nullableOptionalListWasPresent;
+    other.nullableOptionalListWasNull = self.nullableOptionalListWasNull;
+    other.nullableOptionalListValue = self.nullableOptionalListValue;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
@@ -4957,6 +7541,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestNestedStructArgumentRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
@@ -4973,6 +7567,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterBooleanResponseParams alloc] init];
+
+    other.value = self.value;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -4993,6 +7597,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestListStructArgumentRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
@@ -5009,6 +7623,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterSimpleStructResponseParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -5029,6 +7653,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestListInt8UArgumentRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
@@ -5045,6 +7679,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestEmitTestEventResponseParams alloc] init];
+
+    other.value = self.value;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -5065,6 +7709,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestNestedStructListArgumentRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
@@ -5081,6 +7735,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams alloc] init];
+
+    other.value = self.value;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -5101,6 +7765,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestListNestedStructListArgumentRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
@@ -5117,6 +7791,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestListInt8UReverseRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -5139,6 +7823,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestEnumsRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.arg2 = self.arg2;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -5156,6 +7851,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestNullableOptionalRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -5198,6 +7903,27 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestComplexNullableOptionalRequestParams alloc] init];
+
+    other.nullableInt = self.nullableInt;
+    other.optionalInt = self.optionalInt;
+    other.nullableOptionalInt = self.nullableOptionalInt;
+    other.nullableString = self.nullableString;
+    other.optionalString = self.optionalString;
+    other.nullableOptionalString = self.nullableOptionalString;
+    other.nullableStruct = self.nullableStruct;
+    other.optionalStruct = self.optionalStruct;
+    other.nullableOptionalStruct = self.nullableOptionalStruct;
+    other.nullableList = self.nullableList;
+    other.optionalList = self.optionalList;
+    other.nullableOptionalList = self.nullableOptionalList;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -5222,6 +7948,16 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterSimpleStructEchoRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
@@ -5236,6 +7972,15 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTimedInvokeRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -5254,6 +7999,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description
@@ -5278,6 +8033,18 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestEmitTestEventRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.arg2 = self.arg2;
+    other.arg3 = self.arg3;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
 - (NSString *)description
 {
     NSString * descriptionString =
@@ -5295,6 +8062,16 @@ NS_ASSUME_NONNULL_BEGIN
         _timedInvokeTimeoutMs = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
 }
 
 - (NSString *)description

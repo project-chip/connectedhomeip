@@ -2,6 +2,7 @@ import ctypes
 import glob
 import os
 import platform
+import construct
 
 NATIVE_LIBRARY_BASE_NAME = "_ChipDeviceCtrl.so"
 
@@ -69,19 +70,30 @@ class NativeLibraryHandleMethodArguments:
 _nativeLibraryHandle: ctypes.CDLL = None
 
 
-def GetLibraryHandle() -> ctypes.CDLL:
+def _GetLibraryHandle(shouldInit: bool) -> ctypes.CDLL:
     """Get a memoized handle to the chip native code dll."""
 
     global _nativeLibraryHandle
     if _nativeLibraryHandle is None:
+        if shouldInit:
+            raise Exception("Common stack has not been initialized!")
         _nativeLibraryHandle = ctypes.CDLL(FindNativeLibraryPath())
         setter = NativeLibraryHandleMethodArguments(_nativeLibraryHandle)
-        setter.Set("pychip_CommonStackInit", ctypes.c_uint32, [])
-
-        #
-        # We've a split initialization model with some init happening here and some other
-        # bits of init happening in ChipStack. #20437 tracks consolidating those.
-        #
-        _nativeLibraryHandle.pychip_CommonStackInit()
+        setter.Set("pychip_CommonStackInit", ctypes.c_uint32, [ctypes.c_char_p])
 
     return _nativeLibraryHandle
+
+
+def Init(bluetoothAdapter: int = None):
+    CommonStackParams = construct.Struct(
+        "BluetoothAdapterId" / construct.Int32ul,
+    )
+    params = CommonStackParams.parse(b'\x00' * CommonStackParams.sizeof())
+    params.BluetoothAdapterId = bluetoothAdapter if bluetoothAdapter is not None else 0
+    params = CommonStackParams.build(params)
+
+    _GetLibraryHandle(False).pychip_CommonStackInit(ctypes.c_char_p(params))
+
+
+def GetLibraryHandle():
+    return _GetLibraryHandle(True)

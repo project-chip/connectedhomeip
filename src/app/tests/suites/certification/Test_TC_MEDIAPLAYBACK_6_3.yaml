@@ -19,7 +19,7 @@ config:
     cluster: "Media Playback"
     endpoint: 1
     SeekPosition:
-        type: INT64U
+        type: int64u
         defaultValue: 100000000
 
 tests:
@@ -35,14 +35,14 @@ tests:
           "Precondition: Media content in a paused state at the beginning of the
           content"
       command: "Pause"
-      PICS: MEDIAPLAYBACK.S.C0001
+      PICS: MEDIAPLAYBACK.S.C01.Rsp
       response:
           values:
               - name: "status"
                 value: 0
 
     - label: "Sends a Seek command"
-      PICS: MEDIAPLAYBACK.S.C000B
+      PICS: MEDIAPLAYBACK.S.C0B.Rsp
       command: "Seek"
       arguments:
           values:
@@ -57,7 +57,7 @@ tests:
           "Verify that the media has moved to 10 seconds from the starting point"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0B.Rsp
       arguments:
           values:
               - name: "message"
@@ -68,7 +68,7 @@ tests:
                 value: "y"
 
     - label: "Reads the SampledPosition attribute"
-      PICS: MEDIAPLAYBACK.S.A0003
+      PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C0B.Rsp
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
@@ -142,7 +142,7 @@ tests:
     - label:
           "Sends a Seek command Position value beyond the furthest valid
           position"
-      PICS: MEDIAPLAYBACK.S.C000B
+      PICS: MEDIAPLAYBACK.S.C0B.Rsp
       command: "Seek"
       arguments:
           values:

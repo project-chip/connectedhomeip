@@ -18,6 +18,9 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    StepSizeConfigValue:
+        type: int8u
+        defaultValue: 15
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -39,25 +42,32 @@ tests:
       response:
           value: 1
 
-    - label: "Reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.A0001
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F00 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Step saturation up command"
-      PICS: CC.S.C05.Rsp
+    - label: "TH sends StepSaturation command to DUT with StepMode Up"
+      PICS: CC.S.F00 && CC.S.C05.Rsp
       command: "StepSaturation"
       arguments:
           values:
               - name: "StepMode"
                 value: 1
               - name: "StepSize"
-                value: 15
+                value: StepSizeConfigValue
               - name: "TransitionTime"
                 value: 10
               - name: "OptionsMask"
@@ -66,33 +76,33 @@ tests:
                 value: 0
 
     #delay step is necessary to let the attribute value change over time
-    - label: "Wait 10ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10
+                value: 1000
 
-    - label: "Over TransitionTime,Read CurrentSaturation attribute from DUT"
-      PICS: CC.S.A0001
+    - label: "Over TransitionTime,TH read CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C05.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Step saturation down command"
-      PICS: CC.S.C05.Rsp
+    - label: "TH sends StepSaturation command to DUT with StepMode Down"
+      PICS: CC.S.F00 && CC.S.C05.Rsp
       command: "StepSaturation"
       arguments:
           values:
               - name: "StepMode"
                 value: 3
               - name: "StepSize"
-                value: 20
+                value: StepSizeConfigValue
               - name: "TransitionTime"
                 value: 10
               - name: "OptionsMask"
@@ -100,21 +110,21 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 10ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10
+                value: 1000
 
-    - label: "Over TransitionTime,Reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.A0001
+    - label: "Over TransitionTime,TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C05.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 

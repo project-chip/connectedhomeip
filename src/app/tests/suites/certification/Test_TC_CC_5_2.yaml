@@ -18,6 +18,12 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    RateXValue:
+        type: int16s
+        defaultValue: 50
+    RateYValue:
+        type: int16s
+        defaultValue: 50
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -39,74 +45,81 @@ tests:
       response:
           value: 1
 
-    - label: "Check current x attribute value  matched before any change"
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F03 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "TH reads CurrentX attribute from DUT"
       command: "readAttribute"
-      PICS: CC.S.A0003
+      PICS: CC.S.F03 && CC.S.A0003
       attribute: "CurrentX"
       response:
+          saveAs: CurrentXValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
-    - label: "Check current y attribute value matched before any change"
+    - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
-      PICS: CC.S.A0004
+      PICS: CC.S.F03 && CC.S.A0004
       attribute: "CurrentY"
       response:
+          saveAs: CurrentYValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
-    - label: "Move Color command"
+    - label: "TH sends MoveColor command to DUT"
       command: "MoveColor"
-      PICS: CC.S.C08.Rsp
+      PICS: CC.S.F03 && CC.S.C08.Rsp
       arguments:
           values:
               - name: "rateX"
-                value: 15
+                value: RateXValue
               - name: "rateY"
-                value: 20
+                value: RateYValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 150ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 150
+                value: 1000
 
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0003
+    - label: "TH reads CurrentX attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C08.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
       response:
+          saveAs: CurrentXBeforeStopCommand
           constraints:
-              type: uint16
-              minValue: 0
+              type: int16u
+              minValue: CurrentXValue
               maxValue: 65279
 
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0004
+    - label: "TH reads CurrentY attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C08.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
       response:
+          saveAs: CurrentYBeforeStopCommand
           constraints:
-              type: uint16
-              minValue: 0
+              type: int16u
+              minValue: CurrentYValue
               maxValue: 65279
 
-    - label: "Stop Move Step command"
-      PICS: CC.S.C47.Rsp
+    - label: "TH sends StopMoveStep command to DUT"
+      PICS: CC.S.F03 && CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
           values:
@@ -115,28 +128,24 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0003
+    - label: "TH reads CurrentX attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C47.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
       response:
           constraints:
-              type: uint16
-              minValue: 0
+              type: int16u
+              minValue: CurrentXBeforeStopCommand
               maxValue: 65279
 
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0004
+    - label: "TH reads CurrentY attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C47.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
       response:
           constraints:
-              type: uint16
-              minValue: 0
+              type: int16u
+              minValue: CurrentYBeforeStopCommand
               maxValue: 65279
 
     - label: "Turn off light that we turned on"

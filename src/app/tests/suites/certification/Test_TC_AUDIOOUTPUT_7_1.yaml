@@ -34,7 +34,7 @@ tests:
       attribute: "OutputList"
       response:
           constraints:
-              type: OutPutInfo
+              type: list
 
     - label: "Sends a SelectAudioOutput command"
       PICS: AUDIOOUTPUT.S.C0000

@@ -29,11 +29,31 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads Location from the DUT."
-      command: "readAttribute"
-      attribute: "Location"
-      response:
-          saveAs: CountryCode
+    #not supported in YAML
+    - label:
+          "During Commissioning, TH Saves the CountryCode Information from
+          SetRegulatoryConfig command"
+      verification: |
+          While commissioning TH Saves the CountryCode Information from SetRegulatoryConfig command
+
+          ./chip-tool pairing ble-wifi 1 GRLPrivate_EXT matter123 20202021 3840
+
+          TH END:
+          [1641381202.376419][5628:5633] CHIP:CTL: Received success response 0x3df8
+
+          sudo ./all-clusters-app --wifi
+
+          DUT END:
+          [1641381202.306840][4431:4431] CHIP:DL: NVS set: chip-config/regulatory-location = 0 (0x0)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads DataModelRevision from the DUT."
       PICS: BINFO.S.A0000
@@ -42,7 +62,7 @@ tests:
       response:
           saveAs: DataModelRevisionValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65534
 
@@ -69,7 +89,7 @@ tests:
       response:
           saveAs: VendorNameValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes VendorName from the DUT."
@@ -95,7 +115,7 @@ tests:
       response:
           saveAs: VendorIDValue
           constraints:
-              type: uint16
+              type: vendor_id
               minValue: 1
               maxValue: 65521
 
@@ -122,7 +142,7 @@ tests:
       response:
           saveAs: ProductNameValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes ProductName from the DUT."
@@ -148,7 +168,7 @@ tests:
       response:
           saveAs: ProductIDValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 1
               maxValue: 65534
 
@@ -175,7 +195,7 @@ tests:
       response:
           saveAs: NodeLabelValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes NodeLabel from the DUT."
@@ -197,10 +217,30 @@ tests:
       command: "readAttribute"
       attribute: "Location"
       response:
-          value: CountryCode
           constraints:
-              type: string
+              type: char_string
               maxLength: 16
+
+    - label:
+          "Verify that the Location is same as CountryCode value saved from
+          step1"
+      verification: |
+          ./chip-tool basic read location 1 0
+
+          On TH,  Verify that TH reads Location from the DUT successfully,  the name should be string and length is less than or equal to 2 bytes.
+          [1656495999.760797][2249:2254] CHIP:DMG: }
+          [1656495999.761084][2249:2254] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 941124320
+          [1656495999.761187][2249:2254] CHIP:TOO:   Location: XX
+          [1656495999.761371][2249:2254] CHIP:EM: Sending Standalone Ack for MessageCounter:7663506 on exchange 28126i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BINFO.S.A0006
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH write Location from the DUT"
       PICS: BINFO.S.A0006
@@ -223,7 +263,7 @@ tests:
       response:
           saveAs: HardwareVersionValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65534
 
@@ -250,7 +290,7 @@ tests:
       response:
           saveAs: HardwareVersionStringValue
           constraints:
-              type: string
+              type: char_string
               minLength: 1
               maxLength: 64
 
@@ -317,7 +357,7 @@ tests:
           saveAs: SoftwareVersionStringValue
           constraints:
               minLength: 1
-              maxLenght: 64
+              maxLength: 64
 
     - label: "TH writes SoftwareVersionString from the DUT."
       PICS: BINFO.S.A000a
@@ -342,7 +382,7 @@ tests:
       response:
           saveAs: ManufacturingDateValue
           constraints:
-              type: string
+              type: char_string
               minLength: 8
               maxLength: 16
 
@@ -382,7 +422,7 @@ tests:
       response:
           saveAs: PartNumberValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes PartNumber from the DUT."
@@ -408,7 +448,7 @@ tests:
       response:
           saveAs: ProductURLValue
           constraints:
-              type: string
+              type: long_char_string
               maxLength: 256
 
     - label:
@@ -447,7 +487,7 @@ tests:
       response:
           saveAs: ProductLabelValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 64
 
     - label:
@@ -480,12 +520,13 @@ tests:
           value: ProductLabelValue
 
     - label: "TH reads SerialNumber from the DUT."
+      PICS: BINFO.S.A000f
       command: "readAttribute"
       attribute: "SerialNumber"
       response:
           saveAs: SerialNumberValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes SerialNumber from the DUT."
@@ -554,7 +595,7 @@ tests:
       response:
           saveAs: UniqueIDValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes UniqueID from the DUT."

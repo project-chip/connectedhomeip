@@ -941,9 +941,8 @@ NS_ASSUME_NONNULL_BEGIN
               completionHandler:(StatusCompletion)completionHandler;
 - (void)stepWithOnOffWithParams:(MTRLevelControlClusterStepWithOnOffParams *)params
               completionHandler:(StatusCompletion)completionHandler;
-- (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams * _Nullable)params
+- (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams *)params
               completionHandler:(StatusCompletion)completionHandler;
-- (void)stopWithOnOffWithCompletionHandler:(StatusCompletion)completionHandler;
 - (void)moveToClosestFrequencyWithParams:(MTRLevelControlClusterMoveToClosestFrequencyParams *)params
                        completionHandler:(StatusCompletion)completionHandler;
 
@@ -22492,7 +22491,6 @@ typedef NS_ENUM(uint8_t, MTROperationalCredentialsOperationalCertStatus) {
     MTROperationalCredentialsOperationalCertStatusMissingCsr = 0x04,
     MTROperationalCredentialsOperationalCertStatusTableFull = 0x05,
     MTROperationalCredentialsOperationalCertStatusInvalidAdminSubject = 0x06,
-    MTROperationalCredentialsOperationalCertStatusInsufficientPrivilege = 0x08,
     MTROperationalCredentialsOperationalCertStatusFabricConflict = 0x09,
     MTROperationalCredentialsOperationalCertStatusLabelConflict = 0x0A,
     MTROperationalCredentialsOperationalCertStatusInvalidFabricIndex = 0x0B,

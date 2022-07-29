@@ -173,7 +173,7 @@ void MediaPlaybackManager::InitializeWithObjects(jobject managerObject)
     }
 
     mGetPositionMethod =
-        env->GetMethodID(mMediaPlaybackManagerClass, "getPosition", "()[Lcom/matter/tv/server/tvapp/MediaPlaybackPosition;");
+        env->GetMethodID(mMediaPlaybackManagerClass, "getPosition", "()Lcom/matter/tv/server/tvapp/MediaPlaybackPosition;");
     if (mGetPositionMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access MediaPlaybackManager 'getPosition' method");

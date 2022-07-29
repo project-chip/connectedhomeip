@@ -28,62 +28,53 @@ tests:
           has the Custom Flow field set to 0 and supports BLE for its Discovery
           Capability. Ensure the Version bit string follows the current Matter
           spec. documentation."
-      PICS: MCORE.DD.DT_BLE
+      PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          $ ./out/ble/all-clusters-app/chip-all-clusters-app --capabilities 2
+          $ ./out/ble/all-clusters-app/chip-all-clusters-app --capabilities 2 --ble-device 1
           ...
-          [1651101335.714230][22353:22353] CHIP:DL: Device Configuration:
-          [1651101335.722064][22353:22353] CHIP:DL:   Serial Number: TEST_SN
-          [1651101335.722638][22353:22353] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1651101335.723167][22353:22353] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1651101335.723712][22353:22353] CHIP:DL:   Hardware Version: 0
-          [1651101335.724228][22353:22353] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
-          [1651101335.724756][22353:22353] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
-          [1651101335.725226][22353:22353] CHIP:DL:   Manufacturing Date: (not set)
-          [1651101335.725721][22353:22353] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1651101335.733693][22353:22353] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
-          [1651101335.734598][22353:22353] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
-          [1651101335.735182][22353:22353] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1651101335.735618][22353:22353] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
-
-
-          ubuntu@ubuntu:~/apps$ ./chip-tool payload parse-setup-payload MT:-24J0YXE00KA0648G00
-          [1653562354.037031][4312:4312] CHIP:SPL: Parsing base38Representation: MT:-24J0YXE00KA0648G00
-          [1653562354.037218][4312:4312] CHIP:SPL: Version:       0
-          [1653562354.037243][4312:4312] CHIP:SPL: VendorID:      65521
-          [1653562354.037263][4312:4312] CHIP:SPL: ProductID:     32769
-          [1653562354.037283][4312:4312] CHIP:SPL: Custom flow:   2    (CUSTOM)
-          [1653562354.037337][4312:4312] CHIP:SPL: Capabilities:  0x02 (BLE)
-          [1653562354.037359][4312:4312] CHIP:SPL: Discriminator: 3840
-          [1653562354.037378][4312:4312] CHIP:SPL: Passcode:      20202021
+          [1657232267.387816][370320:370320] CHIP:DL: Device Configuration:
+          [1657232267.387853][370320:370320] CHIP:DL:   Serial Number: (not set)
+          [1657232267.387907][370320:370320] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1657232267.387942][370320:370320] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1657232267.387974][370320:370320] CHIP:DL:   Hardware Version: 0
+          [1657232267.387996][370320:370320] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1657232267.388017][370320:370320] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1657232267.388045][370320:370320] CHIP:DL:   Manufacturing Date: (not set)
+          [1657232267.388067][370320:370320] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1657232267.388101][370320:370320] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
+          [1657232267.388128][370320:370320] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1657232267.388148][370320:370320] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
+          [1657232267.388182][370320:370320] CHIP:SVR: Manual pairing code: [749701123365521327694]
       disabled: true
 
     - label: "Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
-          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+          1. Verify the QR code is scanned by DUT.
+          Note: chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label:
           "Using the DUT, parse the THs QR code and follow any steps needed for
           the Commissioner/Commissionee to complete the commissioning process
           using BLE"
-      PICS: MCORE.DD.DT_BLE
+      PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           TH Commissionee:
 
-          [1651101510.975272][22353:22353] CHIP:SVR: Commissioning completed successfully
-          [1651101510.975318][22353:22353] CHIP:DIS: Updating services using commissioning mode 0
+          [1657232374.956508][370357:370357] CHIP:DL: HandlePlatformSpecificBLEEvent 32784
+          [1657232374.956534][370357:370357] CHIP:SVR: Commissioning completed successfully
+          [1657232374.956577][370357:370357] CHIP:DIS: Updating services using commissioning mode 0
 
           DUT Commissioner:
-          $ ./out/chip-tool/chip-tool pairing qrcode 1  MT:-24J042C00KA0648G00
+          $ ./chip-tool pairing code 1  MT:-24J0YXE00KA0648G00
 
-          [1651101510810] [94338:65557180] CHIP: [CTL] Received CommissioningComplete response
-          [1651101510810] [94338:65557180] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1651101510810] [94338:65557180] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1651101510810] [94338:65557180] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1651101510810] [94338:65557180] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
-          [1651101510810] [94338:65557180] CHIP: [TOO] Device commissioning completed with success
+          [1657232374820] [31379:16804218] CHIP: [CTL] Received CommissioningComplete response, errorCode=0
+          [1657232374820] [31379:16804218] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1657232374820] [31379:16804218] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1657232374820] [31379:16804218] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1657232374820] [31379:16804218] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657232374820] [31379:16804218] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
@@ -92,7 +83,7 @@ tests:
           Discovery Capability and is already on the same IP network as the DUT
           commissioner. Ensure the Version bit string follows the current Matter
           spec. documentation."
-      PICS: MCORE.DD.DT_IP
+      PICS: MCORE.DD.DISCOVERY_IP
       verification: |
           $ ./out/all-clusters-app/chip-all-clusters-app --custom-flow 0 --capabilities 4
 
@@ -107,18 +98,6 @@ tests:
           [1651105420.610886][27312:27312] CHIP:DL:   Device Type: 65535 (0xFFFF)
           [1651105420.610907][27312:27312] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
           [1651105420.610962][27312:27312] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
-
-
-          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload MT:-24J0AFN00KA0648G00
-          [1653998998.287050][2941:2941] CHIP:SPL: Parsing base38Representation: MT:-24J0AFN00KA0648G00
-          [1653998998.287266][2941:2941] CHIP:SPL: Version:       0
-          [1653998998.287293][2941:2941] CHIP:SPL: VendorID:      65521
-          [1653998998.287313][2941:2941] CHIP:SPL: ProductID:     32769
-          [1653998998.287332][2941:2941] CHIP:SPL: Custom flow:   0    (STANDARD)
-          [1653998998.287354][2941:2941] CHIP:SPL: Capabilities:  0x04 (On IP network)
-          [1653998998.287374][2941:2941] CHIP:SPL: Discriminator: 3840
-          [1653998998.287394][2941:2941] CHIP:SPL: Passcode:      20202021
-          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$
       disabled: true
 
     - label: "Scan the QR code from the previous step using the DUT."
@@ -131,7 +110,7 @@ tests:
           "Using the DUT, parse the THs QR code and follow any steps needed for
           the Commissioner/Commissionee to complete the commissioning process
           using IP Network"
-      PICS: MCORE.DD.DT_IP
+      PICS: MCORE.DD.DISCOVERY_IP
       verification: |
           TH Commissionee:
 
@@ -139,7 +118,7 @@ tests:
           [1651105530.973215][27371:27371] CHIP:DIS: Updating services using commissioning mode 0
 
           DUT Commissioner:
-          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J0AFN00KA0648G00
+          $ ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 
           [1651105530854] [95067:65607294] CHIP: [CTL] Received CommissioningComplete response
           [1651105530854] [95067:65607294] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
@@ -154,14 +133,17 @@ tests:
           has the Custom Flow field set to 0 and supports SoftAP for its
           Discovery Capability. Ensure the Version bit string follows the
           current Matter spec. documentation."
-      PICS: MCORE.DD.DT_SOFTAP
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          BLOCKED: SoftAP commissioning not currently supported
+          Out of Scope for V1.0
+          SoftAP commissioning not currently supported
       disabled: true
 
     - label: "Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
+          Out of Scope for V1.0
+          SoftAP commissioning not currently supported
           1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true
 
@@ -169,7 +151,8 @@ tests:
           "Using the DUT, parse the THs QR code and follow any steps needed for
           the Commissioner/Commissionee to complete the commissioning process
           using SoftAP"
-      PICS: MCORE.DD.DT_SOFTAP
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          BLOCKED: SoftAP commissioning not currently supported
+          Out of Scope for V1.0
+          SoftAP commissioning not currently supported
       disabled: true

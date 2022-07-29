@@ -25,6 +25,9 @@ const path              = require('path');
 
 // Import helpers from zap core
 const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
+const zclHelper    = require(zapPath + 'dist/src-electron/generator/helper-zcl.js');
+const queryEnum    = require(zapPath + 'dist/src-electron/db/query-enum');
+const queryBitmap  = require(zapPath + 'dist/src-electron/db/query-bitmap');
 
 const { getClusters, getCommands, getAttributes, getEvents, isTestOnlyCluster }
 = require('./simulated-clusters/SimulatedClusters.js');
@@ -1000,13 +1003,53 @@ async function chip_tests_only_cluster_response_parameters(options)
 
 function chip_tests_iterate_expected_list(values, options)
 {
-  values = values.map(value => {
+  let context = options.hash.context || this;
+  values      = values.map(value => {
     return {
-      global: this.global, parent: this.parent, name: this.name, type: this.type, isArray: false, isNullable: false, value: value,
+      global: context.global, parent: context.parent, name: context.name, type: context.type, isArray: false, isNullable: false,
+          value: value,
     }
   });
 
   return asBlocks.call(this, Promise.resolve(values), options);
+}
+
+function chip_tests_iterate_constraints(constraints, options)
+{
+  let values = [];
+  for (let key of Object.keys(constraints)) {
+    // Skip "global", because that's not an actual constraint.
+    if (key == "global") {
+      continue;
+    }
+    values.push({ global : this.global, constraint : key, value : constraints[key] })
+  }
+
+  return asBlocks.call(this, Promise.resolve(values), options)
+}
+
+async function asTestType(type, isList)
+{
+  if (isList) {
+    return 'list';
+  }
+
+  const pkgId = await templateUtil.ensureZclPackageId(this);
+  const db    = this.global.db;
+
+  const isEnum = await zclHelper.isEnum(db, type, pkgId);
+  if (isEnum != 'unknown') {
+    const enumObj = await queryEnum.selectEnumByName(db, type, pkgId);
+    return 'enum' + (8 * enumObj.size);
+  }
+
+  const isBitmap = await zclHelper.isBitmap(db, type, pkgId);
+  if (isBitmap != 'unknown') {
+    const bitmapObj = await queryBitmap.selectBitmapByName(db, pkgId, type);
+    return 'bitmap' + (8 * bitmapObj.size);
+  }
+
+  return type;
 }
 
 //
@@ -1040,3 +1083,5 @@ exports.isHexString                                 = isHexString;
 exports.octetStringLengthFromHexString              = octetStringLengthFromHexString;
 exports.octetStringFromHexString                    = octetStringFromHexString;
 exports.chip_tests_iterate_expected_list            = chip_tests_iterate_expected_list;
+exports.chip_tests_iterate_constraints              = chip_tests_iterate_constraints;
+exports.asTestType                                  = asTestType;

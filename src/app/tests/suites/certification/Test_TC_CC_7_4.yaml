@@ -20,6 +20,12 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    EnhancedHueConfigValue:
+        type: int16u
+        defaultValue: 1200
+    SaturationConfigValue:
+        type: int8u
+        defaultValue: 90
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -41,25 +47,32 @@ tests:
       response:
           value: 1
 
-    - label: "Reads EnhancedCurrentHue attribute from DUT"
-      PICS: CC.S.A4000
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F01 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT"
+      PICS: CC.S.F01 && CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
-    - label: "Enhanced move to hue and saturation command"
-      PICS: CC.S.C43.Rsp
+    - label: "TH sends EnhancedMoveToHueAndSaturation command to DUT"
+      PICS: CC.S.F01 && CC.S.C43.Rsp
       command: "EnhancedMoveToHueAndSaturation"
       arguments:
           values:
               - name: "EnhancedHue"
-                value: 1200
+                value: EnhancedHueConfigValue
               - name: "Saturation"
-                value: 90
+                value: SaturationConfigValue
               - name: "TransitionTime"
                 value: 10
               - name: "OptionsMask"
@@ -67,23 +80,24 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 10ms"
+    - label: "Wait 1500ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10
+                value: 1500
 
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
-      PICS: CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C43.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
+          value: EnhancedHueConfigValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 

@@ -107,3 +107,8 @@ extern "C" void otPlatFree(void * aPtr)
 {
     return CHIPPlatformMemoryFree(aPtr);
 }
+
+extern "C" void * otPlatRealloc(void * p, size_t aSize)
+{
+    return CHIPPlatformMemoryRealloc(p, aSize);
+}

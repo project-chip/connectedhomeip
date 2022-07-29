@@ -109,7 +109,7 @@ chip::NodeId kDefaultLocalDeviceId = chip::kTestControllerNodeId;
 chip::NodeId kRemoteDeviceId       = chip::kTestDeviceNodeId;
 
 extern "C" {
-ChipError::StorageType pychip_DeviceController_StackInit(uint32_t bluetoothAdapterId);
+ChipError::StorageType pychip_DeviceController_StackInit();
 ChipError::StorageType pychip_DeviceController_StackShutdown();
 
 ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
@@ -222,16 +222,9 @@ chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter()
     return sStorageAdapter;
 }
 
-ChipError::StorageType pychip_DeviceController_StackInit(uint32_t bluetoothAdapterId)
+ChipError::StorageType pychip_DeviceController_StackInit()
 {
     VerifyOrDie(sStorageAdapter != nullptr);
-
-#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
-    CHIP_ERROR err =
-        chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ bluetoothAdapterId, /* BLE central */ true);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-#endif
 
     FactoryInitParams factoryParams;
     factoryParams.fabricIndependentStorage = sStorageAdapter;
@@ -298,12 +291,9 @@ ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controlle
                                                                  uint16_t * outPort)
 {
     Inet::IPAddress address;
-    ReturnErrorOnFailure(
-        devCtrl
-            ->GetPeerAddressAndPort(PeerId().SetCompressedFabricId(devCtrl->GetCompressedFabricId()).SetNodeId(nodeId), address,
-                                    *outPort)
-            .AsInteger());
-    VerifyOrReturnError(address.ToString(outAddress, maxAddressLen), CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger());
+    ReturnErrorOnFailure(devCtrl->GetPeerAddressAndPort(nodeId, address, *outPort).AsInteger());
+    VerifyOrReturnError(address.ToString(outAddress, static_cast<uint32_t>(maxAddressLen)),
+                        CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger());
 
     return CHIP_NO_ERROR.AsInteger();
 }
@@ -621,7 +611,7 @@ struct GetDeviceCallbacks
         delete self;
     }
 
-    static void OnConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
+    static void OnConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
     {
         auto * self = static_cast<GetDeviceCallbacks *>(context);
         self->mCallback(nullptr, error.AsInteger());

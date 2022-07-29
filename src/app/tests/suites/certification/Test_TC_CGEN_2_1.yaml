@@ -37,7 +37,7 @@ tests:
       attribute: "Breadcrumb"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label: "TH1 writes the BreadCrumb attribute as 1 to the DUT"
       PICS: CGEN.S.A0000
@@ -88,4 +88,4 @@ tests:
       attribute: "SupportsConcurrentConnection"
       response:
           constraints:
-              type: bool
+              type: boolean
