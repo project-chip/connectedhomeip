@@ -28,6 +28,30 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Commit User Label List"
+      command: "writeAttribute"
+      attribute: "label list"
+      arguments:
+          value:
+              [
+                  { label: "room", value: "bedroom 1" },
+                  { label: "orientation", value: "South" },
+                  { label: "floor", value: "2" },
+                  { label: "direction", value: "down" },
+              ]
+
+    - label: "Verify committed User Label List"
+      command: "readAttribute"
+      attribute: "label list"
+      response:
+          value:
+              [
+                  { label: "room", value: "bedroom 1" },
+                  { label: "orientation", value: "South" },
+                  { label: "floor", value: "2" },
+                  { label: "direction", value: "down" },
+              ]
+
     - label: "Clear User Label List"
       command: "writeAttribute"
       attribute: "label list"
@@ -64,7 +88,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Verify"
+    - label: "Verify User Label List after reboot"
       command: "readAttribute"
       attribute: "label list"
       response:
