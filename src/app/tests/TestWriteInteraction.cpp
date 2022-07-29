@@ -32,8 +32,8 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 
-#include <nlunit-test.h>
 #include <memory>
+#include <nlunit-test.h>
 #include <utility>
 
 using TestContext = chip::Test::AppContext;
@@ -551,8 +551,8 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     engine->Shutdown();
 }
 
-// This test is to create Chunked write requests, we drop the message since the 3rd message, then write hanlder received unknown report message
-// and sends out the status report with invalid action.
+// This test is to create Chunked write requests, we drop the message since the 3rd message, then write hanlder received unknown
+// report message and sends out the status report with invalid action.
 void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
@@ -560,7 +560,7 @@ void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * a
 
     app::AttributePathParams attributePath(2, 3, 4);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
@@ -578,17 +578,16 @@ void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * a
     err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 5));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 1;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 1;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 2;
-    err                                            = writeClient.SendWriteRequest(sessionHandle);
+    err                                                 = writeClient.SendWriteRequest(sessionHandle);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 1);
     NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 3);
     NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
-
 
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
@@ -606,8 +605,8 @@ void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * a
     auto * writeHandler = InteractionModelEngine::GetInstance()->ActiveWriteHandlerAt(0);
     rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
     rm->ClearRetransTable(writeHandler->mExchangeCtx.Get());
-    ctx.GetLoopback().mSentMessageCount = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 0;
+    ctx.GetLoopback().mSentMessageCount  = 0;
+    ctx.GetLoopback().mNumMessagesToDrop = 0;
     writeHandler->OnMessageReceived(writeHandler->mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
     ctx.DrainAndServiceIO();
 

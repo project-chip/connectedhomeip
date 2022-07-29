@@ -201,7 +201,7 @@ ReadHandler * InteractionModelEngine::ActiveHandlerAt(unsigned int aIndex)
 
 WriteHandler * InteractionModelEngine::ActiveWriteHandlerAt(unsigned int aIndex)
 {
-    unsigned int i    = 0;
+    unsigned int i = 0;
 
     for (auto & writeHandler : mWriteHandlers)
     {
@@ -211,9 +211,8 @@ WriteHandler * InteractionModelEngine::ActiveWriteHandlerAt(unsigned int aIndex)
             {
                 return &writeHandler;
             }
-            i ++;
+            i++;
         }
-
     }
     return nullptr;
 }
