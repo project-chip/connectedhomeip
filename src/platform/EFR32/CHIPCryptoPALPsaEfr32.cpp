@@ -52,10 +52,10 @@ extern "C" {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
 #include <mbedtls/x509_crt.h>
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+#include <mbedtls/md.h>
 #include <mbedtls/oid.h>
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_csr.h>
-#include <mbedtls/md.h>
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
@@ -138,17 +138,17 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
                            const uint8_t * key, size_t key_length, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    psa_status_t status = PSA_ERROR_BAD_STATE;
+    CHIP_ERROR error          = CHIP_NO_ERROR;
+    psa_status_t status       = PSA_ERROR_BAD_STATE;
     psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
-    size_t output_length = 0;
-    uint8_t * buffer = nullptr;
-    bool allocated_buffer = false;
+    size_t output_length      = 0;
+    uint8_t * buffer          = nullptr;
+    bool allocated_buffer     = false;
 
     // If the ciphertext and tag outputs aren't a contiguous buffer, the PSA API requires buffer copying
     if (Uint8::to_uchar(ciphertext) + plaintext_length != Uint8::to_uchar(tag))
     {
-        buffer = (uint8_t *) MemoryCalloc(1, plaintext_length + tag_length);
+        buffer           = (uint8_t *) MemoryCalloc(1, plaintext_length + tag_length);
         allocated_buffer = true;
         VerifyOrExit(buffer != nullptr, error = CHIP_ERROR_NO_MEMORY);
     }
@@ -165,13 +165,9 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_ENCRYPT);
 
     status = psa_driver_wrapper_aead_encrypt(
-                &attr, Uint8::to_const_uchar(key), key_length,
-                PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_CCM, tag_length),
-                Uint8::to_const_uchar(nonce), nonce_length,
-                Uint8::to_const_uchar(aad), aad_length,
-                Uint8::to_const_uchar(plaintext), plaintext_length,
-                allocated_buffer ? buffer : ciphertext, plaintext_length + tag_length,
-                &output_length);
+        &attr, Uint8::to_const_uchar(key), key_length, PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_CCM, tag_length),
+        Uint8::to_const_uchar(nonce), nonce_length, Uint8::to_const_uchar(aad), aad_length, Uint8::to_const_uchar(plaintext),
+        plaintext_length, allocated_buffer ? buffer : ciphertext, plaintext_length + tag_length, &output_length);
 
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(output_length == plaintext_length + tag_length, error = CHIP_ERROR_INTERNAL);
@@ -196,17 +192,17 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
                            const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    psa_status_t status = PSA_ERROR_BAD_STATE;
+    CHIP_ERROR error          = CHIP_NO_ERROR;
+    psa_status_t status       = PSA_ERROR_BAD_STATE;
     psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
-    size_t output_length = 0;
-    uint8_t * buffer = nullptr;
-    bool allocated_buffer = false;
+    size_t output_length      = 0;
+    uint8_t * buffer          = nullptr;
+    bool allocated_buffer     = false;
 
     // If the ciphertext and tag outputs aren't a contiguous buffer, the PSA API requires buffer copying
     if (Uint8::to_const_uchar(ciphertext) + ciphertext_len != Uint8::to_const_uchar(tag))
     {
-        buffer = (uint8_t *) MemoryCalloc(1, ciphertext_len + tag_length);
+        buffer           = (uint8_t *) MemoryCalloc(1, ciphertext_len + tag_length);
         allocated_buffer = true;
         VerifyOrExit(buffer != nullptr, error = CHIP_ERROR_NO_MEMORY);
     }
@@ -229,13 +225,9 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     }
 
     status = psa_driver_wrapper_aead_decrypt(
-                &attr, Uint8::to_const_uchar(key), key_length,
-                PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_CCM, tag_length),
-                Uint8::to_const_uchar(nonce), nonce_length,
-                Uint8::to_const_uchar(aad), aad_len,
-                allocated_buffer ? buffer : ciphertext, ciphertext_len + tag_length,
-                plaintext, ciphertext_len,
-                &output_length);
+        &attr, Uint8::to_const_uchar(key), key_length, PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_CCM, tag_length),
+        Uint8::to_const_uchar(nonce), nonce_length, Uint8::to_const_uchar(aad), aad_len, allocated_buffer ? buffer : ciphertext,
+        ciphertext_len + tag_length, plaintext, ciphertext_len, &output_length);
 
     if (allocated_buffer)
     {
@@ -260,10 +252,8 @@ CHIP_ERROR Hash_SHA256(const uint8_t * data, const size_t data_length, uint8_t *
 
     psa_crypto_init();
 
-    const psa_status_t result = psa_hash_compute(PSA_ALG_SHA_256,
-                                                 data, data_length,
-                                                 out_buffer, PSA_HASH_LENGTH(PSA_ALG_SHA_256),
-                                                 &output_length);
+    const psa_status_t result =
+        psa_hash_compute(PSA_ALG_SHA_256, data, data_length, out_buffer, PSA_HASH_LENGTH(PSA_ALG_SHA_256), &output_length);
 
     VerifyOrReturnError(result == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(output_length == PSA_HASH_LENGTH(PSA_ALG_SHA_256), CHIP_ERROR_INTERNAL);
@@ -277,10 +267,8 @@ CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * o
 
     psa_crypto_init();
 
-    const psa_status_t result = psa_hash_compute(PSA_ALG_SHA_1,
-                                                 data, data_length,
-                                                 out_buffer, PSA_HASH_LENGTH(PSA_ALG_SHA_1),
-                                                 &output_length);
+    const psa_status_t result =
+        psa_hash_compute(PSA_ALG_SHA_1, data, data_length, out_buffer, PSA_HASH_LENGTH(PSA_ALG_SHA_1), &output_length);
 
     VerifyOrReturnError(result == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(output_length == PSA_HASH_LENGTH(PSA_ALG_SHA_1), CHIP_ERROR_INTERNAL);
@@ -298,7 +286,7 @@ static inline psa_hash_operation_t * to_inner_hash_sha256_context(HashSHA256Opaq
 
 Hash_SHA256_stream::Hash_SHA256_stream(void)
 {
-    psa_hash_operation_t * context = to_inner_hash_sha256_context(&mContext);
+    psa_hash_operation_t * context             = to_inner_hash_sha256_context(&mContext);
     const psa_hash_operation_t initial_context = PSA_HASH_OPERATION_INIT;
     memcpy(context, &initial_context, sizeof(psa_hash_operation_t));
 }
@@ -315,7 +303,7 @@ CHIP_ERROR Hash_SHA256_stream::Begin(void)
     psa_crypto_init();
 
     psa_hash_operation_t * context = to_inner_hash_sha256_context(&mContext);
-    const psa_status_t result = psa_hash_setup(context, PSA_ALG_SHA_256);
+    const psa_status_t result      = psa_hash_setup(context, PSA_ALG_SHA_256);
 
     VerifyOrReturnError(result == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
@@ -325,7 +313,7 @@ CHIP_ERROR Hash_SHA256_stream::Begin(void)
 CHIP_ERROR Hash_SHA256_stream::AddData(const ByteSpan data)
 {
     psa_hash_operation_t * context = to_inner_hash_sha256_context(&mContext);
-    const psa_status_t result = psa_hash_update(context, Uint8::to_const_uchar(data.data()), data.size());
+    const psa_status_t result      = psa_hash_update(context, Uint8::to_const_uchar(data.data()), data.size());
 
     VerifyOrReturnError(result == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
@@ -334,22 +322,19 @@ CHIP_ERROR Hash_SHA256_stream::AddData(const ByteSpan data)
 
 CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
 {
-    CHIP_ERROR result = CHIP_NO_ERROR;
-    psa_status_t status = PSA_ERROR_BAD_STATE;
-    size_t output_length = 0;
+    CHIP_ERROR result              = CHIP_NO_ERROR;
+    psa_status_t status            = PSA_ERROR_BAD_STATE;
+    size_t output_length           = 0;
     psa_hash_operation_t * context = to_inner_hash_sha256_context(&mContext);
 
     // Clone the context first since calculating the digest finishes the operation
     psa_hash_operation_t digest_context = PSA_HASH_OPERATION_INIT;
-    status = psa_hash_clone(context, &digest_context);
+    status                              = psa_hash_clone(context, &digest_context);
 
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     // Calculate digest on the cloned context
-    status = psa_hash_finish(&digest_context,
-                             Uint8::to_uchar(out_buffer.data()),
-                             out_buffer.size(),
-                             &output_length);
+    status = psa_hash_finish(&digest_context, Uint8::to_uchar(out_buffer.data()), out_buffer.size(), &output_length);
 
     VerifyOrExit(status == PSA_SUCCESS, result = CHIP_ERROR_INTERNAL);
     VerifyOrExit(output_length == PSA_HASH_LENGTH(PSA_ALG_SHA_256), result = CHIP_ERROR_INTERNAL);
@@ -361,12 +346,9 @@ exit:
 CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
 {
     psa_hash_operation_t * context = to_inner_hash_sha256_context(&mContext);
-    size_t output_length = 0;
+    size_t output_length           = 0;
 
-    const psa_status_t status = psa_hash_finish(context,
-                                                Uint8::to_uchar(out_buffer.data()),
-                                                out_buffer.size(),
-                                                &output_length);
+    const psa_status_t status = psa_hash_finish(context, Uint8::to_uchar(out_buffer.data()), out_buffer.size(), &output_length);
 
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(output_length == PSA_HASH_LENGTH(PSA_ALG_SHA_256), CHIP_ERROR_INTERNAL);
@@ -397,8 +379,8 @@ CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_len
     VerifyOrReturnError(out_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    psa_status_t status = PSA_ERROR_BAD_STATE;
+    CHIP_ERROR error                         = CHIP_NO_ERROR;
+    psa_status_t status                      = PSA_ERROR_BAD_STATE;
     psa_key_derivation_operation_t operation = PSA_KEY_DERIVATION_OPERATION_INIT;
 
     psa_crypto_init();
@@ -408,21 +390,19 @@ CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_len
 
     if (salt_length > 0)
     {
-        status = psa_key_derivation_input_bytes(&operation, PSA_KEY_DERIVATION_INPUT_SALT,
-                                                Uint8::to_const_uchar(salt), salt_length);
+        status =
+            psa_key_derivation_input_bytes(&operation, PSA_KEY_DERIVATION_INPUT_SALT, Uint8::to_const_uchar(salt), salt_length);
         VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
     }
 
-    status = psa_key_derivation_input_bytes(&operation, PSA_KEY_DERIVATION_INPUT_SECRET,
-                                            Uint8::to_const_uchar(secret), secret_length);
+    status =
+        psa_key_derivation_input_bytes(&operation, PSA_KEY_DERIVATION_INPUT_SECRET, Uint8::to_const_uchar(secret), secret_length);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
-    status = psa_key_derivation_input_bytes(&operation, PSA_KEY_DERIVATION_INPUT_INFO,
-                                            Uint8::to_const_uchar(info), info_length);
+    status = psa_key_derivation_input_bytes(&operation, PSA_KEY_DERIVATION_INPUT_INFO, Uint8::to_const_uchar(info), info_length);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
-    status = psa_key_derivation_output_bytes(&operation,
-                                             out_buffer, out_length);
+    status = psa_key_derivation_output_bytes(&operation, out_buffer, out_length);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 exit:
     psa_key_derivation_abort(&operation);
@@ -440,11 +420,11 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
     VerifyOrReturnError(out_length >= kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    psa_status_t status = PSA_ERROR_BAD_STATE;
-    psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
+    CHIP_ERROR error              = CHIP_NO_ERROR;
+    psa_status_t status           = PSA_ERROR_BAD_STATE;
+    psa_key_attributes_t attr     = PSA_KEY_ATTRIBUTES_INIT;
     psa_mac_operation_t operation = PSA_MAC_OPERATION_INIT;
-    size_t output_length = 0;
+    size_t output_length          = 0;
 
     psa_crypto_init();
 
@@ -453,11 +433,8 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
     psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_SIGN_HASH);
     psa_set_key_algorithm(&attr, PSA_ALG_HMAC(PSA_ALG_SHA_256));
 
-    status = psa_driver_wrapper_mac_compute(&attr,
-                                            Uint8::to_const_uchar(key), key_length,
-                                            PSA_ALG_HMAC(PSA_ALG_SHA_256),
-                                            Uint8::to_const_uchar(message), message_length,
-                                            out_buffer, out_length, &output_length);
+    status = psa_driver_wrapper_mac_compute(&attr, Uint8::to_const_uchar(key), key_length, PSA_ALG_HMAC(PSA_ALG_SHA_256),
+                                            Uint8::to_const_uchar(message), message_length, out_buffer, out_length, &output_length);
 
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(output_length == PSA_HASH_LENGTH(PSA_ALG_SHA_256), error = CHIP_ERROR_INTERNAL);
@@ -471,23 +448,24 @@ CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, c
                                         unsigned int iteration_count, uint32_t key_length, uint8_t * output)
 {
     // TODO: replace inlined algorithm with usage of the PSA key derivation API once implemented
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    psa_status_t status = PSA_ERROR_BAD_STATE;
+    CHIP_ERROR error          = CHIP_NO_ERROR;
+    psa_status_t status       = PSA_ERROR_BAD_STATE;
     psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
-    size_t output_length = 0;
+    size_t output_length      = 0;
 
     // Align these buffers on the native data size to speed up the XOR
-    static const size_t hash_size_in_native = ((PSA_HASH_LENGTH(PSA_ALG_SHA_256) + sizeof(unsigned int) - 1) / sizeof(unsigned int));
+    static const size_t hash_size_in_native =
+        ((PSA_HASH_LENGTH(PSA_ALG_SHA_256) + sizeof(unsigned int) - 1) / sizeof(unsigned int));
     static_assert(hash_size_in_native * sizeof(unsigned int) >= PSA_HASH_LENGTH(PSA_ALG_SHA_256));
 
     unsigned int md1_buffer[hash_size_in_native];
     unsigned int work_buffer[hash_size_in_native];
-    uint8_t *md1 = (uint8_t*) md1_buffer;
-    uint8_t *work = (uint8_t*) work_buffer;
+    uint8_t * md1  = (uint8_t *) md1_buffer;
+    uint8_t * work = (uint8_t *) work_buffer;
 
     size_t use_len;
-    unsigned char *out_p = output;
-    uint8_t *U1 = (uint8_t *) MemoryCalloc(1, slen + 4);
+    unsigned char * out_p = output;
+    uint8_t * U1          = (uint8_t *) MemoryCalloc(1, slen + 4);
 
     VerifyOrExit(U1 != nullptr, error = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(password != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -507,7 +485,7 @@ CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, c
 
     // Start with initializing the salt + counter
     memcpy(U1, salt, slen);
-    U1[slen] = 0;
+    U1[slen]     = 0;
     U1[slen + 1] = 0;
     U1[slen + 2] = 0;
     U1[slen + 3] = 1;
@@ -516,11 +494,8 @@ CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, c
     while (key_length)
     {
         // U1 ends up in work
-        status = psa_driver_wrapper_mac_compute(
-                    &attr, password, plen,
-                    PSA_ALG_HMAC(PSA_ALG_SHA_256),
-                    U1, slen + 4,
-                    work, PSA_HASH_LENGTH(PSA_ALG_SHA_256), &output_length);
+        status = psa_driver_wrapper_mac_compute(&attr, password, plen, PSA_ALG_HMAC(PSA_ALG_SHA_256), U1, slen + 4, work,
+                                                PSA_HASH_LENGTH(PSA_ALG_SHA_256), &output_length);
 
         VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
         VerifyOrExit(output_length == PSA_HASH_LENGTH(PSA_ALG_SHA_256), error = CHIP_ERROR_INTERNAL);
@@ -532,11 +507,8 @@ CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, c
             // U2 ends up in md1
             //
 
-            status = psa_driver_wrapper_mac_compute(
-                    &attr, password, plen,
-                    PSA_ALG_HMAC(PSA_ALG_SHA_256),
-                    md1, sizeof(md1),
-                    md1, sizeof(md1), &output_length);
+            status = psa_driver_wrapper_mac_compute(&attr, password, plen, PSA_ALG_HMAC(PSA_ALG_SHA_256), md1, sizeof(md1), md1,
+                                                    sizeof(md1), &output_length);
 
             VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
             VerifyOrExit(output_length == PSA_HASH_LENGTH(PSA_ALG_SHA_256), error = CHIP_ERROR_INTERNAL);
@@ -563,7 +535,6 @@ CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, c
             }
         }
     }
-
 
 exit:
     MemoryFree(U1);
@@ -634,7 +605,8 @@ mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
  *
  ******************************************************************************/
 
-typedef struct {
+typedef struct
+{
     uint8_t privkey[32];
     size_t bitlen;
 } psa_plaintext_ecp_keypair;
@@ -651,10 +623,10 @@ static inline const psa_plaintext_ecp_keypair * to_const_keypair(const P256Keypa
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    psa_status_t status = PSA_ERROR_BAD_STATE;
-    psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
-    size_t output_length = 0;
+    CHIP_ERROR error                          = CHIP_NO_ERROR;
+    psa_status_t status                       = PSA_ERROR_BAD_STATE;
+    psa_key_attributes_t attr                 = PSA_KEY_ATTRIBUTES_INIT;
+    size_t output_length                      = 0;
     const psa_plaintext_ecp_keypair * keypair = to_const_keypair(&mKeypair);
 
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
@@ -668,12 +640,9 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_SIGN_MESSAGE);
 
     // use imported key to sign a message
-    status = psa_driver_wrapper_sign_message(
-                &attr, keypair->privkey, PSA_BITS_TO_BYTES(keypair->bitlen),
-                PSA_ALG_ECDSA(PSA_ALG_SHA_256),
-                msg, msg_length,
-                out_signature.Bytes(), out_signature.Capacity(),
-                &output_length);
+    status =
+        psa_driver_wrapper_sign_message(&attr, keypair->privkey, PSA_BITS_TO_BYTES(keypair->bitlen), PSA_ALG_ECDSA(PSA_ALG_SHA_256),
+                                        msg, msg_length, out_signature.Bytes(), out_signature.Capacity(), &output_length);
 
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(output_length == kP256_ECDSA_Signature_Length_Raw, CHIP_ERROR_INTERNAL);
@@ -689,8 +658,8 @@ exit:
 CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
                                                        const P256ECDSASignature & signature) const
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    psa_status_t status = PSA_ERROR_BAD_STATE;
+    CHIP_ERROR error          = CHIP_NO_ERROR;
+    psa_status_t status       = PSA_ERROR_BAD_STATE;
     psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
 
     VerifyOrExit((msg != nullptr) && (msg_length > 0), error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -703,11 +672,8 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
     psa_set_key_algorithm(&attr, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
 
     // use imported key to verify a message
-    status = psa_driver_wrapper_verify_message(
-                &attr, Uint8::to_const_uchar(*this), Length(),
-                PSA_ALG_ECDSA(PSA_ALG_SHA_256),
-                msg, msg_length,
-                signature.ConstBytes(), signature.Length());
+    status = psa_driver_wrapper_verify_message(&attr, Uint8::to_const_uchar(*this), Length(), PSA_ALG_ECDSA(PSA_ALG_SHA_256), msg,
+                                               msg_length, signature.ConstBytes(), signature.Length());
 
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 exit:
@@ -724,8 +690,8 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     VerifyOrReturnError(hash_length == kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(signature.Length() == kP256_ECDSA_Signature_Length_Raw, CHIP_ERROR_INVALID_ARGUMENT);
 
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    psa_status_t status = PSA_ERROR_BAD_STATE;
+    CHIP_ERROR error          = CHIP_NO_ERROR;
+    psa_status_t status       = PSA_ERROR_BAD_STATE;
     psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
 
     // Step 1: import public key as volatile
@@ -737,11 +703,8 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     psa_set_key_algorithm(&attr, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
 
     // use imported key to verify a hash
-    status = psa_driver_wrapper_verify_hash(
-                &attr, Uint8::to_const_uchar(*this), Length(),
-                PSA_ALG_ECDSA(PSA_ALG_SHA_256),
-                hash, hash_length,
-                signature.ConstBytes(), signature.Length());
+    status = psa_driver_wrapper_verify_hash(&attr, Uint8::to_const_uchar(*this), Length(), PSA_ALG_ECDSA(PSA_ALG_SHA_256), hash,
+                                            hash_length, signature.ConstBytes(), signature.Length());
 
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 exit:
@@ -753,11 +716,11 @@ exit:
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
     // Todo: replace with driver call once key derivation through the driver wrapper has been figured out
-    CHIP_ERROR error     = CHIP_NO_ERROR;
-    psa_status_t status  = PSA_ERROR_BAD_STATE;
-    mbedtls_svc_key_id_t key_id = 0;
-    psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
-    size_t output_length = 0;
+    CHIP_ERROR error                          = CHIP_NO_ERROR;
+    psa_status_t status                       = PSA_ERROR_BAD_STATE;
+    mbedtls_svc_key_id_t key_id               = 0;
+    psa_key_attributes_t attr                 = PSA_KEY_ATTRIBUTES_INIT;
+    size_t output_length                      = 0;
     const psa_plaintext_ecp_keypair * keypair = to_const_keypair(&mKeypair);
 
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
@@ -770,21 +733,14 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     psa_set_key_algorithm(&attr, PSA_ALG_ECDH);
     psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_DERIVE);
 
-    status = psa_import_key(&attr,
-                            keypair->privkey,
-                            PSA_BITS_TO_BYTES(keypair->bitlen),
-                            &key_id);
+    status = psa_import_key(&attr, keypair->privkey, PSA_BITS_TO_BYTES(keypair->bitlen), &key_id);
 
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     // Step 2: do key derivation
-    status = psa_raw_key_agreement(PSA_ALG_ECDH,
-                                   key_id,
-                                   Uint8::to_const_uchar(remote_public_key),
-                                   remote_public_key.Length(),
+    status = psa_raw_key_agreement(PSA_ALG_ECDH, key_id, Uint8::to_const_uchar(remote_public_key), remote_public_key.Length(),
                                    Uint8::to_uchar(out_secret),
-                                   (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length(),
-                                   &output_length);
+                                   (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length(), &output_length);
 
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
     SuccessOrExit(out_secret.SetLength(output_length));
@@ -833,8 +789,8 @@ bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n)
 
 CHIP_ERROR P256Keypair::Initialize()
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    psa_status_t status = PSA_ERROR_BAD_STATE;
+    CHIP_ERROR error                    = CHIP_NO_ERROR;
+    psa_status_t status                 = PSA_ERROR_BAD_STATE;
     psa_plaintext_ecp_keypair * keypair = to_keypair(&mKeypair);
     size_t output_length;
 
@@ -852,10 +808,7 @@ CHIP_ERROR P256Keypair::Initialize()
     psa_set_key_algorithm(&attr, PSA_ALG_ECDH);
     psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_DERIVE | PSA_KEY_USAGE_EXPORT);
 
-    status = psa_driver_wrapper_generate_key(
-                &attr,
-                keypair->privkey, sizeof(keypair->privkey),
-                &output_length);
+    status = psa_driver_wrapper_generate_key(&attr, keypair->privkey, sizeof(keypair->privkey), &output_length);
 
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(output_length == kP256_PrivateKey_Length, error = CHIP_ERROR_INTERNAL);
@@ -863,10 +816,8 @@ CHIP_ERROR P256Keypair::Initialize()
     keypair->bitlen = 256;
 
     // Step 2: Export the public key into the pubkey member
-    status = psa_driver_wrapper_export_public_key(
-                &attr, keypair->privkey, sizeof(keypair->privkey),
-                Uint8::to_uchar(mPublicKey), mPublicKey.Length(),
-                &output_length);
+    status = psa_driver_wrapper_export_public_key(&attr, keypair->privkey, sizeof(keypair->privkey), Uint8::to_uchar(mPublicKey),
+                                                  mPublicKey.Length(), &output_length);
 
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(output_length == kP256_PublicKey_Length, error = CHIP_ERROR_INTERNAL);
@@ -884,9 +835,9 @@ exit:
 
 CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error                          = CHIP_NO_ERROR;
     const psa_plaintext_ecp_keypair * keypair = to_const_keypair(&mKeypair);
-    size_t len                      = output.Length() == 0 ? output.Capacity() : output.Length();
+    size_t len                                = output.Length() == 0 ? output.Capacity() : output.Length();
     Encoding::BufferWriter bbuf(output, len);
 
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
@@ -906,7 +857,7 @@ exit:
 
 CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error                    = CHIP_NO_ERROR;
     psa_plaintext_ecp_keypair * keypair = to_keypair(&mKeypair);
     Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
 
@@ -947,9 +898,9 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
     size_t out_length;
-    psa_status_t status  = PSA_ERROR_BAD_STATE;
-    mbedtls_svc_key_id_t key_id = 0;
-    psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
+    psa_status_t status                       = PSA_ERROR_BAD_STATE;
+    mbedtls_svc_key_id_t key_id               = 0;
+    psa_key_attributes_t attr                 = PSA_KEY_ATTRIBUTES_INIT;
     const psa_plaintext_ecp_keypair * keypair = to_const_keypair(&mKeypair);
 
     mbedtls_x509write_csr csr;
@@ -965,10 +916,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     psa_set_key_algorithm(&attr, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
     psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_SIGN_HASH);
 
-    status = psa_import_key(&attr,
-                            keypair->privkey,
-                            PSA_BITS_TO_BYTES(keypair->bitlen),
-                            &key_id);
+    status = psa_import_key(&attr, keypair->privkey, PSA_BITS_TO_BYTES(keypair->bitlen), &key_id);
 
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
