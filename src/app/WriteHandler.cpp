@@ -31,7 +31,7 @@ namespace chip {
 namespace app {
 
 using namespace Protocols::InteractionModel;
-
+using Status                         = Protocols::InteractionModel::Status;
 constexpr uint8_t kListAttributeType = 0x48;
 
 CHIP_ERROR WriteHandler::Init()
@@ -119,6 +119,7 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
     if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
         ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
+        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
         Close();
         return CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
@@ -133,7 +134,7 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
             Close();
         }
     }
-    else if (status != Protocols::InteractionModel::Status::Success)
+    else if (status != Status::Success)
     {
         err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
         Close();
@@ -312,7 +313,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             // it with Busy status code.
             (dataAttributePath.IsListItemOperation() && !IsSameAttribute(mProcessingAttributePath, dataAttributePath)))
         {
-            err = AddStatus(dataAttributePath, StatusIB(Protocols::InteractionModel::Status::Busy));
+            err = AddStatus(dataAttributePath, StatusIB(Status::Busy));
             continue;
         }
 
@@ -619,13 +620,11 @@ CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, cons
 
 CHIP_ERROR WriteHandler::AddClusterSpecificSuccess(const ConcreteDataAttributePath & aPath, ClusterStatus aClusterStatus)
 {
-    using Protocols::InteractionModel::Status;
     return AddStatus(aPath, StatusIB(Status::Success, aClusterStatus));
 }
 
 CHIP_ERROR WriteHandler::AddClusterSpecificFailure(const ConcreteDataAttributePath & aPath, ClusterStatus aClusterStatus)
 {
-    using Protocols::InteractionModel::Status;
     return AddStatus(aPath, StatusIB(Status::Failure, aClusterStatus));
 }
 
