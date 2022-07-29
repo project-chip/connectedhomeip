@@ -18,6 +18,7 @@ import("//build_overrides/chip.gni")
 executable("chip-lock-app") {
   sources = [
     "main.cpp",
+    "src/LockAppCommandDelegate.cpp",
     "src/LockEndpoint.cpp",
     "src/LockManager.cpp",
     "src/ZCLDoorLockCallbacks.cpp",
@@ -27,6 +28,7 @@ executable("chip-lock-app") {
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
+    "${chip_root}/third_party/jsoncpp",
   ]
 
   include_dirs = [

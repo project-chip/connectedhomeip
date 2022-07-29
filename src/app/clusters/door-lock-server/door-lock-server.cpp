@@ -228,6 +228,14 @@ bool DoorLockServer::GetNumberOfHolidaySchedulesSupported(chip::EndpointId endpo
                         Attributes::NumberOfHolidaySchedulesSupported::Get, numberOfHolidaySchedules);
 }
 
+bool DoorLockServer::SendLockAlarmEvent(chip::EndpointId endpointId, DlAlarmCode alarmCode)
+{
+    Events::DoorLockAlarm::Type event{ alarmCode };
+    SendEvent(endpointId, event);
+
+    return true;
+}
+
 void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandObj,
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData)
@@ -1577,7 +1585,8 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, DlCr
 }
 
 bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, DlCredentialType credentialType,
-                                               chip::ByteSpan credentialData, uint16_t & userIndex, uint16_t & credentialIndex)
+                                               chip::ByteSpan credentialData, uint16_t & userIndex, uint16_t & credentialIndex,
+                                               EmberAfPluginDoorLockUserInfo & userInfo)
 {
     uint16_t maxNumberOfUsers = 0;
     VerifyOrReturnError(GetAttribute(endpointId, Attributes::NumberOfTotalUsersSupported::Id,
@@ -1633,6 +1642,7 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, DlCr
             {
                 userIndex       = i;
                 credentialIndex = i;
+                userInfo        = user;
                 return true;
             }
         }
@@ -2951,6 +2961,11 @@ DlLockDataType DoorLockServer::credentialTypeToLockDataType(DlCredentialType cre
     return DlLockDataType::kUnspecified;
 }
 
+bool DoorLockServer::isUserScheduleRestricted(chip::EndpointId endpointId, const EmberAfPluginDoorLockUserInfo & user)
+{
+    return false;
+}
+
 void DoorLockServer::setHolidayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
                                                       const chip::app::ConcreteCommandPath & commandPath, uint8_t holidayIndex,
                                                       uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode)
@@ -3136,14 +3151,22 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
                          chip::to_underlying(opType)));
 
         // Look up the user index and credential index -- it should be used in the Lock Operation event
-        findUserIndexByCredential(endpoint, DlCredentialType::kPin, pinCode.Value(), pinUserIdx, pinCredIdx);
+        EmberAfPluginDoorLockUserInfo user;
+        findUserIndexByCredential(endpoint, DlCredentialType::kPin, pinCode.Value(), pinUserIdx, pinCredIdx, user);
+
+        // If the user status is OccupiedDisabled we should deny the access and send out the appropriate event
+        VerifyOrExit(user.userStatus != DlUserStatus::kOccupiedDisabled, {
+            reason = DlOperationError::kDisabledUserDenied;
+            emberAfDoorLockClusterPrintln(
+                "Unable to perform remote lock operation: user is disabled [endpoint=%d, lock_op=%d, userIndex=%d]", endpoint,
+                to_underlying(opType), pinUserIdx);
+        });
 
         // [EM]: I don't think we should prevent door lock/unlocking if we couldn't find credential associated with user. I
         // think if the app thinks that PIN is correct the door should be unlocked.
         //
         // [DV]: let app decide on PIN correctness, we will fail only if 'opHandler' returns false.
-        credentialsOk =
-            true; // findUserIndexByCredential(endpoint, DlCredentialType::kPin, pinCode.Value(), pinUserIdx, pinCredIdx);
+        credentialsOk = true;
     }
     else
     {
