@@ -20,23 +20,23 @@ config:
     nodeId: 0x12344321
     timeout: 700
     nodeIdForDuplicateCommissioning:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0x11
     nodeId2:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0xCAFE
     nodeId3:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0xC00FEE
     endpoint: 0
     discriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 3840
     payload:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "MT:0000000000I31506010"
     payload2:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "MT:0000000000I.0648G00"
 
 tests:

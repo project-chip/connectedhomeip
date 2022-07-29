@@ -11481,9 +11481,9 @@ struct TypeInfo
 namespace CurrentFabricIndex {
 struct TypeInfo
 {
-    using Type             = chip::FabricIndex;
-    using DecodableType    = chip::FabricIndex;
-    using DecodableArgType = chip::FabricIndex;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentFabricIndex::Id; }
@@ -11534,7 +11534,7 @@ struct TypeInfo
         Attributes::SupportedFabrics::TypeInfo::DecodableType supportedFabrics       = static_cast<uint8_t>(0);
         Attributes::CommissionedFabrics::TypeInfo::DecodableType commissionedFabrics = static_cast<uint8_t>(0);
         Attributes::TrustedRootCertificates::TypeInfo::DecodableType trustedRootCertificates;
-        Attributes::CurrentFabricIndex::TypeInfo::DecodableType currentFabricIndex = static_cast<chip::FabricIndex>(0);
+        Attributes::CurrentFabricIndex::TypeInfo::DecodableType currentFabricIndex = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -22645,9 +22645,9 @@ struct TypeInfo
 namespace VendorID {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::VendorId;
+    using DecodableType    = chip::VendorId;
+    using DecodableArgType = chip::VendorId;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorID::Id; }
@@ -22768,7 +22768,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::VendorName::TypeInfo::DecodableType vendorName;
-        Attributes::VendorID::TypeInfo::DecodableType vendorID = static_cast<uint16_t>(0);
+        Attributes::VendorID::TypeInfo::DecodableType vendorID = static_cast<chip::VendorId>(0);
         Attributes::ApplicationName::TypeInfo::DecodableType applicationName;
         Attributes::ProductID::TypeInfo::DecodableType productID = static_cast<uint16_t>(0);
         Attributes::Application::TypeInfo::DecodableType application;

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E5801C328941C050033A199 /* MTRTestOTAProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E748B3828941A44008A1BE8 /* MTRTestOTAProvider.m */; };
 		1E85730C265519AE0050A4D9 /* callback-stub.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E857307265519AE0050A4D9 /* callback-stub.cpp */; };
 		1EB41B7B263C4CC60048E4C1 /* MTRClustersTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EB41B7A263C4CC60048E4C1 /* MTRClustersTests.m */; };
 		1EC3238D271999E2002A8BF0 /* cluster-objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC3238C271999E2002A8BF0 /* cluster-objects.cpp */; };
@@ -127,6 +128,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1E748B3828941A44008A1BE8 /* MTRTestOTAProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRTestOTAProvider.m; sourceTree = "<group>"; };
+		1E748B3928941A45008A1BE8 /* MTRTestOTAProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestOTAProvider.h; sourceTree = "<group>"; };
 		1E857307265519AE0050A4D9 /* callback-stub.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "callback-stub.cpp"; path = "../../../../zzz_generated/controller-clusters/zap-generated/callback-stub.cpp"; sourceTree = "<group>"; };
 		1EB41B7A263C4CC60048E4C1 /* MTRClustersTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRClustersTests.m; sourceTree = "<group>"; };
 		1EC3238C271999E2002A8BF0 /* cluster-objects.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "cluster-objects.cpp"; path = "../../../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp"; sourceTree = "<group>"; };
@@ -404,6 +407,8 @@
 		B202529A2459E34F00F97062 /* CHIPTests */ = {
 			isa = PBXGroup;
 			children = (
+				1E748B3928941A45008A1BE8 /* MTRTestOTAProvider.h */,
+				1E748B3828941A44008A1BE8 /* MTRTestOTAProvider.m */,
 				D437613E285BDC0D0051FEA2 /* MTRErrorTestUtils.h */,
 				D437613F285BDC0D0051FEA2 /* MTRTestKeys.h */,
 				D4376140285BDC0D0051FEA2 /* MTRTestStorage.h */,
@@ -667,6 +672,7 @@
 				997DED1A26955D0200975E97 /* MTRThreadOperationalDatasetTests.mm in Sources */,
 				51C8E3F82825CDB600D47D00 /* MTRTestKeys.m in Sources */,
 				99C65E10267282F1003402F6 /* MTRControllerTests.m in Sources */,
+				1E5801C328941C050033A199 /* MTRTestOTAProvider.m in Sources */,
 				5A6FEC9D27B5E48900F25F42 /* MTRXPCProtocolTests.m in Sources */,
 				5AE6D4E427A99041001F2493 /* MTRDeviceTests.m in Sources */,
 				5A7947DE27BEC3F500434CF2 /* MTRXPCListenerSampleTests.m in Sources */,

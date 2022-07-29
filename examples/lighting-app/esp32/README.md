@@ -75,6 +75,14 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
         $ source ./scripts/activate.sh
 
+-   Enable Ccache for faster IDF builds
+
+    It is recommended to have Ccache installed for faster builds
+
+    ```
+    $ export IDF_CCACHE_ENABLE=1
+    ```
+
 -   Target Set
 
         $ idf.py set-target esp32

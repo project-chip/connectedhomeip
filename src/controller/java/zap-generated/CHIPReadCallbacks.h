@@ -5054,36 +5054,6 @@ private:
     bool keepAlive;
 };
 
-class CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback
-    : public chip::Callback::Callback<CHIPOperationalCredentialsClusterCurrentFabricIndexAttributeCallbackType>
-{
-public:
-    CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback(jobject javaCallback, bool keepAlive = false);
-
-    ~CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback();
-
-    static void maybeDestroy(CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback * callback)
-    {
-        if (!callback->keepAlive)
-        {
-            callback->Cancel();
-            chip::Platform::Delete<CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback>(callback);
-        }
-    }
-
-    static void CallbackFn(void * context, chip::FabricIndex value);
-    static void OnSubscriptionEstablished(void * context)
-    {
-        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback *>(context)->javaCallbackRef);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
-    };
-
-private:
-    jobject javaCallbackRef;
-    bool keepAlive;
-};
-
 class CHIPOperationalCredentialsGeneratedCommandListAttributeCallback
     : public chip::Callback::Callback<CHIPOperationalCredentialsClusterGeneratedCommandListAttributeCallbackType>
 {
@@ -10164,6 +10134,36 @@ public:
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
             reinterpret_cast<CHIPApplicationLauncherAttributeListAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPApplicationBasicVendorIDAttributeCallback
+    : public chip::Callback::Callback<CHIPApplicationBasicClusterVendorIDAttributeCallbackType>
+{
+public:
+    CHIPApplicationBasicVendorIDAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPApplicationBasicVendorIDAttributeCallback();
+
+    static void maybeDestroy(CHIPApplicationBasicVendorIDAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPApplicationBasicVendorIDAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, chip::VendorId value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPApplicationBasicVendorIDAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 

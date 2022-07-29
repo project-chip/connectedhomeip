@@ -113,6 +113,14 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
         $ source ./scripts/activate.sh
         ```
 
+-   Enable Ccache for faster IDF builds
+
+    It is recommended to have Ccache installed for faster builds
+
+    ```
+    $ export IDF_CCACHE_ENABLE=1
+    ```
+
 -   Target Set
 
 To set IDF target, first:
@@ -278,8 +286,8 @@ the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
 Parameters:
 
-1. Discriminator: 3840 (configurable through menuconfig)
-2. Setup-pin-code: 20202021 (configurable through menuconfig)
+1. Discriminator: 3840
+2. Setup-pin-code: 20202021
 3. Node-id: 12344321 (you can assign any node id)
 
 ### Cluster control

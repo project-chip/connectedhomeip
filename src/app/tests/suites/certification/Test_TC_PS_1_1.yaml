@@ -34,7 +34,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "Read the global attribute: FeatureMap"
       PICS: PS.S.F00 || PS.S.F01 || PS.S.F02 || PS.S.F03
@@ -42,7 +42,7 @@ tests:
       attribute: "FeatureMap"
       response:
           constraints:
-              type: map32
+              type: bitmap32
               minValue: 0
               maxValue: 15
 

@@ -1362,7 +1362,7 @@ server cluster OperationalCredentials = 62 {
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
-  readonly attribute fabric_idx currentFabricIndex = 5;
+  readonly attribute int8u currentFabricIndex = 5;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
