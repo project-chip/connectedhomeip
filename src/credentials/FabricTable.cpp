@@ -85,7 +85,7 @@ CHIP_ERROR FabricInfo::Init(const FabricInfo::InitParams & initParams)
     mFabricIndex        = initParams.fabricIndex;
     mCompressedFabricId = initParams.compressedFabricId;
     mRootPublicKey      = initParams.rootPublicKey;
-    mVendorId           = initParams.vendorId;
+    mVendorId           = static_cast<VendorId>(initParams.vendorId);
 
     // Deal with externally injected keys
     if (initParams.operationalKeypair != nullptr)
@@ -664,7 +664,8 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric, FabricIndex newFabr
                     "Fabric index 0x%x was retrieved from storage. Compressed FabricId 0x" ChipLogFormatX64
                     ", FabricId 0x" ChipLogFormatX64 ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
                     static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
-                    ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
+                    ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()),
+                    to_underlying(fabric->GetVendorId()));
 
     return CHIP_NO_ERROR;
 }
@@ -788,7 +789,7 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::
 
         VerifyOrReturnError(fabricEntry != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        newFabricInfo.vendorId    = vendorId;
+        newFabricInfo.vendorId    = static_cast<VendorId>(vendorId);
         newFabricInfo.fabricIndex = fabricIndex;
     }
     else

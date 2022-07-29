@@ -6212,12 +6212,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("WindowStatus", 1, value);
         }
         case AdministratorCommissioning::Attributes::AdminFabricIndex::Id: {
-            chip::FabricIndex value;
+            chip::app::DataModel::Nullable<chip::FabricIndex> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AdminFabricIndex", 1, value);
         }
         case AdministratorCommissioning::Attributes::AdminVendorId::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AdminVendorId", 1, value);
         }

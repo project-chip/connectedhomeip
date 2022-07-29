@@ -5263,7 +5263,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.AdministratorCommissioningCluster) cluster)
-                  .readAdminVendorIdAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readAdminVendorIdAttribute(
+                      (ChipClusters.AdministratorCommissioningCluster
+                              .AdminVendorIdAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readAdministratorCommissioningAdminVendorIdCommandParams);

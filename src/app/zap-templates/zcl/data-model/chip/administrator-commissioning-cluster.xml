@@ -39,8 +39,8 @@ limitations under the License.
     <description>Commands to trigger a Node to allow a new Administrator to commission it.</description>
 
     <attribute side="server" code="0x0000" define="WINDOW_STATUS" type="INT8U" writable="false" optional="false">WindowStatus</attribute>
-    <attribute side="server" code="0x0001" define="ADMIN_FABRIC_INDEX" type="fabric_idx" writable="false" optional="false">AdminFabricIndex</attribute>
-    <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="INT16U" writable="false" optional="false">AdminVendorId</attribute>
+    <attribute side="server" code="0x0001" define="ADMIN_FABRIC_INDEX" type="fabric_idx" writable="false" isNullable="true" optional="false">AdminFabricIndex</attribute>
+    <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="INT16U" writable="false" isNullable="true" optional="false">AdminVendorId</attribute>
 
     <command source="client" code="0x00" name="OpenCommissioningWindow" mustUseTimedInvoke="true" optional="false">
       <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method.</description>
