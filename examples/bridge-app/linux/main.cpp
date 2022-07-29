@@ -855,6 +855,18 @@ void * bridge_polling_thread(void * context)
                 // TC-ACT-2.2 step 3i, add "Turn off Room 1 renamed lights"
                 action3.setIsVisible(true);
             }
+
+            // Commands used for the Bridged Device Basic Information test plan
+            if (ch == 'u')
+            {
+                // TC-BRBINFO-2.2 step 2 "Set reachable to false"
+                TempSensor1.SetReachable(false);
+            }
+            if (ch == 'v')
+            {
+                // TC-BRBINFO-2.2 step 2 "Set reachable to true"
+                TempSensor1.SetReachable(true);
+            }
             continue;
         }
 
