@@ -93,9 +93,9 @@ public:
         mStatus = status;
         mOnSuccessCalled++;
     }
-    void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override 
-    { 
-        mOnErrorCalled++; 
+    void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override
+    {
+        mOnErrorCalled++;
         mLastErrorReason = app::StatusIB(chipError);
     }
     void OnDone(WriteClient * apWriteClient) override { mOnDoneCalled++; }
@@ -574,7 +574,7 @@ void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * a
                                  static_cast<uint16_t>(900) /* reserved buffer size */);
 
     ByteSpan list[5];
-    
+
     err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 5));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -594,7 +594,7 @@ void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * a
     NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
-    
+
     ReportDataMessage::Builder response;
     response.Init(&writer);
     NL_TEST_ASSERT(apSuite, writer.Finalize(&msgBuf) == CHIP_NO_ERROR);
@@ -602,7 +602,7 @@ void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * a
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
- 
+
     auto * writeHandler = InteractionModelEngine::GetInstance()->ActiveWriteHandlerAt(0);
     rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
     rm->ClearRetransTable(writeHandler->mExchangeCtx.Get());
