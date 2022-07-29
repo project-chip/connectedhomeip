@@ -21,6 +21,9 @@ import("${_bootstrap_root}/build_overrides/pigweed_environment.gni")
 
 # Rebase paths to our root.
 dir_cipd_arm = get_path_info("${_bootstrap_root}/${dir_cipd_arm}", "abspath")
-dir_cipd_pigweed = get_path_info("${_bootstrap_root}/${dir_cipd_pigweed}", "abspath")
-dir_cipd_python = get_path_info("${_bootstrap_root}/${dir_cipd_python}", "abspath")
-dir_virtual_env = get_path_info("${_bootstrap_root}/${dir_virtual_env}", "abspath")
+dir_cipd_pigweed =
+    get_path_info("${_bootstrap_root}/${dir_cipd_pigweed}", "abspath")
+dir_cipd_python =
+    get_path_info("${_bootstrap_root}/${dir_cipd_python}", "abspath")
+dir_virtual_env =
+    get_path_info("${_bootstrap_root}/${dir_virtual_env}", "abspath")
