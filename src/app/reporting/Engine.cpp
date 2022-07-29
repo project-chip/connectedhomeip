@@ -323,7 +323,7 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
             }
             aHasEncodedData = true;
             ChipLogDetail(InteractionModel,
-                          "Construct event status (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") due to insufficient privilege",
+                          "Acces to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by ACL",
                           current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId),
                           ChipLogValueMEI(current->mValue.mEventId));
         }
@@ -338,7 +338,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     size_t eventCount   = 0;
-    bool hasEncodedData = false;
+    bool hasEncodedStatus = false;
     TLV::TLVWriter backup;
     bool eventClean                = true;
     auto & eventMin                = apReadHandler->GetEventMin();
@@ -370,7 +370,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         VerifyOrExit(eventReportIBs.GetWriter() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = eventReportIBs.GetWriter()->ReserveBuffer(kReservedSizeEndOfReportIBs));
 
-        err = CheckAccessDeniedEventPaths(*(eventReportIBs.GetWriter()), hasEncodedData, apReadHandler);
+        err = CheckAccessDeniedEventPaths(*(eventReportIBs.GetWriter()), hasEncodedStatus, apReadHandler);
         SuccessOrExit(err);
 
         err = eventManager.FetchEventsSince(*(eventReportIBs.GetWriter()), apReadHandler->GetEventPathList(), eventMin, eventCount,
@@ -420,14 +420,13 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     ChipLogDetail(DataManagement, "Fetched %u events", static_cast<unsigned int>(eventCount));
 
 exit:
-    hasEncodedData = hasEncodedData || (eventCount != 0);
     if (apHasEncodedData != nullptr)
     {
-        *apHasEncodedData = hasEncodedData;
+        *apHasEncodedData = hasEncodedStatus || (eventCount != 0);
     }
 
     // Maybe encoding the attributes has already used up all space.
-    if ((err == CHIP_NO_ERROR || err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL) && !hasEncodedData)
+    if ((err == CHIP_NO_ERROR || err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL) && !(hasEncodedStatus || (eventCount != 0)))
     {
         aReportDataBuilder.Rollback(backup);
         aReportDataBuilder.ResetError();

@@ -27,8 +27,6 @@ static_library("helpers") {
     "AppTestContext.cpp",
     "AppTestContext.h",
     "integration/RequiredPrivilegeStubs.cpp",
-    "MockAclTestContext.cpp",
-    "MockAclTestContext.h",
   ]
 
   cflags = [ "-Wconversion" ]

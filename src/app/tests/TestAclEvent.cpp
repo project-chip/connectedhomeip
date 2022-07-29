@@ -23,11 +23,12 @@
  */
 
 #include "lib/support/CHIPMem.h"
+#include <access/AccessControl.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/EventDataIB.h>
-#include <app/tests/MockAclTestContext.h>
+#include <app/tests/AppTestContext.h>
 #include <app/util/basic-types.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
@@ -47,6 +48,9 @@
 #include <type_traits>
 
 namespace {
+using namespace chip;
+using namespace chip::Access;
+
 uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
@@ -58,12 +62,39 @@ chip::EventId kTestEventIdDebug    = 1;
 chip::EventId kTestEventIdCritical = 2;
 chip::TLV::Tag kTestEventTag       = chip::TLV::ContextTag(1);
 
-class TestContext : public chip::Test::MockAclTestContext
+class TestAccessControlDelegate : public AccessControl::Delegate
+{
+public:
+    // Check
+    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const chip::Access::RequestPath & requestPath,
+                     Privilege requestPrivilege) override
+    {
+        if (requestPath.cluster == kTestClusterId1)
+        {
+            return CHIP_ERROR_ACCESS_DENIED;
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+AccessControl::Delegate * GetTestAccessControlDelegate()
+{
+    static TestAccessControlDelegate accessControlDelegate;
+    return &accessControlDelegate;
+}
+
+class TestDeviceTypeResolver : public AccessControl::DeviceTypeResolver
+{
+public:
+    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return false; }
+} gDeviceTypeResolver;
+
+class TestContext : public chip::Test::AppContext
 {
 public:
     static int Initialize(void * context)
     {
-        if (MockAclTestContext::Initialize(context) != SUCCESS)
+        if (AppContext::Initialize(context) != SUCCESS)
             return FAILURE;
 
         auto * ctx = static_cast<TestContext *>(context);
@@ -81,7 +112,8 @@ public:
 
         chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
-
+        Access::GetAccessControl().Finish();
+        Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
         return SUCCESS;
     }
 
@@ -89,7 +121,7 @@ public:
     {
         chip::app::EventManagement::DestroyEventManagement();
 
-        if (MockAclTestContext::Finalize(context) != SUCCESS)
+        if (AppContext::Finalize(context) != SUCCESS)
             return FAILURE;
 
         return SUCCESS;
@@ -236,7 +268,7 @@ void TestAclEvent::TestReadRoundtripWithEventStatusIBInEventReport(nlTestSuite *
         ctx.DrainAndServiceIO();
 
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
-        NL_TEST_ASSERT(apSuite, delegate.mNumReadEventFailureStatusReceived > 0);
+        NL_TEST_ASSERT(apSuite, delegate.mNumReadEventFailureStatusReceived == 1);
         NL_TEST_ASSERT(apSuite, delegate.mLastStatusReceived.mStatus == Protocols::InteractionModel::Status::UnsupportedAccess);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
     }
