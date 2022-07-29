@@ -210,8 +210,7 @@ bool DoorLockServer::EngageLockout(chip::EndpointId endpointId)
     endpointContext->lockoutEndTimestamp =
         chip::System::SystemClock().GetMonotonicTimestamp() + chip::System::Clock::Seconds32(lockoutTimeout);
 
-    emberAfDoorLockClusterPrintln("Lockout engaged [endpointId=%d,lockoutTimeout=%d]",
-                                  endpointId, lockoutTimeout);
+    emberAfDoorLockClusterPrintln("Lockout engaged [endpointId=%d,lockoutTimeout=%d]", endpointId, lockoutTimeout);
 
     return true;
 }
@@ -3157,12 +3156,12 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
     VerifyOrDie(DlLockOperationType::kLock == opType || DlLockOperationType::kUnlock == opType);
     VerifyOrDie(nullptr != opHandler);
 
-    EndpointId endpoint      = commandPath.mEndpointId;
-    DlOperationError reason  = DlOperationError::kUnspecified;
-    uint16_t pinUserIdx      = 0;
-    uint16_t pinCredIdx      = 0;
-    bool success             = false;
-    bool sendEvent           = true;
+    EndpointId endpoint     = commandPath.mEndpointId;
+    DlOperationError reason = DlOperationError::kUnspecified;
+    uint16_t pinUserIdx     = 0;
+    uint16_t pinCredIdx     = 0;
+    bool success            = false;
+    bool sendEvent          = true;
 
     auto currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
 

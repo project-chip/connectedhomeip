@@ -351,7 +351,7 @@ private:
 
     bool RemoteOperationEnabled(chip::EndpointId endpointId) const;
 
-    EmberAfDoorLockEndpointContext *getContext(chip::EndpointId endpointId);
+    EmberAfDoorLockEndpointContext * getContext(chip::EndpointId endpointId);
 
     /**
      * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands
