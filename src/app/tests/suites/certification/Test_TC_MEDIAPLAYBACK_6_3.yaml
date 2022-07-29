@@ -19,7 +19,7 @@ config:
     cluster: "Media Playback"
     endpoint: 1
     SeekPosition:
-        type: INT64U
+        type: int64u
         defaultValue: 100000000
 
 tests:

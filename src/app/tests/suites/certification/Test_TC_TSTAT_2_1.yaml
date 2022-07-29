@@ -33,7 +33,7 @@ tests:
       attribute: "LocalTemperature"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -43,7 +43,7 @@ tests:
       attribute: "OutdoorTemperature"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -53,7 +53,7 @@ tests:
       attribute: "Occupancy"
       response:
           constraints:
-              type: int16
+              type: bitmap8
               minValue: 0
               maxValue: 1
 
@@ -63,7 +63,7 @@ tests:
       attribute: "AbsMinHeatSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -73,7 +73,7 @@ tests:
       attribute: "AbsMaxHeatSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -83,7 +83,7 @@ tests:
       attribute: "AbsMinCoolSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -93,7 +93,7 @@ tests:
       attribute: "AbsMaxCoolSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -103,7 +103,7 @@ tests:
       attribute: "PICoolingDemand"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 100
 
@@ -113,7 +113,7 @@ tests:
       attribute: "PIHeatingDemand"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 100
 
@@ -123,7 +123,7 @@ tests:
       attribute: "HVACSystemTypeConfiguration"
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 0
               maxValue: 63
 
@@ -133,7 +133,7 @@ tests:
       attribute: "LocalTemperatureCalibration"
       response:
           constraints:
-              type: int8
+              type: int8s
               minValue: 25
               maxValue: -25
 
@@ -143,7 +143,7 @@ tests:
       attribute: "OccupiedCoolingSetpoint"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 1600
               maxValue: 3200
 
@@ -153,7 +153,7 @@ tests:
       attribute: "OccupiedHeatingSetpoint"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 700
               maxValue: 3000
 
@@ -163,7 +163,7 @@ tests:
       attribute: "UnoccupiedCoolingSetpoint"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 1600
               maxValue: 3200
 
@@ -173,7 +173,7 @@ tests:
       attribute: "UnoccupiedHeatingSetpoint"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 700
               maxValue: 3000
 
@@ -183,7 +183,7 @@ tests:
       attribute: "MinHeatSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: 700
               maxValue: 3000
 
@@ -193,7 +193,7 @@ tests:
       attribute: "MaxHeatSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -203,7 +203,7 @@ tests:
       attribute: "MinCoolSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -213,7 +213,7 @@ tests:
       attribute: "MaxCoolSetpointLimit"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -223,7 +223,7 @@ tests:
       attribute: "MinSetpointDeadBand"
       response:
           constraints:
-              type: int8
+              type: int8s
               minValue: 0
               maxValue: 25
 
@@ -233,7 +233,7 @@ tests:
       attribute: "RemoteSensing"
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 0
               maxValue: 7
 
@@ -281,7 +281,7 @@ tests:
       attribute: "NumberOfWeeklyTransitions"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -291,7 +291,7 @@ tests:
       attribute: "NumberOfDailyTransitions"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -311,7 +311,7 @@ tests:
       attribute: "TemperatureSetpointHoldDuration"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 1440
 
@@ -321,7 +321,7 @@ tests:
       attribute: "ThermostatProgrammingOperationMode"
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 0
               maxValue: 7
 
@@ -331,7 +331,7 @@ tests:
       attribute: "ThermostatRunningState"
       response:
           constraints:
-              type: map16
+              type: bitmap16
               minValue: 0
               maxValue: 127
 
@@ -351,7 +351,7 @@ tests:
       attribute: "SetpointChangeAmount"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 
@@ -369,7 +369,7 @@ tests:
       attribute: "OccupiedSetback"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -379,7 +379,7 @@ tests:
       attribute: "OccupiedSetbackMin"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -389,7 +389,7 @@ tests:
       attribute: "OccupiedSetbackMax"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -399,7 +399,7 @@ tests:
       attribute: "UnoccupiedSetback"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -409,7 +409,7 @@ tests:
       attribute: "UnoccupiedSetbackMin"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -419,7 +419,7 @@ tests:
       attribute: "UnoccupiedSetbackMax"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -429,7 +429,7 @@ tests:
       attribute: "EmergencyHeatDelta"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -449,7 +449,7 @@ tests:
       attribute: "ACCapacity"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -479,7 +479,7 @@ tests:
       attribute: "ACErrorCode"
       response:
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "Read ACLouverPosition attribute from the DUT"
       PICS: TSTAT.S.A0045
@@ -497,7 +497,7 @@ tests:
       attribute: "ACCoilTemperature"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32767
 

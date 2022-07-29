@@ -55,7 +55,7 @@ tests:
       response:
           saveAs: MinlevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -95,7 +95,7 @@ tests:
           value: MinlevelValue + 1
           saveAs: CurrentlevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -106,7 +106,7 @@ tests:
       response:
           value: 2
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -157,7 +157,7 @@ tests:
       response:
           value: 66
           constraints:
-              type: uint8
+              type: int8u
 
     - label: "Reads current level attribute from DUT"
       PICS: LVL.S.A0000 && LVL.S.C02.Rsp && !LVL.S.M.VarRate
@@ -166,7 +166,7 @@ tests:
       response:
           value: 66
           constraints:
-              type: uint8
+              type: int8u
 
     - label: "Sends a StepWithOnOff command"
       PICS: LVL.S.C06.Rsp && LVL.S.M.VarRate

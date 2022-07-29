@@ -37,7 +37,7 @@ tests:
       attribute: "TemperatureUnit"
       response:
           constraints:
-              type: uint8
+              type: enum8
 
     - label: "TH writes 0 (Fahrenheit) to TemperatureUnit attribute"
       PICS: LUNIT.C.A0000.Fahrenheit

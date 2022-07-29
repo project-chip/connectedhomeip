@@ -34,7 +34,13 @@ protected:
 
     bool CheckConstraintType(const char * itemName, const char * current, const char * expected)
     {
-        ChipLogError(chipTool, "Warning: %s type checking is not implemented yet. Expected type: '%s'", itemName, expected);
+        if (strcmp(current, expected) != 0)
+        {
+            Exit(std::string(itemName) + " type (" + std::string(current) + ") is different than the expected type (" +
+                 std::string(expected) + ").");
+            return false;
+        }
+
         return true;
     }
 

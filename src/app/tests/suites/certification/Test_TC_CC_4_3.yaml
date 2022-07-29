@@ -19,7 +19,7 @@ config:
     cluster: "Color Control"
     endpoint: 1
     StepSizeConfigValue:
-        type: INT8U
+        type: int8u
         defaultValue: 15
 
 tests:
@@ -55,7 +55,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -90,7 +90,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -124,7 +124,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 

@@ -73,6 +73,7 @@ function atomicType(arg)
   case 'epoch_us':
     return 'uint64_t';
   case 'epoch_s':
+  case 'utc':
     return 'uint32_t';
   default:
     throw 'not overriding';
