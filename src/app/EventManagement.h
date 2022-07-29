@@ -491,11 +491,6 @@ private:
     static CHIP_ERROR CopyEvent(const TLV::TLVReader & aReader, TLV::TLVWriter & aWriter, EventLoadOutContext * apContext);
 
     /**
-     * @brief construct EventStatusIB to target buffer for report
-     */
-    static CHIP_ERROR WriteEventStatusIB(TLV::TLVWriter & aWriter, const ConcreteEventPath & aEvent, StatusIB aStatus);
-
-    /**
      * @brief
      *   A function to get the circular buffer for particular priority
      *
