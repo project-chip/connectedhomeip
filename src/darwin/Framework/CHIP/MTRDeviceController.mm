@@ -405,20 +405,20 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
         chip::Controller::CommissioningParameters params;
         if (commissioningParams.CSRNonce) {
-            params.SetCSRNonce(chip::ByteSpan((uint8_t *) commissioningParams.CSRNonce.bytes, commissioningParams.CSRNonce.length));
+            params.SetCSRNonce(AsByteSpan(commissioningParams.CSRNonce));
         }
         if (commissioningParams.attestationNonce) {
-            params.SetAttestationNonce(chip::ByteSpan(
-                (uint8_t *) commissioningParams.attestationNonce.bytes, commissioningParams.attestationNonce.length));
+            params.SetAttestationNonce(AsByteSpan(commissioningParams.attestationNonce));
         }
         if (commissioningParams.threadOperationalDataset) {
-            params.SetThreadOperationalDataset(chip::ByteSpan((uint8_t *) commissioningParams.threadOperationalDataset.bytes,
-                commissioningParams.threadOperationalDataset.length));
+            params.SetThreadOperationalDataset(AsByteSpan(commissioningParams.threadOperationalDataset));
         }
-        if (commissioningParams.wifiSSID && commissioningParams.wifiCredentials) {
-            chip::ByteSpan ssid((uint8_t *) commissioningParams.wifiSSID.bytes, commissioningParams.wifiSSID.length);
-            chip::ByteSpan credentials(
-                (uint8_t *) commissioningParams.wifiCredentials.bytes, commissioningParams.wifiCredentials.length);
+        if (commissioningParams.wifiSSID) {
+            chip::ByteSpan ssid = AsByteSpan(commissioningParams.wifiSSID);
+            chip::ByteSpan credentials;
+            if (commissioningParams.wifiCredentials != nil) {
+                credentials = AsByteSpan(commissioningParams.wifiCredentials);
+            }
             chip::Controller::WiFiCredentials wifiCreds(ssid, credentials);
             params.SetWiFiCredentials(wifiCreds);
         }

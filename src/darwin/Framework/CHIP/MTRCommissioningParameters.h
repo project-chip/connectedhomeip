@@ -36,15 +36,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable) NSData * attestationNonce;
 /**
- *  The Wi-Fi SSID
+ *  The Wi-Fi SSID, if available.
  */
 @property (nonatomic, copy, nullable) NSData * wifiSSID;
 /**
- *  The Wi-Fi Credentials
+ *  The Wi-Fi Credentials.  Allowed to be nil or 0-length data for an open
+ *  network, as long as wifiSSID is not nil.
  */
 @property (nonatomic, copy, nullable) NSData * wifiCredentials;
 /**
- *  The Thread operational dataset
+ *  The Thread operational dataset, if available.
  */
 @property (nonatomic, copy, nullable) NSData * threadOperationalDataset;
 /**
