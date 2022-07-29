@@ -42,7 +42,7 @@
             /* Endpoint: 1, Cluster: Bridged Actions (server), big-endian */                                                       \
                                                                                                                                    \
             /* 14 - setup url, */                                                                                                  \
-            0, 19, 'h', 't', 't', 'p', 's', ':', '/', '/', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm',                  \
+            19, 0, 'h', 't', 't', 'p', 's', ':', '/', '/', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm',                  \
     }
 
 #else // !BIGENDIAN_CPU
@@ -62,7 +62,7 @@
             /* Endpoint: 1, Cluster: Bridged Actions (server), little-endian */                                                    \
                                                                                                                                    \
             /* 14 - setup url, */                                                                                                  \
-            0, 19, 'h', 't', 't', 'p', 's', ':', '/', '/', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm',                  \
+            19, 0, 'h', 't', 't', 'p', 's', ':', '/', '/', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm',                  \
     }
 
 #endif // BIGENDIAN_CPU
