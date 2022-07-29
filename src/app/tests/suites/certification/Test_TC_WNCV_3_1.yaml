@@ -38,7 +38,7 @@ tests:
     - label:
           "1a: TH sends DownOrClose command to preposition the DUT in the
           opposite direction"
-      PICS: WNCV.S.C01.Rsp
+      PICS: WNCV.S.C01.Rsp && ( WNCV.S.F00 || WNCV.S.F01 )
       command: "DownOrClose"
 
     - label: "1b: TH Waits for 10 seconds movement(s) on the device"
@@ -51,12 +51,10 @@ tests:
 
     ###
     ### Mandatory Depends on the FeatureMap
-    - label:
-          "1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
-          from DUT"
+    - label: "1c: TH reads CurrentPositionLiftPercent100ths attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
+      PICS: WNCV.S.A000e && ( WNCV.S.F00 || WNCV.S.F01 )
       response:
           constraints:
               type: Percent100ths
@@ -65,11 +63,11 @@ tests:
 
     ### Optional Depends on the FeatureMap
     - label:
-          "1d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
-          attribute from DUT"
+          "1d: TH reads CurrentPositionLiftPercentage optional attribute from
+          DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
+      PICS: WNCV.S.A0008 && ( WNCV.S.F00 || WNCV.S.F01 )
       response:
           constraints:
               type: Percent
@@ -77,12 +75,10 @@ tests:
               maxValue: 100
 
     ### Mandatory Depends on the FeatureMap
-    - label:
-          "1e: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
-          from DUT"
+    - label: "1e: TH reads CurrentPositionTiltPercent100ths attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
+      PICS: WNCV.S.A000f && ( WNCV.S.F00 || WNCV.S.F01 )
       response:
           constraints:
               type: Percent100ths
@@ -91,11 +87,11 @@ tests:
 
     ### Optional Depends on the FeatureMap
     - label:
-          "1f: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
-          attribute from DUT"
+          "1f: TH reads CurrentPositionTiltPercentage optional attribute from
+          DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
+      PICS: WNCV.S.A0009 && ( WNCV.S.F00 || WNCV.S.F01 )
       response:
           constraints:
               type: Percent
@@ -117,7 +113,7 @@ tests:
     ### MANDATORY Command
     - label: "2a: TH sends UpOrOpen command to DUT"
       command: "UpOrOpen"
-      PICS: WNCV.S.C00.Rsp
+      PICS: WNCV.S.C00.Rsp && ( WNCV.S.F00 || WNCV.S.F01 )
 
     ### Depending on the DUT specs we might prefer a arguments here
     - label: "2b: DUT updates its attributes"
@@ -129,22 +125,18 @@ tests:
                 value: 100
 
     ### Mandatory Depends on the FeatureMap
-    - label:
-          "2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
-          from DUT"
+    - label: "2c: TH reads TargetPositionLiftPercent100ths attribute from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
+      PICS: WNCV.S.A000b && ( WNCV.S.F00 || WNCV.S.F01 )
       response:
           value: 0
 
     ### Mandatory Depends on the FeatureMap
-    - label:
-          "2d: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
-          from DUT"
+    - label: "2d: TH reads TargetPositionTiltPercent100ths attribute from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
+      PICS: WNCV.S.A000c && ( WNCV.S.F00 || WNCV.S.F01 )
       response:
           value: 0
 
@@ -166,7 +158,7 @@ tests:
           UpOrOpen"
       command: "waitForReport"
       attribute: "OperationalStatus"
-      PICS: WNCV.S.A000a
+      PICS: WNCV.S.A000a && ( WNCV.S.F00 || WNCV.S.F01 )
       response:
           constraints:
               type: bitmap8
@@ -183,12 +175,10 @@ tests:
                 value: 2000
 
     ### Mandatory Depends on the FeatureMap
-    - label:
-          "3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
-          from DUT"
+    - label: "3b: TH reads CurrentPositionLiftPercent100ths attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
+      PICS: WNCV.S.A000e && ( WNCV.S.F00 || WNCV.S.F01 )
       response:
           constraints:
               type: Percent100ths
@@ -197,11 +187,11 @@ tests:
 
     ### Optional Depends on the FeatureMap
     - label:
-          "3c: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
-          attribute from DUT"
+          "3c: TH reads CurrentPositionLiftPercentage optional attribute from
+          DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
+      PICS: WNCV.S.A0008 && ( WNCV.S.F00 || WNCV.S.F01 )
       response:
           constraints:
               type: Percent
@@ -209,12 +199,10 @@ tests:
               maxValue: 99
 
     ### Mandatory Depends on the FeatureMap
-    - label:
-          "3d: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
-          from DUT"
+    - label: "3d: TH reads CurrentPositionTiltPercent100ths attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
+      PICS: WNCV.S.A000f && ( WNCV.S.F00 || WNCV.S.F01 )
       response:
           constraints:
               type: Percent100ths
@@ -223,11 +211,11 @@ tests:
 
     ### Optional Depends on the FeatureMap
     - label:
-          "3e: If (PA & LF) TH reads CurrentPositionTiltPercentage optional
-          attribute from DUT"
+          "3e: TH reads CurrentPositionTiltPercentage optional attribute from
+          DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
+      PICS: WNCV.S.A0009 && ( WNCV.S.F00 || WNCV.S.F01 )
       response:
           constraints:
               type: Percent
@@ -239,7 +227,7 @@ tests:
     ### MANDATORY Command
     - label: "4a: TH sends a StopMotion command to DUT"
       command: "StopMotion"
-      PICS: WNCV.S.C02.Rsp
+      PICS: WNCV.S.C02.Rsp && ( WNCV.S.F00 || WNCV.S.F01 )
 
     - label:
           "4b: TH waits for 3 seconds the end of inertial movement(s) on the
@@ -258,7 +246,7 @@ tests:
           StopMotion"
       command: "readAttribute"
       attribute: "OperationalStatus"
-      PICS: WNCV.S.A000a
+      PICS: WNCV.S.A000a && ( WNCV.S.F00 || WNCV.S.F01 )
       response:
           value: 0
 
@@ -272,12 +260,10 @@ tests:
                 value: 1000
 
     ### Mandatory Depends on the FeatureMap shall be tested as equals CurrentPositionLiftPercent100ths
-    - label:
-          "5b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
-          from DUT"
+    - label: "5b: TH reads TargetPositionLiftPercent100ths attribute from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
+      PICS: WNCV.S.A000b && ( WNCV.S.F00 || WNCV.S.F01 )
       response:
           constraints:
               type: Percent100ths
@@ -285,12 +271,10 @@ tests:
               maxValue: 9999
 
     ### Mandatory Depends on the FeatureMap shall be tested as equals CurrentPositionTiltPercent100ths
-    - label:
-          "5c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
-          from DUT"
+    - label: "5c: TH reads TargetPositionTiltPercent100ths attribute from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
+      PICS: WNCV.S.A000c && ( WNCV.S.F00 || WNCV.S.F01 )
       response:
           constraints:
               type: Percent100ths
