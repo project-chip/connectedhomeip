@@ -43,7 +43,7 @@ tests:
       attribute: "RebootCount"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -99,7 +99,7 @@ tests:
       attribute: "UpTime"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label: "TH reads a TotalOperationalHours attribute value from DUT."
       PICS: DGGEN.S.A0003
@@ -107,7 +107,7 @@ tests:
       attribute: "TotalOperationalHours"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFE
 

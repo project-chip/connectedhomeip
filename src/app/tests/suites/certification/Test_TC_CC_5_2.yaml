@@ -19,10 +19,10 @@ config:
     cluster: "Color Control"
     endpoint: 1
     RateXValue:
-        type: INT16S
+        type: int16s
         defaultValue: 50
     RateYValue:
-        type: INT16S
+        type: int16s
         defaultValue: 50
 
 tests:
@@ -59,7 +59,7 @@ tests:
       response:
           saveAs: CurrentXValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -70,7 +70,7 @@ tests:
       response:
           saveAs: CurrentYValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -103,7 +103,7 @@ tests:
       response:
           saveAs: CurrentXBeforeStopCommand
           constraints:
-              type: uint16
+              type: int16u
               minValue: CurrentXValue
               maxValue: 65279
 
@@ -114,7 +114,7 @@ tests:
       response:
           saveAs: CurrentYBeforeStopCommand
           constraints:
-              type: uint16
+              type: int16u
               minValue: CurrentYValue
               maxValue: 65279
 
@@ -134,7 +134,7 @@ tests:
       attribute: "CurrentX"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: CurrentXBeforeStopCommand
               maxValue: 65279
 
@@ -144,7 +144,7 @@ tests:
       attribute: "CurrentY"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: CurrentYBeforeStopCommand
               maxValue: 65279
 

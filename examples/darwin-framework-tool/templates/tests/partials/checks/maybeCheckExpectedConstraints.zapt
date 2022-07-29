@@ -8,7 +8,7 @@
         if ({{>actualValue}} != nil) {
     {{/if}}
 
-    {{#if (hasProperty expectedConstraints "type")}}VerifyOrReturn(CheckConstraintType("{{>item}}", "", "{{expectedConstraints.type}}"));{{/if}}
+    {{#if (hasProperty expectedConstraints "type")}}VerifyOrReturn(CheckConstraintType("{{>item}}", "{{asTestType type isArray}}", "{{expectedConstraints.type}}"));{{/if}}
 
     {{~#if (hasProperty expectedConstraints "format")}}VerifyOrReturn(CheckConstraintFormat("{{>item}}", "", "{{expectedConstraints.format}}"));{{/if}}
 

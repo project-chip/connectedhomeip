@@ -54,7 +54,7 @@ tests:
       response:
           saveAs: ColorTempPhysicalMinMiredsValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -65,7 +65,7 @@ tests:
       response:
           saveAs: ColorTempPhysicalMaxMiredsValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -75,7 +75,7 @@ tests:
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -111,7 +111,7 @@ tests:
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -129,7 +129,7 @@ tests:
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -147,7 +147,7 @@ tests:
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -183,7 +183,7 @@ tests:
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -201,7 +201,7 @@ tests:
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -219,7 +219,7 @@ tests:
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -274,7 +274,7 @@ tests:
       response:
           saveAs: ColorTemperatureValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -293,7 +293,7 @@ tests:
       response:
           value: ColorTemperatureValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -312,7 +312,7 @@ tests:
       response:
           value: ColorTemperatureValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -367,7 +367,7 @@ tests:
       response:
           saveAs: ColorTemperatureMoveModeStop
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -386,7 +386,7 @@ tests:
       response:
           value: ColorTemperatureMoveModeStop
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
@@ -405,7 +405,7 @@ tests:
       response:
           value: ColorTemperatureValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 

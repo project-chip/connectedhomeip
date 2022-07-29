@@ -6281,7 +6281,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("TrustedRootCertificates", 1, value);
         }
         case OperationalCredentials::Attributes::CurrentFabricIndex::Id: {
-            chip::FabricIndex value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentFabricIndex", 1, value);
         }
@@ -8714,7 +8714,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("VendorName", 1, value);
         }
         case ApplicationBasic::Attributes::VendorID::Id: {
-            uint16_t value;
+            chip::VendorId value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("VendorID", 1, value);
         }

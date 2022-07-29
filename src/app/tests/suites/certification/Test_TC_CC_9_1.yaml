@@ -237,7 +237,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep5d
               maxValue: 65535
 
@@ -255,7 +255,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep5d
               maxValue: 65535
 
@@ -382,7 +382,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep8d
               maxValue: 65535
 
@@ -400,7 +400,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep8d
               maxValue: 65535
 
@@ -558,7 +558,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep12d
               maxValue: 65535
 
@@ -576,7 +576,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep12d
               maxValue: 65535
 
@@ -703,7 +703,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep15d
               maxValue: 65535
 
@@ -721,7 +721,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep15d
               maxValue: 65535
 

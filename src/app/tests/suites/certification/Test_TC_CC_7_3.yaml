@@ -19,7 +19,7 @@ config:
     cluster: "Color Control"
     endpoint: 1
     StepSizeConfigValue:
-        type: INT16U
+        type: int16u
         defaultValue: 50
 
 tests:
@@ -55,7 +55,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -89,7 +89,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -123,7 +123,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 

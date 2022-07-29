@@ -130,6 +130,19 @@ async function structs_with_cluster_name(options)
   return templateUtil.collectBlocks(blocks, options, this);
 }
 
+async function assertSameTestType(current, expected)
+{
+  if (current == expected) {
+    return '';
+  }
+
+  const filename = this.parent.parent.parent.filename;
+  const testName = this.parent.parent.parent.testName;
+  const error = `\nFile: ${filename}\nTest: ${testName}\nCluster ${this.parent.cluster} Attribute: ${this.name}: Constraint type "${
+      expected}" does not match the current type "${current}".`;
+  throw error;
+}
+
 //
 // Module exports
 //
@@ -137,3 +150,4 @@ exports.asDelimitedCommand        = asDelimitedCommand;
 exports.asTypeMinValue            = asTypeMinValue;
 exports.asTypeMaxValue            = asTypeMaxValue;
 exports.structs_with_cluster_name = structs_with_cluster_name;
+exports.assertSameTestType        = assertSameTestType;
