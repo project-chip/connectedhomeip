@@ -19,6 +19,18 @@ NS_ASSUME_NONNULL_BEGIN
   return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+  auto other = [[MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params alloc] init];
+
+  {{#zcl_command_arguments}}
+  other.{{asStructPropertyName label}} = self.{{asStructPropertyName label}};
+  {{/zcl_command_arguments}}
+  other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+  return other;
+}
+
 - (NSString *)description
 {
   NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_command_arguments}}{{asStructPropertyName label}}:%@; {{/zcl_command_arguments}}>", NSStringFromClass([self class]) {{#zcl_command_arguments}},{{#if isArray}}_{{asStructPropertyName label}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName label}}{{/if}}{{/zcl_command_arguments}}];
