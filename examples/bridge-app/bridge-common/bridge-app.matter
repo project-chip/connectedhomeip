@@ -1423,6 +1423,17 @@ server cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+server cluster TemperatureMeasurement = 1026 {
+  readonly attribute nullable int16s measuredValue = 0;
+  readonly attribute nullable int16s minMeasuredValue = 1;
+  readonly attribute nullable int16s maxMeasuredValue = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 endpoint 0 {
   device type bridge = 22;
   binding cluster AccessControl;
@@ -1793,6 +1804,17 @@ endpoint 2 {
     ram      attribute multiPressMax default = 2;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TemperatureMeasurement {
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue default = 0x954D;
+    callback attribute maxMeasuredValue default = 0x7FFF;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision default = 1;
   }
 }
 
