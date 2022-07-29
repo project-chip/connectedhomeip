@@ -286,8 +286,8 @@ the ESP32 all-clusters-minimal-app to commission it onto a Wi-Fi network:
 
 Parameters:
 
-1. Discriminator: 3840 (configurable through menuconfig)
-2. Setup-pin-code: 20202021 (configurable through menuconfig)
+1. Discriminator: 3840
+2. Setup-pin-code: 20202021
 3. Node-id: 12344321 (you can assign any node id)
 
 ### Cluster control
