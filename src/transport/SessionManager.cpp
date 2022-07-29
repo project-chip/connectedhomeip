@@ -346,6 +346,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         chip::Inet::InterfaceIterator interfaceIt;
         chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
         chip::Inet::IPAddress addr;
+        bool interfaceFound = false;
 
         while (interfaceIt.Next())
         {
@@ -359,6 +360,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
                     char address_string[255];
                     addr.ToString(address_string, 255);
                     ChipLogDetail(Inet, "Interface %s has a link local address : %s", name, address_string);
+
+                    interfaceFound = true;
 
                     multicastAddress.GetIPAddress().ToString(address_string, 255);
                     destination = &(multicastAddress.SetInterface(interfaceId));
@@ -378,19 +381,17 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
             }
         }
 
-        // Always return No error, because we expect some interface to fails and others to always succeed (e.g. lo interface)
-        return CHIP_NO_ERROR;
-    }
-    else
-    {
-#endif // CHIP_SYSTEM_CONFIG_MULTICAST_HOMING
-        if (mTransportMgr != nullptr)
+        if (!interfaceFound)
         {
-            CHIP_TRACE_PREPARED_MESSAGE_SENT(destination, &msgBuf);
-            return mTransportMgr->SendMessage(*destination, std::move(msgBuf));
+            ChipLogError(Inet, "No valid Interface found.. Sending to the default one.. ");
         }
-#if CHIP_SYSTEM_CONFIG_MULTICAST_HOMING
+        else
+        {
+            // Always return No error, because we expect some interface to fails and others to always succeed (e.g. lo interface)
+            return CHIP_NO_ERROR;
+        }
     }
+
 #endif // CHIP_SYSTEM_CONFIG_MULTICAST_HOMING
 
     if (mTransportMgr != nullptr)
