@@ -2790,9 +2790,9 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage(nlTestSuite * apSu
         ctx.DrainAndServiceIO();
 
         // TODO: Need to validate what status is being sent to the ReadHandler
-        // since we synthesized the StatusResponse to the ReadClient, instead of sending it from the ReadHandler,
-        // the ReadHandler's exchange is still open. The ReadClient responds to the unexpected message with a StatusResponse,
-        // and then the ReadHandler also responds to the unexpected message it gets with a ACK.
+        // The ReadHandler closed its exchange when it sent the Report Data (which we dropped).
+        // Since we synthesized the StatusResponse to the ReadClient, instead of sending it from the ReadHandler,
+        // the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP ack.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_IM_GLOBAL_STATUS(Busy));
     }
@@ -2877,9 +2877,10 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse(nlTest
         ctx.DrainAndServiceIO();
 
         // TODO: Need to validate what status is being sent to the ReadHandler
-        // since we synthesized the StatusResponse to the ReadClient, instead of sending it from the ReadHandler,
-        // the ReadHandler's exchange is still open. The ReadClient responds to the unexpected message with a StatusResponse,
-        // and then the ReadHandler also responds to the unexpected message it gets with a ACK.
+        // The ReadHandler's exchange is still open when we synthesize the StatusResponse.
+        // Since we synthesized the StatusResponse to the ReadClient, instead of sending it from the ReadHandler,
+        // the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP ack.
+        // The ReadHandler should have sent a StatusResponse too, but it's buggy and does not do that.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_IM_GLOBAL_STATUS(Busy));
@@ -2966,9 +2967,10 @@ void TestReadInteraction::TestSubscribeClientReceiveWellFormedStatusResponse(nlT
         ctx.DrainAndServiceIO();
 
         // TODO: Need to validate what status is being sent to the ReadHandler
-        // since we synthesized the StatusResponse to the ReadClient, instead of sending it from the ReadHandler,
-        // the ReadHandler's exchange is still open. The ReadClient responds to the unexpected message with a StatusResponse,
-        // and then the ReadHandler also responds to the unexpected message it gets with a ACK.
+        // The ReadHandler's exchange is still open when we synthesize the StatusResponse.
+        // Since we synthesized the StatusResponse to the ReadClient, instead of sending it from the ReadHandler,
+        // the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP ack.
+        // The ReadHandler should have sent a StatusResponse too, but it's buggy and does not do that.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_ERROR_INVALID_MESSAGE_TYPE);
@@ -3054,9 +3056,10 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidReportMessage(nlTestS
         ctx.DrainAndServiceIO();
 
         // TODO: Need to validate what status is being sent to the ReadHandler
-        // since we synthesized the invalid report data to the ReadClient, instead of sending it from the ReadHandler,
-        // the ReadHandler's exchange is still open. The ReadClient responds to the invalid report message with a StatusResponse,
-        // and then the ReadHandler also responds to the unexpected message it gets with a ACK.
+        // The ReadHandler's exchange is still open when we synthesize the ReportData.
+        // Since we synthesized the ReportData to the ReadClient, instead of sending it from the ReadHandler,
+        // the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP ack.
+        // The ReadHandler should have sent a StatusResponse too, but it's buggy and does not do that.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_ERROR_END_OF_TLV);
@@ -3134,7 +3137,10 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedInvalidReportMess
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
 
-        // client recevies report data and sends out status report with invalid action, server sends out ack
+        // The server sends a data report.
+        // The client receives the data report data and sends out status report with invalid action.
+        // The server should respond with a status report of its own, leading to 4 messages (because
+        // the client would ack the server's status report), but it's buggy and just sends an ack to the status report it got.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 3);
     }
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
