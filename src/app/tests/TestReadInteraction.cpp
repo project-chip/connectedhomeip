@@ -2773,7 +2773,7 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage(nlTestSuite * apSu
         writer.Init(std::move(msgBuf));
         StatusResponseMessage::Builder response;
         response.Init(&writer);
-        response.Status(Protocols::InteractionModel::Status::InvalidAction);
+        response.Status(Protocols::InteractionModel::Status::Busy);
         NL_TEST_ASSERT(apSuite, writer.Finalize(&msgBuf) == CHIP_NO_ERROR);
         PayloadHeader payloadHeader;
         payloadHeader.SetExchangeID(0);
@@ -2792,12 +2792,11 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage(nlTestSuite * apSu
         // TODO: Need to validate what status is being sent to the ReadHandler
         // since we synthesized the StatusResponse to the ReadClient, instead of sending it from the ReadHandler,
         // the ReadHandler's exchange is still open. The ReadClient responds to the unexpected message with a StatusResponse,
-        // and then the ReadHandler also responds to the unexpected message it gets with a StatusResponse.
+        // and then the ReadHandler also responds to the unexpected message it gets with a ACK.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
         NL_TEST_ASSERT(
             apSuite,
-            delegate.mError ==
-                ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(Protocols::InteractionModel::Status::InvalidAction)));
+            delegate.mError == CHIP_IM_GLOBAL_STATUS(Busy));
     }
 
     engine->Shutdown();
@@ -2858,7 +2857,7 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse(nlTest
         writer.Init(std::move(msgBuf));
         StatusResponseMessage::Builder response;
         response.Init(&writer);
-        response.Status(Protocols::InteractionModel::Status::InvalidAction);
+        response.Status(Protocols::InteractionModel::Status::Busy);
         NL_TEST_ASSERT(apSuite, writer.Finalize(&msgBuf) == CHIP_NO_ERROR);
         PayloadHeader payloadHeader;
         payloadHeader.SetExchangeID(0);
@@ -2882,13 +2881,12 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse(nlTest
         // TODO: Need to validate what status is being sent to the ReadHandler
         // since we synthesized the StatusResponse to the ReadClient, instead of sending it from the ReadHandler,
         // the ReadHandler's exchange is still open. The ReadClient responds to the unexpected message with a StatusResponse,
-        // and then the ReadHandler also responds to the unexpected message it gets with a StatusResponse.
+        // and then the ReadHandler also responds to the unexpected message it gets with a ACK.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
         NL_TEST_ASSERT(
             apSuite,
-            delegate.mError ==
-                ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(Protocols::InteractionModel::Status::InvalidAction)));
+            delegate.mError == CHIP_IM_GLOBAL_STATUS(Busy));
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 0);
     }
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
@@ -2974,7 +2972,7 @@ void TestReadInteraction::TestSubscribeClientReceiveWellFormedStatusResponse(nlT
         // TODO: Need to validate what status is being sent to the ReadHandler
         // since we synthesized the StatusResponse to the ReadClient, instead of sending it from the ReadHandler,
         // the ReadHandler's exchange is still open. The ReadClient responds to the unexpected message with a StatusResponse,
-        // and then the ReadHandler also responds to the unexpected message it gets with a StatusResponse.
+        // and then the ReadHandler also responds to the unexpected message it gets with a ACK.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_ERROR_INVALID_MESSAGE_TYPE);
@@ -3062,7 +3060,7 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidReportMessage(nlTestS
         // TODO: Need to validate what status is being sent to the ReadHandler
         // since we synthesized the invalid report data to the ReadClient, instead of sending it from the ReadHandler,
         // the ReadHandler's exchange is still open. The ReadClient responds to the invalid report message with a StatusResponse,
-        // and then the ReadHandler also responds to the unexpected message it gets with a StatusResponse.
+        // and then the ReadHandler also responds to the unexpected message it gets with a ACK.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_ERROR_END_OF_TLV);
@@ -3111,12 +3109,14 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedInvalidReportMess
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
 
     {
+        ctx.GetLoopback().mSentMessageCount = 0;
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 5);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
@@ -3135,7 +3135,6 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedInvalidReportMess
         delegate.mpReadHandler->mExchangeCtx.Grab(exchange);
         err = delegate.mpReadHandler->mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(msgBuf),
                                                                 Messaging::SendMessageFlags::kExpectResponse);
-        delegate.mpReadHandler->mExchangeCtx.Grab(exchange);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
 
