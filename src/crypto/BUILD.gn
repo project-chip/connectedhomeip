@@ -31,7 +31,8 @@ if (chip_crypto == "") {
 
 assert(
     chip_crypto == "mbedtls" || chip_crypto == "openssl" ||
-        chip_crypto == "tinycrypt" || chip_crypto == "boringssl" || chip_crypto == "platform",
+        chip_crypto == "tinycrypt" || chip_crypto == "boringssl" ||
+        chip_crypto == "platform",
     "Please select a valid crypto implementation: mbedtls, openssl, tinycrypt, boringssl, platform")
 
 buildconfig_header("crypto_buildconfig") {
