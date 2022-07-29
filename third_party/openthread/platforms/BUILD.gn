@@ -41,7 +41,6 @@ source_set("libopenthread-platform") {
 }
 
 static_library("libopenthread-platform-utils") {
-  print("I SHOULDN'T BE HERE")
   sources = [
     "${openthread_root}/examples/platforms/utils/code_utils.h",
     "${openthread_root}/examples/platforms/utils/debug_uart.c",

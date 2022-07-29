@@ -54,7 +54,7 @@
 extern "C" {
 #endif
 
-void efr32LogInit(void);
+void efr32InitLog(void);
 
 void efr32Log(const char * aFormat, ...);
 #define EFR32_LOG(...) efr32Log(__VA_ARGS__);

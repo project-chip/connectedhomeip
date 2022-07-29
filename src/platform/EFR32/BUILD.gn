@@ -17,7 +17,6 @@ import("//build_overrides/pigweed.gni")
 import("//build_overrides/efr32_sdk.gni")
 
 import("${chip_root}/src/platform/device.gni")
-import("${efr32_sdk_build_root}/ot-efr32-libs.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
@@ -100,19 +99,12 @@ static_library("EFR32") {
     "$dir_pw_kvs",
   ]
   if (chip_enable_openthread) {
-    if (use_thread_cert_lib){
-       public_deps +=
-            [ "${efr32_sdk_build_root}:ot-efr32-cert" ]
-    } else {
-      print("SHOULD NOT BE HERE IN src/platform/EFR32/build.gn")
+    public_deps += [ 
+      "${chip_root}/src/platform:ot_device_deps",
+    ]
+    
+    if (chip_use_ot_lib == false){
       public_deps += [ "${chip_root}/third_party/openthread/platforms:openthread_system"]
-      if (chip_openthread_ftd) {
-        public_deps +=
-            [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
-      } else {
-        public_deps +=
-            [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
-      }
     }
 
     sources += [

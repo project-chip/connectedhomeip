@@ -15,8 +15,8 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
-import("${efr32_sdk_build_root}/ot-efr32-libs.gni")
 
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
@@ -45,24 +45,18 @@ source_set("openthread_core_config_efr32_chip_examples") {
 
   public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
 
-  if (use_thread_cert_lib)
+  if (chip_use_ot_lib == true)
   {
-    print("openthread_core_config_efr32_chip_examples cert")
-    public_deps += [    #TOFIX
+    public_deps += [
       "${chip_root}/third_party/silabs:openthread_core_config_efr32",
     ]
   }
   else
   {
-    print("openthread_core_config_efr32_chip_examples not cert")
     public_deps += [
       "${chip_root}/third_party/openthread/platforms/efr32:openthread_core_config_efr32",
     ]
   }
-
-  defines = [  
-    "OPENTHREAD_PROJECT_CORE_CONFIG_FILE=\"OpenThreadConfig.h\"", 
-  ]
 
   public_configs = [ ":chip_examples_project_config" ]
 }

@@ -151,7 +151,7 @@ else
                 shift
                 ;;
             --use_ot_lib)
-                optArgs+="use_thread_cert_lib=true openthread_external_platform=\"""\" "
+                optArgs+="chip_use_ot_lib=true openthread_external_platform=\"""\" "
                 shift
                 ;;
             *)
