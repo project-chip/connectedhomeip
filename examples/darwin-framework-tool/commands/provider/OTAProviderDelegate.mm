@@ -25,6 +25,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
 @property NSString * mOTAFilePath;
 @property NSFileHandle * mFileHandle;
 @property NSNumber * mFileOffset;
+@property NSNumber * mFileEndOffset;
 @property DeviceSoftwareVersionModel * candidate;
 @end
 
@@ -144,8 +145,19 @@ constexpr uint8_t kUpdateTokenLen = 32;
         return;
     }
 
+    uint64_t endOffset;
+    if (![handle seekToEndReturningOffset:&endOffset error:&seekError]) {
+        auto errorString = [NSString stringWithFormat:@"Error seeking file (%@) to end offset", fileDesignator];
+        auto error = [[NSError alloc] initWithDomain:@"OTAProviderDomain"
+                                                code:MTRErrorCodeGeneralError
+                                            userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(errorString, nil) }];
+        completionHandler(error);
+        return;
+    }
+
     _mFileHandle = handle;
     _mFileOffset = offset;
+    _mFileEndOffset = @(endOffset);
     completionHandler(nil);
 }
 
@@ -154,6 +166,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
     NSLog(@"BDX TransferSession end with error: %@", error);
     _mFileHandle = nil;
     _mFileOffset = nil;
+    _mFileEndOffset = nil;
 }
 
 - (void)handleBDXQuery:(NSNumber * _Nonnull)blockSize
@@ -173,8 +186,15 @@ constexpr uint8_t kUpdateTokenLen = 32;
         return;
     }
 
-    NSData * data = [_mFileHandle readDataOfLength:[blockSize unsignedLongValue]];
-    completionHandler(data, [[_mFileHandle availableData] length] == 0);
+    NSData * data = [_mFileHandle readDataUpToLength:[blockSize unsignedLongValue] error:&error];
+    if (error != nil) {
+        NSLog(@"Error reading file %@", _mFileHandle);
+        completionHandler(nil, NO);
+        return;
+    }
+
+    BOOL isEOF = offset + [blockSize unsignedLongValue] >= [_mFileEndOffset unsignedLongLongValue];
+    completionHandler(data, isEOF);
 }
 
 - (void)SetOTAFilePath:(const char *)path
