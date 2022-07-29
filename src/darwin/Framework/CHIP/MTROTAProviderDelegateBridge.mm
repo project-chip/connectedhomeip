@@ -276,9 +276,9 @@ private:
             return;
         }
 
+        Responder::ResetTransfer();
         mFabricIndex.ClearValue();
         mNodeId.ClearValue();
-        mTransfer.Reset();
 
         if (mExchangeCtx != nullptr) {
             mExchangeCtx->Close();
