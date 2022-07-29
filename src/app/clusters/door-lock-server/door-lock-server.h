@@ -348,6 +348,9 @@ private:
 
     bool RemoteOperationEnabled(chip::EndpointId endpointId) const;
 
+    static CHIP_ERROR sendClusterResponse(chip::app::CommandHandler * commandObj,
+                                          const chip::app::ConcreteCommandPath & commandPath, EmberAfStatus status);
+
     /**
      * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands
      *
