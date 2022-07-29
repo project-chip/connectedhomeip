@@ -1,5 +1,5 @@
 {
-  "featureLevel": 76,
+  "featureLevel": 77,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -7389,7 +7389,7 @@
               "side": "server",
               "type": "int16s",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x954D",
@@ -7405,7 +7405,7 @@
               "side": "server",
               "type": "int16s",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x7FFF",
@@ -7485,7 +7485,7 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
@@ -7501,7 +7501,7 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
