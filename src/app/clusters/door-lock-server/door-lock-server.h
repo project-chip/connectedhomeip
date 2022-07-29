@@ -64,6 +64,12 @@ static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
 struct EmberAfPluginDoorLockCredentialInfo;
 struct EmberAfPluginDoorLockUserInfo;
 
+struct EmberAfDoorLockEndpointContext
+{
+    chip::System::Clock::Timestamp lockoutEndTimestamp;
+    int wrongCodeEntryAttempts;
+};
+
 /**
  * @brief Door Lock Server Plugin class.
  */
@@ -107,6 +113,8 @@ public:
 
     bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
     bool SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled);
+
+    bool EngageLockout(chip::EndpointId endpointId);
 
     bool GetAutoRelockTime(chip::EndpointId endpointId, uint32_t & autoRelockTime);
     bool GetNumberOfUserSupported(chip::EndpointId endpointId, uint16_t & numberOfUsersSupported);
@@ -343,6 +351,8 @@ private:
 
     bool RemoteOperationEnabled(chip::EndpointId endpointId) const;
 
+    EmberAfDoorLockEndpointContext *getContext(chip::EndpointId endpointId);
+
     /**
      * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands
      *
@@ -504,6 +514,8 @@ private:
         const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData);
 
     EmberEventControl AutolockEvent; /**< for automatic relock scheduling */
+
+    std::array<EmberAfDoorLockEndpointContext, EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT> mEndpointCtx;
 
     static DoorLockServer instance;
 };

@@ -362,6 +362,9 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
                 lockStateToString(lockState), mEndpointId);
 
             mLockState = lockState;
+
+            DoorLockServer::Instance().SetLockState(mEndpointId, mLockState, DlOperationSource::kRemote);
+
             return true;
         }
     }
