@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDeviceControllerStartupParams ()
 // We want to be able to write to operationalCertificate in
 // MTRDeviceControllerStartupParamsInternal.
-@property (strong, nonatomic, nullable) NSData * operationalCertificate;
+@property (nonatomic, copy, nullable) NSData * operationalCertificate;
 
 // Init method that just copies the values of all our ivars.
 - (instancetype)initWithParams:(MTRDeviceControllerStartupParams *)params;
@@ -45,14 +45,14 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDeviceControllerStartupParamsInternal : MTRDeviceControllerStartupParams
 
 // Fabric table we can use to do things like allocate operational keys.
-@property (nonatomic, readonly) chip::FabricTable * fabricTable;
+@property (nonatomic, assign, readonly) chip::FabricTable * fabricTable;
 
 // Fabric index we're starting on.  Only has a value when starting on an
 // existing fabric.
-@property (nonatomic, readonly) chip::Optional<chip::FabricIndex> fabricIndex;
+@property (nonatomic, assign, readonly) chip::Optional<chip::FabricIndex> fabricIndex;
 
 // Key store we're using with our fabric table, for sanity checks.
-@property (nonatomic, readonly) chip::Crypto::OperationalKeystore * keystore;
+@property (nonatomic, assign, readonly) chip::Crypto::OperationalKeystore * keystore;
 
 /**
  * Helper method that checks that our keypairs match our certificates.
