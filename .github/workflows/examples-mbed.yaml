@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-mbed-os:0.5.84
+            image: connectedhomeip/chip-build-mbed-os:0.5.91
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -150,7 +150,7 @@ jobs:
                     mbed $APP_TARGET+$APP_PROFILE shell \
                     examples/ota-requestor-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-ota-requestor-app-example.elf \
                     /tmp/bloat_reports/
-            
+
             - name: Build unit tests
               # Temporarily disable build due to running out of flash space
               if: false

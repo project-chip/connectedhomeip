@@ -476,7 +476,6 @@ CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter, jobject con
     // supported clusters so that ZAP will generated the requisite code.
     ChipLogDetail(DeviceLayer, "TV App: Disabling Fixed Content App Endpoints");
     emberAfEndpointEnableDisable(3, false);
-
     return CHIP_NO_ERROR;
 }
 

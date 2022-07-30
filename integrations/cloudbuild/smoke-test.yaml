@@ -1,5 +1,5 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.5.84"
+    - name: "connectedhomeip/chip-build-vscode:0.5.91"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -12,7 +12,7 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.84"
+    - name: "connectedhomeip/chip-build-vscode:0.5.91"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -28,7 +28,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.84"
+    - name: "connectedhomeip/chip-build-vscode:0.5.91"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -45,7 +45,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.84"
+    - name: "connectedhomeip/chip-build-vscode:0.5.91"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -62,7 +62,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.84"
+    - name: "connectedhomeip/chip-build-vscode:0.5.91"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -79,7 +79,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.84"
+    - name: "connectedhomeip/chip-build-vscode:0.5.91"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
