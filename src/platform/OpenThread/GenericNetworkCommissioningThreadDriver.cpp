@@ -177,16 +177,9 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
 
 void GenericThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
 {
-    CHIP_ERROR err = DeviceLayer::ThreadStackMgrImpl().StartThreadScan(callback);
-    if (err != CHIP_NO_ERROR)
+    if (DeviceLayer::ThreadStackMgrImpl().StartThreadScan(callback) != CHIP_NO_ERROR)
     {
-        mScanStatus.SetValue(Status::kUnknownError);
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
-    }
-    else
-    {
-        // OpenThread's "scan" will always success once started, so we can set the value of scan result here.
-        mScanStatus.SetValue(Status::kSuccess);
     }
 }
 

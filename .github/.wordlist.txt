@@ -44,6 +44,7 @@ aef
 AES
 algs
 alloc
+AlarmCode
 Ameba
 amebad
 amebaiot
@@ -181,6 +182,7 @@ CatalogVendorId
 CBB
 cbd
 CBOR
+Ccache
 ccf
 CCMP
 CCS
@@ -422,6 +424,7 @@ Dockerfile
 Dockerfiles
 Don'ts
 DoorLock
+DoorState
 doru
 DOTBR
 DOVERLAY

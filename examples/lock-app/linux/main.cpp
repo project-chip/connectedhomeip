@@ -20,6 +20,9 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
+#include "LockAppCommandDelegate.h"
+#include "LockManager.h"
+
 using namespace chip;
 using namespace chip::app;
 
@@ -51,11 +54,23 @@ void InitNetworkCommissioning() {}
 
 #endif // (CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_THREAD) || CHIP_DEVICE_CONFIG_ENABLE_WPA
 
+// Variables for handling named pipe commands
+constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_lock_app_fifo-";
+NamedPipeCommands sChipNamedPipeCommands;
+LockAppCommandDelegate sLockAppCommandDelegate;
+
 } // anonymous namespace
 
 void ApplicationInit()
 {
     InitNetworkCommissioning();
+
+    auto path = kChipEventFifoPathPrefix + std::to_string(getpid());
+    if (sChipNamedPipeCommands.Start(path, &sLockAppCommandDelegate) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
+        sChipNamedPipeCommands.Stop();
+    }
 }
 
 int main(int argc, char * argv[])

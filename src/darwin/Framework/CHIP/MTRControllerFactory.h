@@ -25,6 +25,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTRPersistentStorageDelegate;
+@protocol MTROTAProviderDelegate;
 @protocol MTRKeypair;
 
 @class MTRDeviceController;
@@ -36,23 +37,30 @@ NS_ASSUME_NONNULL_BEGIN
  * controllers.  It is used to store persistent information for the fabrics the
  * controllers ends up interacting with.
  */
-@property (strong, nonatomic, readonly) id<MTRPersistentStorageDelegate> storageDelegate;
+@property (nonatomic, strong, readonly) id<MTRPersistentStorageDelegate> storageDelegate;
+
+/*
+ * OTA Provider delegate to be called when an OTA Requestor is requesting a software update.
+ * Defaults to nil.
+ */
+@property (nonatomic, strong, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
+
 /*
  * The Product Attestation Authority certificates that are trusted to sign
  * device attestation information.  Defaults to nil.
  *
  */
-@property (strong, nonatomic, nullable) NSArray<NSData *> * paaCerts;
+@property (nonatomic, copy, nullable) NSArray<NSData *> * paaCerts;
 /*
  * The network port to bind to.  If not specified, an ephemeral port will be
  * used.
  */
-@property (strong, nonatomic, nullable) NSNumber * port;
+@property (nonatomic, copy, nullable) NSNumber * port;
 /*
  * Whether to run a server capable of accepting incoming CASE
  * connections.  Defaults to NO.
  */
-@property (nonatomic) BOOL startServer;
+@property (nonatomic, assign) BOOL startServer;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithStorage:(id<MTRPersistentStorageDelegate>)storageDelegate;

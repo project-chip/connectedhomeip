@@ -146,17 +146,104 @@ tests:
       response:
           error: FAILURE
 
-    # Clean-up
     - label: "Set OperatingMode to Normal"
       command: "writeAttribute"
       attribute: "OperatingMode"
       arguments:
           value: 0
 
-    - label: "Clean the created credential"
-      command: "ClearCredential"
+    - label: "Create a disabled user and credential"
+      command: "SetCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
+              - name: "operationType"
+                value: 0
               - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
+                value: { CredentialType: 1, CredentialIndex: 2 }
+              - name: "credentialData"
+                value: "654321"
+              - name: "userIndex"
+                value: null
+              - name: "userStatus"
+                value: 3
+              - name: "userType"
+                value: null
+      response:
+          values:
+              - name: "status"
+                value: 0x00
+              - name: "userIndex"
+                value: 2
+              - name: "nextCredentialIndex"
+                value: 3
+
+    - label: "Try to unlock the door with disabled user PIN"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "654321"
+      response:
+          error: FAILURE
+
+    - label: "Verify that lock state attribute value is set to Locked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
+
+    - label: "Unlock the door with enabled user PIN"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "123456"
+
+    - label: "Verify that lock state attribute value is set to Unlocked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 2
+
+    - label: "Try to lock the door with disabled user PIN"
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "654321"
+      response:
+          error: FAILURE
+
+    - label: "Verify that lock state attribute value stays Unlocked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 2
+
+    - label: "Lock the door with enabled user PIN"
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "123456"
+
+    - label: "Verify that lock state attribute value is set to Locked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
+
+    # Clean-up
+
+    - label: "Clean all the users and credentials"
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 0xFFFE

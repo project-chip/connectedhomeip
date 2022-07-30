@@ -20,10 +20,10 @@ config:
     cluster: "Color Control"
     endpoint: 1
     hueConfigValue:
-        type: INT8U
+        type: int8u
         defaultValue: 40
     SaturationConfigValue:
-        type: INT8U
+        type: int8u
         defaultValue: 160
 
 tests:
@@ -59,7 +59,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -69,7 +69,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -104,7 +104,7 @@ tests:
       response:
           value: hueConfigValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -116,7 +116,7 @@ tests:
       response:
           value: SaturationConfigValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 

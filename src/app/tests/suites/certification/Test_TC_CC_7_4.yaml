@@ -21,10 +21,10 @@ config:
     cluster: "Color Control"
     endpoint: 1
     EnhancedHueConfigValue:
-        type: INT16U
+        type: int16u
         defaultValue: 1200
     SaturationConfigValue:
-        type: INT8U
+        type: int8u
         defaultValue: 90
 
 tests:
@@ -60,7 +60,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -97,7 +97,7 @@ tests:
       response:
           value: EnhancedHueConfigValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 

@@ -55,7 +55,7 @@ tests:
       response:
           saveAs: MinlevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -68,9 +68,9 @@ tests:
                 value: 1
               - name: "transitionTime"
                 value: 0
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 1
 
     - label: "reads max level attribute from DUT"
@@ -80,7 +80,7 @@ tests:
       response:
           saveAs: MaxlevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -93,9 +93,9 @@ tests:
                 value: 0
               - name: "rate"
                 value: 32
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 1
 
     - label:
@@ -136,9 +136,9 @@ tests:
                 value: 1
               - name: "rate"
                 value: 64
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 1
 
     - label:
@@ -180,7 +180,7 @@ tests:
       response:
           saveAs: DefaultMoveRateValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -193,9 +193,9 @@ tests:
                 value: 0
               - name: "rate"
                 value: 255
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 1
 
     - label: "Wait 500ms"

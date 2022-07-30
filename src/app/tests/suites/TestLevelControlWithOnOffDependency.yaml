@@ -36,9 +36,9 @@ tests:
                 value: 1
               - name: "transitionTime"
                 value: 0
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Wait 100 ms"
@@ -159,9 +159,9 @@ tests:
                 value: 127
               - name: "transitionTime"
                 value: 0
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Wait 100 ms"

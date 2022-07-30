@@ -19,7 +19,7 @@ config:
     cluster: "Color Control"
     endpoint: 1
     SaturationConfigValue:
-        type: INT8U
+        type: int8u
         defaultValue: 90
 
 tests:
@@ -55,7 +55,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -89,7 +89,7 @@ tests:
       response:
           value: SaturationConfigValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 

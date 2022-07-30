@@ -7,16 +7,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#zcl_clusters}}
 {{#zcl_commands}}
-@interface MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params : NSObject
+@interface MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params : NSObject <NSCopying>
 {{#zcl_command_arguments}}
 
 {{! Override the getter name because some of our properties start with things
     like "new" or "init" }}
-@property (strong, nonatomic{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName label}};
+@property (nonatomic, copy{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName label}};
 {{/zcl_command_arguments}}
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -26,12 +26,12 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
- 
+- (instancetype)init;
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
 {{/zcl_commands}}
 {{/zcl_clusters}}
