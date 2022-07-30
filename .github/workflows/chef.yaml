@@ -23,7 +23,6 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-
     chef_linux:
         name: Chef - Linux CI Examples
         runs-on: ubuntu-latest
@@ -50,7 +49,7 @@ jobs:
             - name: CI Examples Linux
               shell: bash
               run: |
-                ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t linux"
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t linux"
 
     chef_esp32:
         name: Chef - ESP32 CI Examples
@@ -78,32 +77,33 @@ jobs:
             - name: CI Examples ESP32
               shell: bash
               run: |
-                ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t esp32"
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t esp32"
 
-    chef_nrfconnect:
-        name: Chef - NRFConnect CI Examples
-        runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+    # https://github.com/project-chip/connectedhomeip/issues/21465
+    # chef_nrfconnect:
+    #     name: Chef - NRFConnect CI Examples
+    #     runs-on: ubuntu-latest
+    #     if: github.actor != 'restyled-io[bot]'
 
-        container:
-            image: connectedhomeip/chip-build-nrf-platform:0.5.91
-            options: --user root
+    #     container:
+    #         image: connectedhomeip/chip-build-nrf-platform:0.5.91
+    #         options: --user root
 
-        steps:
-            - uses: Wandalen/wretry.action@v1.0.15
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform nrfconnect
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: scripts/build/gn_bootstrap.sh
-            - name: CI Examples NRFConnect
-              shell: bash
-              run: |
-                ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t nrfconnect"
+    #     steps:
+    #         - uses: Wandalen/wretry.action@v1.0.15
+    #           name: Checkout
+    #           with:
+    #               action: actions/checkout@v3
+    #               with: |
+    #                   token: ${{ github.token }}
+    #               attempt_limit: 3
+    #               attempt_delay: 2000
+    #         - name: Checkout submodules
+    #           run: scripts/checkout_submodules.py --shallow --platform nrfconnect
+    #         - name: Bootstrap
+    #           timeout-minutes: 10
+    #           run: scripts/build/gn_bootstrap.sh
+    #         - name: CI Examples NRFConnect
+    #           shell: bash
+    #           run: |
+    #             ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t nrfconnect"
