@@ -367,7 +367,7 @@ void CommissioningWindowManager::OnFabricRemoved(FabricIndex removedIndex)
 {
     if (!mOpenerFabricIndex.IsNull() && mOpenerFabricIndex.Value() == removedIndex)
     {
-        // Per spec, we shoiuld clear out the stale fabric index.
+        // Per spec, we should clear out the stale fabric index.
         mOpenerFabricIndex.SetNull();
     }
 }
