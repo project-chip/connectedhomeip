@@ -18,7 +18,6 @@
 package com.matter.tv.server.tvapp;
 
 import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,8 +57,7 @@ public class ChannelManagerStub implements ChannelManager {
     return channelList[currentChannelIndex];
   }
 
-  boolean isChannelMatched(ChannelInfo channel, String match)
-  {
+  boolean isChannelMatched(ChannelInfo channel, String match) {
     String number = channel.majorNumber + "." + channel.minorNumber;
     boolean nameMatch = channel.name.equals(match);
     boolean affiliateCallSignMatch = channel.affiliateCallSign.equals(match);
@@ -81,11 +79,11 @@ public class ChannelManagerStub implements ChannelManager {
       if (isChannelMatched(channel, match)) {
         matchedList.add(channel);
         break;
-      };
+      }
+      ;
       // use index to set current channel at the end
-      ++ index;
+      ++index;
     }
-
 
     if (matchedList.size() > 1) {
       // Error: Multiple matches
@@ -121,14 +119,16 @@ public class ChannelManagerStub implements ChannelManager {
     for (ChannelInfo channel : channelList) {
       // verify if major & minor matches one of the channel from the list
       if (channel.majorNumber == majorNumber && channel.minorNumber == minorNumber) {
-        // verify if channel changed by comparing values of current channel with the requested channel
-        if (channel.majorNumber != currentChannel.majorNumber || channel.minorNumber != currentChannel.minorNumber) {
-          channelChanged      = true;
+        // verify if channel changed by comparing values of current channel with the requested
+        // channel
+        if (channel.majorNumber != currentChannel.majorNumber
+            || channel.minorNumber != currentChannel.minorNumber) {
+          channelChanged = true;
           currentChannelIndex = index;
-          currentChannel      = channelList[index];
+          currentChannel = channelList[index];
         }
       }
-      ++ index;
+      ++index;
     }
     return channelChanged;
   }
