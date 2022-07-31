@@ -48,7 +48,7 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
     if (printHeader)
     {
         char str[64];
-        sprintf(str, "udc-commission %zu\r\n", index);
+        sprintf(str, "udc-commission %ld\r\n", (long)index);
         strcat(response, str);
     }
 
