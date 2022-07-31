@@ -223,7 +223,7 @@ limitations under the License.
       <description>
         Command description for Move
       </description>
-      <arg name="MoveMode" type="ENUM8"/>
+      <arg name="MoveMode" type="MoveMode"/>
       <arg name="Rate" type="INT8U" isNullable="true"/>
       <arg name="OptionsMask" type="BITMAP8"/>
       <arg name="OptionsOverride" type="BITMAP8"/>
@@ -232,7 +232,7 @@ limitations under the License.
       <description>
         Command description for Step
       </description>
-      <arg name="StepMode" type="ENUM8"/>
+      <arg name="StepMode" type="StepMode"/>
       <arg name="StepSize" type="INT8U"/>
       <arg name="TransitionTime" type="INT16U" isNullable="true"/>
       <arg name="OptionsMask" type="BITMAP8"/>
@@ -258,7 +258,7 @@ limitations under the License.
       <description>
         Command description for MoveWithOnOff
       </description>
-      <arg name="MoveMode" type="ENUM8"/>
+      <arg name="MoveMode" type="MoveMode"/>
       <arg name="Rate" type="INT8U" isNullable="true"/>
       <arg name="OptionsMask" type="BITMAP8"/>
       <arg name="OptionsOverride" type="BITMAP8"/>
@@ -267,7 +267,7 @@ limitations under the License.
       <description>
         Command description for StepWithOnOff
       </description>
-      <arg name="StepMode" type="ENUM8"/>
+      <arg name="StepMode" type="StepMode"/>
       <arg name="StepSize" type="INT8U"/>
       <arg name="TransitionTime" type="INT16U" isNullable="true"/>
       <arg name="OptionsMask" type="BITMAP8"/>
