@@ -44,7 +44,7 @@ using namespace chip::app::Clusters;
 
 static CHIP_ERROR pairApp(bool printHeader, size_t index)
 {
- 
+
     if (printHeader)
     {
         char str[64];
@@ -201,7 +201,7 @@ void DumpAccessControlEntry(const Access::AccessControl::Entry & entry)
 
 exit:
     if (err != CHIP_NO_ERROR) {
-        ChipLogError(DeviceLayer, "DumpAccessControlEntry: dump failed %" CHIP_ERROR_FORMAT, err.Format());    
+        ChipLogError(DeviceLayer, "DumpAccessControlEntry: dump failed %" CHIP_ERROR_FORMAT, err.Format());
         strcpy(response, "Error occurred");
     }
 }
