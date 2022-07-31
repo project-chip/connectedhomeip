@@ -53,7 +53,7 @@ tests:
       command: "readAttribute"
       attribute: "MinLevel"
       response:
-          saveAs: MinlevelValue
+          saveAs: MinimumLevelValue
           constraints:
               type: int8u
               minValue: 0
@@ -78,7 +78,7 @@ tests:
       command: "readAttribute"
       attribute: "MaxLevel"
       response:
-          saveAs: MaxlevelValue
+          saveAs: MaximumLevelValue
           constraints:
               type: int8u
               minValue: 0
@@ -125,7 +125,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
-          value: MaxlevelValue
+          value: MaximumLevelValue
 
     - label: "sends a Move command"
       PICS: LVL.S.C05.Rsp
@@ -168,7 +168,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
-          value: MinlevelValue
+          value: MinimumLevelValue
           constraints:
               minValue: 0
               maxValue: 255
