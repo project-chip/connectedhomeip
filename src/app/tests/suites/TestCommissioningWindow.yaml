@@ -1,0 +1,233 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test Commissioning Window
+
+config:
+    nodeId: 0x12344321
+    nodeId2:
+        type: node_id
+        defaultValue: 0xCAFE
+    endpoint: 0
+    cluster: "AdministratorCommissioning"
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
+    alphaIndex:
+        type: int8u
+        defaultValue: 1
+    betaIndex:
+        type: int8u
+        defaultValue: 2
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved for alpha"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Get alpha's fabric index"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          # We could saveAs here, but then when we try to compare to it later
+          # the nullable-vs-non-nullable compare fails to work right.  For now
+          # just use a config variable.
+          value: alphaIndex
+
+    - label: "Check that commissioning window is not open"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      response:
+          value: 0
+
+    - label: "Check that there is no AdminFabricIndex"
+      command: "readAttribute"
+      attribute: "AdminFabricIndex"
+      response:
+          value: null
+
+    - label: "Check that there is no AdminVendorId"
+      command: "readAttribute"
+      attribute: "AdminVendorId"
+      response:
+          value: null
+
+    - label: "Open Commissioning Window from alpha"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Check that commissioning window is open"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      response:
+          value: 2
+
+    - label: "Check the AdminFabricIndex"
+      command: "readAttribute"
+      attribute: "AdminFabricIndex"
+      response:
+          value: alphaIndex
+
+    - label: "Check the AdminVendorId is not null"
+      command: "readAttribute"
+      attribute: "AdminVendorId"
+      response:
+          constraints:
+              notValue: null
+
+    - label: "Close Commissioning Window"
+      command: "RevokeCommissioning"
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Check that commissioning window is again not open"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      response:
+          value: 0
+
+    - label: "Check that again there is no AdminFabricIndex"
+      command: "readAttribute"
+      attribute: "AdminFabricIndex"
+      response:
+          value: null
+
+    - label: "Check that again there is no AdminVendorId"
+      command: "readAttribute"
+      attribute: "AdminVendorId"
+      response:
+          value: null
+
+    - label: "Open Commissioning Window from alpha again"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Commission from beta"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for beta"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+
+    - label: "Check that commissioning window is not open for the third time"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      response:
+          value: 0
+
+    - label: "Check that there is no AdminFabricIndex for the third time"
+      command: "readAttribute"
+      attribute: "AdminFabricIndex"
+      response:
+          value: null
+
+    - label: "Check that there is no AdminVendorId for the third time"
+      command: "readAttribute"
+      attribute: "AdminVendorId"
+      response:
+          value: null
+
+    - label: "Get beta's fabric index"
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          # We could saveAs here, but then when we try to compare to it later
+          # the nullable-vs-non-nullable compare fails to work right.  For now
+          # just use a config variable.
+          value: betaIndex
+
+    - label: "Open Commissioning Window from beta"
+      identity: "beta"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Check that commissioning window is open again"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      response:
+          value: 2
+
+    - label: "Check the AdminFabricIndex again"
+      command: "readAttribute"
+      attribute: "AdminFabricIndex"
+      response:
+          value: betaIndex
+
+    - label: "Check the AdminVendorId is not null again"
+      command: "readAttribute"
+      attribute: "AdminVendorId"
+      response:
+          saveAs: adminVendorId
+          constraints:
+              notValue: null
+
+    - label: "Remove beta fabric"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: betaIndex
+
+    - label: "Check that commissioning window is still open"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      response:
+          value: 2
+
+    - label: "Check the AdminFabricIndex got reset"
+      command: "readAttribute"
+      attribute: "AdminFabricIndex"
+      response:
+          value: null
+
+    - label: "Check the AdminVendorId did not get reset"
+      command: "readAttribute"
+      attribute: "AdminVendorId"
+      response:
+          value: adminVendorId

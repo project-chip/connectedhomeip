@@ -10782,9 +10782,9 @@ struct TypeInfo
 namespace AdminFabricIndex {
 struct TypeInfo
 {
-    using Type             = chip::FabricIndex;
-    using DecodableType    = chip::FabricIndex;
-    using DecodableArgType = chip::FabricIndex;
+    using Type             = chip::app::DataModel::Nullable<chip::FabricIndex>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::FabricIndex>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::FabricIndex> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AdminFabricIndex::Id; }
@@ -10794,9 +10794,9 @@ struct TypeInfo
 namespace AdminVendorId {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AdminVendorId::Id; }
@@ -10842,9 +10842,9 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::WindowStatus::TypeInfo::DecodableType windowStatus         = static_cast<uint8_t>(0);
-        Attributes::AdminFabricIndex::TypeInfo::DecodableType adminFabricIndex = static_cast<chip::FabricIndex>(0);
-        Attributes::AdminVendorId::TypeInfo::DecodableType adminVendorId       = static_cast<uint16_t>(0);
+        Attributes::WindowStatus::TypeInfo::DecodableType windowStatus = static_cast<uint8_t>(0);
+        Attributes::AdminFabricIndex::TypeInfo::DecodableType adminFabricIndex;
+        Attributes::AdminVendorId::TypeInfo::DecodableType adminVendorId;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
