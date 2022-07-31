@@ -23,15 +23,17 @@
 #include <json/json.h>
 #include <platform/DiagnosticDataProvider.h>
 
-class AllClustersCommandDelegate : public NamedPipeCommandDelegate
+class AllClustersAppCommandHandler
 {
 public:
-    void OnEventCommandReceived(const char * json) override;
+    static AllClustersAppCommandHandler * FromJSON(const char * json);
+
+    static void HandleCommand(intptr_t context);
+
+    AllClustersAppCommandHandler(Json::Value jasonValue) : mJsonValue(std::move(jasonValue)) {}
 
 private:
     Json::Value mJsonValue;
-
-    static void HandleEventCommand(intptr_t context);
 
     bool IsClusterPresentOnAnyEndpoint(chip::ClusterId clusterId);
 
@@ -86,4 +88,10 @@ private:
      * sequence, after it has been detected that the sequence has ended.
      */
     void OnSwitchMultiPressCompleteHandler(uint8_t previousPosition, uint8_t count);
+};
+
+class AllClustersCommandDelegate : public NamedPipeCommandDelegate
+{
+public:
+    void OnEventCommandReceived(const char * json) override;
 };
