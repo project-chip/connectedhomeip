@@ -34,10 +34,10 @@ import copy
 
 
 class FabricAdmin:
-    ''' Administers a specific fabric as identified by the tuple of RCAC, ICAC and Fabric ID. 
+    ''' Administers a specific fabric as identified by the tuple of RCAC subject public key and Fabric ID. 
         The Fabric ID can be passed into the constructor while the RCAC and ICAC are generated. 
         The Fabric ID *does not* have to be unique across multiple FabricAdmin instances as 
-        it is scoped to the RCAC/ICAC.
+        it is scoped to the key pair used by the root CA and whose public key is in the RCAC.
 
         Each admin is identified by an 'admin index' that is unique to the running
         process. This is used to store credential information to disk so that
@@ -64,7 +64,7 @@ class FabricAdmin:
 
         Specifically, each instance persists its fabric ID and admin
         index to storage. This is in addition to the persistence built into the ExampleOperationalCredentialsIssuer that persists details
-        about the RCAC/ICAC as well. This facilitates re-construction of a fabric admin on subsequent
+        about the RCAC/ICAC and associated keys as well. This facilitates re-construction of a fabric admin on subsequent
         boot for a given fabric and ensuring it automatically picks up the right ICAC/RCAC details as well.
     '''
 
@@ -116,14 +116,14 @@ class FabricAdmin:
         else:
             if (adminIndex in FabricAdmin.activeAdminIndexList):
                 raise ValueError(
-                    f"AdminIndex {aabricIndex} is already being managed by an existing FabricAdmin object!")
+                    f"AdminIndex {adminIndex} is already being managed by an existing FabricAdmin object!")
 
             self._adminIndex = adminIndex
 
         FabricAdmin.activeAdminIndexList.add(self._adminIndex)
 
         print(
-            f"New FabricAdmin: FabricId: {self._fabricId}, AdminIndex: {self._adminIndex}, VendorId = {hex(self.vendorId)}")
+            f"New FabricAdmin: FabricId: 0x{self._fabricId:016X}, AdminIndex: {self._adminIndex}, VendorId = 0x{self.vendorId:04X}")
         self._Handle().pychip_OpCreds_InitializeDelegate.restype = c_void_p
 
         self.closure = builtins.chipStack.Call(
@@ -163,7 +163,7 @@ class FabricAdmin:
             self.nextControllerId = self.nextControllerId + 1
 
         print(
-            f"Allocating new controller with FabricId: {self._fabricId}, NodeId: {nodeId}")
+            f"Allocating new controller with FabricId: 0x{self._fabricId:016X}, NodeId: 0x{nodeId:016X}")
 
         controller = ChipDeviceCtrl.ChipDeviceController(
             self.closure, self._fabricId, nodeId, self.vendorId, paaTrustStorePath, useTestCommissioner)

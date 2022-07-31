@@ -175,7 +175,6 @@ public:
                                             const ScopedNodeId & sessionEvictionHint);
 
     /**
-     * @brief
      *  A set of templated helper function that call a provided lambda
      *  on all sessions in the underlying session table that match the provided
      *  query criteria.
@@ -183,8 +182,6 @@ public:
      */
 
     /**
-     * @brief
-     *
      * Call the provided lambda on sessions that match the provided ScopedNodeId.
      *
      */
@@ -202,8 +199,6 @@ public:
     }
 
     /**
-     * @brief
-     *
      * Call the provided lambda on sessions that match the provided fabric index.
      *
      */
@@ -221,8 +216,6 @@ public:
     }
 
     /**
-     * @brief
-     *
      * Call the provided lambda on all sessions that match the logical fabric
      * associated with the provided ScopedNodeId and target the same logical node.
      *
@@ -270,8 +263,6 @@ public:
     }
 
     /**
-     * @brief
-     *
      * Call the provided lambda on all sessions that match the logical fabric
      * associated with the provided fabric index.
      *

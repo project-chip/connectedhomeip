@@ -70,7 +70,7 @@ struct SetupParams
     DevicePairingDelegate * pairingDelegate = nullptr;
 
     /**
-     * Controls where we permit multiple DeviceController instances to exist
+     * Controls whether we permit multiple DeviceController instances to exist
      * on the same logical fabric (identified by the tuple of the fabric's
      * root public key + fabric id).
      *

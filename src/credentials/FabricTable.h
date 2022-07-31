@@ -925,7 +925,7 @@ public:
                                  Crypto::P256PublicKey * outRootPublicKey = nullptr) const;
 
     /**
-     * @brief Enables FabricInfo instances to collide and reference the same logical fabric (i.e RCAC + FabricId).
+     * @brief Enables FabricInfo instances to collide and reference the same logical fabric (i.e Root Public Key + FabricId).
      *
      * *WARNING* This is ONLY to be used when creating multiple controllers on the same fabric OR for test.
      *
