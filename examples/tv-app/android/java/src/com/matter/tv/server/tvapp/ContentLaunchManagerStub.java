@@ -9,27 +9,27 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
   private int endpoint;
 
   private ContentLaunchSearchParameter[] tvShowSearchList = {
-          new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.ACTOR, "Gaby sHofmann"),
-          new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.CHANNEL, "PBS"),
-          new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.CHARACTER, "Snow White"),
-          new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.DIRECTOR, "Spike Lee"),
-          new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.FRANCHISE, "Star Wars"),
-          new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.GENRE, "Horror"),
-          new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.POPULARITY, "Popularity"),
-          new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.PROVIDER, "Netfxlix"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.ACTOR, "Gaby sHofmann"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.CHANNEL, "PBS"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.CHARACTER, "Snow White"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.DIRECTOR, "Spike Lee"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.FRANCHISE, "Star Wars"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.GENRE, "Horror"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.POPULARITY, "Popularity"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.PROVIDER, "Netfxlix"),
   };
 
   private ContentLaunchSearchParameter[] sportsShowSearchList = {
-          new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.EVENT, "Football games"),
-          new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.LEAGUE, "NCAA"),
-          new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.SPORT, "football"),
-          new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.SPORTS_TEAM, "Arsenal"),
-          new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.TYPE, "TVSeries"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.EVENT, "Football games"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.LEAGUE, "NCAA"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.SPORT, "football"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.SPORTS_TEAM, "Arsenal"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.TYPE, "TVSeries"),
   };
 
   private ContentLaunchEntry[] entries = {
-          new ContentLaunchEntry("Sports Example", sportsShowSearchList),
-          new ContentLaunchEntry("TV Show Example", tvShowSearchList)
+    new ContentLaunchEntry("Sports Example", sportsShowSearchList),
+    new ContentLaunchEntry("TV Show Example", tvShowSearchList)
   };
 
   public ContentLaunchManagerStub(int endpoint) {

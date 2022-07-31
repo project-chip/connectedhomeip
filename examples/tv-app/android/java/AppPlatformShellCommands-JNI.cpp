@@ -44,7 +44,7 @@ using namespace chip::app::Clusters;
 
 static CHIP_ERROR pairApp(bool printHeader, size_t index)
 {
- 
+
     if (printHeader)
     {
         char str[64];
@@ -96,8 +96,7 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
         if (pincode == 0)
         {
             char str[64];
-            sprintf(str, "udc no pin returned for vendor id=%d rotating ID=%s \r\n", state->GetVendorId(),
-                            rotatingIdString);
+            sprintf(str, "udc no pin returned for vendor id=%d rotating ID=%s \r\n", state->GetVendorId(), rotatingIdString);
             strcat(response, str);
             return CHIP_ERROR_BAD_REQUEST;
         }
@@ -176,21 +175,21 @@ void DumpAccessControlEntry(const Access::AccessControl::Entry & entry)
                 if (target.flags & Access::AccessControl::Entry::Target::kCluster)
                 {
                     sprintf(buffer, "  %u: cluster: 0x" ChipLogFormatMEI, static_cast<unsigned>(i),
-                                  ChipLogValueMEI(target.cluster));
-                    strcat(buffer,"\n");
+                            ChipLogValueMEI(target.cluster));
+                    strcat(buffer, "\n");
                     strcat(response, buffer);
                 }
                 if (target.flags & Access::AccessControl::Entry::Target::kEndpoint)
                 {
                     sprintf(buffer, "  %u: endpoint: %u", static_cast<unsigned>(i), target.endpoint);
-                    strcat(buffer,"\n");
+                    strcat(buffer, "\n");
                     strcat(response, buffer);
                 }
                 if (target.flags & Access::AccessControl::Entry::Target::kDeviceType)
                 {
                     sprintf(buffer, "  %u: deviceType: 0x" ChipLogFormatMEI, static_cast<unsigned>(i),
-                                  ChipLogValueMEI(target.deviceType));
-                    strcat(buffer,"\n");
+                            ChipLogValueMEI(target.deviceType));
+                    strcat(buffer, "\n");
                     strcat(response, buffer);
                 }
             }
@@ -200,8 +199,9 @@ void DumpAccessControlEntry(const Access::AccessControl::Entry & entry)
     strcat(response, "----- END ENTRY -----\n");
 
 exit:
-    if (err != CHIP_NO_ERROR) {
-        ChipLogError(DeviceLayer, "DumpAccessControlEntry: dump failed %" CHIP_ERROR_FORMAT, err.Format());    
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "DumpAccessControlEntry: dump failed %" CHIP_ERROR_FORMAT, err.Format());
         strcpy(response, "Error occurred");
     }
 }
@@ -254,7 +254,7 @@ char * AppPlatformHandler(int argc, char ** argv)
 
         return response;
     }
-     else if (strcmp(argv[0], "print-app-access") == 0)
+    else if (strcmp(argv[0], "print-app-access") == 0)
     {
         Access::AccessControl::EntryIterator iterator;
         SuccessOrExit(err = Access::GetAccessControl().Entries(GetDeviceCommissioner()->GetFabricIndex(), iterator));
