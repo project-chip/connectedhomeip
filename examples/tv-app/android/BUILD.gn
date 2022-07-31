@@ -35,8 +35,6 @@ shared_library("jni") {
     "include/cluster-init.cpp",
     "include/content-launcher/AppContentLauncherManager.cpp",
     "include/content-launcher/AppContentLauncherManager.h",
-    "include/endpoint-configuration/EndpointConfigurationStorage.cpp",
-    "include/endpoint-configuration/EndpointConfigurationStorage.h",
     "include/target-navigator/TargetNavigatorManager.cpp",
     "include/target-navigator/TargetNavigatorManager.h",
     "java/AppImpl.cpp",
