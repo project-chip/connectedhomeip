@@ -2754,6 +2754,7 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 | * ConnectionStatus                                                  | 0x0000 |
+| * NetworkFaultChange                                                | 0x0001 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -9633,10 +9634,12 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                         //
-        make_unique<ReadEvent>(Id, "connection-status", Events::ConnectionStatus::Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                    //
-        make_unique<SubscribeEvent>(Id, "connection-status", Events::ConnectionStatus::Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                              //
+        make_unique<ReadEvent>(Id, "connection-status", Events::ConnectionStatus::Id, credsIssuerConfig),           //
+        make_unique<ReadEvent>(Id, "network-fault-change", Events::NetworkFaultChange::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                         //
+        make_unique<SubscribeEvent>(Id, "connection-status", Events::ConnectionStatus::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, "network-fault-change", Events::NetworkFaultChange::Id, credsIssuerConfig), //
     };
 
     commands.Register(clusterName, clusterCommands);

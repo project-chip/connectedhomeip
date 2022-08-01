@@ -1714,6 +1714,7 @@ typedef NS_ENUM(uint32_t, MTRClusterEventIDType) {
 
     // Cluster ThreadNetworkDiagnostics events
     MTRClusterThreadNetworkDiagnosticsEventConnectionStatusID = 0x00000000,
+    MTRClusterThreadNetworkDiagnosticsEventNetworkFaultChangeID = 0x00000001,
 
     // Cluster WiFiNetworkDiagnostics events
     MTRClusterWiFiNetworkDiagnosticsEventDisconnectionID = 0x00000000,
