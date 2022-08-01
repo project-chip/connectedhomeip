@@ -191,3 +191,7 @@ emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t holidayInd
 {
     return DlStatus::kFailure;
 }
+
+void __attribute__((weak))
+emberAfPluginDoorLockLockoutStarted(chip::EndpointId endpointId, chip::System::Clock::Timestamp lockoutEndTime)
+{}
