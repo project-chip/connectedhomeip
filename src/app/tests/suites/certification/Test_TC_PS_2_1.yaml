@@ -59,7 +59,7 @@ tests:
     - label:
           "Test Harness Client reads WiredAssessedInputVoltage attribue from
           Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0003
+      PICS: PS.S.A0003
       command: "readAttribute"
       attribute: "WiredAssessedInputVoltage"
       response:
@@ -71,7 +71,7 @@ tests:
     - label:
           "Test Harness Client reads WiredAssessedInputFrequency attribute from
           Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0004
+      PICS: PS.S.A0004
       command: "readAttribute"
       attribute: "WiredAssessedInputFrequency"
       response:
@@ -82,7 +82,7 @@ tests:
 
     - label:
           "Test Harness Client reads WiredCurrentType attribute from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0005
+      PICS: PS.S.A0005
       command: "readAttribute"
       attribute: "WiredCurrentType"
       response:
@@ -94,7 +94,7 @@ tests:
     - label:
           "Test Harness Client reads WiredAssessedCurrent attribute from Server
           DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0006
+      PICS: PS.S.A0006
       command: "readAttribute"
       attribute: "WiredAssessedCurrent"
       response:
@@ -104,7 +104,7 @@ tests:
               maxValue: 0xFFFFFFFF
 
     - label: "Test Harness Client reads WiredNominalVoltage from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0007
+      PICS: PS.S.A0007
       command: "readAttribute"
       attribute: "WiredNominalVoltage"
       response:
@@ -114,7 +114,7 @@ tests:
               maxValue: 0xFFFFFFFF
 
     - label: "Test Harness Client reads WiredMaximumCurrent from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0008
+      PICS: PS.S.A0008
       command: "readAttribute"
       attribute: "WiredMaximumCurrent"
       response:
@@ -124,7 +124,7 @@ tests:
               maxValue: 0xFFFFFFFF
 
     - label: "Test Harness Client reads WiredPresent from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0009
+      PICS: PS.S.A0009
       command: "readAttribute"
       attribute: "WiredPresent"
       response:
@@ -132,7 +132,7 @@ tests:
               type: boolean
 
     - label: "Test Harness Client reads ActiveWiredFaults from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000a
+      PICS: PS.S.A000a
       command: "readAttribute"
       attribute: "ActiveWiredFaults"
       response:
@@ -141,7 +141,7 @@ tests:
               maxLength: 8
 
     - label: "Test Harness Client reads BatVoltage from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000b
+      PICS: PS.S.A000b
       command: "readAttribute"
       attribute: "BatVoltage"
       response:
@@ -151,7 +151,7 @@ tests:
               maxValue: 0xFFFFFFFF
 
     - label: "Test Harness Client reads BatPercentRemaining from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000c
+      PICS: PS.S.A000c
       command: "readAttribute"
       attribute: "BatPercentRemaining"
       response:
@@ -161,7 +161,7 @@ tests:
               maxValue: 200
 
     - label: "Test Harness Client reads BatTimeRemaining from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000d
+      PICS: PS.S.A000d
       command: "readAttribute"
       attribute: "BatTimeRemaining"
       response:
@@ -181,7 +181,7 @@ tests:
               maxValue: 2
 
     - label: "Test Harness Client reads BatReplacementNeeded from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000f
+      PICS: PS.S.A000f
       command: "readAttribute"
       attribute: "BatReplacementNeeded"
       response:
@@ -189,7 +189,7 @@ tests:
               type: boolean
 
     - label: "Test Harness Client reads BatReplaceability from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0010
+      PICS: PS.S.A0010
       command: "readAttribute"
       attribute: "BatReplaceability"
       response:
@@ -199,7 +199,7 @@ tests:
               maxValue: 3
 
     - label: "Test Harness Client reads BatPresent from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0011
+      PICS: PS.S.A0011
       command: "readAttribute"
       attribute: "BatPresent"
       response:
@@ -207,7 +207,7 @@ tests:
               type: boolean
 
     - label: "Test Harness Client readsActiveBatFaults from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0012
+      PICS: PS.S.A0012
       command: "readAttribute"
       attribute: "ActiveBatFaults"
       response:
@@ -217,7 +217,7 @@ tests:
 
     - label:
           "Test Harness Client reads BatReplacementDescription from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0013
+      PICS: PS.S.A0013
       command: "readAttribute"
       attribute: "BatReplacementDescription"
       response:
@@ -226,7 +226,7 @@ tests:
               maxLength: 60
 
     - label: "Test Harness Client reads BatCommonDesignation from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0014
+      PICS: PS.S.A0014
       command: "readAttribute"
       attribute: "BatCommonDesignation"
       response:
@@ -236,7 +236,7 @@ tests:
               maxValue: 80
 
     - label: "Test Harness Client reads BatANSIDesignation from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0015
+      PICS: PS.S.A0015
       command: "readAttribute"
       attribute: "BatANSIDesignation"
       response:
@@ -245,7 +245,7 @@ tests:
               maxLength: 20
 
     - label: "Test Harness Client reads BatIECDesignation from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0016
+      PICS: PS.S.A0016
       command: "readAttribute"
       attribute: "BatIECDesignation"
       response:
@@ -254,7 +254,7 @@ tests:
               maxLength: 20
 
     - label: "Test Harness Client reads BatApprovedChemistry from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0017
+      PICS: PS.S.A0017
       command: "readAttribute"
       attribute: "BatApprovedChemistry"
       response:
@@ -264,7 +264,7 @@ tests:
               maxValue: 32
 
     - label: "Test Harness Client reads BatCapacity from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0018
+      PICS: PS.S.A0018
       command: "readAttribute"
       attribute: "BatCapacity"
       response:
@@ -274,7 +274,7 @@ tests:
               maxValue: 0xFFFFFFFF
 
     - label: "Test Harness Client reads BatQuantity from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0019
+      PICS: PS.S.A0019
       command: "readAttribute"
       attribute: "BatQuantity"
       response:
@@ -284,7 +284,7 @@ tests:
               maxValue: 255
 
     - label: "Test Harness Client reads BatChargeState from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001a
+      PICS: PS.S.A001a
       command: "readAttribute"
       attribute: "BatChargeState"
       response:
@@ -294,7 +294,7 @@ tests:
               maxValue: 3
 
     - label: "Test Harness Client reads BatTimeToFullCharge from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001b
+      PICS: PS.S.A001b
       command: "readAttribute"
       attribute: "BatTimeToFullCharge"
       response:
@@ -305,7 +305,7 @@ tests:
 
     - label:
           "Test Harness Client reads BatFunctionalWhileCharging from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001c
+      PICS: PS.S.A001c
       command: "readAttribute"
       attribute: "BatFunctionalWhileCharging"
       response:
@@ -313,7 +313,7 @@ tests:
               type: boolean
 
     - label: "Test Harness Client reads BatChargingCurrent from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001d
+      PICS: PS.S.A001d
       command: "readAttribute"
       attribute: "BatChargingCurrent"
       response:
@@ -323,7 +323,7 @@ tests:
               maxValue: 0xFFFFFFFF
 
     - label: "Test Harness Client reads ActiveBatChargeFaults from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001e
+      PICS: PS.S.A001e
       command: "readAttribute"
       attribute: "ActiveBatChargeFaults"
       response:

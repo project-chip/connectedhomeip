@@ -588,6 +588,15 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
+    - label: "TH reads Reachable from the DUT."
+      PICS: BINFO.S.A0011
+      command: "readAttribute"
+      attribute: "Reachable"
+      response:
+          value: true
+          constraints:
+              type: boolean
+
     - label: "TH reads UniqueID from the DUT."
       PICS: BINFO.S.A0012
       command: "readAttribute"

@@ -32,27 +32,26 @@ tests:
       command: "readAttribute"
       attribute: "number of positions"
       response:
-          value: 2
+          saveAs: NumberOfPositionsValue
           constraints:
               type: int8u
               minValue: 2
+              maxValue: 255
 
     - label: "Read CurrentPosition attribute"
       command: "readAttribute"
       attribute: "current position"
       response:
-          value: 0
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: NumberOfPositionsValue - 1
 
     - label: "Read MultiPressMax attribute"
       PICS: SWTCH.S.F04
       command: "readAttribute"
       attribute: "multi press max"
       response:
-          value: 2
           constraints:
               type: int8u
               minValue: 2
