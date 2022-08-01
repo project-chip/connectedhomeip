@@ -1384,16 +1384,20 @@ void SubscriptionCallback::ReportData()
 {
     __block NSArray * attributeReports = mAttributeReports;
     mAttributeReports = nil;
+    __block auto attributeCallback = mAttributeReportCallback;
+
     __block NSArray * eventReports = mEventReports;
     mEventReports = nil;
-    if (mAttributeReportCallback && attributeReports.count) {
+    __block auto eventCallback = mEventReportCallback;
+
+    if (attributeCallback != nil && attributeReports.count) {
         dispatch_async(mQueue, ^{
-            mAttributeReportCallback(attributeReports);
+            attributeCallback(attributeReports);
         });
     }
-    if (mEventReportCallback && eventReports.count) {
+    if (eventCallback != nil && eventReports.count) {
         dispatch_async(mQueue, ^{
-            mEventReportCallback(eventReports);
+            eventCallback(eventReports);
         });
     }
 }
