@@ -423,7 +423,8 @@ extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_
                         X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig);
 extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool GenerateKeyPair_Secp256k1(EVP_PKEY * key);
-extern bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupportedCurve = false);
+extern bool ReadKey(const char * fileName, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key,
+                    bool ignorErrorIfUnsupportedCurve = false);
 extern bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt);
 extern bool SerializeKeyPair(EVP_PKEY * key, chip::Crypto::P256SerializedKeypair & serializedKeypair);
 
