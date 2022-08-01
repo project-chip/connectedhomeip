@@ -15,7 +15,6 @@ import chip.FabricAdmin
 import chip.native
 from chip.utils import CommissioningBuildingBlocks
 import atexit
-import chip.dynamic_server.Server as Server
 
 _fabricAdmins = None
 
