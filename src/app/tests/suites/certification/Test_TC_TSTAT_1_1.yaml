@@ -178,7 +178,6 @@ tests:
       response:
           constraints:
               type: list
-
     # #issue #15011 disabled steps below Global attributes missing from YAML framework
     # - label: "Read the global attribute: EventList"
     #   disabled: true
