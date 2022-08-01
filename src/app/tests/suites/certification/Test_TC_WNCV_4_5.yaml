@@ -33,12 +33,14 @@ tests:
                 value: nodeId
 
     ### Trying to randomize DUT's positions
-    #- label: "0b: TH sends UpOrOpen command to preposition the DUT"
-    #  command: "UpOrOpen"
+    - label: "0b: TH sends UpOrOpen command to preposition the DUT"
+      command: "UpOrOpen"
 
     ######## Command GoTo 1 #######
     ### Step 1x -> Check GoToLiftPercentage NVM effects
-    - label: "1a: TH sends GoToLiftPercentage command with 90%% to DUT"
+    - label:
+          "1a: If (PA_LF & LF) TH sends GoToLiftPercentage command with 90%% to
+          DUT"
       command: "GoToLiftPercentage"
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.C05.Rsp
       arguments:
@@ -74,7 +76,9 @@ tests:
 
     ######## Command GoTo 2 ######
     ### Step 2x -> Check GoToTiltPercentage NVM effects
-    - label: "2a: TH sends GoToTiltPercentage command with 90%% to DUT"
+    - label:
+          "2a: If (PA_TL & TL) TH sends GoToTiltPercentage command with 90%% to
+          DUT"
       command: "GoToTiltPercentage"
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.C08.Rsp
       arguments:

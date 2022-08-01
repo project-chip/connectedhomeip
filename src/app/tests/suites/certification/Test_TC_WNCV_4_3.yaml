@@ -34,10 +34,12 @@ tests:
     ######## Check attribute coherence #######
     ### Step 1x -> Verify the Lift Percent100ths and Percent attributes
     ### Shall be tested as equals CurrentPositionLiftPercent100ths
-    - label: "1a: TH reads CurrentPositionLiftPercent100ths from DUT"
+    - label:
+          "1a: If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths from
+          DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV.S.A000e && WNCV.S.F00
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           saveAs: attrCurrentPositionLiftPercent100ths
           constraints:
@@ -45,12 +47,12 @@ tests:
               maxValue: 10000
 
     - label:
-          "1b 1c: TH reads CurrentPositionLiftPercentage from DUT + assert
-          CurrentPositionLiftPercent100ths/100 equals
+          "1b 1c: If (PA_LF & LF) TH reads CurrentPositionLiftPercentage from
+          DUT + assert CurrentPositionLiftPercent100ths/100 equals
           CurrentPositionLiftPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: WNCV.S.A0008 && WNCV.S.A000e && WNCV.S.F00
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008 && WNCV.S.A000e
       response:
           value: attrCurrentPositionLiftPercent100ths / 100
           constraints:
@@ -66,7 +68,7 @@ tests:
 
     - label: "2b: TH sends GoToLiftPercentage command with BadParam to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV.S.C05.Rsp && WNCV.S.F00
+      PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
               - name: "LiftPercent100thsValue"
@@ -80,7 +82,7 @@ tests:
     ### Step 3x -> Verify the GoToLiftPercentage with 10001 as param
     - label: "3a: TH sends GoToLiftPercentage command with 10001 to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV.S.C05.Rsp && WNCV.S.F00
+      PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
               - name: "LiftPercent100thsValue"
@@ -94,7 +96,7 @@ tests:
     ### Step 4x -> Verify the GoToLiftPercentage with 0xFFFF as param
     - label: "4a: TH sends GoToLiftPercentage command with 0xFFFF to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV.S.C05.Rsp && WNCV.S.F00
+      PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
               - name: "LiftPercent100thsValue"

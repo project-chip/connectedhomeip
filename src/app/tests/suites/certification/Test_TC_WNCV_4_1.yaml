@@ -39,7 +39,7 @@ tests:
           "1a: TH sends DownOrClose command to preposition the DUT in the
           opposite direction"
       command: "DownOrClose"
-      PICS: WNCV.S.C01.Rsp && WNCV.S.F00
+      PICS: WNCV.S.C01.Rsp
 
     ### Step 5x -> Verify the DUT has moved
     ### DUT moves toward its DownOrClose position
@@ -52,10 +52,12 @@ tests:
                 value: fullMotionDuration
 
     ### Depends on the FeatureMap -> Check CurrentPosition attributes
-    - label: "1c: TH reads CurrentPositionLiftPercent100ths attribute from DUT"
+    - label:
+          "1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV.S.A000e && WNCV.S.F00
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           constraints:
               notValue: 0
@@ -64,7 +66,7 @@ tests:
     ### Step 2x ->  Check GoToLiftPercentage 25% Long-Run effects
     - label: "2a: TH sends GoToLiftPercentage command with 25 percent to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV.S.F00 && WNCV.S.C05.Rsp
+      PICS: "WNCV.S.F00 && WNCV.S.C05.Rsp"
       arguments:
           values:
               - name: "liftPercent100thsValue"
@@ -82,10 +84,12 @@ tests:
                 value: 100
 
     ### Mandatory Depends on the FeatureMap
-    - label: "2c: TH reads TargetPositionLiftPercent100ths attribute from DUT"
+    - label:
+          "2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
+          from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: WNCV.S.A000b && WNCV.S.F00
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
       response:
           value: 2500
 
@@ -103,25 +107,27 @@ tests:
     - label: "3b: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
-      PICS: WNCV.S.A000a && WNCV.S.F00
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
     ### Mandatory Depends on the FeatureMap
-    - label: "3c: TH reads CurrentPositionLiftPercent100ths attribute from DUT"
+    - label:
+          "3c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV.S.A000e && WNCV.S.F00
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           value: 2500
 
     ### Optional Depends on the FeatureMap
     - label:
-          "3d: TH reads CurrentPositionLiftPercentage optional attribute from
-          DUT"
+          "3d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: WNCV.S.A0008 && WNCV.S.F00
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       response:
           value: 25
 
@@ -147,10 +153,12 @@ tests:
                 value: 100
 
     ### Mandatory Depends on the FeatureMap
-    - label: "4c: TH reads TargetPositionLiftPercent100ths attribute from DUT"
+    - label:
+          "4c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
+          from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: WNCV.S.A000b && WNCV.S.F00
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
       response:
           value: 7520
 
@@ -168,23 +176,25 @@ tests:
     - label: "5b: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
-      PICS: WNCV.S.A000a && WNCV.S.F00
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
     ### Mandatory Depends on the FeatureMap
-    - label: "5c: TH reads CurrentPositionLiftPercent100ths attribute from DUT"
+    - label:
+          "5c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV.S.A000e && WNCV.S.F00
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           value: 7520
 
     ### Optional Depends on the FeatureMap
     - label:
-          "5d: TH reads CurrentPositionLiftPercentage optional attribute from
-          DUT"
-      PICS: WNCV.S.A0008 && WNCV.S.F00
+          "5d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
+          attribute from DUT"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
       response:
