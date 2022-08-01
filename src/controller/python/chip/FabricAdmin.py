@@ -83,14 +83,11 @@ class FabricAdmin:
             nextAdminIndex = nextAdminIndex + 1
         return nextAdminIndex
 
-    def __init__(self, vendorId: int, rcac: bytes = None, icac: bytes = None, adminIndex: int = None, fabricId: int = 1):
+    def __init__(self, vendorId: int, adminIndex: int = None, fabricId: int = 1):
         ''' Creates a valid FabricAdmin object with valid RCAC/ICAC, and registers itself as an OperationalCredentialsDelegate
             for other parts of the system (notably, DeviceController) to vend NOCs.
 
             vendorId:       Valid operational Vendor ID associated with this fabric.
-            rcac, icac:     Specify the RCAC and ICAC to be used with this fabric (not-supported). If not specified, an RCAC and ICAC will
-                            be automatically generated.
-
             adminIndex:     Local index to be associated with this fabric. This is NOT the fabric index. Each controller on the fabric
                             is assigned a unique fabric index. 
 

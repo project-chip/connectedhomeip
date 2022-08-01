@@ -182,7 +182,7 @@ public:
      */
 
     /**
-     * Call the provided lambda on sessions that match the provided ScopedNodeId.
+     * Call the provided lambda on sessions whose remote side match the provided ScopedNodeId.
      *
      */
     template <typename Function>
@@ -216,12 +216,17 @@ public:
     }
 
     /**
-     * Call the provided lambda on all sessions that match the logical fabric
-     * associated with the provided ScopedNodeId and target the same logical node.
+     * Call the provided lambda on all sessions whose remote side match the logical fabric
+     * associated with the provided ScopedNodeId and target the same logical remote node.
      *
+     * *NOTE* This is identical in behavior to ForEachMatchingSession(const ScopedNodeId ..)
+     *        EXCEPT if there are multiple FabricInfo instances in the FabricTable that collide
+     *        on the same logical fabric (i.e root public key + fabric ID tuple).
+     *        This can ONLY happen if multiple controller instances on the same fabric is permitted
+     *        and each is assigned a unique fabric index.
      */
     template <typename Function>
-    CHIP_ERROR ForEachCollidingSession(const ScopedNodeId & node, Function && function)
+    CHIP_ERROR ForEachSessionOnLogicalFabric(const ScopedNodeId & node, Function && function)
     {
         Crypto::P256PublicKey targetPubKey;
 
@@ -266,9 +271,14 @@ public:
      * Call the provided lambda on all sessions that match the logical fabric
      * associated with the provided fabric index.
      *
+     * *NOTE* This is identical in behavior to ForEachMatchingSession(FabricIndex ..)
+     *        EXCEPT if there are multiple FabricInfo instances in the FabricTable that collide
+     *        on the same logical fabric (i.e root public key + fabric ID tuple).
+     *        This can ONLY happen if multiple controller instances on the same fabric is permitted
+     *        and each is assigned a unique fabric index.
      */
     template <typename Function>
-    CHIP_ERROR ForEachCollidingSession(FabricIndex fabricIndex, Function && function)
+    CHIP_ERROR ForEachSessionOnLogicalFabric(FabricIndex fabricIndex, Function && function)
     {
         Crypto::P256PublicKey targetPubKey;
 
@@ -311,8 +321,31 @@ public:
     void ExpireAllSessions(const ScopedNodeId & node);
     void ExpireAllSessionsForFabric(FabricIndex fabricIndex);
 
-    CHIP_ERROR ExpireAllCollidingSessions(const ScopedNodeId & node);
-    CHIP_ERROR ExpireAllCollidingSessionsForFabric(FabricIndex fabricIndex);
+    /**
+     * Expire all sessions whose remote side matches the logical fabric
+     * associated with the provided ScopedNodeId and target the same logical remote node.
+     *
+     * *NOTE* This is identical in behavior to ExpireAllSessions(const ScopedNodeId ..)
+     *        EXCEPT if there are multiple FabricInfo instances in the FabricTable that collide
+     *        on the same logical fabric (i.e root public key + fabric ID tuple).  This can ONLY happen
+     *        if multiple controller instances on the same fabric is permitted and each is assigned
+     *        a unique fabric index.
+     *
+     */
+    CHIP_ERROR ExpireAllSessionsOnLogicalFabric(const ScopedNodeId & node);
+
+    /**
+     * Expire all sessions whose remote side matches the logical fabric
+     * associated with the provided fabric index.
+     *
+     * *NOTE* This is identical in behavior to ExpireAllSessExpireAllSessionsForFabricions(FabricIndex ..)
+     *        EXCEPT if there are multiple FabricInfo instances in the FabricTable that collide
+     *        on the same logical fabric (i.e root public key + fabric ID tuple).  This can ONLY happen
+     *        if multiple controller instances on the same fabric is permitted and each is assigned
+     *        a unique fabric index.
+     *
+     */
+    CHIP_ERROR ExpireAllSessionsOnLogicalFabric(FabricIndex fabricIndex);
 
     void ExpireAllPASESessions();
 

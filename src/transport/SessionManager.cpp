@@ -364,18 +364,19 @@ void SessionManager::ExpireAllSessionsForFabric(FabricIndex fabricIndex)
     ForEachMatchingSession(fabricIndex, [](auto * session) { session->MarkForEviction(); });
 }
 
-CHIP_ERROR SessionManager::ExpireAllCollidingSessions(const ScopedNodeId & node)
+CHIP_ERROR SessionManager::ExpireAllSessionsOnLogicalFabric(const ScopedNodeId & node)
 {
-    ChipLogDetail(Inet, "Expiring all colliding sessions for node " ChipLogFormatScopedNodeId "!!", ChipLogValueScopedNodeId(node));
+    ChipLogDetail(Inet, "Expiring all sessions to peer " ChipLogFormatScopedNodeId " that are on the same logical fabric!!",
+                  ChipLogValueScopedNodeId(node));
 
-    return ForEachCollidingSession(node, [](auto * session) { session->MarkForEviction(); });
+    return ForEachSessionOnLogicalFabric(node, [](auto * session) { session->MarkForEviction(); });
 }
 
-CHIP_ERROR SessionManager::ExpireAllCollidingSessionsForFabric(FabricIndex fabricIndex)
+CHIP_ERROR SessionManager::ExpireAllSessionsOnLogicalFabric(FabricIndex fabricIndex)
 {
-    ChipLogDetail(Inet, "Expiring all colliding sessions for fabric 0x%x!!", static_cast<unsigned>(fabricIndex));
+    ChipLogDetail(Inet, "Expiring all sessions on the same logical fabric as fabric 0x%x!!", static_cast<unsigned>(fabricIndex));
 
-    return ForEachCollidingSession(fabricIndex, [](auto * session) { session->MarkForEviction(); });
+    return ForEachSessionOnLogicalFabric(fabricIndex, [](auto * session) { session->MarkForEviction(); });
 }
 
 void SessionManager::ExpireAllPASESessions()

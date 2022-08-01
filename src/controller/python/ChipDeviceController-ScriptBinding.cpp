@@ -669,7 +669,7 @@ ChipError::StorageType pychip_ExpireSessions(chip::Controller::DeviceCommissione
     // Since we permit multiple controllers on the same fabric each associated with a different fabric index, expiring a session
     // needs to correctly expire sessions on other controllers on matching fabrics as well.
     //
-    devCtrl->SessionMgr()->ExpireAllCollidingSessions(ScopedNodeId(nodeId, devCtrl->GetFabricIndex()));
+    devCtrl->SessionMgr()->ExpireAllSessionsOnLogicalFabric(ScopedNodeId(nodeId, devCtrl->GetFabricIndex()));
     return CHIP_NO_ERROR.AsInteger();
 }
 

@@ -462,9 +462,9 @@ const FabricInfo * FabricTable::FindFabricCommon(const Crypto::P256PublicKey & r
     if (HasPendingFabricUpdate())
     {
         bool pubKeyAvailable = (mPendingFabric.FetchRootPubkey(candidatePubKey) == CHIP_NO_ERROR);
-        auto tmpNodeId       = (nodeId == kUndefinedNodeId) ? mPendingFabric.GetNodeId() : nodeId;
+        auto matchingNodeId  = (nodeId == kUndefinedNodeId) ? mPendingFabric.GetNodeId() : nodeId;
         if (pubKeyAvailable && rootPubKey.Matches(candidatePubKey) && fabricId == mPendingFabric.GetFabricId() &&
-            tmpNodeId == mPendingFabric.GetNodeId())
+            matchingNodeId == mPendingFabric.GetNodeId())
         {
             return &mPendingFabric;
         }
@@ -472,7 +472,7 @@ const FabricInfo * FabricTable::FindFabricCommon(const Crypto::P256PublicKey & r
 
     for (auto & fabric : mStates)
     {
-        auto tmpNodeId = (nodeId == kUndefinedNodeId) ? fabric.GetNodeId() : nodeId;
+        auto matchingNodeId = (nodeId == kUndefinedNodeId) ? fabric.GetNodeId() : nodeId;
 
         if (!fabric.IsInitialized())
         {
@@ -482,7 +482,7 @@ const FabricInfo * FabricTable::FindFabricCommon(const Crypto::P256PublicKey & r
         {
             continue;
         }
-        if (rootPubKey.Matches(candidatePubKey) && fabricId == fabric.GetFabricId() && tmpNodeId == fabric.GetNodeId())
+        if (rootPubKey.Matches(candidatePubKey) && fabricId == fabric.GetFabricId() && matchingNodeId == fabric.GetNodeId())
         {
             return &fabric;
         }
