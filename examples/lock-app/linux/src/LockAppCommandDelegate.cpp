@@ -31,7 +31,8 @@ public:
 
     static void HandleCommand(intptr_t context);
 
-    LockAppCommandHandler(std::string cmd, Json::Value params) : mCommandName(std::move(cmd)), mCommandParameters(std::move(params))
+    LockAppCommandHandler(std::string & cmd, Json::Value & params) :
+        mCommandName(std::move(cmd)), mCommandParameters(std::move(params))
     {}
 
 private:
