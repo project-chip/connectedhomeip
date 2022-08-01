@@ -28,16 +28,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads MeasuredValue attribute from DUT"
-      PICS: ILL.S.A0000
-      command: "readAttribute"
-      attribute: "MeasuredValue"
-      response:
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65534
-
     - label: "TH reads MinMeasuredValue attribute from DUT"
       PICS: ILL.S.A0001
       command: "readAttribute"
@@ -56,6 +46,16 @@ tests:
           constraints:
               type: int16u
               minValue: 2
+              maxValue: 65534
+
+    - label: "TH reads MeasuredValue attribute from DUT"
+      PICS: ILL.S.A0000
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
               maxValue: 65534
 
     - label: "TH reads Tolerance attribute from DUT"
