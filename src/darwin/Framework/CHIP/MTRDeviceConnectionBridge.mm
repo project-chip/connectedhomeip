@@ -22,18 +22,13 @@
 void MTRDeviceConnectionBridge::OnConnected(void * context, chip::OperationalDeviceProxy * device)
 {
     auto * object = static_cast<MTRDeviceConnectionBridge *>(context);
-    MTRBaseDevice * chipDevice = [[MTRBaseDevice alloc] initWithDevice:device];
-    dispatch_async(object->mQueue, ^{
-        object->mCompletionHandler(chipDevice, nil);
-        object->Release();
-    });
+    object->mCompletionHandler(device->GetExchangeManager(), device->GetSecureSession(), nil);
+    object->Release();
 }
 
 void MTRDeviceConnectionBridge::OnConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error)
 {
     auto * object = static_cast<MTRDeviceConnectionBridge *>(context);
-    dispatch_async(object->mQueue, ^{
-        object->mCompletionHandler(nil, [MTRError errorForCHIPErrorCode:error]);
-        object->Release();
-    });
+    object->mCompletionHandler(nil, chip::NullOptional, [MTRError errorForCHIPErrorCode:error]);
+    object->Release();
 }
