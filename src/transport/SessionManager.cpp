@@ -423,14 +423,14 @@ CHIP_ERROR SessionManager::ExpireAllSessionsOnLogicalFabric(const ScopedNodeId &
     ChipLogDetail(Inet, "Expiring all sessions to peer " ChipLogFormatScopedNodeId " that are on the same logical fabric!!",
                   ChipLogValueScopedNodeId(node));
 
-    return ForEachSessionOnLogicalFabric(node, [](auto * session) { session->MarkForEviction(); });
+    return ForEachMatchingSessionOnLogicalFabric(node, [](auto * session) { session->MarkForEviction(); });
 }
 
 CHIP_ERROR SessionManager::ExpireAllSessionsOnLogicalFabric(FabricIndex fabricIndex)
 {
     ChipLogDetail(Inet, "Expiring all sessions on the same logical fabric as fabric 0x%x!!", static_cast<unsigned>(fabricIndex));
 
-    return ForEachSessionOnLogicalFabric(fabricIndex, [](auto * session) { session->MarkForEviction(); });
+    return ForEachMatchingSessionOnLogicalFabric(fabricIndex, [](auto * session) { session->MarkForEviction(); });
 }
 
 void SessionManager::ExpireAllPASESessions()

@@ -226,7 +226,7 @@ public:
      *        and each is assigned a unique fabric index.
      */
     template <typename Function>
-    CHIP_ERROR ForEachSessionOnLogicalFabric(const ScopedNodeId & node, Function && function)
+    CHIP_ERROR ForEachMatchingSessionOnLogicalFabric(const ScopedNodeId & node, Function && function)
     {
         Crypto::P256PublicKey targetPubKey;
 
@@ -278,7 +278,7 @@ public:
      *        and each is assigned a unique fabric index.
      */
     template <typename Function>
-    CHIP_ERROR ForEachSessionOnLogicalFabric(FabricIndex fabricIndex, Function && function)
+    CHIP_ERROR ForEachMatchingSessionOnLogicalFabric(FabricIndex fabricIndex, Function && function)
     {
         Crypto::P256PublicKey targetPubKey;
 
