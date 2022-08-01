@@ -180,6 +180,15 @@ shell/**/README
 temperature-measurement-app/**/README
 ```
 
+## Thermostat example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+thermostat/**/README
+```
+
 ## TV example
 
 ```{toctree}

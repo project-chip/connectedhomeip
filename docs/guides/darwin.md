@@ -200,7 +200,7 @@ requirements
    [examples](https://github.com/project-chip/connectedhomeip/tree/master/examples)
    to support the fixed device types
    [above](#ensuring-your-matter-accessory-works-with-iosipadostvos)
-3. Read the [platform guides](.) on how set up the hardware
+3. Read the [platform guides](README.md) on how set up the hardware
 
 ##### Guides
 

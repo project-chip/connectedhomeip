@@ -661,7 +661,7 @@ $ west build -b nrf52840dk_nrf52840 -- \
 > Note: To generate new certificates using the nRF Connect platform build
 > system, you need the `chip-cert` executable in your system variable PATH. To
 > learn how to get `chip-cert`, go to the note at the end of
-> [creating the factory data partition with the second script](#creating-the-factory-data-partition-with-the-second-script)
+> [creating the factory data partition with the second script](#creating-a-factory-data-partition-with-the-second-script)
 > section, and then add the newly built executable to the system variable PATH.
 > The Cmake build system will find this executable automatically.
 
