@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 64.2.1. [TC-PSCFG-2.1] Attributes with server as DUT
+name: 65.2.1. [TC-PSCFG-2.1] Attributes with server as DUT
 
 config:
     nodeId: 0x12344321
@@ -21,23 +21,23 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
+  - label: "Commission DUT to TH"
+    verification: |
+        verification step to be updated.
+    disabled: true
 
-      disabled: true
+  - label: "TH reads the Sources attribute from the DUT"
+    PICS: PSCFG.S.A0000
+    verification: |
+        ./chip-tool powersourceconfiguration read sources 1 0
 
-    - label: "TH reads the Sources attribute from the DUT"
-      PICS: PSCFG.S.A0000
-      verification: |
-          Verify on the TH Log:
+        On TH, verify that that the DUT response provides a list
 
-          ./chip-tool powersourceconfiguration read sources 1 0
+        The response should look like this: 
 
-          The response should look like this:
-
-          [1650273002.441884][8875:8880] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002E Attribute 0x0000_0000 DataVersion: 461632376
-          [1653564197.717105][36217:36222] CHIP:TOO:   Sources: 3 entries
-          [1653564197.717154][36217:36222] CHIP:TOO:     [1]: 2
-          [1653564197.717196][36217:36222] CHIP:TOO:     [2]: 1
-          [1653564197.717236][36217:36222] CHIP:TOO:     [3]: 0
-      disabled: true
+        [1650273002.441884][8875:8880] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002E Attribute 0x0000_0000 DataVersion: 461632376
+        [1653564197.717105][36217:36222] CHIP:TOO:   Sources: 3 entries
+        [1653564197.717154][36217:36222] CHIP:TOO:     [1]: 2
+        [1653564197.717196][36217:36222] CHIP:TOO:     [2]: 1
+        [1653564197.717236][36217:36222] CHIP:TOO:     [3]: 0
+    disabled: true

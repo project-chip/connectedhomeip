@@ -13,9 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    105.2.1. [TC-LUNIT-2.1] Read and Write Unit Localization Cluster Attributes
-    [DUT as Client]
+name: 105.2.1. [TC-LUNIT-2.1] Read and Write Unit Localization Cluster Attributes [DUT as Client]
 
 config:
     nodeId: 0x12344321
@@ -23,60 +21,60 @@ config:
     endpoint: 0
 
 tests:
-    - label: "DUT reads TemperatureUnit attribute from TH"
-      PICS: LUNIT.C.A0000
-      verification: |
-          ./chip-tool unitlocalization read temperature-unit 1 0
-          Verify in DUT as client side: Verify that DUT reads TemperatureUnit attribute value  is in the range 0 to 3
-          [1658246774.701510][2262:2267] CHIP:DMG: }
-          [1658246774.701747][2262:2267] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_0000 DataVersion: 2312195207
-          [1658246774.702985][2262:2267] CHIP:TOO:   TemperatureUnit: 0
-          [1658246774.703107][2262:2267] CHIP:EM: Sending Standalone Ack for MessageCounter:177086388 on exchange 32231i
-      disabled: true
+  - label: "DUT reads TemperatureUnit attribute from TH"
+    PICS: LUNIT.C.A0000
+    verification: |
+        ./chip-tool unitlocalization read temperature-unit 1 0
+        Verify in DUT as client side: Verify that DUT reads TemperatureUnit attribute value  is in the range 0 to 3
+        [1658246774.701510][2262:2267] CHIP:DMG: }
+        [1658246774.701747][2262:2267] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_0000 DataVersion: 2312195207
+        [1658246774.702985][2262:2267] CHIP:TOO:   TemperatureUnit: 0
+        [1658246774.703107][2262:2267] CHIP:EM: Sending Standalone Ack for MessageCounter:177086388 on exchange 32231i
+    disabled: true
 
-    - label: "DUT writes 3 to TemperatureUnit attribute on TH"
-      PICS: LUNIT.C.A0000
-      verification: |
-          ./chip-tool unitlocalization write temperature-unit 3 1 0
-          Verify in DUT as client side: verify that DUT sends a success response
+  - label: "DUT writes 3 to TemperatureUnit attribute on TH"
+    PICS: LUNIT.C.A0000
+    verification: |
+        ./chip-tool unitlocalization write temperature-unit 3 1 0
+        Verify in DUT as client side: verify that DUT sends a success response
 
-          [1658246841.988723][2274:2279] CHIP:DMG: WriteClient moving to [ResponseRe]
-          [1658246841.988793][2274:2279] CHIP:DMG: WriteResponseMessage =
-          [1658246841.988835][2274:2279] CHIP:DMG: {
-          [1658246841.988871][2274:2279] CHIP:DMG:         AttributeStatusIBs =
-          [1658246841.988921][2274:2279] CHIP:DMG:         [
-          [1658246841.988960][2274:2279] CHIP:DMG:                 AttributeStatusIB =
-          [1658246841.989005][2274:2279] CHIP:DMG:                 {
-          [1658246841.989046][2274:2279] CHIP:DMG:                         AttributePathIB =
-          [1658246841.989102][2274:2279] CHIP:DMG:                         {
-          [1658246841.989153][2274:2279] CHIP:DMG:                                 Endpoint = 0x0,
-          [1658246841.989208][2274:2279] CHIP:DMG:                                 Cluster = 0x2d,
-          [1658246841.989261][2274:2279] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1658246841.989313][2274:2279] CHIP:DMG:                         }
-          [1658246841.989369][2274:2279] CHIP:DMG:
-          [1658246841.989418][2274:2279] CHIP:DMG:                         StatusIB =
-          [1658246841.989469][2274:2279] CHIP:DMG:                         {
-          [1658246841.989518][2274:2279] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1658246841.989569][2274:2279] CHIP:DMG:                         },
-          [1658246841.989620][2274:2279] CHIP:DMG:
-          [1658246841.989664][2274:2279] CHIP:DMG:                 },
-          [1658246841.989712][2274:2279] CHIP:DMG:
-          [1658246841.989750][2274:2279] CHIP:DMG:         ],
-          [1658246841.989797][2274:2279] CHIP:DMG:
-          [1658246841.989836][2274:2279] CHIP:DMG:         InteractionModelRevision = 1
-          [1658246841.989874][2274:2279] CHIP:DMG: }
-          [1658246841.990021][2274:2279] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658246841.990103][2274:2279] CHIP:EM: Sending Standalone Ack for MessageCounter:83846292 on exchange 33799i
-      disabled: true
+        [1658246841.988723][2274:2279] CHIP:DMG: WriteClient moving to [ResponseRe]
+        [1658246841.988793][2274:2279] CHIP:DMG: WriteResponseMessage =
+        [1658246841.988835][2274:2279] CHIP:DMG: {
+        [1658246841.988871][2274:2279] CHIP:DMG:         AttributeStatusIBs =
+        [1658246841.988921][2274:2279] CHIP:DMG:         [
+        [1658246841.988960][2274:2279] CHIP:DMG:                 AttributeStatusIB =
+        [1658246841.989005][2274:2279] CHIP:DMG:                 {
+        [1658246841.989046][2274:2279] CHIP:DMG:                         AttributePathIB =
+        [1658246841.989102][2274:2279] CHIP:DMG:                         {
+        [1658246841.989153][2274:2279] CHIP:DMG:                                 Endpoint = 0x0,
+        [1658246841.989208][2274:2279] CHIP:DMG:                                 Cluster = 0x2d,
+        [1658246841.989261][2274:2279] CHIP:DMG:                                 Attribute = 0x0000_0000,
+        [1658246841.989313][2274:2279] CHIP:DMG:                         }
+        [1658246841.989369][2274:2279] CHIP:DMG:                                 
+        [1658246841.989418][2274:2279] CHIP:DMG:                         StatusIB =
+        [1658246841.989469][2274:2279] CHIP:DMG:                         {
+        [1658246841.989518][2274:2279] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+        [1658246841.989569][2274:2279] CHIP:DMG:                         },
+        [1658246841.989620][2274:2279] CHIP:DMG:                         
+        [1658246841.989664][2274:2279] CHIP:DMG:                 },
+        [1658246841.989712][2274:2279] CHIP:DMG:                 
+        [1658246841.989750][2274:2279] CHIP:DMG:         ],
+        [1658246841.989797][2274:2279] CHIP:DMG:         
+        [1658246841.989836][2274:2279] CHIP:DMG:         InteractionModelRevision = 1
+        [1658246841.989874][2274:2279] CHIP:DMG: }
+        [1658246841.990021][2274:2279] CHIP:DMG: WriteClient moving to [AwaitingDe]
+        [1658246841.990103][2274:2279] CHIP:EM: Sending Standalone Ack for MessageCounter:83846292 on exchange 33799i
+    disabled: true
 
-    - label: "DUT reads TemperatureUnit attribute from TH"
-      PICS: LUNIT.C.A0000
-      verification: |
-          ./chip-tool unitlocalization read temperature-unit 1 0
-          Verify in DUT as client side: Verify that DUT reads TemperatureUnit attribute value  as 3
+  - label: "DUT reads TemperatureUnit attribute from TH"
+    PICS: LUNIT.C.A0000
+    verification: |
+        ./chip-tool unitlocalization read temperature-unit 1 0
+        Verify in DUT as client side: Verify that DUT reads TemperatureUnit attribute value  as 3
 
-          [1658246890.082009][2283:2288] CHIP:DMG: }
-          [1658246890.082194][2283:2288] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_0000 DataVersion: 2312195208
-          [1658246890.082278][2283:2288] CHIP:TOO:   TemperatureUnit: 3
-          [1658246890.082378][2283:2288] CHIP:EM: Sending Standalone Ack for MessageCounter:2721421 on exchange 29345i
-      disabled: true
+        [1658246890.082009][2283:2288] CHIP:DMG: }
+        [1658246890.082194][2283:2288] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_0000 DataVersion: 2312195208
+        [1658246890.082278][2283:2288] CHIP:TOO:   TemperatureUnit: 3
+        [1658246890.082378][2283:2288] CHIP:EM: Sending Standalone Ack for MessageCounter:2721421 on exchange 29345i
+    disabled: true
