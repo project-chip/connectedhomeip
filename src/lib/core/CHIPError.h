@@ -1395,13 +1395,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_LISTENER_ALREADY_STOPPED                    CHIP_CORE_ERROR(0x6a)
 
 /**
- *  @def CHIP_ERROR_UNKNOWN_TOPIC
+ *  @def CHIP_ERROR_INVALID_SUBSCRIPTION
  *
  *  @brief
- *    A topic ID was unknown to the recipient.
+ *    SUBSCRIPTION ID is not matching
  *
  */
-#define CHIP_ERROR_UNKNOWN_TOPIC                               CHIP_CORE_ERROR(0x6b)
+#define CHIP_ERROR_INVALID_SUBSCRIPTION                               CHIP_CORE_ERROR(0x6b)
 
 /**
  *  @def CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
