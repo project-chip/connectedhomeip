@@ -838,8 +838,7 @@ function getTests() {
         "TestArmFailSafe",
         "TestFanControl",
         "TestAccessControlConstraints",
-        "TestLevelControlWithOnOffDependency",
-        "TestCommissioningWindow",
+        "TestLevelControlWithOnOffDependency"
     ];
 
     const MultiAdmin = [
@@ -857,7 +856,7 @@ function getTests() {
     ];
 
     const DoorLock = [
-        //        "DL_UsersAndCredentials",
+        "DL_UsersAndCredentials",
         "DL_LockUnlock",
         "DL_Schedules",
         "Test_TC_DRLK_2_2",
