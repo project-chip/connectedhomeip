@@ -183,44 +183,86 @@ struct BackoffComplianceTestVector theBackoffComplianceTestVector[] = {
     {
         .sendCount   = 0,
         .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(300),
-        .backoffMax  = System::Clock::Timeout(375),
+        .backoffMin  = System::Clock::Timeout(330),
+        .backoffMax  = System::Clock::Timeout(413),
     },
     {
         .sendCount   = 1,
         .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(300),
-        .backoffMax  = System::Clock::Timeout(375),
+        .backoffMin  = System::Clock::Timeout(330),
+        .backoffMax  = System::Clock::Timeout(413),
     },
     {
         .sendCount   = 2,
         .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(480),
-        .backoffMax  = System::Clock::Timeout(600),
+        .backoffMin  = System::Clock::Timeout(528),
+        .backoffMax  = System::Clock::Timeout(660),
     },
     {
         .sendCount   = 3,
         .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(768),
-        .backoffMax  = System::Clock::Timeout(960),
+        .backoffMin  = System::Clock::Timeout(844),
+        .backoffMax  = System::Clock::Timeout(1057),
     },
     {
         .sendCount   = 4,
         .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(1228),
-        .backoffMax  = System::Clock::Timeout(1536),
+        .backoffMin  = System::Clock::Timeout(1351),
+        .backoffMax  = System::Clock::Timeout(1690),
     },
     {
         .sendCount   = 5,
         .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(1966),
-        .backoffMax  = System::Clock::Timeout(2458),
+        .backoffMin  = System::Clock::Timeout(2162),
+        .backoffMax  = System::Clock::Timeout(2704),
     },
     {
         .sendCount   = 6,
         .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(1966),
-        .backoffMax  = System::Clock::Timeout(2458),
+        .backoffMin  = System::Clock::Timeout(2162),
+        .backoffMax  = System::Clock::Timeout(2704),
+    },
+    {
+        .sendCount   = 0,
+        .backoffBase = System::Clock::Timeout(4000),
+        .backoffMin  = System::Clock::Timeout(4400),
+        .backoffMax  = System::Clock::Timeout(5500),
+    },
+    {
+        .sendCount   = 1,
+        .backoffBase = System::Clock::Timeout(4000),
+        .backoffMin  = System::Clock::Timeout(4400),
+        .backoffMax  = System::Clock::Timeout(5500),
+    },
+    {
+        .sendCount   = 2,
+        .backoffBase = System::Clock::Timeout(4000),
+        .backoffMin  = System::Clock::Timeout(7040),
+        .backoffMax  = System::Clock::Timeout(8800),
+    },
+    {
+        .sendCount   = 3,
+        .backoffBase = System::Clock::Timeout(4000),
+        .backoffMin  = System::Clock::Timeout(11264),
+        .backoffMax  = System::Clock::Timeout(14081),
+    },
+    {
+        .sendCount   = 4,
+        .backoffBase = System::Clock::Timeout(4000),
+        .backoffMin  = System::Clock::Timeout(18022),
+        .backoffMax  = System::Clock::Timeout(22529),
+    },
+    {
+        .sendCount   = 5,
+        .backoffBase = System::Clock::Timeout(4000),
+        .backoffMin  = System::Clock::Timeout(28835),
+        .backoffMax  = System::Clock::Timeout(36045),
+    },
+    {
+        .sendCount   = 6,
+        .backoffBase = System::Clock::Timeout(4000),
+        .backoffMin  = System::Clock::Timeout(28835),
+        .backoffMax  = System::Clock::Timeout(36045),
     },
 };
 
@@ -323,7 +365,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, loopback.mDroppedMessageCount == 1);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    // Wait for the initial message to fail (should take 300-375ms)
+    // Wait for the initial message to fail (should take 330-413ms)
     ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
@@ -340,7 +382,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, loopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    // Wait for the 1st retry to fail (should take 300-375ms)
+    // Wait for the 1st retry to fail (should take 330-413ms)
     ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 3; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
@@ -357,7 +399,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, loopback.mDroppedMessageCount == 3);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    // Wait for the 2nd retry to fail (should take 480-600msms)
+    // Wait for the 2nd retry to fail (should take 528-660ms)
     ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 4; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
@@ -374,8 +416,8 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, loopback.mDroppedMessageCount == 4);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    // Wait for the 3rd retry to fail (should take 768-960ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 5; });
+    // Wait for the 3rd retry to fail (should take 845-1056ms)
+    ctx.GetIOContext().DriveIOUntil(1500_ms32, [&] { return loopback.mSentMessageCount >= 5; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #4  Timeout : %d ms", timeoutTime.count());
@@ -1613,7 +1655,8 @@ void CheckGetBackoff(nlTestSuite * inSuite, void * inContext)
         {
             struct BackoffComplianceTestVector * test = &theBackoffComplianceTestVector[i];
             System::Clock::Timeout backoff            = ReliableMessageMgr::GetBackoff(test->backoffBase, test->sendCount);
-            ChipLogProgress(Test, "Backoff # %d: %" PRIu32, test->sendCount, (uint32_t) backoff.count());
+            ChipLogProgress(Test, "Backoff base %" PRIu32 " # %d: %" PRIu32, test->backoffBase.count(), test->sendCount,
+                            backoff.count());
 
             NL_TEST_ASSERT(inSuite, backoff >= test->backoffMin);
             NL_TEST_ASSERT(inSuite, backoff <= test->backoffMax);

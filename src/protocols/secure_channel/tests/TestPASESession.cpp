@@ -279,7 +279,7 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
 
     while (delegate.mMessageDropped)
     {
-        chip::test_utils::SleepMillis(85);
+        chip::test_utils::SleepMillis(100);
         delegate.mMessageDropped = false;
         ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), ctx.GetExchangeManager().GetReliableMessageMgr());
         ctx.DrainAndServiceIO();
