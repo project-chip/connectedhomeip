@@ -210,8 +210,6 @@
     62, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
-    513, /* Cluster: Thermostat, Command: SetWeeklySchedule, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Command: ClearWeeklySchedule, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
@@ -246,8 +244,6 @@
     9, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
     10, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     11, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
-    1, /* Cluster: Thermostat, Command: SetWeeklySchedule, Privilege: manage */ \
-    3, /* Cluster: Thermostat, Command: ClearWeeklySchedule, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
@@ -282,8 +278,6 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Command: SetWeeklySchedule, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Command: ClearWeeklySchedule, Privilege: manage */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

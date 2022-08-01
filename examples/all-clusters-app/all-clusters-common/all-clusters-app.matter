@@ -1765,7 +1765,6 @@ server cluster ModeSelect = 80 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-  readonly attribute int8u manufacturerExtension = 4293984257;
 
   request struct ChangeToModeRequest {
     INT8U newMode = 0;
@@ -2645,7 +2644,9 @@ server cluster Thermostat = 513 {
   attribute access(write: manage) int8s minSetpointDeadBand = 25;
   attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
   attribute access(write: manage) enum8 systemMode = 28;
-  readonly attribute enum8 thermostatRunningMode = 30;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -4281,7 +4282,6 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
-    ram      attribute manufacturerExtension default = 255;
   }
 
   server cluster DoorLock {
@@ -4402,7 +4402,9 @@ endpoint 1 {
     ram      attribute minSetpointDeadBand default = 0x19;
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;
-    ram      attribute thermostatRunningMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x0023;
     ram      attribute clusterRevision default = 5;
   }
