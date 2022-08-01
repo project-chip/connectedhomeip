@@ -35,7 +35,7 @@ tests:
     PICS: LTIME.C.A0000.12HR
     verification: |
         ./chip-tool timeformatlocalization write hour-format 0 1 0
-        Verify in DUT as client side: verify that  TH sends a success response 
+        Verify in DUT as client side: verify that  TH sends a success response
 
         [1657106893.878113][4897:4902] CHIP:DMG: WriteResponseMessage =
         [1657106893.878138][4897:4902] CHIP:DMG: {
@@ -49,16 +49,16 @@ tests:
         [1657106893.878430][4897:4902] CHIP:DMG:                                 Cluster = 0x2c,
         [1657106893.878466][4897:4902] CHIP:DMG:                                 Attribute = 0x0000_0000,
         [1657106893.878501][4897:4902] CHIP:DMG:                         }
-        [1657106893.878537][4897:4902] CHIP:DMG:                                 
+        [1657106893.878537][4897:4902] CHIP:DMG:
         [1657106893.878568][4897:4902] CHIP:DMG:                         StatusIB =
         [1657106893.878599][4897:4902] CHIP:DMG:                         {
         [1657106893.878630][4897:4902] CHIP:DMG:                                 status = 0x00 (SUCCESS),
         [1657106893.878661][4897:4902] CHIP:DMG:                         },
-        [1657106893.878692][4897:4902] CHIP:DMG:                         
+        [1657106893.878692][4897:4902] CHIP:DMG:
         [1657106893.878717][4897:4902] CHIP:DMG:                 },
-        [1657106893.878746][4897:4902] CHIP:DMG:                 
+        [1657106893.878746][4897:4902] CHIP:DMG:
         [1657106893.878769][4897:4902] CHIP:DMG:         ],
-        [1657106893.878798][4897:4902] CHIP:DMG:         
+        [1657106893.878798][4897:4902] CHIP:DMG:
         [1657106893.878822][4897:4902] CHIP:DMG:         InteractionModelRevision = 1
         [1657106893.878844][4897:4902] CHIP:DMG: }
         [1657106893.878914][4897:4902] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -78,7 +78,7 @@ tests:
     PICS: LTIME.C.A0000.24HR
     verification: |
         ./chip-tool timeformatlocalization write hour-format 1 1 0
-        Verify in DUT as client side: verify that  TH sends a success response 
+        Verify in DUT as client side: verify that  TH sends a success response
 
         [1657106989.102102][4907:4912] CHIP:DMG: WriteResponseMessage =
         [1657106989.102137][4907:4912] CHIP:DMG: {
@@ -92,16 +92,16 @@ tests:
         [1657106989.102554][4907:4912] CHIP:DMG:                                 Cluster = 0x2c,
         [1657106989.102611][4907:4912] CHIP:DMG:                                 Attribute = 0x0000_0000,
         [1657106989.102658][4907:4912] CHIP:DMG:                         }
-        [1657106989.102718][4907:4912] CHIP:DMG:                                 
+        [1657106989.102718][4907:4912] CHIP:DMG:
         [1657106989.102768][4907:4912] CHIP:DMG:                         StatusIB =
         [1657106989.102810][4907:4912] CHIP:DMG:                         {
         [1657106989.102865][4907:4912] CHIP:DMG:                                 status = 0x00 (SUCCESS),
         [1657106989.102907][4907:4912] CHIP:DMG:                         },
-        [1657106989.102960][4907:4912] CHIP:DMG:                         
+        [1657106989.102960][4907:4912] CHIP:DMG:
         [1657106989.103008][4907:4912] CHIP:DMG:                 },
-        [1657106989.103049][4907:4912] CHIP:DMG:                 
+        [1657106989.103049][4907:4912] CHIP:DMG:
         [1657106989.103091][4907:4912] CHIP:DMG:         ],
-        [1657106989.103132][4907:4912] CHIP:DMG:         
+        [1657106989.103132][4907:4912] CHIP:DMG:
         [1657106989.103174][4907:4912] CHIP:DMG:         InteractionModelRevision = 1
         [1657106989.103206][4907:4912] CHIP:DMG: }
         [1657106989.103306][4907:4912] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -154,7 +154,7 @@ tests:
     PICS: LTIME.C.A0001
     verification: |
         ./chip-tool timeformatlocalization write active-calendar-type 0 1 0
-        Verify in DUT as client side: verify that  TH sends a success response 
+        Verify in DUT as client side: verify that  TH sends a success response
 
         [1657107074.760869][4932:4937] CHIP:DMG: WriteResponseMessage =
         [1657107074.760897][4932:4937] CHIP:DMG: {
@@ -168,16 +168,16 @@ tests:
         [1657107074.761137][4932:4937] CHIP:DMG:                                 Cluster = 0x2c,
         [1657107074.761171][4932:4937] CHIP:DMG:                                 Attribute = 0x0000_0001,
         [1657107074.761203][4932:4937] CHIP:DMG:                         }
-        [1657107074.761239][4932:4937] CHIP:DMG:                                 
+        [1657107074.761239][4932:4937] CHIP:DMG:
         [1657107074.761270][4932:4937] CHIP:DMG:                         StatusIB =
         [1657107074.761302][4932:4937] CHIP:DMG:                         {
         [1657107074.761334][4932:4937] CHIP:DMG:                                 status = 0x00 (SUCCESS),
         [1657107074.761366][4932:4937] CHIP:DMG:                         },
-        [1657107074.761397][4932:4937] CHIP:DMG:                         
+        [1657107074.761397][4932:4937] CHIP:DMG:
         [1657107074.761422][4932:4937] CHIP:DMG:                 },
-        [1657107074.761452][4932:4937] CHIP:DMG:                 
+        [1657107074.761452][4932:4937] CHIP:DMG:
         [1657107074.761475][4932:4937] CHIP:DMG:         ],
-        [1657107074.761504][4932:4937] CHIP:DMG:         
+        [1657107074.761504][4932:4937] CHIP:DMG:
         [1657107074.761528][4932:4937] CHIP:DMG:         InteractionModelRevision = 1
         [1657107074.761551][4932:4937] CHIP:DMG: }
         [1657107074.761621][4932:4937] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -194,4 +194,3 @@ tests:
     verification: |
         Repeat the test step 8 for below mentioned values 1, 2,3, 4, 5, 6,7, 8, 9,10 and 11 and verify that TH receives the write command and updates the respective value. Verify that TH reads ActiveCalendarType attribute value and it is the same as the value that was set before
     disabled: true
-

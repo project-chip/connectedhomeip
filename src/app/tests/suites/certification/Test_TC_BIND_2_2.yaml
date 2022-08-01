@@ -23,7 +23,7 @@ config:
 tests:
   - label: "Factory Reset DUT"
     verification: |
-        Vendor specific action, for chip-tool run 
+        Vendor specific action, for chip-tool run
         rm -rf /tmp/chip*
     disabled: true
 
@@ -62,7 +62,7 @@ tests:
         [1657717291.809861][3361:3366] CHIP:DMG: ICR moving to [ResponseRe]
         [1657717291.809913][3361:3366] CHIP:DMG: InvokeResponseMessage =
         [1657717291.809939][3361:3366] CHIP:DMG: {
-        [1657717291.809965][3361:3366] CHIP:DMG:         suppressResponse = false, 
+        [1657717291.809965][3361:3366] CHIP:DMG:         suppressResponse = false,
         [1657717291.809992][3361:3366] CHIP:DMG:         InvokeResponseIBs =
         [1657717291.810025][3361:3366] CHIP:DMG:         [
         [1657717291.810051][3361:3366] CHIP:DMG:                 InvokeResponseIB =
@@ -75,18 +75,18 @@ tests:
         [1657717291.810290][3361:3366] CHIP:DMG:                                         ClusterId = 0x3f,
         [1657717291.810326][3361:3366] CHIP:DMG:                                         CommandId = 0x0,
         [1657717291.810364][3361:3366] CHIP:DMG:                                 },
-        [1657717291.810403][3361:3366] CHIP:DMG:                                 
+        [1657717291.810403][3361:3366] CHIP:DMG:
         [1657717291.810435][3361:3366] CHIP:DMG:                                 StatusIB =
         [1657717291.810470][3361:3366] CHIP:DMG:                                 {
         [1657717291.810507][3361:3366] CHIP:DMG:                                         status = 0x00 (SUCCESS),
         [1657717291.810540][3361:3366] CHIP:DMG:                                 },
-        [1657717291.810575][3361:3366] CHIP:DMG:                                 
+        [1657717291.810575][3361:3366] CHIP:DMG:
         [1657717291.810606][3361:3366] CHIP:DMG:                         },
-        [1657717291.810641][3361:3366] CHIP:DMG:                         
+        [1657717291.810641][3361:3366] CHIP:DMG:
         [1657717291.810668][3361:3366] CHIP:DMG:                 },
-        [1657717291.810700][3361:3366] CHIP:DMG:                 
+        [1657717291.810700][3361:3366] CHIP:DMG:
         [1657717291.810725][3361:3366] CHIP:DMG:         ],
-        [1657717291.810757][3361:3366] CHIP:DMG:         
+        [1657717291.810757][3361:3366] CHIP:DMG:
         [1657717291.810782][3361:3366] CHIP:DMG:         InteractionModelRevision = 1
         [1657717291.810807][3361:3366] CHIP:DMG: },
         [1657717291.810869][3361:3366] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003F Command=0x0000_0000 Status=0x0
@@ -114,7 +114,7 @@ tests:
         [1657717342.599959][3368:3373] CHIP:TOO:     status: 0
         [1657717342.600007][3368:3373] CHIP:TOO:     groupId: 1
         [1657717342.600054][3368:3373] CHIP:TOO:    }
-        [1657717342.600130][3368:3373] CHIP:DMG: ICR moving 
+        [1657717342.600130][3368:3373] CHIP:DMG: ICR moving
 
         ./chip-tool groupsettings add-group grp1 0x0001
 

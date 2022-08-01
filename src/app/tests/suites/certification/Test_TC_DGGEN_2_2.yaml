@@ -41,12 +41,12 @@ tests:
         “HardwareFault enum”
         CHIP:DMG: ReportDataMessage =
         [1651562132.028543][7867:7872] CHIP:DMG: {
-        [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true, 
+        [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true,
         [1651562132.028632][7867:7872] CHIP:DMG:         InteractionModelRevision = 1
         [1651562132.028675][7867:7872] CHIP:DMG: }
         [1651562132.028788][7867:7872] CHIP:EM: Sending Standalone Ack for MessageCounter:10343932 on exchange 65462i
 
-        1. Launch chip-tool into interactive mode with the below command 
+        1. Launch chip-tool into interactive mode with the below command
         ./chip-tool interactive start
          generaldiagnostics subscribe-event hardware-fault-change 100 1000 1 0
 
@@ -80,7 +80,7 @@ tests:
 
         CHIP:DMG: ReportDataMessage =
         [1651562132.028543][7867:7872] CHIP:DMG: {
-        [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true, 
+        [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true,
         [1651562132.028632][7867:7872] CHIP:DMG:         InteractionModelRevision = 1
         [1651562132.028675][7867:7872] CHIP:DMG: }
         [1651562132.028788][7867:7872] CHIP:EM: Sending Standalone Ack for MessageCounter:10343932 on exchange 65462i
@@ -122,7 +122,7 @@ tests:
         detected by the Node.
         CHIP:DMG: ReportDataMessage =
         [1651562132.028543][7867:7872] CHIP:DMG: {
-        [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true, 
+        [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true,
         [1651562132.028632][7867:7872] CHIP:DMG:         InteractionModelRevision = 1
         [1651562132.028675][7867:7872] CHIP:DMG: }
         [1651562132.028788][7867:7872] CHIP:EM: Sending Standalone Ack for MessageCounter:10343932 on exchange 65462i

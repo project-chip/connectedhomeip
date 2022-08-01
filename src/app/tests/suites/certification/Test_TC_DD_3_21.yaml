@@ -54,7 +54,7 @@ tests:
         [1651109784.452770][31207:31207] CHIP:SVR: Commissioning completed successfully
         [1651109784.452813][31207:31207] CHIP:DIS: Updating services using commissioning mode 0
 
-        DUT Commissioner: 
+        DUT Commissioner:
         $ ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 
         [1651109784376] [95553:65657838] CHIP: [CTL] Received CommissioningComplete response

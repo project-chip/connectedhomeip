@@ -36,7 +36,7 @@ tests:
     verification: |
         ./chip-tool timeformatlocalization write hour-format 0 1 0
 
-        On TH verify that DUT sends a success response 
+        On TH verify that DUT sends a success response
         [1651192743588] [14026:192208] CHIP: [DMG] WriteResponseMessage =
         [1651192743588] [14026:192208] CHIP: [DMG] {
         [1651192743588] [14026:192208] CHIP: [DMG]         AttributeStatusIBs =
@@ -49,16 +49,16 @@ tests:
         [1651192743588] [14026:192208] CHIP: [DMG]                                 Cluster = 0x2c,
         [1651192743588] [14026:192208] CHIP: [DMG]                                 Attribute = 0x0000_0000,
         [1651192743588] [14026:192208] CHIP: [DMG]                         }
-        [1651192743588] [14026:192208] CHIP: [DMG]                                 
+        [1651192743588] [14026:192208] CHIP: [DMG]
         [1651192743588] [14026:192208] CHIP: [DMG]                         StatusIB =
         [1651192743588] [14026:192208] CHIP: [DMG]                         {
         [1651192743588] [14026:192208] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
         [1651192743588] [14026:192208] CHIP: [DMG]                         },
-        [1651192743588] [14026:192208] CHIP: [DMG]                         
+        [1651192743588] [14026:192208] CHIP: [DMG]
         [1651192743588] [14026:192208] CHIP: [DMG]                 },
-        [1651192743588] [14026:192208] CHIP: [DMG]                 
+        [1651192743588] [14026:192208] CHIP: [DMG]
         [1651192743588] [14026:192208] CHIP: [DMG]         ],
-        [1651192743588] [14026:192208] CHIP: [DMG]         
+        [1651192743588] [14026:192208] CHIP: [DMG]
         [1651192743588] [14026:192208] CHIP: [DMG]         InteractionModelRevision = 1
         [1651192743588] [14026:192208] CHIP: [DMG] }
     disabled: true
@@ -77,7 +77,7 @@ tests:
     verification: |
         ./chip-tool timeformatlocalization write hour-format 1 1 0
 
-        On TH verify that DUT sends a success response 
+        On TH verify that DUT sends a success response
         [1651193043035] [14140:195730] CHIP: [DMG] WriteResponseMessage =
         [1651193043035] [14140:195730] CHIP: [DMG] {
         [1651193043035] [14140:195730] CHIP: [DMG]         AttributeStatusIBs =
@@ -90,16 +90,16 @@ tests:
         [1651193043035] [14140:195730] CHIP: [DMG]                                 Cluster = 0x2c,
         [1651193043035] [14140:195730] CHIP: [DMG]                                 Attribute = 0x0000_0000,
         [1651193043035] [14140:195730] CHIP: [DMG]                         }
-        [1651193043035] [14140:195730] CHIP: [DMG]                                 
+        [1651193043035] [14140:195730] CHIP: [DMG]
         [1651193043035] [14140:195730] CHIP: [DMG]                         StatusIB =
         [1651193043035] [14140:195730] CHIP: [DMG]                         {
         [1651193043035] [14140:195730] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
         [1651193043035] [14140:195730] CHIP: [DMG]                         },
-        [1651193043035] [14140:195730] CHIP: [DMG]                         
+        [1651193043035] [14140:195730] CHIP: [DMG]
         [1651193043035] [14140:195730] CHIP: [DMG]                 },
-        [1651193043035] [14140:195730] CHIP: [DMG]                 
+        [1651193043035] [14140:195730] CHIP: [DMG]
         [1651193043035] [14140:195730] CHIP: [DMG]         ],
-        [1651193043035] [14140:195730] CHIP: [DMG]         
+        [1651193043035] [14140:195730] CHIP: [DMG]
         [1651193043036] [14140:195730] CHIP: [DMG]         InteractionModelRevision = 1
         [1651193043036] [14140:195730] CHIP: [DMG] }
         [1651193043036] [14140:195730] CHIP: [DMG] WriteClient moving to [AwaitingDe]
@@ -150,7 +150,7 @@ tests:
     verification: |
         ./chip-tool timeformatlocalization write active-calendar-type 0 1 0
 
-        On TH verify that DUT sends a success response 
+        On TH verify that DUT sends a success response
         [1651194449245] [14699:212201] CHIP: [DMG] WriteResponseMessage =
         [1651194449245] [14699:212201] CHIP: [DMG] {
         [1651194449245] [14699:212201] CHIP: [DMG]         AttributeStatusIBs =
@@ -163,16 +163,16 @@ tests:
         [1651194449246] [14699:212201] CHIP: [DMG]                                 Cluster = 0x2c,
         [1651194449246] [14699:212201] CHIP: [DMG]                                 Attribute = 0x0000_0001,
         [1651194449246] [14699:212201] CHIP: [DMG]                         }
-        [1651194449246] [14699:212201] CHIP: [DMG]                                 
+        [1651194449246] [14699:212201] CHIP: [DMG]
         [1651194449246] [14699:212201] CHIP: [DMG]                         StatusIB =
         [1651194449246] [14699:212201] CHIP: [DMG]                         {
         [1651194449246] [14699:212201] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
         [1651194449246] [14699:212201] CHIP: [DMG]                         },
-        [1651194449246] [14699:212201] CHIP: [DMG]                         
+        [1651194449246] [14699:212201] CHIP: [DMG]
         [1651194449246] [14699:212201] CHIP: [DMG]                 },
-        [1651194449246] [14699:212201] CHIP: [DMG]                 
+        [1651194449246] [14699:212201] CHIP: [DMG]
         [1651194449246] [14699:212201] CHIP: [DMG]         ],
-        [1651194449246] [14699:212201] CHIP: [DMG]         
+        [1651194449246] [14699:212201] CHIP: [DMG]
         [1651194449246] [14699:212201] CHIP: [DMG]         InteractionModelRevision = 1
         [1651194449246] [14699:212201] CHIP: [DMG] }
 
@@ -196,9 +196,9 @@ tests:
     PICS: LTIME.S.A0001
     verification: |
         ./chip-tool timeformatlocalization write  active-calendar-type 50 1 0
-        On TH verify that DUT sends a CONSTRAINT_ERROR response 
+        On TH verify that DUT sends a CONSTRAINT_ERROR response
         [1658742658.653019][3572:3577] CHIP:DMG:         ],
-        [1658742658.653047][3572:3577] CHIP:DMG:         
+        [1658742658.653047][3572:3577] CHIP:DMG:
         [1658742658.653071][3572:3577] CHIP:DMG:         InteractionModelRevision = 1
         [1658742658.653098][3572:3577] CHIP:DMG: }
         [1658742658.653166][3572:3577] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -210,7 +210,7 @@ tests:
     PICS: LTIME.S.A0000
     verification: |
         ./chip-tool timeformatlocalization write   hour-format  5 1 0
-        On TH verify that DUT sends a CONSTRAINT_ERROR response 
+        On TH verify that DUT sends a CONSTRAINT_ERROR response
 
         [1656934321.910991][6387:6392] CHIP:DMG: WriteResponseMessage =
         [1656934321.911025][6387:6392] CHIP:DMG: {
@@ -224,20 +224,19 @@ tests:
         [1656934321.911330][6387:6392] CHIP:DMG:                                 Cluster = 0x2c,
         [1656934321.911375][6387:6392] CHIP:DMG:                                 Attribute = 0x0000_0000,
         [1656934321.911417][6387:6392] CHIP:DMG:                         }
-        [1656934321.911463][6387:6392] CHIP:DMG:                                 
+        [1656934321.911463][6387:6392] CHIP:DMG:
         [1656934321.911503][6387:6392] CHIP:DMG:                         StatusIB =
         [1656934321.911574][6387:6392] CHIP:DMG:                         {
         [1656934321.911618][6387:6392] CHIP:DMG:                                 status = 0x87 (CONSTRAINT_ERROR),
         [1656934321.911658][6387:6392] CHIP:DMG:                         },
-        [1656934321.911699][6387:6392] CHIP:DMG:                         
+        [1656934321.911699][6387:6392] CHIP:DMG:
         [1656934321.911733][6387:6392] CHIP:DMG:                 },
-        [1656934321.911772][6387:6392] CHIP:DMG:                 
+        [1656934321.911772][6387:6392] CHIP:DMG:
         [1656934321.911804][6387:6392] CHIP:DMG:         ],
-        [1656934321.911842][6387:6392] CHIP:DMG:         
+        [1656934321.911842][6387:6392] CHIP:DMG:
         [1656934321.911875][6387:6392] CHIP:DMG:         InteractionModelRevision = 1
         [1656934321.911906][6387:6392] CHIP:DMG: }
         [1656934321.911992][6387:6392] CHIP:DMG: WriteClient moving to [AwaitingDe]
         [1656934321.912033][6387:6392] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
         [1656934321.912104][6387:6392] CHIP:EM: Sending Standalone Ack for MessageCounter:9709501 on exchange 15031i
     disabled: true
-

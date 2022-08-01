@@ -212,7 +212,7 @@ tests:
         this attribute."
     PICS: DGGEN.C.A0005
     verification: |
-        ./chip-tool generaldiagnostics read active-hardware-faults 1 0 
+        ./chip-tool generaldiagnostics read active-hardware-faults 1 0
 
         Verify in DUT as client side: verify that ActiveHardwareFaults attribute the attribute response should be empty. But when a hardware fault occurs, the return attribute value must match the value listed in the HardwareFault ENUM table 11.11.6.1
 
@@ -224,7 +224,7 @@ tests:
         attribute."
     PICS: DGGEN.C.A0006
     verification: |
-        ./chip-tool generaldiagnostics read active-radio-faults 1 0 
+        ./chip-tool generaldiagnostics read active-radio-faults 1 0
         Verify in DUT as client side:verify that  the attribute response should be empty. But when a radio fault occurs, the return attribute value must match the value listed in the RadioFault ENUM table. 11.11.6.2
         [1650878056.266314][2391:2396] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0006 DataVersion: 3419113433
         [1650878056.266428][2391:2396] CHIP:TOO:   ActiveRadioFaults: 0 entries
@@ -234,7 +234,7 @@ tests:
         this attribute."
     PICS: DGGEN.C.A0007
     verification: |
-        ./chip-tool generaldiagnostics read active-network-faults 1 0 
+        ./chip-tool generaldiagnostics read active-network-faults 1 0
         Verify in DUT as client side: verify that ActiveNetworkFaults attribute value attribute response should be empty. But when a network fault occurs, the return attribute value must match the value listed in the NetworkFault ENUM ta
         [1650878077.694616][2399:2404] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0007 DataVersion: 3419113433
         [1650878077.694781][2399:2404] CHIP:TOO:   ActiveNetworkFaults: 0 entries

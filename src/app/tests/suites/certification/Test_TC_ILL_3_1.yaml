@@ -38,16 +38,16 @@ tests:
         [1658142106.967209][13946:13946] CHIP:DMG:                         Cluster = 0x400,
         [1658142106.967254][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0001,
         [1658142106.967281][13946:13946] CHIP:DMG:                 }
-        [1658142106.967320][13946:13946] CHIP:DMG:                         
+        [1658142106.967320][13946:13946] CHIP:DMG:
         [1658142106.967346][13946:13946] CHIP:DMG:         ],
-        [1658142106.967384][13946:13946] CHIP:DMG:                 
-        [1658142106.967413][13946:13946] CHIP:DMG:         isFabricFiltered = true, 
+        [1658142106.967384][13946:13946] CHIP:DMG:
+        [1658142106.967413][13946:13946] CHIP:DMG:         isFabricFiltered = true,
         [1658142106.967447][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
         [1658142106.967471][13946:13946] CHIP:DMG: },
         [1658142106.967568][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
         [1658142106.967676][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
-        On DUT as a client side, verify that TH all-clusters-app sent MinMeasuredValue attribute value 
+        On DUT as a client side, verify that TH all-clusters-app sent MinMeasuredValue attribute value
         [1657175568.648126][4333:4338] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0001 DataVersion: 891386989
         [1657175568.648195][4333:4338] CHIP:TOO:   MinMeasuredValue: 1
         [1657175568.648282][4333:4338] CHIP:EM: Sending Standalone Ack for MessageCounter:69575282 on exchange 26638i
@@ -66,17 +66,17 @@ tests:
         [1658142397.299125][13946:13946] CHIP:DMG:                         Cluster = 0x400,
         [1658142397.299158][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0002,
         [1658142397.299195][13946:13946] CHIP:DMG:                 }
-        [1658142397.299223][13946:13946] CHIP:DMG:                         
+        [1658142397.299223][13946:13946] CHIP:DMG:
         [1658142397.299258][13946:13946] CHIP:DMG:         ],
-        [1658142397.299286][13946:13946] CHIP:DMG:                 
-        [1658142397.299321][13946:13946] CHIP:DMG:         isFabricFiltered = true, 
+        [1658142397.299286][13946:13946] CHIP:DMG:
+        [1658142397.299321][13946:13946] CHIP:DMG:         isFabricFiltered = true,
         [1658142397.299346][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
         [1658142397.299378][13946:13946] CHIP:DMG: },
         [1658142397.299462][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
         [1658142397.299556][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
 
-        On DUT as a client side, verify that TH all-clusters-app sent MaxMeasuredValue attribute value 
+        On DUT as a client side, verify that TH all-clusters-app sent MaxMeasuredValue attribute value
         [1658142397.323460][8822:8827] CHIP:DMG: }
         [1658142397.323671][8822:8827] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0002 DataVersion: 2941193782
         [1658142397.323776][8822:8827] CHIP:TOO:   MaxMeasuredValue: 65534
@@ -96,16 +96,16 @@ tests:
         [1658142471.266486][13946:13946] CHIP:DMG:                         Cluster = 0x400,
         [1658142471.266521][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0000,
         [1658142471.266558][13946:13946] CHIP:DMG:                 }
-        [1658142471.266593][13946:13946] CHIP:DMG:                         
+        [1658142471.266593][13946:13946] CHIP:DMG:
         [1658142471.266624][13946:13946] CHIP:DMG:         ],
-        [1658142471.266656][13946:13946] CHIP:DMG:                 
-        [1658142471.266686][13946:13946] CHIP:DMG:         isFabricFiltered = true, 
+        [1658142471.266656][13946:13946] CHIP:DMG:
+        [1658142471.266686][13946:13946] CHIP:DMG:         isFabricFiltered = true,
         [1658142471.266714][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
         [1658142471.266740][13946:13946] CHIP:DMG: },
         [1658142471.266826][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
         [1658142471.266939][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
-        On DUT as a client side, verify that TH all-clusters-app sent MeasuredValue attribute value 
+        On DUT as a client side, verify that TH all-clusters-app sent MeasuredValue attribute value
         [1658142471.287159][8830:8835] CHIP:DMG: }
         [1658142471.287366][8830:8835] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0000 DataVersion: 2941193782
         [1658142471.287467][8830:8835] CHIP:TOO:   MeasuredValue: 0
@@ -131,10 +131,10 @@ tests:
         [1658142553.001465][13946:13946] CHIP:DMG:                         Cluster = 0x400,
         [1658142553.001501][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0003,
         [1658142553.001536][13946:13946] CHIP:DMG:                 }
-        [1658142553.001568][13946:13946] CHIP:DMG:                         
+        [1658142553.001568][13946:13946] CHIP:DMG:
         [1658142553.001598][13946:13946] CHIP:DMG:         ],
-        [1658142553.001630][13946:13946] CHIP:DMG:                 
-        [1658142553.001660][13946:13946] CHIP:DMG:         isFabricFiltered = true, 
+        [1658142553.001630][13946:13946] CHIP:DMG:
+        [1658142553.001660][13946:13946] CHIP:DMG:         isFabricFiltered = true,
         [1658142553.001690][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
         [1658142553.001717][13946:13946] CHIP:DMG: },
         [1658142553.001801][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -159,10 +159,10 @@ tests:
         [1658142581.619425][13946:13946] CHIP:DMG:                         Cluster = 0x400,
         [1658142581.619456][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0004,
         [1658142581.619485][13946:13946] CHIP:DMG:                 }
-        [1658142581.619512][13946:13946] CHIP:DMG:                         
+        [1658142581.619512][13946:13946] CHIP:DMG:
         [1658142581.619537][13946:13946] CHIP:DMG:         ],
-        [1658142581.619565][13946:13946] CHIP:DMG:                 
-        [1658142581.619591][13946:13946] CHIP:DMG:         isFabricFiltered = true, 
+        [1658142581.619565][13946:13946] CHIP:DMG:
+        [1658142581.619591][13946:13946] CHIP:DMG:         isFabricFiltered = true,
         [1658142581.619616][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
         [1658142581.619639][13946:13946] CHIP:DMG: },
         [1658142581.619714][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -206,16 +206,16 @@ tests:
         [1658142106.967209][13946:13946] CHIP:DMG:                         Cluster = 0x400,
         [1658142106.967254][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0001,
         [1658142106.967281][13946:13946] CHIP:DMG:                 }
-        [1658142106.967320][13946:13946] CHIP:DMG:                         
+        [1658142106.967320][13946:13946] CHIP:DMG:
         [1658142106.967346][13946:13946] CHIP:DMG:         ],
-        [1658142106.967384][13946:13946] CHIP:DMG:                 
-        [1658142106.967413][13946:13946] CHIP:DMG:         isFabricFiltered = true, 
+        [1658142106.967384][13946:13946] CHIP:DMG:
+        [1658142106.967413][13946:13946] CHIP:DMG:         isFabricFiltered = true,
         [1658142106.967447][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
         [1658142106.967471][13946:13946] CHIP:DMG: },
         [1658142106.967568][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
         [1658142106.967676][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
-        On DUT as a client side, verify that TH all-clusters-app sent MinMeasuredValue attribute value 
+        On DUT as a client side, verify that TH all-clusters-app sent MinMeasuredValue attribute value
         [1657175568.648126][4333:4338] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0001 DataVersion: 891386989
         [1657175568.648195][4333:4338] CHIP:TOO:   MinMeasuredValue: 1
         [1657175568.648282][4333:4338] CHIP:EM: Sending Standalone Ack for MessageCounter:69575282 on exchange 26638i
@@ -234,17 +234,17 @@ tests:
         [1658142397.299125][13946:13946] CHIP:DMG:                         Cluster = 0x400,
         [1658142397.299158][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0002,
         [1658142397.299195][13946:13946] CHIP:DMG:                 }
-        [1658142397.299223][13946:13946] CHIP:DMG:                         
+        [1658142397.299223][13946:13946] CHIP:DMG:
         [1658142397.299258][13946:13946] CHIP:DMG:         ],
-        [1658142397.299286][13946:13946] CHIP:DMG:                 
-        [1658142397.299321][13946:13946] CHIP:DMG:         isFabricFiltered = true, 
+        [1658142397.299286][13946:13946] CHIP:DMG:
+        [1658142397.299321][13946:13946] CHIP:DMG:         isFabricFiltered = true,
         [1658142397.299346][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
         [1658142397.299378][13946:13946] CHIP:DMG: },
         [1658142397.299462][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
         [1658142397.299556][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
 
-        On DUT as a client side, verify that TH all-clusters-app sent MaxMeasuredValue attribute value 
+        On DUT as a client side, verify that TH all-clusters-app sent MaxMeasuredValue attribute value
         [1658142397.323460][8822:8827] CHIP:DMG: }
         [1658142397.323671][8822:8827] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0002 DataVersion: 2941193782
         [1658142397.323776][8822:8827] CHIP:TOO:   MaxMeasuredValue: 65534
@@ -264,16 +264,16 @@ tests:
         [1658142471.266486][13946:13946] CHIP:DMG:                         Cluster = 0x400,
         [1658142471.266521][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0000,
         [1658142471.266558][13946:13946] CHIP:DMG:                 }
-        [1658142471.266593][13946:13946] CHIP:DMG:                         
+        [1658142471.266593][13946:13946] CHIP:DMG:
         [1658142471.266624][13946:13946] CHIP:DMG:         ],
-        [1658142471.266656][13946:13946] CHIP:DMG:                 
-        [1658142471.266686][13946:13946] CHIP:DMG:         isFabricFiltered = true, 
+        [1658142471.266656][13946:13946] CHIP:DMG:
+        [1658142471.266686][13946:13946] CHIP:DMG:         isFabricFiltered = true,
         [1658142471.266714][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
         [1658142471.266740][13946:13946] CHIP:DMG: },
         [1658142471.266826][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
         [1658142471.266939][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
-        On DUT as a client side, verify that TH all-clusters-app sent MeasuredValue attribute value 
+        On DUT as a client side, verify that TH all-clusters-app sent MeasuredValue attribute value
         [1658142471.287159][8830:8835] CHIP:DMG: }
         [1658142471.287366][8830:8835] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0000 DataVersion: 2941193782
         [1658142471.287467][8830:8835] CHIP:TOO:   MeasuredValue: 0

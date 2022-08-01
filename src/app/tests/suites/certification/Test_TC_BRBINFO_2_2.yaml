@@ -25,7 +25,7 @@ tests:
         StartUp event from DUT"
     PICS: BRBINFO.S.E00
     verification: |
-        Optional Event - 
+        Optional Event -
 
         ./chip-tool bridgeddevicebasic read-event start-up 1 3
 
@@ -33,7 +33,7 @@ tests:
 
         [1657698138.901928][15596:15601] CHIP:DMG: ReportDataMessage =
         [1657698138.901978][15596:15601] CHIP:DMG: {
-        [1657698138.902023][15596:15601] CHIP:DMG:         SuppressResponse = true, 
+        [1657698138.902023][15596:15601] CHIP:DMG:         SuppressResponse = true,
         [1657698138.902081][15596:15601] CHIP:DMG:         InteractionModelRevision = 1
         [1657698138.902126][15596:15601] CHIP:DMG: }
     disabled: true
@@ -58,8 +58,7 @@ tests:
         Verify in TH Log:
         [1657698198.023273][15606:15611] CHIP:DMG: ReportDataMessage =
         [1657698198.023302][15606:15611] CHIP:DMG: {
-        [1657698198.023326][15606:15611] CHIP:DMG:         SuppressResponse = true, 
+        [1657698198.023326][15606:15611] CHIP:DMG:         SuppressResponse = true,
         [1657698198.023352][15606:15611] CHIP:DMG:         InteractionModelRevision = 1
         [1657698198.023376][15606:15611] CHIP:DMG: }
     disabled: true
-

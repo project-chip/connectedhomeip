@@ -113,7 +113,7 @@ tests:
         process using IP Network."
     PICS: MCORE.DD.DISCOVERY_IP
     verification: |
-        TH all-clusters-app: 
+        TH all-clusters-app:
         [1657234324.992098][370755:370755] CHIP:SVR: Commissioning completed successfully
         [1657234324.992146][370755:370755] CHIP:DIS: Updating services using commissioning mode 0
 
@@ -157,4 +157,3 @@ tests:
         Out of Scope for V1.0
         SoftAP commissioning not currently supported
     disabled: true
-

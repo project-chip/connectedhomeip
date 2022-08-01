@@ -26,7 +26,7 @@ tests:
         and DeviceTypeList attributes of the Descriptor cluster at that endpoint"
     PICS: MCORE.BRIDGE
     verification: |
-        Read parts-list and device-list with endpoint 0, and for each of the endpoint listed for endpoint 0 read device-list and parts-list and verify the below log in TH  
+        Read parts-list and device-list with endpoint 0, and for each of the endpoint listed for endpoint 0 read device-list and parts-list and verify the below log in TH
 
         ./chip-tool descriptor read parts-list 1 0
 
