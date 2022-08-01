@@ -95,6 +95,12 @@ void DoorLockServer::InitServer(chip::EndpointId endpointId)
         ChipLogError(Zcl, "[InitDoorLockServer] Unable to set the Lock State attribute to null [status=%d]", status);
     }
     SetActuatorEnabled(endpointId, true);
+
+    for (auto & ep : mEndpointCtx)
+    {
+        ep.lockoutEndTimestamp    = ep.lockoutEndTimestamp.zero();
+        ep.wrongCodeEntryAttempts = 0;
+    }
 }
 
 bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState)
@@ -177,6 +183,67 @@ bool DoorLockServer::SetOneTouchLocking(chip::EndpointId endpointId, bool isEnab
 bool DoorLockServer::SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled)
 {
     return SetAttribute(endpointId, Attributes::EnablePrivacyModeButton::Id, Attributes::EnablePrivacyModeButton::Set, isEnabled);
+}
+
+bool DoorLockServer::TrackWrongCodeEntry(chip::EndpointId endpointId)
+{
+    auto endpointContext = getContext(endpointId);
+    if (nullptr == endpointContext)
+    {
+        ChipLogError(Zcl, "Failed to get endpoint index for cluster [endpoint=%d]", endpointId);
+        return false;
+    }
+
+    uint8_t wrongCodeEntryLimit = 0xFF;
+    auto status                 = Attributes::WrongCodeEntryLimit::Get(endpointId, &wrongCodeEntryLimit);
+    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    {
+        if (++endpointContext->wrongCodeEntryAttempts >= wrongCodeEntryLimit)
+        {
+            emberAfDoorLockClusterPrintln("Too many wrong code entry attempts, engaging lockout [endpoint=%d,wrongCodeAttempts=%d]",
+                                          endpointId, endpointContext->wrongCodeEntryAttempts);
+            engageLockout(endpointId);
+        }
+    }
+    else if (EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE != status)
+    {
+        ChipLogError(Zcl, "Failed to read Wrong Code Entry Limit attribute, status=0x%x", to_underlying(status));
+        return false;
+    }
+    return true;
+}
+
+bool DoorLockServer::engageLockout(chip::EndpointId endpointId)
+{
+    uint8_t lockoutTimeout;
+
+    auto endpointContext = getContext(endpointId);
+    if (nullptr == endpointContext)
+    {
+        ChipLogError(Zcl, "Failed to get endpoint index for cluster [endpoint=%d]", endpointId);
+        return false;
+    }
+
+    auto status = Attributes::UserCodeTemporaryDisableTime::Get(endpointId, &lockoutTimeout);
+    if (EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status)
+    {
+        return false;
+    }
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogError(Zcl, "Unable to read the UserCodeTemporaryDisableTime attribute [status=%d]", to_underlying(status));
+        return false;
+    }
+
+    endpointContext->wrongCodeEntryAttempts = 0;
+    endpointContext->lockoutEndTimestamp =
+        chip::System::SystemClock().GetMonotonicTimestamp() + chip::System::Clock::Seconds32(lockoutTimeout);
+
+    emberAfDoorLockClusterPrintln("Lockout engaged [endpointId=%d,lockoutTimeout=%d]", endpointId, lockoutTimeout);
+
+    emberAfPluginDoorLockLockoutStarted(endpointId, endpointContext->lockoutEndTimestamp);
+
+    return true;
 }
 
 bool DoorLockServer::GetAutoRelockTime(chip::EndpointId endpointId, uint32_t & autoRelockTime)
@@ -3136,6 +3203,16 @@ CHIP_ERROR DoorLockServer::sendClusterResponse(chip::app::CommandHandler * comma
     return err;
 }
 
+EmberAfDoorLockEndpointContext * DoorLockServer::getContext(chip::EndpointId endpointId)
+{
+    auto index = emberAfFindClusterServerEndpointIndex(endpointId, ::Id);
+    if (index != 0xFFFF)
+    {
+        return &mEndpointCtx[index];
+    }
+    return nullptr;
+}
+
 bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * commandObj,
                                                const chip::app::ConcreteCommandPath & commandPath, DlLockOperationType opType,
                                                RemoteLockOpHandler opHandler, const Optional<ByteSpan> & pinCode)
@@ -3143,13 +3220,16 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
     VerifyOrDie(DlLockOperationType::kLock == opType || DlLockOperationType::kUnlock == opType);
     VerifyOrDie(nullptr != opHandler);
 
-    DlLockState newLockState = (DlLockOperationType::kLock == opType) ? DlLockState::kLocked : DlLockState::kUnlocked;
-    EndpointId endpoint      = commandPath.mEndpointId;
-    DlOperationError reason  = DlOperationError::kUnspecified;
-    uint16_t pinUserIdx      = 0;
-    uint16_t pinCredIdx      = 0;
-    bool credentialsOk       = false;
-    bool success             = false;
+    EndpointId endpoint     = commandPath.mEndpointId;
+    DlOperationError reason = DlOperationError::kUnspecified;
+    uint16_t pinUserIdx     = 0;
+    uint16_t pinCredIdx     = 0;
+    bool success            = false;
+    bool sendEvent          = true;
+
+    auto currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
+
+    EmberAfDoorLockEndpointContext * endpointContext;
 
     VerifyOrExit(RemoteOperationEnabled(endpoint), reason = DlOperationError::kUnspecified);
 
@@ -3157,7 +3237,16 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
     // When the PINCode field is provided an invalid PIN will count towards the WrongCodeEntryLimit and the
     // UserCodeTemporaryDisableTime will be triggered if the WrongCodeEntryLimit is exceeded. The lock SHALL ignore any attempts
     // to lock/unlock the door until the UserCodeTemporaryDisableTime expires.
-    // TODO: check whether UserCodeTemporaryDisableTime expired or not.
+    endpointContext = getContext(endpoint);
+    VerifyOrExit(nullptr != endpointContext, ChipLogError(Zcl, "Failed to get endpoint index for cluster [endpoint=%d]", endpoint));
+    if (endpointContext->lockoutEndTimestamp >= currentTime)
+    {
+        emberAfDoorLockClusterPrintln("Rejecting unlock command -- lockout is in action [endpoint=%d,lockoutEnd=%u,currentTime=%u]",
+                                      endpoint, static_cast<unsigned>(endpointContext->lockoutEndTimestamp.count()),
+                                      static_cast<unsigned>(currentTime.count()));
+        sendEvent = false;
+        goto exit;
+    }
 
     if (pinCode.HasValue())
     {
@@ -3180,12 +3269,6 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
                 "Unable to perform remote lock operation: user is disabled [endpoint=%d, lock_op=%d, userIndex=%d]", endpoint,
                 to_underlying(opType), pinUserIdx);
         });
-
-        // [EM]: I don't think we should prevent door lock/unlocking if we couldn't find credential associated with user. I
-        // think if the app thinks that PIN is correct the door should be unlocked.
-        //
-        // [DV]: let app decide on PIN correctness, we will fail only if 'opHandler' returns false.
-        credentialsOk = true;
     }
     else
     {
@@ -3202,26 +3285,29 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
                 EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status || EMBER_ZCL_STATUS_SUCCESS == status,
                 ChipLogError(Zcl, "Failed to read Require PIN For Remote Operation attribute, status=0x%x", to_underlying(status)));
         }
-        credentialsOk = !requirePin;
+        // If the PIN is required but not provided we should exit
+        VerifyOrExit(!requirePin, {
+            reason = DlOperationError::kInvalidCredential;
+            emberAfDoorLockClusterPrintln("Checking credentials failed: PIN is not provided when it is required");
+        });
     }
-
-    // TODO: increase WrongCodeEntryLimit if credentialsOk == false.
-    // TODO: If limit is exceeded, lock remote operations for UserCodeTemporaryDisableTime.
-    VerifyOrExit(credentialsOk, {
-        reason = DlOperationError::kInvalidCredential;
-        emberAfDoorLockClusterPrintln("Checking credentials failed: either PIN is invalid or not provided");
-    });
 
     // credentials check succeeded, try to lock/unlock door
     success = opHandler(endpoint, pinCode, reason);
-    VerifyOrExit(success, /* reason is set by the above call */);
-
-    // door locked, set cluster attribute
-    VerifyOrDie(SetLockState(endpoint, newLockState, DlOperationSource::kRemote));
-
+    if (!success && reason == DlOperationError::kInvalidCredential)
+    {
+        TrackWrongCodeEntry(endpoint);
+    }
+    // The app should trigger the lock state change as it may take a while before the lock actually locks/unlocks
 exit:
     // Send command response
     emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+
+    // Most of the time we want to send the lock operation event but sometimes (when the lockout is active) we don't want it.
+    if (!sendEvent)
+    {
+        return success;
+    }
 
     // Send LockOperation/LockOperationError event
     LockOpCredentials foundCred[] = { { DlCredentialType::kPin, pinCredIdx } };
