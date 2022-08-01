@@ -38,7 +38,11 @@
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/OperationalKeystore.h>
+#ifdef ENABLE_HSM_EC_KEY
+#include <crypto/hsm/nxp/PersistentStorageOperationalKeystoreHSM_SE05X.h>
+#else
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#endif
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>
@@ -213,7 +217,11 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     virtual CHIP_ERROR InitializeStaticResourcesBeforeServerInit()
     {
         static chip::KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
+#ifdef ENABLE_HSM_EC_KEY
+        static chip::PersistentStorageOperationalKeystoreHSM sPersistentStorageOperationalKeystore;
+#else
         static chip::PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
+#endif
         static chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
         static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
         static IgnoreCertificateValidityPolicy sDefaultCertValidityPolicy;
