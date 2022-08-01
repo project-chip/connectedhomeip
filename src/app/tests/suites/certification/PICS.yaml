@@ -1685,10 +1685,14 @@ PICS:
     - label: "Does the DUT (Server) support SupportedCalendarTypes attribute?"
       id: LTIME.S.A0002
 
-    - label: "Does the device implement the (0xFFF8) GeneratedCommandList attribute ?"
+    - label:
+          "Does the device implement the (0xFFF8) GeneratedCommandList attribute
+          ?"
       id: LTIME.S.Afff8
 
-    - label: "Does the device implement the (0xFFF9) AcceptedCommandList attribute ?"
+    - label:
+          "Does the device implement the (0xFFF9) AcceptedCommandList attribute
+          ?"
       id: LTIME.S.Afff9
 
     - label: "Does the device implement the (0xFFFA) EventList attribute ?"
@@ -1700,7 +1704,8 @@ PICS:
     - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
       id: LTIME.S.Afffc
 
-    - label: "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
+    - label:
+          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
       id: LTIME.S.Afffd
 
     - label: "PIXIT of the list of DUT SupportedCalendarTypes"
@@ -1721,10 +1726,14 @@ PICS:
     - label: "Does the DUT (Client) support SupportedCalendarTypes attribute?"
       id: LTIME.C.A0002
 
-    - label: "Does the device implement the (0xFFF8) GeneratedCommandList attribute ?"
+    - label:
+          "Does the device implement the (0xFFF8) GeneratedCommandList attribute
+          ?"
       id: LTIME.C.Afff8
 
-    - label: "Does the device implement the (0xFFF9) AcceptedCommandList attribute ?"
+    - label:
+          "Does the device implement the (0xFFF9) AcceptedCommandList attribute
+          ?"
       id: LTIME.C.Afff9
 
     - label: "Does the device implement the (0xFFFA) EventList attribute ?"
@@ -1736,7 +1745,8 @@ PICS:
     - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
       id: LTIME.C.Afffc
 
-    - label: "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
+    - label:
+          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
       id: LTIME.C.Afffd
 
     - label: "PIXIT of the list of DUT SupportedCalendarTypes"
@@ -1752,10 +1762,14 @@ PICS:
     - label: "Does the DUT (Server) support TemperatureUnit attribute?"
       id: LUNIT.S.A0000
 
-    - label: "Does the device implement the (0xFFF8) GeneratedCommandList attribute ?"
+    - label:
+          "Does the device implement the (0xFFF8) GeneratedCommandList attribute
+          ?"
       id: LUNIT.S.Afff8
 
-    - label: "Does the device implement the (0xFFF9) AcceptedCommandList attribute ?"
+    - label:
+          "Does the device implement the (0xFFF9) AcceptedCommandList attribute
+          ?"
       id: LUNIT.S.Afff9
 
     - label: "Does the device implement the (0xFFFA) EventList attribute ?"
@@ -1767,7 +1781,8 @@ PICS:
     - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
       id: LUNIT.S.Afffc
 
-    - label: "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
+    - label:
+          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
       id: LUNIT.S.Afffd
 
     - label: "Does the DUT (Server) support Fahrenheit TemperatureUnit?"
@@ -1782,10 +1797,14 @@ PICS:
     - label: "Does the DUT (Client) support TemperatureUnit attribute?"
       id: LUNIT.C.A0000
 
-    - label: "Does the device implement the (0xFFF8) GeneratedCommandList attribute ?"
+    - label:
+          "Does the device implement the (0xFFF8) GeneratedCommandList attribute
+          ?"
       id: LUNIT.C.Afff8
 
-    - label: "Does the device implement the (0xFFF9) AcceptedCommandList attribute ?"
+    - label:
+          "Does the device implement the (0xFFF9) AcceptedCommandList attribute
+          ?"
       id: LUNIT.C.Afff9
 
     - label: "Does the device implement the (0xFFFA) EventList attribute ?"
@@ -1797,7 +1816,8 @@ PICS:
     - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
       id: LUNIT.C.Afffc
 
-    - label: "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
+    - label:
+          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
       id: LUNIT.C.Afffd
 
     - label: "Does the DUT (Client) support Fahrenheit TemperatureUnit?"
@@ -4717,7 +4737,9 @@ PICS:
     - label: "Does the DUT support the OnMode attribute?"
       id: MOD.S.A0005
 
-    - label: "Does the DUT implement the StartUpOnOff attribute (from the OnOffCluster)?"
+    - label:
+          "Does the DUT implement the StartUpOnOff attribute (from the
+          OnOffCluster)?"
       id: OO.S.A4003
 
     - label:
@@ -4725,12 +4747,10 @@ PICS:
           on the same DUT?"
       id: MOD.S.F00
 
-    - label:
-          "Does the DUT support sending the ChangeToMode command?"
+    - label: "Does the DUT support sending the ChangeToMode command?"
       id: MOD.C.C00.Tx
 
-    - label:
-          "Does the DUT support receiving the ChangeToMode command?"
+    - label: "Does the DUT support receiving the ChangeToMode command?"
       id: MOD.S.C00.Rsp
 
     #Device Attestation
@@ -4858,16 +4878,13 @@ PICS:
       id: MCORE.SC.PI_KEY
 
     #133.1. Bridged Device Basic Information Cluster
-    - label:
-          "Does the DUT(server) support the DataModelRevision attribute?"
+    - label: "Does the DUT(server) support the DataModelRevision attribute?"
       id: BRBINFO.S.A0000
 
-    - label:
-          "Does the DUT(server) support the VendorName attribute?"
+    - label: "Does the DUT(server) support the VendorName attribute?"
       id: BRBINFO.S.A0001
 
-    - label:
-          "Does the DUT(server) support the VendorID attribute?"
+    - label: "Does the DUT(server) support the VendorID attribute?"
       id: BRBINFO.S.A0002
 
     - label: "Does the DUT(server) support the ProductName attribute?"
@@ -4876,16 +4893,13 @@ PICS:
     - label: "Does the DUT(server) support the ProductID attribute?"
       id: BRBINFO.S.A0004
 
-    - label:
-          "Does the DUT(server) support the NodeLabel attribute?"
+    - label: "Does the DUT(server) support the NodeLabel attribute?"
       id: BRBINFO.S.A0005
 
-    - label:
-          "Does the DUT(server) support the Location attribute?"
+    - label: "Does the DUT(server) support the Location attribute?"
       id: BRBINFO.S.A0006
 
-    - label:
-          "Does the DUT(server) support the HardwareVersion attribute?"
+    - label: "Does the DUT(server) support the HardwareVersion attribute?"
       id: BRBINFO.S.A0007
 
     - label: "Does the DUT(server) support the HardwareVersionString attribute?"
@@ -4894,16 +4908,13 @@ PICS:
     - label: "Does the DUT(server) support the SoftwareVersion attribute?"
       id: BRBINFO.S.A0009
 
-    - label:
-          "Does the DUT(server) support the SoftwareVersionString attribute?"
+    - label: "Does the DUT(server) support the SoftwareVersionString attribute?"
       id: BRBINFO.S.A000a
 
-    - label:
-          "Does the DUT(server) support the ManufacturingDate attribute?"
+    - label: "Does the DUT(server) support the ManufacturingDate attribute?"
       id: BRBINFO.S.A000b
 
-    - label:
-          "Does the DUT(server) support the PartNumber attribute?"
+    - label: "Does the DUT(server) support the PartNumber attribute?"
       id: BRBINFO.S.A000c
 
     - label: "Does the DUT(server) support the ProductURL attribute?"
@@ -4912,16 +4923,13 @@ PICS:
     - label: "Does the DUT(server) support the ProductLabel attribute?"
       id: BRBINFO.S.A000e
 
-    - label:
-          "Does the DUT(server) support the SerialNumber attribute?"
+    - label: "Does the DUT(server) support the SerialNumber attribute?"
       id: BRBINFO.S.A000f
 
-    - label:
-          "Does the DUT(server) support the LocalConfigDisabled attribute?"
+    - label: "Does the DUT(server) support the LocalConfigDisabled attribute?"
       id: BRBINFO.S.A0010
 
-    - label:
-          "Does the DUT(server) support the Reachable attribute?"
+    - label: "Does the DUT(server) support the Reachable attribute?"
       id: BRBINFO.S.A0011
 
     - label: "Does the DUT(server) support the UniqueID attribute?"
@@ -4931,12 +4939,10 @@ PICS:
       id: BRBINFO.S.A0013
 
     #Events
-    - label:
-          "Does the DUT(server) support the StartUp event?"
+    - label: "Does the DUT(server) support the StartUp event?"
       id: BRBINFO.S.E00
 
-    - label:
-          "Does the DUT(server) support the ShutDown event?"
+    - label: "Does the DUT(server) support the ShutDown event?"
       id: BRBINFO.S.E01
 
     - label: "Does the DUT(server) support the Leave event?"
@@ -4946,16 +4952,13 @@ PICS:
       id: BRBINFO.S.E03
 
     # client
-    - label:
-          "Does the DUT(Client) support the DataModelRevision attribute?"
+    - label: "Does the DUT(Client) support the DataModelRevision attribute?"
       id: BRBINFO.C.A0000
 
-    - label:
-          "Does the DUT(Client) support the VendorName attribute?"
+    - label: "Does the DUT(Client) support the VendorName attribute?"
       id: BRBINFO.C.A0001
 
-    - label:
-          "Does the DUT(Client) support the VendorID attribute?"
+    - label: "Does the DUT(Client) support the VendorID attribute?"
       id: BRBINFO.C.A0002
 
     - label: "Does the DUT(Client) support the ProductName attribute?"
@@ -4964,16 +4967,13 @@ PICS:
     - label: "Does the DUT(Client) support the ProductID attribute?"
       id: BRBINFO.C.A0004
 
-    - label:
-          "Does the DUT(Client) support the NodeLabel attribute?"
+    - label: "Does the DUT(Client) support the NodeLabel attribute?"
       id: BRBINFO.C.A0005
 
-    - label:
-          "Does the DUT(Client) support the Location attribute?"
+    - label: "Does the DUT(Client) support the Location attribute?"
       id: BRBINFO.C.A0006
 
-    - label:
-          "Does the DUT(Client) support the HardwareVersion attribute?"
+    - label: "Does the DUT(Client) support the HardwareVersion attribute?"
       id: BRBINFO.C.A0007
 
     - label: "Does the DUT(Client) support the HardwareVersionString attribute?"
@@ -4982,16 +4982,13 @@ PICS:
     - label: "Does the DUT(Client) support the SoftwareVersion attribute?"
       id: BRBINFO.C.A0009
 
-    - label:
-          "Does the DUT(Client) support the SoftwareVersionString attribute?"
+    - label: "Does the DUT(Client) support the SoftwareVersionString attribute?"
       id: BRBINFO.C.A000a
 
-    - label:
-          "Does the DUT(Client) support the ManufacturingDate attribute?"
+    - label: "Does the DUT(Client) support the ManufacturingDate attribute?"
       id: BRBINFO.C.A000b
 
-    - label:
-          "Does the DUT(Client) support the PartNumber attribute?"
+    - label: "Does the DUT(Client) support the PartNumber attribute?"
       id: BRBINFO.C.A000c
 
     - label: "Does the DUT(Client) support the ProductURL attribute?"
@@ -5000,16 +4997,13 @@ PICS:
     - label: "Does the DUT(Client) support the ProductLabel attribute?"
       id: BRBINFO.C.A000e
 
-    - label:
-          "Does the DUT(Client) support the SerialNumber attribute?"
+    - label: "Does the DUT(Client) support the SerialNumber attribute?"
       id: BRBINFO.C.A000f
 
-    - label:
-          "Does the DUT(Client) support the LocalConfigDisabled attribute?"
+    - label: "Does the DUT(Client) support the LocalConfigDisabled attribute?"
       id: BRBINFO.C.A0010
 
-    - label:
-          "Does the DUT(Client) support the Reachable attribute?"
+    - label: "Does the DUT(Client) support the Reachable attribute?"
       id: BRBINFO.C.A0011
 
     - label: "Does the DUT(Client) support the UniqueID attribute?"
@@ -5019,12 +5013,10 @@ PICS:
       id: BRBINFO.C.A0013
 
     #Events
-    - label:
-          "Does the DUT(Client) support the StartUp event?"
+    - label: "Does the DUT(Client) support the StartUp event?"
       id: BRBINFO.C.E00
 
-    - label:
-          "Does the DUT(Client) support the ShutDown event?"
+    - label: "Does the DUT(Client) support the ShutDown event?"
       id: BRBINFO.C.E01
 
     - label: "Does the DUT(Client) support the Leave event?"
