@@ -325,7 +325,8 @@ public:
     static void TestSubscribeClientReceiveInvalidReportMessage(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeClientReceiveUnsolicitedInvalidReportMessage(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeClientReceiveInvalidSubscribeResponseMessage(nlTestSuite * apSuite, void * apContext);
-    static void TestSubscribeClientReceiveUnsolicitedReportMessageWithInvalidSubscriptionId(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribeClientReceiveUnsolicitedReportMessageWithInvalidSubscriptionId(nlTestSuite * apSuite,
+                                                                                            void * apContext);
     static void TestReadChunkingInvalidSubscriptionId(nlTestSuite * apSuite, void * apContext);
 
 private:
@@ -3163,7 +3164,8 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidSubscribeResponseMess
 
 // Read Client create the subscription, handler sends unsolicited malformed report with invalid subscription id to client,
 // InteractionModelEngine::OnUnsolicitedReportData would process this malformed report and sends out status report
-void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedReportMessageWithInvalidSubscriptionId(nlTestSuite * apSuite, void * apContext)
+void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedReportMessageWithInvalidSubscriptionId(nlTestSuite * apSuite,
+                                                                                                      void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -3237,8 +3239,9 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedReportMessageWith
     engine->Shutdown();
 }
 
-// TestReadChunkingInvalidSubscriptionId will try to read a few large attributes, the report won't fit into the MTU and result in chunking, second report has different
-// subscription id from the first one, read client sends out the status report with invalid subscription
+// TestReadChunkingInvalidSubscriptionId will try to read a few large attributes, the report won't fit into the MTU and result in
+// chunking, second report has different subscription id from the first one, read client sends out the status report with invalid
+// subscription
 void TestReadInteraction::TestReadChunkingInvalidSubscriptionId(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -3272,12 +3275,11 @@ void TestReadInteraction::TestReadChunkingInvalidSubscriptionId(nlTestSuite * ap
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
-
         ctx.GetLoopback().mSentMessageCount                 = 0;
         ctx.GetLoopback().mNumMessagesToDrop                = 1;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 3;
         ctx.GetLoopback().mDroppedMessageCount              = 0;
-        err = readClient.SendRequest(readPrepareParams);
+        err                                                 = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         ctx.DrainAndServiceIO();
@@ -3301,7 +3303,7 @@ void TestReadInteraction::TestReadChunkingInvalidSubscriptionId(nlTestSuite * ap
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
-        //rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mExchangeCtx.Get());
+        // rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mExchangeCtx.Get());
 
         ctx.GetLoopback().mSentMessageCount                 = 0;
         ctx.GetLoopback().mNumMessagesToDrop                = 0;
@@ -3313,9 +3315,9 @@ void TestReadInteraction::TestReadChunkingInvalidSubscriptionId(nlTestSuite * ap
 
         // TODO: Need to validate what status is being sent to the ReadHandler
         // The ReadHandler's exchange is still open when we synthesize the report data message.
-        // Since we synthesized the second report data message to the ReadClient with invalid subscription id, instead of sending it from the ReadHandler,
-        // the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP ack.
-        // The ReadHandler should have sent a StatusResponse too, but it's buggy and does not do that.
+        // Since we synthesized the second report data message to the ReadClient with invalid subscription id, instead of sending it
+        // from the ReadHandler, the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP
+        // ack. The ReadHandler should have sent a StatusResponse too, but it's buggy and does not do that.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_ERROR_INVALID_SUBSCRIPTION);

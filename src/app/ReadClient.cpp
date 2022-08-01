@@ -409,13 +409,13 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
                                          System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Status status = Status::InvalidAction;
+    Status status  = Status::InvalidAction;
     VerifyOrExit(!IsIdle(), err = CHIP_ERROR_INCORRECT_STATE);
 
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
         err = ProcessReportData(std::move(aPayload));
-        if(err == CHIP_ERROR_INVALID_SUBSCRIPTION)
+        if (err == CHIP_ERROR_INVALID_SUBSCRIPTION)
         {
             status = Status::InvalidSubscription;
         }
@@ -426,7 +426,7 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
         ChipLogError(DataManagement, "SubscribeResponse is received");
         VerifyOrExit(apExchangeContext == mExchange.Get(), err = CHIP_ERROR_INCORRECT_STATE);
         err = ProcessSubscribeResponse(std::move(aPayload));
-        if(err == CHIP_ERROR_INVALID_SUBSCRIPTION)
+        if (err == CHIP_ERROR_INVALID_SUBSCRIPTION)
         {
             ChipLogError(DataManagement, "CHIP_ERROR_INVALID_SUBSCRIPTION happens");
             status = Status::InvalidSubscription;
@@ -459,8 +459,7 @@ exit:
     return err;
 }
 
-void ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext,
-                                               System::PacketBufferHandle && aPayload)
+void ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
     Status status = Status::Success;
     mExchange.Grab(apExchangeContext);
