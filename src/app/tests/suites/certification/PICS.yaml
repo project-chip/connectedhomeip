@@ -1756,6 +1756,12 @@ PICS:
     - label: "Does the Device support WindowStatus attribute?"
       id: CADMIN.S.A0000
 
+    - label: "Does the Device support AdminFabricIndex attribute?"
+      id: CADMIN.S.A0001
+
+    - label: "Does the Device support AdminVendorId attribute?"
+      id: CADMIN.S.A0002
+
     #client
     - label: "Does the Device support Enhanced Commissioning Method (ECM)?"
       id: CADMIN.C.C00.Tx

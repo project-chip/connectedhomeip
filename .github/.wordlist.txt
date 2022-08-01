@@ -44,6 +44,7 @@ aef
 AES
 algs
 alloc
+AlarmCode
 Ameba
 amebad
 amebaiot
@@ -424,6 +425,7 @@ Dockerfile
 Dockerfiles
 Don'ts
 DoorLock
+DoorState
 doru
 DOTBR
 DOVERLAY

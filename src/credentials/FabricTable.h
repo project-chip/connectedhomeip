@@ -106,7 +106,7 @@ public:
 
     CHIP_ERROR FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) const;
 
-    uint16_t GetVendorId() const { return mVendorId; }
+    VendorId GetVendorId() const { return mVendorId; }
 
     bool IsInitialized() const { return (mFabricIndex != kUndefinedFabricIndex) && IsOperationalNodeId(mNodeId); }
 
@@ -122,7 +122,7 @@ protected:
         FabricIndex fabricIndex               = kUndefinedFabricIndex;
         CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
         Crypto::P256PublicKey rootPublicKey;
-        uint16_t vendorId                        = VendorId::NotSpecified; /**< Vendor ID for commissioner of fabric */
+        VendorId vendorId                        = VendorId::NotSpecified; /**< Vendor ID for commissioner of fabric */
         Crypto::P256Keypair * operationalKeypair = nullptr;
         bool hasExternallyOwnedKeypair           = false;
 
@@ -228,7 +228,7 @@ protected:
     // We cache the root public key since it's used so often and costly to get.
     Crypto::P256PublicKey mRootPublicKey;
 
-    uint16_t mVendorId                                  = static_cast<uint16_t>(VendorId::NotSpecified);
+    VendorId mVendorId                                  = VendorId::NotSpecified;
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY

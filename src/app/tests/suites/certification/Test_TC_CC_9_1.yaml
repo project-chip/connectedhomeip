@@ -30,6 +30,7 @@ tests:
                 value: nodeId
 
     - label: "Precondition : Turn on light for color control tests"
+      PICS: OO.S.C01.Rsp
       cluster: "On/Off"
       command: "on"
 
@@ -38,6 +39,7 @@ tests:
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
+      PICS: OO.S.A0000
       response:
           value: 1
 
@@ -767,6 +769,7 @@ tests:
           value: ColorLoopStoredEnhancedHueStep16b
 
     - label: "Turn Off light for color control tests"
+      PICS: OO.S.C00.Rsp
       cluster: "On/Off"
       command: "Off"
 
@@ -774,5 +777,6 @@ tests:
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
+      PICS: OO.S.A0000
       response:
           value: 0

@@ -447,6 +447,8 @@ private:
                 ChipLogError(AppServer, "Warning, failed to delete access control state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
                              static_cast<unsigned>(fabricIndex), aclErr.Format());
             }
+
+            mServer->GetCommissioningWindowManager().OnFabricRemoved(fabricIndex);
         }
 
         void OnFabricUpdated(const FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
