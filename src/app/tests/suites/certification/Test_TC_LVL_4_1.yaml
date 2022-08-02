@@ -195,7 +195,7 @@ tests:
               - name: "moveMode"
                 value: 0
               - name: "rate"
-                value: 255
+                value: null
               - name: "OptionsMask"
                 value: 1
               - name: "OptionsOverride"
