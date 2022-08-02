@@ -75,8 +75,6 @@ config("p6_ota_config") {
 
   if (build_update_image) {
     defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=2" ]
-  } else {
-    defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=1" ]
   }
 }
 
@@ -97,23 +95,6 @@ p6_sdk_sources("lighting_app_sdk_sources") {
   public_configs = [ "${chip_root}/third_party/p6:p6_sdk_config" ]
 
   if (chip_enable_ota_requestor) {
-    sources += [
-      "${p6_sdk_root}/libs/anycloud-ota/source/mcuboot/bootutil/src/bootutil_misc.c",
-      "${p6_sdk_root}/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_flash_map.c",
-      "${p6_sdk_root}/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_flash_psoc6.c",
-      "${p6_sdk_root}/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_smif_psoc6.c",
-      "${p6_sdk_root}/libs/anycloud-ota/source/mcuboot/cy_flash_pal/mem_config/mem_config_sfdp.c",
-    ]
-    include_dirs += [
-      "${p6_sdk_root}/ota/config",
-      "${p6_sdk_root}/libs/anycloud-ota/source/mcuboot/cy_flash_pal/",
-      "${p6_sdk_root}/libs/anycloud-ota/source/mcuboot/cy_flash_pal/mem_config/",
-      "${p6_sdk_root}/libs/anycloud-ota/source/mcuboot/cy_flash_pal/include/",
-      "${p6_sdk_root}/libs/anycloud-ota/source/mcuboot/cy_flash_pal/include/flash_map_backend/",
-      "${p6_sdk_root}/libs/anycloud-ota/source/mcuboot/",
-      "${p6_sdk_root}/libs/anycloud-ota/source/mcuboot/sysflash/",
-      "${p6_sdk_root}/libs/anycloud-ota/source/mcuboot/bootutil/include",
-    ]
     public_configs += [ ":p6_ota_config" ]
   }
 }

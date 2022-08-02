@@ -516,12 +516,19 @@ def MbedTargets():
 
 
 def InfineonTargets():
-    target = Target('infineon', InfineonBuilder)
+    builder = VariantBuilder()
+    builder.AppendVariant(name="ota", enable_ota_requestor=True)
+    builder.AppendVariant(name="updateimage", update_image=True)
 
-    yield target.Extend('p6-lock', board=InfineonBoard.P6BOARD, app=InfineonApp.LOCK)
-    yield target.Extend('p6-all-clusters', board=InfineonBoard.P6BOARD, app=InfineonApp.ALL_CLUSTERS)
-    yield target.Extend('p6-all-clusters-minimal', board=InfineonBoard.P6BOARD, app=InfineonApp.ALL_CLUSTERS_MINIMAL)
-    yield target.Extend('p6-light', board=InfineonBoard.P6BOARD, app=InfineonApp.LIGHT)
+    target = Target('infineon-p6', InfineonBuilder, board=InfineonBoard.P6BOARD)
+
+    builder.targets.append(target.Extend('lock', app=InfineonApp.LOCK))
+    builder.targets.append(target.Extend('light', app=InfineonApp.LIGHT))
+    builder.targets.append(target.Extend('all-clusters', app=InfineonApp.ALL_CLUSTERS))
+    builder.targets.append(target.Extend('all-clusters-minimal', app=InfineonApp.ALL_CLUSTERS_MINIMAL))
+
+    for target in builder.AllVariants():
+        yield target
 
 
 def AmebaTargets():

@@ -50,7 +50,8 @@ will then join the network.
 
 *   Build the example application:
 
-          $ ./scripts/examples/gn_p6_example.sh examples/lock-app/p6 out/lock_app_p6
+          $ source scripts/activate.sh
+          $ scripts/build/build_examples.py --no-log-timestamps --target 'infineon-p6-lock' build
 
 -   To delete generated executable, libraries and object files use:
 
@@ -68,7 +69,7 @@ will then join the network.
 -   On the command line:
 
           $ cd ~/connectedhomeip
-          $ python3 out/lock_app_p6/chip-p6-lock-example.flash.py
+          $ python3 out/infineon-p6-lock/chip-p6-lock-example.flash.py
 
 <a name="Commissioning and cluster control"></a>
 
