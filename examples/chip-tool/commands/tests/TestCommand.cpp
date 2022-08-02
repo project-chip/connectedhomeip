@@ -57,7 +57,7 @@ void TestCommand::OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeM
     ChipLogProgress(chipTool, " **** Test Setup: Device Connected\n");
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
-    command->mDevices[command->GetIdentity()] = chip::OperationalDeviceProxy(&exchangeMgr, sessionHandle);
+    command->mDevices[command->GetIdentity()] = make_unique<chip::OperationalDeviceProxy>(&exchangeMgr, sessionHandle);
 
     LogErrorOnFailure(command->ContinueOnChipMainThread(CHIP_NO_ERROR));
 }

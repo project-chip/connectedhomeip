@@ -349,7 +349,14 @@ public:
 
     void ExpireAllPASESessions();
 
-    bool MarkSessionAsDefunctMark(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type);
+    /**
+     * @brief
+     *   Mark session that matches provided arguments as defunct
+     *
+     * @param node    Scoped node ID of the session we should mark as defunct.
+     * @param type    the buffer containing a full CHIP message (except for the optional length field).
+     */
+    bool MarkSessionAsDefunct(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type);
 
     /**
      * @brief

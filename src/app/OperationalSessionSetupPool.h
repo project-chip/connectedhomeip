@@ -32,11 +32,11 @@ public:
 
     virtual void Release(OperationalSessionSetup * device) = 0;
 
-    virtual OperationalSessionSetup * FindDevice(ScopedNodeId peerId) = 0;
+    virtual OperationalSessionSetup * FindSessionSetup(ScopedNodeId peerId) = 0;
 
-    virtual void ReleaseDevicesForFabric(FabricIndex fabricIndex) = 0;
+    virtual void ReleaseSessionSetupForFabric(FabricIndex fabricIndex) = 0;
 
-    virtual void ReleaseAllDevices() = 0;
+    virtual void ReleaseAllSessionSetup() = 0;
 
     virtual ~OperationalSessionSetupPoolDelegate() {}
 };
@@ -55,7 +55,7 @@ public:
 
     void Release(OperationalSessionSetup * device) override { mSessionSetupPool.ReleaseObject(device); }
 
-    OperationalSessionSetup * FindDevice(ScopedNodeId peerId) override
+    OperationalSessionSetup * FindSessionSetup(ScopedNodeId peerId) override
     {
         OperationalSessionSetup * foundDevice = nullptr;
         mSessionSetupPool.ForEachActiveObject([&](auto * activeDevice) {
@@ -70,7 +70,7 @@ public:
         return foundDevice;
     }
 
-    void ReleaseDevicesForFabric(FabricIndex fabricIndex) override
+    void ReleaseSessionSetupForFabric(FabricIndex fabricIndex) override
     {
         mSessionSetupPool.ForEachActiveObject([&](auto * activeDevice) {
             if (activeDevice->GetFabricIndex() == fabricIndex)
@@ -81,7 +81,7 @@ public:
         });
     }
 
-    void ReleaseAllDevices() override
+    void ReleaseAllSessionSetup() override
     {
         mSessionSetupPool.ForEachActiveObject([&](auto * activeDevice) {
             Release(activeDevice);

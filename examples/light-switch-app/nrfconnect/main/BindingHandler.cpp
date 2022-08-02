@@ -101,7 +101,6 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
         Clusters::OnOff::Commands::Toggle::Type toggleCommand;
         if (aDevice)
         {
-            VerifyOrDie(sessionHandle != nullptr);
             ret = Controller::InvokeCommandRequest(aDevice->GetExchangeManager(), aDevice->GetSecureSession().Value(),
                                                    aBinding.remote, toggleCommand, onSuccess, onFailure);
         }
@@ -117,7 +116,6 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
         Clusters::OnOff::Commands::On::Type onCommand;
         if (aDevice)
         {
-            VerifyOrDie(sessionHandle != nullptr);
             ret = Controller::InvokeCommandRequest(aDevice->GetExchangeManager(), aDevice->GetSecureSession().Value(),
                                                    aBinding.remote, onCommand, onSuccess, onFailure);
         }
@@ -132,7 +130,6 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
         Clusters::OnOff::Commands::Off::Type offCommand;
         if (aDevice)
         {
-            VerifyOrDie(sessionHandle != nullptr);
             ret = Controller::InvokeCommandRequest(aDevice->GetExchangeManager(), aDevice->GetSecureSession().Value(),
                                                    aBinding.remote, offCommand, onSuccess, onFailure);
         }
@@ -182,9 +179,8 @@ void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Embe
     case Clusters::LevelControl::Commands::MoveToLevel::Id: {
         Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
         moveToLevelCommand.level = data->Value;
-        if (exchangeMgr)
+        if (aDevice)
         {
-            VerifyOrDie(sessionHandle != nullptr);
             ret = Controller::InvokeCommandRequest(aDevice->GetExchangeManager(), aDevice->GetSecureSession().Value(),
                                                    aBinding.remote, moveToLevelCommand, onSuccess, onFailure);
         }
@@ -228,7 +224,6 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & bi
     }
     else if (binding.type == EMBER_UNICAST_BINDING && !data->IsGroup)
     {
-
         switch (data->ClusterId)
         {
         case Clusters::OnOff::Id:

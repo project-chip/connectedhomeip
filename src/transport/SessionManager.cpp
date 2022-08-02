@@ -445,7 +445,7 @@ void SessionManager::ExpireAllPASESessions()
     });
 }
 
-bool SessionManager::MarkSessionAsDefunctMark(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type)
+bool SessionManager::MarkSessionAsDefunct(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type)
 {
     auto optionalSessionHandle = FindSecureSessionForNode(node, type);
     if (optionalSessionHandle.HasValue())

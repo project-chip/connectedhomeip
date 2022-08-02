@@ -61,12 +61,12 @@ void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)
 
 void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
 {
-    mConfig.sessionSetupPool->ReleaseDevicesForFabric(fabricIndex);
+    mConfig.sessionSetupPool->ReleaseSessionSetupForFabric(fabricIndex);
 }
 
 void CASESessionManager::ReleaseAllSessions()
 {
-    mConfig.sessionSetupPool->ReleaseAllDevices();
+    mConfig.sessionSetupPool->ReleaseAllSessionSetup();
 }
 
 CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr)
@@ -80,7 +80,7 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Trans
 
 OperationalSessionSetup * CASESessionManager::FindExistingSessionSetup(const ScopedNodeId & peerId) const
 {
-    return mConfig.sessionSetupPool->FindDevice(peerId);
+    return mConfig.sessionSetupPool->FindSessionSetup(peerId);
 }
 
 Optional<SessionHandle> CASESessionManager::FindExistingSession(const ScopedNodeId & peerId) const
