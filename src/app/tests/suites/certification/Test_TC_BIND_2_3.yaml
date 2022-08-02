@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    118.2.3. [TC-BIND-2.3] Binding Cluster Attributes-TH1 enables DUT to handle
+    119.2.3. [TC-BIND-2.3] Binding Cluster Attributes-TH1 enables DUT to handle
     its Group settings [DUT-Controller]
 
 config:
@@ -66,10 +66,10 @@ tests:
           ./chip-tool pairing code 2 36299144405
 
           [1657716992.250570][3330:3336] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          [1657716992.250614][3330:3336] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
-          [1657716992.250650][3330:3336] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1657716992.250690][3330:3336] CHIP:CTL: Performing next commissioning step 'Cleanup'
-          [1657716992.250769][3330:3336] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1657716992.250614][3330:3336] CHIP:CTL: Successfully finished commissioning step "SendComplete"
+          [1657716992.250650][3330:3336] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1657716992.250690][3330:3336] CHIP:CTL: Performing next commissioning step "Cleanup"
+          [1657716992.250769][3330:3336] CHIP:CTL: Successfully finished commissioning step "Cleanup"
           [1657716992.250812][3330:3336] CHIP:TOO: Device commissioning completed with success
       disabled: true
 
@@ -84,11 +84,11 @@ tests:
           "TH1 sends KeySetWrite command to GroupKeyManagement cluster to TH2 on
           Endpoint 0."
       verification: |
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42,
+          ./chip-tool groupkeymanagement key-set-write "{"groupKeySetID": 42,
           "groupKeySecurityPolicy": 0, "epochKey0":
           "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
           "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
-          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }" 1 0
 
           [1657719041.075123][4541:4546] CHIP:DMG: ICR moving to [ResponseRe]
           [1657719041.075174][4541:4546] CHIP:DMG: InvokeResponseMessage =
@@ -123,6 +123,19 @@ tests:
       disabled: true
 
     - label:
+          "TH1 binds GroupId with GroupKeySetID in the GroupKeyMap attribute
+          list on GroupKeyManagement cluster to TH2 on Endpoint 0"
+      verification: |
+          ./chip-tool groupkeymanagement write group-key-map "[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]" 1 0
+
+          [1657719130.464175][4557:4562] CHIP:DMG:                         StatusIB =
+          [1657719130.464214][4557:4562] CHIP:DMG:                         {
+          [1657719130.464256][4557:4562] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657719130.464298][4557:4562] CHIP:DMG:                         },
+          [1657719130.464342][4557:4562] CHIP:DMG:
+      disabled: true
+
+    - label:
           "TH1 sends AddGroup( Group Name and Group-ID) Command to TH2 on
           Endpoint 1."
       verification: |
@@ -133,19 +146,6 @@ tests:
           [1657719097.788366][4548:4554] CHIP:TOO:     status: 0
           [1657719097.788393][4548:4554] CHIP:TOO:     groupId: 1
           [1657719097.788418][4548:4554] CHIP:TOO:    }
-      disabled: true
-
-    - label:
-          "TH1 binds GroupId with GroupKeySetID in the GroupKeyMap attribute
-          list on GroupKeyManagement cluster to TH2 on Endpoint 0"
-      verification: |
-          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]' 1 0
-
-          [1657719130.464175][4557:4562] CHIP:DMG:                         StatusIB =
-          [1657719130.464214][4557:4562] CHIP:DMG:                         {
-          [1657719130.464256][4557:4562] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657719130.464298][4557:4562] CHIP:DMG:                         },
-          [1657719130.464342][4557:4562] CHIP:DMG:
 
           ./chip-tool groupsettings add-group grp1 0x0001
 
@@ -169,7 +169,7 @@ tests:
           "TH1 writes Binding entry into DUT with Entry 1: Group = The Group ID
           in the AddGroup command sent from TH1 to TH2"
       verification: |
-          ./chip-tool binding write binding '[{"group" : "0x0001"}]' 1 0
+          ./chip-tool binding write binding "[{"group" : "0x0001"}]" 1 1
 
           [1657719251.763323][4597:4602] CHIP:DMG:                         StatusIB =
           [1657719251.763360][4597:4602] CHIP:DMG:                         {
@@ -179,7 +179,7 @@ tests:
 
     - label: "TH1 sets up group settings on DUT"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:

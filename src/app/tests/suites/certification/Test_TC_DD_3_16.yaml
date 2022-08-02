@@ -15,7 +15,7 @@
 
 name:
     3.3.16. [TC-DD-3.16] Commissioning Flow - 11-digit Manual Pairing Code -
-    Negative Scenario [DUT - Commissioner]
+    Negative Scenario [DUT    - Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -28,7 +28,7 @@ tests:
           DUT in any format supported by DUT"
       PICS: MCORE.DD.11_MANUAL_PC
       verification: |
-          On TH:
+          Verify in TH as server side
           $ ./out/all-clusters-app/chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 0 --capabilities 4 --discriminator 3840 --passcode 20202021
 
           [1651180718.960383][13218:13218] CHIP:DL: Device Configuration:
@@ -53,9 +53,11 @@ tests:
           2"
       PICS: MCORE.DD.11_MANUAL_PC
       verification: |
-          1. Use chip-tool's "payload verhoeff-generate" command to help generate the new, invalid Manual code
+          1. Use chip-tool"s "payload verhoeff-generate" command to help generate the new, invalid Manual code
 
           $ ./chip-tool payload verhoeff-generate 8497011233
+
+          Verify in DUT as client side
           [1651186243492] [13415:349553] CHIP: [SPL] Generating Character for: 84970112331
           [1651186243492] [13415:349553] CHIP: [SPL] Generated Char: 1
           Manual Code: 84970112331
@@ -68,6 +70,8 @@ tests:
       verification: |
           $  ./chip-tool pairing code 1 84970112331
 
+          Verify in DUT as client side
+
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
       disabled: true
 
@@ -78,6 +82,8 @@ tests:
       PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           $ ./chip-tool payload generate-manualcode --discriminator 0xF00 --setup-pin-code 20202021 --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 2 --force-short-code 1
+
+          Verify in DUT as client side
           [1651181048462] [11611:269469] CHIP: [TOO] Manual Code: 74970112334
       disabled: true
 
@@ -88,26 +94,28 @@ tests:
       verification: |
           $  ./chip-tool pairing code 1 74970112334
 
+          Verify in DUT as client side
           [1651184274318] [12512:321250] CHIP: [SPL] Failed decoding base10. Input length 10 was not expected length 20
           ...
           [1651184274321] [12512:321244] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:63: CHIP Error 0x0000001E: Invalid string length
       disabled: true
 
     - label:
-          'SHORT DISCRIMINATOR: Using the manual code from Step 1, generate a
+          "SHORT DISCRIMINATOR: Using the manual code from Step 1, generate a
           new manual code but substituting out the current SHORT DISCRIMINATOR
           string with a discriminator value that makes the generated manual code
           differ from Step 1s manual code (i.e. Choose a discriminator value
           that changes any of the 4 most-significant bits of Step 1s 12-bit
           discriminator value and adheres to rules of section 5.1.1.5.
-          "Discriminator value")'
+          Discriminator value)"
       PICS: MCORE.DD.11_MANUAL_PC
       verification: |
-          1. Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
+          1. Use chip-tool"s "payload generate-manualcode" command to help generate the new, invalid Manual code
 
           $ ./chip-tool payload generate-manualcode --existing-payload 34970112332 --discriminator 0xE00
           [1657236763262] [31784:16850989] CHIP: [TOO] Manual Code: 33331712336
 
+          Verify in DUT as client side
           Manual Code: 33331712336
       disabled: true
 
@@ -135,6 +143,8 @@ tests:
       PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           1. Use these as examples of how to generate manual codes with invalid passcodes
+
+          Verify in DUT as client side
 
           "34915200008" (00000000),
           $ ./chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0 --allow-invalid-payload 1 --setup-pin-code 00000000
@@ -190,6 +200,8 @@ tests:
           step, to the DUT in any format supported by the DUT"
       PICS: MCORE.DD.11_MANUAL_PC
       verification: |
+          Verify in DUT as client side
+
           (00000000)
           $  ./chip-tool pairing code 1 34915200008
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument

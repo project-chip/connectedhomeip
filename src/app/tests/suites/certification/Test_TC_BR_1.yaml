@@ -27,7 +27,7 @@ tests:
       verification: |
           ./chip-tool  descriptor read device-list 1 0
 
-          Verify in TH Log
+          Verify device type Root Node(Type-22) contains in TH Log
 
           [1657002174.323780][3885:3890] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3573910940
           [1657002174.323838][3885:3890] CHIP:TOO:   device list: 1 entries
@@ -38,11 +38,10 @@ tests:
       disabled: true
 
     - label: "Read attribute PartsList of the Descriptor cluster on endpoint 0"
-      PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool  descriptor read parts-list 1 0
 
-          Verify in TH Log
+          Verify the endpoints listed in TH Log
 
           [1657002201.045720][3893:3899] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3573910940
           [1657002201.045841][3893:3899] CHIP:TOO:   parts list: 12 entries
@@ -63,8 +62,9 @@ tests:
     - label:
           "For each of the endpoints read in step 1b, read attribute
           DeviceTypeList of the Descriptor cluster on that endpoint"
-      PICS: MCORE.BRIDGE
       verification: |
+          Verify in which of the following read device-list attribute contains device type Aggregator (Type- 14)
+
           ./chip-tool  descriptor read device-list 1 1
 
           Verify in TH Log
@@ -247,23 +247,15 @@ tests:
       disabled: true
 
     - label:
-          "For each of the endpoints read in step 1b, read attribute
-          DeviceTypeList of the Descriptor cluster on that endpoint"
-      PICS: MCORE.BRIDGE
-      verification: |
-          Verify in step 1c list of endpoints is printed for aggregator i.e., 0x000e=14
-
-          Then in this case Endpoint is 1
-      disabled: true
-
-    - label:
           "Read attribute PartsList of the Descriptor cluster on endpoint found
           in step 1c"
       PICS: MCORE.BRIDGE
       verification: |
+          Read parts-list with endpoint listed in 1c
+
           ./chip-tool  descriptor read parts-list 1 1
 
-          Verify in TH Log
+          Verify the list contains 11 entries in TH Log
 
           [1657002810.697118][4121:4126] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3021853414
           [1657002810.697276][4121:4126] CHIP:TOO:   parts list: 11 entries
@@ -285,7 +277,6 @@ tests:
           DeviceTypeList attribute in the Descriptor cluster on such endpoint,
           and select those endpoints which have (at least) a device type of
           Bridged Node in their DeviceTypeList"
-      PICS: MCORE.BRIDGE
       verification: |
           Verify device type has either Bridged node (0x0013), i.e.,  Type=19
 
@@ -447,14 +438,14 @@ tests:
 
            ./chip-tool bridgeddevicebasic read reachable 1 3
 
-          Verify in TH Log
+          Verify reachable attribute is read successfully in TH Log
 
           [1657003614.269096][4564:4569] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0011 DataVersion: 1897994097
           [1657003614.269155][4564:4569] CHIP:TOO:   Reachable: TRUE
 
           ./chip-tool bridgeddevicebasic read node-label 1 4
 
-          Verify in TH Log
+          Verify Verify Node-label is read sucessfully in TH Log
 
           [1657003598.573764][4552:4557] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 3722118563
           [1657003598.573811][4552:4557] CHIP:TOO:   NodeLabel: Switch 1
@@ -479,7 +470,7 @@ tests:
           type(s) of the bridged device"
       PICS: MCORE.BRIDGE
       verification: |
-          Verify the Endpoint list has devicetype application 1.e, 0x0100 = 256(actuator), 0x0103=259(sensor)
+          Verify thedevice-list attribute has devicetype application 1.e, 0x0100 = 256(actuator), 0x0103=259(sensor)
 
 
           ./chip-tool descriptor read device-list 1 3
@@ -612,17 +603,16 @@ tests:
           which is an actuator (e.g. light, window covering)"
       PICS: MCORE.BRIDGE
       verification: |
-          Choose on-off cluster
+          Choose on-off cluster as the bridged devices which is an actuator
       disabled: true
 
     - label:
           "Read the state of this bridged device (through Matter), e.g. on/off,
           brightness"
-      PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool onoff read on-off 1 3
 
-          Verify in TH Log
+          Verify the actual state of the bridged device in TH Log
 
           [1657004454.213279][4792:4798] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3808303315
           [1657004454.213319][4792:4798] CHIP:TOO:   OnOff: FALSE
@@ -633,7 +623,9 @@ tests:
           its brightness or toggle its on/off state"
       verification: |
           ./chip-tool onoff toggle 1 3
-          On bridge-app
+
+          Verify On bridge-app
+
           [1657522278.538831][18140:18140] CHIP:DMG: Received command for Endpoint=3 Cluster=0x0000_0006 Command=0x0000_0002
           [1657522278.538861][18140:18140] CHIP:ZCL: On/Off set value: 3 2
           [1657522278.538887][18140:18140] CHIP:DL: HandleReadOnOffAttribute: attrId=0, maxReadLength=1
@@ -642,7 +634,7 @@ tests:
           [1657522278.538957][18140:18140] CHIP:DL: Device[Light 1]: ON
 
 
-          Verify in TH Log
+          Verify actual state of the bridged device changes accordingly in TH Log
 
           [1657522278.539407][16698:16703] CHIP:DMG: {
           [1657522278.539447][16698:16703] CHIP:DMG:         suppressResponse = false,
@@ -677,11 +669,10 @@ tests:
       disabled: true
 
     - label: "Read the state of this bridged device (through Matter), as in 6b"
-      PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool onoff read on-off 1 3
 
-          Verify in TH Log
+          Verify the value of onoff matches the value of onoff in step 6c in TH Log
 
           [1657004565.254591][4804:4809] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3808303316
           [1657004565.254635][4804:4809] CHIP:TOO:   OnOff: TRUE
@@ -699,7 +690,6 @@ tests:
     - label:
           "Read the state of this bridged device (through Matter), e.g.
           occupancy status, contact status, current temperature"
-      PICS: MCORE.BRIDGE
       verification: |
           use chip-tool to read sensor state (e.g. current temperature)
       disabled: true
@@ -707,13 +697,11 @@ tests:
     - label:
           "Change the state of this sensor (e.g. cover the occupancy sensor,
           open the contact sensor, heat the temperature sensor)"
-      PICS: MCORE.BRIDGE
       verification: |
           Press a key (which one TBD) on bridge-app to change the simulated temperature
       disabled: true
 
     - label: "Read the state of this bridged device again, as in 7b"
-      PICS: MCORE.BRIDGE
       verification: |
           use chip-tool to read sensor state (e.g. current temperature)
           expect to get a different value than step 7b

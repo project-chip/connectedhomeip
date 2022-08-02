@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 18.1.7. [TC-DA-1.7] Validate CertificateChainRequest [DUT-Commissionee]
+name: 4.1.7. [TC-DA-1.7] Validate CertificateChainRequest [DUT-Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -26,7 +26,7 @@ tests:
           and DUT2 must have a different subject public key 3. TH1 only has
           official PAAs from DCL"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "Start the commissioning process of DUT1 by TH on a first Fabric"
@@ -58,6 +58,8 @@ tests:
           To get PAI value, send below command.
           ./chip-tool operationalcredentials certificate-chain-request 2 1 0
 
+          "Verify in TH log:
+
           [1657774756.281112][7964:7969] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
           [1657774756.281164][7964:7969] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
           [1657774756.281236][7964:7969] CHIP:TOO:   CertificateChainResponse: {
@@ -76,11 +78,11 @@ tests:
           2. Give the below command to extract the Authority key ID
           openssl x509 -in pai_6.pem -text
 
-          Verify that below extracted authority key is not same as the SDK's test PAA
+          Verify that below extracted authority key is not same as the SDK"s test PAA
           1. 78:5C:E7:05:B8:6B:8F:4E:6F:C7:93:AA:60:CB:43:EA:69:68:82:D5
           2. 6A:FD:22:77:1F:51:1F:EC:BF:16:41:97:67:10:DC:DC:31:A1:71:7E
 
-          Below certificate has been extracted using the sample DUT, hence the Authority key ID is same as SDK's test PAA
+          Below certificate has been extracted using the sample DUT, hence the Authority key ID is same as SDK"s test PAA
 
           grl@grl-ThinkPad-L480:~/jul14_2ndcntrl/connectedhomeip$ openssl x509 -in pai_6.pem -text
           Certificate:
@@ -173,7 +175,7 @@ tests:
           2. Give the below command to extract the Authority key ID
           openssl x509 -in pai_6.pem -text
 
-          Below certificate has been extracted using the sample DUT, hence the Authority key ID is same as SDK's test PAA
+          Below certificate has been extracted using the sample DUT, hence the Authority key ID is same as SDK"s test PAA
 
           grl@grl-ThinkPad-L480:~/jul14_2ndcntrl/connectedhomeip$ openssl x509 -in pai_6.pem -text
           Certificate:

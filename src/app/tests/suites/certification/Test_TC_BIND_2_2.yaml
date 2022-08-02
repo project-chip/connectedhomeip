@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    118.2.2. [TC-BIND-2.2] Binding Cluster Attributes-DUT handles its Groups
+    119.2.2. [TC-BIND-2.2] Binding Cluster Attributes-DUT handles its Groups
     settings [DUT-Controller]
 
 config:
@@ -31,46 +31,17 @@ tests:
 
     - label: "Commission DUT to TH1s fabric"
       verification: |
-          ./chip-tool pairing ble-wifi 1 chipsetup4 matter123 20202021 3840
+          ./chip-tool pairing onnetwork 1 20202021
       disabled: true
 
     - label: "TH1 enables DUT as Controller"
       verification: |
-          ./chip-tool pairing open-commissioning-window 1 1 400 1000 3840
-
-
-          [1657716927.940140][4326:4331] CHIP:DMG:
-          [1657716927.940201][4326:4331] CHIP:DMG:                                 StatusIB =
-          [1657716927.940275][4326:4331] CHIP:DMG:                                 {
-          [1657716927.940344][4326:4331] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657716927.940411][4326:4331] CHIP:DMG:                                 },
-          [1657716927.940478][4326:4331] CHIP:DMG:
-          [1657716927.940537][4326:4331] CHIP:DMG:                         },
-          [1657716927.940605][4326:4331] CHIP:DMG:
-          [1657716927.940658][4326:4331] CHIP:DMG:                 },
-          [1657716927.940721][4326:4331] CHIP:DMG:
-          [1657716927.940771][4326:4331] CHIP:DMG:         ],
-          [1657716927.940832][4326:4331] CHIP:DMG:
-          [1657716927.940882][4326:4331] CHIP:DMG:         InteractionModelRevision = 1
-          [1657716927.940931][4326:4331] CHIP:DMG: },
-          [1657716927.941044][4326:4331] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
-          [1657716927.941099][4326:4331] CHIP:CTL: Successfully opened pairing window on the device
-          [1657716927.941205][4326:4331] CHIP:CTL: Manual pairing code: [36299144405]
-          [1657716927.941270][4326:4331] CHIP:CTL: SetupQRCode: [MT:-24J0IRV01-85F3GK10]
-          [1657716927.941345][4326:4331] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1657716927.941403][4326:4331] CHIP:EM: Sending Standalone Ack for MessageCount
+          verification step to be updated.
       disabled: true
 
     - label: "Commission TH2 to TH1s fabric (Node ID = 2)"
       verification: |
-          ./chip-tool pairing code 2 36299144405
-
-          [1657716992.250570][3330:3336] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          [1657716992.250614][3330:3336] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
-          [1657716992.250650][3330:3336] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1657716992.250690][3330:3336] CHIP:CTL: Performing next commissioning step 'Cleanup'
-          [1657716992.250769][3330:3336] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
-          [1657716992.250812][3330:3336] CHIP:TOO: Device commissioning completed with success
+          ./chip-tool pairing ble-wifi 2 chipsetup4 matter123 20202021 3840
       disabled: true
 
     - label:
@@ -85,11 +56,11 @@ tests:
           Endpoint 0."
       PICS: GRPKEY.C.C00.Tx
       verification: |
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42,
+          ./chip-tool groupkeymanagement key-set-write "{"groupKeySetID": 42,
           "groupKeySecurityPolicy": 0, "epochKey0":
           "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
           "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
-          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 2 0
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }" 2 0
 
 
 
@@ -128,6 +99,19 @@ tests:
       disabled: true
 
     - label:
+          "DUT binds GroupId with GroupKeySetID in the GroupKeyMap attribute
+          list on GroupKeyManagement cluster to TH2 on Endpoint 0"
+      PICS: G.C.C00.Tx
+      verification: |
+          ./chip-tool groupkeymanagement write group-key-map "[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]" 2 0
+
+          StatusIB =
+                          {
+                                  status = 0x00 (SUCCESS),
+                  }
+      disabled: true
+
+    - label:
           "DUT sends AddGroup( Group Name and Group-ID) Command to TH2 on
           Endpoint 1."
       PICS: G.C.C00.Tx
@@ -139,20 +123,7 @@ tests:
           [1657717342.599959][3368:3373] CHIP:TOO:     status: 0
           [1657717342.600007][3368:3373] CHIP:TOO:     groupId: 1
           [1657717342.600054][3368:3373] CHIP:TOO:    }
-          [1657717342.600130][3368:3373] CHIP:DMG: ICR moving t
-      disabled: true
-
-    - label:
-          "DUT binds GroupId with GroupKeySetID in the GroupKeyMap attribute
-          list on GroupKeyManagement cluster to TH2 on Endpoint 0"
-      PICS: GRPKEY.C.A0000
-      verification: |
-          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]' 2 0
-
-          StatusIB =
-                          {
-                                  status = 0x00 (SUCCESS),
-                  }
+          [1657717342.600130][3368:3373] CHIP:DMG: ICR moving
 
           ./chip-tool groupsettings add-group grp1 0x0001
 
@@ -176,7 +147,7 @@ tests:
           "TH1 writes Binding entry into DUT with Entry 1: Group = The Group ID
           in the AddGroup command sent from DUT to TH2"
       verification: |
-          ./chip-tool binding write binding '[{"group" : "0x0001"}]' 1 0
+          ./chip-tool binding write binding "[{"group" : "0x0001"}]" 1 1
 
 
           [1657717436.184899][4353:4358] CHIP:DMG:                         StatusIB =

@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    90.2.4. [TC-CGEN-2.4] Verification For CommissioningError on response
+    92.2.3. [TC-CGEN-2.4] Verification For CommissioningError on response
     message [DUT - Server]
 
 config:
@@ -25,11 +25,12 @@ config:
 tests:
     - label: "Start the commissioning process of TH1 on DUT"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
-          "During PASE Session, TH1 sends CommissionComplete command to the DUT"
+          "During PASE Session, TH1 sends CommissioningComplete command to the
+          DUT"
       PICS: CGEN.S.C04.Rsp && CGEN.S.C05.Tx
       verification: |
           Not testable as the execution is in PASE session
@@ -37,17 +38,18 @@ tests:
 
     - label: "Complete the Commission for TH1 and DUT"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
           "TH1 sends SetRegulatoryConfig command to the DUT with
-          NewRegulatoryConfig data value as greater than '3', Breadcrumb as 0
-          and CountryCode value as 'User_countryCode'"
+          NewRegulatoryConfig data value as greater than 3, Breadcrumb as 0 and
+          CountryCode value as PIXIT.CGEN.CountryCode"
       PICS: CGEN.S.C02.Rsp && CGEN.S.C03.Tx
       verification: |
           ./chip-tool generalcommissioning set-regulatory-config 4 new 0 1 0
 
+          On TH, Verify that DUT sends SetRegulatoryConfigResponse command to TH1 with field ErrorCode as 1 and DebugText as string
 
           [1653996382.940789][7220:7225] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0003
           [1653996382.940900][7220:7225] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0003
@@ -59,11 +61,14 @@ tests:
       disabled: true
 
     - label:
-          "After Fail-Safe timer expires, TH1 Sends the CommissionComplete
+          "After Fail-Safe timer expires, TH1 Sends the CommissioningComplete
           command to the DUT"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool generalcommissioning commissioning-complete 1 0
+          ./chip-tool generalcommissioning commissioning-complete 1 0
+
+          On TH, Verify that DUT sends SetRegulatoryConfigResponse command to TH1 with field ErrorCode as 3 and DebugText as string or empty
+
           [1653996461.207051][7229:7234] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           [1653996461.207140][7229:7234] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0005
           [1653996461.207228][7229:7234] CHIP:TOO:   CommissioningCompleteResponse: {

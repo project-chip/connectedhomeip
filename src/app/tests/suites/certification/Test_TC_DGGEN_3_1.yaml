@@ -21,17 +21,17 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "Commission TH to DUT"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
-    - label: "TH reads NetworkInterfaces structure attribute from DUT."
-      PICS: DGGEN.S.A0000
+    - label: "DUT reads NetworkInterfaces structure attribute from TH."
+      PICS: DGGEN.C.A0000
       verification: |
           ./chip-tool generaldiagnostics read network-interfaces 1 0
 
-          Verify in TH all-clusters-app Log:
+          Verify in DUT as client side: verify that list of supported NetworkInterfaces structures,  Structure data includes Name, IsOperational, OffPremiseServicesReachableIPv4, OffPremiseServicesReachableIPv6,   HardwareAddress, IPv4Addresses,  IPv6Addresses and type.
 
           [1654682355.830733][32933:32938] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0000 DataVersion: 2161135285
           [1654682355.830907][32933:32938] CHIP:TOO:   NetworkInterfaces: 11 entries
@@ -166,12 +166,12 @@ tests:
       disabled: true
 
     - label:
-          "TH reads a RebootCount attribute value from DUT. Then a DUT (node)
+          "DUT reads a RebootCount attribute value from TH. Then a TH (node)
           gets rebooted more than 2 times."
-      PICS: DGGEN.S.A0001
+      PICS: DGGEN.C.A0001
       verification: |
           ./chip-tool generaldiagnostics read reboot-count 1 0
-          Verify in TH all-clusters-app Log:
+          Verify in DUT as client side: verify that RebootCount attribute data type must be UINT16 and the count should match with the number of rebooted times.
 
           [1650873646.874760][19568:19573] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0001 DataVersion: 2777668989
           [1650873646.874854][19568:19573] CHIP:TOO:   RebootCount: 2
@@ -179,68 +179,69 @@ tests:
       disabled: true
 
     - label:
-          "DUT reboots and TH reads a UpTime attribute value of DUT since some
-          arbitrary start time of DUT rebooting."
-      PICS: DGGEN.S.A0002
+          "TH reboots and DUT reads a UpTime attribute value of TH since some
+          arbitrary start time of TH rebooting."
+      PICS: DGGEN.C.A0002
       verification: |
           ./chip-tool generaldiagnostics read up-time 1 0
 
-          Verify in TH all-clusters-app Log:
+          Verify in DUT as client side: Verify that UpTime attribute data type must be UINT64 and the time duratoin should be represented in seconds since DUT (node) has been rebooted.
           [1650877936.462457][2360:2365] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0002 DataVersion: 3419113433
           [1650877936.462538][2360:2365] CHIP:TOO:   UpTime: 368
       disabled: true
 
-    - label: "TH reads a TotalOpreationalHours attribute value from DUT."
-      PICS: DGGEN.S.A0003
+    - label: "DUT reads a TotalOperationalHours attribute value from TH."
+      PICS: DGGEN.C.A0003
       verification: |
           ./chip-tool generaldiagnostics read total-operational-hours 1 0
-          Verify in TH all-clusters-app Log:
+          Verify in DUT as client side: verify that TotalOperationalHours attribute data type must be UINT32 and the value indicates the number of hours the node has been operational since DUT (node) has been rebooted.
 
           [1650877969.904265][2369:2374] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0003 DataVersion: 3419113433
           [1650877969.904339][2369:2374] CHIP:TOO:   TotalOperationalHours: 0
       disabled: true
 
     - label:
-          "DUT undergoes a reboot process. TH reads a attribute value from DUT."
-      PICS: DGGEN.S.A0004
+          "TH undergoes a reboot process. DUT reads a attribute value from TH."
+      PICS: DGGEN.C.A0004
       verification: |
           ./chip-tool generaldiagnostics read boot-reasons 1 0
 
-          Verify in TH all-clusters-app Log:
+          Verify in DUT as client side: verify that  bootreason attribute data type must match the value listed in Table 105 BootReason ENUM table in spec
           [1650877998.693012][2377:2382] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0004 DataVersion: 3419113433
           [1650877998.693118][2377:2382] CHIP:TOO:   BootReasons: 0
       disabled: true
 
     - label:
-          "TH reads ActiveHardwareFaults attribute value from DUT. Subscription
+          "DUT reads ActiveHardwareFaults attribute value from TH. Subscription
           is possible option for this attribute."
-      PICS: DGGEN.S.A0005
+      PICS: DGGEN.C.A0005
       verification: |
           ./chip-tool generaldiagnostics read active-hardware-faults 1 0
 
-          Verify in TH all-clusters-app Log:
+          Verify in DUT as client side: verify that ActiveHardwareFaults attribute the attribute response should be empty. But when a hardware fault occurs, the return attribute value must match the value listed in the HardwareFault ENUM table 11.11.6.1
+
           [1650878034.133792][2385:2390] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0005 DataVersion: 3419113433
           [1650878034.133891][2385:2390] CHIP:TOO:   ActiveHardwareFaults: 0 entries
       disabled: true
 
     - label:
-          "TH reads ActiveRadioFaults attribute value from DUT. Subscription is
-          possible option for this attribute"
-      PICS: DGGEN.S.A0006
+          "DUT reads ActiveRadioFaults attribute value from TH. Subscription is
+          possible option for this attribute."
+      PICS: DGGEN.C.A0006
       verification: |
           ./chip-tool generaldiagnostics read active-radio-faults 1 0
-          Verify in TH all-clusters-app Log:
+          Verify in DUT as client side:verify that  the attribute response should be empty. But when a radio fault occurs, the return attribute value must match the value listed in the RadioFault ENUM table. 11.11.6.2
           [1650878056.266314][2391:2396] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0006 DataVersion: 3419113433
           [1650878056.266428][2391:2396] CHIP:TOO:   ActiveRadioFaults: 0 entries
       disabled: true
 
     - label:
-          "TH reads ActiveNetworkFaults attribute value from DUT. Subscription
+          "DUT reads ActiveNetworkFaults attribute value from TH. Subscription
           is possible option for this attribute."
-      PICS: DGGEN.S.A0007
+      PICS: DGGEN.C.A0007
       verification: |
           ./chip-tool generaldiagnostics read active-network-faults 1 0
-          Verify in TH all-clusters-app Log:
+          Verify in DUT as client side: verify that ActiveNetworkFaults attribute value attribute response should be empty. But when a network fault occurs, the return attribute value must match the value listed in the NetworkFault ENUM ta
           [1650878077.694616][2399:2404] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0007 DataVersion: 3419113433
           [1650878077.694781][2399:2404] CHIP:TOO:   ActiveNetworkFaults: 0 entries
       disabled: true
@@ -249,10 +250,10 @@ tests:
           "TH reads TestEventTriggersEnabled attribute value. If this value is
           set True, then a certain test mode will be performed (or triggered)
           according to pre-provisioned client and server test mode."
-      PICS: DGGEN.S.A0008
+      PICS: DGGEN.C.A0008
       verification: |
           ./chip-tool generaldiagnostics read   test-event-triggers-enabled  1 0
-          Verify in TH all-clusters-app Log:
+          Verify in DUT as client side: verify that TestEventTriggersEnabled attribute value should be data type bool
           [1655188892.957794][2868:2873] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0008 DataVersion: 3562689442
           [1655188892.957869][2868:2873] CHIP:TOO:   TestEventTriggersEnabled: FALSE
           [1655188892.957999][2868:2873] CHIP:EM: Sending Standalone Ack for MessageCounter:133140817 on exchange 23176i

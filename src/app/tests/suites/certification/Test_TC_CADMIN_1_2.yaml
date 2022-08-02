@@ -14,8 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    25.1.2. [TC-CADMIN-1.2] Administrator Behavior using BCM [DUT -
-    Commissioner]
+    4.1.2. [TC-CADMIN-1.2] Administrator Behavior using BCM [DUT - Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -98,7 +97,7 @@ tests:
     - label: "DUT_CR2 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
-          Using your DUT Controller connect to the accessory.
+          On second Controller connect to the accessory.
 
           Below is the example when using chip tool as controller
           ./chip-tool pairing onnetwork 1 20202021
@@ -131,7 +130,7 @@ tests:
           Information Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
-          Using your DUT controller write attribute and read attribute to and from TH_CE
+          On the 2nd controller write attribute and read attribute to and from TH_CE
 
           Below is the example while using chip tool on second controller,
           ./chip-tool basic write  node-label te5new 2 0
@@ -163,9 +162,10 @@ tests:
           [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
 
+          Verify read attribute returns the updated value written
           ./chip-tool basic read node-label 1 0
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
-          [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te8
+          [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te5new
           [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
       disabled: true
 
@@ -173,7 +173,7 @@ tests:
           "DUT_CR2 sends command to TH_CE to read the list of Fabrics on TH_CE"
       PICS: OPCREDS.C.A0001
       verification: |
-          On your DUT controller read fabricList
+          On second controller controller read fabricList
 
           Below is the example while using chip tool on second controller,
           ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0
@@ -234,6 +234,7 @@ tests:
           [1649245940.790033][10110:10115] CHIP:DMG: }
           [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
+          Verify read attribute returns the updated value written
           ./chip-tool basic read node-label 1 0
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
           [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te8
@@ -245,7 +246,7 @@ tests:
           Information Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
-          Using your DUT controller read, write attribute and then read attribute to and from TH_CE
+          On second controller read, write attribute and then read attribute to and from TH_CE
 
 
 
@@ -278,6 +279,7 @@ tests:
           [1649245940.790033][10110:10115] CHIP:DMG: }
           [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
+          Verify read attribute returns the updated value written
 
           ./chip-tool basic read node-label 2 0
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
@@ -296,7 +298,7 @@ tests:
           (Basic Commissioning Method)"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On your DUT controller using chip-tool open commissioning widow using BCM.
+          On second controller using chip-tool open commissioning widow using BCM.
 
           Below is the example while using chip tool on second controller,
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
@@ -340,7 +342,7 @@ tests:
           using the Revoke Commissioning command"
       PICS: CADMIN.C.C02.Tx
       verification: |
-          On your DUT controller using chip-tool run revoke command
+          On second controller using chip-tool run revoke command
 
           Below is the example while using chip tool on second controller,
           ./chip-tool administratorcommissioning revoke-commissioning 2 0 --timedInteractionTimeoutMs 1000
@@ -398,7 +400,7 @@ tests:
           Information Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
-          Using your DUT controller, write attribute and read attribute to and from TH_CE
+          On second controller, write attribute and read attribute to and from TH_CE
 
           Below is the example while using chip tool on second controller,
           ./chip-tool basic write node-label te5new 2 0
@@ -429,9 +431,10 @@ tests:
           [1649245940.790033][10110:10115] CHIP:DMG: }
           [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
+          Verify read attribute returns the updated value written
           ./chip-tool basic read node-label 2 0
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
-          [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te8
+          [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te5new
           [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
       disabled: true
 
@@ -440,7 +443,7 @@ tests:
           BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On your DUT controller using chip-tool open commissioning widow using BCM.
+          On second controller using chip-tool open commissioning widow using BCM.
 
           Below is the example while using chip tool on second controller,
           ./chip-tool administratorcommissioning open-basic-commissioning-window 180 2 0 --timedInteractionTimeoutMs 1000
@@ -490,7 +493,7 @@ tests:
           BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On your DUT controller using chip-tool open commissioning widow using BCM.
+          On second controller using chip-tool open commissioning widow using BCM.
 
           Below is the example while using chip tool on second controller,
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
@@ -542,7 +545,7 @@ tests:
           [1651786200275] [36301:315544] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1651786200275] [36301:315544] CHIP: [CTL] Device returned status 9 on receiving the NOC
           [1651786200275] [36301:315544] CHIP: [CTL] Add NOC failed with error ../../src/controller/CHIPDeviceController.cpp:1187: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists
-          [1651786200275] [36301:315544] CHIP: [CTL] Error on commissioning step 'SendNOC': '../../src/controller/CHIPDeviceController.cpp:1187: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists'
+          [1651786200275] [36301:315544] CHIP: [CTL] Error on commissioning step "SendNOC": "../../src/controller/CHIPDeviceController.cpp:1187: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists"
 
           Verify that the commissioning process fails as TH_CE was already commissioned by TH_CR1 in step 1
       disabled: true
