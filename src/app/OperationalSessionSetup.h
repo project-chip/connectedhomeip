@@ -74,8 +74,8 @@ struct DeviceProxyInitParams
  * @brief Delegate provided when creating OperationalSessionSetup.
  *
  * Once OperationalSessionSetup establishes a connection (or errors out) and has notified all
- * registered application via callback via OnDeviceConnected/OnDeviceConnectionFailure, this delegate
- * is used to tell the entity managing pool of OperationalSessionSetup to free itself.
+ * registered application callback via OnDeviceConnected/OnDeviceConnectionFailure, this delegate
+ * is used to deallocate the OperationalSessionSetup.
  */
 class OperationalSessionReleaseDelegate
 {
@@ -93,7 +93,7 @@ public:
  *
  * OperationalDeviceProxy is a minimal implementation of DeviceProxy. It is meant to provide a transition
  * for existing consumers of OperationalDeviceProxy that were delivered a reference to that object in
- * their respective OnDeviceConnected callback, but were incorrectly holding onto that object pass
+ * their respective OnDeviceConnected callback, but were incorrectly holding onto that object past
  * the function call. OperationalDeviceProxy can be held on for as long as is desired, while still
  * minimizing the code changes needed to transition to a more final solution by virtue of
  * implementing DeviceProxy.
@@ -136,8 +136,8 @@ private:
 /**
  * @brief Callback prototype when secure session is established.
  *
- * Callback implementation are not supposed to store the exchangeMgr or the sessionHandle. Older
- * application code does incorrectly held onto this information so do not follow those incorrect
+ * Callback implementations are not supposed to store the exchangeMgr or the sessionHandle. Older
+ * application code does incorrectly hold onto this information so do not follow those incorrect
  * implementations as an example.
  */
 // TODO: OnDeviceConnected should not return ExchangeManager. Application should have this already. This

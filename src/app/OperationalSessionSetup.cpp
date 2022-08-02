@@ -291,7 +291,7 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error)
         cb->Cancel();
         if (error == CHIP_NO_ERROR)
         {
-            // We know that we for sure have the SessionHandler in the successful case.
+            // We know that we for sure have the SessionHandle in the successful case.
             VerifyOrDie(exchangeMgr);
             cb->mCall(cb->mContext, *exchangeMgr, sessionHandle.Value());
         }

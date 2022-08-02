@@ -73,7 +73,7 @@ public:
 
     OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId) const;
 
-    void ReleaseSession(const ScopedNodeId & peerId);
+    void ReleaseSession(const ScopedNodeId & peerId) override;
 
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
