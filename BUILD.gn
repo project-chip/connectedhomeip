@@ -133,7 +133,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/src/setup_payload",
         "${chip_root}/src/tools/spake2p",
       ]
-      if (chip_crypto == "openssl") {
+      if (chip_can_build_cert_tool) {
         deps += [ "${chip_root}/src/tools/chip-cert" ]
       }
       if (chip_enable_python_modules) {
@@ -252,7 +252,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Build the chip-cert tool.
     enable_standalone_chip_cert_build =
-        enable_default_builds && host_os != "win" && chip_crypto == "openssl"
+        enable_default_builds && host_os != "win" && chip_can_build_cert_tool
 
     # Build the chip-tool example.
     enable_standalone_chip_tool_build =
