@@ -21,6 +21,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "MTRDeviceConnectionBridge.h" // For MTRInternalDeviceConnectionCallback
 #import "MTRDeviceController.h"
 
 #include <lib/core/CHIPError.h>
@@ -84,6 +85,28 @@ NS_ASSUME_NONNULL_BEGIN
  * Only MTRControllerFactory should be calling this.
  */
 - (void)shutDownCppController;
+
+/**
+ * Ensure we have a CASE session to the given node ID and then call the provided
+ * connection callback.  This may be called on any queue (including the Matter
+ * event queue) and will always call the provided connection callback on the
+ * Matter queue, asynchronously.  Consumers must be prepared to run on the
+ * Matter queue (an in particular must not use any APIs that will try to do sync
+ * dispatch to the Matter queue).
+ *
+ * If the controller is not running when this function is called, will return NO
+ * and never invoke the completionHandler.  If the controller is not running
+ * when the async dispatch on the Matter queue would happen, an error will be
+ * dispatched to the completion handler.
+ */
+- (BOOL)getSessionForNode:(chip::NodeId)nodeID completionHandler:(MTRInternalDeviceConnectionCallback)completionHandler;
+
+/**
+ * Invalidate the CASE session for the given node ID.  This is a temporary thing
+ * just to support MTRBaseDevice's invalidateCASESession.  Must not be called on
+ * the Matter event queue.
+ */
+- (void)invalidateCASESessionForNode:(chip::NodeId)nodeID;
 
 @end
 
