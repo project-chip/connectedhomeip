@@ -125,14 +125,103 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
                                                                  const ByteSpan & attestationSignature,
-                                                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC,
+                                                                 const ByteSpan & attestationChallenge,
+                                                                 const ByteSpan & attestationElements, const ByteSpan & DAC,
                                                                  const ByteSpan & PAI,
                                                                  Callback::Callback<OnNOCChainGeneration> * onCompletion)
+{
+    if (mUseJavaCallbackForNOCRequest)
+    {
+        return CallbackGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, attestationElements, DAC,
+                                        PAI, onCompletion);
+    }
+    else
+    {
+        return LocalGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, attestationElements, DAC,
+                                     PAI, onCompletion);
+    }
+}
+
+CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
+                                                                         const ByteSpan & attestationSignature,
+                                                                         const ByteSpan & attestationChallenge,
+                                                                         const ByteSpan & attestationElements, const ByteSpan & DAC,
+                                                                         const ByteSpan & PAI,
+                                                                         Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = JniReferences::GetInstance().FindMethod(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef,
-                                                  "onOpCSRGenerationComplete", "([B)V", &method);
+                                                             "onNOCChainGenerationNeeded", "([B[B[B[B[B[B[B)V", &method);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Error invoking onNOCChainGenerationNeeded: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    mOnNOCCompletionCallback = onCompletion;
+
+    JniReferences::GetInstance().GetEnvForCurrentThread()->ExceptionClear();
+
+    jbyteArray javaCsr;
+    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csrElements.data(),
+                                               csrElements.size(), javaCsr);
+
+    jbyteArray javaCsrNonce;
+    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csrNonce.data(),
+                                               csrNonce.size(), javaCsrNonce);
+
+    jbyteArray javaAttestationSignature;
+    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), attestationSignature.data(),
+                                               attestationSignature.size(), javaAttestationSignature);
+
+    jbyteArray javaAttestationChallenge;
+    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), attestationChallenge.data(),
+                                               attestationChallenge.size(), javaAttestationChallenge);
+
+    jbyteArray javaAttestationElements;
+    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), attestationElements.data(),
+                                               attestationElements.size(), javaAttestationElements);
+
+    jbyteArray javaDAC;
+    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), DAC.data(), DAC.size(),
+                                               javaDAC);
+
+    jbyteArray javaPAI;
+    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), PAI.data(), PAI.size(),
+                                               javaPAI);
+
+    JniReferences::GetInstance().GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, javaCsr, javaCsrNonce,
+                                                                          javaAttestationSignature, javaAttestationChallenge,
+                                                                          javaAttestationElements, javaDAC, javaPAI);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AndroidOperationalCredentialsIssuer::NOCChainGenerated(CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
+                                                                  const ByteSpan & rcac, Optional<Crypto::AesCcm128KeySpan> ipk,
+                                                                  Optional<NodeId> adminSubject)
+{
+    ReturnErrorCodeIf(mOnNOCCompletionCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    Callback::Callback<OnNOCChainGeneration> * onCompletion = mOnNOCCompletionCallback;
+    mOnNOCCompletionCallback                                = nullptr;
+
+    // Call-back into commissioner with the generated data.
+    onCompletion->mCall(onCompletion->mContext, status, noc, icac, rcac, ipk, adminSubject);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
+                                                                      const ByteSpan & attestationSignature,
+                                                                      const ByteSpan & attestationChallenge,
+                                                                      const ByteSpan & attestationElements, const ByteSpan & DAC,
+                                                                      const ByteSpan & PAI,
+                                                                      Callback::Callback<OnNOCChainGeneration> * onCompletion)
+{
+    jmethodID method;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    err            = JniReferences::GetInstance().FindMethod(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef,
+                                                             "onOpCSRGenerationComplete", "([B)V", &method);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %" CHIP_ERROR_FORMAT, err.Format());

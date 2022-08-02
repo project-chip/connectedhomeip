@@ -48,8 +48,16 @@ public:
     virtual ~AndroidOperationalCredentialsIssuer() {}
 
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
-                                const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
-                                Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
+                                const ByteSpan & attestationChallenge, const ByteSpan & attestationElements, const ByteSpan & DAC,
+                                const ByteSpan & PAI, Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
+
+    CHIP_ERROR NOCChainGenerated(CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                 Optional<Crypto::AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject);
+
+    void SetUseJavaCallbackForNOCRequest(bool useJavaCallbackForNOCRequest)
+    {
+        mUseJavaCallbackForNOCRequest = useJavaCallbackForNOCRequest;
+    }
 
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override
     {
@@ -87,6 +95,16 @@ public:
                                                MutableByteSpan & noc);
 
 private:
+    CHIP_ERROR CallbackGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
+                                        const ByteSpan & attestationSignature, const ByteSpan & attestationChallenge,
+                                        const ByteSpan & attestationElements, const ByteSpan & DAC, const ByteSpan & PAI,
+                                        Callback::Callback<OnNOCChainGeneration> * onCompletion);
+
+    CHIP_ERROR LocalGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
+                                     const ByteSpan & attestationChallenge, const ByteSpan & attestationElements,
+                                     const ByteSpan & DAC, const ByteSpan & PAI,
+                                     Callback::Callback<OnNOCChainGeneration> * onCompletion);
+
     Crypto::P256Keypair mIssuer;
     bool mInitialized  = false;
     uint32_t mIssuerId = 0;
@@ -103,6 +121,9 @@ private:
     bool mNodeIdRequested       = false;
 
     jobject mJavaObjectRef = nullptr;
+
+    bool mUseJavaCallbackForNOCRequest                                  = false;
+    Callback::Callback<OnNOCChainGeneration> * mOnNOCCompletionCallback = nullptr;
 };
 
 } // namespace Controller

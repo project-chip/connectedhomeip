@@ -155,6 +155,80 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     chip::Platform::MemoryShutdown();
 }
 
+JNI_METHOD(jint, setNOCChain)
+(JNIEnv * env, jobject self, jlong handle, jobject controllerParams)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    ChipLogProgress(Controller, "setNOCChain() called");
+
+    jmethodID getRootCertificate;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getRootCertificate", "()[B", &getRootCertificate);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+
+    jmethodID getIntermediateCertificate;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIntermediateCertificate", "()[B",
+                                                        &getIntermediateCertificate);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+
+    jmethodID getOperationalCertificate;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getOperationalCertificate", "()[B",
+                                                        &getOperationalCertificate);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+
+    jmethodID getIpk;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIpk", "()[B", &getIpk);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+
+    jmethodID getAdminSubject;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAdminSubject", "()J", &getAdminSubject);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+
+    jbyteArray rootCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getRootCertificate);
+    VerifyOrReturnValue(rootCertificate != nullptr, CHIP_ERROR_BAD_REQUEST.AsInteger());
+
+    jbyteArray intermediateCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getIntermediateCertificate);
+    VerifyOrReturnValue(intermediateCertificate != nullptr, CHIP_ERROR_BAD_REQUEST.AsInteger());
+
+    jbyteArray operationalCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
+    VerifyOrReturnValue(operationalCertificate != nullptr, CHIP_ERROR_BAD_REQUEST.AsInteger());
+
+    jbyteArray ipk = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
+    VerifyOrReturnValue(ipk != nullptr, CHIP_ERROR_BAD_REQUEST.AsInteger());
+
+    Optional<NodeId> adminSubjectOptional;
+    uint64_t adminSubject = env->CallLongMethod(controllerParams, getAdminSubject);
+    if (adminSubject != kUndefinedNodeId)
+    {
+        adminSubjectOptional.SetValue(adminSubject);
+    }
+
+    JniByteArray jByteArrayRcac(env, rootCertificate);
+    JniByteArray jByteArrayIcac(env, intermediateCertificate);
+    JniByteArray jByteArrayNoc(env, operationalCertificate);
+    JniByteArray jByteArrayIpk(env, ipk);
+
+    // Prepare IPK to be sent back. A more fully-fledged operational credentials delegate
+    // would obtain a suitable key per fabric.
+    uint8_t ipkValue[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    Crypto::AesCcm128KeySpan ipkSpan(ipkValue);
+
+    VerifyOrReturnValue(jByteArrayIpk.byteSpan().size() == sizeof(ipkValue), CHIP_ERROR_INTERNAL.AsInteger());
+    memcpy(&ipkValue[0], jByteArrayIpk.byteSpan().data(), jByteArrayIpk.byteSpan().size());
+
+    err = wrapper->GetAndroidOperationalCredentialsIssuer()->NOCChainGenerated(CHIP_NO_ERROR, jByteArrayNoc.byteSpan(),
+                                                                               jByteArrayIcac.byteSpan(), jByteArrayRcac.byteSpan(),
+                                                                               MakeOptional(ipkSpan), adminSubjectOptional);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to SetNocChain for the device: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return err.AsInteger();
+}
+
 JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject controllerParams)
 {
     chip::DeviceLayer::StackLock lock;
@@ -211,6 +285,10 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIpk", "()[B", &getIpk);
     SuccessOrExit(err);
 
+    jmethodID getAdminSubject;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAdminSubject", "()J", &getAdminSubject);
+    SuccessOrExit(err);
+
     {
         uint16_t listenPort                = env->CallIntMethod(controllerParams, getUdpListenPort);
         uint16_t controllerVendorId        = env->CallIntMethod(controllerParams, getControllerVendorId);
@@ -220,15 +298,16 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         jbyteArray operationalCertificate  = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
         jbyteArray ipk                     = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
         uint16_t failsafeTimerSeconds      = env->CallIntMethod(controllerParams, getFailsafeTimerSeconds);
-        bool attemptNetworkScanWiFi        = env->CallIntMethod(controllerParams, getAttemptNetworkScanWiFi);
-        bool attemptNetworkScanThread      = env->CallIntMethod(controllerParams, getAttemptNetworkScanThread);
+        bool attemptNetworkScanWiFi        = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanWiFi);
+        bool attemptNetworkScanThread      = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
+        uint64_t adminSubject              = env->CallLongMethod(controllerParams, getAdminSubject);
 
         std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
             new chip::Controller::AndroidOperationalCredentialsIssuer());
         wrapper = AndroidDeviceControllerWrapper::AllocateNew(
             sJVM, self, kLocalDeviceId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(), DeviceLayer::TCPEndPointManager(),
             DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate, rootCertificate, intermediateCertificate,
-            operationalCertificate, ipk, listenPort, controllerVendorId, failsafeTimerSeconds, attemptNetworkScanWiFi,
+            operationalCertificate, ipk, adminSubject, listenPort, controllerVendorId, failsafeTimerSeconds, attemptNetworkScanWiFi,
             attemptNetworkScanThread, &err);
         SuccessOrExit(err);
     }

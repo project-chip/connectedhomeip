@@ -34,6 +34,7 @@ public class ChipDeviceController {
   private int connectionId;
   private CompletionListener completionListener;
   private ScanNetworksListener scanNetworksListener;
+  private NOCChainIssuer nocChainIssuer;
 
   /**
    * To load class and jni, we need to new AndroidChipPlatform after jni load but before new
@@ -59,6 +60,10 @@ public class ChipDeviceController {
 
   public void setScanNetworksListener(ScanNetworksListener listener) {
     scanNetworksListener = listener;
+  }
+
+  public void setNOCChainIssuer(NOCChainIssuer issuer) {
+    nocChainIssuer = issuer;
   }
 
   public void pairDevice(
@@ -182,6 +187,11 @@ public class ChipDeviceController {
   public void resumeCommissioning() {
     resumeCommissioning(deviceControllerPtr);
   }
+
+  public int setNOCChain(ControllerParams params) {
+    return setNOCChain(deviceControllerPtr, params);
+  }
+
 
   /**
    * Update the network credentials held by the commissioner for the current commissioning session.
@@ -312,6 +322,21 @@ public class ChipDeviceController {
 
   public void onError(Throwable error) {
     completionListener.onError(error);
+  }
+
+  public void onNOCChainGenerationNeeded(
+      byte[] csrElements, 
+      byte[] csrNonce, 
+      byte[] attestationSignature, 
+      byte[] attestationChallenge, 
+      byte[] attestationElements, 
+      byte[] dac, 
+      byte[] pai) {
+    if (nocChainIssuer != null) {
+      nocChainIssuer.onNOCChainGenerationNeeded(
+          csrElements, csrNonce, attestationSignature, attestationChallenge, 
+          attestationElements, dac, pai);
+    }
   }
 
   public void close() {
@@ -636,6 +661,8 @@ public class ChipDeviceController {
   private native void updateCommissioningNetworkCredentials(
       long deviceControllerPtr, NetworkCredentials networkCredentials);
 
+  private native int setNOCChain(long deviceControllerPtr, ControllerParams params);
+
   private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
 
   private native void shutdownCommissioning(long deviceControllerPtr);
@@ -654,7 +681,30 @@ public class ChipDeviceController {
     }
   }
 
-  /** Interface to listen for callbacks from CHIPDeviceController. */
+  /** Interface to implement custom operational credentials issuer (NOC chain generation). */
+  public interface NOCChainIssuer {
+    /** 
+     * Notifies when operational cert generation is needed. 
+     * 
+     * Once generated, implementor should populate the following fields on the ControllerParams object
+     * and call setNOCChain():
+     * - ipk
+     * - rootCertificate
+     * - intermediateCertificate
+     * - operationalCertificate
+     * - adminSubject
+     */
+    void onNOCChainGenerationNeeded(
+        byte[] csrElements, 
+        byte[] csrNonce, 
+        byte[] attestationSignature, 
+        byte[] attestationChallenge, 
+        byte[] attestationElements, 
+        byte[] dac, 
+        byte[] pai);
+  }
+
+  /** Interface to listen for scn networks callbacks from CHIPDeviceController. */
   public interface ScanNetworksListener {
     /** Notifies when scan networks call fails. */
     void onScanNetworksFailure(int errorCode);

@@ -799,13 +799,15 @@ private:
      *
      * @param[in] proxy           device proxy
      * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
-     * @param[in] AttestationSignature       Cryptographic signature generated for all the above fields.
+     * @param[in] attestationSignature       Cryptographic signature generated for all the above fields.
+     * @param[in] attestationElements        attestation elements portion of Attestation Response (raw TLV)
      * @param[in] dac               device attestation certificate
      * @param[in] pai               Product Attestation Intermediate certificate
      * @param[in] csrNonce          certificate signing request nonce
      */
-    CHIP_ERROR ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature,
-                          const ByteSpan & dac, const ByteSpan & pai, const ByteSpan & csrNonce);
+    CHIP_ERROR ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & attestationSignature,
+                          const ByteSpan & attestationElements, const ByteSpan & dac, const ByteSpan & pai,
+                          const ByteSpan & csrNonce);
 
     /**
      * @brief

@@ -7,14 +7,15 @@ public final class ControllerParams {
 
   private final int udpListenPort;
   private final int controllerVendorId;
+  private final int failsafeTimerSeconds;
+  private final boolean attemptNetworkScanWiFi;
+  private final boolean attemptNetworkScanThread;
   @Nullable private final KeypairDelegate keypairDelegate;
   @Nullable private final byte[] rootCertificate;
   @Nullable private final byte[] intermediateCertificate;
   @Nullable private final byte[] operationalCertificate;
   @Nullable private final byte[] ipk;
-  private final int failsafeTimerSeconds = 30;
-  private final boolean attemptNetworkScanWiFi = false;
-  private final boolean attemptNetworkScanThread = true;
+  private final long adminSubject;
 
   private static final int LEGACY_GLOBAL_CHIP_PORT = 5540;
 
@@ -22,11 +23,15 @@ public final class ControllerParams {
   private ControllerParams(Builder builder) {
     this.udpListenPort = builder.udpListenPort;
     this.controllerVendorId = builder.controllerVendorId;
+    this.failsafeTimerSeconds = builder.failsafeTimerSeconds;
+    this.attemptNetworkScanWiFi = builder.attemptNetworkScanWiFi;
+    this.attemptNetworkScanThread = builder.attemptNetworkScanThread;
     this.keypairDelegate = builder.keypairDelegate;
     this.rootCertificate = builder.rootCertificate;
     this.intermediateCertificate = builder.intermediateCertificate;
     this.operationalCertificate = builder.operationalCertificate;
     this.ipk = builder.ipk;
+    this.adminSubject = builder.adminSubject;
   }
 
   /** Gets the UDP listening port; 0 indicates "any available port" */
@@ -36,6 +41,18 @@ public final class ControllerParams {
 
   public int getControllerVendorId() {
     return controllerVendorId;
+  }
+
+  public int getFailsafeTimerSeconds() {
+    return failsafeTimerSeconds;
+  }
+
+  public boolean getAttemptNetworkScanWiFi() {
+    return attemptNetworkScanWiFi;
+  }
+
+  public boolean getAttemptNetworkScanThread() {
+    return attemptNetworkScanThread;
   }
 
   public KeypairDelegate getKeypairDelegate() {
@@ -58,16 +75,8 @@ public final class ControllerParams {
     return ipk;
   }
 
-  public int getFailsafeTimerSeconds() {
-    return failsafeTimerSeconds;
-  }
-
-  public boolean getAttemptNetworkScanWiFi() {
-    return attemptNetworkScanWiFi;
-  }
-
-  public boolean getAttemptNetworkScanThread() {
-    return attemptNetworkScanThread;
+  public long getAdminSubject() {
+    return adminSubject;
   }
 
   /** Returns parameters with ephemerally generated operational credentials */
@@ -92,14 +101,15 @@ public final class ControllerParams {
   public static class Builder {
     private int udpListenPort = LEGACY_GLOBAL_CHIP_PORT + 1;
     private int controllerVendorId = 0xFFFF;
+    private int failsafeTimerSeconds = 30;
+    private boolean attemptNetworkScanWiFi = false;
+    private boolean attemptNetworkScanThread = true;
     @Nullable private KeypairDelegate keypairDelegate = null;
     @Nullable private byte[] rootCertificate = null;
     @Nullable private byte[] intermediateCertificate = null;
     @Nullable private byte[] operationalCertificate = null;
     @Nullable private byte[] ipk = null;
-    private int failsafeTimerSeconds = 30;
-    private boolean attemptNetworkScanWiFi = false;
-    private boolean attemptNetworkScanThread = true;
+    private long adminSubject = 0;
 
     private Builder() {}
 
@@ -156,6 +166,11 @@ public final class ControllerParams {
 
     public Builder setIpk(byte[] ipk) {
       this.ipk = ipk;
+      return this;
+    }
+
+    public Builder setAdminSubject(long adminSubject) {
+      this.adminSubject = adminSubject;
       return this;
     }
 

@@ -75,6 +75,11 @@ public:
      */
     CHIP_ERROR UpdateCommissioningParameters(const chip::Controller::CommissioningParameters & params);
 
+    /**
+     * Update the CommissioningParameters used by the active device commissioner and set the NOC Chain
+     */
+    CHIP_ERROR SetNOCChain(const chip::Controller::CommissioningParameters & params);
+
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
@@ -130,6 +135,7 @@ public:
      * @param[in] intermediateCertificate an X.509 DER-encoded intermediate certificate for this node
      * @param[in] nodeOperationalCertificate an X.509 DER-encoded operational certificate for this node
      * @param[in] ipkEpochKey the IPK epoch key to use for this node
+     * @param[in] adminSubject the adminSubject to use for AddNOC command
      * @param[in] listenPort the UDP port to listen on
      * @param[in] controllerVendorId the vendor ID identifying the controller
      * @param[in] failsafeTimerSeconds the failsafe timer in seconds
@@ -143,8 +149,13 @@ public:
                 chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
                 AndroidOperationalCredentialsIssuerPtr opCredsIssuer, jobject keypairDelegate, jbyteArray rootCertificate,
                 jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey,
-                uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi,
-                bool attemptNetworkScanThread, CHIP_ERROR * errInfoOnFailure);
+                uint64_t adminSubject, uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds,
+                bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, CHIP_ERROR * errInfoOnFailure);
+
+    chip::Controller::AndroidOperationalCredentialsIssuer * GetAndroidOperationalCredentialsIssuer()
+    {
+        return mOpCredsIssuer.get();
+    }
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;

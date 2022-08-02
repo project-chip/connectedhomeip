@@ -113,8 +113,9 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateNOC(P256Keypair & signingK
 }
 
 CHIP_ERROR MTROperationalCredentialsDelegate::GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
-    const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
-    const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
+    const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const ByteSpan & attestationElements,
+    const chip::ByteSpan & DAC, const chip::ByteSpan & PAI,
+    chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
 {
     chip::NodeId assignedId;
     if (mNodeIdRequested) {

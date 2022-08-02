@@ -41,8 +41,9 @@ public:
         NSData * _Nullable icaCert);
 
     CHIP_ERROR GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
-        const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
-        const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
+        const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge,
+        const ByteSpan & attestationElements, const chip::ByteSpan & DAC, const chip::ByteSpan & PAI,
+        chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
 
     void SetNodeIdForNextNOCRequest(chip::NodeId nodeId) override
     {
