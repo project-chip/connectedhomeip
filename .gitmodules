@@ -225,7 +225,7 @@
 	platforms = p6
 [submodule "third_party/telink_sdk/repo"]
 	path = third_party/telink_sdk/repo
-	url = https://github.com/rikorsev/telink_b91_ble_sdk
+	url = https://github.com/telink-semi/telink_b91_ble_single_connection_sdk_matter
 	platforms = telink
 [submodule "ti_simplelink_sdk"]
 	path = third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx

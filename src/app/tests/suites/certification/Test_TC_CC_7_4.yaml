@@ -21,10 +21,10 @@ config:
     cluster: "Color Control"
     endpoint: 1
     EnhancedHueConfigValue:
-        type: INT16U
+        type: int16u
         defaultValue: 1200
     SaturationConfigValue:
-        type: INT8U
+        type: int8u
         defaultValue: 90
 
 tests:
@@ -37,6 +37,7 @@ tests:
                 value: nodeId
 
     - label: "Turn on light for color control tests"
+      PICS: OO.S.C01.Rsp
       cluster: "On/Off"
       command: "on"
 
@@ -44,6 +45,7 @@ tests:
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
+      PICS: OO.S.A0000
       response:
           value: 1
 
@@ -60,7 +62,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -97,11 +99,12 @@ tests:
       response:
           value: EnhancedHueConfigValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     - label: "Turn off light that we turned on"
+      PICS: OO.S.C00.Rsp
       cluster: "On/Off"
       command: "off"
 
@@ -109,5 +112,6 @@ tests:
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
+      PICS: OO.S.A0000
       response:
           value: 0

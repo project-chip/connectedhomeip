@@ -25,6 +25,9 @@ const path              = require('path');
 
 // Import helpers from zap core
 const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
+const zclHelper    = require(zapPath + 'dist/src-electron/generator/helper-zcl.js');
+const queryEnum    = require(zapPath + 'dist/src-electron/db/query-enum');
+const queryBitmap  = require(zapPath + 'dist/src-electron/db/query-bitmap');
 
 const { getClusters, getCommands, getAttributes, getEvents, isTestOnlyCluster }
 = require('./simulated-clusters/SimulatedClusters.js');
@@ -1025,6 +1028,30 @@ function chip_tests_iterate_constraints(constraints, options)
   return asBlocks.call(this, Promise.resolve(values), options)
 }
 
+async function asTestType(type, isList)
+{
+  if (isList) {
+    return 'list';
+  }
+
+  const pkgId = await templateUtil.ensureZclPackageId(this);
+  const db    = this.global.db;
+
+  const isEnum = await zclHelper.isEnum(db, type, pkgId);
+  if (isEnum != 'unknown') {
+    const enumObj = await queryEnum.selectEnumByName(db, type, pkgId);
+    return 'enum' + (8 * enumObj.size);
+  }
+
+  const isBitmap = await zclHelper.isBitmap(db, type, pkgId);
+  if (isBitmap != 'unknown') {
+    const bitmapObj = await queryBitmap.selectBitmapByName(db, pkgId, type);
+    return 'bitmap' + (8 * bitmapObj.size);
+  }
+
+  return type;
+}
+
 //
 // Module exports
 //
@@ -1057,3 +1084,4 @@ exports.octetStringLengthFromHexString              = octetStringLengthFromHexSt
 exports.octetStringFromHexString                    = octetStringFromHexString;
 exports.chip_tests_iterate_expected_list            = chip_tests_iterate_expected_list;
 exports.chip_tests_iterate_constraints              = chip_tests_iterate_constraints;
+exports.asTestType                                  = asTestType;

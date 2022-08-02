@@ -62,7 +62,7 @@ tests:
 
 
 
-          2. Parse the DUT's QR Code using the TH commissioner: chip-tool
+          2. Parse the DUT"s QR Code using the TH commissioner: chip-tool
           ubuntu@matter-7:~/Apr18_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload MT:-24J048N01KA0648G00
 
           Verify in DUT as client side:
@@ -78,24 +78,25 @@ tests:
     - label:
           "Using the DUT, parse the THs QR code to onboard the TH Device onto
           the Matter network."
+      PICS: ""
       verification: |
           ./chip-tool pairing code 1 MT:-24J042C00KA0648G00
 
           Verify in DUT as client side:
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          CHIP:CTL: Successfully finished commissioning step 'SendComplete'
-          CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          CHIP:CTL: Performing next commissioning step 'Cleanup'
-          CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          CHIP:CTL: Successfully finished commissioning step "SendComplete"
+          CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
+          CHIP:CTL: Performing next commissioning step "Cleanup"
+          CHIP:CTL: Successfully finished commissioning step "Cleanup"
           CHIP:TOO: Device commissioning completed with success
           CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label:
-          'Scan the TH Devices QR code (that includes the additional TLV data)
+          "Scan the TH Devices QR code (that includes the additional TLV data)
           using DUT. Using the example provided above, the payload would be
-          "MT:-24J029Q00KA064IJ3P0IXZB0DK5N1K8SQ1RYCU1-A40".'
+          MT:-24J029Q00KA064IJ3P0IXZB0DK5N1K8SQ1RYCU1-A40."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Get QR code from TH as server side:
@@ -105,7 +106,7 @@ tests:
           [1657211128.302783][365927:365927] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
           [1657211128.302804][365927:365927] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J029Q00KA0648G00
 
-          2. Build TLV Data into TH's QR code
+          2. Build TLV Data into TH"s QR code
           $ ./chip-tool payload generate-qrcode --existing-payload MT:-24J029Q00KA0648G00 --tlvBytes hex:152C000A3132333435363738393018
           [1657211213125] [28612:16578643] CHIP: [TOO] QR Code: MT:-24J029Q00KA064IJ3P0IXZB0DK5N1K8SQ1RYCU1-A40
       disabled: true
@@ -113,14 +114,15 @@ tests:
     - label:
           "Using the DUT, parse the THs QR code to onboard the TH Device onto
           the Matter network."
+      PICS: ""
       verification: |
           ./chip-tool pairing code 1 MT:-24J0AFN00KA064IJ3P0IXZB0DK5N1K8SQ1RYCU1-A40
 
           Verify in DUT as client side:
           [1657210956708] [28601:16575811] CHIP: [CTL] Received CommissioningComplete response, errorCode=0
-          [1657210956708] [28601:16575811] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1657210956708] [28601:16575811] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1657210956708] [28601:16575811] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1657210956708] [28601:16575811] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657210956708] [28601:16575811] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
+          [1657210956708] [28601:16575811] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1657210956708] [28601:16575811] CHIP: [CTL] Performing next commissioning step "Cleanup"
+          [1657210956708] [28601:16575811] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657210956709] [28601:16575811] CHIP: [TOO] Device commissioning completed with success
       disabled: true

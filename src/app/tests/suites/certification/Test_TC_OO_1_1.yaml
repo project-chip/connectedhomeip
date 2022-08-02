@@ -34,7 +34,7 @@ tests:
       response:
           value: 4
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
@@ -43,7 +43,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
@@ -52,7 +52,7 @@ tests:
       response:
           value: 0
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"

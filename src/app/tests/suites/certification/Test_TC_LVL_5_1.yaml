@@ -55,7 +55,7 @@ tests:
       response:
           saveAs: MinlevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -68,9 +68,9 @@ tests:
                 value: MinlevelValue + 1
               - name: "transitionTime"
                 value: 0
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Sends MoveToLevelWithOnOff command to DUT"
@@ -82,9 +82,9 @@ tests:
                 value: 2
               - name: "transitionTime"
                 value: 0
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Reads current level attribute from DUT"
@@ -95,7 +95,7 @@ tests:
           value: MinlevelValue + 1
           saveAs: CurrentlevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -106,7 +106,7 @@ tests:
       response:
           value: 2
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -121,9 +121,9 @@ tests:
                 value: 64
               - name: "transitionTime"
                 value: 20
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Sends step up command to DUT"
@@ -137,9 +137,9 @@ tests:
                 value: 64
               - name: "transitionTime"
                 value: 20
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 2500ms"
@@ -157,7 +157,7 @@ tests:
       response:
           value: 66
           constraints:
-              type: uint8
+              type: int8u
 
     - label: "Reads current level attribute from DUT"
       PICS: LVL.S.A0000 && LVL.S.C02.Rsp && !LVL.S.M.VarRate
@@ -166,7 +166,7 @@ tests:
       response:
           value: 66
           constraints:
-              type: uint8
+              type: int8u
 
     - label: "Sends a StepWithOnOff command"
       PICS: LVL.S.C06.Rsp && LVL.S.M.VarRate
@@ -179,9 +179,9 @@ tests:
                 value: 64
               - name: "transitionTime"
                 value: 20
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Sends a StepWithOnOff command"
@@ -195,9 +195,9 @@ tests:
                 value: 64
               - name: "transitionTime"
                 value: 20
-              - name: "optionMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 2500ms"

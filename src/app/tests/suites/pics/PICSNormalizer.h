@@ -1,7 +1,5 @@
-/*
- *
- *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
+/**
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,25 +14,15 @@
  *    limitations under the License.
  */
 
-#pragma once
+/**
+ * @file
+ * @brief Declaration of a method that normalizes a PICS code.
+ */
 
-#include <inipp/inipp.h>
-#include <lib/core/CHIPCore.h>
 #include <string>
 
-class EndpointConfigurationStorage
+class PICSNormalizer
 {
 public:
-    CHIP_ERROR Init();
-    CHIP_ERROR get(std::string sectionName, const char * key, char * value, uint16_t & size);
-    CHIP_ERROR get(std::string sectionName, const char * key, uint16_t & value);
-
-    static EndpointConfigurationStorage & GetInstance()
-    {
-        static EndpointConfigurationStorage instance;
-        return instance;
-    }
-
-private:
-    inipp::Ini<char> endpointConfig;
+    static std::string Normalize(std::string code);
 };

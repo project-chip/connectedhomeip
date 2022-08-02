@@ -301,6 +301,79 @@ static void TestASN1_NullWriter(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, encodedLen == 0);
 }
 
+static void TestASN1_ASN1UniversalTime(nlTestSuite * inSuite, void * inContext)
+{
+    struct ASN1TimeTestCase
+    {
+        ASN1UniversalTime asn1Time;
+        const char * asn1TimeStr;
+    };
+
+    struct ASN1TimeErrorTestCase
+    {
+        const char * asn1TimeStr;
+        CHIP_ERROR mExpectedResult;
+    };
+
+    // clang-format off
+    static ASN1TimeTestCase sASN1TimeTestCases[] = {
+        // ASN1 Universal Time           ASN1_TIME String
+        // ====================================================
+        {  { 2020, 10, 15, 14, 23, 43 },   "201015142343Z" },
+        {  { 2020, 12,  1,  2, 34,  0 },   "201201023400Z" },
+        {  { 1979,  1, 30, 12,  0,  0 },   "790130120000Z" },
+        {  { 2079,  1, 30, 12,  0,  0 }, "20790130120000Z" },
+        {  { 2049,  3, 31, 23, 59, 59 },   "490331235959Z" },
+        {  { 1949,  3, 31, 23, 59, 59 }, "19490331235959Z" },
+        {  { 1950,  3, 31, 23, 59, 59 },   "500331235959Z" },
+    };
+    // clang-format on
+
+    // clang-format off
+    static ASN1TimeErrorTestCase sASN1TimeErrorTestCases[] = {
+        // ASN1_TIME String      Expected Result
+        // =======================================================
+        {    "201015142343z",    ASN1_ERROR_UNSUPPORTED_ENCODING },
+        {    "20105142343Z",     ASN1_ERROR_UNSUPPORTED_ENCODING },
+        {    "2010115142343Z",   ASN1_ERROR_UNSUPPORTED_ENCODING },
+        {    "201014415142343Z", ASN1_ERROR_UNSUPPORTED_ENCODING },
+        {    "201O15142343Z",    ASN1_ERROR_INVALID_ENCODING     },
+        {    "200015142343Z",    ASN1_ERROR_INVALID_ENCODING     },
+        {    "201315142343Z",    ASN1_ERROR_INVALID_ENCODING     },
+        {    "201000142343Z",    ASN1_ERROR_INVALID_ENCODING     },
+        {    "201032142343Z",    ASN1_ERROR_INVALID_ENCODING     },
+        {    "201015242343Z",    ASN1_ERROR_INVALID_ENCODING     },
+        {    "201015146043Z",    ASN1_ERROR_INVALID_ENCODING     },
+        {    "201015142360Z",    ASN1_ERROR_INVALID_ENCODING     },
+    };
+    // clang-format on
+
+    for (auto & testCase : sASN1TimeTestCases)
+    {
+        CharSpan testStr = CharSpan(testCase.asn1TimeStr, strlen(testCase.asn1TimeStr));
+        ASN1UniversalTime result;
+
+        NL_TEST_ASSERT(inSuite, result.ImportFrom_ASN1_TIME_string(testStr) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite,
+                       result.Year == testCase.asn1Time.Year && result.Month == testCase.asn1Time.Month &&
+                           result.Day == testCase.asn1Time.Day && result.Hour == testCase.asn1Time.Hour &&
+                           result.Minute == testCase.asn1Time.Minute && result.Second == testCase.asn1Time.Second);
+
+        char buf[ASN1UniversalTime::kASN1TimeStringMaxLength];
+        MutableCharSpan resultTimeStr(buf);
+        NL_TEST_ASSERT(inSuite, result.ExportTo_ASN1_TIME_string(resultTimeStr) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, resultTimeStr.data_equal(testStr));
+    }
+
+    for (auto & testCase : sASN1TimeErrorTestCases)
+    {
+        CharSpan testStr = CharSpan(testCase.asn1TimeStr, strlen(testCase.asn1TimeStr));
+        ASN1UniversalTime result;
+
+        NL_TEST_ASSERT(inSuite, result.ImportFrom_ASN1_TIME_string(testStr) == testCase.mExpectedResult);
+    }
+}
+
 static void TestASN1_ObjectID(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
@@ -491,6 +564,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Test ASN1 encoding macros", TestASN1_Encode),
     NL_TEST_DEF("Test ASN1 decoding macros", TestASN1_Decode),
     NL_TEST_DEF("Test ASN1 NULL writer", TestASN1_NullWriter),
+    NL_TEST_DEF("Test ASN1 universal time", TestASN1_ASN1UniversalTime),
     NL_TEST_DEF("Test ASN1 Object IDs", TestASN1_ObjectID),
     NL_TEST_DEF("Test ASN1 Init with ByteSpan", TestASN1_FromTLVReader),
     NL_TEST_SENTINEL()

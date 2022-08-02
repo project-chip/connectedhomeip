@@ -34,9 +34,9 @@ tests:
           "Commissioner and Commissionee discover each other and connect via the
           discovery mode applicable for the DUT."
       verification: |
-          On TH: start BLE Advertising by specific DUT implementation
+          Verify in TH as server side: start BLE Advertising by specific DUT implementation
 
-          On DUT: start commissioning process(need to obtain the Thread dataset first)
+          Verify in DUT as client side: start commissioning process(need to obtain the Thread dataset first)
 
           ./chip-tool pairing ble-thread 1 hex:0e080000000000010000000300000f35060004001fffe0020811111111222222220708fd27e57b1b1e22d9051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f01021234041061e1206d2c2b46e079eb775f41fc72190c0402a0fff8 20202021 3840
       disabled: true
@@ -45,7 +45,8 @@ tests:
           "Establish encryption keys with Password Authenticated Session
           Establishment on the commissioning channel"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           CHIP:SC: Received PBKDF param response
       disabled: true
 
@@ -53,7 +54,8 @@ tests:
           "Commissioner SHALL re-arm Fail-safe timer on Commissionee within 60s
           (the autonomously Fail-safe timer length set by Commissionee)"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           CHIP:CTL: Arming failsafe (60 seconds)
       disabled: true
 
@@ -62,13 +64,13 @@ tests:
           Commissionee."
       PICS: MCORE.DD.WIRELESS
       verification: |
-          Verify on DUT Log:
+          Verify in DUT as client side
 
-          Performing next commissioning step 'ConfigRegulatory'
+          Performing next commissioning step "ConfigRegulatory"
           [1653471968.202645][30157:30162] CHIP:CTL: Setting Regulatory Config
           [1653471968.202666][30157:30162] CHIP:CTL: No regulatory config supplied by controller, leaving as device default (0)
 
-          Verify on TH:
+          Verify in TH as server side
            NVS set: chip-config/regulatory-location = 0 (0x0)
       disabled: true
 
@@ -76,7 +78,8 @@ tests:
           "Commissioner requests operational CSR from Commissionee with
           OperationalCSRRequest command"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           CHIP:CTL: Sending CSR request to 0xffffa4001730 device
           CHIP:DMG: ICR moving to [AddingComm]
           CHIP:DMG: ICR moving to [AddedComma]
@@ -139,7 +142,8 @@ tests:
           "Commissioner configures operational credentials on DUT if not
           previously installed"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           [1651218829.220063][3273:3278] CHIP:CTL: Sending root certificate to the device
           [1651218829.220201][3273:3278] CHIP:DMG: ICR moving to [AddingComm]
           [1651218829.222415][3273:3278] CHIP:DMG: ICR moving to [AddedComma]
@@ -192,7 +196,8 @@ tests:
           "Commissioner configures itself as administrator in ACL on TH if
           needed"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           [1651218829.457248][3273:3278] CHIP:CTL: Sending operational certificate chain to the device
           [1651218829.457372][3273:3278] CHIP:DMG: ICR moving to [AddingComm]
           [1651218829.460013][3273:3278] CHIP:DMG: ICR moving to [AddedComma]
@@ -247,7 +252,8 @@ tests:
           "Commissioner configures operational network on TH if TH both supports
           and requires"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           [1651218833.995054][3273:3278] CHIP:CTL: Adding thread network
           [1651218833.995176][3273:3278] CHIP:DMG: ICR moving to [AddingComm]
           [1651218833.995253][3273:3278] CHIP:DMG: ICR moving to [AddedComma]
@@ -298,7 +304,8 @@ tests:
           "Commissioner instructs Commissionee to connect to operational network
           if not already connected"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           [1651218834.137891][3273:3278] CHIP:CTL: Enabling thread network
           [1651218834.138014][3273:3278] CHIP:DMG: ICR moving to [AddingComm]
           [1651218834.138086][3273:3278] CHIP:DMG: ICR moving to [AddedComma]
@@ -352,10 +359,10 @@ tests:
       verification: |
           1. Verify the channel was terminated on DUT=chip-tool
           [1651271753284] [23287:743790] CHIP: [CTL] Received CommissioningComplete response
-          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1651271753284] [23287:743790] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1651271753284] [23287:743790] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
+          [1651271753284] [23287:743790] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1651271753284] [23287:743790] CHIP: [CTL] Performing next commissioning step "Cleanup"
+          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1651271753284] [23287:743790] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
@@ -368,7 +375,8 @@ tests:
           "Establish encryption keys with Password Authenticated Session
           Establishment on the commissioning channel"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           CHIP:SC: Received PBKDF param response
       disabled: true
 
@@ -376,7 +384,8 @@ tests:
           "Commissioner re-arms Fail-safe timer on Commissionee within 60s (the
           autonomously Fail-safe timer length set by Commissionee)"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           CHIP:CTL: Arming failsafe (60 seconds)
       disabled: true
 
@@ -385,9 +394,10 @@ tests:
           Commissionee."
       PICS: MCORE.DD.WIRELESS
       verification: |
-          Verify on DUT Log:
+          Verify in DUT as client side
 
-          Performing next commissioning step 'ConfigRegulatory'
+
+          Performing next commissioning step "ConfigRegulatory"
           [1653471968.202645][30157:30162] CHIP:CTL: Setting Regulatory Config
           [1653471968.202666][30157:30162] CHIP:CTL: No regulatory config supplied by controller, leaving as device default (0)
 
@@ -399,7 +409,8 @@ tests:
           "Commissioner requests operational CSR from Commissionee with
           OperationalCSRRequest command"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           CHIP:CTL: Sending CSR request to 0xffffa4001730 device
           CHIP:DMG: ICR moving to [AddingComm]
           CHIP:DMG: ICR moving to [AddedComma]
@@ -462,7 +473,8 @@ tests:
           "Commissioner configures operational credentials on DUT if not
           previously installed"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           [1651218829.220063][3273:3278] CHIP:CTL: Sending root certificate to the device
           [1651218829.220201][3273:3278] CHIP:DMG: ICR moving to [AddingComm]
           [1651218829.222415][3273:3278] CHIP:DMG: ICR moving to [AddedComma]
@@ -515,7 +527,8 @@ tests:
           "Commissioner configures itself as administrator in ACL on TH if
           needed"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           [1651218829.457248][3273:3278] CHIP:CTL: Sending operational certificate chain to the device
           [1651218829.457372][3273:3278] CHIP:DMG: ICR moving to [AddingComm]
           [1651218829.460013][3273:3278] CHIP:DMG: ICR moving to [AddedComma]
@@ -570,7 +583,8 @@ tests:
           "Commissioner configures operational network on TH if TH both supports
           and requires"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           [1651218833.995054][3273:3278] CHIP:CTL: Adding thread network
           [1651218833.995176][3273:3278] CHIP:DMG: ICR moving to [AddingComm]
           [1651218833.995253][3273:3278] CHIP:DMG: ICR moving to [AddedComma]
@@ -621,7 +635,8 @@ tests:
           "Commissioner instructs Commissionee to connect to operational network
           if not already connected"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           [1651218834.137891][3273:3278] CHIP:CTL: Enabling thread network
           [1651218834.138014][3273:3278] CHIP:DMG: ICR moving to [AddingComm]
           [1651218834.138086][3273:3278] CHIP:DMG: ICR moving to [AddedComma]
@@ -675,16 +690,17 @@ tests:
       verification: |
           1. Verify the channel was terminated on DUT=chip-tool
           [1651271753284] [23287:743790] CHIP: [CTL] Received CommissioningComplete response
-          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1651271753284] [23287:743790] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1651271753284] [23287:743790] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
+          [1651271753284] [23287:743790] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1651271753284] [23287:743790] CHIP: [CTL] Performing next commissioning step "Cleanup"
+          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1651271753284] [23287:743790] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label: "Commissioner starts discovery of TH using Operational Discovery"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           CHIP:DL: Avahi resolve found
           CHIP:DIS: Node ID resolved for 0x0000000000000001
           CHIP:DIS:     Addr 0: [fd11:22::9d96:8fcf:10cf:799e]:5540
@@ -694,7 +710,8 @@ tests:
     - label:
           "Commissioner opens a CASE session with TH over operational network"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           CHIP:SC: Sent Sigma1 msg
           CHIP:CTL: Address resolved for node: 0x0000000000000001
           CHIP:EM: Received message of type 0x31 with protocolId (0, 0) and MessageCounter:1066460336 on exchange 45047i
@@ -732,7 +749,8 @@ tests:
 
     - label: "Commissioner sends CommissioningComplete command"
       verification: |
-          On DUT:
+          Verify in DUT as client side
+
           CHIP:CTL: Received CommissioningComplete response
           CHIP:CTL: Rendezvous cleanup
           CHIP:TOO: Device commissioning completed with success

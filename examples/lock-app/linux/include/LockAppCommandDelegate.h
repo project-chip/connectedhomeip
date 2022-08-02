@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,23 +18,13 @@
 
 #pragma once
 
-#include <inipp/inipp.h>
-#include <lib/core/CHIPCore.h>
-#include <string>
+#include <NamedPipeCommands.h>
+#include <json/json.h>
 
-class EndpointConfigurationStorage
+#include <app/clusters/door-lock-server/door-lock-server.h>
+
+class LockAppCommandDelegate : public NamedPipeCommandDelegate
 {
 public:
-    CHIP_ERROR Init();
-    CHIP_ERROR get(std::string sectionName, const char * key, char * value, uint16_t & size);
-    CHIP_ERROR get(std::string sectionName, const char * key, uint16_t & value);
-
-    static EndpointConfigurationStorage & GetInstance()
-    {
-        static EndpointConfigurationStorage instance;
-        return instance;
-    }
-
-private:
-    inipp::Ini<char> endpointConfig;
+    void OnEventCommandReceived(const char * json) override;
 };

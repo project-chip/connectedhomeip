@@ -23,19 +23,16 @@ config:
 tests:
     - label: "Commission TH to DUT"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT sends ResetCounts command to TH"
       PICS: DGWIFI.S.C00.Rsp
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          Verify Command data recieved from running the below command is a success
-
           ./chip-tool wifinetworkdiagnostics reset-counts 1 0
 
-          Verify in TH all-clusters-app log
+
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
 
           CHIP:DMG: InvokeResponseMessage =
           [1649664146.639743][8173:8178] CHIP:DMG: {

@@ -107,6 +107,18 @@ struct ControllerInitParams
     ByteSpan controllerICAC;
     ByteSpan controllerRCAC;
 
+    /**
+     * Controls whether we permit multiple DeviceController instances to exist
+     * on the same logical fabric (identified by the tuple of the fabric's
+     * root public key + fabric id).
+     *
+     * Each controller instance will be associated with its own FabricIndex.
+     * This pivots the FabricTable to tracking identities instead of fabrics,
+     * represented by FabricInfo instances that can have colliding logical fabrics.
+     *
+     */
+    bool permitMultiControllerFabrics = false;
+
     //
     // Controls enabling server cluster interactions on a controller. This in turn
     // causes the following to get enabled:

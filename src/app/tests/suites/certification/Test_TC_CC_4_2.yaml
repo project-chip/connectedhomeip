@@ -19,7 +19,7 @@ config:
     cluster: "Color Control"
     endpoint: 1
     RateConfigValue:
-        type: INT8U
+        type: int8u
         defaultValue: 50
 
 tests:
@@ -32,6 +32,7 @@ tests:
                 value: nodeId
 
     - label: "Turn on light for color control tests"
+      PICS: OO.S.C01.Rsp
       cluster: "On/Off"
       command: "on"
 
@@ -39,6 +40,7 @@ tests:
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
+      PICS: OO.S.A0000
       response:
           value: 1
 
@@ -55,7 +57,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -87,7 +89,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -105,7 +107,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -123,7 +125,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -155,7 +157,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -173,7 +175,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -191,7 +193,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -225,7 +227,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -260,7 +262,7 @@ tests:
       response:
           saveAs: CurrentSaturationStep4d
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -310,7 +312,7 @@ tests:
       response:
           saveAs: CurrentSaturationStep5b
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -328,7 +330,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: CurrentSaturationStep5b
 
@@ -363,7 +365,7 @@ tests:
       response:
           saveAs: CurrentSaturationStep5d
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
@@ -383,6 +385,7 @@ tests:
           value: CurrentSaturationStep5d
 
     - label: "Turn off light that we turned on"
+      PICS: OO.S.C00.Rsp
       cluster: "On/Off"
       command: "off"
 
@@ -390,5 +393,6 @@ tests:
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
+      PICS: OO.S.A0000
       response:
           value: 0

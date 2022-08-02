@@ -1147,7 +1147,7 @@ bool Cmd_GenCD(int argc, char * argv[])
         std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> key(EVP_PKEY_new(), &EVP_PKEY_free);
 
         VerifyOrReturnError(ReadCert(gCertFileName, cert.get()), false);
-        VerifyOrReturnError(ReadKey(gKeyFileName, key.get()), false);
+        VerifyOrReturnError(ReadKey(gKeyFileName, key), false);
 
         // Extract the subject key id from the X509 certificate.
         ByteSpan signerKeyId;

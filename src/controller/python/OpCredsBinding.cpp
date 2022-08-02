@@ -324,8 +324,8 @@ void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::C
 }
 
 ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * context,
-                                                         chip::Controller::DeviceCommissioner ** outDevCtrl, uint8_t fabricIndex,
-                                                         FabricId fabricId, chip::NodeId nodeId, chip::VendorId adminVendorId,
+                                                         chip::Controller::DeviceCommissioner ** outDevCtrl, FabricId fabricId,
+                                                         chip::NodeId nodeId, chip::VendorId adminVendorId,
                                                          const char * paaTrustStorePath, bool useTestCommissioner)
 {
     ChipLogDetail(Controller, "Creating New Device Controller");
@@ -374,6 +374,7 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     initParams.controllerNOC                  = nocSpan;
     initParams.enableServerInteractions       = true;
     initParams.controllerVendorId             = adminVendorId;
+    initParams.permitMultiControllerFabrics   = true;
 
     if (useTestCommissioner)
     {

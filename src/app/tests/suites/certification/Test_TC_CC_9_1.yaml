@@ -30,6 +30,7 @@ tests:
                 value: nodeId
 
     - label: "Precondition : Turn on light for color control tests"
+      PICS: OO.S.C01.Rsp
       cluster: "On/Off"
       command: "on"
 
@@ -38,6 +39,7 @@ tests:
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
+      PICS: OO.S.A0000
       response:
           value: 1
 
@@ -237,7 +239,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep5d
               maxValue: 65535
 
@@ -255,7 +257,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep5d
               maxValue: 65535
 
@@ -382,7 +384,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep8d
               maxValue: 65535
 
@@ -400,7 +402,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep8d
               maxValue: 65535
 
@@ -558,7 +560,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep12d
               maxValue: 65535
 
@@ -576,7 +578,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep12d
               maxValue: 65535
 
@@ -703,7 +705,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep15d
               maxValue: 65535
 
@@ -721,7 +723,7 @@ tests:
       PICS: CC.S.F02 && CC.S.F01 && CC.S.A4000 && CC.S.C44.Rsp
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: ColorLoopStartEnhancedHueStep15d
               maxValue: 65535
 
@@ -767,6 +769,7 @@ tests:
           value: ColorLoopStoredEnhancedHueStep16b
 
     - label: "Turn Off light for color control tests"
+      PICS: OO.S.C00.Rsp
       cluster: "On/Off"
       command: "Off"
 
@@ -774,5 +777,6 @@ tests:
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
+      PICS: OO.S.A0000
       response:
           value: 0

@@ -51,6 +51,14 @@ using namespace ::chip;
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    auto other = [[MTRWriteParams alloc] init];
+    other.timedWriteTimeout = self.timedWriteTimeout;
+    other.dataVersion = self.dataVersion;
+    return other;
+}
+
 @end
 
 @implementation MTRReadParams
@@ -60,6 +68,13 @@ using namespace ::chip;
         _fabricFiltered = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    auto other = [[MTRReadParams alloc] init];
+    other.fabricFiltered = self.fabricFiltered;
+    return other;
 }
 
 @end
@@ -72,6 +87,15 @@ using namespace ::chip;
         _autoResubscribe = nil;
     }
     return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    auto other = [[MTRSubscribeParams alloc] init];
+    other.fabricFiltered = self.fabricFiltered;
+    other.keepPreviousSubscriptions = self.keepPreviousSubscriptions;
+    other.autoResubscribe = self.autoResubscribe;
+    return other;
 }
 
 @end

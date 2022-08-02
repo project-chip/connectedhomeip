@@ -23,10 +23,11 @@ config:
 tests:
     - label: "Commission TH to DUT"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
-    - label: "TH reads from the DUT the (0xFFFD) ClusterRevision attribute"
+    - label: "{THread} (0xFFFD) ClusterRevision attribute"
+      PICS: LTIME.S.Afffd
       verification: |
           ./chip-tool timeformatlocalization read  cluster-revision 1 0
           On TH, verify that DUT sends ClusterRevision attribute value as 1
@@ -35,7 +36,8 @@ tests:
           [1651185991606] [10988:109915] CHIP: [TOO]   ClusterRevision: 1
       disabled: true
 
-    - label: "TH reads from the DUT the (0xFFFC) FeatureMap attribute"
+    - label: "{THread} (0xFFFC) FeatureMap attribute"
+      PICS: LTIME.S.Afffc
       verification: |
           ./chip-tool timeformatlocalization read feature-map 1 0
 
@@ -46,7 +48,8 @@ tests:
           [1653400472.682416][11385:11390] CHIP:EM: Sending Standalone Ack for MessageCounter:10442089 on exchange 10027i
       disabled: true
 
-    - label: "TH reads from the DUT the (0xFFFB) AttributeList attribute"
+    - label: "{THread} (0xFFFB) AttributeList attribute"
+      PICS: LTIME.S.Afffb
       verification: |
           ./chip-tool timeformatlocalization read attribute-list 1 0
 
@@ -66,12 +69,14 @@ tests:
           [1653999139.214522][7477:7482] CHIP:EM: Sending Standalone Ack for MessageCounter:5643805 on exchange 4737i
       disabled: true
 
-    - label: "TH reads from the DUT the (0xFFFA) EventList attribute"
+    - label: "{THread} (0xFFFA) EventList attribute"
+      PICS: LTIME.S.Afffa
       verification: |
           Out of scope for V1.0
       disabled: true
 
-    - label: "TH reads from the DUT the (0xFFF9) AcceptedCommandList attribute"
+    - label: "{THread} (0xFFF9) AcceptedCommandList attribute"
+      PICS: LTIME.S.Afff9
       verification: |
           ./chip-tool timeformatlocalization read accepted-command-list 1 0
 
@@ -81,7 +86,8 @@ tests:
           [1651186189564] [11076:112595] CHIP: [TOO]   AcceptedCommandList: 0 entries
       disabled: true
 
-    - label: "TH reads from the DUT the (0xFFF8) GeneratedCommandList attribute"
+    - label: "{THread} (0xFFF8) GeneratedCommandList attribute"
+      PICS: LTIME.S.Afff8
       verification: |
           ./chip-tool timeformatlocalization read generated-command-list 1 0
 

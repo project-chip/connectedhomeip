@@ -15,7 +15,7 @@
 
 name:
     3.3.17. [TC-DD-3.17] Commissioning Flow - 21-digit Manual Pairing Code -
-    Negative Scenario [DUT - Commissioner]
+    Negative Scenario [DUT    - Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -28,7 +28,7 @@ tests:
           DUT in any format supported by DUT"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          On TH:
+          Verify in TH as server side
           $ ./out/all-clusters-app/chip-all-clusters-app
 
           [1657203632.334400][13827:13827] CHIP:DL: Device Configuration:
@@ -58,13 +58,15 @@ tests:
           2"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          1. Use chip-tool's "payload verhoeff-generate" command to help generate the new, invalid Manual code
+          1. Use chip-tool"s "payload verhoeff-generate" command to help generate the new, invalid Manual code
 
           $ ./chip-tool payload verhoeff-generate  84970112336552132769
+
+          Verify in DUT as client side
           [1657238290868] [31968:16868160] CHIP: [SPL] Generating Character for: 84970112336552132769
           [1657238290868] [31968:16868160] CHIP: [SPL] Generated Char: 3
 
-          Manual code: 8497011233655213276930
+          Manual code: 849701123365521327693
       disabled: true
 
     - label:
@@ -74,6 +76,7 @@ tests:
       verification: |
           $  ./chip-tool pairing code 1 849701123365521327693
 
+          Verify in DUT as client side
           [1657238348848] [31971:16868925] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
       disabled: true
 
@@ -83,8 +86,10 @@ tests:
           invalid VID_PID_PRESENT set to 0"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          1. Use chip-tool's "payload verhoeff-generate" command to help generate the new, invalid Manual code
+          1. Use chip-tool"s "payload verhoeff-generate" command to help generate the new, invalid Manual code
           $ ./chip-tool payload verhoeff-generate 34970112336552132769
+
+          Verify in DUT as client side
           [1651186492744] [13434:353094] CHIP: [SPL] Generating Character for: 34970112336552132769
           [1651186492744] [13434:353094] CHIP: [SPL] Generated Char: 6
 
@@ -98,23 +103,25 @@ tests:
       verification: |
           $  ./chip-tool pairing code 1 349701123365521327696
 
+          Verify in DUT as client side
           [1657238541643] [31975:16871084] CHIP: [SPL] Failed decoding base10. Input length 20 was not expected length 10
           ...
           [1657238541644] [31975:16871079] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:63: CHIP Error 0x0000001E: Invalid string length
       disabled: true
 
     - label:
-          'SHORT DISCRIMINATOR: Using the manual code from Step 1, generate a
+          "SHORT DISCRIMINATOR: Using the manual code from Step 1, generate a
           new manual code but substituting out the current SHORT DISCRIMINATOR
           string with a discriminator value that makes the generated manual code
           differ from Step 1s manual code (i.e. Choose a discriminator value
           that changes any of the 4 most-significant bits of Step 1s 12-bit
           discriminator value and adheres to rules of section 5.1.1.5.
-          "Discriminator value")'
+          Discriminator value)"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          1. Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
+          1. Use chip-tool"s "payload generate-manualcode" command to help generate the new, invalid Manual code
 
+          Verify in DUT as client side
           $ ./chip-tool payload generate-manualcode --existing-payload 749701123365521327694 --allow-invalid-payload 1 --discriminator 3584
           [1657238783501] [31989:16873588] CHIP: [TOO] Manual Code: 733317123365521327692
       disabled: true
@@ -126,6 +133,7 @@ tests:
       verification: |
           $  ./chip-tool pairing code 1 733317123365521327692
 
+          Verify in DUT as client side
           [1655814152.716988][3723:3726] CHIP:CTL: Commissioning discovery over BLE failed: ../../third_party/connectedhomeip/src/platform/Linux/BLEManagerImpl.cpp:829: CHIP Error 0x00000032: Timeout
           [1655814152.717099][3723:3726] CHIP:-: ../../third_party/connectedhomeip/src/platform/Linux/BLEManagerImpl.cpp:829: CHIP Error 0x00000032: Timeout at ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:270
           [1655814172.703455][3723:3728] CHIP:CTL: Discovery timed out
@@ -145,8 +153,9 @@ tests:
       verification: |
           1. Use this as an example of how to generate a manual code with an invalid passcode. In this example the invalid passcode=00000000
 
-          Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
+          Use chip-tool"s "payload generate-manualcode" command to help generate the new, invalid Manual code
 
+          Verify in DUT as client side
           $ ./chip-tool payload generate-manualcode --existing-payload 749701123365521327694 --allow-invalid-payload 1 --setup-pin-code 00000000
           [1657239062245] [32164:16876812] CHIP: [TOO] Manual Code: 749152000065521327698
       disabled: true
@@ -156,7 +165,9 @@ tests:
           step, to the DUT in any format supported by the DUT"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          (00000000)
+          Verify in DUT as client side
+
+           (00000000)
            $  ./chip-tool pairing code 1 749152000065521327698
           [1651187937232] [13896:372977] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:161: CHIP Error 0x0000002F: Invalid argument
 
@@ -226,6 +237,7 @@ tests:
       verification: |
           1. Use this as an example of how to generate a manual code with an invalid vendor IDs
 
+          Verify in DUT as client side
           $ ./chip-tool payload generate-manualcode --discriminator 3840 --setup-pin-code 20202021 --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 1
           [1651189120686] [14218:398626] CHIP: [TOO] Manual Code: 749701123365521327694
       disabled: true
@@ -251,14 +263,15 @@ tests:
       disabled: true
 
     - label:
-          'PRODUCT_ID: Using the manual code from Step 1, generate a new manual
+          "PRODUCT_ID: Using the manual code from Step 1, generate a new manual
           code but substituting out the current PRODUCT_ID with an invalid
-          PRODUCT_ID of 0x0000(i.e. While following section 2.5.3. "Product
-          Identifier")'
+          PRODUCT_ID of 0x0000(i.e. While following section 2.5.3. Product
+          Identifier)"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          1. Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
+          1. Use chip-tool"s "payload generate-manualcode" command to help generate the new, invalid Manual code
 
+          Verify in DUT as client side
           $ ./chip-tool payload generate-manualcode --existing-payload 749701123365521327694 --allow-invalid-payload 1 --product-id 0x0000
           [1657239418656] [32180:16880488] CHIP: [TOO] Manual Code: 749701123365521000006
       disabled: true
@@ -268,7 +281,7 @@ tests:
           the DUT in any format supported by the DUT"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          On DUT:
+          Verify in DUT as client side
           $  ./chip-tool pairing code 1 749701123365521000006
 
           [1657239565895] [32193:16881922] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
@@ -282,9 +295,11 @@ tests:
           Product IDs included (VID_PID_Present == 1))"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          1. Use chip-tool's "payload verhoeff-verify" command to help verify that the check-digit is invalid
+          1. Use chip-tool"s "payload verhoeff-verify" command to help verify that the check-digit is invalid
 
           $ ./chip-tool payload verhoeff-verify 749701123365521327693 20
+
+          Verify in DUT as client side
           [1651187504088] [13629:367627] CHIP: [SPL] Verifying Manual Code: 74970112336552132769
           [1651187504088] [13629:367627] CHIP: [SPL] 749701123365521327693 is INVALID at position 20
       disabled: true
@@ -296,5 +311,6 @@ tests:
       verification: |
           $  ./chip-tool pairing code 1 749701123365521327693
 
+          Verify in DUT as client side
           [1651187528666] [13631:367920] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:50: CHIP Error 0x00000013: Integrity check failed
       disabled: true

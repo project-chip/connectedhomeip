@@ -183,7 +183,7 @@ bool SerializeKeyPair(EVP_PKEY * key, P256SerializedKeypair & serializedKeypair)
     return true;
 }
 
-bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupportedCurve)
+bool ReadKey(const char * fileName, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key, bool ignorErrorIfUnsupportedCurve)
 {
     bool res            = true;
     uint32_t keyDataLen = 0;
@@ -230,12 +230,12 @@ bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupported
 
     if (IsChipPrivateKeyFormat(keyFormat))
     {
-        res = DeserializeKeyPair(keyData.get(), keyDataLen, key);
+        res = DeserializeKeyPair(keyData.get(), keyDataLen, key.get());
         VerifyTrueOrExit(res);
     }
     else if (IsChipPublicKeyFormat(keyFormat))
     {
-        res = SetPublicKey(keyData.get(), keyDataLen, key);
+        res = SetPublicKey(keyData.get(), keyDataLen, key.get());
         VerifyTrueOrExit(res);
     }
     else
@@ -252,20 +252,23 @@ bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupported
                 ReportOpenSSLErrorAndExit("PEM_read_bio_EC_PUBKEY", res = false);
             }
 
-            if (EVP_PKEY_set1_EC_KEY(key, ecKey) != 1)
+            if (EVP_PKEY_set1_EC_KEY(key.get(), ecKey) != 1)
             {
                 ReportOpenSSLErrorAndExit("EVP_PKEY_set1_EC_KEY", res = false);
             }
         }
         else if (keyFormat == kKeyFormat_X509_PEM)
         {
-            if (PEM_read_bio_PrivateKey(keyBIO.get(), &key, nullptr, nullptr) == nullptr)
+            EVP_PKEY * tmpKeyPtr = nullptr;
+            if (PEM_read_bio_PrivateKey(keyBIO.get(), &tmpKeyPtr, nullptr, nullptr) == nullptr)
             {
                 ReportOpenSSLErrorAndExit("PEM_read_bio_PrivateKey", res = false);
             }
+            key.reset(tmpKeyPtr);
         }
         else
         {
+            EVP_PKEY * tmpKeyPtr = nullptr;
             if (keyFormat == kKeyFormat_X509_Hex)
             {
                 size_t len = HexToBytes(reinterpret_cast<char *>(keyBIO.get()), keyDataLen,
@@ -273,14 +276,15 @@ bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupported
                 VerifyOrReturnError(2 * len == keyDataLen, false);
             }
 
-            if (d2i_PrivateKey_bio(keyBIO.get(), &key) == nullptr)
+            if (d2i_PrivateKey_bio(keyBIO.get(), &tmpKeyPtr) == nullptr)
             {
                 ReportOpenSSLErrorAndExit("d2i_PrivateKey_bio", res = false);
             }
+            key.reset(tmpKeyPtr);
         }
     }
 
-    if ((EC_GROUP_get_curve_name(EC_KEY_get0_group(EVP_PKEY_get1_EC_KEY(key))) != gNIDChipCurveP256) &&
+    if ((EC_GROUP_get_curve_name(EC_KEY_get0_group(EVP_PKEY_get1_EC_KEY(key.get()))) != gNIDChipCurveP256) &&
         !ignorErrorIfUnsupportedCurve)
     {
         fprintf(stderr, "Specified key uses unsupported Elliptic Curve\n");

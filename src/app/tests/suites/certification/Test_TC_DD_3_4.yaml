@@ -25,9 +25,11 @@ tests:
       verification: |
           ubuntu@ubuntu:~/may23_DUT/connectedhomeip/examples/tv-app/linux/out/tv-app$ sudo ./chip-tv-app
 
+          Verify in tv-app side:
+
           CHIP:DL: Using wifi MAC for hostname
           CHIP:DIS: Advertise operational node DFC28FF9FE811EF2-FFFFFFEFFFFFFFFF
-          CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'.
+          CHIP:DIS: CHIP minimal mDNS configured as "Operational device".
           CHIP:DIS: Broadcasting mDns reply for query from
       disabled: true
 
@@ -69,18 +71,20 @@ tests:
 
     - label: "By any means, DUT prompts user for onboarding payload"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT starts the commissioning procedure with TH"
       verification: |
           ./chip-tool pairing ethernet 1 20202021 3840   fe80::e65f:1ff:fe0f:2755  5640
 
+          Verify in DUT as  commissioner side Log:
+
           [1653559159.021348][4240:4246] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           [1653559159.021432][4240:4246] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          [1653559159.021499][4240:4246] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
-          [1653559159.021554][4240:4246] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1653559159.021611][4240:4246] CHIP:CTL: Performing next commissioning step 'Cleanup'
-          [1653559159.021725][4240:4246] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1653559159.021499][4240:4246] CHIP:CTL: Successfully finished commissioning step "SendComplete"
+          [1653559159.021554][4240:4246] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1653559159.021611][4240:4246] CHIP:CTL: Performing next commissioning step "Cleanup"
+          [1653559159.021725][4240:4246] CHIP:CTL: Successfully finished commissioning step "Cleanup"
           [1653559159.021790][4240:4246] CHIP:TOO: Device commissioning completed with success
       disabled: true

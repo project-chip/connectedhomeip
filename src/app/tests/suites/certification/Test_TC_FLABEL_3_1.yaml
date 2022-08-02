@@ -26,7 +26,7 @@ tests:
       verification: |
           ./chip-tool fixedlabel read label-list 1 0
 
-          Verify in DUT as client side:
+          Verify in DUT as client side, verify that DUT reads LabelList successfully
 
           [1651124649.820293][2819:2824] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_0000 DataVersion: 3688229931
           [1651124649.820478][2819:2824] CHIP:TOO:   label list: 4 entries
