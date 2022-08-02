@@ -122,7 +122,6 @@ function getManualTests() {
         "Test_TC_CNET_4_4",
         "Test_TC_CNET_4_5",
         "Test_TC_CNET_4_6",
-
         "Test_TC_CNET_4_9",
         "Test_TC_CNET_4_10",
         "Test_TC_CNET_4_11",
