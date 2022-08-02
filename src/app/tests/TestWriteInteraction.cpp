@@ -58,6 +58,10 @@ public:
     static void TestWriteClientGroup(nlTestSuite * apSuite, void * apContext);
     static void TestWriteHandler(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtrip(nlTestSuite * apSuite, void * apContext);
+    static void TestWriteInvalidMessage1(nlTestSuite * apSuite, void * apContext);
+    static void TestWriteInvalidMessage2(nlTestSuite * apSuite, void * apContext);
+    static void TestWriteInvalidMessage3(nlTestSuite * apSuite, void * apContext);
+    static void TestWriteInvalidMessage4(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtripWithClusterObjectsVersionMatch(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtripWithClusterObjectsVersionMismatch(nlTestSuite * apSuite, void * apContext);
@@ -90,13 +94,18 @@ public:
         mStatus = status;
         mOnSuccessCalled++;
     }
-    void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override { mOnErrorCalled++; }
+    void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override 
+    { 
+        mError     = chipError;
+        mOnErrorCalled++; 
+    }
     void OnDone(WriteClient * apWriteClient) override { mOnDoneCalled++; }
 
     int mOnSuccessCalled = 0;
     int mOnErrorCalled   = 0;
     int mOnDoneCalled    = 0;
     StatusIB mStatus;
+    CHIP_ERROR mError = CHIP_NO_ERROR;
 };
 
 void TestWriteInteraction::AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient)
@@ -543,6 +552,271 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     engine->Shutdown();
 }
 
+// Write Client sends the write request, and process the unknown message error via OnMessageReceived to close the client.
+void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    AddAttributeDataIB(apSuite, apContext, writeClient);
+
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
+
+    ctx.GetLoopback().mSentMessageCount            = 0;
+    ctx.GetLoopback().mNumMessagesToDrop           = 3;
+    ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    ctx.GetLoopback().mDroppedMessageCount = 0;
+    err                                            = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
+
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(msgBuf));
+    ReportDataMessage::Builder response;
+    response.Init(&writer);
+    NL_TEST_ASSERT(apSuite, writer.Finalize(&msgBuf) == CHIP_NO_ERROR);
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
+
+    rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
+    ctx.GetLoopback().mSentMessageCount            = 0;
+    ctx.GetLoopback().mNumMessagesToDrop           = 0;
+    ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    ctx.GetLoopback().mDroppedMessageCount = 0;
+    err = writeClient.OnMessageReceived(writeClient.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    ctx.DrainAndServiceIO();
+    NL_TEST_ASSERT(apSuite, callback.mError == CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
+
+    //Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
+
+    engine->Shutdown();
+    ctx.ExpireSessionAliceToBob();
+    ctx.ExpireSessionBobToAlice();
+    ctx.CreateSessionAliceToBob();
+    ctx.CreateSessionBobToAlice();
+}
+
+// Write Client sends the write request, and process the invalid write response message error via OnMessageReceived to close the client.
+void TestWriteInteraction::TestWriteInvalidMessage2(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    AddAttributeDataIB(apSuite, apContext, writeClient);
+
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
+
+    ctx.GetLoopback().mSentMessageCount            = 0;
+    ctx.GetLoopback().mNumMessagesToDrop           = 3;
+    ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    ctx.GetLoopback().mDroppedMessageCount = 0;
+    err                                            = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
+
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(msgBuf));
+    WriteResponseMessage::Builder response;
+    response.Init(&writer);
+    NL_TEST_ASSERT(apSuite, writer.Finalize(&msgBuf) == CHIP_NO_ERROR);
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::WriteResponse);
+
+    rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
+    ctx.GetLoopback().mSentMessageCount            = 0;
+    ctx.GetLoopback().mNumMessagesToDrop           = 0;
+    ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    ctx.GetLoopback().mDroppedMessageCount = 0;
+    err = writeClient.OnMessageReceived(writeClient.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_END_OF_TLV);
+    ctx.DrainAndServiceIO();
+    NL_TEST_ASSERT(apSuite, callback.mError == CHIP_ERROR_END_OF_TLV);
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
+
+    //Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
+
+    engine->Shutdown();
+    ctx.ExpireSessionAliceToBob();
+    ctx.ExpireSessionBobToAlice();
+    ctx.CreateSessionAliceToBob();
+    ctx.CreateSessionBobToAlice();
+}
+
+// Write Client sends the write request, and process the malformed status response message error via OnMessageReceived to close the client.
+void TestWriteInteraction::TestWriteInvalidMessage3(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    AddAttributeDataIB(apSuite, apContext, writeClient);
+
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
+
+    ctx.GetLoopback().mSentMessageCount            = 0;
+    ctx.GetLoopback().mNumMessagesToDrop           = 3;
+    ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    ctx.GetLoopback().mDroppedMessageCount = 0;
+    err                                            = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
+
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(msgBuf));
+    StatusResponseMessage::Builder response;
+    response.Init(&writer);
+    NL_TEST_ASSERT(apSuite, writer.Finalize(&msgBuf) == CHIP_NO_ERROR);
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
+
+    rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
+    ctx.GetLoopback().mSentMessageCount            = 0;
+    ctx.GetLoopback().mNumMessagesToDrop           = 0;
+    ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    ctx.GetLoopback().mDroppedMessageCount = 0;
+    err = writeClient.OnMessageReceived(writeClient.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_END_OF_TLV);
+    ctx.DrainAndServiceIO();
+    NL_TEST_ASSERT(apSuite, callback.mError == CHIP_ERROR_END_OF_TLV);
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
+
+    //Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
+
+    engine->Shutdown();
+    ctx.ExpireSessionAliceToBob();
+    ctx.ExpireSessionBobToAlice();
+    ctx.CreateSessionAliceToBob();
+    ctx.CreateSessionBobToAlice();
+}
+
+// Write Client sends the write request, and process the busy status response message error via OnMessageReceived to close the client.
+void TestWriteInteraction::TestWriteInvalidMessage4(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    AddAttributeDataIB(apSuite, apContext, writeClient);
+
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
+
+    ctx.GetLoopback().mSentMessageCount            = 0;
+    ctx.GetLoopback().mNumMessagesToDrop           = 3;
+    ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    ctx.GetLoopback().mDroppedMessageCount = 0;
+    err                                            = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
+
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(msgBuf));
+    StatusResponseMessage::Builder response;
+    response.Init(&writer);
+    response.Status(Protocols::InteractionModel::Status::Busy);
+    NL_TEST_ASSERT(apSuite, writer.Finalize(&msgBuf) == CHIP_NO_ERROR);
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
+
+    rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
+    ctx.GetLoopback().mSentMessageCount            = 0;
+    ctx.GetLoopback().mNumMessagesToDrop           = 0;
+    ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    ctx.GetLoopback().mDroppedMessageCount = 0;
+    err = writeClient.OnMessageReceived(writeClient.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
+    NL_TEST_ASSERT(apSuite, err == CHIP_IM_GLOBAL_STATUS(Busy));
+    ctx.DrainAndServiceIO();
+    NL_TEST_ASSERT(apSuite, callback.mError == CHIP_IM_GLOBAL_STATUS(Busy));
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
+
+    //Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
+
+    engine->Shutdown();
+    ctx.ExpireSessionAliceToBob();
+    ctx.ExpireSessionBobToAlice();
+    ctx.CreateSessionAliceToBob();
+    ctx.CreateSessionBobToAlice();
+}
+
 } // namespace app
 } // namespace chip
 
@@ -562,6 +836,10 @@ const nlTest sTests[] =
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjects", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjects),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjectsVersionMatch", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMatch),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjectsVersionMismatch", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMismatch),
+        NL_TEST_DEF("TestWriteInvalidMessage1", chip::app::TestWriteInteraction::TestWriteInvalidMessage1),
+        NL_TEST_DEF("TestWriteInvalidMessage2", chip::app::TestWriteInteraction::TestWriteInvalidMessage2),
+        NL_TEST_DEF("TestWriteInvalidMessage3", chip::app::TestWriteInteraction::TestWriteInvalidMessage3),
+        NL_TEST_DEF("TestWriteInvalidMessage4", chip::app::TestWriteInteraction::TestWriteInvalidMessage4),
         NL_TEST_SENTINEL()
 };
 // clang-format on
