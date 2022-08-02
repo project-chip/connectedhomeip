@@ -28,7 +28,7 @@ public:
     StepCommand() : MediaCommandBase(chip::app::Clusters::LevelControl::Id) {}
 
     CHIP_ERROR Invoke(chip::app::Clusters::LevelControl::StepMode stepMode, uint8_t stepSize,
-                      uapp::DataModel::Nullable<uint16_t> transitionTime, uint8_t optionMask, uint8_t optionOverride,
+                      chip::app::DataModel::Nullable<uint16_t> transitionTime, uint8_t optionMask, uint8_t optionOverride,
                       std::function<void(CHIP_ERROR)> responseCallback);
 };
 
@@ -38,6 +38,6 @@ class MoveToLevelCommand
 public:
     MoveToLevelCommand() : MediaCommandBase(chip::app::Clusters::LevelControl::Id) {}
 
-    CHIP_ERROR Invoke(uint8_t level, app::DataModel::Nullable<uint16_t> transitionTime, uint8_t optionMask, uint8_t optionOverride,
-                      std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(uint8_t level, chip::app::DataModel::Nullable<uint16_t> transitionTime, uint8_t optionMask,
+                      uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback);
 };
