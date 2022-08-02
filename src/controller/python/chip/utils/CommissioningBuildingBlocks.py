@@ -23,6 +23,10 @@ import chip.clusters as Clusters
 import chip.tlv
 from chip.clusters import OperationalCredentials as opCreds
 from chip.clusters import GeneralCommissioning as generalCommissioning
+from chip.FabricAdmin import FabricAdmin as FabricAdmin
+import typing
+from chip.ChipDeviceCtrl import ChipDeviceController as ChipDeviceController
+from chip.clusters.Types import *
 
 _UINT16_MAX = 65535
 
@@ -39,8 +43,79 @@ async def _IsNodeInFabricList(devCtrl, nodeId):
     return False
 
 
+async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDeviceController, privilege: Clusters.AccessControl.Enums.Privilege, targetNodeId: int):
+    ''' Given an existing controller with admin privileges over a target node, grants the specified privilege to the new ChipDeviceController instance to the entire Node. This is achieved
+        by updating the ACL entries on the target.
+
+        This will automatically take care of working within the minimas of the target as well as doing an efficient read-modify-write operation that takes
+        into consideration the existing entries on the target and minimizing the total number of ACL entries written per fabric.
+
+        Args:
+            adminCtrl:      ChipDeviceController instance with admin privileges over the target node
+            grantedCtrl:    ChipDeviceController instance that is being granted the new privilege.
+            privilege:      Privilege to grant to the granted controller
+            targetNodeId:   Target node to which the controller is granted privilege.
+    '''
+
+    data = await adminCtrl.ReadAttribute(targetNodeId, [(Clusters.AccessControl.Attributes.Acl)])
+    if 0 not in data:
+        raise ValueError("Did not get back any data (possible cause: controller has no access..")
+
+    currentAcls = data[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
+
+    # Step 1: Wipe the subject from all existing ACLs.
+    for acl in currentAcls:
+        if (acl.subjects != NullValue):
+            acl.subjects = [subject for subject in acl.subjects if subject != grantedCtrl.GetNodeId()]
+
+    if (privilege):
+        addedPrivilege = False
+
+        # Step 2: Attempt to add the subject to an existing ACL entry if possible where
+        #         the existing privilege in that entry matches our desired privilege.
+        for acl in currentAcls:
+            if acl.privilege == privilege:
+                if grantedCtrl.GetNodeId() not in acl.subjects:
+                    acl.subjects.append(grantedCtrl.GetNodeId())
+                addedPrivilege = True
+
+        # Step 3: If there isn't an existing entry to add to, make a new one.
+        if (not(addedPrivilege)):
+            if len(currentAcls) >= 3:
+                raise ValueError(
+                    f"Cannot add another ACL entry to grant privilege to existing count of {currentAcls} ACLs -- will exceed minimas!")
+
+            currentAcls.append(Clusters.AccessControl.Structs.AccessControlEntry(privilege=privilege, authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+                                                                                 subjects=[grantedCtrl.GetNodeId()]))
+
+    # Step 4: Prune ACLs which have empty subjects.
+    currentAcls = [acl for acl in currentAcls if acl.subjects != NullValue and len(acl.subjects) != 0]
+    await adminCtrl.WriteAttribute(targetNodeId, [(0, Clusters.AccessControl.Attributes.Acl(currentAcls))])
+
+
+async def CreateControllersOnFabric(fabricAdmin: FabricAdmin, adminDevCtrl: ChipDeviceController, controllerNodeIds: typing.List[int], privilege: Clusters.AccessControl.Enums.Privilege, targetNodeId: int) -> typing.List[ChipDeviceController]:
+    ''' Create new ChipDeviceController instances on a given fabric with a specific privilege on a target node.
+
+        Args:
+            fabricAdmin:                A FabricAdmin object that is capable of vending new controller instances on a fabric.
+            adminDevCtrl:               An existing ChipDeviceController instance that already has admin privileges on the target node.
+            controllerNodeIds:          List of desired nodeIds for the controllers.
+            privilege:                  The specific ACL privilege to grant to the newly minted controllers.
+            targetNodeId:               The Node ID of the target.
+    '''
+
+    controllerList = []
+
+    for nodeId in controllerNodeIds:
+        newController = fabricAdmin.NewController(nodeId=nodeId)
+        await GrantPrivilege(adminDevCtrl, newController, privilege, targetNodeId)
+        controllerList.append(newController)
+
+    return controllerList
+
+
 async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, existingNodeId, newNodeId):
-    """ Perform sequence to commission new frabric using existing commissioned fabric.
+    ''' Perform sequence to commission new frabric using existing commissioned fabric.
 
     Args:
         commissionerDevCtrl (ChipDeviceController): Already commissioned device controller used
@@ -55,7 +130,8 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
     Return:
         bool: True if successful, False otherwise.
 
-    """
+    '''
+
     resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(60), timedRequestTimeoutMs=1000)
     if resp.errorCode is not generalCommissioning.Enums.CommissioningError.kOk:
         return False

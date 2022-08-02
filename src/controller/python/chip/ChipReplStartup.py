@@ -50,9 +50,9 @@ def LoadFabricAdmins():
 
     for k in adminList:
         console.print(
-            f"[purple]Restoring FabricAdmin from storage to manage FabricId {adminList[k]['fabricId']}, FabricIndex {k}...")
+            f"[purple]Restoring FabricAdmin from storage to manage FabricId {adminList[k]['fabricId']}, AdminIndex {k}...")
         _fabricAdmins.append(chip.FabricAdmin.FabricAdmin(vendorId=int(adminList[k]['vendorId']),
-                                                          fabricId=adminList[k]['fabricId'], fabricIndex=int(k)))
+                                                          fabricId=adminList[k]['fabricId'], adminIndex=int(k)))
 
     console.print(
         '\n[blue]Fabric Admins have been loaded and are available at [red]fabricAdmins')

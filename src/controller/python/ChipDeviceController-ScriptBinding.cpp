@@ -405,7 +405,28 @@ ChipError::StorageType pychip_DeviceController_SetWiFiCredentials(const char * s
 
 ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
+#if 0
+    //
+    // Since we permit multiple controllers per fabric and each is associated with a unique fabric index, closing a session
+    // requires us to do so across all controllers on the same logical fabric.
+    //
+    // TODO: Enable this and remove the call below to DisconnectDevice once #19259 is completed. This is because
+    //       OperationalDeviceProxy instances that are currently active will remain un-affected by this call and still
+    //       provide a valid SessionHandle in the OnDeviceConnected call later when we call DeviceController::GetConnectedDevice.
+    //       However, it provides a SessionHandle that is incapable of actually vending exchanges since it is in a defunct state.
+    //
+    //       For now, calling DisconnectDevice will at least just correctly de-activate a currently active OperationalDeviceProxy
+    //       instance and ensure that subsequent attempts to acquire one will correctly re-establish CASE on the fabric associated
+    //       with the provided devCtrl.
+    //
+    auto err = devCtrl->SessionMgr()->ForEachCollidingSession(ScopedNodeId(nodeid, devCtrl->GetFabricIndex()), [](auto *session) {
+        session->MarkAsDefunct();
+    });
+
+    ReturnErrorOnFailure(err.AsInteger());
+#else
     return devCtrl->DisconnectDevice(nodeid).AsInteger();
+#endif
 }
 
 ChipError::StorageType pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl,
@@ -643,7 +664,12 @@ ChipError::StorageType pychip_ExpireSessions(chip::Controller::DeviceCommissione
 {
     VerifyOrReturnError((devCtrl != nullptr) && (devCtrl->SessionMgr() != nullptr), CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     (void) devCtrl->ReleaseOperationalDevice(nodeId);
-    devCtrl->SessionMgr()->ExpireAllSessions(ScopedNodeId(nodeId, devCtrl->GetFabricIndex()));
+
+    //
+    // Since we permit multiple controllers on the same fabric each associated with a different fabric index, expiring a session
+    // needs to correctly expire sessions on other controllers on matching fabrics as well.
+    //
+    devCtrl->SessionMgr()->ExpireAllSessionsOnLogicalFabric(ScopedNodeId(nodeId, devCtrl->GetFabricIndex()));
     return CHIP_NO_ERROR.AsInteger();
 }
 
