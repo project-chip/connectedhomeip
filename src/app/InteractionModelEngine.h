@@ -397,8 +397,8 @@ private:
     /**This function handles processing of un-solicited ReportData messages on the client, which can
      * only occur post subscription establishment
      */
-    CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                       System::PacketBufferHandle && aPayload);
+    Status OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                   System::PacketBufferHandle && aPayload);
 
     void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
