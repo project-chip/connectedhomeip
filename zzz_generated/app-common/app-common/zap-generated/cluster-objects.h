@@ -9293,6 +9293,42 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace ConnectionStatus
+namespace NetworkFaultChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields
+{
+    kCurrent  = 0,
+    kPrevious = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::NetworkFaultChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::List<const NetworkFault> current;
+    DataModel::List<const NetworkFault> previous;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::NetworkFaultChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+
+    DataModel::DecodableList<NetworkFault> current;
+    DataModel::DecodableList<NetworkFault> previous;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace NetworkFaultChange
 } // namespace Events
 } // namespace ThreadNetworkDiagnostics
 namespace WiFiNetworkDiagnostics {

@@ -1217,6 +1217,11 @@ server cluster ThreadNetworkDiagnostics = 53 {
     ThreadConnectionStatus connectionStatus = 0;
   }
 
+  info event NetworkFaultChange = 1 {
+    NetworkFault current[] = 0;
+    NetworkFault previous[] = 1;
+  }
+
   readonly attribute nullable int16u channel = 0;
   readonly attribute nullable RoutingRole routingRole = 1;
   readonly attribute nullable char_string<16> networkName = 2;
