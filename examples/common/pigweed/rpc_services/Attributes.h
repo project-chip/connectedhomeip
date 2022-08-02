@@ -113,15 +113,15 @@ public:
             response.which_data = chip_rpc_AttributeData_data_uint32_tag;
             break;
         case chip_rpc_AttributeType_ZCL_INT8S_ATTRIBUTE_TYPE:
-            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_UnsignedInteger, response.data.data_int8));
+            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_SignedInteger, response.data.data_int8));
             response.which_data = chip_rpc_AttributeData_data_int8_tag;
             break;
         case chip_rpc_AttributeType_ZCL_INT16S_ATTRIBUTE_TYPE:
-            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_UnsignedInteger, response.data.data_int16));
+            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_SignedInteger, response.data.data_int16));
             response.which_data = chip_rpc_AttributeData_data_int16_tag;
             break;
         case chip_rpc_AttributeType_ZCL_INT32S_ATTRIBUTE_TYPE:
-            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_UnsignedInteger, response.data.data_int32));
+            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_SignedInteger, response.data.data_int32));
             response.which_data = chip_rpc_AttributeData_data_int32_tag;
             break;
         case chip_rpc_AttributeType_ZCL_BITMAP8_ATTRIBUTE_TYPE:
