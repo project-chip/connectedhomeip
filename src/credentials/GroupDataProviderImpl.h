@@ -80,8 +80,8 @@ public:
     // Key Sets
     //
 
-    static CHIP_ERROR DeriveOperationalKey(const ByteSpan & epoch_key, const ByteSpan & compressed_fabric_id,
-                                           OperationalKey & operational_credentials);
+    static CHIP_ERROR DeriveOperationalCredentials(const ByteSpan & epoch_key, const ByteSpan & compressed_fabric_id,
+                                                   OperationalKey & operational_credentials);
     CHIP_ERROR SetKeySet(FabricIndex fabric_index, const ByteSpan & compressed_fabric_id, const KeySet & keys) override;
     CHIP_ERROR GetKeySet(FabricIndex fabric_index, chip::KeysetId keyset_id, KeySet & keys) override;
     CHIP_ERROR RemoveKeySet(FabricIndex fabric_index, chip::KeysetId keyset_id) override;

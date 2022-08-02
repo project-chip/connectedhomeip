@@ -1560,8 +1560,8 @@ void GroupDataProviderImpl::GroupKeyIteratorImpl::Release()
 // Key Sets
 //
 
-CHIP_ERROR GroupDataProviderImpl::DeriveOperationalKey(const ByteSpan & epoch_key, const ByteSpan & compressed_fabric_id,
-                                                       OperationalKey & operational_credentials)
+CHIP_ERROR GroupDataProviderImpl::DeriveOperationalCredentials(const ByteSpan & epoch_key, const ByteSpan & compressed_fabric_id,
+                                                               OperationalKey & operational_credentials)
 {
     MutableByteSpan encryption_key(operational_credentials.value);
     MutableByteSpan privacy_key(operational_credentials.privacy_key);
@@ -1602,11 +1602,7 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     for (size_t i = 0; i < in_keyset.num_keys_used; ++i)
     {
         ByteSpan epoch_key(in_keyset.epoch_keys[i].key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-        MutableByteSpan key_span(keyset.operational_keys[i].value);
-        MutableByteSpan privacy_key(keyset.operational_keys[i].privacy_key);
-        ReturnErrorOnFailure(Crypto::DeriveGroupOperationalKey(epoch_key, compressed_fabric_id, key_span));
-        ReturnErrorOnFailure(Crypto::DeriveGroupSessionId(key_span, keyset.operational_keys[i].hash));
-        ReturnErrorOnFailure(Crypto::DeriveGroupPrivacyKey(key_span, privacy_key));
+        ReturnErrorOnFailure(DeriveOperationalCredentials(epoch_key, compressed_fabric_id, keyset.operational_keys[i]));
     }
 
     if (found)

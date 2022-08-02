@@ -1259,8 +1259,8 @@ void TestKeySetPrivacy(nlTestSuite * apSuite, void * apContext)
     for (unsigned i = 0; i < theGroupKeySetTestVectorLength; i++)
     {
         const ByteSpan epochKey(theGroupKeySetTestVector[i].epochKey->key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-        NL_TEST_ASSERT(apSuite,
-                       CHIP_NO_ERROR == GroupDataProviderImpl::DeriveOperationalKey(epochKey, kCompressedFabricId1, opCreds));
+        NL_TEST_ASSERT(
+            apSuite, CHIP_NO_ERROR == GroupDataProviderImpl::DeriveOperationalCredentials(epochKey, kCompressedFabricId1, opCreds));
 
         NL_TEST_ASSERT(apSuite, opCreds.hash == theGroupKeySetTestVector[i].groupKeys->hash);
         NL_TEST_ASSERT(apSuite, 0 == memcmp(opCreds.value, theGroupKeySetTestVector[i].groupKeys->value, EpochKey::kLengthBytes));
