@@ -14,19 +14,6 @@ jobs:
             (github.event.pull_request.merged == true)
             && (
                    (contains(github.event.pull_request.labels.*.name, 'sve'))
-                || (contains(github.event.pull_request.labels.*.name, 'cert blocker'))
-                || (contains(github.event.pull_request.labels.*.name, 'spec'))
-                || (contains(github.event.pull_request.labels.*.name, 'platform'))
-                || (contains(github.event.pull_request.labels.*.name, 'darwin'))
-                || (contains(github.event.pull_request.labels.*.name, 'android'))
-                || (contains(github.event.pull_request.labels.*.name, 'examples'))
-                || (contains(github.event.pull_request.labels.*.name, 'scripts'))
-                || (contains(github.event.pull_request.labels.*.name, 'tests'))
-                || (contains(github.event.pull_request.labels.*.name, 'integrations'))
-                || (contains(github.event.pull_request.labels.*.name, 'request sve'))
-                || (contains(github.event.pull_request.labels.*.name, 'workflows'))
-                || (contains(github.event.pull_request.labels.*.name, 'github'))
-                || (contains(github.event.pull_request.labels.*.name, 'sve cherry-pick'))
             )
         steps:
             - name: Checkout
