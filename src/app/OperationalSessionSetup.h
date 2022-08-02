@@ -140,7 +140,7 @@ private:
  * application code does incorrectly held onto this information so do not follow those incorrect
  * implementations as an example.
  */
-// TODO(###) OnDeviceConnected should not return ExchangeManager. Application should have this already. This
+// TODO: OnDeviceConnected should not return ExchangeManager. Application should have this already. This
 // was provided initially to keep code churn down during a large refactor of OnDeviceConnected.
 typedef void (*OnDeviceConnected)(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
 typedef void (*OnDeviceConnectionFailure)(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);

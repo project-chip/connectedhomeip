@@ -23,7 +23,7 @@ void MTRDeviceConnectionBridge::OnConnected(
     void * context, chip::Messaging::ExchangeManager & exchangeMgr, chip::SessionHandle & sessionHandle)
 {
     auto * object = static_cast<MTRDeviceConnectionBridge *>(context);
-    object->mCompletionHandler(&exchangeMgr, chip::MakeOptional<chip::SessionHandle>(sessionHandle), nil);
+    object->mCompletionHandler(&exchangeMgr, chip::MakeOptional<chip::SessionHandle>(sessionHandle->AsSecureSession()), nil);
     object->Release();
 }
 

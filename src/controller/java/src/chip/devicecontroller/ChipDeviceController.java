@@ -589,6 +589,8 @@ public class ChipDeviceController {
   private native void getConnectedDevicePointer(
       long deviceControllerPtr, long deviceId, long callbackHandle);
 
+  private native void releaseConnectedDevicePointer(long devicePtr);
+
   private native boolean disconnectDevice(long deviceControllerPtr, long deviceId);
 
   private native void deleteDeviceController(long deviceControllerPtr);

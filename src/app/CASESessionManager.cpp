@@ -54,7 +54,6 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
     session->Connect(onConnection, onFailure);
 }
 
-// TODO need to figure out what things are calling this
 void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)
 {
     ReleaseSession(FindExistingSessionSetup(peerId));
