@@ -34,7 +34,7 @@ declare_args() {
   chip_automation_logging = chip_logging
 
   # Configure the maximum size for logged messages
-  if (current_os == "linux" || current_os == "mac") {
+  if (current_os == "linux" || current_os == "mac" || current_os == "ios") {
     # Allow base64 encoding of 1 MTU (4 * (1280 / 3) + padding
     chip_log_message_max_size = 1708
   } else {
