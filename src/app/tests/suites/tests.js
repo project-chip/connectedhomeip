@@ -15,15 +15,14 @@
  *    limitations under the License.
  */
 
-function disable(testName)
-{
-  const index = this.indexOf(testName);
-  if (index == -1) {
-    const errStr = `Test ${testName}  does not exists.`;
-    throw new Error(errStr);
-  }
+function disable(testName) {
+    const index = this.indexOf(testName);
+    if (index == -1) {
+        const errStr = `Test ${testName}  does not exists.`;
+        throw new Error(errStr);
+    }
 
-  this.splice(index, 1);
+    this.splice(index, 1);
 }
 
 // clang-format off
@@ -864,7 +863,7 @@ function getTests() {
     ];
 
     const DoorLock = [
-        //"DL_UsersAndCredentials",  TODO: This test is not aligned with spec
+        //"DL_UsersAndCredentials", TODO: This test is not aligned with spec
         "DL_LockUnlock",
         "DL_Schedules",
         "Test_TC_DRLK_2_2",
@@ -872,7 +871,7 @@ function getTests() {
         "Test_TC_DRLK_2_4",
         "Test_TC_DRLK_2_5",
         "Test_TC_DRLK_2_7",
-        "Test_TC_DRLK_2_9",
+        //"Test_TC_DRLK_2_9", TODO: This test is not aligned with spec
     ];
 
     const Groups = [
@@ -933,5 +932,5 @@ function getTests() {
 //
 // Module exports
 //
-exports.getTests       = getTests;
+exports.getTests = getTests;
 exports.getManualTests = getManualTests;
