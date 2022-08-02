@@ -80,6 +80,9 @@ struct BrowseContext : public GenericContext
     void * mCbContext;
 
     dnssd_browser_h mBrowserHandle = 0;
+    // The timeout source used to stop browsing
+    GSource * mTimeoutSource = nullptr;
+
     std::vector<DnssdService> mServices;
     bool mIsBrowsing = false;
 
