@@ -360,7 +360,7 @@ private:
      * Called when Interaction Model receives a Command Request message.
      */
     Status OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                      System::PacketBufferHandle && aPayload, bool aIsTimedInvoke);
+                                  System::PacketBufferHandle && aPayload, bool aIsTimedInvoke);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;

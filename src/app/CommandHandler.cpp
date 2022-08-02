@@ -67,14 +67,12 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
 }
 
 void CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                              System::PacketBufferHandle && payload, bool isTimedInvoke)
+                                            System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
     System::PacketBufferHandle response;
     Status status = Status::Failure;
-    VerifyOrDieWithMsg(ec != nullptr, DataManagement,
-                       "Incoming exchange context should not be null");
-    VerifyOrDieWithMsg(mState == State::Idle, DataManagement,
-                       "state should be Idle");
+    VerifyOrDieWithMsg(ec != nullptr, DataManagement, "Incoming exchange context should not be null");
+    VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "state should be Idle");
 
     // NOTE: we already know this is an InvokeCommand Request message because we explicitly registered with the
     // Exchange Manager for unsolicited InvokeCommand Requests.

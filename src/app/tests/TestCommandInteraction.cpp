@@ -186,7 +186,7 @@ public:
     int onResponseCalledTimes = 0;
     int onErrorCalledTimes    = 0;
     int onFinalCalledTimes    = 0;
-    CHIP_ERROR mError = CHIP_NO_ERROR;
+    CHIP_ERROR mError         = CHIP_NO_ERROR;
 } mockCommandSenderDelegate;
 
 class MockCommandHandlerCallback : public CommandHandler::Callback
@@ -674,7 +674,8 @@ void TestCommandInteraction::TestCommandHandlerInvalidMessageSync(nlTestSuite * 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-// Command Sender sends the  malformed invoke request, this command is aysnc command, handler fails to process it and send status report with invalid action
+// Command Sender sends the  malformed invoke request, this command is aysnc command, handler fails to process it and send status
+// report with invalid action
 void TestCommandInteraction::TestCommandHandlerInvalidMessageAsync(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);

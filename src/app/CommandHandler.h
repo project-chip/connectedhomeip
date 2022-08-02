@@ -140,7 +140,7 @@ public:
      * the timer verification has already been done.
      */
     void OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                                               System::PacketBufferHandle && payload, bool isTimedInvoke);
+                                System::PacketBufferHandle && payload, bool isTimedInvoke);
     CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus);
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
