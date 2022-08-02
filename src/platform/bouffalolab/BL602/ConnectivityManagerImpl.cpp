@@ -155,5 +155,16 @@ void ConnectivityManagerImpl::OnStationConnected()
 #endif
 }
 
+void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
+{
+    if (mWiFiStationState != newState)
+    {
+        ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
+                        WiFiStationStateToStr(newState));
+        mWiFiStationState = newState;
+        SystemLayer().ScheduleLambda([]() { NetworkCommissioning::BLWiFiDriver::GetInstance().OnNetworkStatusChange(); });
+    }
+}
+
 } // namespace DeviceLayer
 } // namespace chip

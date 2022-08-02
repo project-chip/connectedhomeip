@@ -152,6 +152,7 @@ CHIP_ERROR AppTask::Init()
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 
     InitButtons();
+    StoreWifiConfig();
 
 #if PW_RPC_ENABLED
     chip::rpc::Init();
@@ -527,19 +528,6 @@ void AppTask::UpdateClusterState(void)
     }
 }
 
-void AppTask::OtaTask(void)
-{
-    int ret;
-    const char * const task_name = "ota task";
-
-    ret = xTaskCreate(ota_tcp_server, task_name, 512, NULL, 6, &OTA_TASK_HANDLE);
-    if (ret != pdPASS)
-    {
-        printf("unable to start task client task");
-        return;
-    }
-}
-
 void AppTask::FactoryResetButtonEventHandler(void)
 {
     AppEvent button_event           = {};
@@ -566,6 +554,11 @@ void AppTask::InitButtons(void)
 {
     Button_Configure_FactoryResetEventHandler(&FactoryResetButtonEventHandler);
     Button_Configure_LightingActionEventHandler(&LightingActionButtonEventHandler);
+}
+
+void AppTask::StoreWifiConfig(void)
+{
+    wifi_mgmr_scan(NULL, NULL);
 }
 
 void AppTask::LightStateUpdateEventHandler(void)
