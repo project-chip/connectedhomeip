@@ -165,7 +165,6 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    # Null is not supported here 0xFFFF is considerd as Null
     - label: "sends a Move to level command"
       PICS: LVL.S.C00.Rsp && LVL.S.A0010
       command: "MoveToLevel"
@@ -174,7 +173,7 @@ tests:
               - name: "level"
                 value: 64
               - name: "transitionTime"
-                value: 0xFFFF
+                value: null
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
