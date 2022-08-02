@@ -63,16 +63,6 @@ static_library("EFR32") {
     "gatt_db.h",
   ]
 
-  if (chip_crypto == "platform") {
-    sources += [
-      "CHIPCryptoPALPsaEfr32.cpp",
-      "Efr32OpaqueKeypair.h",
-      "Efr32PsaOpaqueKeypair.cpp",
-      "Efr32PsaOperationalKeystore.cpp",
-      "Efr32PsaOperationalKeystore.h",
-    ]
-  }
-
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
@@ -82,8 +72,20 @@ static_library("EFR32") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
+  # Add platform crypto implementation
   if (chip_crypto == "platform") {
-    public_deps += [ "${mbedtls_root}:mbedtls" ]
+    sources += [
+      "CHIPCryptoPALPsaEfr32.cpp",
+      "Efr32OpaqueKeypair.h",
+      "Efr32PsaOpaqueKeypair.cpp",
+      "Efr32PsaOperationalKeystore.cpp",
+      "Efr32PsaOperationalKeystore.h",
+    ]
+
+    public_deps += [
+      "${chip_root}/src/crypto",
+      "${mbedtls_root}:mbedtls"
+    ]
   }
 
   # Add pigweed KVS
