@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 90.2.2. [TC-CGEN-2.2] ArmFailSafe command verification [DUT - Server]
+name: 92.2.2. [TC-CGEN-2.2] ArmFailSafe command verification [DUT - Server]
 
 config:
     nodeId: 0x12344321
@@ -22,61 +22,682 @@ config:
 
 tests:
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
-          value as 'commission_timeout' and the Breadcrumb value as 0"
-      PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
+          "TH1 reads the TrustedRootCertificates attribute from the Node
+          Operational Credentials cluster and saves the number of list items as
+          numTrustedRootsOriginal"
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool generalcommissioning arm-fail-safe  60 0 1 0
+          ./chip-tool  operationalcredentials read  trusted-root-certificates 1 0
+          On TH verify that  TH reads TrustedRootCertificates entries from DUT
 
-          [1651132026.841009][4775:4780] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
-          [1651132026.841099][4775:4780] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
-          [1651132026.841231][4775:4780] CHIP:TOO:   ArmFailSafeResponse: {
-          [1651132026.841298][4775:4780] CHIP:TOO:     errorCode: 0
-          [1651132026.841347][4775:4780] CHIP:TOO:     debugText:
-          [1651132026.841395][4775:4780] CHIP:TOO:    }
-          [1651132026.841469][4775:4780] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1651132026.841561][4775:4780] CHIP:EM: Sending Standalone Ack for MessageCounter:15104814 on exchange 44980i
-      disabled: true
-
-    - label: "TH saves the current timestamp as TS1"
-      verification: |
-          TH records timestamp
+          [1658482014.176273][26852:26857] CHIP:DMG: }
+          [1658482014.176359][26852:26857] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687668
+          [1658482014.176386][26852:26857] CHIP:TOO:   TrustedRootCertificates: 1 entries
+          [1658482014.176402][26852:26857] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69370A3501290118240260300414A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF3300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40E878725378AEA74A5F6CB6267CB9F7ACD0DACF26741FB24356379D850DD5F23A746281C845FD76D89E97AB188E9BF8A98047B43E3E868A5A8B8E50BAE62F116F18
+          [1658482014.176447][26852:26857] CHIP:EM: Sending Standalone Ack for MessageCounter:182536164 on exchange 11450i
       disabled: true
 
     - label:
-          "TH1 sends SetRegulatoryConfig command to the DUT with
-          NewRegulatoryConfig as 'set_regulatory', CountryCode as 'xxxx' and the
-          Breadcrumb value as 0"
-      PICS: CGEN.S.C02.Rsp && CGEN.S.C03.Tx
+          "TH1 reads the BasicCommissioningInfo attribute and saves the
+          MaxCumulativeFailsafeSeconds as maxFailsafe"
+      PICS: CGEN.S.A0001
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool generalcommissioning set-regulatory-config 0 12 0 1 0
+          ./chip-tool generalcommissioning read  basic-commissioning-info 1 0
+          On TH verify that TH reads BasicCommissioningInfo attribute from DUT
 
-          [1651132032.042755][4782:4788] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0003
-          [1651132032.042803][4782:4788] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0003
-          [1651132032.042871][4782:4788] CHIP:TOO:   SetRegulatoryConfigResponse: {
-          [1651132032.042907][4782:4788] CHIP:TOO:     errorCode: 0
-          [1651132032.042930][4782:4788] CHIP:TOO:     debugText:
-          [1651132032.042954][4782:4788] CHIP:TOO:    }
-          [1651132032.042989][4782:4788] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1651132032.043040][4782:4788] CHIP:EM: Sending Standalone Ack for MessageCounter:11153448 on exchange 27233i
+          [1658482413.950617][27013:27018] CHIP:DMG: }
+          [1658482413.950753][27013:27018] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0001 DataVersion: 2195123768
+          [1658482413.950802][27013:27018] CHIP:TOO:   BasicCommissioningInfo: {
+          [1658482413.950825][27013:27018] CHIP:TOO:     FailSafeExpiryLengthSeconds: 60
+          [1658482413.950842][27013:27018] CHIP:TOO:     MaxCumulativeFailsafeSeconds: 900
+          [1658482413.950853][27013:27018] CHIP:TOO:    }
+          [1658482413.950913][27013:27018] CHIP:EM: Sending Standalone Ack for MessageCounter:205901818 on exchange 42335i
       disabled: true
 
-    - label: "TH1 Sends CommissionComplete command to the DUT"
-      PICS: CGEN.S.C04.Rsp && CGEN.S.C05.Tx
+    - label:
+          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
+          field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb
+          value as 1"
+      PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool generalcommissioning commissioning-complete 1 0
+          ./chip-tool generalcommissioning  arm-fail-safe   900 1 1 0
+          On TH verify that  TH reads ArmFailSafe command from DUT
 
-          [1651132037.205822][4789:4794] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
-          [1651132037.205914][4789:4794] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0005
-          [1651132037.206042][4789:4794] CHIP:TOO:   CommissioningCompleteResponse: {
-          [1651132037.206142][4789:4794] CHIP:TOO:     errorCode: 0
-          [1651132037.206196][4789:4794] CHIP:TOO:     debugText:
-          [1651132037.206244][4789:4794] CHIP:TOO:    }
-          [1651132037.206319][4789:4794] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1651132037.206416][4789:4794] CHIP:EM: Sending Standalone Ack for MessageCounter:1991425 on exchange 49997i
+          [1658482454.092676][27036:27041] CHIP:DMG: },
+          [1658482454.092739][27036:27041] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1658482454.092777][27036:27041] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1658482454.092821][27036:27041] CHIP:TOO:   ArmFailSafeResponse: {
+          [1658482454.092853][27036:27041] CHIP:TOO:     errorCode: 0
+          [1658482454.092866][27036:27041] CHIP:TOO:     debugText:
+          [1658482454.092878][27036:27041] CHIP:TOO:    }
+          [1658482454.092910][27036:27041] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658482454.092955][27036:27041] CHIP:EM: Sending Standalone Ack for MessageCounter:147679912 on exchange 8754i
       disabled: true
 
-    - label: "TH1 saves the Current time stamp as TS2"
+    - label: "TH1 reads the Breadcrumb attribute"
+      PICS: CGEN.S.A0000
       verification: |
-          TH records timestamp and verified manually
+          ./chip-tool generalcommissioning read breadcrumb 1 0
+
+          On TH Verify that the breadcrumb attribute value
+          [1658482504.991161][27058:27064] CHIP:DMG: }
+          [1658482504.991205][27058:27064] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2195123769
+          [1658482504.991215][27058:27064] CHIP:TOO:   Breadcrumb: 1
+          [1658482504.991243][27058:27064] CHIP:EM: Sending Standalone Ack for MessageCounter:52534281 on exchange 8370i
+      disabled: true
+
+    - label:
+          "TH1 obtains or generates a new TrustedRootCertificate that is
+          different from the previously commissioned TrustedRootCertificate for
+          TH1. TH1 sends an AddTrustedRootCertificate command to the Node
+          Operational Credentials cluster to install this new certificate"
+      verification: |
+          To generate TrustedRootCertificate, need to buld chip-cert in connectedhomeip by giving below mentioned commands
+          1. gn gen --check out/debug
+          2. ninja -v -C out/debug chip-cert
+          Once build completes
+          3. cd out/debug
+          4.  ./chip-cert gen-cert --type r --subject-chip-id CACACACA00000001 --valid-from "2020-10-15 14:23:43" --lifetime 7305 --out-key Chip-Root-Key.txt --out Chip-Root-Cert.txt --out-format chip-hex
+          5. cat Chip-Root-Key.txt
+
+
+          ./chip-tool  operationalcredentials add-trusted-root-certificate  hex:1530010828c376ebc17f21512402013703271401000000cacacaca182604ef171b2726056eb5b94c3706271401000000cacacaca182407012408013009410452c19fd9d329a738fd65722a8309fa68bcaa9ffe87d8114b802c922e5066d0b2f0573b89b38bf98fc9c424ab8ffdabcb18d42e623d82a02d0ca0c062ccadb4bc370a350129011824026030041457934de5405e9a40eacb86ee647e583141ae78f430051457934de5405e9a40eacb86ee647e583141ae78f418300b40a0b0d57bddbc7bcf44480a8b7bd0231d54ccacd68d90efb67b7aa3206adbd268725092992a0388c8e934504178613c5b932d422eed7463f38fd82aaa429b574a18 1 0
+
+
+          Verify in TH log:
+
+
+          [1658482609.069728][27095:27100] CHIP:DMG:         InteractionModelRevision = 1
+          [1658482609.069733][27095:27100] CHIP:DMG: },
+          [1658482609.069760][27095:27100] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000B Status=0x0
+          [1658482609.069779][27095:27100] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "TH1 reads the TrustedRootCertificates attribute from the Node
+          Operational Credentials cluster"
+      verification: |
+          ./chip-tool  operationalcredentials read  trusted-root-certificates 1 0
+          On TH verify that  TH reads TrustedRootCertificates entries from DUT
+          [1658482718.809139][27144:27149] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687668
+          [1658482718.809271][27144:27149] CHIP:TOO:   TrustedRootCertificates: 2 entries
+          [1658482718.809327][27144:27149] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69370A3501290118240260300414A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF3300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40E878725378AEA74A5F6CB6267CB9F7ACD0DACF26741FB24356379D850DD5F23A746281C845FD76D89E97AB188E9BF8A98047B43E3E868A5A8B8E50BAE62F116F18
+          [1658482718.809379][27144:27149] CHIP:TOO:     [2]: 1530010828C376EBC17F21512402013703271401000000CACACACA182604EF171B2726056EB5B94C3706271401000000CACACACA182407012408013009410452C19FD9D329A738FD65722A8309FA68BCAA9FFE87D8114B802C922E5066D0B2F0573B89B38BF98FC9C424AB8FFDABCB18D42E623D82A02D0CA0C062CCADB4BC370A350129011824026030041457934DE5405E9A40EACB86EE647E583141AE78F430051457934DE5405E9A40EACB86EE647E583141AE78F418300B40A0B0D57BDDBC7BCF44480A8B7BD0231D54CCACD68D90EFB67B7AA3206ADBD268725092992A0388C8E934504178613C5B932D422EED7463F38FD82AAA429B574A18
+          [1658482718.809545][27144:27149] CHIP:EM: Sending Standalone Ack for MessageCounter:259488098 on exchange 24852i
+          [1658482718.809646][27144:27149] CHIP:IN: Prepared secure message 0x7fef39dc6ff0 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 24852i with MessageCounter:24381439.
+      disabled: true
+
+    - label:
+          "TH1 waits for PIXIT.CGEN.FailsafeExpiryLengthSeconds to ensure the
+          failsafe timer has expired"
+      verification: |
+          The expiry length is mentioned in above step as 900 secs so wait till 60secs and proced for next step
+      disabled: true
+
+    - label:
+          "TH1 reads the TrustedRootCertificates attribute from the Node
+          Operational Credentials cluster"
+      verification: |
+          ./chip-tool  operationalcredentials read  trusted-root-certificates 1 0
+          On TH verify that  TH reads TrustedRootCertificates entries from DUT
+          [1658483361.121153][27343:27348] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687668
+          [1658483361.121212][27343:27348] CHIP:TOO:   TrustedRootCertificates: 1 entries
+          [1658483361.121257][27343:27348] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69370A3501290118240260300414A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF3300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40E878725378AEA74A5F6CB6267CB9F7ACD0DACF26741FB24356379D850DD5F23A746281C845FD76D89E97AB188E9BF8A98047B43E3E868A5A8B8E50BAE62F116F18
+          [1658483361.121342][27343:27348] CHIP:EM: Sending Standalone Ack for MessageCounter:8407614 on exchange 22615i
+      disabled: true
+
+    - label: "TH1 reads the Breadcrumb attribute"
+      PICS: CGEN.S.C00.Rsp && CGEN.S.A0000
+      verification: |
+          ./chip-tool generalcommissioning read breadcrumb 1 0
+
+          On TH Verify that the breadcrumb attribute value
+          [1658483428.627422][27375:27380] CHIP:DMG: }
+          [1658483428.627566][27375:27380] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2195123770
+          [1658483428.627610][27375:27380] CHIP:TOO:   Breadcrumb: 0
+          [1658483428.627696][27375:27380] CHIP:EM: Sending Standalone Ack for MessageCounter:242324966 on exchange 46358i
+      disabled: true
+
+    - label: "TH1 repeats steps 3 through 5"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
+          field set to 0"
+      PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
+      verification: |
+          ./chip-tool generalcommissioning  arm-fail-safe  0 1 1 0
+          On TH verify that  TH reads ArmFailSafe command from DUT
+          [1658483503.637026][27397:27402] CHIP:DMG: },
+          [1658483503.637054][27397:27402] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1658483503.637074][27397:27402] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1658483503.637102][27397:27402] CHIP:TOO:   ArmFailSafeResponse: {
+          [1658483503.637119][27397:27402] CHIP:TOO:     errorCode: 0
+          [1658483503.637126][27397:27402] CHIP:TOO:     debugText:
+          [1658483503.637133][27397:27402] CHIP:TOO:    }
+          [1658483503.637151][27397:27402] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658483503.637176][27397:27402] CHIP:EM: Sending Standalone Ack for MessageCounter:200752002 on exchange 2227i
+      disabled: true
+
+    - label: "Repeat steps 8 through 9"
+      verification: |
+          Repeat steps 8 through 9
+      disabled: true
+
+    - label:
+          "TH1 sends the OpenCommissioningWindow command to the Administrator
+          Commissioning cluster"
+      verification: |
+          ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3840
+          [1658483545.889080][27420:27425] CHIP:DMG: },
+          [1658483545.889093][27420:27425] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
+          [1658483545.889098][27420:27425] CHIP:CTL: Successfully opened pairing window on the device
+          [1658483545.889113][27420:27425] CHIP:CTL: Manual pairing code: [36116400648]
+          [1658483545.889120][27420:27425] CHIP:CTL: SetupQRCode: [MT:-24J0AFN00KG3-2W000]
+          [1658483545.889127][27420:27425] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
+          field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds"
+      PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
+      verification: |
+          ./chip-tool generalcommissioning  arm-fail-safe   900 1 1 0
+          On TH verify that  TH reads ArmFailSafe command from DUT
+          [1658483622.896405][27446:27451] CHIP:DMG: },
+          [1658483622.896466][27446:27451] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1658483622.896509][27446:27451] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1658483622.896556][27446:27451] CHIP:TOO:   ArmFailSafeResponse: {
+          [1658483622.896589][27446:27451] CHIP:TOO:     errorCode: 4
+          [1658483622.896605][27446:27451] CHIP:TOO:     debugText:
+          [1658483622.896620][27446:27451] CHIP:TOO:    }
+          [1658483622.896657][27446:27451] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658483622.896705][27446:27451] CHIP:EM: Sending Standalone Ack for MessageCounter:156899074 on exchange 18880i
+      disabled: true
+
+    - label: "TH2 opens a PASE session with the DUT"
+      verification: |
+          ./chip-tool pairing  code 1 36116400648
+          On TH2 verify that the PASE established successfully
+          [1658483765.114083][8082:8087] CHIP:CTL: Stopping commissioning discovery over DNS-SD
+          [1658483765.114107][8082:8087] CHIP:TOO: Pairing Success
+          [1658483765.114130][8082:8087] CHIP:TOO: PASE establishment successful
+          [1658483765.114156][8082:8087] CHIP:CTL: Commissioning stage next step: "SecurePairing" -> "ReadCommissioningInfo"
+      disabled: true
+
+    - label:
+          "TH2 obtains or generates a TrustedRootCertificate that is different
+          from the previously commissioned TrustedRootCertificate for TH1. TH2
+          sends an AddTrustedRootCertificate command to the Node Operational
+          Credentials cluster to install this new certificate"
+      verification: |
+          During time of pairing, between DUT and TH2, verify the SUCCESS response from DUT on TH2
+          [1658483765.249026][8082:8087] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000B Status=0x0
+          [1658483765.249064][8082:8087] CHIP:CTL: Device confirmed that it has received the root certificate
+          [1658483765.249099][8082:8087] CHIP:CTL: Successfully finished commissioning step "SendTrustedRootCert"
+      disabled: true
+
+    - label:
+          "TH2 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
+          field set to 0"
+      PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
+      verification: |
+          During time of pairing, between DUT and TH2, verify the SUCCESS response from DUT on TH2
+
+          [1658483765.202417][8082:8087] CHIP:DMG:         InteractionModelRevision = 1
+          [1658483765.202440][8082:8087] CHIP:DMG: },
+          [1658483765.202500][8082:8087] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1658483765.202535][8082:8087] CHIP:CTL: Received ArmFailSafe response errorCode=0
+          [1658483765.202563][8082:8087] CHIP:CTL: Successfully finished commissioning step "ArmFailSafe"
+      disabled: true
+
+    - label:
+          "TH1 reads the NOCs attribute from the Node Operational Credentials
+          cluster using a non-fabric-filtered read and saves the returned list
+          as nocs"
+      verification: |
+          ./chip-tool  operationalcredentials read  nocs  1 0 --fabric-filtered 0
+          On TH verify that  TH reads nocs entries from DUT
+          [1658484050.459056][27576:27582] CHIP:DMG: }
+          [1658484050.459316][27576:27582] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 527687672
+          [1658484050.459362][27576:27582] CHIP:TOO:   NOCs: 2 entries
+          [1658484050.459394][27576:27582] CHIP:TOO:     [1]: {
+          [1658484050.459420][27576:27582] CHIP:TOO:       Noc: 1530010101240201370324130118260480228127260580254D3A37062415012411011824070124080130094104D1FEC456CB358665A14971F896E876442C90E881FB9ED2CF54628F0DDF6298A0BBB4DCF1156F8A7CA469B9CB1EDFEA2138EF9C0EAC4111CF073A60EAF870AEB0370A3501280118240201360304020401183004149B8576578FF95883D7BCEBCD09C4708B29FC6210300514B92621DEFAD8BB81798C14070F4F90955057B41518300B405D4940E87ABE12A37EB8F32F251E8085A64BEB818B1A5954B568D22816534E8049CCF6A9D8FC65F5794A2BF8F138D2821284452DE96F27FC651014AF259C066D18
+          [1658484050.459458][27576:27582] CHIP:TOO:       Icac: 1530010100240201370324140018260480228127260580254D3A370624130118240701240801300941040DAF5C326E671D0956DE7D39ACD3D07EC88D668754941B689576A904A91D42B2706599463826738C42D692831A46C74D71CA58288AB5DECD6ABCDDABC81A78A7370A3501290118240260300414B92621DEFAD8BB81798C14070F4F90955057B415300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40449C941A0F5388E41E9E598B021BDA6833C2F6CEDFF77F02D27ED431D70564289AAAACC6718C398759B1D692CEE20CF179694883A6A4740F00E30EC816AE208618
+          [1658484050.459476][27576:27582] CHIP:TOO:       FabricIndex: 1
+          [1658484050.459488][27576:27582] CHIP:TOO:      }
+          [1658484050.459505][27576:27582] CHIP:TOO:     [2]: {
+          [1658484050.459517][27576:27582] CHIP:TOO:       Noc:
+          [1658484050.459528][27576:27582] CHIP:TOO:       Icac: null
+          [1658484050.459540][27576:27582] CHIP:TOO:       FabricIndex: 2
+          [1658484050.459551][27576:27582] CHIP:TOO:      }
+          [1658484050.459609][27576:27582] CHIP:EM: Sending Standalone Ack for MessageCounter:155357005 on exchange 49985i
+      disabled: true
+
+    - label:
+          "TH1 reads the Fabrics attribute from the Node Operational Credentials
+          cluster using a non-fabric-filtered read and saves the returned list
+          as fabrics"
+      verification: |
+          ./chip-tool operationalcredentials read fabrics    1  0 --fabric-filtered 0
+
+          [1658484135.730921][27619:27624] CHIP:DMG: }
+          [1658484135.731211][27619:27624] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 527687672
+          [1658484135.731264][27619:27624] CHIP:TOO:   Fabrics: 2 entries
+          [1658484135.731297][27619:27624] CHIP:TOO:     [1]: {
+          [1658484135.731316][27619:27624] CHIP:TOO:       RootPublicKey: 045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69
+          [1658484135.731329][27619:27624] CHIP:TOO:       VendorId: 65521
+          [1658484135.731340][27619:27624] CHIP:TOO:       FabricId: 1
+          [1658484135.731350][27619:27624] CHIP:TOO:       NodeId: 1
+          [1658484135.731360][27619:27624] CHIP:TOO:       Label:
+          [1658484135.731370][27619:27624] CHIP:TOO:       FabricIndex: 1
+          [1658484135.731380][27619:27624] CHIP:TOO:      }
+          [1658484135.731398][27619:27624] CHIP:TOO:     [2]: {
+          [1658484135.731412][27619:27624] CHIP:TOO:       RootPublicKey: 042B0716ED651EBABF1B37198D6722B01C40B61ADBA286FA0BAEC566068BB98B1B752264B4510716473E7CD6CBFE771733254B6489BF02AF1EF9C448EA88F17629
+          [1658484135.731424][27619:27624] CHIP:TOO:       VendorId: 65521
+          [1658484135.731433][27619:27624] CHIP:TOO:       FabricId: 1
+          [1658484135.731443][27619:27624] CHIP:TOO:       NodeId: 2
+          [1658484135.731452][27619:27624] CHIP:TOO:       Label:
+          [1658484135.731461][27619:27624] CHIP:TOO:       FabricIndex: 2
+          [1658484135.731471][27619:27624] CHIP:TOO:      }
+          [1658484135.731545][27619:27624] CHIP:EM: Sending Standalone Ack for MessageCounter:227858273 on exchange 33410i
+      disabled: true
+
+    - label:
+          "TH1 reads the TrustedRootCertificates attribute from the Node
+          Operational Credentials cluster and saves the returned list as
+          trustedroots"
+      verification: |
+          ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
+          On TH verify that  TH reads TrustedRootCertificates entries from DUT
+          [1658489869.278413][31188:31193] CHIP:DMG: }
+          [1658489869.278997][31188:31193] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687672
+          [1658489869.279090][31188:31193] CHIP:TOO:   TrustedRootCertificates: 2 entries
+          [1658489869.279151][31188:31193] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69370A3501290118240260300414A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF3300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40E878725378AEA74A5F6CB6267CB9F7ACD0DACF26741FB24356379D850DD5F23A746281C845FD76D89E97AB188E9BF8A98047B43E3E868A5A8B8E50BAE62F116F18
+          [1658489869.279213][31188:31193] CHIP:TOO:     [2]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941042B0716ED651EBABF1B37198D6722B01C40B61ADBA286FA0BAEC566068BB98B1B752264B4510716473E7CD6CBFE771733254B6489BF02AF1EF9C448EA88F17629370A3501290118240260300414386906595DA80026C699034E368C4BF528F581AE300514386906595DA80026C699034E368C4BF528F581AE18300B404BFA1D1897E64C216DC7003245C5FB781B168A7BF152A4114017AFB8A19CE8271E22612CFBFCDC74DDFFE41683CE644B7E8F7DBE36833D91B5B233D853E47F0018
+          [1658489869.279343][31188:31193] CHIP:EM: Sending Standalone Ack for MessageCounter:134534814 on exchange 37320i
+          [1658489869.279418][31188:31193] CHIP:IN: Prepared secure message 0x7f0a13ffdff0 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 37320i with MessageCounter:267920734.
+      disabled: true
+
+    - label:
+          "TH2 starts commissioning the DUT. It performs all steps up to
+          establishing a CASE connection, but DOES NOT send the
+          CommissioningComplete command"
+      verification: |
+          While pairing between DUT and TH2, On TH2 verify that the CASE establishment successful respose from DUT
+          [1658483765.375804][8082:8087] CHIP:DMG: },
+          [1658483765.375942][8082:8087] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1658483765.376024][8082:8087] CHIP:CTL: Device returned status 0 on receiving the NOC
+          [1658483765.376082][8082:8087] CHIP:CTL: Operational credentials provisioned on device 0xffff6c00c4d0
+          [1658483765.376138][8082:8087] CHIP:TOO: Secure Pairing Success
+          [1658483765.376187][8082:8087] CHIP:TOO: CASE establishment successful
+          [1658483765.376245][8082:8087] CHIP:CTL: Successfully finished commissioning step "SendNOC"
+      disabled: true
+
+    - label:
+          "TH2 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
+          field set to 0"
+      PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
+      verification: |
+          While pairing between DUT and TH2, On TH2 verify that ArmFailSafeResponse with ErrorCode as "OK"(0)respose from DUT
+          [1658483765.202440][8082:8087] CHIP:DMG: },
+          [1658483765.202500][8082:8087] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1658483765.202535][8082:8087] CHIP:CTL: Received ArmFailSafe response errorCode=0
+          [1658483765.202563][8082:8087] CHIP:CTL: Successfully finished commissioning step "ArmFailSafe"
+          [1658483765.202586][8082:8087] CHIP:CTL: Commissioning stage next step: "ArmFailSafe" -> "ConfigRegulatory"
+      disabled: true
+
+    - label:
+          "TH1 reads the NOCs attribute from the Node Operational Credentials
+          cluster using a non-fabric-filtered read"
+      verification: |
+          ./chip-tool  operationalcredentials read  nocs  1 0
+          On TH verify that  TH reads nocs entries from DUT
+          [1658484226.587652][27658:27663] CHIP:DMG: }
+          [1658484226.587884][27658:27663] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687672
+          [1658484226.587936][27658:27663] CHIP:TOO:   TrustedRootCertificates: 2 entries
+          [1658484226.587965][27658:27663] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69370A3501290118240260300414A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF3300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40E878725378AEA74A5F6CB6267CB9F7ACD0DACF26741FB24356379D850DD5F23A746281C845FD76D89E97AB188E9BF8A98047B43E3E868A5A8B8E50BAE62F116F18
+          [1658484226.587994][27658:27663] CHIP:TOO:     [2]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941042B0716ED651EBABF1B37198D6722B01C40B61ADBA286FA0BAEC566068BB98B1B752264B4510716473E7CD6CBFE771733254B6489BF02AF1EF9C448EA88F17629370A3501290118240260300414386906595DA80026C699034E368C4BF528F581AE300514386906595DA80026C699034E368C4BF528F581AE18300B404BFA1D1897E64C216DC7003245C5FB781B168A7BF152A4114017AFB8A19CE8271E22612CFBFCDC74DDFFE41683CE644B7E8F7DBE36833D91B5B233D853E47F0018
+          [1658484226.588062][27658:27663] CHIP:EM: Sending Standalone Ack for MessageCounter:261685492 on exchange 62042i
+      disabled: true
+
+    - label:
+          "TH1 reads the Fabrics attribute from the Node Operational Credentials
+          cluster using a non-fabric-filtered read"
+      verification: |
+          ./chip-tool operationalcredentials read fabrics    1  0 --fabric-filtered 0
+          On TH verify that  TH reads fabrics list from DUT
+          [1658484405.562192][27710:27716] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 527687672
+          [1658484405.562321][27710:27716] CHIP:TOO:   Fabrics: 2 entries
+          [1658484405.562395][27710:27716] CHIP:TOO:     [1]: {
+          [1658484405.562428][27710:27716] CHIP:TOO:       RootPublicKey: 045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69
+          [1658484405.562467][27710:27716] CHIP:TOO:       VendorId: 65521
+          [1658484405.562487][27710:27716] CHIP:TOO:       FabricId: 1
+          [1658484405.562505][27710:27716] CHIP:TOO:       NodeId: 1
+          [1658484405.562523][27710:27716] CHIP:TOO:       Label:
+          [1658484405.562543][27710:27716] CHIP:TOO:       FabricIndex: 1
+          [1658484405.562561][27710:27716] CHIP:TOO:      }
+          [1658484405.562594][27710:27716] CHIP:TOO:     [2]: {
+          [1658484405.562621][27710:27716] CHIP:TOO:       RootPublicKey: 042B0716ED651EBABF1B37198D6722B01C40B61ADBA286FA0BAEC566068BB98B1B752264B4510716473E7CD6CBFE771733254B6489BF02AF1EF9C448EA88F17629
+          [1658484405.562643][27710:27716] CHIP:TOO:       VendorId: 65521
+          [1658484405.562662][27710:27716] CHIP:TOO:       FabricId: 1
+          [1658484405.562686][27710:27716] CHIP:TOO:       NodeId: 2
+          [1658484405.562735][27710:27716] CHIP:TOO:       Label:
+          [1658484405.562753][27710:27716] CHIP:TOO:       FabricIndex: 2
+          [1658484405.562771][27710:27716] CHIP:TOO:      }
+          [1658484405.562881][27710:27716] CHIP:EM: Sending Standalone Ack for MessageCounter:161805931 on exchange 9158i
+      disabled: true
+
+    - label:
+          "TH1 reads the TrustedRootCertificates attribute from the Node
+          Operational Credentials cluster"
+      verification: |
+          ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
+          On TH verify that  TH reads TrustedRootCertificates entries from DUT
+          [1658484601.144043][28501:28506] CHIP:DMG:         InteractionModelRevision = 1
+          [1658484601.144050][28501:28506] CHIP:DMG: }
+          [1658484601.144213][28501:28506] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687672
+          [1658484601.144243][28501:28506] CHIP:TOO:   TrustedRootCertificates: 2 entries
+          [1658484601.144264][28501:28506] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69370A3501290118240260300414A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF3300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40E878725378AEA74A5F6CB6267CB9F7ACD0DACF26741FB24356379D850DD5F23A746281C845FD76D89E97AB188E9BF8A98047B43E3E868A5A8B8E50BAE62F116F18
+          [1658484601.144285][28501:28506] CHIP:TOO:     [2]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941042B0716ED651EBABF1B37198D6722B01C40B61ADBA286FA0BAEC566068BB98B1B752264B4510716473E7CD6CBFE771733254B6489BF02AF1EF9C448EA88F17629370A3501290118240260300414386906595DA80026C699034E368C4BF528F581AE300514386906595DA80026C699034E368C4BF528F581AE18300B404BFA1D1897E64C216DC7003245C5FB781B168A7BF152A4114017AFB8A19CE8271E22612CFBFCDC74DDFFE41683CE644B7E8F7DBE36833D91B5B233D853E47F0018
+          [1658484601.144331][28501:28506] CHIP:EM: Sending Standalone Ack for MessageCounter:68619713 on exchange 46067i
+          [1658484601.144356][28501:28506] CHIP:IN: Prepared secure message 0x7fdeecbbeff0 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 46067i with MessageCounter:26061854.
+          [1658484601.144370][28501:28506] CHIP:IN: Sending encrypted msg 0x7fdeecbbeff0 with MessageCounter:26061854 to 0x0000000000000001 (1) at monotonic time: 00000000020BD55A msec
+          [1658484601.144408][28501:28506] CHIP:EM: Flushed pending ack for MessageCounter:68619713 on exchange 46067i
+      disabled: true
+
+    - label: "TH2 fully commissions the DUT"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "TH2 obtains or generates a new TrustedRootCertificate that is
+          different from the previously commissioned TrustedRootCertificate for
+          TH2. TH2 sends an AddTrustedRootCertificate command to the Node
+          Operational Credentials cluster to install this new certificate"
+      verification: |
+          To generate TrustedRootCertificate, need to buld chip-cert in connectedhomeip by giving below mentioned commands
+          1. gn gen --check out/debug
+          2. ninja -v -C out/debug chip-cert
+          Once build completes
+          3. cd out/debug
+          4.  ./chip-cert gen-cert --type r --subject-chip-id CACACACA00000001 --valid-from "2020-10-15 14:23:43" --lifetime 7305 --out-key Chip-Root-Key.txt --out Chip-Root-Cert.txt --out-format chip-hex
+          5. cat Chip-Root-Key.txt
+
+
+          ./chip-tool  operationalcredentials add-trusted-root-certificate    04614D01D2897082D7F85832CE00AC787A5A221A6F7B19C4202C069E3D70DDC615E5B9436919266360AC847F2FAB3EAEE3902B43812A13D18C061CC5028EADB775583DCB1008E4CEBFF810EEB2BC60FF7A3CF954C57101798443DA39E75F5FFDEA 2 0
+          On TH verify that DUT responds with FAILSAFE_REQUIRED
+          [1658484766.785916][8132:8137] CHIP:DMG:
+          [1658484766.785961][8132:8137] CHIP:DMG:         InteractionModelRevision = 1
+          [1658484766.786005][8132:8137] CHIP:DMG: },
+          [1658484766.786109][8132:8137] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000B Status=0xca
+          [1658484766.786168][8132:8137] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
+          [1658484766.786233][8132:8137] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "TH1 reads the Fabrics attribute from the Node Operational Credentials
+          cluster using a non-fabric-filtered read"
+      verification: |
+          ./chip-tool operationalcredentials read fabrics    1  0 --fabric-filtered 0
+          On TH verify that  TH reads fabrics list from DUT
+          [1658484969.071455][28631:28636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 527687672
+          [1658484969.071527][28631:28636] CHIP:TOO:   NOCs: 2 entries
+          [1658484969.071587][28631:28636] CHIP:TOO:     [1]: {
+          [1658484969.071625][28631:28636] CHIP:TOO:       Noc: 1530010101240201370324130118260480228127260580254D3A37062415012411011824070124080130094104D1FEC456CB358665A14971F896E876442C90E881FB9ED2CF54628F0DDF6298A0BBB4DCF1156F8A7CA469B9CB1EDFEA2138EF9C0EAC4111CF073A60EAF870AEB0370A3501280118240201360304020401183004149B8576578FF95883D7BCEBCD09C4708B29FC6210300514B92621DEFAD8BB81798C14070F4F90955057B41518300B405D4940E87ABE12A37EB8F32F251E8085A64BEB818B1A5954B568D22816534E8049CCF6A9D8FC65F5794A2BF8F138D2821284452DE96F27FC651014AF259C066D18
+          [1658484969.071669][28631:28636] CHIP:TOO:       Icac: 1530010100240201370324140018260480228127260580254D3A370624130118240701240801300941040DAF5C326E671D0956DE7D39ACD3D07EC88D668754941B689576A904A91D42B2706599463826738C42D692831A46C74D71CA58288AB5DECD6ABCDDABC81A78A7370A3501290118240260300414B92621DEFAD8BB81798C14070F4F90955057B415300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40449C941A0F5388E41E9E598B021BDA6833C2F6CEDFF77F02D27ED431D70564289AAAACC6718C398759B1D692CEE20CF179694883A6A4740F00E30EC816AE208618
+          [1658484969.071696][28631:28636] CHIP:TOO:       FabricIndex: 1
+          [1658484969.071712][28631:28636] CHIP:TOO:      }
+          [1658484969.071734][28631:28636] CHIP:TOO:     [2]: {
+          [1658484969.071750][28631:28636] CHIP:TOO:       Noc:
+          [1658484969.071766][28631:28636] CHIP:TOO:       Icac: null
+          [1658484969.071782][28631:28636] CHIP:TOO:       FabricIndex: 2
+          [1658484969.071796][28631:28636] CHIP:TOO:      }
+          [1658484969.071889][28631:28636] CHIP:EM: Sending Standalone Ack for MessageCounter:202454119 on exchange 59946i
+      disabled: true
+
+    - label:
+          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
+          field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb
+          value as 1"
+      PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
+      verification: |
+          ./chip-tool generalcommissioning  arm-fail-safe   60 1 1 0
+          On TH verify that  TH reads ArmFailSafe command from DUT
+          [1658485224.066397][28732:28737] CHIP:DMG:         InteractionModelRevision = 1
+          [1658485224.066407][28732:28737] CHIP:DMG: },
+          [1658485224.066441][28732:28737] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1658485224.066461][28732:28737] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1658485224.066484][28732:28737] CHIP:TOO:   ArmFailSafeResponse: {
+          [1658485224.066501][28732:28737] CHIP:TOO:     errorCode: 0
+          [1658485224.066508][28732:28737] CHIP:TOO:     debugText:
+          [1658485224.066516][28732:28737] CHIP:TOO:    }
+          [1658485224.066534][28732:28737] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "TH1 obtains or generates a new TrustedRootCertificate that is
+          different from the previously commissioned TrustedRootCertificate for
+          TH1. TH1 sends an AddTrustedRootCertificate command to the Node
+          Operational Credentials cluster to install this new certificate"
+      verification: |
+          ./chip-tool  operationalcredentials add-trusted-root-certificate  hex:1530010828c376ebc17f21512402013703271401000000cacacaca182604ef171b2726056eb5b94c3706271401000000cacacaca182407012408013009410452c19fd9d329a738fd65722a8309fa68bcaa9ffe87d8114b802c922e5066d0b2f0573b89b38bf98fc9c424ab8ffdabcb18d42e623d82a02d0ca0c062ccadb4bc370a350129011824026030041457934de5405e9a40eacb86ee647e583141ae78f430051457934de5405e9a40eacb86ee647e583141ae78f418300b40a0b0d57bddbc7bcf44480a8b7bd0231d54ccacd68d90efb67b7aa3206adbd268725092992a0388c8e934504178613c5b932d422eed7463f38fd82aaa429b574a18 1 0
+
+          On TH verify that DUT responds as success
+          [1658485618.508499][28884:28890] CHIP:DMG:
+          [1658485618.508513][28884:28890] CHIP:DMG:         InteractionModelRevision = 1
+          [1658485618.508525][28884:28890] CHIP:DMG: },
+          [1658485618.508577][28884:28890] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000B Status=0x0
+          [1658485618.508615][28884:28890] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658485618.508657][28884:28890] CHIP:EM: Sending Standalone Ack for MessageCounter:224164697 on exchange 53263i
+      disabled: true
+
+    - label:
+          "TH1 reads the TrustedRootCertificates attribute from the Node
+          Operational Credentials cluster"
+      verification: |
+          ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
+
+          On TH verify that  TH reads TrustedRootCertificates entries from DUT
+          [1658485696.739931][28920:28925] CHIP:DMG:         InteractionModelRevision = 1
+          [1658485696.739936][28920:28925] CHIP:DMG: }
+          [1658485696.740122][28920:28925] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687672
+          [1658485696.740163][28920:28925] CHIP:TOO:   TrustedRootCertificates: 3 entries
+          [1658485696.740187][28920:28925] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69370A3501290118240260300414A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF3300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40E878725378AEA74A5F6CB6267CB9F7ACD0DACF26741FB24356379D850DD5F23A746281C845FD76D89E97AB188E9BF8A98047B43E3E868A5A8B8E50BAE62F116F18
+          [1658485696.740206][28920:28925] CHIP:TOO:     [2]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941042B0716ED651EBABF1B37198D6722B01C40B61ADBA286FA0BAEC566068BB98B1B752264B4510716473E7CD6CBFE771733254B6489BF02AF1EF9C448EA88F17629370A3501290118240260300414386906595DA80026C699034E368C4BF528F581AE300514386906595DA80026C699034E368C4BF528F581AE18300B404BFA1D1897E64C216DC7003245C5FB781B168A7BF152A4114017AFB8A19CE8271E22612CFBFCDC74DDFFE41683CE644B7E8F7DBE36833D91B5B233D853E47F0018
+          [1658485696.740224][28920:28925] CHIP:TOO:     [3]: 1530010828C376EBC17F21512402013703271401000000CACACACA182604EF171B2726056EB5B94C3706271401000000CACACACA182407012408013009410452C19FD9D329A738FD65722A8309FA68BCAA9FFE87D8114B802C922E5066D0B2F0573B89B38BF98FC9C424AB8FFDABCB18D42E623D82A02D0CA0C062CCADB4BC370A350129011824026030041457934DE5405E9A40EACB86EE647E583141AE78F430051457934DE5405E9A40EACB86EE647E583141AE78F418300B40A0B0D57BDDBC7BCF44480A8B7BD0231D54CCACD68D90EFB67B7AA3206ADBD268725092992A0388C8E934504178613C5B932D422EED7463F38FD82AAA429B574A18
+          [1658485696.740262][28920:28925] CHIP:EM: Sending Standalone Ack for MessageCounter:212578370 on exchange 21268i
+      disabled: true
+
+    - label:
+          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
+          field set to maxFailsafe"
+      PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
+      verification: |
+          ./chip-tool generalcommissioning  arm-fail-safe   900 1 1 0
+          On TH verify that  TH reads ArmFailSafe command from DUT
+          [1658486181.080260][29218:29223] CHIP:DMG: },
+          [1658486181.080289][29218:29223] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1658486181.080319][29218:29223] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1658486181.080346][29218:29223] CHIP:TOO:   ArmFailSafeResponse: {
+          [1658486181.080356][29218:29223] CHIP:TOO:     errorCode: 0
+          [1658486181.080363][29218:29223] CHIP:TOO:     debugText:
+          [1658486181.080370][29218:29223] CHIP:TOO:    }
+          [1658486181.080386][29218:29223] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658486181.080408][29218:29223] CHIP:EM: Sending Standalone Ack for MessageCounter:68810716 on exchange 21458i
+      disabled: true
+
+    - label: "TH1 waits for PIXIT.CGEN.FailsafeExpiryLengthSeconds"
+      verification: |
+          The expiry length is mentioned in above step as 900 secs so wait till 900secs and proced for next step
+      disabled: true
+
+    - label:
+          "TH1 reads the TrustedRootCertificates attribute from the Node
+          Operational Credentials cluster"
+      verification: |
+          ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
+          On TH verify that  TH reads TrustedRootCertificates entries from DUT
+          [1658486366.493185][29315:29320] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687672
+          [1658486366.493236][29315:29320] CHIP:TOO:   TrustedRootCertificates: 2 entries
+          [1658486366.493266][29315:29320] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69370A3501290118240260300414A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF3300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40E878725378AEA74A5F6CB6267CB9F7ACD0DACF26741FB24356379D850DD5F23A746281C845FD76D89E97AB188E9BF8A98047B43E3E868A5A8B8E50BAE62F116F18
+          [1658486366.493298][29315:29320] CHIP:TOO:     [2]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941042B0716ED651EBABF1B37198D6722B01C40B61ADBA286FA0BAEC566068BB98B1B752264B4510716473E7CD6CBFE771733254B6489BF02AF1EF9C448EA88F17629370A3501290118240260300414386906595DA80026C699034E368C4BF528F581AE300514386906595DA80026C699034E368C4BF528F581AE18300B404BFA1D1897E64C216DC7003245C5FB781B168A7BF152A4114017AFB8A19CE8271E22612CFBFCDC74DDFFE41683CE644B7E8F7DBE36833D91B5B233D853E47F0018
+          [1658486366.493362][29315:29320] CHIP:EM: Sending Standalone Ack for MessageCounter:144174642 on exchange 45594i
+      disabled: true
+
+    - label:
+          "TH2 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
+          field set to PIXIT.CGEN.FailsafeExpiryLengthSeconds and the Breadcrumb
+          value as 1"
+      PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
+      verification: |
+          ./chip-tool generalcommissioning  arm-fail-safe   900 1 2 0
+          On TH verify that  TH reads ArmFailSafe command from DUT
+          [1658486289.473526][8200:8205] CHIP:DMG:         InteractionModelRevision = 1
+          [1658486289.473563][8200:8205] CHIP:DMG: },
+          [1658486289.473639][8200:8205] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1658486289.473697][8200:8205] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1658486289.473786][8200:8205] CHIP:TOO:   ArmFailSafeResponse: {
+          [1658486289.473824][8200:8205] CHIP:TOO:     errorCode: 4
+          [1658486289.473849][8200:8205] CHIP:TOO:     debugText:
+          [1658486289.473873][8200:8205] CHIP:TOO:    }
+          [1658486289.473911][8200:8205] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658486289.473967][8200:8205] CHIP:EM: Sending Standalone Ack for MessageCounter:175169144 on exchange 29496i
+      disabled: true
+
+    - label:
+          "TH1 sends ArmFailSafeCommand to the DUT with ExpiryLengthSeconds
+          field set to 0"
+      PICS: CGEN.S.C00.Rsp
+      verification: |
+          ./chip-tool generalcommissioning  arm-fail-safe 0 1 1 0
+          On TH verify that  TH reads ArmFailSafe command from DUT
+          [1658486510.232274][29388:29393] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1658486510.232302][29388:29393] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1658486510.232334][29388:29393] CHIP:TOO:   ArmFailSafeResponse: {
+          [1658486510.232357][29388:29393] CHIP:TOO:     errorCode: 0
+          [1658486510.232368][29388:29393] CHIP:TOO:     debugText:
+          [1658486510.232378][29388:29393] CHIP:TOO:    }
+          [1658486510.232402][29388:29393] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658486510.232433][29388:29393] CHIP:EM: Sending Standalone Ack for MessageCounter:262461791 on exchange 31822i
+      disabled: true
+
+    - label:
+          "TH1 sends ArmFailsafeCommand to the DUT with ExpiryLengthSeconds
+          field set to maxFailsafe"
+      PICS: CGEN.S.C00.Rsp
+      verification: |
+          ./chip-tool generalcommissioning  arm-fail-safe 900 1 1 0
+          On TH verify that  TH reads ArmFailSafe command from DUT
+          [1658486418.024554][29343:29348] CHIP:DMG:         InteractionModelRevision = 1
+          [1658486418.024559][29343:29348] CHIP:DMG: },
+          [1658486418.024588][29343:29348] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1658486418.024609][29343:29348] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1658486418.024658][29343:29348] CHIP:TOO:   ArmFailSafeResponse: {
+          [1658486418.024674][29343:29348] CHIP:TOO:     errorCode: 0
+          [1658486418.024682][29343:29348] CHIP:TOO:     debugText:
+          [1658486418.024687][29343:29348] CHIP:TOO:    }
+          [1658486418.024703][29343:29348] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658486418.024725][29343:29348] CHIP:EM: Sending Standalone Ack for MessageCounter:21602903 on exchange 9289i
+      disabled: true
+
+    - label: "TH1 saves the current wall time clock in seconds as Tstart"
+      verification: |
+          this can be calculated manually from the value obtained from the previous steps
+      disabled: true
+
+    - label:
+          "TH1 obtains or generates a new TrustedRootCertificate that is
+          different from the previously commissioned TrustedRootCertificate for
+          TH1. TH1 sends an AddTrustedRootCertificate command to the Node
+          Operational Credentials cluster to install this new certificate"
+      verification: |
+          To generate TrustedRootCertificate, need to buld chip-cert in connectedhomeip by giving below mentioned commands
+          1. gn gen --check out/debug
+          2. ninja -v -C out/debug chip-cert
+          Once build completes
+          3. cd out/debug
+          4.  ./chip-cert gen-cert --type r --subject-chip-id CACACACA00000001 --valid-from "2020-10-15 14:23:43" --lifetime 7305 --out-key Chip-Root-Key.txt --out Chip-Root-Cert.txt --out-format chip-hex
+          5. cat Chip-Root-Key.txt
+
+
+
+          ./chip-tool  operationalcredentials add-trusted-root-certificate
+          hex:1530010828c376ebc17f21512402013703271401000000cacacaca182604ef171b2726056eb5b94c3706271401000000cacacaca182407012408013009410452c19fd9d329a738fd65722a8309fa68bcaa9ffe87d8114b802c922e5066d0b2f0573b89b38bf98fc9c424ab8ffdabcb18d42e623d82a02d0ca0c062ccadb4bc370a350129011824026030041457934de5405e9a40eacb86ee647e583141ae78f430051457934de5405e9a40eacb86ee647e583141ae78f418300b40a0b0d57bddbc7bcf44480a8b7bd0231d54ccacd68d90efb67b7aa3206adbd268725092992a0388c8e934504178613c5b932d422eed7463f38fd82aaa429b574a18 1 0
+          On TH verify that DUT responds as success
+          [1658487558.547191][30203:30208] CHIP:DMG: },
+          [1658487558.547257][30203:30208] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000B Status=0x0
+          [1658487558.547300][30203:30208] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658487558.547346][30203:30208] CHIP:EM: Sending Standalone Ack for MessageCounter:96695002 on exchange 23114i
+      disabled: true
+
+    - label:
+          "TH1 reads the TrustedRootCertificates attribute from the Node
+          Operational Credentials cluster"
+      verification: |
+          ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
+          On TH verify that  TH reads TrustedRootCertificates entries from DUT
+
+          [1658487613.357548][30232:30237] CHIP:DMG: }
+          [1658487613.358000][30232:30237] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687672
+          [1658487613.358081][30232:30237] CHIP:TOO:   TrustedRootCertificates: 3 entries
+          [1658487613.358124][30232:30237] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69370A3501290118240260300414A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF3300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40E878725378AEA74A5F6CB6267CB9F7ACD0DACF26741FB24356379D850DD5F23A746281C845FD76D89E97AB188E9BF8A98047B43E3E868A5A8B8E50BAE62F116F18
+          [1658487613.358168][30232:30237] CHIP:TOO:     [2]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941042B0716ED651EBABF1B37198D6722B01C40B61ADBA286FA0BAEC566068BB98B1B752264B4510716473E7CD6CBFE771733254B6489BF02AF1EF9C448EA88F17629370A3501290118240260300414386906595DA80026C699034E368C4BF528F581AE300514386906595DA80026C699034E368C4BF528F581AE18300B404BFA1D1897E64C216DC7003245C5FB781B168A7BF152A4114017AFB8A19CE8271E22612CFBFCDC74DDFFE41683CE644B7E8F7DBE36833D91B5B233D853E47F0018
+          [1658487613.358245][30232:30237] CHIP:TOO:     [3]: 1530010828C376EBC17F21512402013703271401000000CACACACA182604EF171B2726056EB5B94C3706271401000000CACACACA182407012408013009410452C19FD9D329A738FD65722A8309FA68BCAA9FFE87D8114B802C922E5066D0B2F0573B89B38BF98FC9C424AB8FFDABCB18D42E623D82A02D0CA0C062CCADB4BC370A350129011824026030041457934DE5405E9A40EACB86EE647E583141AE78F430051457934DE5405E9A40EACB86EE647E583141AE78F418300B40A0B0D57BDDBC7BCF44480A8B7BD0231D54CCACD68D90EFB67B7AA3206ADBD268725092992A0388C8E934504178613C5B932D422EED7463F38FD82AAA429B574A18
+          [1658487613.358374][30232:30237] CHIP:EM: Sending Standalone Ack for MessageCounter:173225978 on exchange 1335i
+          [1658487613.358431][30232:30237] CHIP:IN: Prepared secure message 0x7f16a27faff0 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 1335i with MessageCounter:195893108.
+          [1658487613.358474][30232:30237] CHIP:IN: Sending encrypted msg 0x7f16a27faff0 with MessageCounter:195893108 to 0x0000000000000001 (1) at monotonic time: 000000000239CBD0 msec
+          [1658487613.358595][30232:30237] CHIP:EM: Flushed pending ack for MessageCounter:173225978 on exchange 1335i
+      disabled: true
+
+    - label:
+          "TH1 waits until the current wall time clock is Tstart + maxFailsafe/2"
+      verification: |
+          this can be calculated manually from the value obtained from the previous steps
+      disabled: true
+
+    - label:
+          "TH1 sends ArmFailsafeCommand to the DUT with ExpiryLengthSeconds
+          field set to maxFailsafe"
+      PICS: CGEN.S.C00.Rsp
+      verification: |
+          ./chip-tool generalcommissioning  arm-fail-safe   900 0 1  0
+          On TH verify that  TH reads ArmFailSafe command from DUT
+
+          [1658487663.593485][30268:30273] CHIP:DMG:         InteractionModelRevision = 1
+          [1658487663.593506][30268:30273] CHIP:DMG: },
+          [1658487663.593586][30268:30273] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1658487663.593643][30268:30273] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1658487663.593718][30268:30273] CHIP:TOO:   ArmFailSafeResponse: {
+          [1658487663.593763][30268:30273] CHIP:TOO:     errorCode: 0
+          [1658487663.593782][30268:30273] CHIP:TOO:     debugText:
+          [1658487663.593813][30268:30273] CHIP:TOO:    }
+          [1658487663.593868][30268:30273] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658487663.593929][30268:30273] CHIP:EM: Sending Standalone Ack for MessageCounter:208682984 on exchange 49973i
+      disabled: true
+
+    - label:
+          "TH1 waits until the current wall time clock is Tstart + maxFailsafe.
+          maxFailsafe is the maximum amount of time a failsafe can be armed for,
+          so the failsafe is required to time out at this point, despite having
+          been re-armed in step 42."
+      verification: |
+          this can be calculated manually from the value obtained from the previous steps
+      disabled: true
+
+    - label:
+          "TH1 reads the TrustedRootCertificates attribute from the Node
+          Operational Credentials cluster"
+      verification: |
+          ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
+          On TH verify that  TH reads TrustedRootCertificates entries from DUT
+          [1658489869.278413][31188:31193] CHIP:DMG: }
+          [1658489869.278997][31188:31193] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687672
+          [1658489869.279090][31188:31193] CHIP:TOO:   TrustedRootCertificates: 2 entries
+          [1658489869.279151][31188:31193] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69370A3501290118240260300414A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF3300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40E878725378AEA74A5F6CB6267CB9F7ACD0DACF26741FB24356379D850DD5F23A746281C845FD76D89E97AB188E9BF8A98047B43E3E868A5A8B8E50BAE62F116F18
+          [1658489869.279213][31188:31193] CHIP:TOO:     [2]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941042B0716ED651EBABF1B37198D6722B01C40B61ADBA286FA0BAEC566068BB98B1B752264B4510716473E7CD6CBFE771733254B6489BF02AF1EF9C448EA88F17629370A3501290118240260300414386906595DA80026C699034E368C4BF528F581AE300514386906595DA80026C699034E368C4BF528F581AE18300B404BFA1D1897E64C216DC7003245C5FB781B168A7BF152A4114017AFB8A19CE8271E22612CFBFCDC74DDFFE41683CE644B7E8F7DBE36833D91B5B233D853E47F0018
+          [1658489869.279343][31188:31193] CHIP:EM: Sending Standalone Ack for MessageCounter:134534814 on exchange 37320i
+          [1658489869.279418][31188:31193] CHIP:IN: Prepared secure message 0x7f0a13ffdff0 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 37320i with MessageCounter:267920734.
       disabled: true

@@ -23,16 +23,15 @@ config:
 tests:
     - label: "Check UpOrOpen command"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT sends UpOrOpen command to TH"
       PICS: WNCV.C.C00.Tx
       verification: |
-          On TestHarnes (all-cluster-app) a received up-or-open for WindowCovering looks like this
-
           ./chip-tool windowcovering up-or-open 1 1
-          Verify in TH all-clusters-app log
+
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
 
           [1657103322.822782][4661:4666] CHIP:DMG: InvokeResponseMessage =
           [1657103322.822822][4661:4666] CHIP:DMG: {
@@ -69,16 +68,16 @@ tests:
 
     - label: "Check DownOrClose command"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT sends DownOrClose command to TH"
       PICS: WNCV.C.C01.Tx
       verification: |
-          On TestHarnes (all-cluster-app) a received down-or-close for WindowCovering looks like this
           ./chip-tool windowcovering down-or-close 1 1
 
-          Verify in TH all-clusters-app log
+
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
 
           [1657103347.810523][4668:4673] CHIP:DMG: InvokeResponseMessage =
           [1657103347.810548][4668:4673] CHIP:DMG: {
@@ -114,18 +113,18 @@ tests:
       disabled: true
 
     - label: "Check StopMotion command"
+      PICS: ""
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT sends a StopMotion command to TH"
       PICS: WNCV.C.C02.Tx
       verification: |
-          On TestHarnes (all-cluster-app) a received stop-motion for WindowCovering looks like this
-
           ./chip-tool windowcovering stop-motion 1 1
 
-          Verify in TH all-clusters-app log
+
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
 
           [1657103367.961698][4676:4681] CHIP:DMG: InvokeResponseMessage =
           [1657103367.961722][4676:4681] CHIP:DMG: {

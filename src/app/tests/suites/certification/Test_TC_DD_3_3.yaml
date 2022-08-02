@@ -32,9 +32,11 @@ tests:
       verification: |
           ubuntu@ubuntu:~/may23_DUT/connectedhomeip/examples/tv-app/linux/out/tv-app$ sudo ./chip-tv-app
 
+          Verify in tv-app side
+
           CHIP:DL: Using wifi MAC for hostname
           CHIP:DIS: Advertise operational node DFC28FF9FE811EF2-FFFFFFEFFFFFFFFF
-          CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'.
+          CHIP:DIS: CHIP minimal mDNS configured as "Operational device".
           CHIP:DIS: Broadcasting mDns reply for query from
       disabled: true
 
@@ -44,9 +46,11 @@ tests:
       verification: |
           connectedhomeip/examples/tv-casting-app/linux/out/tv-casting-app$ sudo ./chip-tv-casting-app
 
+
+          Verify in tv-casting-app side
+
           CHIP:SVR: Discovered Commissioner #0
-          [1653478433.097515][3785:3785] CHIP:DIS:         Hostname: E45F010F19FF0000
-          [1653478433.097546][3785:3785] CHIP:DIS:         IP Address #1: fe80::d83a:21ff:fe24:b6d6
+          [1653478433.097515][3785:3785] CHIP:DIS:         Hostname: E45F010F19FF0000        [1653478433.097546][3785:3785] CHIP:DIS:         IP Address #1: fe80::d83a:21ff:fe24:b6d6
           [1653478433.097570][3785:3785] CHIP:DIS:         Port: 5540
           [1653478433.097593][3785:3785] CHIP:DIS:         Mrp Interval idle: 5000 ms
           [1653478433.097615][3785:3785] CHIP:DIS:         Mrp Interval active: 300 ms
@@ -59,8 +63,7 @@ tests:
           [1653478433.097775][3785:3785] CHIP:DIS:         Instance Name: C1E39719B158802A
           [1653478433.097797][3785:3785] CHIP:DIS:         Commissioning Mode: 0
           [1653478433.097821][3785:3785] CHIP:SVR: Discovered Commissioner #1
-          [1653478433.097841][3785:3785] CHIP:DIS:         Hostname: E45F010F27530000
-          [1653478433.097867][3785:3785] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2755
+          [1653478433.097841][3785:3785] CHIP:DIS:         Hostname: E45F010F27530000        [1653478433.097867][3785:3785] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2755
           [1653478433.097890][3785:3785] CHIP:DIS:         Port: 5650
           [1653478433.097912][3785:3785] CHIP:DIS:         Mrp Interval idle: 5000 ms
           [1653478433.097934][3785:3785] CHIP:DIS:         Mrp Interval active: 300 ms
@@ -78,27 +81,25 @@ tests:
           "DUT is instructed to start the commissioning procedure with the TH
           found at Step 3"
       verification: |
-          Out of scope for V1.0 - IDM functionality
-
-          https://github.com/project-chip/connectedhomeip/issues/11004
+          Out of scope for V1.0
       disabled: true
 
     - label: "TH verifies the Identification Declaration message"
       verification: |
-          Out of scope for V1.0 - IDM functionality
-
-          https://github.com/project-chip/connectedhomeip/issues/11004
+          Out of scope for V1.0
       disabled: true
 
     - label: "TH start the commissioning procedure with DUT"
       verification: |
           ./chip-tool pairing ethernet 1 20202021 3840   fe80::e65f:1ff:fe0f:2755  5640
 
+          Verify in TH log:
+
           [1653559159.021348][4240:4246] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           [1653559159.021432][4240:4246] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          [1653559159.021499][4240:4246] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
-          [1653559159.021554][4240:4246] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1653559159.021611][4240:4246] CHIP:CTL: Performing next commissioning step 'Cleanup'
-          [1653559159.021725][4240:4246] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1653559159.021499][4240:4246] CHIP:CTL: Successfully finished commissioning step "SendComplete"
+          [1653559159.021554][4240:4246] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1653559159.021611][4240:4246] CHIP:CTL: Performing next commissioning step "Cleanup"
+          [1653559159.021725][4240:4246] CHIP:CTL: Successfully finished commissioning step "Cleanup"
           [1653559159.021790][4240:4246] CHIP:TOO: Device commissioning completed with success
       disabled: true

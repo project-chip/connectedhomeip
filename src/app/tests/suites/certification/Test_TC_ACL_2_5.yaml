@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 129.2.5. [TC-ACL-2.5] AccessControlExtensionChanged event
+name: 132.2.5. [TC-ACL-2.5] AccessControlExtensionChanged event
 
 config:
     nodeId: 0x12344321
@@ -23,7 +23,7 @@ config:
 tests:
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
@@ -80,10 +80,10 @@ tests:
     - label:
           "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
           value is list of AccessControlExtensionStruct containing 1 element
-          struct Data field: D_OK_EMPTY"
+          1.struct Data field: D_OK_EMPTY : 1718"
       PICS: ACL.S.E01
       verification: |
-          ./chip-tool   accesscontrol  write extension '[{"data":"1718"}]' 1 0
+          ./chip-tool   accesscontrol  write extension "[{"data":"1718"}]" 1 0
           Verify in TH log:
 
           217.510779][2371:2376] CHIP:DMG:                        AttributePathIB =
@@ -157,10 +157,11 @@ tests:
     - label:
           "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
           value is list of AccessControlExtensionStruct containing 1 element
-          struct Data field: D_OK_SINGLE"
+          1.struct Data field: D_OK_SINGLE
+          17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
       PICS: ACL.S.E01
       verification: |
-          ./chip-tool   accesscontrol  write extension '[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]' 1 0
+          ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
           On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element
           7284747.131523][2411:2416] CHIP:DMG:                        StatusIB =
           [1657284747.131568][2411:2416] CHIP:DMG:                        {
@@ -201,6 +202,8 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
+          On TH , Verify DUT  Responds  Successfully to extension attribute with a value is list of AccessControlExtensionChanged containing at least 2 new elements
+
 
           [1657618237.140162][9007:9012] CHIP:DMG: }
           [1657618237.140415][9007:9012] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
@@ -250,10 +253,13 @@ tests:
     - label:
           "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
           value is list of AccessControlExtensionStruct containing 1 element
-          struct Data field: D_BAD_LENGTH"
+          1.struct Data field: D_BAD_LENGTH
+          17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"
       PICS: ACL.S.E01
       verification: |
-          ./chip-tool   accesscontrol  write extension '[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"}]' 1 0
+          ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"}]" 1 0
+
+          On TH , Verify DUT  Responds  Successfully to extension attribute .
 
           1657287642.551842][9699:9704] CHIP:DMG: WriteResponseMessage =
           [1657287642.551872][9699:9704] CHIP:DMG: {
@@ -372,12 +378,14 @@ tests:
 
     - label:
           "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
-          value is list of AccessControlExtensionStruct containing 2 elements
-          struct Data field: D_OK_EMPTY struct Data field: D_OK_SINGLE"
+          value is list of AccessControlExtensionStruct containing 2 elements 1.
+          struct Data field: D_OK_EMPTY :1718 2.struct Data field: D_OK_SINGLE
+          :17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
       PICS: ACL.S.E01
       verification: |
-          ./chip-tool   accesscontrol  write extension '[{"data":"1718"},{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]' 1 0
+          ./chip-tool   accesscontrol  write extension "[{"data":"1718"},{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
 
+          On TH , Verify DUT  Responds  Successfully to extension attribute
 
 
           1657289068.797364][9823:9828] CHIP:DMG: WriteResponseMessage =
@@ -558,7 +566,7 @@ tests:
           value is an empty list"
       PICS: ACL.S.E01
       verification: |
-          ./chip-tool accesscontrol write extension '[]' 1 0
+          ./chip-tool accesscontrol write extension "[]" 1 0
           On TH , Verify DUT  Responds  Successfully
 
           7625][1521:1526] CHIP:DMG:                AttributeStatusIB =

@@ -503,6 +503,12 @@ function getManualTests() {
         "Test_TC_ULABEL_3_1",
     ];
 
+    const BridgedDeviceBasicInformation = [
+        "Test_TC_BRBINFO_1_1",
+        "Test_TC_BRBINFO_2_1",
+        "Test_TC_BRBINFO_2_2",
+        "Test_TC_BRBINFO_2_3",
+    ];
 
     const tests = [
         DeviceDiscovery,
@@ -553,6 +559,7 @@ function getManualTests() {
         PumpConfigurationControl,
         AccessControl,
         UserLabel,
+        BridgedDeviceBasicInformation,
     ].flat(1);
 
     tests.disable = disable.bind(tests);

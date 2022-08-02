@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 18.1.6. [TC-DA-1.6] NOCSR Procedure Validation [DUT - Commissioner]
+name: 4.1.6. [TC-DA-1.6] NOCSR Procedure Validation [DUT - Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -26,14 +26,14 @@ tests:
           certificates are obtained and validated against externally obtained
           PAA certificate 3. Operations happen within the Fail-Safe Context"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT completes the attestation procedure"
       verification: |
           DUT as commissioner side:
 
-          [1655374218.114327][35023:35028] CHIP:CTL: Performing next commissioning step 'SendAttestationRequest'
+          [1655374218.114327][35023:35028] CHIP:CTL: Performing next commissioning step "SendAttestationRequest"
           [1655374218.114378][35023:35028] CHIP:CTL: Sending Attestation Request to the device.
           [1655374218.114556][35023:35028] CHIP:CTL: Sending Attestation request to 0xffff74000b60 device
           [1655374218.114675][35023:35028] CHIP:DMG: ICR moving to [AddingComm]
@@ -268,31 +268,45 @@ tests:
           [1655374218.462118][35023:35028] CHIP:DMG: },
           [1655374218.462220][35023:35028] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
           [1655374218.462275][35023:35028] CHIP:CTL: Received Attestation Information from the device
-          [1655374218.462320][35023:35028] CHIP:CTL: Successfully finished commissioning step 'SendAttestationRequest'
+          [1655374218.462320][35023:35028] CHIP:CTL: Successfully finished commissioning step "SendAttestationRequest"
       disabled: true
 
     - label:
           "DUT generates 32-byte CSRNonce and is sent to TH1 through CSRRequest
           Command"
       verification: |
-          DUT as commissioner side:
+          Send the below command 2 times to create CSR NONCE value  in TH
 
-          [1655374218.694869][35023:35028] CHIP:DMG: NOCSR Elements =
-          [1655374218.694922][35023:35028] CHIP:DMG: {
-          [1655374218.695009][35023:35028] CHIP:DMG:     CSR (203) = 3081C83070020100300E310C300A060355040A0C034353523059301306072A8648CE3D020106082A8648CE3D03010703420004FD1662E0C1F44C5BD8A284452ED17C631CA88697CBF396EB765397315ED248729BFC7DE464404B1FA34B2DD81714E2484B8E908121BB95DFDA4493D5CDDA797AA000300A06082A8648CE3D0403020348003045022100832718B8679DB2C9A26579F08D930F7DA747F6F23EE2DD11777FBF1191909FD3022073E039F63AEA4C1BF812AE65221CB09203FF1BD382872FB37478C2C4045FD8B8
-          [1655374218.695086][35023:35028] CHIP:DMG:     CSRNonce (32) = 79964F34E68A97E41DBDFE7888583183535EDC3A185AF99941BDA4C5A65FDA39
-          [1655374218.695133][35023:35028] CHIP:DMG: }
+          echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom)
+          The generated CSRNONCE value is hex:F707BFC795117AAD94D5D95586B3B33984B475E00FFB5950BA21736FFB0FAFDE
+
+          ./chip-tool generalcommissioning arm-fail-safe 500 900 1 0
+
+          Verify ArmFailSafeResponse in TH log :
+          [1657546015.217932][18649:18654] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1657546015.217979][18649:18654] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1657546015.218043][18649:18654] CHIP:TOO:   ArmFailSafeResponse: {
+          [1657546015.218111][18649:18654] CHIP:TOO:     errorCode: 0
+          [1657546015.218136][18649:18654] CHIP:TOO:     debugText:
+          [1657546015.218158][18649:18654] CHIP:TOO:    }
 
 
-          "./chip-tool operationalcredentials csrrequest 79964F34E68A97E41DBDFE7888583183535EDC3A185AF99941BDA4C5A65FDA39 1 0
-          "
+          ./chip-tool operationalcredentials csrrequest hex:F707BFC795117AAD94D5D95586B3B33984B475E00FFB5950BA21736FFB0FAFDE 1 0 --IsForUpdateNOC true
+
+          Verify CSRResponse in TH log:
+          [1657546020.124932][18656:18661] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0005
+          [1657546020.124991][18656:18661] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0005
+          [1657546020.125052][18656:18661] CHIP:TOO:   CSRResponse: {
+          [1657546020.125106][18656:18661] CHIP:TOO:     NOCSRElements: 153001CA3081C73070020100300E310C300A060355040A0C034353523059301306072A8648CE3D020106082A8648CE3D03010703420004E9431F76E8D3B083EE08460ED0D5892DEACF1E88A2C76A9F734D10BAD5369BD20B8A33674711FD1DD7F5FA097330EC7BE42700B7EF037F0507BA8DE769C760B9A000300A06082A8648CE3D040302034700304402204A7F88FB88EC7CFE9091DF0500AF53F58D15E4283B8C7851C7CFE6138F33688102201CE8800872A85B69E2E9F19674F68BB2C5FCED56922CB159B56A62445163BD6C30022017B9FC123976D542DD6114F0CBE993E2922864A85925E0B848AED4F9D0B3E60E18
+          [1657546020.125151][18656:18661] CHIP:TOO:     attestationSignature: 983F2686F7FEFD2DE6238980A1F2DB061C6648BE7BCD6BF410E01B759F33393705C066A1635EDAEFFC1D6D209E51CB506FD1E70DE94709845C0F3AD915D8BFAD
+          [1657546020.125184][18656:18661] CHIP:TOO:    }
       disabled: true
 
     - label:
           "TH1 generates Invalid NOCSR Information and sends the CSRResponse
           Command. Refer Steps 6.1 to 6.8"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "Factory Reset DUT so that it is commissionable again"
@@ -311,32 +325,27 @@ tests:
           "Repeat Step1 to Step 4 multiple times. For each time in Step 3 TH1
           generates the following error:"
       verification: |
-
-      disabled: true
-
-    - label: "CSR is not of the type OCTET string"
-      verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "CSRNonce is OCTET string of length > 32"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
           "CSRNonce value does not match the value CSR Nonce field in the
           corresponding CSRRequest Command"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "NOCSRElement size is greater than RESP_MAX"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "AttestationSignature is not an octet string"
       verification: |
-
+          verification step to be updated.
       disabled: true
