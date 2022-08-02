@@ -15,14 +15,15 @@
  *    limitations under the License.
  */
 
-function disable(testName) {
-    const index = this.indexOf(testName);
-    if (index == -1) {
-        const errStr = `Test ${testName}  does not exists.`;
-        throw new Error(errStr);
-    }
+function disable(testName)
+{
+  const index = this.indexOf(testName);
+  if (index == -1) {
+    const errStr = `Test ${testName}  does not exists.`;
+    throw new Error(errStr);
+  }
 
-    this.splice(index, 1);
+  this.splice(index, 1);
 }
 
 // clang-format off
@@ -108,7 +109,6 @@ function getManualTests() {
     ];
 
     const DeviceManagement = [
-        "Test_TC_BINFO_1_1",
         "Test_TC_OPCREDS_1_2",
         "Test_TC_CNET_1_3",
         "Test_TC_BINFO_2_2",
@@ -603,6 +603,7 @@ function getTests() {
     ];
 
     const DeviceManagement = [
+        "Test_TC_BINFO_1_1",
         "Test_TC_BINFO_2_1",
     ];
 
@@ -934,5 +935,5 @@ function getTests() {
 //
 // Module exports
 //
-exports.getTests = getTests;
+exports.getTests       = getTests;
 exports.getManualTests = getManualTests;
