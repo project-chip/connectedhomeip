@@ -95,7 +95,7 @@ protected:
 
     chip::Optional<char *> mPICSFilePath;
     chip::Optional<uint16_t> mTimeout;
-    std::map<std::string, std::unique_ptr<chip::OperationalDeviceProxy> > mDevices;
+    std::map<std::string, std::unique_ptr<chip::OperationalDeviceProxy>> mDevices;
 
     // When set to false, prevents interaction model events from affecting the current test status.
     // This flag exists because if an error happens while processing a response the allocated
