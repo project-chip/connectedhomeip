@@ -614,10 +614,29 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
  * @param plaintext Buffer to write plaintext into
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
                            const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext);
+
+/**
+ * @brief A function that implements AES-CCM decryption
+ *
+ * This implements the AES-CTR-Encrypt/Decrypt() cryptographic primitives per sections
+ * 3.7.1 and 3.7.2 of the specification. For an empty ciphertext, the user of the API
+ * can provide an empty string, or a nullptr, and provide ciphertext_length as 0.
+ * The output buffer, plaintext can also be an empty string, or a nullptr for this case.
+ *
+ * @param input Input text to encrypt/decrypt
+ * @param input_length Length of ciphertext
+ * @param key Decryption key
+ * @param key_length Length of Decryption key (in bytes)
+ * @param nonce Encryption nonce
+ * @param nonce_length Length of encryption nonce
+ * @param output Buffer to write output into
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
+                         size_t nonce_length, uint8_t * output);
 
 /**
  * @brief Generate a PKCS#10 CSR, usable for Matter, from a P256Keypair.
