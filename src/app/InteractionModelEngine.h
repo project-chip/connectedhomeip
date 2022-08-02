@@ -367,13 +367,10 @@ private:
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
     /**
-     * Called when Interaction Model receives a Command Request message.  Errors processing
-     * the Command Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
-     * expected to set it to success if it does not want an automatic status response message to be sent.
+     * Called when Interaction Model receives a Command Request message.
      */
-    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                      System::PacketBufferHandle && aPayload, bool aIsTimedInvoke,
-                                      Protocols::InteractionModel::Status & aStatus);
+    Status OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                  System::PacketBufferHandle && aPayload, bool aIsTimedInvoke);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
