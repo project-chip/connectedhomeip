@@ -43,7 +43,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "TH reads the FeatureMap from DUT"
       verification: |
