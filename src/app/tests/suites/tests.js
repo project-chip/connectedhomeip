@@ -15,15 +15,14 @@
  *    limitations under the License.
  */
 
-function disable(testName)
-{
-  const index = this.indexOf(testName);
-  if (index == -1) {
-    const errStr = `Test ${testName}  does not exists.`;
-    throw new Error(errStr);
-  }
+function disable(testName) {
+    const index = this.indexOf(testName);
+    if (index == -1) {
+        const errStr = `Test ${testName}  does not exists.`;
+        throw new Error(errStr);
+    }
 
-  this.splice(index, 1);
+    this.splice(index, 1);
 }
 
 // clang-format off
@@ -123,8 +122,7 @@ function getManualTests() {
         "Test_TC_CNET_4_4",
         "Test_TC_CNET_4_5",
         "Test_TC_CNET_4_6",
-        "Test_TC_CNET_4_7",
-        "Test_TC_CNET_4_8",
+
         "Test_TC_CNET_4_9",
         "Test_TC_CNET_4_10",
         "Test_TC_CNET_4_11",
@@ -161,7 +159,6 @@ function getManualTests() {
 
     const GeneralCommissioning = [
         "Test_TC_CGEN_2_2",
-        "Test_TC_CGEN_2_3",
         "Test_TC_CGEN_2_4",
     ];
 
@@ -935,5 +932,5 @@ function getTests() {
 //
 // Module exports
 //
-exports.getTests       = getTests;
+exports.getTests = getTests;
 exports.getManualTests = getManualTests;
