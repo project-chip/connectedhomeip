@@ -33,8 +33,8 @@
 
 extern "C" {
 #include <bl602_hal/hal_sys.h>
-#include <easyflash.h>
 #include <bl_efuse.h>
+#include <easyflash.h>
 }
 
 namespace chip {

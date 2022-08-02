@@ -55,10 +55,7 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
-    System::Clock::Timestamp GetStartTime()
-    {
-        return mStartTime;
-    }
+    System::Clock::Timestamp GetStartTime() { return mStartTime; }
     /* none so far */
 
 private:

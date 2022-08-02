@@ -75,63 +75,63 @@ static void WifiStaDisconect(void)
 
     switch (reason)
     {
-        case WLAN_FW_TX_ASSOC_FRAME_ALLOCATE_FAIILURE:
-        case WLAN_FW_ASSOCIATE_FAIILURE:
-        case WLAN_FW_4WAY_HANDSHAKE_ERROR_PSK_TIMEOUT_FAILURE:
-            associationFailureCause =
-                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAssociationFailed);
-            if (delegate)
-            {
-                delegate->OnAssociationFailureDetected(associationFailureCause, reason);
-            }
-            break;
-        case WLAN_FW_TX_AUTH_FRAME_ALLOCATE_FAIILURE:
-        case WLAN_FW_AUTHENTICATION_FAIILURE:
-        case WLAN_FW_AUTH_ALGO_FAIILURE:
-        case WLAN_FW_DEAUTH_BY_AP_WHEN_NOT_CONNECTION:
-        case WLAN_FW_DEAUTH_BY_AP_WHEN_CONNECTION:
-        case WLAN_FW_4WAY_HANDSHAKE_TX_DEAUTH_FRAME_TRANSMIT_FAILURE:
-        case WLAN_FW_4WAY_HANDSHAKE_TX_DEAUTH_FRAME_ALLOCATE_FAIILURE:
-        case WLAN_FW_AUTH_OR_ASSOC_RESPONSE_TIMEOUT_FAILURE:
-        case WLAN_FW_DISCONNECT_BY_USER_WITH_DEAUTH:
-        case WLAN_FW_DISCONNECT_BY_USER_NO_DEAUTH:
-            associationFailureCause =
-                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAuthenticationFailed);
-            if (delegate)
-            {
-                delegate->OnAssociationFailureDetected(associationFailureCause, reason);
-            }
-            break;
-        case WLAN_FW_SCAN_NO_BSSID_AND_CHANNEL:
-            associationFailureCause =
-                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kSsidNotFound);
-            if (delegate)
-            {
-                delegate->OnAssociationFailureDetected(associationFailureCause, reason);
-            }
-            break;
-        case WLAN_FW_BEACON_LOSS:
-        case WLAN_FW_JOIN_NETWORK_SECURITY_NOMATCH:
-        case WLAN_FW_JOIN_NETWORK_WEPLEN_ERROR:
-        case WLAN_FW_DISCONNECT_BY_FW_PS_TX_NULLFRAME_FAILURE:
-        case WLAN_FW_CREATE_CHANNEL_CTX_FAILURE_WHEN_JOIN_NETWORK:
-        case WLAN_FW_ADD_STA_FAILURE:
-        case WLAN_FW_JOIN_NETWORK_FAILURE:
-            break;
+    case WLAN_FW_TX_ASSOC_FRAME_ALLOCATE_FAIILURE:
+    case WLAN_FW_ASSOCIATE_FAIILURE:
+    case WLAN_FW_4WAY_HANDSHAKE_ERROR_PSK_TIMEOUT_FAILURE:
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAssociationFailed);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
+    case WLAN_FW_TX_AUTH_FRAME_ALLOCATE_FAIILURE:
+    case WLAN_FW_AUTHENTICATION_FAIILURE:
+    case WLAN_FW_AUTH_ALGO_FAIILURE:
+    case WLAN_FW_DEAUTH_BY_AP_WHEN_NOT_CONNECTION:
+    case WLAN_FW_DEAUTH_BY_AP_WHEN_CONNECTION:
+    case WLAN_FW_4WAY_HANDSHAKE_TX_DEAUTH_FRAME_TRANSMIT_FAILURE:
+    case WLAN_FW_4WAY_HANDSHAKE_TX_DEAUTH_FRAME_ALLOCATE_FAIILURE:
+    case WLAN_FW_AUTH_OR_ASSOC_RESPONSE_TIMEOUT_FAILURE:
+    case WLAN_FW_DISCONNECT_BY_USER_WITH_DEAUTH:
+    case WLAN_FW_DISCONNECT_BY_USER_NO_DEAUTH:
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAuthenticationFailed);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
+    case WLAN_FW_SCAN_NO_BSSID_AND_CHANNEL:
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kSsidNotFound);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
+    case WLAN_FW_BEACON_LOSS:
+    case WLAN_FW_JOIN_NETWORK_SECURITY_NOMATCH:
+    case WLAN_FW_JOIN_NETWORK_WEPLEN_ERROR:
+    case WLAN_FW_DISCONNECT_BY_FW_PS_TX_NULLFRAME_FAILURE:
+    case WLAN_FW_CREATE_CHANNEL_CTX_FAILURE_WHEN_JOIN_NETWORK:
+    case WLAN_FW_ADD_STA_FAILURE:
+    case WLAN_FW_JOIN_NETWORK_FAILURE:
+        break;
 
-        default:
-            if (delegate)
-            {
-                delegate->OnAssociationFailureDetected(associationFailureCause, reason);
-            }
-            break;
+    default:
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
     }
 
     if (delegate)
     {
         delegate->OnDisconnectionDetected(reason);
         delegate->OnConnectionStatusChanged(
-                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kNotConnected));
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kNotConnected));
     }
 
     NetworkCommissioning::BLWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
@@ -150,7 +150,7 @@ static void WifiStaConnected(void)
 
     memset(ap_ssid, 0, sizeof(ap_ssid));
     wifi_mgmr_sta_ssid_get(ap_ssid);
-    wifi_mgmr_ap_item_t *ap_info = mgmr_get_ap_info_handle();
+    wifi_mgmr_ap_item_t * ap_info = mgmr_get_ap_info_handle();
     wifi_mgmr_get_scan_result_filter(ap_info, ap_ssid);
     ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManagerImpl::kWiFiStationState_Connected);
     ConnectivityMgrImpl().WifiStationStateChange();
@@ -158,7 +158,7 @@ static void WifiStaConnected(void)
     if (delegate)
     {
         delegate->OnConnectionStatusChanged(
-                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kConnected));
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kConnected));
     }
 }
 

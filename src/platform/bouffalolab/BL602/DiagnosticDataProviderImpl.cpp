@@ -30,10 +30,10 @@
 
 extern "C" {
 #include <bl602_hal/bl_sys.h>
-#include <bl_main.h>
-#include <wifi_mgmr_ext.h>
 #include <bl_efuse.h>
+#include <bl_main.h>
 #include <wifi_mgmr.h>
+#include <wifi_mgmr_ext.h>
 }
 
 extern uint8_t _heap_size;
@@ -214,7 +214,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityTyp
 {
     int authmode;
 
-    authmode = mgmr_get_security_type();
+    authmode     = mgmr_get_security_type();
     securityType = MapAuthModeToSecurityType(authmode);
     return CHIP_NO_ERROR;
 }
