@@ -849,11 +849,47 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating infineon-p6-all-clusters-minimal
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-all-clusters-minimal
 
+# Generating infineon-p6-all-clusters-minimal-ota
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/p6 '--args=p6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true' {out}/infineon-p6-all-clusters-minimal-ota
+
+# Generating infineon-p6-all-clusters-minimal-ota-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/p6 '--args=p6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true build_update_image=true' {out}/infineon-p6-all-clusters-minimal-ota-updateimage
+
+# Generating infineon-p6-all-clusters-minimal-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/p6 '--args=p6_board="CY8CKIT-062S2-43012" build_update_image=true' {out}/infineon-p6-all-clusters-minimal-updateimage
+
+# Generating infineon-p6-all-clusters-ota
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/p6 '--args=p6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true' {out}/infineon-p6-all-clusters-ota
+
+# Generating infineon-p6-all-clusters-ota-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/p6 '--args=p6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true build_update_image=true' {out}/infineon-p6-all-clusters-ota-updateimage
+
+# Generating infineon-p6-all-clusters-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/p6 '--args=p6_board="CY8CKIT-062S2-43012" build_update_image=true' {out}/infineon-p6-all-clusters-updateimage
+
 # Generating infineon-p6-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-light
 
+# Generating infineon-p6-light-ota
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/p6 '--args=p6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true' {out}/infineon-p6-light-ota
+
+# Generating infineon-p6-light-ota-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/p6 '--args=p6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true build_update_image=true' {out}/infineon-p6-light-ota-updateimage
+
+# Generating infineon-p6-light-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/p6 '--args=p6_board="CY8CKIT-062S2-43012" build_update_image=true' {out}/infineon-p6-light-updateimage
+
 # Generating infineon-p6-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
+
+# Generating infineon-p6-lock-ota
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true' {out}/infineon-p6-lock-ota
+
+# Generating infineon-p6-lock-ota-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true build_update_image=true' {out}/infineon-p6-lock-ota-updateimage
+
+# Generating infineon-p6-lock-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012" build_update_image=true' {out}/infineon-p6-lock-updateimage
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
@@ -2073,11 +2109,47 @@ ninja -C {out}/infineon-p6-all-clusters
 # Building infineon-p6-all-clusters-minimal
 ninja -C {out}/infineon-p6-all-clusters-minimal
 
+# Building infineon-p6-all-clusters-minimal-ota
+ninja -C {out}/infineon-p6-all-clusters-minimal-ota
+
+# Building infineon-p6-all-clusters-minimal-ota-updateimage
+ninja -C {out}/infineon-p6-all-clusters-minimal-ota-updateimage
+
+# Building infineon-p6-all-clusters-minimal-updateimage
+ninja -C {out}/infineon-p6-all-clusters-minimal-updateimage
+
+# Building infineon-p6-all-clusters-ota
+ninja -C {out}/infineon-p6-all-clusters-ota
+
+# Building infineon-p6-all-clusters-ota-updateimage
+ninja -C {out}/infineon-p6-all-clusters-ota-updateimage
+
+# Building infineon-p6-all-clusters-updateimage
+ninja -C {out}/infineon-p6-all-clusters-updateimage
+
 # Building infineon-p6-light
 ninja -C {out}/infineon-p6-light
 
+# Building infineon-p6-light-ota
+ninja -C {out}/infineon-p6-light-ota
+
+# Building infineon-p6-light-ota-updateimage
+ninja -C {out}/infineon-p6-light-ota-updateimage
+
+# Building infineon-p6-light-updateimage
+ninja -C {out}/infineon-p6-light-updateimage
+
 # Building infineon-p6-lock
 ninja -C {out}/infineon-p6-lock
+
+# Building infineon-p6-lock-ota
+ninja -C {out}/infineon-p6-lock-ota
+
+# Building infineon-p6-lock-ota-updateimage
+ninja -C {out}/infineon-p6-lock-ota-updateimage
+
+# Building infineon-p6-lock-updateimage
+ninja -C {out}/infineon-p6-lock-updateimage
 
 # Building k32w-light-ota-se
 ninja -C {out}/k32w-light-ota-se

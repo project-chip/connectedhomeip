@@ -60,6 +60,9 @@ class InfineonApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
+    def BuildRoot(self, root):
+        return os.path.join(root, 'examples', self.ExampleName(), 'p6')
+
 
 class InfineonBoard(Enum):
     P6BOARD = 1
@@ -75,16 +78,23 @@ class InfineonBuilder(GnBuilder):
                  root,
                  runner,
                  app: InfineonApp = InfineonApp.LOCK,
-                 board: InfineonBoard = InfineonBoard.P6BOARD):
+                 board: InfineonBoard = InfineonBoard.P6BOARD,
+                 enable_ota_requestor: bool = False,
+                 update_image: bool = False):
         super(InfineonBuilder, self).__init__(
-            root=os.path.join(root, 'examples', app.ExampleName(), 'p6'),
+            root=app.BuildRoot(root),
             runner=runner)
 
         self.app = app
-        self.board = board
+        self.extra_gn_options = ['p6_board="%s"' % board.GnArgName()]
+
+        if enable_ota_requestor:
+            self.extra_gn_options.append('chip_enable_ota_requestor=true')
+        if update_image:
+            self.extra_gn_options.append('build_update_image=true')
 
     def GnBuildArgs(self):
-        return ['p6_board="%s"' % self.board.GnArgName()]
+        return self.extra_gn_options
 
     def build_outputs(self):
         items = {

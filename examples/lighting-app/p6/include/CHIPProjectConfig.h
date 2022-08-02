@@ -47,7 +47,22 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 #endif
 
-// define Device type based on the application
+/* The ProductID attribute of the Basic cluster. */
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
+
+/* The ProductName attribute of the Basic cluster. */
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "P6-CYW43012 Light"
+
+/* The HardwareVersionString attribute of the Basic cluster. */
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING "P6-43012"
+
+/* The HardwareVersion attribute of the Basic cluster. */
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION 43012
+
+/* The SoftwareVersion attribute of the Basic cluster. */
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 1
+
+/* define Device type based on the application */
 #define CHIP_DEVICE_CONFIG_DEVICE_TYPE 257 // 0x0101  Dimmable Bulb
 
 // For convenience, Chip Security Test Mode can be enabled and the
@@ -76,7 +91,7 @@
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.0"
 #endif
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
