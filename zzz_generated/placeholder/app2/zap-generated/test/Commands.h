@@ -23,18 +23,21 @@
 
 #include <lib/support/CHIPListUtils.h>
 
-class Test_TC_BINFO_2_3_SimulatedSuite : public TestCommand
+class Test_TC_BINFO_2_3_SimulatedSuite: public TestCommand
 {
 public:
-    Test_TC_BINFO_2_3_SimulatedSuite() : TestCommand("Test_TC_BINFO_2_3_Simulated", 21)
+    Test_TC_BINFO_2_3_SimulatedSuite(): TestCommand("Test_TC_BINFO_2_3_Simulated", 21)
     {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+          AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+          AddArgument("cluster", &mCluster);
+          AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+          AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_BINFO_2_3_SimulatedSuite() {}
+    ~Test_TC_BINFO_2_3_SimulatedSuite()
+    {
+            }
+
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
@@ -42,7 +45,11 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint)
+    {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -55,13 +62,11 @@ private:
         switch (mTestIndex - 1)
         {
         case 0:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
+                VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+shouldContinue = true;            break;
         case 1:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
+                VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+shouldContinue = true;            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -79,110 +84,132 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the device to be commissioned");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
-            return WaitForCommissioning(kIdentityAlpha, value);
+                ListFreer listFreer;
+                chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+                return WaitForCommissioning(kIdentityAlpha, value
+            );
         }
         case 1: {
             LogStep(1, "Log OnOff Test Startup");
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message = chip::Span<const char>("*** Basic Cluster Tests Readygarbage: not in length on purpose", 29);
-            return Log(kIdentityAlpha, value);
+                ListFreer listFreer;
+                chip::app::Clusters::LogCommands::Commands::Log::Type value;
+                        value.message =        chip::Span<const char>("*** Basic Cluster Tests Readygarbage: not in length on purpose", 29);
+    return Log(kIdentityAlpha, value
+            );
         }
         case 2: {
             LogStep(2, "Query Data Model Revision");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::DataModelRevision::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::DataModelRevision::Id
+            );
         }
         case 3: {
             LogStep(3, "Query Vendor Name");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::VendorName::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::VendorName::Id
+            );
         }
         case 4: {
             LogStep(4, "Query VendorID");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::VendorID::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::VendorID::Id
+            );
         }
         case 5: {
             LogStep(5, "Query Product Name");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::ProductName::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::ProductName::Id
+            );
         }
         case 6: {
             LogStep(6, "Query ProductID");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::ProductID::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::ProductID::Id
+            );
         }
         case 7: {
             LogStep(7, "Query Node Label");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id
+            );
         }
         case 8: {
             LogStep(8, "Query User Location");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::Location::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::Location::Id
+            );
         }
         case 9: {
             LogStep(9, "Query HardwareVersion");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::HardwareVersion::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::HardwareVersion::Id
+            );
         }
         case 10: {
             LogStep(10, "Query HardwareVersionString");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::HardwareVersionString::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::HardwareVersionString::Id
+            );
         }
         case 11: {
             LogStep(11, "Query SoftwareVersion");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersion::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersion::Id
+            );
         }
         case 12: {
             LogStep(12, "Query SoftwareVersionString");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersionString::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersionString::Id
+            );
         }
         case 13: {
             LogStep(13, "Query ManufacturingDate");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::ManufacturingDate::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::ManufacturingDate::Id
+            );
         }
         case 14: {
             LogStep(14, "Query PartNumber");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::PartNumber::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::PartNumber::Id
+            );
         }
         case 15: {
             LogStep(15, "Query ProductURL");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::ProductURL::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::ProductURL::Id
+            );
         }
         case 16: {
             LogStep(16, "Query ProductLabel");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::ProductLabel::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::ProductLabel::Id
+            );
         }
         case 17: {
             LogStep(17, "Query SerialNumber");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::SerialNumber::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::SerialNumber::Id
+            );
         }
         case 18: {
             LogStep(18, "Query LocalConfigDisabled");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::LocalConfigDisabled::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::LocalConfigDisabled::Id
+            );
         }
         case 19: {
             LogStep(19, "Query Reachable");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::Reachable::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::Reachable::Id
+            );
         }
         case 20: {
             LogStep(20, "Query UniqueID");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::UniqueID::Id);
+                return WaitAttribute(                   GetEndpoint(0), Basic::Id, Basic::Attributes::UniqueID::Id
+            );
         }
         }
         return CHIP_NO_ERROR;
     }
 };
 
-std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
-{
-    if (testName == "Test_TC_BINFO_2_3_Simulated")
-    {
-        return std::unique_ptr<Test_TC_BINFO_2_3_SimulatedSuite>(new Test_TC_BINFO_2_3_SimulatedSuite());
-    }
 
-    return nullptr;
+std::unique_ptr<TestCommand>GetTestCommand(std::string testName)
+{
+  if (testName == "Test_TC_BINFO_2_3_Simulated")
+  {
+      return std::unique_ptr<Test_TC_BINFO_2_3_SimulatedSuite>(new Test_TC_BINFO_2_3_SimulatedSuite());
+  }
+
+  return nullptr;
 }
 
 void PrintTestCommands()
 {
-    ChipLogError(chipTool, "Supported commands:");
-    ChipLogError(chipTool, "\t* Test_TC_BINFO_2_3_Simulated");
+  ChipLogError(chipTool, "Supported commands:");
+  ChipLogError(chipTool, "\t* Test_TC_BINFO_2_3_Simulated");
 }
