@@ -239,7 +239,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 100
 
@@ -273,7 +273,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 100
 
@@ -302,7 +302,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 100
 
@@ -331,7 +331,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 160
 
@@ -379,7 +379,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 100
 
@@ -413,7 +413,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 120
 
@@ -442,7 +442,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 120
 
@@ -471,7 +471,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 160
 

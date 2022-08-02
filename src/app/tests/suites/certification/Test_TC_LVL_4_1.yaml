@@ -126,6 +126,9 @@ tests:
       attribute: "CurrentLevel"
       response:
           value: MaximumLevelValue
+          constraints:
+              minValue: 0
+              maxValue: 255
 
     - label: "sends a Move command"
       PICS: LVL.S.C05.Rsp

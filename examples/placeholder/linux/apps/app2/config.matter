@@ -343,20 +343,20 @@ server cluster LevelControl = 8 {
     kFrequency = 0x4;
   }
 
-  readonly attribute int8u currentLevel = 0;
+  readonly attribute nullable int8u currentLevel = 0;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct MoveToLevelRequest {
     INT8U level = 0;
-    INT16U transitionTime = 1;
+    nullable INT16U transitionTime = 1;
     BITMAP8 optionsMask = 2;
     BITMAP8 optionsOverride = 3;
   }
 
   request struct MoveRequest {
     MoveMode moveMode = 0;
-    INT8U rate = 1;
+    nullable INT8U rate = 1;
     BITMAP8 optionsMask = 2;
     BITMAP8 optionsOverride = 3;
   }
@@ -364,7 +364,7 @@ server cluster LevelControl = 8 {
   request struct StepRequest {
     StepMode stepMode = 0;
     INT8U stepSize = 1;
-    INT16U transitionTime = 2;
+    nullable INT16U transitionTime = 2;
     BITMAP8 optionsMask = 3;
     BITMAP8 optionsOverride = 4;
   }
@@ -376,14 +376,14 @@ server cluster LevelControl = 8 {
 
   request struct MoveToLevelWithOnOffRequest {
     INT8U level = 0;
-    INT16U transitionTime = 1;
+    nullable INT16U transitionTime = 1;
     BITMAP8 optionsMask = 2;
     BITMAP8 optionsOverride = 3;
   }
 
   request struct MoveWithOnOffRequest {
     MoveMode moveMode = 0;
-    INT8U rate = 1;
+    nullable INT8U rate = 1;
     BITMAP8 optionsMask = 2;
     BITMAP8 optionsOverride = 3;
   }
@@ -391,7 +391,7 @@ server cluster LevelControl = 8 {
   request struct StepWithOnOffRequest {
     StepMode stepMode = 0;
     INT8U stepSize = 1;
-    INT16U transitionTime = 2;
+    nullable INT16U transitionTime = 2;
     BITMAP8 optionsMask = 3;
     BITMAP8 optionsOverride = 4;
   }
