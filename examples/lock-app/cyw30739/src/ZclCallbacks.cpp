@@ -56,6 +56,17 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
             return;
         }
         break;
+    case Identify::Id:
+        if (attributePath.mAttributeId == Identify::Attributes::IdentifyTime::Id)
+        {
+            uint16_t identifyTime;
+            if (EMBER_ZCL_STATUS_SUCCESS == Identify::Attributes::IdentifyTime::Get(attributePath.mEndpointId, &identifyTime))
+            {
+                ChipLogProgress(Zcl, "IdentifyTime %u", identifyTime);
+                return;
+            }
+        }
+        break;
     default:
         printf("Unhandled cluster ID: 0x%04lx\n", attributePath.mClusterId);
         return;
