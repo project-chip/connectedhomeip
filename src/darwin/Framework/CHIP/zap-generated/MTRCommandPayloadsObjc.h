@@ -22,9 +22,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRIdentifyClusterIdentifyParams : NSObject
+@interface MTRIdentifyClusterIdentifyParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull identifyTime;
+@property (nonatomic, copy) NSNumber * _Nonnull identifyTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -39,16 +39,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRIdentifyClusterTriggerEffectParams : NSObject
+@interface MTRIdentifyClusterTriggerEffectParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull effectIdentifier;
+@property (nonatomic, copy) NSNumber * _Nonnull effectIdentifier;
 
-@property (strong, nonatomic) NSNumber * _Nonnull effectVariant;
+@property (nonatomic, copy) NSNumber * _Nonnull effectVariant;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -63,16 +63,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupsClusterAddGroupParams : NSObject
+@interface MTRGroupsClusterAddGroupParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSString * _Nonnull groupName;
+@property (nonatomic, copy) NSString * _Nonnull groupName;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -87,16 +87,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupsClusterAddGroupResponseParams : NSObject
+@interface MTRGroupsClusterAddGroupResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -111,14 +111,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupsClusterViewGroupParams : NSObject
+@interface MTRGroupsClusterViewGroupParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -133,18 +133,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupsClusterViewGroupResponseParams : NSObject
+@interface MTRGroupsClusterViewGroupResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSString * _Nonnull groupName;
+@property (nonatomic, copy) NSString * _Nonnull groupName;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -159,14 +159,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupsClusterGetGroupMembershipParams : NSObject
+@interface MTRGroupsClusterGetGroupMembershipParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSArray * _Nonnull groupList;
+@property (nonatomic, copy) NSArray * _Nonnull groupList;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -181,16 +181,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupsClusterGetGroupMembershipResponseParams : NSObject
+@interface MTRGroupsClusterGetGroupMembershipResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nullable capacity;
+@property (nonatomic, copy) NSNumber * _Nullable capacity;
 
-@property (strong, nonatomic) NSArray * _Nonnull groupList;
+@property (nonatomic, copy) NSArray * _Nonnull groupList;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -205,14 +205,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupsClusterRemoveGroupParams : NSObject
+@interface MTRGroupsClusterRemoveGroupParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -227,16 +227,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupsClusterRemoveGroupResponseParams : NSObject
+@interface MTRGroupsClusterRemoveGroupResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -251,12 +251,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupsClusterRemoveAllGroupsParams : NSObject
+@interface MTRGroupsClusterRemoveAllGroupsParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -271,16 +271,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupsClusterAddGroupIfIdentifyingParams : NSObject
+@interface MTRGroupsClusterAddGroupIfIdentifyingParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSString * _Nonnull groupName;
+@property (nonatomic, copy) NSString * _Nonnull groupName;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -295,22 +295,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterAddSceneParams : NSObject
+@interface MTRScenesClusterAddSceneParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSString * _Nonnull sceneName;
+@property (nonatomic, copy) NSString * _Nonnull sceneName;
 
-@property (strong, nonatomic) NSArray * _Nonnull extensionFieldSets;
+@property (nonatomic, copy) NSArray * _Nonnull extensionFieldSets;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -325,18 +325,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterAddSceneResponseParams : NSObject
+@interface MTRScenesClusterAddSceneResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -351,16 +351,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterViewSceneParams : NSObject
+@interface MTRScenesClusterViewSceneParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -375,24 +375,24 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterViewSceneResponseParams : NSObject
+@interface MTRScenesClusterViewSceneResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
 
-@property (strong, nonatomic) NSNumber * _Nullable transitionTime;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
 
-@property (strong, nonatomic) NSString * _Nullable sceneName;
+@property (nonatomic, copy) NSString * _Nullable sceneName;
 
-@property (strong, nonatomic) NSArray * _Nullable extensionFieldSets;
+@property (nonatomic, copy) NSArray * _Nullable extensionFieldSets;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -407,16 +407,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterRemoveSceneParams : NSObject
+@interface MTRScenesClusterRemoveSceneParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -431,18 +431,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterRemoveSceneResponseParams : NSObject
+@interface MTRScenesClusterRemoveSceneResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -457,14 +457,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterRemoveAllScenesParams : NSObject
+@interface MTRScenesClusterRemoveAllScenesParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -479,16 +479,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterRemoveAllScenesResponseParams : NSObject
+@interface MTRScenesClusterRemoveAllScenesResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -503,16 +503,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterStoreSceneParams : NSObject
+@interface MTRScenesClusterStoreSceneParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -527,18 +527,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterStoreSceneResponseParams : NSObject
+@interface MTRScenesClusterStoreSceneResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -553,18 +553,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterRecallSceneParams : NSObject
+@interface MTRScenesClusterRecallSceneParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
 
-@property (strong, nonatomic) NSNumber * _Nullable transitionTime;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -579,14 +579,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterGetSceneMembershipParams : NSObject
+@interface MTRScenesClusterGetSceneMembershipParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -601,20 +601,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterGetSceneMembershipResponseParams : NSObject
+@interface MTRScenesClusterGetSceneMembershipResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nullable capacity;
+@property (nonatomic, copy) NSNumber * _Nullable capacity;
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSArray * _Nullable sceneList;
+@property (nonatomic, copy) NSArray * _Nullable sceneList;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -629,22 +629,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterEnhancedAddSceneParams : NSObject
+@interface MTRScenesClusterEnhancedAddSceneParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSString * _Nonnull sceneName;
+@property (nonatomic, copy) NSString * _Nonnull sceneName;
 
-@property (strong, nonatomic) NSArray * _Nonnull extensionFieldSets;
+@property (nonatomic, copy) NSArray * _Nonnull extensionFieldSets;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -659,18 +659,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterEnhancedAddSceneResponseParams : NSObject
+@interface MTRScenesClusterEnhancedAddSceneResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -685,16 +685,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterEnhancedViewSceneParams : NSObject
+@interface MTRScenesClusterEnhancedViewSceneParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -709,24 +709,24 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterEnhancedViewSceneResponseParams : NSObject
+@interface MTRScenesClusterEnhancedViewSceneResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
 
-@property (strong, nonatomic) NSNumber * _Nullable transitionTime;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
 
-@property (strong, nonatomic) NSString * _Nullable sceneName;
+@property (nonatomic, copy) NSString * _Nullable sceneName;
 
-@property (strong, nonatomic) NSArray * _Nullable extensionFieldSets;
+@property (nonatomic, copy) NSArray * _Nullable extensionFieldSets;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -741,22 +741,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterCopySceneParams : NSObject
+@interface MTRScenesClusterCopySceneParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull mode;
+@property (nonatomic, copy) NSNumber * _Nonnull mode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupIdFrom;
+@property (nonatomic, copy) NSNumber * _Nonnull groupIdFrom;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneIdFrom;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneIdFrom;
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupIdTo;
+@property (nonatomic, copy) NSNumber * _Nonnull groupIdTo;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneIdTo;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneIdTo;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -771,18 +771,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRScenesClusterCopySceneResponseParams : NSObject
+@interface MTRScenesClusterCopySceneResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupIdFrom;
+@property (nonatomic, copy) NSNumber * _Nonnull groupIdFrom;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneIdFrom;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneIdFrom;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -797,12 +797,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROnOffClusterOffParams : NSObject
+@interface MTROnOffClusterOffParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -817,12 +817,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROnOffClusterOnParams : NSObject
+@interface MTROnOffClusterOnParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -837,12 +837,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROnOffClusterToggleParams : NSObject
+@interface MTROnOffClusterToggleParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -857,16 +857,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROnOffClusterOffWithEffectParams : NSObject
+@interface MTROnOffClusterOffWithEffectParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull effectId;
+@property (nonatomic, copy) NSNumber * _Nonnull effectId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull effectVariant;
+@property (nonatomic, copy) NSNumber * _Nonnull effectVariant;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -881,12 +881,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROnOffClusterOnWithRecallGlobalSceneParams : NSObject
+@interface MTROnOffClusterOnWithRecallGlobalSceneParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -901,18 +901,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROnOffClusterOnWithTimedOffParams : NSObject
+@interface MTROnOffClusterOnWithTimedOffParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull onOffControl;
+@property (nonatomic, copy) NSNumber * _Nonnull onOffControl;
 
-@property (strong, nonatomic) NSNumber * _Nonnull onTime;
+@property (nonatomic, copy) NSNumber * _Nonnull onTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull offWaitTime;
+@property (nonatomic, copy) NSNumber * _Nonnull offWaitTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -927,20 +927,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRLevelControlClusterMoveToLevelParams : NSObject
+@interface MTRLevelControlClusterMoveToLevelParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull level;
+@property (nonatomic, copy) NSNumber * _Nonnull level;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -955,20 +955,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRLevelControlClusterMoveParams : NSObject
+@interface MTRLevelControlClusterMoveParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull moveMode;
+@property (nonatomic, copy) NSNumber * _Nonnull moveMode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull rate;
+@property (nonatomic, copy) NSNumber * _Nonnull rate;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -983,22 +983,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRLevelControlClusterStepParams : NSObject
+@interface MTRLevelControlClusterStepParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull stepMode;
+@property (nonatomic, copy) NSNumber * _Nonnull stepMode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull stepSize;
+@property (nonatomic, copy) NSNumber * _Nonnull stepSize;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1013,16 +1013,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRLevelControlClusterStopParams : NSObject
+@interface MTRLevelControlClusterStopParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1037,16 +1037,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRLevelControlClusterMoveToLevelWithOnOffParams : NSObject
+@interface MTRLevelControlClusterMoveToLevelWithOnOffParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull level;
 
-@property (strong, nonatomic) NSNumber * _Nonnull level;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1061,16 +1065,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRLevelControlClusterMoveWithOnOffParams : NSObject
+@interface MTRLevelControlClusterMoveWithOnOffParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull moveMode;
+
+@property (nonatomic, copy) NSNumber * _Nonnull rate;
 
-@property (strong, nonatomic) NSNumber * _Nonnull moveMode;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull rate;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1085,18 +1093,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRLevelControlClusterStepWithOnOffParams : NSObject
+@interface MTRLevelControlClusterStepWithOnOffParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull stepMode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull stepMode;
+@property (nonatomic, copy) NSNumber * _Nonnull stepSize;
 
-@property (strong, nonatomic) NSNumber * _Nonnull stepSize;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1111,12 +1123,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRLevelControlClusterStopWithOnOffParams : NSObject
+@interface MTRLevelControlClusterStopWithOnOffParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1131,14 +1147,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRLevelControlClusterMoveToClosestFrequencyParams : NSObject
+@interface MTRLevelControlClusterMoveToClosestFrequencyParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull frequency;
+@property (nonatomic, copy) NSNumber * _Nonnull frequency;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1153,16 +1169,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBridgedActionsClusterInstantActionParams : NSObject
+@interface MTRBridgedActionsClusterInstantActionParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID;
 
-@property (strong, nonatomic) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1177,18 +1193,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBridgedActionsClusterInstantActionWithTransitionParams : NSObject
+@interface MTRBridgedActionsClusterInstantActionWithTransitionParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID;
 
-@property (strong, nonatomic) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1203,16 +1219,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBridgedActionsClusterStartActionParams : NSObject
+@interface MTRBridgedActionsClusterStartActionParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID;
 
-@property (strong, nonatomic) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1227,18 +1243,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBridgedActionsClusterStartActionWithDurationParams : NSObject
+@interface MTRBridgedActionsClusterStartActionWithDurationParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID;
 
-@property (strong, nonatomic) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID;
 
-@property (strong, nonatomic) NSNumber * _Nonnull duration;
+@property (nonatomic, copy) NSNumber * _Nonnull duration;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1253,16 +1269,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBridgedActionsClusterStopActionParams : NSObject
+@interface MTRBridgedActionsClusterStopActionParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID;
 
-@property (strong, nonatomic) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1277,16 +1293,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBridgedActionsClusterPauseActionParams : NSObject
+@interface MTRBridgedActionsClusterPauseActionParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID;
 
-@property (strong, nonatomic) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1301,18 +1317,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBridgedActionsClusterPauseActionWithDurationParams : NSObject
+@interface MTRBridgedActionsClusterPauseActionWithDurationParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID;
 
-@property (strong, nonatomic) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID;
 
-@property (strong, nonatomic) NSNumber * _Nonnull duration;
+@property (nonatomic, copy) NSNumber * _Nonnull duration;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1327,16 +1343,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBridgedActionsClusterResumeActionParams : NSObject
+@interface MTRBridgedActionsClusterResumeActionParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID;
 
-@property (strong, nonatomic) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1351,16 +1367,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBridgedActionsClusterEnableActionParams : NSObject
+@interface MTRBridgedActionsClusterEnableActionParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID;
 
-@property (strong, nonatomic) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1375,18 +1391,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBridgedActionsClusterEnableActionWithDurationParams : NSObject
+@interface MTRBridgedActionsClusterEnableActionWithDurationParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID;
 
-@property (strong, nonatomic) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID;
 
-@property (strong, nonatomic) NSNumber * _Nonnull duration;
+@property (nonatomic, copy) NSNumber * _Nonnull duration;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1401,16 +1417,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBridgedActionsClusterDisableActionParams : NSObject
+@interface MTRBridgedActionsClusterDisableActionParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID;
 
-@property (strong, nonatomic) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1425,18 +1441,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBridgedActionsClusterDisableActionWithDurationParams : NSObject
+@interface MTRBridgedActionsClusterDisableActionWithDurationParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID;
 
-@property (strong, nonatomic) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID;
 
-@property (strong, nonatomic) NSNumber * _Nonnull duration;
+@property (nonatomic, copy) NSNumber * _Nonnull duration;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1451,12 +1467,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBasicClusterMfgSpecificPingParams : NSObject
+@interface MTRBasicClusterMfgSpecificPingParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1471,28 +1487,28 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterQueryImageParams : NSObject
+@interface MTROtaSoftwareUpdateProviderClusterQueryImageParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull vendorId;
+@property (nonatomic, copy) NSNumber * _Nonnull vendorId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull productId;
+@property (nonatomic, copy) NSNumber * _Nonnull productId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
+@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
 
-@property (strong, nonatomic) NSArray * _Nonnull protocolsSupported;
+@property (nonatomic, copy) NSArray * _Nonnull protocolsSupported;
 
-@property (strong, nonatomic) NSNumber * _Nullable hardwareVersion;
+@property (nonatomic, copy) NSNumber * _Nullable hardwareVersion;
 
-@property (strong, nonatomic) NSString * _Nullable location;
+@property (nonatomic, copy) NSString * _Nullable location;
 
-@property (strong, nonatomic) NSNumber * _Nullable requestorCanConsent;
+@property (nonatomic, copy) NSNumber * _Nullable requestorCanConsent;
 
-@property (strong, nonatomic) NSData * _Nullable metadataForProvider;
+@property (nonatomic, copy) NSData * _Nullable metadataForProvider;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1507,28 +1523,28 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams : NSObject
+@interface MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nullable delayedActionTime;
+@property (nonatomic, copy) NSNumber * _Nullable delayedActionTime;
 
-@property (strong, nonatomic) NSString * _Nullable imageURI;
+@property (nonatomic, copy) NSString * _Nullable imageURI;
 
-@property (strong, nonatomic) NSNumber * _Nullable softwareVersion;
+@property (nonatomic, copy) NSNumber * _Nullable softwareVersion;
 
-@property (strong, nonatomic) NSString * _Nullable softwareVersionString;
+@property (nonatomic, copy) NSString * _Nullable softwareVersionString;
 
-@property (strong, nonatomic) NSData * _Nullable updateToken;
+@property (nonatomic, copy) NSData * _Nullable updateToken;
 
-@property (strong, nonatomic) NSNumber * _Nullable userConsentNeeded;
+@property (nonatomic, copy) NSNumber * _Nullable userConsentNeeded;
 
-@property (strong, nonatomic) NSData * _Nullable metadataForRequestor;
+@property (nonatomic, copy) NSData * _Nullable metadataForRequestor;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1543,16 +1559,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject
+@interface MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull updateToken;
+@property (nonatomic, copy) NSData * _Nonnull updateToken;
 
-@property (strong, nonatomic, getter=getNewVersion) NSNumber * _Nonnull newVersion;
+@property (nonatomic, copy, getter=getNewVersion) NSNumber * _Nonnull newVersion;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1567,16 +1583,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject
+@interface MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull action;
+@property (nonatomic, copy) NSNumber * _Nonnull action;
 
-@property (strong, nonatomic) NSNumber * _Nonnull delayedActionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull delayedActionTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1591,16 +1607,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject
+@interface MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull updateToken;
+@property (nonatomic, copy) NSData * _Nonnull updateToken;
 
-@property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
+@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1615,22 +1631,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams : NSObject
+@interface MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull providerNodeId;
+@property (nonatomic, copy) NSNumber * _Nonnull providerNodeId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull vendorId;
+@property (nonatomic, copy) NSNumber * _Nonnull vendorId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull announcementReason;
+@property (nonatomic, copy) NSNumber * _Nonnull announcementReason;
 
-@property (strong, nonatomic) NSData * _Nullable metadataForNode;
+@property (nonatomic, copy) NSData * _Nullable metadataForNode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull endpoint;
+@property (nonatomic, copy) NSNumber * _Nonnull endpoint;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1645,16 +1661,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGeneralCommissioningClusterArmFailSafeParams : NSObject
+@interface MTRGeneralCommissioningClusterArmFailSafeParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull expiryLengthSeconds;
+@property (nonatomic, copy) NSNumber * _Nonnull expiryLengthSeconds;
 
-@property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nonnull breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1669,16 +1685,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGeneralCommissioningClusterArmFailSafeResponseParams : NSObject
+@interface MTRGeneralCommissioningClusterArmFailSafeResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull errorCode;
+@property (nonatomic, copy) NSNumber * _Nonnull errorCode;
 
-@property (strong, nonatomic) NSString * _Nonnull debugText;
+@property (nonatomic, copy) NSString * _Nonnull debugText;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1693,18 +1709,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGeneralCommissioningClusterSetRegulatoryConfigParams : NSObject
+@interface MTRGeneralCommissioningClusterSetRegulatoryConfigParams : NSObject <NSCopying>
 
-@property (strong, nonatomic, getter=getNewRegulatoryConfig) NSNumber * _Nonnull newRegulatoryConfig;
+@property (nonatomic, copy, getter=getNewRegulatoryConfig) NSNumber * _Nonnull newRegulatoryConfig;
 
-@property (strong, nonatomic) NSString * _Nonnull countryCode;
+@property (nonatomic, copy) NSString * _Nonnull countryCode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nonnull breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1719,16 +1735,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams : NSObject
+@interface MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull errorCode;
+@property (nonatomic, copy) NSNumber * _Nonnull errorCode;
 
-@property (strong, nonatomic) NSString * _Nonnull debugText;
+@property (nonatomic, copy) NSString * _Nonnull debugText;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1743,12 +1759,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGeneralCommissioningClusterCommissioningCompleteParams : NSObject
+@interface MTRGeneralCommissioningClusterCommissioningCompleteParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1763,16 +1779,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGeneralCommissioningClusterCommissioningCompleteResponseParams : NSObject
+@interface MTRGeneralCommissioningClusterCommissioningCompleteResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull errorCode;
+@property (nonatomic, copy) NSNumber * _Nonnull errorCode;
 
-@property (strong, nonatomic) NSString * _Nonnull debugText;
+@property (nonatomic, copy) NSString * _Nonnull debugText;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1787,16 +1803,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRNetworkCommissioningClusterScanNetworksParams : NSObject
+@interface MTRNetworkCommissioningClusterScanNetworksParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nullable ssid;
+@property (nonatomic, copy) NSData * _Nullable ssid;
 
-@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nullable breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1811,20 +1827,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRNetworkCommissioningClusterScanNetworksResponseParams : NSObject
+@interface MTRNetworkCommissioningClusterScanNetworksResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull networkingStatus;
+@property (nonatomic, copy) NSNumber * _Nonnull networkingStatus;
 
-@property (strong, nonatomic) NSString * _Nullable debugText;
+@property (nonatomic, copy) NSString * _Nullable debugText;
 
-@property (strong, nonatomic) NSArray * _Nullable wiFiScanResults;
+@property (nonatomic, copy) NSArray * _Nullable wiFiScanResults;
 
-@property (strong, nonatomic) NSArray * _Nullable threadScanResults;
+@property (nonatomic, copy) NSArray * _Nullable threadScanResults;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1839,18 +1855,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams : NSObject
+@interface MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull ssid;
+@property (nonatomic, copy) NSData * _Nonnull ssid;
 
-@property (strong, nonatomic) NSData * _Nonnull credentials;
+@property (nonatomic, copy) NSData * _Nonnull credentials;
 
-@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nullable breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1865,16 +1881,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams : NSObject
+@interface MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull operationalDataset;
+@property (nonatomic, copy) NSData * _Nonnull operationalDataset;
 
-@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nullable breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1889,16 +1905,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRNetworkCommissioningClusterRemoveNetworkParams : NSObject
+@interface MTRNetworkCommissioningClusterRemoveNetworkParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull networkID;
+@property (nonatomic, copy) NSData * _Nonnull networkID;
 
-@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nullable breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1913,18 +1929,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRNetworkCommissioningClusterNetworkConfigResponseParams : NSObject
+@interface MTRNetworkCommissioningClusterNetworkConfigResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull networkingStatus;
+@property (nonatomic, copy) NSNumber * _Nonnull networkingStatus;
 
-@property (strong, nonatomic) NSString * _Nullable debugText;
+@property (nonatomic, copy) NSString * _Nullable debugText;
 
-@property (strong, nonatomic) NSNumber * _Nullable networkIndex;
+@property (nonatomic, copy) NSNumber * _Nullable networkIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1939,16 +1955,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRNetworkCommissioningClusterConnectNetworkParams : NSObject
+@interface MTRNetworkCommissioningClusterConnectNetworkParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull networkID;
+@property (nonatomic, copy) NSData * _Nonnull networkID;
 
-@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nullable breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1963,18 +1979,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRNetworkCommissioningClusterConnectNetworkResponseParams : NSObject
+@interface MTRNetworkCommissioningClusterConnectNetworkResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull networkingStatus;
+@property (nonatomic, copy) NSNumber * _Nonnull networkingStatus;
 
-@property (strong, nonatomic) NSString * _Nullable debugText;
+@property (nonatomic, copy) NSString * _Nullable debugText;
 
-@property (strong, nonatomic) NSNumber * _Nullable errorValue;
+@property (nonatomic, copy) NSNumber * _Nullable errorValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1989,18 +2005,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRNetworkCommissioningClusterReorderNetworkParams : NSObject
+@interface MTRNetworkCommissioningClusterReorderNetworkParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull networkID;
+@property (nonatomic, copy) NSData * _Nonnull networkID;
 
-@property (strong, nonatomic) NSNumber * _Nonnull networkIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull networkIndex;
 
-@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nullable breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2015,18 +2031,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDiagnosticLogsClusterRetrieveLogsRequestParams : NSObject
+@interface MTRDiagnosticLogsClusterRetrieveLogsRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull intent;
+@property (nonatomic, copy) NSNumber * _Nonnull intent;
 
-@property (strong, nonatomic) NSNumber * _Nonnull requestedProtocol;
+@property (nonatomic, copy) NSNumber * _Nonnull requestedProtocol;
 
-@property (strong, nonatomic) NSData * _Nonnull transferFileDesignator;
+@property (nonatomic, copy) NSData * _Nonnull transferFileDesignator;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2041,20 +2057,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDiagnosticLogsClusterRetrieveLogsResponseParams : NSObject
+@interface MTRDiagnosticLogsClusterRetrieveLogsResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSData * _Nonnull content;
+@property (nonatomic, copy) NSData * _Nonnull content;
 
-@property (strong, nonatomic) NSNumber * _Nonnull timeStamp;
+@property (nonatomic, copy) NSNumber * _Nonnull timeStamp;
 
-@property (strong, nonatomic) NSNumber * _Nonnull timeSinceBoot;
+@property (nonatomic, copy) NSNumber * _Nonnull timeSinceBoot;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2069,16 +2085,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGeneralDiagnosticsClusterTestEventTriggerParams : NSObject
+@interface MTRGeneralDiagnosticsClusterTestEventTriggerParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull enableKey;
+@property (nonatomic, copy) NSData * _Nonnull enableKey;
 
-@property (strong, nonatomic) NSNumber * _Nonnull eventTrigger;
+@property (nonatomic, copy) NSNumber * _Nonnull eventTrigger;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2093,12 +2109,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRSoftwareDiagnosticsClusterResetWatermarksParams : NSObject
+@interface MTRSoftwareDiagnosticsClusterResetWatermarksParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2113,12 +2129,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRThreadNetworkDiagnosticsClusterResetCountsParams : NSObject
+@interface MTRThreadNetworkDiagnosticsClusterResetCountsParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2133,12 +2149,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRWiFiNetworkDiagnosticsClusterResetCountsParams : NSObject
+@interface MTRWiFiNetworkDiagnosticsClusterResetCountsParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2153,12 +2169,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTREthernetNetworkDiagnosticsClusterResetCountsParams : NSObject
+@interface MTREthernetNetworkDiagnosticsClusterResetCountsParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2173,22 +2189,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRAdministratorCommissioningClusterOpenCommissioningWindowParams : NSObject
+@interface MTRAdministratorCommissioningClusterOpenCommissioningWindowParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull commissioningTimeout;
+@property (nonatomic, copy) NSNumber * _Nonnull commissioningTimeout;
 
-@property (strong, nonatomic) NSData * _Nonnull pakeVerifier;
+@property (nonatomic, copy) NSData * _Nonnull pakeVerifier;
 
-@property (strong, nonatomic) NSNumber * _Nonnull discriminator;
+@property (nonatomic, copy) NSNumber * _Nonnull discriminator;
 
-@property (strong, nonatomic) NSNumber * _Nonnull iterations;
+@property (nonatomic, copy) NSNumber * _Nonnull iterations;
 
-@property (strong, nonatomic) NSData * _Nonnull salt;
+@property (nonatomic, copy) NSData * _Nonnull salt;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2203,14 +2219,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams : NSObject
+@interface MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull commissioningTimeout;
+@property (nonatomic, copy) NSNumber * _Nonnull commissioningTimeout;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2225,12 +2241,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRAdministratorCommissioningClusterRevokeCommissioningParams : NSObject
+@interface MTRAdministratorCommissioningClusterRevokeCommissioningParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2245,14 +2261,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROperationalCredentialsClusterAttestationRequestParams : NSObject
+@interface MTROperationalCredentialsClusterAttestationRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull attestationNonce;
+@property (nonatomic, copy) NSData * _Nonnull attestationNonce;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2267,16 +2283,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROperationalCredentialsClusterAttestationResponseParams : NSObject
+@interface MTROperationalCredentialsClusterAttestationResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull attestationElements;
+@property (nonatomic, copy) NSData * _Nonnull attestationElements;
 
-@property (strong, nonatomic) NSData * _Nonnull signature;
+@property (nonatomic, copy) NSData * _Nonnull signature;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2291,14 +2307,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROperationalCredentialsClusterCertificateChainRequestParams : NSObject
+@interface MTROperationalCredentialsClusterCertificateChainRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull certificateType;
+@property (nonatomic, copy) NSNumber * _Nonnull certificateType;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2313,14 +2329,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROperationalCredentialsClusterCertificateChainResponseParams : NSObject
+@interface MTROperationalCredentialsClusterCertificateChainResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull certificate;
+@property (nonatomic, copy) NSData * _Nonnull certificate;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2335,16 +2351,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROperationalCredentialsClusterCSRRequestParams : NSObject
+@interface MTROperationalCredentialsClusterCSRRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull csrNonce;
+@property (nonatomic, copy) NSData * _Nonnull csrNonce;
 
-@property (strong, nonatomic) NSNumber * _Nullable isForUpdateNOC;
+@property (nonatomic, copy) NSNumber * _Nullable isForUpdateNOC;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2359,16 +2375,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROperationalCredentialsClusterCSRResponseParams : NSObject
+@interface MTROperationalCredentialsClusterCSRResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull nocsrElements;
+@property (nonatomic, copy) NSData * _Nonnull nocsrElements;
 
-@property (strong, nonatomic) NSData * _Nonnull attestationSignature;
+@property (nonatomic, copy) NSData * _Nonnull attestationSignature;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2383,22 +2399,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROperationalCredentialsClusterAddNOCParams : NSObject
+@interface MTROperationalCredentialsClusterAddNOCParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull nocValue;
+@property (nonatomic, copy) NSData * _Nonnull nocValue;
 
-@property (strong, nonatomic) NSData * _Nullable icacValue;
+@property (nonatomic, copy) NSData * _Nullable icacValue;
 
-@property (strong, nonatomic) NSData * _Nonnull ipkValue;
+@property (nonatomic, copy) NSData * _Nonnull ipkValue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull caseAdminSubject;
+@property (nonatomic, copy) NSNumber * _Nonnull caseAdminSubject;
 
-@property (strong, nonatomic) NSNumber * _Nonnull adminVendorId;
+@property (nonatomic, copy) NSNumber * _Nonnull adminVendorId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2413,16 +2429,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROperationalCredentialsClusterUpdateNOCParams : NSObject
+@interface MTROperationalCredentialsClusterUpdateNOCParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull nocValue;
+@property (nonatomic, copy) NSData * _Nonnull nocValue;
 
-@property (strong, nonatomic) NSData * _Nullable icacValue;
+@property (nonatomic, copy) NSData * _Nullable icacValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2437,18 +2453,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROperationalCredentialsClusterNOCResponseParams : NSObject
+@interface MTROperationalCredentialsClusterNOCResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull statusCode;
+@property (nonatomic, copy) NSNumber * _Nonnull statusCode;
 
-@property (strong, nonatomic) NSNumber * _Nullable fabricIndex;
+@property (nonatomic, copy) NSNumber * _Nullable fabricIndex;
 
-@property (strong, nonatomic) NSString * _Nullable debugText;
+@property (nonatomic, copy) NSString * _Nullable debugText;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2463,14 +2479,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROperationalCredentialsClusterUpdateFabricLabelParams : NSObject
+@interface MTROperationalCredentialsClusterUpdateFabricLabelParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSString * _Nonnull label;
+@property (nonatomic, copy) NSString * _Nonnull label;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2485,14 +2501,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROperationalCredentialsClusterRemoveFabricParams : NSObject
+@interface MTROperationalCredentialsClusterRemoveFabricParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2507,14 +2523,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTROperationalCredentialsClusterAddTrustedRootCertificateParams : NSObject
+@interface MTROperationalCredentialsClusterAddTrustedRootCertificateParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nonnull rootCertificate;
+@property (nonatomic, copy) NSData * _Nonnull rootCertificate;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2529,14 +2545,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupKeyManagementClusterKeySetWriteParams : NSObject
+@interface MTRGroupKeyManagementClusterKeySetWriteParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) MTRGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
+@property (nonatomic, copy) MTRGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2551,14 +2567,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupKeyManagementClusterKeySetReadParams : NSObject
+@interface MTRGroupKeyManagementClusterKeySetReadParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
+@property (nonatomic, copy) NSNumber * _Nonnull groupKeySetID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2573,14 +2589,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupKeyManagementClusterKeySetReadResponseParams : NSObject
+@interface MTRGroupKeyManagementClusterKeySetReadResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) MTRGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
+@property (nonatomic, copy) MTRGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2595,14 +2611,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupKeyManagementClusterKeySetRemoveParams : NSObject
+@interface MTRGroupKeyManagementClusterKeySetRemoveParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
+@property (nonatomic, copy) NSNumber * _Nonnull groupKeySetID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2617,14 +2633,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupKeyManagementClusterKeySetReadAllIndicesParams : NSObject
+@interface MTRGroupKeyManagementClusterKeySetReadAllIndicesParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSArray * _Nonnull groupKeySetIDs;
+@property (nonatomic, copy) NSArray * _Nonnull groupKeySetIDs;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2639,14 +2655,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams : NSObject
+@interface MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSArray * _Nonnull groupKeySetIDs;
+@property (nonatomic, copy) NSArray * _Nonnull groupKeySetIDs;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2661,14 +2677,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRModeSelectClusterChangeToModeParams : NSObject
+@interface MTRModeSelectClusterChangeToModeParams : NSObject <NSCopying>
 
-@property (strong, nonatomic, getter=getNewMode) NSNumber * _Nonnull newMode;
+@property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2683,14 +2699,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterLockDoorParams : NSObject
+@interface MTRDoorLockClusterLockDoorParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nullable pinCode;
+@property (nonatomic, copy) NSData * _Nullable pinCode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2705,14 +2721,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterUnlockDoorParams : NSObject
+@interface MTRDoorLockClusterUnlockDoorParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSData * _Nullable pinCode;
+@property (nonatomic, copy) NSData * _Nullable pinCode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2727,16 +2743,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterUnlockWithTimeoutParams : NSObject
+@interface MTRDoorLockClusterUnlockWithTimeoutParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull timeout;
+@property (nonatomic, copy) NSNumber * _Nonnull timeout;
 
-@property (strong, nonatomic) NSData * _Nullable pinCode;
+@property (nonatomic, copy) NSData * _Nullable pinCode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2751,26 +2767,26 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterSetWeekDayScheduleParams : NSObject
+@interface MTRDoorLockClusterSetWeekDayScheduleParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull weekDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull weekDayIndex;
 
-@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
 
-@property (strong, nonatomic) NSNumber * _Nonnull daysMask;
+@property (nonatomic, copy) NSNumber * _Nonnull daysMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull startHour;
+@property (nonatomic, copy) NSNumber * _Nonnull startHour;
 
-@property (strong, nonatomic) NSNumber * _Nonnull startMinute;
+@property (nonatomic, copy) NSNumber * _Nonnull startMinute;
 
-@property (strong, nonatomic) NSNumber * _Nonnull endHour;
+@property (nonatomic, copy) NSNumber * _Nonnull endHour;
 
-@property (strong, nonatomic) NSNumber * _Nonnull endMinute;
+@property (nonatomic, copy) NSNumber * _Nonnull endMinute;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2785,16 +2801,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterGetWeekDayScheduleParams : NSObject
+@interface MTRDoorLockClusterGetWeekDayScheduleParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull weekDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull weekDayIndex;
 
-@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2809,28 +2825,28 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterGetWeekDayScheduleResponseParams : NSObject
+@interface MTRDoorLockClusterGetWeekDayScheduleResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull weekDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull weekDayIndex;
 
-@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nullable daysMask;
+@property (nonatomic, copy) NSNumber * _Nullable daysMask;
 
-@property (strong, nonatomic) NSNumber * _Nullable startHour;
+@property (nonatomic, copy) NSNumber * _Nullable startHour;
 
-@property (strong, nonatomic) NSNumber * _Nullable startMinute;
+@property (nonatomic, copy) NSNumber * _Nullable startMinute;
 
-@property (strong, nonatomic) NSNumber * _Nullable endHour;
+@property (nonatomic, copy) NSNumber * _Nullable endHour;
 
-@property (strong, nonatomic) NSNumber * _Nullable endMinute;
+@property (nonatomic, copy) NSNumber * _Nullable endMinute;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2845,16 +2861,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterClearWeekDayScheduleParams : NSObject
+@interface MTRDoorLockClusterClearWeekDayScheduleParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull weekDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull weekDayIndex;
 
-@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2869,20 +2885,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterSetYearDayScheduleParams : NSObject
+@interface MTRDoorLockClusterSetYearDayScheduleParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull yearDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull yearDayIndex;
 
-@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
 
-@property (strong, nonatomic) NSNumber * _Nonnull localStartTime;
+@property (nonatomic, copy) NSNumber * _Nonnull localStartTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull localEndTime;
+@property (nonatomic, copy) NSNumber * _Nonnull localEndTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2897,16 +2913,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterGetYearDayScheduleParams : NSObject
+@interface MTRDoorLockClusterGetYearDayScheduleParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull yearDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull yearDayIndex;
 
-@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2921,22 +2937,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterGetYearDayScheduleResponseParams : NSObject
+@interface MTRDoorLockClusterGetYearDayScheduleResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull yearDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull yearDayIndex;
 
-@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nullable localStartTime;
+@property (nonatomic, copy) NSNumber * _Nullable localStartTime;
 
-@property (strong, nonatomic) NSNumber * _Nullable localEndTime;
+@property (nonatomic, copy) NSNumber * _Nullable localEndTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2951,16 +2967,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterClearYearDayScheduleParams : NSObject
+@interface MTRDoorLockClusterClearYearDayScheduleParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull yearDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull yearDayIndex;
 
-@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2975,20 +2991,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterSetHolidayScheduleParams : NSObject
+@interface MTRDoorLockClusterSetHolidayScheduleParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull holidayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull holidayIndex;
 
-@property (strong, nonatomic) NSNumber * _Nonnull localStartTime;
+@property (nonatomic, copy) NSNumber * _Nonnull localStartTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull localEndTime;
+@property (nonatomic, copy) NSNumber * _Nonnull localEndTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull operatingMode;
+@property (nonatomic, copy) NSNumber * _Nonnull operatingMode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3003,14 +3019,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterGetHolidayScheduleParams : NSObject
+@interface MTRDoorLockClusterGetHolidayScheduleParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull holidayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull holidayIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3025,22 +3041,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterGetHolidayScheduleResponseParams : NSObject
+@interface MTRDoorLockClusterGetHolidayScheduleResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull holidayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull holidayIndex;
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nullable localStartTime;
+@property (nonatomic, copy) NSNumber * _Nullable localStartTime;
 
-@property (strong, nonatomic) NSNumber * _Nullable localEndTime;
+@property (nonatomic, copy) NSNumber * _Nullable localEndTime;
 
-@property (strong, nonatomic) NSNumber * _Nullable operatingMode;
+@property (nonatomic, copy) NSNumber * _Nullable operatingMode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3055,14 +3071,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterClearHolidayScheduleParams : NSObject
+@interface MTRDoorLockClusterClearHolidayScheduleParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull holidayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull holidayIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3077,26 +3093,26 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterSetUserParams : NSObject
+@interface MTRDoorLockClusterSetUserParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull operationType;
+@property (nonatomic, copy) NSNumber * _Nonnull operationType;
 
-@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
 
-@property (strong, nonatomic) NSString * _Nullable userName;
+@property (nonatomic, copy) NSString * _Nullable userName;
 
-@property (strong, nonatomic) NSNumber * _Nullable userUniqueId;
+@property (nonatomic, copy) NSNumber * _Nullable userUniqueId;
 
-@property (strong, nonatomic) NSNumber * _Nullable userStatus;
+@property (nonatomic, copy) NSNumber * _Nullable userStatus;
 
-@property (strong, nonatomic) NSNumber * _Nullable userType;
+@property (nonatomic, copy) NSNumber * _Nullable userType;
 
-@property (strong, nonatomic) NSNumber * _Nullable credentialRule;
+@property (nonatomic, copy) NSNumber * _Nullable credentialRule;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3111,14 +3127,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterGetUserParams : NSObject
+@interface MTRDoorLockClusterGetUserParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3133,32 +3149,32 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterGetUserResponseParams : NSObject
+@interface MTRDoorLockClusterGetUserResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
 
-@property (strong, nonatomic) NSString * _Nullable userName;
+@property (nonatomic, copy) NSString * _Nullable userName;
 
-@property (strong, nonatomic) NSNumber * _Nullable userUniqueId;
+@property (nonatomic, copy) NSNumber * _Nullable userUniqueId;
 
-@property (strong, nonatomic) NSNumber * _Nullable userStatus;
+@property (nonatomic, copy) NSNumber * _Nullable userStatus;
 
-@property (strong, nonatomic) NSNumber * _Nullable userType;
+@property (nonatomic, copy) NSNumber * _Nullable userType;
 
-@property (strong, nonatomic) NSNumber * _Nullable credentialRule;
+@property (nonatomic, copy) NSNumber * _Nullable credentialRule;
 
-@property (strong, nonatomic) NSArray * _Nullable credentials;
+@property (nonatomic, copy) NSArray * _Nullable credentials;
 
-@property (strong, nonatomic) NSNumber * _Nullable creatorFabricIndex;
+@property (nonatomic, copy) NSNumber * _Nullable creatorFabricIndex;
 
-@property (strong, nonatomic) NSNumber * _Nullable lastModifiedFabricIndex;
+@property (nonatomic, copy) NSNumber * _Nullable lastModifiedFabricIndex;
 
-@property (strong, nonatomic) NSNumber * _Nullable nextUserIndex;
+@property (nonatomic, copy) NSNumber * _Nullable nextUserIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3173,14 +3189,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterClearUserParams : NSObject
+@interface MTRDoorLockClusterClearUserParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3195,24 +3211,24 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterSetCredentialParams : NSObject
+@interface MTRDoorLockClusterSetCredentialParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull operationType;
+@property (nonatomic, copy) NSNumber * _Nonnull operationType;
 
-@property (strong, nonatomic) MTRDoorLockClusterDlCredential * _Nonnull credential;
+@property (nonatomic, copy) MTRDoorLockClusterDlCredential * _Nonnull credential;
 
-@property (strong, nonatomic) NSData * _Nonnull credentialData;
+@property (nonatomic, copy) NSData * _Nonnull credentialData;
 
-@property (strong, nonatomic) NSNumber * _Nullable userIndex;
+@property (nonatomic, copy) NSNumber * _Nullable userIndex;
 
-@property (strong, nonatomic) NSNumber * _Nullable userStatus;
+@property (nonatomic, copy) NSNumber * _Nullable userStatus;
 
-@property (strong, nonatomic) NSNumber * _Nullable userType;
+@property (nonatomic, copy) NSNumber * _Nullable userType;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3227,18 +3243,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterSetCredentialResponseParams : NSObject
+@interface MTRDoorLockClusterSetCredentialResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nullable userIndex;
+@property (nonatomic, copy) NSNumber * _Nullable userIndex;
 
-@property (strong, nonatomic) NSNumber * _Nullable nextCredentialIndex;
+@property (nonatomic, copy) NSNumber * _Nullable nextCredentialIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3253,14 +3269,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterGetCredentialStatusParams : NSObject
+@interface MTRDoorLockClusterGetCredentialStatusParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) MTRDoorLockClusterDlCredential * _Nonnull credential;
+@property (nonatomic, copy) MTRDoorLockClusterDlCredential * _Nonnull credential;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3275,22 +3291,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterGetCredentialStatusResponseParams : NSObject
+@interface MTRDoorLockClusterGetCredentialStatusResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull credentialExists;
+@property (nonatomic, copy) NSNumber * _Nonnull credentialExists;
 
-@property (strong, nonatomic) NSNumber * _Nullable userIndex;
+@property (nonatomic, copy) NSNumber * _Nullable userIndex;
 
-@property (strong, nonatomic) NSNumber * _Nullable creatorFabricIndex;
+@property (nonatomic, copy) NSNumber * _Nullable creatorFabricIndex;
 
-@property (strong, nonatomic) NSNumber * _Nullable lastModifiedFabricIndex;
+@property (nonatomic, copy) NSNumber * _Nullable lastModifiedFabricIndex;
 
-@property (strong, nonatomic) NSNumber * _Nullable nextCredentialIndex;
+@property (nonatomic, copy) NSNumber * _Nullable nextCredentialIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3305,14 +3321,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRDoorLockClusterClearCredentialParams : NSObject
+@interface MTRDoorLockClusterClearCredentialParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) MTRDoorLockClusterDlCredential * _Nullable credential;
+@property (nonatomic, copy) MTRDoorLockClusterDlCredential * _Nullable credential;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3327,12 +3343,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRWindowCoveringClusterUpOrOpenParams : NSObject
+@interface MTRWindowCoveringClusterUpOrOpenParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3347,12 +3363,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRWindowCoveringClusterDownOrCloseParams : NSObject
+@interface MTRWindowCoveringClusterDownOrCloseParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3367,12 +3383,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRWindowCoveringClusterStopMotionParams : NSObject
+@interface MTRWindowCoveringClusterStopMotionParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3387,14 +3403,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRWindowCoveringClusterGoToLiftValueParams : NSObject
+@interface MTRWindowCoveringClusterGoToLiftValueParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull liftValue;
+@property (nonatomic, copy) NSNumber * _Nonnull liftValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3409,14 +3425,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRWindowCoveringClusterGoToLiftPercentageParams : NSObject
+@interface MTRWindowCoveringClusterGoToLiftPercentageParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull liftPercent100thsValue;
+@property (nonatomic, copy) NSNumber * _Nonnull liftPercent100thsValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3431,14 +3447,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRWindowCoveringClusterGoToTiltValueParams : NSObject
+@interface MTRWindowCoveringClusterGoToTiltValueParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull tiltValue;
+@property (nonatomic, copy) NSNumber * _Nonnull tiltValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3453,14 +3469,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRWindowCoveringClusterGoToTiltPercentageParams : NSObject
+@interface MTRWindowCoveringClusterGoToTiltPercentageParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull tiltPercent100thsValue;
+@property (nonatomic, copy) NSNumber * _Nonnull tiltPercent100thsValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3475,14 +3491,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBarrierControlClusterBarrierControlGoToPercentParams : NSObject
+@interface MTRBarrierControlClusterBarrierControlGoToPercentParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull percentOpen;
+@property (nonatomic, copy) NSNumber * _Nonnull percentOpen;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3497,12 +3513,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRBarrierControlClusterBarrierControlStopParams : NSObject
+@interface MTRBarrierControlClusterBarrierControlStopParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3517,16 +3533,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRThermostatClusterSetpointRaiseLowerParams : NSObject
+@interface MTRThermostatClusterSetpointRaiseLowerParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull mode;
+@property (nonatomic, copy) NSNumber * _Nonnull mode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull amount;
+@property (nonatomic, copy) NSNumber * _Nonnull amount;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3541,20 +3557,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRThermostatClusterGetWeeklyScheduleResponseParams : NSObject
+@interface MTRThermostatClusterGetWeeklyScheduleResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull numberOfTransitionsForSequence;
+@property (nonatomic, copy) NSNumber * _Nonnull numberOfTransitionsForSequence;
 
-@property (strong, nonatomic) NSNumber * _Nonnull dayOfWeekForSequence;
+@property (nonatomic, copy) NSNumber * _Nonnull dayOfWeekForSequence;
 
-@property (strong, nonatomic) NSNumber * _Nonnull modeForSequence;
+@property (nonatomic, copy) NSNumber * _Nonnull modeForSequence;
 
-@property (strong, nonatomic) NSArray * _Nonnull transitions;
+@property (nonatomic, copy) NSArray * _Nonnull transitions;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3569,20 +3585,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRThermostatClusterSetWeeklyScheduleParams : NSObject
+@interface MTRThermostatClusterSetWeeklyScheduleParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull numberOfTransitionsForSequence;
+@property (nonatomic, copy) NSNumber * _Nonnull numberOfTransitionsForSequence;
 
-@property (strong, nonatomic) NSNumber * _Nonnull dayOfWeekForSequence;
+@property (nonatomic, copy) NSNumber * _Nonnull dayOfWeekForSequence;
 
-@property (strong, nonatomic) NSNumber * _Nonnull modeForSequence;
+@property (nonatomic, copy) NSNumber * _Nonnull modeForSequence;
 
-@property (strong, nonatomic) NSArray * _Nonnull transitions;
+@property (nonatomic, copy) NSArray * _Nonnull transitions;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3597,16 +3613,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRThermostatClusterGetWeeklyScheduleParams : NSObject
+@interface MTRThermostatClusterGetWeeklyScheduleParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull daysToReturn;
+@property (nonatomic, copy) NSNumber * _Nonnull daysToReturn;
 
-@property (strong, nonatomic) NSNumber * _Nonnull modeToReturn;
+@property (nonatomic, copy) NSNumber * _Nonnull modeToReturn;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3621,12 +3637,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRThermostatClusterClearWeeklyScheduleParams : NSObject
+@interface MTRThermostatClusterClearWeeklyScheduleParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3641,22 +3657,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterMoveToHueParams : NSObject
+@interface MTRColorControlClusterMoveToHueParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull hue;
+@property (nonatomic, copy) NSNumber * _Nonnull hue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull direction;
+@property (nonatomic, copy) NSNumber * _Nonnull direction;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3671,20 +3687,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterMoveHueParams : NSObject
+@interface MTRColorControlClusterMoveHueParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull moveMode;
+@property (nonatomic, copy) NSNumber * _Nonnull moveMode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull rate;
+@property (nonatomic, copy) NSNumber * _Nonnull rate;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3699,22 +3715,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterStepHueParams : NSObject
+@interface MTRColorControlClusterStepHueParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull stepMode;
+@property (nonatomic, copy) NSNumber * _Nonnull stepMode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull stepSize;
+@property (nonatomic, copy) NSNumber * _Nonnull stepSize;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3729,20 +3745,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterMoveToSaturationParams : NSObject
+@interface MTRColorControlClusterMoveToSaturationParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull saturation;
+@property (nonatomic, copy) NSNumber * _Nonnull saturation;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3757,20 +3773,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterMoveSaturationParams : NSObject
+@interface MTRColorControlClusterMoveSaturationParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull moveMode;
+@property (nonatomic, copy) NSNumber * _Nonnull moveMode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull rate;
+@property (nonatomic, copy) NSNumber * _Nonnull rate;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3785,22 +3801,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterStepSaturationParams : NSObject
+@interface MTRColorControlClusterStepSaturationParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull stepMode;
+@property (nonatomic, copy) NSNumber * _Nonnull stepMode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull stepSize;
+@property (nonatomic, copy) NSNumber * _Nonnull stepSize;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3815,22 +3831,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterMoveToHueAndSaturationParams : NSObject
+@interface MTRColorControlClusterMoveToHueAndSaturationParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull hue;
+@property (nonatomic, copy) NSNumber * _Nonnull hue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull saturation;
+@property (nonatomic, copy) NSNumber * _Nonnull saturation;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3845,22 +3861,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterMoveToColorParams : NSObject
+@interface MTRColorControlClusterMoveToColorParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorX;
+@property (nonatomic, copy) NSNumber * _Nonnull colorX;
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorY;
+@property (nonatomic, copy) NSNumber * _Nonnull colorY;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3875,20 +3891,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterMoveColorParams : NSObject
+@interface MTRColorControlClusterMoveColorParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull rateX;
+@property (nonatomic, copy) NSNumber * _Nonnull rateX;
 
-@property (strong, nonatomic) NSNumber * _Nonnull rateY;
+@property (nonatomic, copy) NSNumber * _Nonnull rateY;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3903,22 +3919,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterStepColorParams : NSObject
+@interface MTRColorControlClusterStepColorParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull stepX;
+@property (nonatomic, copy) NSNumber * _Nonnull stepX;
 
-@property (strong, nonatomic) NSNumber * _Nonnull stepY;
+@property (nonatomic, copy) NSNumber * _Nonnull stepY;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3933,20 +3949,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterMoveToColorTemperatureParams : NSObject
+@interface MTRColorControlClusterMoveToColorTemperatureParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorTemperature;
+@property (nonatomic, copy) NSNumber * _Nonnull colorTemperature;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3961,22 +3977,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterEnhancedMoveToHueParams : NSObject
+@interface MTRColorControlClusterEnhancedMoveToHueParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull enhancedHue;
+@property (nonatomic, copy) NSNumber * _Nonnull enhancedHue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull direction;
+@property (nonatomic, copy) NSNumber * _Nonnull direction;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3991,20 +4007,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterEnhancedMoveHueParams : NSObject
+@interface MTRColorControlClusterEnhancedMoveHueParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull moveMode;
+@property (nonatomic, copy) NSNumber * _Nonnull moveMode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull rate;
+@property (nonatomic, copy) NSNumber * _Nonnull rate;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4019,22 +4035,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterEnhancedStepHueParams : NSObject
+@interface MTRColorControlClusterEnhancedStepHueParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull stepMode;
+@property (nonatomic, copy) NSNumber * _Nonnull stepMode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull stepSize;
+@property (nonatomic, copy) NSNumber * _Nonnull stepSize;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4049,22 +4065,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterEnhancedMoveToHueAndSaturationParams : NSObject
+@interface MTRColorControlClusterEnhancedMoveToHueAndSaturationParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull enhancedHue;
+@property (nonatomic, copy) NSNumber * _Nonnull enhancedHue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull saturation;
+@property (nonatomic, copy) NSNumber * _Nonnull saturation;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4079,26 +4095,26 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterColorLoopSetParams : NSObject
+@interface MTRColorControlClusterColorLoopSetParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull updateFlags;
+@property (nonatomic, copy) NSNumber * _Nonnull updateFlags;
 
-@property (strong, nonatomic) NSNumber * _Nonnull action;
+@property (nonatomic, copy) NSNumber * _Nonnull action;
 
-@property (strong, nonatomic) NSNumber * _Nonnull direction;
+@property (nonatomic, copy) NSNumber * _Nonnull direction;
 
-@property (strong, nonatomic) NSNumber * _Nonnull time;
+@property (nonatomic, copy) NSNumber * _Nonnull time;
 
-@property (strong, nonatomic) NSNumber * _Nonnull startHue;
+@property (nonatomic, copy) NSNumber * _Nonnull startHue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4113,16 +4129,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterStopMoveStepParams : NSObject
+@interface MTRColorControlClusterStopMoveStepParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4137,24 +4153,24 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterMoveColorTemperatureParams : NSObject
+@interface MTRColorControlClusterMoveColorTemperatureParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull moveMode;
+@property (nonatomic, copy) NSNumber * _Nonnull moveMode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull rate;
+@property (nonatomic, copy) NSNumber * _Nonnull rate;
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMinimumMireds;
+@property (nonatomic, copy) NSNumber * _Nonnull colorTemperatureMinimumMireds;
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMaximumMireds;
+@property (nonatomic, copy) NSNumber * _Nonnull colorTemperatureMaximumMireds;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4169,26 +4185,26 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRColorControlClusterStepColorTemperatureParams : NSObject
+@interface MTRColorControlClusterStepColorTemperatureParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull stepMode;
+@property (nonatomic, copy) NSNumber * _Nonnull stepMode;
 
-@property (strong, nonatomic) NSNumber * _Nonnull stepSize;
+@property (nonatomic, copy) NSNumber * _Nonnull stepSize;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMinimumMireds;
+@property (nonatomic, copy) NSNumber * _Nonnull colorTemperatureMinimumMireds;
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMaximumMireds;
+@property (nonatomic, copy) NSNumber * _Nonnull colorTemperatureMaximumMireds;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4203,14 +4219,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRChannelClusterChangeChannelParams : NSObject
+@interface MTRChannelClusterChangeChannelParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSString * _Nonnull match;
+@property (nonatomic, copy) NSString * _Nonnull match;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4225,16 +4241,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRChannelClusterChangeChannelResponseParams : NSObject
+@interface MTRChannelClusterChangeChannelResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSString * _Nullable data;
+@property (nonatomic, copy) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4249,16 +4265,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRChannelClusterChangeChannelByNumberParams : NSObject
+@interface MTRChannelClusterChangeChannelByNumberParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull majorNumber;
+@property (nonatomic, copy) NSNumber * _Nonnull majorNumber;
 
-@property (strong, nonatomic) NSNumber * _Nonnull minorNumber;
+@property (nonatomic, copy) NSNumber * _Nonnull minorNumber;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4273,14 +4289,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRChannelClusterSkipChannelParams : NSObject
+@interface MTRChannelClusterSkipChannelParams : NSObject <NSCopying>
 
-@property (strong, nonatomic, getter=getCount) NSNumber * _Nonnull count;
+@property (nonatomic, copy, getter=getCount) NSNumber * _Nonnull count;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4295,16 +4311,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTargetNavigatorClusterNavigateTargetParams : NSObject
+@interface MTRTargetNavigatorClusterNavigateTargetParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull target;
+@property (nonatomic, copy) NSNumber * _Nonnull target;
 
-@property (strong, nonatomic) NSString * _Nullable data;
+@property (nonatomic, copy) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4319,16 +4335,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTargetNavigatorClusterNavigateTargetResponseParams : NSObject
+@interface MTRTargetNavigatorClusterNavigateTargetResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSString * _Nullable data;
+@property (nonatomic, copy) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4343,12 +4359,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaPlaybackClusterPlayParams : NSObject
+@interface MTRMediaPlaybackClusterPlayParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4363,12 +4379,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaPlaybackClusterPauseParams : NSObject
+@interface MTRMediaPlaybackClusterPauseParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4383,12 +4399,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaPlaybackClusterStopPlaybackParams : NSObject
+@interface MTRMediaPlaybackClusterStopPlaybackParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4403,12 +4419,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaPlaybackClusterStartOverParams : NSObject
+@interface MTRMediaPlaybackClusterStartOverParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4423,12 +4439,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaPlaybackClusterPreviousParams : NSObject
+@interface MTRMediaPlaybackClusterPreviousParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4443,12 +4459,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaPlaybackClusterNextParams : NSObject
+@interface MTRMediaPlaybackClusterNextParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4463,12 +4479,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaPlaybackClusterRewindParams : NSObject
+@interface MTRMediaPlaybackClusterRewindParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4483,12 +4499,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaPlaybackClusterFastForwardParams : NSObject
+@interface MTRMediaPlaybackClusterFastForwardParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4503,14 +4519,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaPlaybackClusterSkipForwardParams : NSObject
+@interface MTRMediaPlaybackClusterSkipForwardParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull deltaPositionMilliseconds;
+@property (nonatomic, copy) NSNumber * _Nonnull deltaPositionMilliseconds;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4525,14 +4541,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaPlaybackClusterSkipBackwardParams : NSObject
+@interface MTRMediaPlaybackClusterSkipBackwardParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull deltaPositionMilliseconds;
+@property (nonatomic, copy) NSNumber * _Nonnull deltaPositionMilliseconds;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4547,16 +4563,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaPlaybackClusterPlaybackResponseParams : NSObject
+@interface MTRMediaPlaybackClusterPlaybackResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSString * _Nullable data;
+@property (nonatomic, copy) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4571,14 +4587,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaPlaybackClusterSeekParams : NSObject
+@interface MTRMediaPlaybackClusterSeekParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull position;
+@property (nonatomic, copy) NSNumber * _Nonnull position;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4593,14 +4609,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaInputClusterSelectInputParams : NSObject
+@interface MTRMediaInputClusterSelectInputParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull index;
+@property (nonatomic, copy) NSNumber * _Nonnull index;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4615,12 +4631,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaInputClusterShowInputStatusParams : NSObject
+@interface MTRMediaInputClusterShowInputStatusParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4635,12 +4651,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaInputClusterHideInputStatusParams : NSObject
+@interface MTRMediaInputClusterHideInputStatusParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4655,16 +4671,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRMediaInputClusterRenameInputParams : NSObject
+@interface MTRMediaInputClusterRenameInputParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull index;
+@property (nonatomic, copy) NSNumber * _Nonnull index;
 
-@property (strong, nonatomic) NSString * _Nonnull name;
+@property (nonatomic, copy) NSString * _Nonnull name;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4679,12 +4695,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRLowPowerClusterSleepParams : NSObject
+@interface MTRLowPowerClusterSleepParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4699,14 +4715,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRKeypadInputClusterSendKeyParams : NSObject
+@interface MTRKeypadInputClusterSendKeyParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull keyCode;
+@property (nonatomic, copy) NSNumber * _Nonnull keyCode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4721,14 +4737,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRKeypadInputClusterSendKeyResponseParams : NSObject
+@interface MTRKeypadInputClusterSendKeyResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4743,18 +4759,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRContentLauncherClusterLaunchContentParams : NSObject
+@interface MTRContentLauncherClusterLaunchContentParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) MTRContentLauncherClusterContentSearch * _Nonnull search;
+@property (nonatomic, copy) MTRContentLauncherClusterContentSearch * _Nonnull search;
 
-@property (strong, nonatomic) NSNumber * _Nonnull autoPlay;
+@property (nonatomic, copy) NSNumber * _Nonnull autoPlay;
 
-@property (strong, nonatomic) NSString * _Nullable data;
+@property (nonatomic, copy) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4769,18 +4785,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRContentLauncherClusterLaunchURLParams : NSObject
+@interface MTRContentLauncherClusterLaunchURLParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSString * _Nonnull contentURL;
+@property (nonatomic, copy) NSString * _Nonnull contentURL;
 
-@property (strong, nonatomic) NSString * _Nullable displayString;
+@property (nonatomic, copy) NSString * _Nullable displayString;
 
-@property (strong, nonatomic) MTRContentLauncherClusterBrandingInformation * _Nullable brandingInformation;
+@property (nonatomic, copy) MTRContentLauncherClusterBrandingInformation * _Nullable brandingInformation;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4795,16 +4811,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRContentLauncherClusterLaunchResponseParams : NSObject
+@interface MTRContentLauncherClusterLaunchResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSString * _Nullable data;
+@property (nonatomic, copy) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4819,14 +4835,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRAudioOutputClusterSelectOutputParams : NSObject
+@interface MTRAudioOutputClusterSelectOutputParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull index;
+@property (nonatomic, copy) NSNumber * _Nonnull index;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4841,16 +4857,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRAudioOutputClusterRenameOutputParams : NSObject
+@interface MTRAudioOutputClusterRenameOutputParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull index;
+@property (nonatomic, copy) NSNumber * _Nonnull index;
 
-@property (strong, nonatomic) NSString * _Nonnull name;
+@property (nonatomic, copy) NSString * _Nonnull name;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4865,16 +4881,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRApplicationLauncherClusterLaunchAppParams : NSObject
+@interface MTRApplicationLauncherClusterLaunchAppParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) MTRApplicationLauncherClusterApplication * _Nonnull application;
+@property (nonatomic, copy) MTRApplicationLauncherClusterApplication * _Nonnull application;
 
-@property (strong, nonatomic) NSData * _Nullable data;
+@property (nonatomic, copy) NSData * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4889,14 +4905,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRApplicationLauncherClusterStopAppParams : NSObject
+@interface MTRApplicationLauncherClusterStopAppParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) MTRApplicationLauncherClusterApplication * _Nonnull application;
+@property (nonatomic, copy) MTRApplicationLauncherClusterApplication * _Nonnull application;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4911,14 +4927,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRApplicationLauncherClusterHideAppParams : NSObject
+@interface MTRApplicationLauncherClusterHideAppParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) MTRApplicationLauncherClusterApplication * _Nonnull application;
+@property (nonatomic, copy) MTRApplicationLauncherClusterApplication * _Nonnull application;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4933,16 +4949,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRApplicationLauncherClusterLauncherResponseParams : NSObject
+@interface MTRApplicationLauncherClusterLauncherResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSData * _Nonnull data;
+@property (nonatomic, copy) NSData * _Nonnull data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4957,14 +4973,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRAccountLoginClusterGetSetupPINParams : NSObject
+@interface MTRAccountLoginClusterGetSetupPINParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSString * _Nonnull tempAccountIdentifier;
+@property (nonatomic, copy) NSString * _Nonnull tempAccountIdentifier;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4979,14 +4995,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRAccountLoginClusterGetSetupPINResponseParams : NSObject
+@interface MTRAccountLoginClusterGetSetupPINResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSString * _Nonnull setupPIN;
+@property (nonatomic, copy) NSString * _Nonnull setupPIN;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5001,16 +5017,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRAccountLoginClusterLoginParams : NSObject
+@interface MTRAccountLoginClusterLoginParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSString * _Nonnull tempAccountIdentifier;
+@property (nonatomic, copy) NSString * _Nonnull tempAccountIdentifier;
 
-@property (strong, nonatomic) NSString * _Nonnull setupPIN;
+@property (nonatomic, copy) NSString * _Nonnull setupPIN;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5025,12 +5041,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRAccountLoginClusterLogoutParams : NSObject
+@interface MTRAccountLoginClusterLogoutParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5045,20 +5061,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams : NSObject
+@interface MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull profileCount;
+@property (nonatomic, copy) NSNumber * _Nonnull profileCount;
 
-@property (strong, nonatomic) NSNumber * _Nonnull profileIntervalPeriod;
+@property (nonatomic, copy) NSNumber * _Nonnull profileIntervalPeriod;
 
-@property (strong, nonatomic) NSNumber * _Nonnull maxNumberOfIntervals;
+@property (nonatomic, copy) NSNumber * _Nonnull maxNumberOfIntervals;
 
-@property (strong, nonatomic) NSArray * _Nonnull listOfAttributes;
+@property (nonatomic, copy) NSArray * _Nonnull listOfAttributes;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5073,12 +5089,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRElectricalMeasurementClusterGetProfileInfoCommandParams : NSObject
+@interface MTRElectricalMeasurementClusterGetProfileInfoCommandParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5093,24 +5109,24 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams : NSObject
+@interface MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull startTime;
+@property (nonatomic, copy) NSNumber * _Nonnull startTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nonnull profileIntervalPeriod;
+@property (nonatomic, copy) NSNumber * _Nonnull profileIntervalPeriod;
 
-@property (strong, nonatomic) NSNumber * _Nonnull numberOfIntervalsDelivered;
+@property (nonatomic, copy) NSNumber * _Nonnull numberOfIntervalsDelivered;
 
-@property (strong, nonatomic) NSNumber * _Nonnull attributeId;
+@property (nonatomic, copy) NSNumber * _Nonnull attributeId;
 
-@property (strong, nonatomic) NSArray * _Nonnull intervals;
+@property (nonatomic, copy) NSArray * _Nonnull intervals;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5125,18 +5141,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams : NSObject
+@interface MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull attributeId;
+@property (nonatomic, copy) NSNumber * _Nonnull attributeId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull startTime;
+@property (nonatomic, copy) NSNumber * _Nonnull startTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull numberOfIntervals;
+@property (nonatomic, copy) NSNumber * _Nonnull numberOfIntervals;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5151,12 +5167,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestParams : NSObject
+@interface MTRTestClusterClusterTestParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5171,14 +5187,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestSpecificResponseParams : NSObject
+@interface MTRTestClusterClusterTestSpecificResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull returnValue;
+@property (nonatomic, copy) NSNumber * _Nonnull returnValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5193,12 +5209,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestNotHandledParams : NSObject
+@interface MTRTestClusterClusterTestNotHandledParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5213,14 +5229,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestAddArgumentsResponseParams : NSObject
+@interface MTRTestClusterClusterTestAddArgumentsResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull returnValue;
+@property (nonatomic, copy) NSNumber * _Nonnull returnValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5235,12 +5251,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestSpecificParams : NSObject
+@interface MTRTestClusterClusterTestSpecificParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5255,14 +5271,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestSimpleArgumentResponseParams : NSObject
+@interface MTRTestClusterClusterTestSimpleArgumentResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull returnValue;
+@property (nonatomic, copy) NSNumber * _Nonnull returnValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5277,12 +5293,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestUnknownCommandParams : NSObject
+@interface MTRTestClusterClusterTestUnknownCommandParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5297,24 +5313,24 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestStructArrayArgumentResponseParams : NSObject
+@interface MTRTestClusterClusterTestStructArrayArgumentResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1;
 
-@property (strong, nonatomic) NSArray * _Nonnull arg2;
+@property (nonatomic, copy) NSArray * _Nonnull arg2;
 
-@property (strong, nonatomic) NSArray * _Nonnull arg3;
+@property (nonatomic, copy) NSArray * _Nonnull arg3;
 
-@property (strong, nonatomic) NSArray * _Nonnull arg4;
+@property (nonatomic, copy) NSArray * _Nonnull arg4;
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg5;
+@property (nonatomic, copy) NSNumber * _Nonnull arg5;
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg6;
+@property (nonatomic, copy) NSNumber * _Nonnull arg6;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5329,16 +5345,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestAddArgumentsParams : NSObject
+@interface MTRTestClusterClusterTestAddArgumentsParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1;
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg2;
+@property (nonatomic, copy) NSNumber * _Nonnull arg2;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5353,14 +5369,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestListInt8UReverseResponseParams : NSObject
+@interface MTRTestClusterClusterTestListInt8UReverseResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5375,14 +5391,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestSimpleArgumentRequestParams : NSObject
+@interface MTRTestClusterClusterTestSimpleArgumentRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5397,16 +5413,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestEnumsResponseParams : NSObject
+@interface MTRTestClusterClusterTestEnumsResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1;
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg2;
+@property (nonatomic, copy) NSNumber * _Nonnull arg2;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5421,24 +5437,24 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestStructArrayArgumentRequestParams : NSObject
+@interface MTRTestClusterClusterTestStructArrayArgumentRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1;
 
-@property (strong, nonatomic) NSArray * _Nonnull arg2;
+@property (nonatomic, copy) NSArray * _Nonnull arg2;
 
-@property (strong, nonatomic) NSArray * _Nonnull arg3;
+@property (nonatomic, copy) NSArray * _Nonnull arg3;
 
-@property (strong, nonatomic) NSArray * _Nonnull arg4;
+@property (nonatomic, copy) NSArray * _Nonnull arg4;
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg5;
+@property (nonatomic, copy) NSNumber * _Nonnull arg5;
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg6;
+@property (nonatomic, copy) NSNumber * _Nonnull arg6;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5453,20 +5469,20 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestNullableOptionalResponseParams : NSObject
+@interface MTRTestClusterClusterTestNullableOptionalResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull wasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull wasPresent;
 
-@property (strong, nonatomic) NSNumber * _Nullable wasNull;
+@property (nonatomic, copy) NSNumber * _Nullable wasNull;
 
-@property (strong, nonatomic) NSNumber * _Nullable value;
+@property (nonatomic, copy) NSNumber * _Nullable value;
 
-@property (strong, nonatomic) NSNumber * _Nullable originalValue;
+@property (nonatomic, copy) NSNumber * _Nullable originalValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5481,14 +5497,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestStructArgumentRequestParams : NSObject
+@interface MTRTestClusterClusterTestStructArgumentRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) MTRTestClusterClusterSimpleStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5503,68 +5519,68 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestComplexNullableOptionalResponseParams : NSObject
+@interface MTRTestClusterClusterTestComplexNullableOptionalResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull nullableIntWasNull;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableIntWasNull;
 
-@property (strong, nonatomic) NSNumber * _Nullable nullableIntValue;
+@property (nonatomic, copy) NSNumber * _Nullable nullableIntValue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionalIntWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull optionalIntWasPresent;
 
-@property (strong, nonatomic) NSNumber * _Nullable optionalIntValue;
+@property (nonatomic, copy) NSNumber * _Nullable optionalIntValue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull nullableOptionalIntWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalIntWasPresent;
 
-@property (strong, nonatomic) NSNumber * _Nullable nullableOptionalIntWasNull;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalIntWasNull;
 
-@property (strong, nonatomic) NSNumber * _Nullable nullableOptionalIntValue;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalIntValue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull nullableStringWasNull;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableStringWasNull;
 
-@property (strong, nonatomic) NSString * _Nullable nullableStringValue;
+@property (nonatomic, copy) NSString * _Nullable nullableStringValue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionalStringWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull optionalStringWasPresent;
 
-@property (strong, nonatomic) NSString * _Nullable optionalStringValue;
+@property (nonatomic, copy) NSString * _Nullable optionalStringValue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull nullableOptionalStringWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalStringWasPresent;
 
-@property (strong, nonatomic) NSNumber * _Nullable nullableOptionalStringWasNull;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalStringWasNull;
 
-@property (strong, nonatomic) NSString * _Nullable nullableOptionalStringValue;
+@property (nonatomic, copy) NSString * _Nullable nullableOptionalStringValue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull nullableStructWasNull;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableStructWasNull;
 
-@property (strong, nonatomic) MTRTestClusterClusterSimpleStruct * _Nullable nullableStructValue;
+@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable nullableStructValue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionalStructWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull optionalStructWasPresent;
 
-@property (strong, nonatomic) MTRTestClusterClusterSimpleStruct * _Nullable optionalStructValue;
+@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable optionalStructValue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull nullableOptionalStructWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalStructWasPresent;
 
-@property (strong, nonatomic) NSNumber * _Nullable nullableOptionalStructWasNull;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalStructWasNull;
 
-@property (strong, nonatomic) MTRTestClusterClusterSimpleStruct * _Nullable nullableOptionalStructValue;
+@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable nullableOptionalStructValue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull nullableListWasNull;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableListWasNull;
 
-@property (strong, nonatomic) NSArray * _Nullable nullableListValue;
+@property (nonatomic, copy) NSArray * _Nullable nullableListValue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionalListWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull optionalListWasPresent;
 
-@property (strong, nonatomic) NSArray * _Nullable optionalListValue;
+@property (nonatomic, copy) NSArray * _Nullable optionalListValue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull nullableOptionalListWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalListWasPresent;
 
-@property (strong, nonatomic) NSNumber * _Nullable nullableOptionalListWasNull;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalListWasNull;
 
-@property (strong, nonatomic) NSArray * _Nullable nullableOptionalListValue;
+@property (nonatomic, copy) NSArray * _Nullable nullableOptionalListValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5579,14 +5595,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestNestedStructArgumentRequestParams : NSObject
+@interface MTRTestClusterClusterTestNestedStructArgumentRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) MTRTestClusterClusterNestedStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRTestClusterClusterNestedStruct * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5601,14 +5617,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterBooleanResponseParams : NSObject
+@interface MTRTestClusterClusterBooleanResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull value;
+@property (nonatomic, copy) NSNumber * _Nonnull value;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5623,14 +5639,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestListStructArgumentRequestParams : NSObject
+@interface MTRTestClusterClusterTestListStructArgumentRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5645,14 +5661,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterSimpleStructResponseParams : NSObject
+@interface MTRTestClusterClusterSimpleStructResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) MTRTestClusterClusterSimpleStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5667,14 +5683,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestListInt8UArgumentRequestParams : NSObject
+@interface MTRTestClusterClusterTestListInt8UArgumentRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5689,14 +5705,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestEmitTestEventResponseParams : NSObject
+@interface MTRTestClusterClusterTestEmitTestEventResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull value;
+@property (nonatomic, copy) NSNumber * _Nonnull value;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5711,14 +5727,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestNestedStructListArgumentRequestParams : NSObject
+@interface MTRTestClusterClusterTestNestedStructListArgumentRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) MTRTestClusterClusterNestedStructList * _Nonnull arg1;
+@property (nonatomic, copy) MTRTestClusterClusterNestedStructList * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5733,14 +5749,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams : NSObject
+@interface MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull value;
+@property (nonatomic, copy) NSNumber * _Nonnull value;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5755,14 +5771,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestListNestedStructListArgumentRequestParams : NSObject
+@interface MTRTestClusterClusterTestListNestedStructListArgumentRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5777,14 +5793,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestListInt8UReverseRequestParams : NSObject
+@interface MTRTestClusterClusterTestListInt8UReverseRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5799,16 +5815,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestEnumsRequestParams : NSObject
+@interface MTRTestClusterClusterTestEnumsRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1;
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg2;
+@property (nonatomic, copy) NSNumber * _Nonnull arg2;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5823,14 +5839,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestNullableOptionalRequestParams : NSObject
+@interface MTRTestClusterClusterTestNullableOptionalRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nullable arg1;
+@property (nonatomic, copy) NSNumber * _Nullable arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5845,36 +5861,36 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestComplexNullableOptionalRequestParams : NSObject
+@interface MTRTestClusterClusterTestComplexNullableOptionalRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nullable nullableInt;
+@property (nonatomic, copy) NSNumber * _Nullable nullableInt;
 
-@property (strong, nonatomic) NSNumber * _Nullable optionalInt;
+@property (nonatomic, copy) NSNumber * _Nullable optionalInt;
 
-@property (strong, nonatomic) NSNumber * _Nullable nullableOptionalInt;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalInt;
 
-@property (strong, nonatomic) NSString * _Nullable nullableString;
+@property (nonatomic, copy) NSString * _Nullable nullableString;
 
-@property (strong, nonatomic) NSString * _Nullable optionalString;
+@property (nonatomic, copy) NSString * _Nullable optionalString;
 
-@property (strong, nonatomic) NSString * _Nullable nullableOptionalString;
+@property (nonatomic, copy) NSString * _Nullable nullableOptionalString;
 
-@property (strong, nonatomic) MTRTestClusterClusterSimpleStruct * _Nullable nullableStruct;
+@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable nullableStruct;
 
-@property (strong, nonatomic) MTRTestClusterClusterSimpleStruct * _Nullable optionalStruct;
+@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable optionalStruct;
 
-@property (strong, nonatomic) MTRTestClusterClusterSimpleStruct * _Nullable nullableOptionalStruct;
+@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable nullableOptionalStruct;
 
-@property (strong, nonatomic) NSArray * _Nullable nullableList;
+@property (nonatomic, copy) NSArray * _Nullable nullableList;
 
-@property (strong, nonatomic) NSArray * _Nullable optionalList;
+@property (nonatomic, copy) NSArray * _Nullable optionalList;
 
-@property (strong, nonatomic) NSArray * _Nullable nullableOptionalList;
+@property (nonatomic, copy) NSArray * _Nullable nullableOptionalList;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5889,14 +5905,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterSimpleStructEchoRequestParams : NSObject
+@interface MTRTestClusterClusterSimpleStructEchoRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) MTRTestClusterClusterSimpleStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5911,12 +5927,12 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTimedInvokeRequestParams : NSObject
+@interface MTRTestClusterClusterTimedInvokeRequestParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5931,14 +5947,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams : NSObject
+@interface MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nullable arg1;
+@property (nonatomic, copy) NSNumber * _Nullable arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5953,18 +5969,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestEmitTestEventRequestParams : NSObject
+@interface MTRTestClusterClusterTestEmitTestEventRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1;
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg2;
+@property (nonatomic, copy) NSNumber * _Nonnull arg2;
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg3;
+@property (nonatomic, copy) NSNumber * _Nonnull arg3;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5979,14 +5995,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
-@interface MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams : NSObject
+@interface MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams : NSObject <NSCopying>
 
-@property (strong, nonatomic) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6001,10 +6017,10 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
 
 NS_ASSUME_NONNULL_END

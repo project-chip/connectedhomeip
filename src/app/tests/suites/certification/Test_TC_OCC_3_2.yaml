@@ -23,35 +23,63 @@ config:
 tests:
     - label: "Commission TH to DUT"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT reads Occupancy attribute from TH"
       PICS: OCC.C.A0000
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool occupancysensing read occupancy 1 1
 
-          Verify in TH all-clusters-app log
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
 
-          [1648461864.548948][9281:9286] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000 DataVersion: 3082917122
-          [1648461864.549008][9281:9286] CHIP:TOO:   occupancy: 0
+          [1657906910.080564][2361:2361] CHIP:IM: Received Read request
+          [1657906910.080689][2361:2361] CHIP:DMG: ReadRequestMessage =
+          [1657906910.080758][2361:2361] CHIP:DMG: {
+          [1657906910.080799][2361:2361] CHIP:DMG:        AttributePathIBs =
+          [1657906910.080846][2361:2361] CHIP:DMG:        [
+          [1657906910.080907][2361:2361] CHIP:DMG:                AttributePathIB =
+          [1657906910.080965][2361:2361] CHIP:DMG:                {
+          [1657906910.081017][2361:2361] CHIP:DMG:                        Endpoint = 0x1,
+          [1657906910.081092][2361:2361] CHIP:DMG:                        Cluster = 0x406,
+          [1657906910.081152][2361:2361] CHIP:DMG:                        Attribute = 0x0000_0000,
+          [1657906910.081206][2361:2361] CHIP:DMG:                }
+          [1657906910.081279][2361:2361] CHIP:DMG:
+          [1657906910.081331][2361:2361] CHIP:DMG:        ],
+          [1657906910.081398][2361:2361] CHIP:DMG:
+          [1657906910.081449][2361:2361] CHIP:DMG:        isFabricFiltered = true,
+          [1657906910.081496][2361:2361] CHIP:DMG:        InteractionModelRevision = 1
+          [1657906910.081538][2361:2361] CHIP:DMG: },
       disabled: true
 
     - label: "Operate on TH to change the occupancy status"
       PICS: OCC.M.OccupancyChange
       verification: |
-          Logs will be device specific[Dut Action needed]
+          Logs will be device specific[Manual operation required]
       disabled: true
 
     - label: "after a few seconds, DUT reads Occupancy attribute from TH"
       PICS: OCC.C.A0000
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool occupancysensing read occupancy 1 1
 
-          Verify in TH all-clusters-app log
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
 
-          [1648461864.548948][9281:9286] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000 DataVersion: 3082917122
-          [1648461864.549008][9281:9286] CHIP:TOO:   occupancy: 1
+          [1657906923.314549][2361:2361] CHIP:IM: Received Read request
+          [1657906923.314735][2361:2361] CHIP:DMG: ReadRequestMessage =
+          [1657906923.314792][2361:2361] CHIP:DMG: {
+          [1657906923.314838][2361:2361] CHIP:DMG:        AttributePathIBs =
+          [1657906923.314899][2361:2361] CHIP:DMG:        [
+          [1657906923.314949][2361:2361] CHIP:DMG:                AttributePathIB =
+          [1657906923.315006][2361:2361] CHIP:DMG:                {
+          [1657906923.315064][2361:2361] CHIP:DMG:                        Endpoint = 0x1,
+          [1657906923.315132][2361:2361] CHIP:DMG:                        Cluster = 0x406,
+          [1657906923.315199][2361:2361] CHIP:DMG:                        Attribute = 0x0000_0000,
+          [1657906923.315258][2361:2361] CHIP:DMG:                }
+          [1657906923.315322][2361:2361] CHIP:DMG:
+          [1657906923.315380][2361:2361] CHIP:DMG:        ],
+          [1657906923.315438][2361:2361] CHIP:DMG:
+          [1657906923.315497][2361:2361] CHIP:DMG:        isFabricFiltered = true,
+          [1657906923.315560][2361:2361] CHIP:DMG:        InteractionModelRevision = 1
+          [1657906923.315609][2361:2361] CHIP:DMG: },
       disabled: true

@@ -154,6 +154,7 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
     Credentials::P256PublicKeySpan rootPublicKeySpan;
     FabricId fabricId;
+    NodeId nodeId;
     bool hasExternallyOwnedKeypair                   = false;
     Crypto::P256Keypair * externalOperationalKeypair = nullptr;
     VendorId newFabricVendorId                       = params.controllerVendorId;
@@ -195,15 +196,50 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     MutableByteSpan nocSpan = MutableByteSpan(nocBuf.Get(), chipCertAllocatedLen);
 
     ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerNOC, nocSpan));
-    ReturnErrorOnFailure(ExtractFabricIdFromCert(nocSpan, &fabricId));
+    ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(nocSpan, &nodeId, &fabricId));
 
-    auto * fabricTable      = params.systemState->Fabrics();
-    auto * fabricInfo       = fabricTable->FindFabric(rootPublicKey, fabricId);
+    auto * fabricTable            = params.systemState->Fabrics();
+    const FabricInfo * fabricInfo = nullptr;
+
+    //
+    // When multiple controllers are permitted on the same fabric, we need to find fabrics with
+    // nodeId as an extra discriminant since we can have multiple FabricInfo objects that all
+    // collide on the same fabric. Not doing so may result in a match with an existing FabricInfo
+    // instance that matches the fabric in the provided NOC but is associated with a different NodeId
+    // that is already in use by another active controller instance. That will effectively cause it
+    // to change its identity inadvertently, which is not acceptable.
+    //
+    // TODO: Figure out how to clean up unreclaimed FabricInfos restored from persistent
+    //       storage that are not in use by active DeviceController instances. Also, figure out
+    //       how to reclaim FabricInfo slots when a DeviceController instance is deleted.
+    //
+    if (params.permitMultiControllerFabrics)
+    {
+        fabricInfo = fabricTable->FindIdentity(rootPublicKey, fabricId, nodeId);
+    }
+    else
+    {
+        fabricInfo = fabricTable->FindFabric(rootPublicKey, fabricId);
+    }
+
     bool fabricFoundInTable = (fabricInfo != nullptr);
 
     FabricIndex fabricIndex = fabricFoundInTable ? fabricInfo->GetFabricIndex() : kUndefinedFabricIndex;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    //
+    // We permit colliding fabrics when multiple controllers are present on the same logical fabric
+    // since each controller is associated with a unique FabricInfo 'identity' object and consequently,
+    // a unique FabricIndex.
+    //
+    // This sets a flag that will be cleared automatically when the fabric is committed/reverted later
+    // in this function.
+    //
+    if (params.permitMultiControllerFabrics)
+    {
+        fabricTable->PermitCollidingFabrics();
+    }
 
     // We have 4 cases to handle legacy usage of direct operational key injection
     if (externalOperationalKeypair)

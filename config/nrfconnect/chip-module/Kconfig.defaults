@@ -205,6 +205,10 @@ config NET_L2_OPENTHREAD
     bool
     default y
 
+choice OPENTHREAD_STACK_VERSION
+	default OPENTHREAD_THREAD_VERSION_1_3
+endchoice
+
 # Enable mbedTLS from nrf_security library
 
 choice OPENTHREAD_SECURITY

@@ -28,6 +28,13 @@ public:
     virtual ~AppDelegate() {}
     virtual void OnCommissioningSessionStarted() {}
     virtual void OnCommissioningSessionStopped() {}
+
+    /*
+     * This is called anytime a basic or enhanced commissioning window is opened.
+     *
+     * The type of the window can be retrieved by calling
+     * CommissioningWindowManager::CommissioningWindowStatus()
+     */
     virtual void OnCommissioningWindowOpened() {}
     virtual void OnCommissioningWindowClosed() {}
 };

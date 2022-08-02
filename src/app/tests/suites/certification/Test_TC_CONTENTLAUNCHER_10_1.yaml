@@ -42,4 +42,4 @@ tests:
       attribute: "SupportedStreamingProtocols"
       response:
           constraints:
-              type: map32
+              type: bitmap32

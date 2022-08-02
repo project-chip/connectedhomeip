@@ -15,7 +15,7 @@
 
 name:
     3.1.15. [TC-DD-1.15] Onboarding Payload Verification - Unique Discriminator
-    and Passcode Values [DUT - Commissionee]
+    and Passcode Values    [DUT - Commissionee]
 
 config:
     nodeId: 0x12344321

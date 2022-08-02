@@ -21,6 +21,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Commission DUT to TH"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
     - label:
           "Induce a DUT hardware failure two times as addressed in HardwareFault
           ENUM table 11.11.6.1. (Ex. Pull the DUT power plug off causing power
@@ -30,24 +35,25 @@ tests:
       PICS: DGGEN.S.E00
       verification: |
           Optional attribute so its not compulsory to get the expected outcome
+          On Raspi platform the event is triggered with this command, Pls use equivalent command on the respective DUT
 
-          Verify in TH log
           ./chip-tool generaldiagnostics read-event hardware-fault-change 1 0
 
+          On TH verify that HardwareFaultChange Event SHALL indicate a change in the set of hardware faults currently
+          detected by the Node. The current and previous field SHALL represent the set of faults as per Section 11.11.6.1,
+          “HardwareFault enum”
           CHIP:DMG: ReportDataMessage =
           [1651562132.028543][7867:7872] CHIP:DMG: {
           [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true,
           [1651562132.028632][7867:7872] CHIP:DMG:         InteractionModelRevision = 1
           [1651562132.028675][7867:7872] CHIP:DMG: }
           [1651562132.028788][7867:7872] CHIP:EM: Sending Standalone Ack for MessageCounter:10343932 on exchange 65462i
-      disabled: true
 
-    - label: "TH initiates the subscription of HardwareFault event from DUT."
-      PICS: DGGEN.S.E00
-      verification: |
-          Verify in TH log
+          1. Launch chip-tool into interactive mode with the below command
+          ./chip-tool interactive start
+           generaldiagnostics subscribe-event hardware-fault-change 100 1000 1 0
 
-          sudo ./chip-tool generaldiagnostics subscribe-event hardware-fault-change 100 1000 1 0
+          On TH verify that TH reads and subscrition response message showing subscrition ID
 
           [1653659428.373913][242542:242547] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:15916168 on exchange 65448i
           [1653659428.373971][242542:242547] CHIP:EM: Found matching exchange: 65448i, Delegate: 0x7ff474004ae0
@@ -65,7 +71,7 @@ tests:
 
     - label:
           "Induce a DUT radio failure two times as addressed in RadioFault ENUM
-          table 11.11.6.2. (Ex. Put the DUT under metalic cover causing WiFi
+          table 11.11.6.2. (Ex. Put the DUT under metallic cover causing WiFi
           failure. Uncover DUT and make DUT rejoining DUT back to previous TH
           fabric. Repeat the radio failure one more time and rejoin DUT back to
           previous TH fabric."
@@ -73,7 +79,8 @@ tests:
       verification: |
           Optional attribute so its not compulsory to get the expected outcome
 
-          Verify in TH log
+          On TH verify that RadioFaultChange Event SHALL indicate a change in the set of radio faults currently detected
+          by the Node.
           ./chip-tool generaldiagnostics read-event radio-fault-change 1 0
 
           CHIP:DMG: ReportDataMessage =
@@ -84,12 +91,18 @@ tests:
           [1651562132.028788][7867:7872] CHIP:EM: Sending Standalone Ack for MessageCounter:10343932 on exchange 65462i
       disabled: true
 
-    - label: "TH initiates the subscription of RadioFault event from DUT."
-      PICS: DGGEN.S.E01
+    - label:
+          "Induce a DUT radio failure two times as addressed in NetworkFault
+          ENUM table 11.11.6.3. (Ex. Put the DUT under metallic cover causing
+          network failure. Uncover DUT and rejoin DUT back to previous TH
+          fabric. Pull the DUT power plug off causing power source failure.
+          rejoining DUT back to previous TH fabric.)"
+      PICS: DGGEN.S.E02
       verification: |
           sudo ./chip-tool generaldiagnostics subscribe-event radio-fault-change 100 1000 1 0
 
-          Verify in TH log
+          On TH verify that subscription response  of RadioFault event shows subscrition ID
+
           [1653659768.885436][242582:242587] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:13730082 on exchange 33170i
           [1653659768.885490][242582:242587] CHIP:EM: Found matching exchange: 33170i, Delegate: 0x7f1d40006300
           [1653659768.885520][242582:242587] CHIP:EM: Rxd Ack; Removing MessageCounter:6045655 from Retrans Table on exchange 33170i
@@ -105,18 +118,17 @@ tests:
       disabled: true
 
     - label:
-          "Induce a DUT radio failure two times as addressed in NetworkFault
-          ENUM table 11.11.6.3. (Ex. Put the DUT under metalic cover causing
-          network failure. Uncover DUT and rejoin DUT back to previous TH
-          fabric. Pull the DUT power plug off causing power source failure.
-          rejoining DUT back to previous TH fabric.)"
-      PICS: DGGEN.S.E02
+          "Reboot DUT with a normal reboot process. Rejoin DUT back to previous
+          TH fabric."
+      PICS: DGGEN.S.E03
       verification: |
           Optional attribute so its not compulsory to get the expected outcome
 
-          Verify in TH log
+
           ./chip-tool generaldiagnostics read-event network-fault-change 1 0
 
+          On TH verify that The NetworkFaultChange Event SHALL indicate a change in the set of network faults currently
+          detected by the Node.
           CHIP:DMG: ReportDataMessage =
           [1651562132.028543][7867:7872] CHIP:DMG: {
           [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true,
@@ -128,9 +140,10 @@ tests:
     - label: "TH initiates the subscription of NetworkFault event from DUT."
       PICS: DGGEN.S.E02
       verification: |
-          Verify in TH log
+          On Raspi platform the event is triggered with this command, Pls use equivalent command on the respective DUT
 
           sudo ./chip-tool generaldiagnostics subscribe-event network-fault-change 100 1000 1 0
+          On TH verify that subscription response  of NetworkFault event  shows subscrition ID
 
           [1653659901.757441][242605:242610] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:11933575 on exchange 20223i
           [1653659901.757513][242605:242610] CHIP:EM: Found matching exchange: 20223i, Delegate: 0x7fd058003950
@@ -151,9 +164,9 @@ tests:
           TH fabric."
       PICS: DGGEN.S.E03
       verification: |
-          Verify in TH log
-
-          ./chip-tool generaldiagnostics read-event boot-reason 1 0
+          1. Reboot DUT with a normal reboot process
+          2. ./chip-tool generaldiagnostics read-event boot-reason 1 0
+          On TH verify that the event data of BootReason specified by Table 103 BootReason ENUM table.
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0003
           [1651562139.644134][7873:7878] CHIP:TOO:          Event number: 1

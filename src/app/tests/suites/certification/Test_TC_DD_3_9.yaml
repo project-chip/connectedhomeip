@@ -24,7 +24,7 @@ config:
 tests:
     - label: "TH receives Onboarding Payload from the DUT"
       verification: |
-          1. Parse the DUT's QR Code using the TH commissioner: chip-tool
+          1. Parse the DUT"s QR Code using the TH commissioner: chip-tool
           $ ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
           [1657230447725] [31078:16782733] CHIP: [SPL] Parsing base38Representation: MT:-24J029Q00KA0648G00
           [1657230447725] [31078:16782733] CHIP: [SPL] Version:       0
@@ -42,7 +42,7 @@ tests:
           "TH fetches commissioning data from Distributed Compliance Ledger
           (DCL)"
       verification: |
-          1. TH fetches the DCL from DUT's DCL
+          1. TH fetches the DCL from DUT"s DCL
           2. Verify that DCL contains the criteria:
           - CommissioningCustomFlow field = 2
           - CommissioningModeInitialStepsHint bit 0 (Power Cycle) = 0 and bit 1 (Device Manufacturer URL) = 1
@@ -53,7 +53,7 @@ tests:
           "TH uses the provided URL to guide user on how to put DUT in a state
           that allows commissioning"
       verification: |
-          1. Follow steps from DCL's URL given
+          1. Follow steps from DCL"s URL given
       disabled: true
 
     - label: "DUT is commissioned by the TH"

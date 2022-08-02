@@ -35,7 +35,7 @@ tests:
       response:
           saveAs: ValueBeforeChange
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -56,7 +56,7 @@ tests:
       attribute: "MeasuredValue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
               notValue: ValueBeforeChange

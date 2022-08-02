@@ -34,7 +34,7 @@ tests:
       attribute: "MinMeasuredValue"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32766
 
@@ -44,7 +44,7 @@ tests:
       attribute: "MaxMeasuredValue"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27314
               maxValue: 32767
 
@@ -55,9 +55,9 @@ tests:
       response:
           saveAs: valueBeforeChange
           constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
+              type: int16s
+              minValue: -27314
+              maxValue: 32767
 
     - label: "Operate on device to change the temperature significantly"
       cluster: "LogCommands"
@@ -76,7 +76,7 @@ tests:
       PICS: TMP.S.A0000 && TMP.M.ManuallyControlled
       response:
           constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
+              type: int16s
+              minValue: -27314
+              maxValue: 32767
               notValue: valueBeforeChange

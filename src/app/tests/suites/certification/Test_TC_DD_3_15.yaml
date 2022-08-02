@@ -62,20 +62,19 @@ tests:
           $ ./chip-tool pairing code 1 34970112332
 
           [1651109112823] [95528:65650355] CHIP: [CTL] Received CommissioningComplete response
-          [1651109112823] [95528:65650355] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1651109112823] [95528:65650355] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1651109112823] [95528:65650355] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1651109112823] [95528:65650355] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651109112823] [95528:65650355] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
+          [1651109112823] [95528:65650355] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1651109112823] [95528:65650355] CHIP: [CTL] Performing next commissioning step "Cleanup"
+          [1651109112823] [95528:65650355] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1651109112823] [95528:65650355] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
-          'Verify the THs 21-digit Manual Pairing Code meets the following
+          "Verify the THs 21-digit Manual Pairing Code meets the following
           criteria: - A VERSION bit string string up-to-date with the current
           Matter spec. documentation - A VID_PID_PRESENT bit string set to 1 - A
-          VENDOR_ID present (as defined in section 2.5.2. "Vendor Identifier") -
-          A PRODUCT_ID present (as defined in section 2.5.3. "Product
-          Identifier")'
+          VENDOR_ID present (as defined in section 2.5.2. Vendor Identifier) - A
+          PRODUCT_ID present (as defined in section 2.5.3. Product Identifier)"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           On TH Commissionee:
@@ -117,9 +116,9 @@ tests:
           $ ./chip-tool pairing code 1 749701123365521327694
 
           [1651109219028] [95536:65652322] CHIP: [CTL] Received CommissioningComplete response
-          [1651109219028] [95536:65652322] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1651109219028] [95536:65652322] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1651109219028] [95536:65652322] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1651109219028] [95536:65652322] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651109219028] [95536:65652322] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
+          [1651109219028] [95536:65652322] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1651109219028] [95536:65652322] CHIP: [CTL] Performing next commissioning step "Cleanup"
+          [1651109219028] [95536:65652322] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1651109219028] [95536:65652322] CHIP: [TOO] Device commissioning completed with success
       disabled: true

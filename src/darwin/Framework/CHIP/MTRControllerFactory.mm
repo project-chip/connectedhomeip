@@ -26,6 +26,7 @@
 #import "MTRDeviceController_Internal.h"
 #import "MTRLogging.h"
 #import "MTRMemory.h"
+#import "MTROTAProviderDelegateBridge.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "NSDataSpanConversion.h"
@@ -53,6 +54,7 @@ static NSString * const kErrorControllersInit = @"Init controllers array failure
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
 static NSString * const kErrorKeystoreInit = @"Init failure while initializing persistent storage keystore";
 static NSString * const kErrorCertStoreInit = @"Init failure while initializing persistent storage operational certificate store";
+static NSString * const kErrorOtaProviderInit = @"Init failure while creating an OTA provider delegate";
 
 @interface MTRControllerFactory ()
 
@@ -60,6 +62,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
 @property (readonly) DeviceControllerFactory * controllerFactory;
 @property (readonly) MTRPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
 @property (readonly) MTRAttestationTrustStoreBridge * attestationTrustStoreBridge;
+@property (readonly) MTROTAProviderDelegateBridge * otaProviderDelegateBridge;
 // We use TestPersistentStorageDelegate just to get an in-memory store to back
 // our group data provider impl.  We initialize this store correctly on every
 // controller startup, so don't need to actually persist it.
@@ -73,6 +76,8 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
                     params:(MTRDeviceControllerStartupParams *)params
                     fabric:(const FabricInfo * _Nullable * _Nonnull)fabric;
+
+- (MTRDeviceController * _Nullable)maybeInitializeOTAProvider:(MTRDeviceController * _Nonnull)controller;
 @end
 
 @implementation MTRControllerFactory
@@ -171,6 +176,11 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
         _attestationTrustStoreBridge = nullptr;
     }
 
+    if (_otaProviderDelegateBridge) {
+        delete _otaProviderDelegateBridge;
+        _otaProviderDelegateBridge = nullptr;
+    }
+
     if (_keystore) {
         _keystore->Finish();
         delete _keystore;
@@ -209,6 +219,14 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
         if (_persistentStorageDelegateBridge == nil) {
             MTR_LOG_ERROR("Error: %@", kErrorPersistentStorageInit);
             return;
+        }
+
+        if (startupParams.otaProviderDelegate) {
+            _otaProviderDelegateBridge = new MTROTAProviderDelegateBridge(startupParams.otaProviderDelegate);
+            if (_otaProviderDelegateBridge == nil) {
+                MTR_LOG_ERROR("Error: %@", kErrorOtaProviderInit);
+                return;
+            }
         }
 
         // TODO: Allow passing a different keystore implementation via startupParams.
@@ -371,7 +389,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
         return nil;
     }
 
-    return controller;
+    return [self maybeInitializeOTAProvider:controller];
 }
 
 - (MTRDeviceController * _Nullable)startControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
@@ -431,7 +449,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
         return nil;
     }
 
-    return controller;
+    return [self maybeInitializeOTAProvider:controller];
 }
 
 - (MTRDeviceController * _Nullable)createController
@@ -495,6 +513,27 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
     return YES;
 }
 
+// Initialize the MTROTAProviderDelegateBridge if it has not been initialized already
+//
+// Returns nil on failure, the input controller on success.
+// If the provider has been initialized already, it is not considered as a failure.
+//
+- (MTRDeviceController * _Nullable)maybeInitializeOTAProvider:(MTRDeviceController * _Nonnull)controller
+{
+    VerifyOrReturnValue(_otaProviderDelegateBridge != nil, controller);
+    VerifyOrReturnValue([_controllers count] == 1, controller);
+
+    auto systemState = _controllerFactory->GetSystemState();
+    CHIP_ERROR err = _otaProviderDelegateBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr());
+    if (CHIP_NO_ERROR != err) {
+        MTR_LOG_ERROR("Failed to init provider delegate bridge: %" CHIP_ERROR_FORMAT, err.Format());
+        [controller shutdown];
+        return nil;
+    }
+
+    return controller;
+}
+
 @end
 
 @implementation MTRControllerFactory (InternalMethods)
@@ -521,6 +560,10 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
     [_controllers removeObject:controller];
 
     if ([_controllers count] == 0) {
+        if (_otaProviderDelegateBridge) {
+            _otaProviderDelegateBridge->Shutdown();
+        }
+
         // That was our last controller.  Stop the event loop before it
         // shuts down, because shutdown of the last controller will tear
         // down most of the world.
@@ -556,6 +599,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
     }
 
     _storageDelegate = storageDelegate;
+    _otaProviderDelegate = nil;
     _paaCerts = nil;
     _port = nil;
     _startServer = NO;

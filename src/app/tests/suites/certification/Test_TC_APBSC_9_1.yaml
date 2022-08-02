@@ -34,7 +34,7 @@ tests:
       attribute: "VendorName"
       response:
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "Reads the VendorID attribute"
@@ -43,7 +43,7 @@ tests:
       attribute: "VendorID"
       response:
           constraints:
-              type: vendor-id
+              type: vendor_id
           saveAs: vendorID
 
     - label: "Reads the ApplicationName attribute"
@@ -52,7 +52,7 @@ tests:
       attribute: "ApplicationName"
       response:
           constraints:
-              type: string
+              type: char_string
               maxLength: 256
 
     - label: "Reads the ProductID attribute"
@@ -61,7 +61,7 @@ tests:
       attribute: "ProductID"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -71,7 +71,7 @@ tests:
       attribute: "Application"
       response:
           constraints:
-              type: struct
+              type: ApplicationBasicApplication
 
     - label: "Reads the Status attribute"
       PICS: APBSC.S.A0005
@@ -88,7 +88,7 @@ tests:
       attribute: "ApplicationVersion"
       response:
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "Reads the AllowedVendorList attribute"

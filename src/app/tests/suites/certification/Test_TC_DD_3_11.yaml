@@ -70,10 +70,10 @@ tests:
           $ ./chip-tool pairing code 1  MT:-24J0YXE00KA0648G00
 
           [1657232374820] [31379:16804218] CHIP: [CTL] Received CommissioningComplete response, errorCode=0
-          [1657232374820] [31379:16804218] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1657232374820] [31379:16804218] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1657232374820] [31379:16804218] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1657232374820] [31379:16804218] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657232374820] [31379:16804218] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
+          [1657232374820] [31379:16804218] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1657232374820] [31379:16804218] CHIP: [CTL] Performing next commissioning step "Cleanup"
+          [1657232374820] [31379:16804218] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657232374820] [31379:16804218] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
@@ -121,10 +121,10 @@ tests:
           $ ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 
           [1651105530854] [95067:65607294] CHIP: [CTL] Received CommissioningComplete response
-          [1651105530854] [95067:65607294] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1651105530854] [95067:65607294] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1651105530854] [95067:65607294] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1651105530854] [95067:65607294] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651105530854] [95067:65607294] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
+          [1651105530854] [95067:65607294] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1651105530854] [95067:65607294] CHIP: [CTL] Performing next commissioning step "Cleanup"
+          [1651105530854] [95067:65607294] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1651105530854] [95067:65607294] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 

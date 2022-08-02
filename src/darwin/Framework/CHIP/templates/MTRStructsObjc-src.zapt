@@ -17,6 +17,17 @@ NS_ASSUME_NONNULL_BEGIN
   return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+  auto other = [[MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}} alloc] init];
+
+  {{#zcl_struct_items}}
+  other.{{asStructPropertyName label}} = self.{{asStructPropertyName label}};
+  {{/zcl_struct_items}}
+
+  return other;
+}
+
 - (NSString *)description
 {
   NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_struct_items}}{{asStructPropertyName label}}:%@; {{/zcl_struct_items}}>", NSStringFromClass([self class]){{#zcl_struct_items}},{{#if isArray}}_{{asStructPropertyName label}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName label}}{{/if}}{{/zcl_struct_items}}];
@@ -37,6 +48,17 @@ NS_ASSUME_NONNULL_BEGIN
     {{/zcl_event_fields}}
   }
   return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+  auto other = [[MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event alloc] init];
+
+  {{#zcl_event_fields}}
+  other.{{asStructPropertyName name}} = self.{{asStructPropertyName name}};
+  {{/zcl_event_fields}}
+
+  return other;
 }
 
 - (NSString *)description

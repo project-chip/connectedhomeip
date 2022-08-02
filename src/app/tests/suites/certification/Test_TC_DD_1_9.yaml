@@ -26,6 +26,7 @@ tests:
     - label:
           "Provide the 11-digit/21-digit Manual Pairing Code from the TH Device
           in text, speech or any format supported by DUT"
+      PICS: ""
       verification: |
           1. Launch all-clusters-app on the raspi , get the Manual Pairing code from the log
 
@@ -84,10 +85,10 @@ tests:
           Verify in DUT as client side:
           [1653556303.582797][4071:4076] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           [1653556303.582850][4071:4076] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          [1653556303.582891][4071:4076] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
-          [1653556303.582927][4071:4076] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1653556303.582964][4071:4076] CHIP:CTL: Performing next commissioning step 'Cleanup'
-          [1653556303.583040][4071:4076] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1653556303.582891][4071:4076] CHIP:CTL: Successfully finished commissioning step "SendComplete"
+          [1653556303.582927][4071:4076] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1653556303.582964][4071:4076] CHIP:CTL: Performing next commissioning step "Cleanup"
+          [1653556303.583040][4071:4076] CHIP:CTL: Successfully finished commissioning step "Cleanup"
           [1653556303.583110][4071:4076] CHIP:TOO: Device commissioning completed with success
           [1653556303.583209][4071:4076] CHIP:DMG: ICR moving to [AwaitingDe]
           [1653556303.583255][4071:4076] CHIP:EM: Sending Standalone Ack for MessageCounter:9735725 on exchange 24476i

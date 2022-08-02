@@ -123,8 +123,6 @@ function getManualTests() {
         "Test_TC_CNET_4_4",
         "Test_TC_CNET_4_5",
         "Test_TC_CNET_4_6",
-        "Test_TC_CNET_4_7",
-        "Test_TC_CNET_4_8",
         "Test_TC_CNET_4_9",
         "Test_TC_CNET_4_10",
         "Test_TC_CNET_4_11",
@@ -161,7 +159,6 @@ function getManualTests() {
 
     const GeneralCommissioning = [
         "Test_TC_CGEN_2_2",
-        "Test_TC_CGEN_2_3",
         "Test_TC_CGEN_2_4",
     ];
 
@@ -506,6 +503,12 @@ function getManualTests() {
         "Test_TC_ULABEL_3_1",
     ];
 
+    const BridgedDeviceBasicInformation = [
+        "Test_TC_BRBINFO_1_1",
+        "Test_TC_BRBINFO_2_1",
+        "Test_TC_BRBINFO_2_2",
+        "Test_TC_BRBINFO_2_3",
+    ];
 
     const tests = [
         DeviceDiscovery,
@@ -556,6 +559,7 @@ function getManualTests() {
         PumpConfigurationControl,
         AccessControl,
         UserLabel,
+        BridgedDeviceBasicInformation,
     ].flat(1);
 
     tests.disable = disable.bind(tests);
@@ -841,7 +845,8 @@ function getTests() {
         "TestArmFailSafe",
         "TestFanControl",
         "TestAccessControlConstraints",
-        "TestLevelControlWithOnOffDependency"
+        "TestLevelControlWithOnOffDependency",
+        "TestCommissioningWindow",
     ];
 
     const MultiAdmin = [

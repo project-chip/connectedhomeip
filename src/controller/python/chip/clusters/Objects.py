@@ -1649,14 +1649,14 @@ class LevelControl(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="level", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="transitionTime", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="optionMask", Tag=2, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="optionOverride", Tag=3, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsMask", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
             level: 'uint' = 0
             transitionTime: 'uint' = 0
-            optionMask: 'uint' = 0
-            optionOverride: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class Move(ClusterCommand):
@@ -1670,14 +1670,14 @@ class LevelControl(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="moveMode", Tag=0, Type=LevelControl.Enums.MoveMode),
                             ClusterObjectFieldDescriptor(Label="rate", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="optionMask", Tag=2, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="optionOverride", Tag=3, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsMask", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
             moveMode: 'LevelControl.Enums.MoveMode' = 0
             rate: 'uint' = 0
-            optionMask: 'uint' = 0
-            optionOverride: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class Step(ClusterCommand):
@@ -1692,15 +1692,15 @@ class LevelControl(Cluster):
                             ClusterObjectFieldDescriptor(Label="stepMode", Tag=0, Type=LevelControl.Enums.StepMode),
                             ClusterObjectFieldDescriptor(Label="stepSize", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="optionMask", Tag=3, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="optionOverride", Tag=4, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsMask", Tag=3, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=4, Type=uint),
                     ])
 
             stepMode: 'LevelControl.Enums.StepMode' = 0
             stepSize: 'uint' = 0
             transitionTime: 'uint' = 0
-            optionMask: 'uint' = 0
-            optionOverride: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class Stop(ClusterCommand):
@@ -1712,12 +1712,12 @@ class LevelControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="optionMask", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="optionOverride", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsMask", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=1, Type=uint),
                     ])
 
-            optionMask: 'uint' = 0
-            optionOverride: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class MoveToLevelWithOnOff(ClusterCommand):
@@ -1731,10 +1731,14 @@ class LevelControl(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="level", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="transitionTime", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsMask", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
             level: 'uint' = 0
             transitionTime: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class MoveWithOnOff(ClusterCommand):
@@ -1748,10 +1752,14 @@ class LevelControl(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="moveMode", Tag=0, Type=LevelControl.Enums.MoveMode),
                             ClusterObjectFieldDescriptor(Label="rate", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsMask", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
             moveMode: 'LevelControl.Enums.MoveMode' = 0
             rate: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class StepWithOnOff(ClusterCommand):
@@ -1766,11 +1774,15 @@ class LevelControl(Cluster):
                             ClusterObjectFieldDescriptor(Label="stepMode", Tag=0, Type=LevelControl.Enums.StepMode),
                             ClusterObjectFieldDescriptor(Label="stepSize", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsMask", Tag=3, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=4, Type=uint),
                     ])
 
             stepMode: 'LevelControl.Enums.StepMode' = 0
             stepSize: 'uint' = 0
             transitionTime: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class StopWithOnOff(ClusterCommand):
@@ -1782,8 +1794,12 @@ class LevelControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
+                            ClusterObjectFieldDescriptor(Label="optionsMask", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=1, Type=uint),
                     ])
 
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class MoveToClosestFrequency(ClusterCommand):
@@ -4179,8 +4195,10 @@ class Basic(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
+                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=0, Type=uint),
                     ])
 
+            fabricIndex: 'uint' = 0
 
         @dataclass
         class ReachableChanged(ClusterEvent):
@@ -9169,6 +9187,27 @@ class ThreadNetworkDiagnostics(Cluster):
 
             connectionStatus: 'ThreadNetworkDiagnostics.Enums.ThreadConnectionStatus' = 0
 
+        @dataclass
+        class NetworkFaultChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0035
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]),
+                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]),
+                    ])
+
+            current: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]' = field(default_factory=lambda: [])
+            previous: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]' = field(default_factory=lambda: [])
+
 
 @dataclass
 class WiFiNetworkDiagnostics(Cluster):
@@ -10773,8 +10812,8 @@ class AdministratorCommissioning(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="windowStatus", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="adminVendorId", Tag=0x00000002, Type=uint),
+                ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="adminVendorId", Tag=0x00000002, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -10783,8 +10822,8 @@ class AdministratorCommissioning(Cluster):
             ])
 
     windowStatus: 'uint' = None
-    adminFabricIndex: 'uint' = None
-    adminVendorId: 'uint' = None
+    adminFabricIndex: 'typing.Union[Nullable, uint]' = None
+    adminVendorId: 'typing.Union[Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -10898,9 +10937,9 @@ class AdministratorCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'uint' = 0
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class AdminVendorId(ClusterAttributeDescriptor):
@@ -10914,9 +10953,9 @@ class AdministratorCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'uint' = 0
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
