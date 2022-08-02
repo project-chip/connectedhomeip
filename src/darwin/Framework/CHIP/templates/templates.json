@@ -54,18 +54,33 @@
         },
         {
             "path": "MTRBaseClusters_internal.zapt",
-            "name": "Objc ZCL API Internal Header",
+            "name": "Objc ZCL asynchronous API Internal Header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters_internal.h"
         },
         {
             "path": "MTRBaseClusters.zapt",
-            "name": "Objc ZCL API Header",
+            "name": "Objc ZCL asynchronous API Header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.h"
         },
         {
             "path": "MTRBaseClusters-src.zapt",
-            "name": "Objc ZCL API",
+            "name": "Objc ZCL asynchronous API",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.mm"
+        },
+        {
+            "path": "MTRClusters_internal.zapt",
+            "name": "Objc ZCL synchronous API Internal Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters_internal.h"
+        },
+        {
+            "path": "MTRClusters.zapt",
+            "name": "Objc ZCL synchronous API Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters.h"
+        },
+        {
+            "path": "MTRClusters-src.zapt",
+            "name": "Objc ZCL synchronous API",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters.mm"
         },
         {
             "path": "MTRStructsObjc.zapt",
