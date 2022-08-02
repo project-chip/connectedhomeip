@@ -227,22 +227,21 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
         {
             setOnOffValue(endpoint, (currentLevel.Value() != state->minLevel));
         }
-        else
+
+        if (state->storedLevel != INVALID_STORED_LEVEL)
         {
-            if (state->storedLevel != INVALID_STORED_LEVEL)
+            uint8_t storedLevel8u = (uint8_t) state->storedLevel;
+            status                = Attributes::CurrentLevel::Set(endpoint, storedLevel8u);
+            if (status != EMBER_ZCL_STATUS_SUCCESS)
             {
-                uint8_t storedLevel8u = (uint8_t) state->storedLevel;
-                status                = Attributes::CurrentLevel::Set(endpoint, storedLevel8u);
-                if (status != EMBER_ZCL_STATUS_SUCCESS)
-                {
-                    emberAfLevelControlClusterPrintln("ERR: writing current level %x", status);
-                }
-                else
-                {
-                    updateCoupledColorTemp(endpoint);
-                }
+                emberAfLevelControlClusterPrintln("ERR: writing current level %x", status);
+            }
+            else
+            {
+                updateCoupledColorTemp(endpoint);
             }
         }
+
         writeRemainingTime(endpoint, 0);
     }
     else
@@ -1070,16 +1069,15 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         // time period OnOffTransitionTime."
         if (useOnLevel)
         {
-
             // If OnLevel is defined, don't revert to stored level.
-            moveToLevelHandler(endpoint, Commands::MoveToLevel::Id, minimumLevelAllowedForTheDevice, transitionTime, 0xFF, 0xFF,
-                               INVALID_STORED_LEVEL);
+            moveToLevelHandler(endpoint, Commands::MoveToLevelWithOnOff::Id, minimumLevelAllowedForTheDevice, currentOnOffTransitionTime,
+                               0xFF, 0xFF, INVALID_STORED_LEVEL);
         }
         else
         {
             // If OnLevel is not defined, set the CurrentLevel to the stored level.
-            moveToLevelHandler(endpoint, Commands::MoveToLevel::Id, minimumLevelAllowedForTheDevice, transitionTime, 0xFF, 0xFF,
-                               temporaryCurrentLevelCache.Value());
+            moveToLevelHandler(endpoint, Commands::MoveToLevelWithOnOff::Id, minimumLevelAllowedForTheDevice, currentOnOffTransitionTime,
+                               0xFF, 0xFF, temporaryCurrentLevelCache);
         }
     }
 }

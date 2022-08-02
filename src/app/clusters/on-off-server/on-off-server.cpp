@@ -187,8 +187,9 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
         {
             emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
         }
+        else
+        {
 #endif
-
         // write the new on/off value
         status = Attributes::OnOff::Set(endpoint, newValue);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -196,6 +197,9 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
             emberAfOnOffClusterPrintln("ERR: writing on/off %x", status);
             return status;
         }
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
+        }
+#endif
     }
 
 #ifdef EMBER_AF_PLUGIN_SCENES
