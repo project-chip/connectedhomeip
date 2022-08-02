@@ -127,7 +127,7 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
         MoveToState(State::ResponseReceived);
     }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
     bool sendStatusResponse = false;
     VerifyOrExit(apExchangeContext == mExchangeCtx.Get(), err = CHIP_ERROR_INCORRECT_STATE);
     sendStatusResponse = true;

@@ -635,8 +635,8 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
 #endif
 }
 
-// Command Sender sends the invoke request, command handler drops invoke response, then test injects status response message with busy to client,
-// client would send out the status response with invalid action.
+// Command Sender sends the invoke request, command handler drops invoke response, then test injects status response message with
+// busy to client, client would send out the status response with invalid action.
 void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -647,10 +647,10 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     AddInvokeRequestData(apSuite, apContext, &commandSender);
     asyncCommand = false;
 
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 1;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 1;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    err                                            = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
+    err                                                 = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
@@ -678,10 +678,10 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
 
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     rm->ClearRetransTable(commandSender.mExchangeCtx.Get());
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 0;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    ctx.GetLoopback().mDroppedMessageCount = 0;
+    ctx.GetLoopback().mDroppedMessageCount              = 0;
 
     err = commandSender.OnMessageReceived(commandSender.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_IM_GLOBAL_STATUS(Busy));
@@ -692,7 +692,7 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
 
     ctx.DrainAndServiceIO();
 
-    //Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
+    // Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
     NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
     ctx.ExpireSessionAliceToBob();
@@ -713,10 +713,10 @@ void TestCommandInteraction::TestCommandInvalidMessage2(nlTestSuite * apSuite, v
     AddInvokeRequestData(apSuite, apContext, &commandSender);
     asyncCommand = false;
 
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 1;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 1;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    err                                            = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
+    err                                                 = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
@@ -743,10 +743,10 @@ void TestCommandInteraction::TestCommandInvalidMessage2(nlTestSuite * apSuite, v
 
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     rm->ClearRetransTable(commandSender.mExchangeCtx.Get());
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 0;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    ctx.GetLoopback().mDroppedMessageCount = 0;
+    ctx.GetLoopback().mDroppedMessageCount              = 0;
 
     err = commandSender.OnMessageReceived(commandSender.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INVALID_MESSAGE_TYPE);
@@ -757,7 +757,7 @@ void TestCommandInteraction::TestCommandInvalidMessage2(nlTestSuite * apSuite, v
 
     ctx.DrainAndServiceIO();
 
-    //Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
+    // Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
     NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
     ctx.ExpireSessionAliceToBob();
@@ -766,8 +766,8 @@ void TestCommandInteraction::TestCommandInvalidMessage2(nlTestSuite * apSuite, v
     ctx.CreateSessionBobToAlice();
 }
 
-// Command Sender sends the invoke request, command handler drops invoke response, then test injects malformed invoke response message to client,
-// client would send out the status response with invalid action.
+// Command Sender sends the invoke request, command handler drops invoke response, then test injects malformed invoke response
+// message to client, client would send out the status response with invalid action.
 void TestCommandInteraction::TestCommandInvalidMessage3(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -778,10 +778,10 @@ void TestCommandInteraction::TestCommandInvalidMessage3(nlTestSuite * apSuite, v
     AddInvokeRequestData(apSuite, apContext, &commandSender);
     asyncCommand = false;
 
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 1;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 1;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    err                                            = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
+    err                                                 = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
@@ -808,10 +808,10 @@ void TestCommandInteraction::TestCommandInvalidMessage3(nlTestSuite * apSuite, v
 
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     rm->ClearRetransTable(commandSender.mExchangeCtx.Get());
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 0;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    ctx.GetLoopback().mDroppedMessageCount = 0;
+    ctx.GetLoopback().mDroppedMessageCount              = 0;
 
     err = commandSender.OnMessageReceived(commandSender.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_END_OF_TLV);
@@ -822,7 +822,7 @@ void TestCommandInteraction::TestCommandInvalidMessage3(nlTestSuite * apSuite, v
 
     ctx.DrainAndServiceIO();
 
-    //Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
+    // Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
     NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
     ctx.ExpireSessionAliceToBob();
@@ -831,8 +831,8 @@ void TestCommandInteraction::TestCommandInvalidMessage3(nlTestSuite * apSuite, v
     ctx.CreateSessionBobToAlice();
 }
 
-// Command Sender sends the invoke request, command handler drops invoke response, then test injects malformed status response to client,
-// client would out the status response with invalid action.
+// Command Sender sends the invoke request, command handler drops invoke response, then test injects malformed status response to
+// client, client would out the status response with invalid action.
 void TestCommandInteraction::TestCommandInvalidMessage4(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -843,10 +843,10 @@ void TestCommandInteraction::TestCommandInvalidMessage4(nlTestSuite * apSuite, v
     AddInvokeRequestData(apSuite, apContext, &commandSender);
     asyncCommand = false;
 
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 1;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 1;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    err                                            = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
+    err                                                 = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
@@ -873,10 +873,10 @@ void TestCommandInteraction::TestCommandInvalidMessage4(nlTestSuite * apSuite, v
 
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     rm->ClearRetransTable(commandSender.mExchangeCtx.Get());
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 0;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    ctx.GetLoopback().mDroppedMessageCount = 0;
+    ctx.GetLoopback().mDroppedMessageCount              = 0;
 
     err = commandSender.OnMessageReceived(commandSender.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_END_OF_TLV);
@@ -887,7 +887,7 @@ void TestCommandInteraction::TestCommandInvalidMessage4(nlTestSuite * apSuite, v
 
     ctx.DrainAndServiceIO();
 
-    //Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
+    // Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
     NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
     ctx.ExpireSessionAliceToBob();
