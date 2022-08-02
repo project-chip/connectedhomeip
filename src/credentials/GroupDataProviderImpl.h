@@ -80,6 +80,8 @@ public:
     // Key Sets
     //
 
+    static CHIP_ERROR DeriveOperationalKey(const ByteSpan & epoch_key, const ByteSpan & compressed_fabric_id,
+                                           OperationalKey & operational_credentials);
     CHIP_ERROR SetKeySet(FabricIndex fabric_index, const ByteSpan & compressed_fabric_id, const KeySet & keys) override;
     CHIP_ERROR GetKeySet(FabricIndex fabric_index, chip::KeysetId keyset_id, KeySet & keys) override;
     CHIP_ERROR RemoveKeySet(FabricIndex fabric_index, chip::KeysetId keyset_id) override;
@@ -156,13 +158,18 @@ protected:
                         const ByteSpan & privacyKey) :
             mProvider(provider)
         {
-            SetKey(encryptionKey, hash, privacyKey);
+            SetKey(encryptionKey, hash);
+            SetPrivacyKey(privacyKey);
         }
 
-        void SetKey(const ByteSpan & encryptionKey, uint16_t hash, const ByteSpan & privacyKey)
+        void SetKey(const ByteSpan & encryptionKey, uint16_t hash)
         {
             mKeyHash = hash;
             memcpy(mEncryptionKey, encryptionKey.data(), std::min(encryptionKey.size(), sizeof(mEncryptionKey)));
+        }
+
+        void SetPrivacyKey(const ByteSpan & privacyKey)
+        {
             memcpy(mPrivacyKey, privacyKey.data(), std::min(privacyKey.size(), sizeof(mPrivacyKey)));
         }
 
@@ -220,7 +227,7 @@ protected:
         uint16_t mKeyIndex       = 0;
         uint16_t mKeyCount       = 0;
         bool mFirstMap           = true;
-        GroupKeyContext mKeyContext;
+        GroupKeyContext mGroupKeyContext;
     };
     bool IsInitialized() { return (mStorage != nullptr); }
     CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id);
@@ -231,7 +238,7 @@ protected:
     ObjectPool<EndpointIteratorImpl, kIteratorsMax> mEndpointIterators;
     ObjectPool<KeySetIteratorImpl, kIteratorsMax> mKeySetIterators;
     ObjectPool<GroupSessionIteratorImpl, kIteratorsMax> mGroupSessionsIterator;
-    ObjectPool<GroupKeyContext, kIteratorsMax> mKeyContexPool;
+    ObjectPool<GroupKeyContext, kIteratorsMax> mGroupKeyContexPool;
 };
 
 } // namespace Credentials
