@@ -4338,74 +4338,74 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case LevelControl::Attributes::CurrentLevel::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current level", 1, value);
+            return DataModelLogger::LogValue("CurrentLevel", 1, value);
         }
         case LevelControl::Attributes::RemainingTime::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("remaining time", 1, value);
+            return DataModelLogger::LogValue("RemainingTime", 1, value);
         }
         case LevelControl::Attributes::MinLevel::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("min level", 1, value);
+            return DataModelLogger::LogValue("MinLevel", 1, value);
         }
         case LevelControl::Attributes::MaxLevel::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("max level", 1, value);
+            return DataModelLogger::LogValue("MaxLevel", 1, value);
         }
         case LevelControl::Attributes::CurrentFrequency::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current frequency", 1, value);
+            return DataModelLogger::LogValue("CurrentFrequency", 1, value);
         }
         case LevelControl::Attributes::MinFrequency::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("min frequency", 1, value);
+            return DataModelLogger::LogValue("MinFrequency", 1, value);
         }
         case LevelControl::Attributes::MaxFrequency::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("max frequency", 1, value);
+            return DataModelLogger::LogValue("MaxFrequency", 1, value);
         }
         case LevelControl::Attributes::Options::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("options", 1, value);
+            return DataModelLogger::LogValue("Options", 1, value);
         }
         case LevelControl::Attributes::OnOffTransitionTime::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("on off transition time", 1, value);
+            return DataModelLogger::LogValue("OnOffTransitionTime", 1, value);
         }
         case LevelControl::Attributes::OnLevel::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("on level", 1, value);
+            return DataModelLogger::LogValue("OnLevel", 1, value);
         }
         case LevelControl::Attributes::OnTransitionTime::Id: {
             chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("on transition time", 1, value);
+            return DataModelLogger::LogValue("OnTransitionTime", 1, value);
         }
         case LevelControl::Attributes::OffTransitionTime::Id: {
             chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("off transition time", 1, value);
+            return DataModelLogger::LogValue("OffTransitionTime", 1, value);
         }
         case LevelControl::Attributes::DefaultMoveRate::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("default move rate", 1, value);
+            return DataModelLogger::LogValue("DefaultMoveRate", 1, value);
         }
         case LevelControl::Attributes::StartUpCurrentLevel::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("start up current level", 1, value);
+            return DataModelLogger::LogValue("StartUpCurrentLevel", 1, value);
         }
         case LevelControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
