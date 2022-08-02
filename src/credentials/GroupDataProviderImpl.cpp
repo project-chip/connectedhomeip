@@ -1863,6 +1863,7 @@ CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::DecryptMessage(const ByteSpan
 CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyEncrypt(const ByteSpan & input, const ByteSpan & nonce,
                                                                   MutableByteSpan & output) const
 {
+    // TODO(#21559): Add AES_CTR_encrypt and use that
     return Crypto::AES_CCM_encrypt(input.data(), input.size(), nullptr, 0, mPrivacyKey, Crypto::kAES_CCM128_Key_Length,
                                    nonce.data(), nonce.size(), output.data(), nullptr, 0);
 }
@@ -1870,6 +1871,7 @@ CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyEncrypt(const ByteSpan
 CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyDecrypt(const ByteSpan & input, const ByteSpan & nonce,
                                                                   MutableByteSpan & output) const
 {
+    // TODO(#21559): Add AES_CTR_decrypt and use that
     return Crypto::AES_CCM_decrypt(input.data(), input.size(), nullptr, 0, nullptr, 0, mPrivacyKey, Crypto::kAES_CCM128_Key_Length,
                                    nonce.data(), nonce.size(), output.data());
 }
