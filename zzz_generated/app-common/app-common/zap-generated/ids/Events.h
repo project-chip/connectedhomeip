@@ -132,6 +132,10 @@ namespace ConnectionStatus {
 static constexpr EventId Id = 0x00000000;
 } // namespace ConnectionStatus
 
+namespace NetworkFaultChange {
+static constexpr EventId Id = 0x00000001;
+} // namespace NetworkFaultChange
+
 } // namespace Events
 } // namespace ThreadNetworkDiagnostics
 
