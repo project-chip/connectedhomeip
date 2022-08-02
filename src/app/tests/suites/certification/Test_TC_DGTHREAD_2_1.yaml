@@ -34,7 +34,7 @@ tests:
       attribute: "channel"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -44,7 +44,7 @@ tests:
       attribute: "RoutingRole"
       response:
           constraints:
-              type: RoutingRole
+              type: enum8
               minValue: 0
               maxValue: 6
 
@@ -56,7 +56,7 @@ tests:
       attribute: "NetworkName"
       response:
           constraints:
-              type: string
+              type: char_string
 
     - label:
           "Read NetworkName attribute from DUT and verify response value, If
@@ -90,7 +90,7 @@ tests:
       attribute: "PanId"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -125,7 +125,7 @@ tests:
       attribute: "ExtendedPanId"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label:
           "Read ExtendedPanId attribute from DUT and verify response value, If
@@ -180,7 +180,7 @@ tests:
       attribute: "OverrunCount"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label:
           "read OverrunCount attribute from DUT and verify response value, If
@@ -271,7 +271,7 @@ tests:
       attribute: "PartitionId"
       response:
           constraints:
-              type: uint32
+              type: int32u
 
     - label: "TH reads Weighting attribute value from DUT"
       PICS: DGTHREAD.S.A000a
@@ -279,7 +279,7 @@ tests:
       attribute: "weighting"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -289,7 +289,7 @@ tests:
       attribute: "DataVersion"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -299,7 +299,7 @@ tests:
       attribute: "StableDataVersion"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -309,7 +309,7 @@ tests:
       attribute: "LeaderRouterId"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -319,7 +319,7 @@ tests:
       attribute: "DetachedRoleCount"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -329,7 +329,7 @@ tests:
       attribute: "ChildRoleCount"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -339,7 +339,7 @@ tests:
       attribute: "RouterRoleCount"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -349,7 +349,7 @@ tests:
       attribute: "LeaderRoleCount"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -359,7 +359,7 @@ tests:
       attribute: "AttachAttemptCount"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -369,7 +369,7 @@ tests:
       attribute: "PartitionIdChangeCount"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -380,7 +380,7 @@ tests:
       attribute: "BetterPartitionAttachAttemptCount"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -390,7 +390,7 @@ tests:
       attribute: "ParentChangeCount"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -400,7 +400,7 @@ tests:
       attribute: "ActiveTimestamp"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label: "TH reads PendingTimestamp attribute value from DUT"
       PICS: DGTHREAD.S.A0039
@@ -408,7 +408,7 @@ tests:
       attribute: "PendingTimestamp"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label: "TH reads Delay attribute value from DUT"
       PICS: DGTHREAD.S.A003a
@@ -416,7 +416,9 @@ tests:
       attribute: "delay"
       response:
           constraints:
-              type: uint32
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     #issue #14097
     - label:
@@ -450,7 +452,7 @@ tests:
       attribute: "ChannelMask"
       response:
           constraints:
-              type: octstr
+              type: octet_string
 
     #issue #14097
     - label:

@@ -100,7 +100,7 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="3"/>
     <attribute side="server" code="0x0000" define="GROUP_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" optional="false">name support</attribute>
     <!-- NAME_SUPPORT -->
-    <command source="client" code="0x00" name="AddGroup" response="AddGroupResponse" optional="false" cli="zcl groups add">
+    <command source="client" code="0x00" name="AddGroup" response="AddGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups add">
       <description>
         Command description for AddGroup
       </description>
@@ -108,32 +108,32 @@ limitations under the License.
       <arg name="groupName" type="CHAR_STRING"/>
       <access op="invoke" role="manage"/>
     </command>
-    <command source="client" code="0x01" name="ViewGroup" response="ViewGroupResponse" optional="false" cli="zcl groups view">
+    <command source="client" code="0x01" name="ViewGroup" response="ViewGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups view">
       <description>
         Command description for ViewGroup
       </description>
       <arg name="groupId" type="group_id"/>
     </command>
-    <command source="client" code="0x02" name="GetGroupMembership" response="GetGroupMembershipResponse" cliFunctionName="zclGroupsGetCommand" optional="false" cli="zcl groups get">
+    <command source="client" code="0x02" name="GetGroupMembership" response="GetGroupMembershipResponse" cliFunctionName="zclGroupsGetCommand" isFabricScoped="true" optional="false" cli="zcl groups get">
       <description>
         Command description for GetGroupMembership
       </description>
       <arg name="groupList" type="group_id" array="true"/>
     </command>
-    <command source="client" code="0x03" name="RemoveGroup" response="RemoveGroupResponse" optional="false" cli="zcl groups remove">
+    <command source="client" code="0x03" name="RemoveGroup" response="RemoveGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups remove">
       <description>
         Command description for RemoveGroup
       </description>
       <arg name="groupId" type="group_id"/>
       <access op="invoke" role="manage"/>
     </command>
-    <command source="client" code="0x04" name="RemoveAllGroups" optional="false" cli="zcl groups rmall">
+    <command source="client" code="0x04" name="RemoveAllGroups" isFabricScoped="true" optional="false" cli="zcl groups rmall">
       <description>
         Command description for RemoveAllGroups
       </description>
       <access op="invoke" role="manage"/>
     </command>
-    <command source="client" code="0x05" name="AddGroupIfIdentifying" optional="false" cli="zcl groups add-if-id">
+    <command source="client" code="0x05" name="AddGroupIfIdentifying" isFabricScoped="true" optional="false" cli="zcl groups add-if-id">
       <description>
         Command description for AddGroupIfIdentifying
       </description>
@@ -216,8 +216,8 @@ limitations under the License.
       </description>
       <arg name="level" type="INT8U"/>
       <arg name="transitionTime" type="INT16U"/>
-      <arg name="optionMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x01" name="Move" optional="false" cli="zcl level-control move">
       <description>
@@ -225,8 +225,8 @@ limitations under the License.
       </description>
       <arg name="moveMode" type="MoveMode"/>
       <arg name="rate" type="INT8U"/>
-      <arg name="optionMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x02" name="Step" optional="false" cli="zcl level-control step">
       <description>
@@ -235,15 +235,15 @@ limitations under the License.
       <arg name="stepMode" type="StepMode"/>
       <arg name="stepSize" type="INT8U"/>
       <arg name="transitionTime" type="INT16U"/>
-      <arg name="optionMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x03" name="Stop" optional="false" cli="zcl level-control stop">
       <description>
         Command description for Stop
       </description>
-      <arg name="optionMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x04" name="MoveToLevelWithOnOff" optional="false" cli="zcl level-control o-mv-to-level">
       <description>
@@ -251,6 +251,8 @@ limitations under the License.
       </description>
       <arg name="level" type="INT8U"/>
       <arg name="transitionTime" type="INT16U"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x05" name="MoveWithOnOff" optional="false" cli="zcl level-control o-move">
       <description>
@@ -258,6 +260,8 @@ limitations under the License.
       </description>
       <arg name="moveMode" type="MoveMode"/>
       <arg name="rate" type="INT8U"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x06" name="StepWithOnOff" optional="false" cli="zcl level-control o-step">
       <description>
@@ -266,11 +270,15 @@ limitations under the License.
       <arg name="stepMode" type="StepMode"/>
       <arg name="stepSize" type="INT8U"/>
       <arg name="transitionTime" type="INT16U"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x07" name="StopWithOnOff" optional="false" cli="zcl level-control o-stop">
       <description>
         Command description for StopWithOnOff
       </description>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x08" name="MoveToClosestFrequency" optional="true">
       <description>

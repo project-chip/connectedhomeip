@@ -22,21 +22,22 @@ config:
 
 tests:
     - label: "TH reads the OnMode attribute from the DUT"
+      PICS: MOD.S.A0005 && MOD.S.F00
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
-          Verify on the TH Log:
+          on TH,Verify that the DUT response The attribute is nullable, and null is  valid value.
 
           [1649678983.679893][10871:10876] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065073
           [1649678983.680002][10871:10876] CHIP:TOO:   OnMode: null
-
       disabled: true
 
     - label: "TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003 && MOD.S.F00
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify on the TH Log:
+          on TH,Verify that the DUT response is an integer. Record this value for usage in steps 2b.
 
           [1649679034.895848][10879:10884] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
           [1649679034.895972][10879:10884] CHIP:TOO:   CurrentMode: 4
@@ -44,16 +45,19 @@ tests:
 
     - label:
           "If the OnMode and CurrentMode attributes have the same value, proceed
-          to step 2c, Otherwise proceed to step 3a"
+          to step 2c, Otherwise proceed to step 3a."
+      PICS: MOD.S.A0003 && MOD.S.A0005 && MOD.S.F00
       verification: |
-
+          NOTE:
+          If the OnMode and CurrentMode attributes have the same value, proceed to step 2c, Otherwise proceed to step 3a.
       disabled: true
 
     - label: "TH reads the SupportedModes attribute from the DUT"
+      PICS: MOD.S.A0002 && MOD.S.F00
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          Verify on the TH
+          on TH,Verify that the DUT response provides a list of supported modes
 
           [1654595268.854568][14400:14405] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
           [1654595268.854678][14400:14405] CHIP:TOO:   SupportedModes: 3 entries
@@ -92,37 +96,41 @@ tests:
           "Select a value from the list in step 2c with a different value than
           the StartUpMode value read in step 1. TH sends a ChangeToMode command
           to the TH with the selected value."
+      PICS: MOD.S.A0002 && MOD.S.C00.Rsp && MOD.S.F00
       verification: |
           ./chip-tool modeselect change-to-mode 7 1 1
 
-          Verify on the TH Log:
+          on TH,Verify that the DUT response with a successful (value 0x00) status response.
 
           [1645777419.711572][4798:4803] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
       disabled: true
 
     - label: "TH reads sends an Off command to the DUT"
+      PICS: OO.S.C01.Rsp && MOD.S.F00
       verification: |
           ./chip-tool onoff off 1 1
 
-          Verify on the TH Log:
+          on TH,Verify that the DUT response with a successful (value 0x00) status response.
 
           [1649679101.658594][10886:10891] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0000 Status=0x0
       disabled: true
 
     - label: "TH reads sends an On command to the DUT"
+      PICS: OO.S.C01.Rsp && MOD.S.F00
       verification: |
           ./chip-tool onoff on 1 1
 
-          Verify on the TH Log:
+          on TH,Verify that the DUT response with a successful (value 0x00) status response.
 
           [1649679156.146015][10893:10898] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
       disabled: true
 
     - label: "TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003 && MOD.S.F00
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify on the TH Log:
+          on TH,Verify that the DUT response is the integer recorded in step 1.
 
           [1649679202.069163][10899:10904] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
           [1649679202.069278][10899:10904] CHIP:TOO:   CurrentMode: 4

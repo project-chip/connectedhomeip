@@ -88,12 +88,12 @@ server cluster Groups = 4 {
     group_id groupId = 1;
   }
 
-  command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
-  command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
-  command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
-  command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
-  command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
+  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
+  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
+  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
+  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
+  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
+  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
 server cluster Scenes = 5 {
@@ -195,13 +195,13 @@ server cluster Scenes = 5 {
     optional INT8U sceneList[] = 3;
   }
 
-  command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
-  command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-  command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
-  command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
+  fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
+  fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
+  fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
+  fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
+  fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
+  fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
+  fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
 }
 
 client cluster OnOff = 6 {
@@ -350,44 +350,55 @@ server cluster LevelControl = 8 {
   request struct MoveToLevelRequest {
     INT8U level = 0;
     INT16U transitionTime = 1;
-    BITMAP8 optionMask = 2;
-    BITMAP8 optionOverride = 3;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct MoveRequest {
     MoveMode moveMode = 0;
     INT8U rate = 1;
-    BITMAP8 optionMask = 2;
-    BITMAP8 optionOverride = 3;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct StepRequest {
     StepMode stepMode = 0;
     INT8U stepSize = 1;
     INT16U transitionTime = 2;
-    BITMAP8 optionMask = 3;
-    BITMAP8 optionOverride = 4;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
   }
 
   request struct StopRequest {
-    BITMAP8 optionMask = 0;
-    BITMAP8 optionOverride = 1;
+    BITMAP8 optionsMask = 0;
+    BITMAP8 optionsOverride = 1;
   }
 
   request struct MoveToLevelWithOnOffRequest {
     INT8U level = 0;
     INT16U transitionTime = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct MoveWithOnOffRequest {
     MoveMode moveMode = 0;
     INT8U rate = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct StepWithOnOffRequest {
     StepMode stepMode = 0;
     INT8U stepSize = 1;
     INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
+  }
+
+  request struct StopWithOnOffRequest {
+    BITMAP8 optionsMask = 0;
+    BITMAP8 optionsOverride = 1;
   }
 
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
@@ -397,7 +408,7 @@ server cluster LevelControl = 8 {
   command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
   command MoveWithOnOff(MoveWithOnOffRequest): DefaultSuccess = 5;
   command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
-  command StopWithOnOff(): DefaultSuccess = 7;
+  command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
 }
 
 server cluster Descriptor = 29 {
@@ -508,6 +519,7 @@ server cluster Basic = 40 {
   }
 
   info event Leave = 2 {
+    fabric_idx fabricIndex = 0;
   }
 
   info event ReachableChanged = 3 {
@@ -689,7 +701,7 @@ client cluster GeneralCommissioning = 48 {
 
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
-  command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
+  fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
 }
 
 server cluster GeneralCommissioning = 48 {
@@ -751,7 +763,7 @@ server cluster GeneralCommissioning = 48 {
 
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
-  command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
+  fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -985,7 +997,7 @@ server cluster GeneralDiagnostics = 51 {
     INT64U eventTrigger = 1;
   }
 
-  command TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
+  command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
 }
 
 server cluster SoftwareDiagnostics = 52 {
@@ -1205,8 +1217,8 @@ server cluster AdministratorCommissioning = 60 {
   }
 
   readonly attribute int8u windowStatus = 0;
-  readonly attribute fabric_idx adminFabricIndex = 1;
-  readonly attribute int16u adminVendorId = 2;
+  readonly attribute nullable fabric_idx adminFabricIndex = 1;
+  readonly attribute nullable int16u adminVendorId = 2;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -1236,7 +1248,6 @@ client cluster OperationalCredentials = 62 {
     kMissingCsr = 4;
     kTableFull = 5;
     kInvalidAdminSubject = 6;
-    kInsufficientPrivilege = 8;
     kFabricConflict = 9;
     kLabelConflict = 10;
     kInvalidFabricIndex = 11;
@@ -1255,7 +1266,7 @@ client cluster OperationalCredentials = 62 {
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
-  readonly attribute fabric_idx currentFabricIndex = 5;
+  readonly attribute int8u currentFabricIndex = 5;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -1301,8 +1312,8 @@ client cluster OperationalCredentials = 62 {
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+  fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
@@ -1316,7 +1327,6 @@ server cluster OperationalCredentials = 62 {
     kMissingCsr = 4;
     kTableFull = 5;
     kInvalidAdminSubject = 6;
-    kInsufficientPrivilege = 8;
     kFabricConflict = 9;
     kLabelConflict = 10;
     kInvalidFabricIndex = 11;
@@ -1335,7 +1345,7 @@ server cluster OperationalCredentials = 62 {
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
-  readonly attribute fabric_idx currentFabricIndex = 5;
+  readonly attribute int8u currentFabricIndex = 5;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -1401,8 +1411,8 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+  fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
@@ -2544,7 +2554,7 @@ client cluster ApplicationBasic = 1293 {
   }
 
   readonly attribute char_string<32> vendorName = 0;
-  readonly attribute int16u vendorID = 1;
+  readonly attribute vendor_id vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
   readonly attribute int16u productID = 3;
   readonly attribute ApplicationBasicApplication application = 4;
@@ -2572,7 +2582,7 @@ server cluster ApplicationBasic = 1293 {
   }
 
   readonly attribute char_string<32> vendorName = 0;
-  readonly attribute int16u vendorID = 1;
+  readonly attribute vendor_id vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
   readonly attribute int16u productID = 3;
   readonly attribute ApplicationBasicApplication application = 4;

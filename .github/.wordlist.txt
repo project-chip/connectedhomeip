@@ -44,6 +44,7 @@ aef
 AES
 algs
 alloc
+AlarmCode
 Ameba
 amebad
 amebaiot
@@ -126,6 +127,7 @@ BeagleBone
 befc
 betaprogram
 BinaryInputBasic
+Binfmt
 bitbake
 bld
 BLE
@@ -160,7 +162,9 @@ btmgmt
 BTN
 BTP
 btvirt
+BuildKit
 buildwithmatter
+buildX
 burndown
 ButtonIsr
 BytesMain
@@ -178,6 +182,7 @@ CatalogVendorId
 CBB
 cbd
 CBOR
+Ccache
 ccf
 CCMP
 CCS
@@ -419,6 +424,7 @@ Dockerfile
 Dockerfiles
 Don'ts
 DoorLock
+DoorState
 doru
 DOTBR
 DOVERLAY

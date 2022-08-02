@@ -86,6 +86,8 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
 
 CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Seconds16 expiryLengthSeconds)
 {
+    VerifyOrReturnError(!IsFailSafeBusy(), CHIP_ERROR_INCORRECT_STATE);
+
     CHIP_ERROR err           = CHIP_NO_ERROR;
     bool cancelTimersIfError = false;
     if (!mFailSafeArmed)

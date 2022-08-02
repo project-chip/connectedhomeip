@@ -63,6 +63,7 @@ function getManualTests() {
         "Test_TC_DD_3_18",
         "Test_TC_DD_3_19",
         "Test_TC_DD_3_20",
+        "Test_TC_DD_3_21",
     ];
 
     const Groups = [
@@ -122,8 +123,6 @@ function getManualTests() {
         "Test_TC_CNET_4_4",
         "Test_TC_CNET_4_5",
         "Test_TC_CNET_4_6",
-        "Test_TC_CNET_4_7",
-        "Test_TC_CNET_4_8",
         "Test_TC_CNET_4_9",
         "Test_TC_CNET_4_10",
         "Test_TC_CNET_4_11",
@@ -160,7 +159,6 @@ function getManualTests() {
 
     const GeneralCommissioning = [
         "Test_TC_CGEN_2_2",
-        "Test_TC_CGEN_2_3",
         "Test_TC_CGEN_2_4",
     ];
 
@@ -244,8 +242,6 @@ function getManualTests() {
         "Test_TC_CADMIN_1_20",
         "Test_TC_CADMIN_1_21",
         "Test_TC_CADMIN_1_22",
-        "Test_TC_CADMIN_1_23",
-        "Test_TC_CADMIN_1_24",
         // Slow tests that should not run in CI because they take many minutes each
         "Test_TC_CADMIN_1_3",
         "Test_TC_CADMIN_1_4",
@@ -254,8 +250,8 @@ function getManualTests() {
         "Test_TC_CADMIN_1_9",
         "Test_TC_CADMIN_1_10",
         "Test_TC_CADMIN_1_13",
-        "Test_TC_CADMIN_1_25",
-        "Test_TC_CADMIN_1_26",
+        "Test_TC_CADMIN_1_23",
+        "Test_TC_CADMIN_1_24",
     ];
 
     const ModeSelect = [
@@ -372,6 +368,8 @@ function getManualTests() {
         "Test_TC_CC_7_5",
         "Test_TC_CC_9_4",
         // Slow tests that should not run in CI because they take many minutes each
+        "Test_TC_CC_3_1",
+        "Test_TC_CC_7_1",
         "Test_TC_CC_9_1",
         "Test_TC_CC_9_2",
         "Test_TC_CC_9_3",
@@ -412,7 +410,6 @@ function getManualTests() {
     ];
 
     const Switch = [
-        "Test_TC_SWTCH_1_1",
         "Test_TC_SWTCH_2_2",
         "Test_TC_SWTCH_3_1",
         "Test_TC_SWTCH_3_2",
@@ -506,6 +503,12 @@ function getManualTests() {
         "Test_TC_ULABEL_3_1",
     ];
 
+    const BridgedDeviceBasicInformation = [
+        "Test_TC_BRBINFO_1_1",
+        "Test_TC_BRBINFO_2_1",
+        "Test_TC_BRBINFO_2_2",
+        "Test_TC_BRBINFO_2_3",
+    ];
 
     const tests = [
         DeviceDiscovery,
@@ -556,6 +559,7 @@ function getManualTests() {
         PumpConfigurationControl,
         AccessControl,
         UserLabel,
+        BridgedDeviceBasicInformation,
     ].flat(1);
 
     tests.disable = disable.bind(tests);
@@ -579,7 +583,6 @@ function getTests() {
     const ColorControl = [
         "Test_TC_CC_1_1",
         "Test_TC_CC_2_1",
-        "Test_TC_CC_3_1",
         "Test_TC_CC_3_2",
         "Test_TC_CC_3_3",
         "Test_TC_CC_4_1",
@@ -592,7 +595,6 @@ function getTests() {
         "Test_TC_CC_6_1",
         "Test_TC_CC_6_2",
         "Test_TC_CC_6_3",
-        "Test_TC_CC_7_1",
         "Test_TC_CC_7_2",
         "Test_TC_CC_7_3",
         "Test_TC_CC_7_4",
@@ -750,6 +752,7 @@ function getTests() {
     ];
 
     const Switch = [
+        "Test_TC_SWTCH_1_1",
         "Test_TC_SWTCH_2_1",
     ];
 
@@ -842,6 +845,8 @@ function getTests() {
         "TestArmFailSafe",
         "TestFanControl",
         "TestAccessControlConstraints",
+        "TestLevelControlWithOnOffDependency",
+        "TestCommissioningWindow",
     ];
 
     const MultiAdmin = [

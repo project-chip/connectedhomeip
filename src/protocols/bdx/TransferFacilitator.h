@@ -119,6 +119,8 @@ public:
     CHIP_ERROR PrepareForTransfer(System::Layer * layer, TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
                                   uint16_t maxBlockSize, System::Clock::Timeout timeout,
                                   System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
+
+    void ResetTransfer();
 };
 
 /**
@@ -137,8 +139,8 @@ public:
      * @param[in] layer      A System::Layer pointer to use to start the polling timer
      * @param[in] role       The role of the Initiator: Sender or Receiver of BDX data
      * @param[in] initData   Data needed for preparing a transfer request BDX message
-     * @param[in] timeoutMs  The chosen timeout delay for the BDX transfer in milliseconds
-     * @param[in] pollFreqMs The period for the TransferSession poll timer in milliseconds
+     * @param[in] timeout    The chosen timeout delay for the BDX transfer in milliseconds
+     * @param[in] pollFreq   The period for the TransferSession poll timer in milliseconds
      */
     CHIP_ERROR InitiateTransfer(System::Layer * layer, TransferRole role, const TransferSession::TransferInitData & initData,
                                 System::Clock::Timeout timeout,

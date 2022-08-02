@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    117.2.2. [TC-BIND-2.2] Binding Cluster Attributes-DUT handles its Groups
+    119.2.2. [TC-BIND-2.2] Binding Cluster Attributes-DUT handles its Groups
     settings [DUT-Controller]
 
 config:
@@ -25,29 +25,30 @@ config:
 tests:
     - label: "Factory Reset DUT"
       verification: |
-
+          Vendor specific action, for chip-tool run
+          rm -rf /tmp/chip*
       disabled: true
 
     - label: "Commission DUT to TH1s fabric"
       verification: |
-
+          ./chip-tool pairing onnetwork 1 20202021
       disabled: true
 
     - label: "TH1 enables DUT as Controller"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "Commission TH2 to TH1s fabric (Node ID = 2)"
       verification: |
-
+          ./chip-tool pairing ble-wifi 2 chipsetup4 matter123 20202021 3840
       disabled: true
 
     - label:
           "DUT generates fabric-unique GroupID, GroupName, random key, EpochKey0
           and GroupKeySetID."
       verification: |
-          ./chip-tool groupkeymanagement key-set-read 42 1 0
+          As Admin generates it is not necessary to verify
       disabled: true
 
     - label:
@@ -55,11 +56,59 @@ tests:
           Endpoint 0."
       PICS: GRPKEY.C.C00.Tx
       verification: |
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42,
+          ./chip-tool groupkeymanagement key-set-write "{"groupKeySetID": 42,
           "groupKeySecurityPolicy": 0, "epochKey0":
           "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
           "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
-          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }" 2 0
+
+
+
+
+          [1657717291.809861][3361:3366] CHIP:DMG: ICR moving to [ResponseRe]
+          [1657717291.809913][3361:3366] CHIP:DMG: InvokeResponseMessage =
+          [1657717291.809939][3361:3366] CHIP:DMG: {
+          [1657717291.809965][3361:3366] CHIP:DMG:         suppressResponse = false,
+          [1657717291.809992][3361:3366] CHIP:DMG:         InvokeResponseIBs =
+          [1657717291.810025][3361:3366] CHIP:DMG:         [
+          [1657717291.810051][3361:3366] CHIP:DMG:                 InvokeResponseIB =
+          [1657717291.810088][3361:3366] CHIP:DMG:                 {
+          [1657717291.810115][3361:3366] CHIP:DMG:                         CommandStatusIB =
+          [1657717291.810149][3361:3366] CHIP:DMG:                         {
+          [1657717291.810179][3361:3366] CHIP:DMG:                                 CommandPathIB =
+          [1657717291.810215][3361:3366] CHIP:DMG:                                 {
+          [1657717291.810252][3361:3366] CHIP:DMG:                                         EndpointId = 0x0,
+          [1657717291.810290][3361:3366] CHIP:DMG:                                         ClusterId = 0x3f,
+          [1657717291.810326][3361:3366] CHIP:DMG:                                         CommandId = 0x0,
+          [1657717291.810364][3361:3366] CHIP:DMG:                                 },
+          [1657717291.810403][3361:3366] CHIP:DMG:
+          [1657717291.810435][3361:3366] CHIP:DMG:                                 StatusIB =
+          [1657717291.810470][3361:3366] CHIP:DMG:                                 {
+          [1657717291.810507][3361:3366] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1657717291.810540][3361:3366] CHIP:DMG:                                 },
+          [1657717291.810575][3361:3366] CHIP:DMG:
+          [1657717291.810606][3361:3366] CHIP:DMG:                         },
+          [1657717291.810641][3361:3366] CHIP:DMG:
+          [1657717291.810668][3361:3366] CHIP:DMG:                 },
+          [1657717291.810700][3361:3366] CHIP:DMG:
+          [1657717291.810725][3361:3366] CHIP:DMG:         ],
+          [1657717291.810757][3361:3366] CHIP:DMG:
+          [1657717291.810782][3361:3366] CHIP:DMG:         InteractionModelRevision = 1
+          [1657717291.810807][3361:3366] CHIP:DMG: },
+          [1657717291.810869][3361:3366] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003F Command=0x0000_0000 Status=0x0
+      disabled: true
+
+    - label:
+          "DUT binds GroupId with GroupKeySetID in the GroupKeyMap attribute
+          list on GroupKeyManagement cluster to TH2 on Endpoint 0"
+      PICS: G.C.C00.Tx
+      verification: |
+          ./chip-tool groupkeymanagement write group-key-map "[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]" 2 0
+
+          StatusIB =
+                          {
+                                  status = 0x00 (SUCCESS),
+                  }
       disabled: true
 
     - label:
@@ -67,22 +116,45 @@ tests:
           Endpoint 1."
       PICS: G.C.C00.Tx
       verification: |
-          ./chip-tool groups add-group 0x0001 grp1 1 1
-      disabled: true
+          ./chip-tool groups add-group 0x0001 grp1 2 1
 
-    - label:
-          "DUT binds GroupId with GroupKeySetID in the GroupKeyMap attribute
-          list on GroupKeyManagement cluster to TH2 on Endpoint 0"
-      PICS: GRPKEY.C.A0000
-      verification: |
-          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]' 1 0
+          [1657717342.599740][3368:3373] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Command 0x0000_0000
+          [1657717342.599891][3368:3373] CHIP:TOO:   AddGroupResponse: {
+          [1657717342.599959][3368:3373] CHIP:TOO:     status: 0
+          [1657717342.600007][3368:3373] CHIP:TOO:     groupId: 1
+          [1657717342.600054][3368:3373] CHIP:TOO:    }
+          [1657717342.600130][3368:3373] CHIP:DMG: ICR moving
+
+          ./chip-tool groupsettings add-group grp1 0x0001
+
+          ./chip-tool groupsettings add-keysets 0x0042 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
+
+          ./chip-tool groupsettings bind-keyset 0x0001 0x0042
+
+          ./chip-tool groupsettings show-groups
+
+            +-------------------------------------------------------------------------------------+
+            | Available Groups :                                                                  |
+            +-------------------------------------------------------------------------------------+
+            | Group Id   |  KeySet Id     |   Group Name                                          |
+            | 0x101           0x1a1            Group #1                                           |
+            | 0x102           0x1a2            Group #2                                           |
+            | 0x1               0x42              grp1                                                   |
+            +-------------------------------------------------------------------------------------+"
       disabled: true
 
     - label:
           "TH1 writes Binding entry into DUT with Entry 1: Group = The Group ID
           in the AddGroup command sent from DUT to TH2"
       verification: |
-          ./chip-tool binding write binding '[{"Group" : 0x0001  }]' 1 0
+          ./chip-tool binding write binding "[{"group" : "0x0001"}]" 1 1
+
+
+          [1657717436.184899][4353:4358] CHIP:DMG:                         StatusIB =
+          [1657717436.184940][4353:4358] CHIP:DMG:                         {
+          [1657717436.184981][4353:4358] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657717436.185022][4353:4358] CHIP:DMG:                         },
+          [1657717436.185062][4353:4358] CHIP:DMG:
       disabled: true
 
     - label:
@@ -90,18 +162,141 @@ tests:
           entries"
       PICS: OO.C.C01.Tx
       verification: |
-          ./chip-tool onoff on 0x0001 1
+          ./chip-tool onoff on 0xffffffffffff0001 1
+
+          1657717627.565673][3417:3422] CHIP:TOO: Sending command to group 0x1
+          [1657717627.565718][3417:3422] CHIP:TOO: Sending cluster (0x00000006) command (0x00000001) on Group 1
       disabled: true
 
     - label: "TH1 reads OnOff attribute from TH2 (Endpoint 1)"
       PICS: OO.C.C01.Tx
       verification: |
           ./chip-tool onoff read on-off 1 1
+
+          [1657717900.832851][4381:4386] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 1558029216
+          [1657717900.832890][4381:4386] CHIP:TOO:   OnOff: TRUE
       disabled: true
 
     - label: "TH1 removes all the binding entries from DUT"
       verification: |
-          ./chip-tool binding write binding [] 1 0
+          ./chip-tool groupsettings unbind-keyset  0x0001 0x0042
+
+
+          [1657804100.222346][1483:1483] CHIP:DL: ChipLinuxStorage::Init: Using KVS config file: /tmp/chip_kvs
+          [1657804100.222880][1483:1483] CHIP:DL: ChipLinuxStorage::Init: Using KVS config file: /tmp/chip_factory.ini
+          [1657804100.223041][1483:1483] CHIP:DL: ChipLinuxStorage::Init: Using KVS config file: /tmp/chip_config.ini
+          [1657804100.223149][1483:1483] CHIP:DL: ChipLinuxStorage::Init: Using KVS config file: /tmp/chip_counters.ini
+          [1657804100.223500][1483:1483] CHIP:DL: writing settings to file (/tmp/chip_counters.ini-mlceY7)
+          [1657804100.224151][1483:1483] CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
+          [1657804100.224208][1483:1483] CHIP:DL: NVS set: chip-counters/reboot-count = 16 (0x10)
+          [1657804100.224925][1483:1483] CHIP:DL: Got Ethernet interface: eth0
+          [1657804100.225323][1483:1483] CHIP:DL: Found the primary Ethernet interface:eth0
+          [1657804100.225720][1483:1483] CHIP:DL: Got WiFi interface: wlan0
+          [1657804100.225791][1483:1483] CHIP:DL: Failed to reset WiFi statistic counts
+          [1657804100.225873][1483:1483] CHIP:IN: UDP::Init bind&listen port=0
+          [1657804100.226005][1483:1483] CHIP:IN: UDP::Init bound to port=43367
+          [1657804100.226030][1483:1483] CHIP:IN: BLEBase::Init - setting/overriding transport
+          [1657804100.226052][1483:1483] CHIP:IN: TransportMgr initialized
+          [1657804100.226085][1483:1483] CHIP:FP: Initializing FabricTable from persistent storage
+          [1657804100.226331][1483:1483] CHIP:TS: Last Known Good Time: 2022-07-13T12:47:52
+          [1657804100.226953][1483:1483] CHIP:FP: Fabric index 0x1 was retrieved from storage. Compressed FabricId 0xAF5C7831F3704268, FabricId 0x0000000000000001, NodeId 0x000000000001B669, VendorId 0xFFF1
+          [1657804100.227380][1483:1483] CHIP:FP: Fabric index 0x2 was retrieved from storage. Compressed FabricId 0x756CE95FCDF96118, FabricId 0x0000000000000002, NodeId 0x000000000001B669, VendorId 0xFFF1
+          [1657804100.227789][1483:1483] CHIP:FP: Fabric index 0x3 was retrieved from storage. Compressed FabricId 0xCCD838643BEE9065, FabricId 0x0000000000000003, NodeId 0x000000000001B669, VendorId 0xFFF1
+          [1657804100.230946][1483:1483] CHIP:ZCL: Using ZAP configuration...
+          [1657804100.235033][1483:1483] CHIP:DL: Avahi client registered
+          [1657804100.236263][1483:1483] CHIP:CTL: System State Initialized...
+          [1657804100.236328][1483:1483] CHIP:CTL: Stopping commissioning discovery over DNS-SD
+          [1657804100.236364][1483:1483] CHIP:CTL: Setting attestation nonce to random value
+          [1657804100.236412][1483:1483] CHIP:CTL: Setting CSR nonce to random value
+          [1657804100.236485][1483:1483] CHIP:IN: UDP::Init bind&listen port=5550
+          [1657804100.236621][1483:1483] CHIP:IN: UDP::Init bound to port=5550
+          [1657804100.236646][1483:1483] CHIP:IN: TransportMgr initialized
+          [1657804100.236733][1483:1483] CHIP:CTL: Stopping commissioning discovery over DNS-SD
+          [1657804100.236763][1483:1483] CHIP:CTL: Setting attestation nonce to random value
+          [1657804100.236811][1483:1483] CHIP:CTL: Setting CSR nonce to random value
+          [1657804100.239619][1483:1483] CHIP:CTL: Generating NOC
+          [1657804100.240796][1483:1483] CHIP:FP: Validating NOC chain
+          [1657804100.242766][1483:1483] CHIP:FP: NOC chain validation successful
+          [1657804100.242960][1483:1483] CHIP:FP: Updated fabric at index: 0x1, Node ID: 0x000000000001B669
+          [1657804100.243000][1483:1483] CHIP:TS: Last Known Good Time: 2022-07-13T12:47:52
+          [1657804100.243029][1483:1483] CHIP:TS: New proposed Last Known Good Time: 2021-01-01T00:00:00
+          [1657804100.243055][1483:1483] CHIP:TS: Retaining current Last Known Good Time
+          [1657804100.246677][1483:1483] CHIP:FP: Metadata for Fabric 0x1 persisted to storage.
+          [1657804100.250025][1483:1483] CHIP:TS: Committing Last Known Good Time to storage: 2022-07-13T12:47:52
+          [1657804100.253538][1483:1483] CHIP:CTL: Joined the fabric at index 1. Compressed fabric ID is: 0x0000000000000000
+          [1657804100.253600][1483:1483] CHIP:IN: UDP::Init bind&listen port=5550
+          [1657804100.253724][1483:1483] CHIP:IN: UDP::Init bound to port=5550
+          [1657804100.253751][1483:1483] CHIP:IN: TransportMgr initialized
+          [1657804100.253834][1483:1483] CHIP:CTL: Stopping commissioning discovery over DNS-SD
+          [1657804100.253872][1483:1483] CHIP:CTL: Setting attestation nonce to random value
+          [1657804100.253934][1483:1483] CHIP:CTL: Setting CSR nonce to random value
+          [1657804100.254935][1483:1483] CHIP:CTL: Generating NOC
+          [1657804100.256071][1483:1483] CHIP:FP: Validating NOC chain
+          [1657804100.257762][1483:1483] CHIP:FP: NOC chain validation successful
+          [1657804100.257921][1483:1483] CHIP:FP: Updated fabric at index: 0x2, Node ID: 0x000000000001B669
+          [1657804100.257955][1483:1483] CHIP:TS: Last Known Good Time: 2022-07-13T12:47:52
+          [1657804100.257978][1483:1483] CHIP:TS: New proposed Last Known Good Time: 2021-01-01T00:00:00
+          [1657804100.257998][1483:1483] CHIP:TS: Retaining current Last Known Good Time
+          [1657804100.260948][1483:1483] CHIP:FP: Metadata for Fabric 0x2 persisted to storage.
+          [1657804100.263784][1483:1483] CHIP:TS: Committing Last Known Good Time to storage: 2022-07-13T12:47:52
+          [1657804100.266433][1483:1483] CHIP:CTL: Joined the fabric at index 2. Compressed fabric ID is: 0x0000000000000000
+          [1657804100.266491][1483:1483] CHIP:IN: UDP::Init bind&listen port=5550
+          [1657804100.266615][1483:1483] CHIP:IN: UDP::Init bound to port=5550
+          [1657804100.266641][1483:1483] CHIP:IN: TransportMgr initialized
+          [1657804100.266727][1483:1483] CHIP:CTL: Stopping commissioning discovery over DNS-SD
+          [1657804100.266766][1483:1483] CHIP:CTL: Setting attestation nonce to random value
+          [1657804100.266828][1483:1483] CHIP:CTL: Setting CSR nonce to random value
+          [1657804100.267811][1483:1483] CHIP:CTL: Generating NOC
+          [1657804100.268914][1483:1483] CHIP:FP: Validating NOC chain
+          [1657804100.270701][1483:1483] CHIP:FP: NOC chain validation successful
+          [1657804100.270859][1483:1483] CHIP:FP: Updated fabric at index: 0x3, Node ID: 0x000000000001B669
+          [1657804100.270892][1483:1483] CHIP:TS: Last Known Good Time: 2022-07-13T12:47:52
+          [1657804100.270914][1483:1483] CHIP:TS: New proposed Last Known Good Time: 2021-01-01T00:00:00
+          [1657804100.270935][1483:1483] CHIP:TS: Retaining current Last Known Good Time
+          [1657804100.273854][1483:1483] CHIP:FP: Metadata for Fabric 0x3 persisted to storage.
+          [1657804100.276610][1483:1483] CHIP:TS: Committing Last Known Good Time to storage: 2022-07-13T12:47:52
+          [1657804100.279350][1483:1483] CHIP:CTL: Joined the fabric at index 3. Compressed fabric ID is: 0x0000000000000000
+          [1657804100.279411][1483:1483] CHIP:IN: UDP::Init bind&listen port=5550
+          [1657804100.279535][1483:1483] CHIP:IN: UDP::Init bound to port=5550
+          [1657804100.279560][1483:1483] CHIP:IN: TransportMgr initialized
+          [1657804100.315695][1483:1488] CHIP:DL: CHIP task running
+          [1657804100.315921][1483:1488] CHIP:DL: HandlePlatformSpecificBLEEvent 32784
+          [1657804100.321174][1483:1483] CHIP:CTL: Shutting down the commissioner
+          [1657804100.321268][1483:1483] CHIP:CTL: Shutting down the controller
+          [1657804100.321299][1483:1483] CHIP:CTL: Shutting down the commissioner
+          [1657804100.321348][1483:1483] CHIP:CTL: Shutting down the controller
+          [1657804100.321373][1483:1483] CHIP:IN: Expiring all sessions for fabric 0x1!!
+          [1657804100.321396][1483:1483] CHIP:FP: Forgetting fabric 0x1
+          [1657804100.321429][1483:1483] CHIP:TS: Pending Last Known Good Time: 2022-07-13T12:47:52
+          [1657804100.321597][1483:1483] CHIP:TS: Previous Last Known Good Time: 2022-07-13T12:47:52
+          [1657804100.321622][1483:1483] CHIP:TS: Reverted Last Known Good Time to previous value
+          [1657804100.321661][1483:1483] CHIP:CTL: Shutting down the commissioner
+          [1657804100.321718][1483:1483] CHIP:CTL: Shutting down the controller
+          [1657804100.321819][1483:1483] CHIP:IN: Expiring all sessions for fabric 0x2!!
+          [1657804100.321849][1483:1483] CHIP:FP: Forgetting fabric 0x2
+          [1657804100.321875][1483:1483] CHIP:TS: Pending Last Known Good Time: 2022-07-13T12:47:52
+          [1657804100.321998][1483:1483] CHIP:TS: Previous Last Known Good Time: 2022-07-13T12:47:52
+          [1657804100.322022][1483:1483] CHIP:TS: Reverted Last Known Good Time to previous value
+          [1657804100.322056][1483:1483] CHIP:CTL: Shutting down the commissioner
+          [1657804100.322113][1483:1483] CHIP:CTL: Shutting down the controller
+          [1657804100.322136][1483:1483] CHIP:IN: Expiring all sessions for fabric 0x3!!
+          [1657804100.322156][1483:1483] CHIP:FP: Forgetting fabric 0x3
+          [1657804100.322179][1483:1483] CHIP:TS: Pending Last Known Good Time: 2022-07-13T12:47:52
+          [1657804100.322314][1483:1483] CHIP:TS: Previous Last Known Good Time: 2022-07-13T12:47:52
+          [1657804100.322339][1483:1483] CHIP:TS: Reverted Last Known Good Time to previous value
+          [1657804100.322367][1483:1483] CHIP:CTL: Shutting down the System State, this will teardown the CHIP Stack
+          [1657804100.323278][1483:1483] CHIP:DMG: IM WH moving to [Uninitialized]
+          [1657804100.323318][1483:1483] CHIP:DMG: IM WH moving to [Uninitialized]
+          [1657804100.323341][1483:1483] CHIP:DMG: IM WH moving to [Uninitialized]
+          [1657804100.323362][1483:1483] CHIP:DMG: IM WH moving to [Uninitialized]
+          [1657804100.323384][1483:1483] CHIP:DMG: All ReadHandler-s are clean, clear GlobalDirtySet
+          [1657804100.323455][1483:1483] CHIP:BLE: BleConnectionDelegate::CancelConnection is not implemented.
+          [1657804100.323744][1483:1483] CHIP:DL: writing settings to file (/tmp/chip_counters.ini-wsLxnz)
+          [1657804100.324436][1483:1483] CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
+          [1657804100.324498][1483:1483] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
+          [1657804100.324524][1483:1483] CHIP:DL: Inet Layer shutdown
+          [1657804100.324547][1483:1483] CHIP:DL: BLE shutdown
+          [1657804100.324569][1483:1483] CHIP:DL: System Layer shutdown
       disabled: true
 
     - label:
@@ -109,11 +304,18 @@ tests:
           entries"
       PICS: OO.C.C00.Tx
       verification: |
-          ./chip-tool onoff on 0x0001 1
+          ./chip-tool onoff off 0xffffffffffff0001 1
+
+          [1657718018.006875][3467:3472] CHIP:TOO: Sending command to group 0x1
+          [1657718018.006899][3467:3472] CHIP:TOO: Sending cluster (0x00000006) command (0x00000000) on Group 1
+          [1657718018.006949][3467:3472] CHIP:DMG: ICR moving to [AddingComm]
       disabled: true
 
     - label: "TH1 reads OnOff attribute from TH2 (Endpoint 1)"
       PICS: OO.C.C01.Tx
       verification: |
           ./chip-tool onoff read on-off 1 1
+
+          [1657718251.169765][4425:4431] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 1558029223
+          [1657718251.169817][4425:4431] CHIP:TOO:   OnOff: TRUE
       disabled: true

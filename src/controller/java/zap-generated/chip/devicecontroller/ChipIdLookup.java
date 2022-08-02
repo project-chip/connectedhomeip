@@ -3219,6 +3219,9 @@ public final class ChipIdLookup {
       if (eventId == 0L) {
         return "ConnectionStatus";
       }
+      if (eventId == 1L) {
+        return "NetworkFaultChange";
+      }
       return "";
     }
     if (clusterId == 54L) {

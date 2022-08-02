@@ -22,6 +22,12 @@ import("${k32w0_sdk_build_root}/k32w0_executable.gni")
 import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
 
 import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/lib/core/core.gni")
+
+if (chip_pw_tokenizer_logging) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_tokenizer/database.gni")
+}
 
 assert(current_os == "freertos")
 
@@ -59,7 +65,7 @@ k32w0_sdk("sdk") {
 }
 
 k32w0_executable("lock_app") {
-  output_name = "chip-k32w061-lock-example"
+  output_name = "chip-k32w0x-lock-example"
 
   sources = [
     "${k32w0_platform_dir}/util/LEDWidget.cpp",
@@ -100,15 +106,26 @@ k32w0_executable("lock_app") {
 
   output_dir = root_out_dir
 
-  ldscript = "${k32w0_platform_dir}/app/ldscripts/chip-k32w061-linker.ld"
+  ldscript = "${k32w0_platform_dir}/app/ldscripts/chip-k32w0x-linker.ld"
 
   inputs = [ ldscript ]
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 }
 
+if (chip_pw_tokenizer_logging) {
+  pw_tokenizer_database("lock_app.database") {
+    database = "$root_build_dir/chip-k32w0x-lock-example-database.bin"
+    create = "binary"
+    deps = [ ":lock_app" ]
+    optional_paths = [ "$root_build_dir/chip-k32w0x-lock-example" ]
+  }
+}
 group("k32w0") {
   deps = [ ":lock_app" ]
+  if (chip_pw_tokenizer_logging) {
+    deps += [ ":lock_app.database" ]
+  }
 }
 
 group("default") {

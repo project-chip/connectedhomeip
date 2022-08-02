@@ -33,7 +33,8 @@ namespace chip {
 namespace app {
 
 CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest) :
-    mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(false), mTimedRequest(aIsTimedRequest)
+    mExchangeCtx(*this), mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(false),
+    mTimedRequest(aIsTimedRequest)
 {}
 
 CHIP_ERROR CommandSender::AllocateBuffer()
@@ -67,15 +68,17 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
     ReturnErrorOnFailure(Finalize(mPendingInvokeData));
 
     // Create a new exchange context.
-    mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
-    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
-    VerifyOrReturnError(!mpExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    auto exchange = mpExchangeMgr->NewContext(session, this);
+    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    mpExchangeCtx->SetResponseTimeout(timeout.ValueOr(session->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
+    mExchangeCtx.Grab(exchange);
+    VerifyOrReturnError(!mExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+
+    mExchangeCtx->SetResponseTimeout(timeout.ValueOr(session->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
 
     if (mTimedInvokeTimeoutMs.HasValue())
     {
-        ReturnErrorOnFailure(TimedRequest::Send(mpExchangeCtx, mTimedInvokeTimeoutMs.Value()));
+        ReturnErrorOnFailure(TimedRequest::Send(mExchangeCtx.Get(), mTimedInvokeTimeoutMs.Value()));
         MoveToState(State::AwaitingTimedStatus);
         return CHIP_NO_ERROR;
     }
@@ -90,14 +93,13 @@ CHIP_ERROR CommandSender::SendGroupCommandRequest(const SessionHandle & session)
     ReturnErrorOnFailure(Finalize(mPendingInvokeData));
 
     // Create a new exchange context.
-    mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
-    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
-    VerifyOrReturnError(mpExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    auto exchange = mpExchangeMgr->NewContext(session, this);
+    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    mExchangeCtx.Grab(exchange);
+    VerifyOrReturnError(mExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     ReturnErrorOnFailure(SendInvokeRequest());
-
-    // Exchange is gone now, since it closed itself on successful send.
-    mpExchangeCtx = nullptr;
 
     Close();
     return CHIP_NO_ERROR;
@@ -108,8 +110,8 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
     using namespace Protocols::InteractionModel;
     using namespace Messaging;
 
-    ReturnErrorOnFailure(mpExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData),
-                                                    SendMessageFlags::kExpectResponse));
+    ReturnErrorOnFailure(
+        mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), SendMessageFlags::kExpectResponse));
     MoveToState(State::CommandSent);
 
     return CHIP_NO_ERROR;
@@ -118,31 +120,39 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
 CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                             System::PacketBufferHandle && aPayload)
 {
+    using namespace Protocols::InteractionModel;
+
     if (mState == State::CommandSent)
     {
         MoveToState(State::ResponseReceived);
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(apExchangeContext == mExchangeCtx.Get(), err = CHIP_ERROR_INCORRECT_STATE);
 
     if (mState == State::AwaitingTimedStatus)
     {
-        err = HandleTimedStatus(aPayloadHeader, std::move(aPayload));
+        VerifyOrExit(aPayloadHeader.HasMessageType(MsgType::StatusResponse), err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+        CHIP_ERROR statusError = CHIP_NO_ERROR;
+        SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
+        SuccessOrExit(err = statusError);
+        err = SendInvokeRequest();
         // Skip all other processing here (which is for the response to the
         // invoke request), no matter whether err is success or not.
         goto exit;
     }
 
-    if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse))
+    if (aPayloadHeader.HasMessageType(MsgType::InvokeCommandResponse))
     {
         err = ProcessInvokeResponse(std::move(aPayload));
         SuccessOrExit(err);
     }
-    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+    else if (aPayloadHeader.HasMessageType(MsgType::StatusResponse))
     {
-        err = StatusResponse::ProcessStatusResponse(std::move(aPayload));
-        SuccessOrExit(err);
+        CHIP_ERROR statusError = CHIP_NO_ERROR;
+        SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
+        SuccessOrExit(err = statusError);
+        err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
     else
     {
@@ -222,18 +232,6 @@ void CommandSender::Close()
     mSuppressResponse = false;
     mTimedRequest     = false;
     MoveToState(State::AwaitingDestruction);
-
-    // OnDone below can destroy us before we unwind all the way back into the
-    // exchange code and it tries to close itself.  Make sure that it doesn't
-    // try to notify us that it's closing, since we will be dead.
-    //
-    // For more details, see #10344.
-    if (mpExchangeCtx != nullptr)
-    {
-        mpExchangeCtx->SetDelegate(nullptr);
-    }
-
-    mpExchangeCtx = nullptr;
 
     if (mpCallback)
     {
@@ -379,13 +377,6 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
     return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
 }
 
-CHIP_ERROR CommandSender::HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
-{
-    ReturnErrorOnFailure(TimedRequest::HandleResponse(aPayloadHeader, std::move(aPayload)));
-
-    return SendInvokeRequest();
-}
-
 CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs)
 {
     ReturnErrorOnFailure(FinishCommand(/* aEndDataStruct = */ false));
@@ -441,28 +432,6 @@ void CommandSender::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
     ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
-}
-
-void CommandSender::Abort()
-{
-    //
-    // If the exchange context hasn't already been gracefully closed
-    // (signaled by setting it to null), then we need to forcibly
-    // tear it down.
-    //
-    if (mpExchangeCtx != nullptr)
-    {
-        // We might be a delegate for this exchange, and we don't want the
-        // OnExchangeClosing notification in that case.  Null out the delegate
-        // to avoid that.
-        //
-        // TODO: This makes all sorts of assumptions about what the delegate is
-        // (notice the "might" above!) that might not hold in practice.  We
-        // really need a better solution here....
-        mpExchangeCtx->SetDelegate(nullptr);
-        mpExchangeCtx->Abort();
-        mpExchangeCtx = nullptr;
-    }
 }
 
 } // namespace app

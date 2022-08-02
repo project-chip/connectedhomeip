@@ -192,6 +192,49 @@ void DeviceSwitch::HandleDeviceChange(Device * device, Device::Changed_t changeM
     }
 }
 
+DeviceTempSensor::DeviceTempSensor(const char * szDeviceName, std::string szLocation, int16_t min, int16_t max,
+                                   int16_t measuredValue) :
+    Device(szDeviceName, szLocation),
+    mMin(min), mMax(max), mMeasurement(measuredValue)
+{}
+
+void DeviceTempSensor::SetMeasuredValue(int16_t measurement)
+{
+    // Limit measurement based on the min and max.
+    if (measurement < mMin)
+    {
+        measurement = mMin;
+    }
+    else if (measurement > mMax)
+    {
+        measurement = mMax;
+    }
+
+    bool changed = mMeasurement != measurement;
+
+    ChipLogProgress(DeviceLayer, "TempSensorDevice[%s]: New measurement=\"%d\"", mName, measurement);
+
+    mMeasurement = measurement;
+
+    if (changed && mChanged_CB)
+    {
+        mChanged_CB(this, kChanged_MeasurementValue);
+    }
+}
+
+void DeviceTempSensor::SetChangeCallback(DeviceCallback_fn aChanged_CB)
+{
+    mChanged_CB = aChanged_CB;
+}
+
+void DeviceTempSensor::HandleDeviceChange(Device * device, Device::Changed_t changeMask)
+{
+    if (mChanged_CB)
+    {
+        mChanged_CB(this, (DeviceTempSensor::Changed_t) changeMask);
+    }
+}
+
 void ComposedDevice::HandleDeviceChange(Device * device, Device::Changed_t changeMask)
 {
     if (mChanged_CB)
@@ -261,4 +304,16 @@ Room::Room(std::string name, uint16_t endpointListId, EndpointListTypeEnum type,
     mEndpointListId = endpointListId;
     mType           = type;
     mIsVisible      = isVisible;
+}
+
+Action::Action(uint16_t actionId, std::string name, ActionTypeEnum type, uint16_t endpointListId, uint16_t supportedCommands,
+               ActionStateEnum status, bool isVisible)
+{
+    mActionId          = actionId;
+    mName              = name;
+    mType              = type;
+    mEndpointListId    = endpointListId;
+    mSupportedCommands = supportedCommands;
+    mStatus            = status;
+    mIsVisible         = isVisible;
 }

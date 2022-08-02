@@ -31,7 +31,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-crosscompile:0.5.84
+            image: connectedhomeip/chip-build-crosscompile:0.5.91
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -69,11 +69,11 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target linux-arm64-all-clusters \
-                        --target linux-arm64-chip-tool-ipv6only \
-                        --target linux-arm64-lock \
-                        --target linux-arm64-minmdns \
-                        --target linux-arm64-thermostat-no-ble \
+                        --target linux-arm64-clang-all-clusters \
+                        --target linux-arm64-clang-chip-tool-ipv6only \
+                        --target linux-arm64-clang-lock \
+                        --target linux-arm64-clang-minmdns \
+                        --target linux-arm64-clang-thermostat-no-ble \
                         build \
                      "
             - name: Bloat report - chip-tool
@@ -81,14 +81,14 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux arm64 chip-tool-ipv6only \
-                    out/linux-arm64-chip-tool-ipv6only/chip-tool \
+                    out/linux-arm64-clang-chip-tool-ipv6only/chip-tool \
                     /tmp/bloat_reports/
             - name: Bloat report - thermostat
               timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux arm64 thermostat-no-ble \
-                    out/linux-arm64-thermostat-no-ble/thermostat-app \
+                    out/linux-arm64-clang-thermostat-no-ble/thermostat-app \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2

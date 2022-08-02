@@ -91,9 +91,6 @@ private:
     CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
     void RunConfigUnitTest(void) override;
 
-    friend ConfigurationManager & ConfigurationMgr(void);
-    friend ConfigurationManagerImpl & ConfigurationMgrImpl(void);
-
     static ConfigurationManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
@@ -101,33 +98,19 @@ private:
     static void DoFactoryReset(intptr_t arg);
 };
 
-/**
- * Returns the public interface of the ConfigurationManager singleton object.
- *
- * Chip applications should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
- */
-inline ConfigurationManager & ConfigurationMgr(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
- *
- * Chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the BL602 platform.
- */
-inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
-
 inline CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     log_error("ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress() is not supported now.\r\n");
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
+
+/**
+ * Returns the platform-specific implementation of the ConfigurationManager object.
+ *
+ * Applications can use this to gain access to features of the ConfigurationManager
+ * that are specific to the selected platform.
+ */
+ConfigurationManager & ConfigurationMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

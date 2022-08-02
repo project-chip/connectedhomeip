@@ -27,8 +27,8 @@ tests:
           ./chip-tool userlabel read label-list 1 0
 
 
-          Verify in DUT as client side:
-           Log that DUT reads LabelList from the TH successfully
+          Verify in DUT as client side: Verify that DUT reads LabelList from the TH successfully
+
 
           [1651124790.936078][2829:2834] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_0000 DataVersion: 953549512
           [1651124790.936142][2829:2834] CHIP:TOO:   label list: 0 entries
@@ -40,11 +40,11 @@ tests:
           LabelList"
       PICS: ULABEL.C.A0000
       verification: |
-          ./chip-tool userlabel write label-list '[{"label":"room", "value":"bedroom 1"}, {"label":"orientation", "value":"east"}]' 1 0
+          ./chip-tool userlabel write label-list "[{"label":"room", "value":"bedroom 1"}, {"label":"orientation", "value":"east"}]" 1 0
 
 
-          Verify in DUT as client side:
-           Log that  DUT is able to write to the LabelList successfully
+          Verify in DUT as client side: Verify that DUT is able to write to the LabelList entries successfully
+
 
           [1657187118.343190][4999:5005] CHIP:DMG: WriteResponseMessage =
           [1657187118.343215][4999:5005] CHIP:DMG: {

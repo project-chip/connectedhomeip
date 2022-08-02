@@ -1,170 +1,190 @@
 # Commands will be run in CHIP project root.
 cd "{root}"
 
-# Generating linux-arm64-all-clusters
+# Generating linux-arm64-clang-all-clusters
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-all-clusters'
 
-# Generating linux-arm64-all-clusters-app-nodeps
+# Generating linux-arm64-clang-all-clusters-app-nodeps
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters-app-nodeps'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls" target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-all-clusters-app-nodeps'
 
-# Generating linux-arm64-all-clusters-app-nodeps-ipv6only
+# Generating linux-arm64-clang-all-clusters-app-nodeps-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters-app-nodeps-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls" target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-all-clusters-app-nodeps-ipv6only'
 
-# Generating linux-arm64-all-clusters-ipv6only
+# Generating linux-arm64-clang-all-clusters-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-all-clusters-ipv6only'
 
-# Generating linux-arm64-all-clusters-minimal
+# Generating linux-arm64-clang-all-clusters-minimal
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters-minimal'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/linux '"'"'--args=is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-all-clusters-minimal'
 
-# Generating linux-arm64-all-clusters-minimal-ipv6only
+# Generating linux-arm64-clang-all-clusters-minimal-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters-minimal-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-all-clusters-minimal-ipv6only'
 
-# Generating linux-arm64-bridge
+# Generating linux-arm64-clang-bridge
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/bridge-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-bridge'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/bridge-app/linux '"'"'--args=is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-bridge'
 
-# Generating linux-arm64-bridge-ipv6only
+# Generating linux-arm64-clang-bridge-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/bridge-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-bridge-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/bridge-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-bridge-ipv6only'
 
-# Generating linux-arm64-chip-tool
+# Generating linux-arm64-clang-chip-tool
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-chip-tool'
 
-# Generating linux-arm64-chip-tool-ipv6only
+# Generating linux-arm64-clang-chip-tool-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=chip_inet_config_enable_ipv4=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-chip-tool-ipv6only'
 
-# Generating linux-arm64-chip-tool-nodeps
+# Generating linux-arm64-clang-chip-tool-nodeps
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool-nodeps'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls" target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-chip-tool-nodeps'
 
-# Generating linux-arm64-chip-tool-nodeps-ipv6only
+# Generating linux-arm64-clang-chip-tool-nodeps-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool-nodeps-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls" target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-chip-tool-nodeps-ipv6only'
 
-# Generating linux-arm64-light
+# Generating linux-arm64-clang-light
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-light'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-light'
 
-# Generating linux-arm64-light-ipv6only
+# Generating linux-arm64-clang-light-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-light-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-light-ipv6only'
 
-# Generating linux-arm64-light-rpc
+# Generating linux-arm64-clang-light-rpc
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=import("//with_pw_rpc.gni") target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-light-rpc'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=import("//with_pw_rpc.gni") is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-light-rpc'
 
-# Generating linux-arm64-light-rpc-ipv6only
+# Generating linux-arm64-clang-light-rpc-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=import("//with_pw_rpc.gni") chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-light-rpc-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=import("//with_pw_rpc.gni") chip_inet_config_enable_ipv4=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-light-rpc-ipv6only'
 
-# Generating linux-arm64-lock
+# Generating linux-arm64-clang-lock
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-lock'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/linux '"'"'--args=is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-lock'
 
-# Generating linux-arm64-lock-ipv6only
+# Generating linux-arm64-clang-lock-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-lock-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-lock-ipv6only'
 
-# Generating linux-arm64-minmdns
+# Generating linux-arm64-clang-minmdns
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/minimal-mdns '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-minmdns'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/minimal-mdns '"'"'--args=is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-minmdns'
 
-# Generating linux-arm64-minmdns-ipv6only
+# Generating linux-arm64-clang-minmdns-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/minimal-mdns '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-minmdns-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/minimal-mdns '"'"'--args=chip_inet_config_enable_ipv4=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-minmdns-ipv6only'
 
-# Generating linux-arm64-ota-provider
+# Generating linux-arm64-clang-ota-provider
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '"'"'--args=chip_config_network_layer_ble=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-ota-provider'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '"'"'--args=chip_config_network_layer_ble=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-ota-provider'
 
-# Generating linux-arm64-ota-provider-ipv6only
+# Generating linux-arm64-clang-ota-provider-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-ota-provider-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-ota-provider-ipv6only'
 
-# Generating linux-arm64-ota-requestor
+# Generating linux-arm64-clang-ota-provider-nodeps
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '"'"'--args=chip_config_network_layer_ble=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-ota-requestor'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '"'"'--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls" target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-ota-provider-nodeps'
 
-# Generating linux-arm64-ota-requestor-ipv6only
+# Generating linux-arm64-clang-ota-provider-nodeps-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-ota-requestor-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls" target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-ota-provider-nodeps-ipv6only'
 
-# Generating linux-arm64-python-bindings
+# Generating linux-arm64-clang-ota-requestor
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '"'"'--args=enable_rtti=false chip_project_config_include_dirs=["//config/python"] target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-python-bindings'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '"'"'--args=chip_config_network_layer_ble=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-ota-requestor'
 
-# Generating linux-arm64-shell
+# Generating linux-arm64-clang-ota-requestor-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/standalone '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-shell'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-ota-requestor-ipv6only'
 
-# Generating linux-arm64-shell-ipv6only
+# Generating linux-arm64-clang-ota-requestor-nodeps
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/standalone '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-shell-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '"'"'--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls" target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-ota-requestor-nodeps'
 
-# Generating linux-arm64-thermostat
+# Generating linux-arm64-clang-ota-requestor-nodeps-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/thermostat/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-thermostat'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls" target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-ota-requestor-nodeps-ipv6only'
 
-# Generating linux-arm64-thermostat-ipv6only
+# Generating linux-arm64-clang-python-bindings
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/thermostat/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-thermostat-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '"'"'--args=is_clang=true enable_rtti=false chip_project_config_include_dirs=["//config/python"] target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-python-bindings'
 
-# Generating linux-arm64-tv-app
+# Generating linux-arm64-clang-shell
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-tv-app'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/standalone '"'"'--args=is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-shell'
 
-# Generating linux-arm64-tv-app-ipv6only
+# Generating linux-arm64-clang-shell-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-tv-app-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/standalone '"'"'--args=chip_inet_config_enable_ipv4=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-shell-ipv6only'
 
-# Generating linux-arm64-tv-casting-app
+# Generating linux-arm64-clang-thermostat
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-casting-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-tv-casting-app'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/thermostat/linux '"'"'--args=is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-thermostat'
 
-# Generating linux-arm64-tv-casting-app-ipv6only
+# Generating linux-arm64-clang-thermostat-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-casting-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-tv-casting-app-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/thermostat/linux '"'"'--args=chip_inet_config_enable_ipv4=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-thermostat-ipv6only'
+
+# Generating linux-arm64-clang-tv-app
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-app/linux '"'"'--args=is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-tv-app'
+
+# Generating linux-arm64-clang-tv-app-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-tv-app-ipv6only'
+
+# Generating linux-arm64-clang-tv-casting-app
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-casting-app/linux '"'"'--args=is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-tv-casting-app'
+
+# Generating linux-arm64-clang-tv-casting-app-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-casting-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-clang-tv-casting-app-ipv6only'
 
 # Generating linux-fake-tests
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_build_tests=true custom_toolchain="//build/toolchain/fake:fake_x64_gcc" chip_link_tests=true chip_device_platform="fake" chip_fake_platform=true' {out}/linux-fake-tests
@@ -176,10 +196,10 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root} {ou
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux {out}/linux-x64-all-clusters
 
 # Generating linux-x64-all-clusters-app-nodeps
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true' {out}/linux-x64-all-clusters-app-nodeps
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls"' {out}/linux-x64-all-clusters-app-nodeps
 
 # Generating linux-x64-all-clusters-app-nodeps-ipv6only
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true' {out}/linux-x64-all-clusters-app-nodeps-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls"' {out}/linux-x64-all-clusters-app-nodeps-ipv6only
 
 # Generating linux-x64-all-clusters-coverage
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux --args=use_coverage=true {out}/linux-x64-all-clusters-coverage
@@ -200,7 +220,7 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/bridge-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-bridge-ipv6only
 
 # Generating linux-x64-chip-cert
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_crypto="openssl"' {out}/linux-x64-chip-cert
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root} {out}/linux-x64-chip-cert
 
 # Generating linux-x64-chip-tool
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool {out}/linux-x64-chip-tool
@@ -212,10 +232,10 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-chip-tool-ipv6only
 
 # Generating linux-x64-chip-tool-nodeps
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true' {out}/linux-x64-chip-tool-nodeps
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls"' {out}/linux-x64-chip-tool-nodeps
 
 # Generating linux-x64-chip-tool-nodeps-ipv6only
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true' {out}/linux-x64-chip-tool-nodeps-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls"' {out}/linux-x64-chip-tool-nodeps-ipv6only
 
 # Generating linux-x64-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux {out}/linux-x64-light
@@ -250,11 +270,23 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating linux-x64-ota-provider-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false' {out}/linux-x64-ota-provider-ipv6only
 
+# Generating linux-x64-ota-provider-nodeps
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls"' {out}/linux-x64-ota-provider-nodeps
+
+# Generating linux-x64-ota-provider-nodeps-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls"' {out}/linux-x64-ota-provider-nodeps-ipv6only
+
 # Generating linux-x64-ota-requestor
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux --args=chip_config_network_layer_ble=false {out}/linux-x64-ota-requestor
 
 # Generating linux-x64-ota-requestor-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false' {out}/linux-x64-ota-requestor-ipv6only
+
+# Generating linux-x64-ota-requestor-nodeps
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls"' {out}/linux-x64-ota-requestor-nodeps
+
+# Generating linux-x64-ota-requestor-nodeps-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls"' {out}/linux-x64-ota-requestor-nodeps-ipv6only
 
 # Generating linux-x64-python-bindings
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=enable_rtti=false chip_project_config_include_dirs=["//config/python"]' {out}/linux-x64-python-bindings
@@ -270,18 +302,6 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating linux-x64-tests
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} --args=chip_build_tests=true {out}/linux-x64-tests
-
-# Generating linux-x64-tests-clang
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=is_clang=true chip_build_tests=true' {out}/linux-x64-tests-clang
-
-# Generating linux-x64-tests-coverage
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=use_coverage=true chip_build_tests=true' {out}/linux-x64-tests-coverage
-
-# Create coverage output location
-mkdir -p {out}/linux-x64-tests-coverage/coverage
-
-# Initial coverage baseline
-lcov --initial --capture --directory {out}/linux-x64-tests-coverage/obj --output-file {out}/linux-x64-tests-coverage/coverage/lcov_base.info
 
 # Generating linux-x64-thermostat
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/thermostat/linux {out}/linux-x64-thermostat
@@ -301,104 +321,116 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating linux-x64-tv-casting-app-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-casting-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-tv-casting-app-ipv6only
 
-# Building linux-arm64-all-clusters
-ninja -C {out}/linux-arm64-all-clusters
+# Building linux-arm64-clang-all-clusters
+ninja -C {out}/linux-arm64-clang-all-clusters
 
-# Building linux-arm64-all-clusters-app-nodeps
-ninja -C {out}/linux-arm64-all-clusters-app-nodeps
+# Building linux-arm64-clang-all-clusters-app-nodeps
+ninja -C {out}/linux-arm64-clang-all-clusters-app-nodeps
 
-# Building linux-arm64-all-clusters-app-nodeps-ipv6only
-ninja -C {out}/linux-arm64-all-clusters-app-nodeps-ipv6only
+# Building linux-arm64-clang-all-clusters-app-nodeps-ipv6only
+ninja -C {out}/linux-arm64-clang-all-clusters-app-nodeps-ipv6only
 
-# Building linux-arm64-all-clusters-ipv6only
-ninja -C {out}/linux-arm64-all-clusters-ipv6only
+# Building linux-arm64-clang-all-clusters-ipv6only
+ninja -C {out}/linux-arm64-clang-all-clusters-ipv6only
 
-# Building linux-arm64-all-clusters-minimal
-ninja -C {out}/linux-arm64-all-clusters-minimal
+# Building linux-arm64-clang-all-clusters-minimal
+ninja -C {out}/linux-arm64-clang-all-clusters-minimal
 
-# Building linux-arm64-all-clusters-minimal-ipv6only
-ninja -C {out}/linux-arm64-all-clusters-minimal-ipv6only
+# Building linux-arm64-clang-all-clusters-minimal-ipv6only
+ninja -C {out}/linux-arm64-clang-all-clusters-minimal-ipv6only
 
-# Building linux-arm64-bridge
-ninja -C {out}/linux-arm64-bridge
+# Building linux-arm64-clang-bridge
+ninja -C {out}/linux-arm64-clang-bridge
 
-# Building linux-arm64-bridge-ipv6only
-ninja -C {out}/linux-arm64-bridge-ipv6only
+# Building linux-arm64-clang-bridge-ipv6only
+ninja -C {out}/linux-arm64-clang-bridge-ipv6only
 
-# Building linux-arm64-chip-tool
-ninja -C {out}/linux-arm64-chip-tool
+# Building linux-arm64-clang-chip-tool
+ninja -C {out}/linux-arm64-clang-chip-tool
 
-# Building linux-arm64-chip-tool-ipv6only
-ninja -C {out}/linux-arm64-chip-tool-ipv6only
+# Building linux-arm64-clang-chip-tool-ipv6only
+ninja -C {out}/linux-arm64-clang-chip-tool-ipv6only
 
-# Building linux-arm64-chip-tool-nodeps
-ninja -C {out}/linux-arm64-chip-tool-nodeps
+# Building linux-arm64-clang-chip-tool-nodeps
+ninja -C {out}/linux-arm64-clang-chip-tool-nodeps
 
-# Building linux-arm64-chip-tool-nodeps-ipv6only
-ninja -C {out}/linux-arm64-chip-tool-nodeps-ipv6only
+# Building linux-arm64-clang-chip-tool-nodeps-ipv6only
+ninja -C {out}/linux-arm64-clang-chip-tool-nodeps-ipv6only
 
-# Building linux-arm64-light
-ninja -C {out}/linux-arm64-light
+# Building linux-arm64-clang-light
+ninja -C {out}/linux-arm64-clang-light
 
-# Building linux-arm64-light-ipv6only
-ninja -C {out}/linux-arm64-light-ipv6only
+# Building linux-arm64-clang-light-ipv6only
+ninja -C {out}/linux-arm64-clang-light-ipv6only
 
-# Building linux-arm64-light-rpc
-ninja -C {out}/linux-arm64-light-rpc
+# Building linux-arm64-clang-light-rpc
+ninja -C {out}/linux-arm64-clang-light-rpc
 
-# Building linux-arm64-light-rpc-ipv6only
-ninja -C {out}/linux-arm64-light-rpc-ipv6only
+# Building linux-arm64-clang-light-rpc-ipv6only
+ninja -C {out}/linux-arm64-clang-light-rpc-ipv6only
 
-# Building linux-arm64-lock
-ninja -C {out}/linux-arm64-lock
+# Building linux-arm64-clang-lock
+ninja -C {out}/linux-arm64-clang-lock
 
-# Building linux-arm64-lock-ipv6only
-ninja -C {out}/linux-arm64-lock-ipv6only
+# Building linux-arm64-clang-lock-ipv6only
+ninja -C {out}/linux-arm64-clang-lock-ipv6only
 
-# Building linux-arm64-minmdns
-ninja -C {out}/linux-arm64-minmdns
+# Building linux-arm64-clang-minmdns
+ninja -C {out}/linux-arm64-clang-minmdns
 
-# Building linux-arm64-minmdns-ipv6only
-ninja -C {out}/linux-arm64-minmdns-ipv6only
+# Building linux-arm64-clang-minmdns-ipv6only
+ninja -C {out}/linux-arm64-clang-minmdns-ipv6only
 
-# Building linux-arm64-ota-provider
-ninja -C {out}/linux-arm64-ota-provider
+# Building linux-arm64-clang-ota-provider
+ninja -C {out}/linux-arm64-clang-ota-provider
 
-# Building linux-arm64-ota-provider-ipv6only
-ninja -C {out}/linux-arm64-ota-provider-ipv6only
+# Building linux-arm64-clang-ota-provider-ipv6only
+ninja -C {out}/linux-arm64-clang-ota-provider-ipv6only
 
-# Building linux-arm64-ota-requestor
-ninja -C {out}/linux-arm64-ota-requestor
+# Building linux-arm64-clang-ota-provider-nodeps
+ninja -C {out}/linux-arm64-clang-ota-provider-nodeps
 
-# Building linux-arm64-ota-requestor-ipv6only
-ninja -C {out}/linux-arm64-ota-requestor-ipv6only
+# Building linux-arm64-clang-ota-provider-nodeps-ipv6only
+ninja -C {out}/linux-arm64-clang-ota-provider-nodeps-ipv6only
 
-# Building linux-arm64-python-bindings
-ninja -C {out}/linux-arm64-python-bindings chip-repl
+# Building linux-arm64-clang-ota-requestor
+ninja -C {out}/linux-arm64-clang-ota-requestor
 
-# Building linux-arm64-shell
-ninja -C {out}/linux-arm64-shell
+# Building linux-arm64-clang-ota-requestor-ipv6only
+ninja -C {out}/linux-arm64-clang-ota-requestor-ipv6only
 
-# Building linux-arm64-shell-ipv6only
-ninja -C {out}/linux-arm64-shell-ipv6only
+# Building linux-arm64-clang-ota-requestor-nodeps
+ninja -C {out}/linux-arm64-clang-ota-requestor-nodeps
 
-# Building linux-arm64-thermostat
-ninja -C {out}/linux-arm64-thermostat
+# Building linux-arm64-clang-ota-requestor-nodeps-ipv6only
+ninja -C {out}/linux-arm64-clang-ota-requestor-nodeps-ipv6only
 
-# Building linux-arm64-thermostat-ipv6only
-ninja -C {out}/linux-arm64-thermostat-ipv6only
+# Building linux-arm64-clang-python-bindings
+ninja -C {out}/linux-arm64-clang-python-bindings chip-repl
 
-# Building linux-arm64-tv-app
-ninja -C {out}/linux-arm64-tv-app
+# Building linux-arm64-clang-shell
+ninja -C {out}/linux-arm64-clang-shell
 
-# Building linux-arm64-tv-app-ipv6only
-ninja -C {out}/linux-arm64-tv-app-ipv6only
+# Building linux-arm64-clang-shell-ipv6only
+ninja -C {out}/linux-arm64-clang-shell-ipv6only
 
-# Building linux-arm64-tv-casting-app
-ninja -C {out}/linux-arm64-tv-casting-app
+# Building linux-arm64-clang-thermostat
+ninja -C {out}/linux-arm64-clang-thermostat
 
-# Building linux-arm64-tv-casting-app-ipv6only
-ninja -C {out}/linux-arm64-tv-casting-app-ipv6only
+# Building linux-arm64-clang-thermostat-ipv6only
+ninja -C {out}/linux-arm64-clang-thermostat-ipv6only
+
+# Building linux-arm64-clang-tv-app
+ninja -C {out}/linux-arm64-clang-tv-app
+
+# Building linux-arm64-clang-tv-app-ipv6only
+ninja -C {out}/linux-arm64-clang-tv-app-ipv6only
+
+# Building linux-arm64-clang-tv-casting-app
+ninja -C {out}/linux-arm64-clang-tv-casting-app
+
+# Building linux-arm64-clang-tv-casting-app-ipv6only
+ninja -C {out}/linux-arm64-clang-tv-casting-app-ipv6only
 
 # Building linux-fake-tests
 ninja -C {out}/linux-fake-tests check
@@ -484,11 +516,23 @@ ninja -C {out}/linux-x64-ota-provider
 # Building linux-x64-ota-provider-ipv6only
 ninja -C {out}/linux-x64-ota-provider-ipv6only
 
+# Building linux-x64-ota-provider-nodeps
+ninja -C {out}/linux-x64-ota-provider-nodeps
+
+# Building linux-x64-ota-provider-nodeps-ipv6only
+ninja -C {out}/linux-x64-ota-provider-nodeps-ipv6only
+
 # Building linux-x64-ota-requestor
 ninja -C {out}/linux-x64-ota-requestor
 
 # Building linux-x64-ota-requestor-ipv6only
 ninja -C {out}/linux-x64-ota-requestor-ipv6only
+
+# Building linux-x64-ota-requestor-nodeps
+ninja -C {out}/linux-x64-ota-requestor-nodeps
+
+# Building linux-x64-ota-requestor-nodeps-ipv6only
+ninja -C {out}/linux-x64-ota-requestor-nodeps-ipv6only
 
 # Building linux-x64-python-bindings
 ninja -C {out}/linux-x64-python-bindings chip-repl
@@ -504,27 +548,6 @@ ninja -C {out}/linux-x64-shell-ipv6only
 
 # Building linux-x64-tests
 ninja -C {out}/linux-x64-tests check
-
-# Building linux-x64-tests-clang
-ninja -C {out}/linux-x64-tests-clang check
-
-# Build-only
-ninja -C {out}/linux-x64-tests-coverage default
-
-# Initial coverage baseline
-lcov --initial --capture --directory {out}/linux-x64-tests-coverage/obj --output-file {out}/linux-x64-tests-coverage/coverage/lcov_base.info
-
-# Building linux-x64-tests-coverage
-ninja -C {out}/linux-x64-tests-coverage check
-
-# Update coverage
-lcov --capture --directory {out}/linux-x64-tests-coverage/obj --output-file {out}/linux-x64-tests-coverage/coverage/lcov_test.info
-
-# Final coverage info
-lcov --add-tracefile {out}/linux-x64-tests-coverage/coverage/lcov_base.info --add-tracefile {out}/linux-x64-tests-coverage/coverage/lcov_test.info --output-file {out}/linux-x64-tests-coverage/coverage/lcov_final.info
-
-# HTML coverage
-genhtml {out}/linux-x64-tests-coverage/coverage/lcov_final.info --output-directory {out}/linux-x64-tests-coverage/coverage/html
 
 # Building linux-x64-thermostat
 ninja -C {out}/linux-x64-thermostat

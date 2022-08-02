@@ -22,7 +22,7 @@
  *
  */
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusResponseMessage.h>
@@ -39,46 +39,20 @@ namespace app {
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType) :
+    mExchangeCtx(*this),
     mManagementCallback(apCallback)
 {
-    mpExchangeCtx               = apExchangeContext;
+    VerifyOrDie(apExchangeContext != nullptr);
+
+    mExchangeCtx.Grab(apExchangeContext);
+
     mInteractionType            = aInteractionType;
     mLastWrittenEventsBytes     = 0;
     mTransactionStartGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
     mFlags.ClearAll();
     mFlags.Set(ReadHandlerFlags::PrimingReports, true);
-    if (apExchangeContext != nullptr)
-    {
-        apExchangeContext->SetDelegate(this);
-        mSessionHandle.Grab(mpExchangeCtx->GetSessionHandle());
-    }
-}
 
-void ReadHandler::Abort(bool aCalledFromDestructor)
-{
-    //
-    // If the exchange context hasn't already been gracefully closed
-    // (signaled by setting it to null), then we need to forcibly
-    // tear it down.
-    //
-    if (mpExchangeCtx != nullptr)
-    {
-        // We might be a delegate for this exchange, and we don't want the
-        // OnExchangeClosing notification in that case.  Null out the delegate
-        // to avoid that.
-        //
-        // TODO: This makes all sorts of assumptions about what the delegate is
-        // (notice the "might" above!) that might not hold in practice.  We
-        // really need a better solution here....
-        mpExchangeCtx->SetDelegate(nullptr);
-        mpExchangeCtx->Abort();
-        mpExchangeCtx = nullptr;
-    }
-
-    if (!aCalledFromDestructor)
-    {
-        Close();
-    }
+    mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
 }
 
 ReadHandler::~ReadHandler()
@@ -88,8 +62,6 @@ ReadHandler::~ReadHandler()
     {
         appCallback->OnSubscriptionTerminated(*this);
     }
-
-    Abort(true);
 
     if (IsType(InteractionType::Subscribe))
     {
@@ -111,12 +83,6 @@ ReadHandler::~ReadHandler()
 
 void ReadHandler::Close()
 {
-    if (mpExchangeCtx != nullptr)
-    {
-        mpExchangeCtx->SetDelegate(nullptr);
-        mpExchangeCtx = nullptr;
-    }
-
     MoveToState(HandlerState::AwaitingDestruction);
     mManagementCallback.OnDone(*this);
 }
@@ -150,24 +116,22 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
 
 CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = StatusResponse::ProcessStatusResponse(std::move(aPayload));
-    SuccessOrExit(err);
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    CHIP_ERROR statusError = CHIP_NO_ERROR;
+    SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
+    SuccessOrExit(err = statusError);
     switch (mState)
     {
     case HandlerState::AwaitingReportResponse:
         if (IsChunkedReport())
         {
-            mpExchangeCtx->WillSendMessage();
+            mExchangeCtx->WillSendMessage();
         }
         else if (IsType(InteractionType::Subscribe))
         {
             if (IsPriming())
             {
                 err = SendSubscribeResponse();
-
-                mpExchangeCtx = nullptr;
-                SuccessOrExit(err);
 
                 mFlags.Set(ReadHandlerFlags::ActiveSubscription);
 
@@ -176,10 +140,6 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
                 {
                     appCallback->OnSubscriptionEstablished(*this);
                 }
-            }
-            else
-            {
-                mpExchangeCtx = nullptr;
             }
         }
         else
@@ -215,18 +175,19 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
     if (IsPriming() || IsChunkedReport())
     {
-        mSessionHandle.Grab(mpExchangeCtx->GetSessionHandle());
+        mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
     }
     else
     {
-        VerifyOrReturnLogError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnLogError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
-        mpExchangeCtx = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+        auto exchange = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+        VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        mExchangeCtx.Grab(exchange);
     }
-    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    return StatusResponse::Send(aStatus, mpExchangeCtx,
-                                /* aExpectResponse = */ false);
+    VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
+    return StatusResponse::Send(aStatus, mExchangeCtx.Get(), /* aExpectResponse = */ false);
 }
 
 CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks)
@@ -234,16 +195,19 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
     if (IsPriming() || IsChunkedReport())
     {
-        mSessionHandle.Grab(mpExchangeCtx->GetSessionHandle());
+        mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
     }
     else
     {
-        VerifyOrReturnLogError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnLogError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
-        mpExchangeCtx = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+        auto exchange = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+        VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        mExchangeCtx.Grab(exchange);
     }
 
-    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
+
     if (!IsReporting())
     {
         mCurrentReportsBeginGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
@@ -255,14 +219,13 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         MoveToState(HandlerState::AwaitingReportResponse);
     }
 
-    mpExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+    mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     CHIP_ERROR err =
-        mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
-                                   Messaging::SendFlags(noResponseExpected ? Messaging::SendMessageFlags::kNone
-                                                                           : Messaging::SendMessageFlags::kExpectResponse));
+        mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
+                                  Messaging::SendFlags(noResponseExpected ? Messaging::SendMessageFlags::kNone
+                                                                          : Messaging::SendMessageFlags::kExpectResponse));
     if (err == CHIP_NO_ERROR && noResponseExpected)
     {
-        mpExchangeCtx = nullptr;
         InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
     }
 
@@ -279,6 +242,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         ClearDirty();
         InteractionModelEngine::GetInstance()->ReleaseDataVersionFilterList(mpDataVersionFilterList);
     }
+
     return err;
 }
 
@@ -391,7 +355,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     ReturnErrorOnFailure(readRequestParser.ExitContainer());
     MoveToState(HandlerState::GeneratingReports);
 
-    mpExchangeCtx->WillSendMessage();
+    mExchangeCtx->WillSendMessage();
 
     // There must be no code after the WillSendMessage() call that can cause
     // this method to return a failure.
@@ -676,12 +640,12 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     ReturnErrorOnFailure(response.GetError());
 
     ReturnErrorOnFailure(writer.Finalize(&packet));
-    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(RefreshSubscribeSyncTimer());
 
     mFlags.Set(ReadHandlerFlags::PrimingReports, false);
-    return mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));
+    return mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));
 }
 
 CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aPayload)
@@ -750,7 +714,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     auto * appCallback = mManagementCallback.GetAppCallback();
     if (appCallback)
     {
-        if (appCallback->OnSubscriptionRequested(*this, *mpExchangeCtx->GetSessionHandle()->AsSecureSession()) != CHIP_NO_ERROR)
+        if (appCallback->OnSubscriptionRequested(*this, *mExchangeCtx->GetSessionHandle()->AsSecureSession()) != CHIP_NO_ERROR)
         {
             return CHIP_ERROR_TRANSACTION_CANCELED;
         }
@@ -766,7 +730,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(subscribeRequestParser.ExitContainer());
     MoveToState(HandlerState::GeneratingReports);
 
-    mpExchangeCtx->WillSendMessage();
+    mExchangeCtx->WillSendMessage();
 
     return CHIP_NO_ERROR;
 }

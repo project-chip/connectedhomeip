@@ -197,5 +197,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     MAP_PRCMHibernateCycleTrigger();
 }
 
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

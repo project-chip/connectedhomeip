@@ -2260,10 +2260,10 @@ namespace Commands {
 namespace MoveToLevel {
 enum class Fields
 {
-    kLevel          = 0,
-    kTransitionTime = 1,
-    kOptionMask     = 2,
-    kOptionOverride = 3,
+    kLevel           = 0,
+    kTransitionTime  = 1,
+    kOptionsMask     = 2,
+    kOptionsOverride = 3,
 };
 
 struct Type
@@ -2275,8 +2275,8 @@ public:
 
     uint8_t level           = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionMask      = static_cast<uint8_t>(0);
-    uint8_t optionOverride  = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2293,18 +2293,18 @@ public:
 
     uint8_t level           = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionMask      = static_cast<uint8_t>(0);
-    uint8_t optionOverride  = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveToLevel
 namespace Move {
 enum class Fields
 {
-    kMoveMode       = 0,
-    kRate           = 1,
-    kOptionMask     = 2,
-    kOptionOverride = 3,
+    kMoveMode        = 0,
+    kRate            = 1,
+    kOptionsMask     = 2,
+    kOptionsOverride = 3,
 };
 
 struct Type
@@ -2314,10 +2314,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Move::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode      = static_cast<MoveMode>(0);
-    uint8_t rate           = static_cast<uint8_t>(0);
-    uint8_t optionMask     = static_cast<uint8_t>(0);
-    uint8_t optionOverride = static_cast<uint8_t>(0);
+    MoveMode moveMode       = static_cast<MoveMode>(0);
+    uint8_t rate            = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2332,21 +2332,21 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Move::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode      = static_cast<MoveMode>(0);
-    uint8_t rate           = static_cast<uint8_t>(0);
-    uint8_t optionMask     = static_cast<uint8_t>(0);
-    uint8_t optionOverride = static_cast<uint8_t>(0);
+    MoveMode moveMode       = static_cast<MoveMode>(0);
+    uint8_t rate            = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Move
 namespace Step {
 enum class Fields
 {
-    kStepMode       = 0,
-    kStepSize       = 1,
-    kTransitionTime = 2,
-    kOptionMask     = 3,
-    kOptionOverride = 4,
+    kStepMode        = 0,
+    kStepSize        = 1,
+    kTransitionTime  = 2,
+    kOptionsMask     = 3,
+    kOptionsOverride = 4,
 };
 
 struct Type
@@ -2359,8 +2359,8 @@ public:
     StepMode stepMode       = static_cast<StepMode>(0);
     uint8_t stepSize        = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionMask      = static_cast<uint8_t>(0);
-    uint8_t optionOverride  = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2378,16 +2378,16 @@ public:
     StepMode stepMode       = static_cast<StepMode>(0);
     uint8_t stepSize        = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionMask      = static_cast<uint8_t>(0);
-    uint8_t optionOverride  = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Step
 namespace Stop {
 enum class Fields
 {
-    kOptionMask     = 0,
-    kOptionOverride = 1,
+    kOptionsMask     = 0,
+    kOptionsOverride = 1,
 };
 
 struct Type
@@ -2397,8 +2397,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    uint8_t optionMask     = static_cast<uint8_t>(0);
-    uint8_t optionOverride = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2413,16 +2413,18 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    uint8_t optionMask     = static_cast<uint8_t>(0);
-    uint8_t optionOverride = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Stop
 namespace MoveToLevelWithOnOff {
 enum class Fields
 {
-    kLevel          = 0,
-    kTransitionTime = 1,
+    kLevel           = 0,
+    kTransitionTime  = 1,
+    kOptionsMask     = 2,
+    kOptionsOverride = 3,
 };
 
 struct Type
@@ -2434,6 +2436,8 @@ public:
 
     uint8_t level           = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2450,14 +2454,18 @@ public:
 
     uint8_t level           = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveToLevelWithOnOff
 namespace MoveWithOnOff {
 enum class Fields
 {
-    kMoveMode = 0,
-    kRate     = 1,
+    kMoveMode        = 0,
+    kRate            = 1,
+    kOptionsMask     = 2,
+    kOptionsOverride = 3,
 };
 
 struct Type
@@ -2467,8 +2475,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode = static_cast<MoveMode>(0);
-    uint8_t rate      = static_cast<uint8_t>(0);
+    MoveMode moveMode       = static_cast<MoveMode>(0);
+    uint8_t rate            = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2483,17 +2493,21 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode = static_cast<MoveMode>(0);
-    uint8_t rate      = static_cast<uint8_t>(0);
+    MoveMode moveMode       = static_cast<MoveMode>(0);
+    uint8_t rate            = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveWithOnOff
 namespace StepWithOnOff {
 enum class Fields
 {
-    kStepMode       = 0,
-    kStepSize       = 1,
-    kTransitionTime = 2,
+    kStepMode        = 0,
+    kStepSize        = 1,
+    kTransitionTime  = 2,
+    kOptionsMask     = 3,
+    kOptionsOverride = 4,
 };
 
 struct Type
@@ -2506,6 +2520,8 @@ public:
     StepMode stepMode       = static_cast<StepMode>(0);
     uint8_t stepSize        = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2523,12 +2539,16 @@ public:
     StepMode stepMode       = static_cast<StepMode>(0);
     uint8_t stepSize        = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StepWithOnOff
 namespace StopWithOnOff {
 enum class Fields
 {
+    kOptionsMask     = 0,
+    kOptionsOverride = 1,
 };
 
 struct Type
@@ -2537,6 +2557,9 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StopWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2551,6 +2574,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopWithOnOff
@@ -3514,11 +3539,11 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields
 {
-    kAdminNodeID      = 1,
-    kAdminPasscodeID  = 2,
-    kChangeType       = 3,
-    kLatestValue      = 4,
-    kAdminFabricIndex = 254,
+    kAdminNodeID     = 1,
+    kAdminPasscodeID = 2,
+    kChangeType      = 3,
+    kLatestValue     = 4,
+    kFabricIndex     = 254,
 };
 
 struct Type
@@ -3533,9 +3558,9 @@ public:
     DataModel::Nullable<uint16_t> adminPasscodeID;
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::AccessControlEntry::Type> latestValue;
-    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
-    auto GetFabricIndex() const { return adminFabricIndex; }
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3551,7 +3576,7 @@ public:
     DataModel::Nullable<uint16_t> adminPasscodeID;
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::AccessControlEntry::DecodableType> latestValue;
-    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -3561,11 +3586,11 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields
 {
-    kAdminNodeID      = 1,
-    kAdminPasscodeID  = 2,
-    kChangeType       = 3,
-    kLatestValue      = 4,
-    kAdminFabricIndex = 254,
+    kAdminNodeID     = 1,
+    kAdminPasscodeID = 2,
+    kChangeType      = 3,
+    kLatestValue     = 4,
+    kFabricIndex     = 254,
 };
 
 struct Type
@@ -3580,9 +3605,9 @@ public:
     DataModel::Nullable<uint16_t> adminPasscodeID;
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::ExtensionEntry::Type> latestValue;
-    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
-    auto GetFabricIndex() const { return adminFabricIndex; }
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3598,7 +3623,7 @@ public:
     DataModel::Nullable<uint16_t> adminPasscodeID;
     ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
     DataModel::Nullable<Structs::ExtensionEntry::DecodableType> latestValue;
-    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -4812,6 +4837,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields
 {
+    kFabricIndex = 0,
 };
 
 struct Type
@@ -4822,6 +4848,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr bool kIsFabricScoped = false;
 
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
@@ -4831,6 +4859,8 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::Leave::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -9263,6 +9293,42 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace ConnectionStatus
+namespace NetworkFaultChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields
+{
+    kCurrent  = 0,
+    kPrevious = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::NetworkFaultChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::List<const NetworkFault> current;
+    DataModel::List<const NetworkFault> previous;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::NetworkFaultChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+
+    DataModel::DecodableList<NetworkFault> current;
+    DataModel::DecodableList<NetworkFault> previous;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace NetworkFaultChange
 } // namespace Events
 } // namespace ThreadNetworkDiagnostics
 namespace WiFiNetworkDiagnostics {
@@ -10752,9 +10818,9 @@ struct TypeInfo
 namespace AdminFabricIndex {
 struct TypeInfo
 {
-    using Type             = chip::FabricIndex;
-    using DecodableType    = chip::FabricIndex;
-    using DecodableArgType = chip::FabricIndex;
+    using Type             = chip::app::DataModel::Nullable<chip::FabricIndex>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::FabricIndex>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::FabricIndex> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AdminFabricIndex::Id; }
@@ -10764,9 +10830,9 @@ struct TypeInfo
 namespace AdminVendorId {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AdminVendorId::Id; }
@@ -10812,9 +10878,9 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::WindowStatus::TypeInfo::DecodableType windowStatus         = static_cast<uint8_t>(0);
-        Attributes::AdminFabricIndex::TypeInfo::DecodableType adminFabricIndex = static_cast<chip::FabricIndex>(0);
-        Attributes::AdminVendorId::TypeInfo::DecodableType adminVendorId       = static_cast<uint16_t>(0);
+        Attributes::WindowStatus::TypeInfo::DecodableType windowStatus = static_cast<uint8_t>(0);
+        Attributes::AdminFabricIndex::TypeInfo::DecodableType adminFabricIndex;
+        Attributes::AdminVendorId::TypeInfo::DecodableType adminVendorId;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -11451,9 +11517,9 @@ struct TypeInfo
 namespace CurrentFabricIndex {
 struct TypeInfo
 {
-    using Type             = chip::FabricIndex;
-    using DecodableType    = chip::FabricIndex;
-    using DecodableArgType = chip::FabricIndex;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentFabricIndex::Id; }
@@ -11504,7 +11570,7 @@ struct TypeInfo
         Attributes::SupportedFabrics::TypeInfo::DecodableType supportedFabrics       = static_cast<uint8_t>(0);
         Attributes::CommissionedFabrics::TypeInfo::DecodableType commissionedFabrics = static_cast<uint8_t>(0);
         Attributes::TrustedRootCertificates::TypeInfo::DecodableType trustedRootCertificates;
-        Attributes::CurrentFabricIndex::TypeInfo::DecodableType currentFabricIndex = static_cast<chip::FabricIndex>(0);
+        Attributes::CurrentFabricIndex::TypeInfo::DecodableType currentFabricIndex = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -22615,9 +22681,9 @@ struct TypeInfo
 namespace VendorID {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::VendorId;
+    using DecodableType    = chip::VendorId;
+    using DecodableArgType = chip::VendorId;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorID::Id; }
@@ -22738,7 +22804,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::VendorName::TypeInfo::DecodableType vendorName;
-        Attributes::VendorID::TypeInfo::DecodableType vendorID = static_cast<uint16_t>(0);
+        Attributes::VendorID::TypeInfo::DecodableType vendorID = static_cast<chip::VendorId>(0);
         Attributes::ApplicationName::TypeInfo::DecodableType applicationName;
         Attributes::ProductID::TypeInfo::DecodableType productID = static_cast<uint16_t>(0);
         Attributes::Application::TypeInfo::DecodableType application;
@@ -27747,7 +27813,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields
 {
-    kArg1 = 254,
+    kFabricIndex = 254,
 };
 
 struct Type
@@ -27758,9 +27824,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    chip::FabricIndex arg1 = static_cast<chip::FabricIndex>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
-    auto GetFabricIndex() const { return arg1; }
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -27772,7 +27838,7 @@ public:
     static constexpr EventId GetEventId() { return Events::TestFabricScopedEvent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
-    chip::FabricIndex arg1 = static_cast<chip::FabricIndex>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

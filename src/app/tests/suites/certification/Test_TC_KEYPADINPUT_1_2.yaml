@@ -36,15 +36,15 @@ tests:
       response:
           value: 1
           constraints:
-              type: uint16
+              type: int16u
 
-    - label: "Read the optional global attribute: FeatureMap"
+    - label: "Read the global attribute: FeatureMap"
       PICS: KEYPADINPUT.S.NV || KEYPADINPUT.S.LK || KEYPADINPUT.S.NK
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
-              type: map32
+              type: bitmap32
               minValue: 0
               maxValue: 7
 

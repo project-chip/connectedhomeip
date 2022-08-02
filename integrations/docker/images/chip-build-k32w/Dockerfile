@@ -4,8 +4,7 @@ FROM connectedhomeip/chip-build:${VERSION} as build
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    wget=1.20.3-1ubuntu2 \
-    unzip=6.0-25ubuntu1 \
+    wget unzip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line

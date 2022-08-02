@@ -205,8 +205,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     InitDataModelHandler(stateParams.exchangeMgr);
 
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, stateParams.fabricTable));
-
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
 
     if (params.enableServerInteractions)
@@ -266,6 +264,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.caseSessionManager = Platform::New<CASESessionManager>();
     ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer, sessionManagerConfig));
 
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, stateParams.fabricTable,
+                                                                                stateParams.caseSessionManager));
+
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(std::move(stateParams));
     mSystemState->SetTempFabricTable(tempFabricTable);
@@ -281,6 +282,7 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerNOC                        = params.controllerNOC;
     controllerParams.controllerICAC                       = params.controllerICAC;
     controllerParams.controllerRCAC                       = params.controllerRCAC;
+    controllerParams.permitMultiControllerFabrics         = params.permitMultiControllerFabrics;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;

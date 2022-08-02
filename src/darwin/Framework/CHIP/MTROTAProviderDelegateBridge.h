@@ -24,10 +24,11 @@ NS_ASSUME_NONNULL_BEGIN
 class MTROTAProviderDelegateBridge : public chip::app::Clusters::OTAProviderDelegate
 {
 public:
-    MTROTAProviderDelegateBridge();
+    MTROTAProviderDelegateBridge(id<MTROTAProviderDelegate> delegate);
     ~MTROTAProviderDelegateBridge();
 
-    void setDelegate(id<MTROTAProviderDelegate> delegate, dispatch_queue_t queue);
+    CHIP_ERROR Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager);
+    void Shutdown();
 
     void HandleQueryImage(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -59,7 +60,7 @@ private:
         MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams);
 
     _Nullable id<MTROTAProviderDelegate> mDelegate;
-    _Nullable dispatch_queue_t mQueue;
+    dispatch_queue_t mWorkQueue;
 };
 
 NS_ASSUME_NONNULL_END

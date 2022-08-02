@@ -126,10 +126,10 @@ private:
     static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device);
     void HandleDeviceConnected(OperationalDeviceProxy * device);
 
-    static void HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error);
-    void HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR error);
+    static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
+    void HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error);
 
-    CHIP_ERROR EstablishConnection(FabricIndex fabric, NodeId node);
+    CHIP_ERROR EstablishConnection(const ScopedNodeId & nodeId);
 
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;

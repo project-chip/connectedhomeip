@@ -28,23 +28,23 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the mandatory attribute: MinMeasuredValue"
+    - label: "Read the mandatory attribute: MinMeasuredValue"
       PICS: TMP.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
               maxValue: 32766
 
-    - label: "read the mandatory attribute: MaxMeasuredValue"
+    - label: "Read the mandatory attribute: MaxMeasuredValue"
       PICS: TMP.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27314
               maxValue: 32767
 
@@ -55,9 +55,9 @@ tests:
       response:
           saveAs: valueBeforeChange
           constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
+              type: int16s
+              minValue: -27314
+              maxValue: 32767
 
     - label: "Operate on device to change the temperature significantly"
       cluster: "LogCommands"
@@ -73,10 +73,10 @@ tests:
     - label: "Read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
       attribute: "MeasuredValue"
-      PICS: TMP.S.A0000
+      PICS: TMP.S.A0000 && TMP.M.ManuallyControlled
       response:
           constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
+              type: int16s
+              minValue: -27314
+              maxValue: 32767
               notValue: valueBeforeChange

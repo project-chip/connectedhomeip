@@ -125,44 +125,55 @@ server cluster LevelControl = 8 {
   request struct MoveToLevelRequest {
     INT8U level = 0;
     INT16U transitionTime = 1;
-    BITMAP8 optionMask = 2;
-    BITMAP8 optionOverride = 3;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct MoveRequest {
     MoveMode moveMode = 0;
     INT8U rate = 1;
-    BITMAP8 optionMask = 2;
-    BITMAP8 optionOverride = 3;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct StepRequest {
     StepMode stepMode = 0;
     INT8U stepSize = 1;
     INT16U transitionTime = 2;
-    BITMAP8 optionMask = 3;
-    BITMAP8 optionOverride = 4;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
   }
 
   request struct StopRequest {
-    BITMAP8 optionMask = 0;
-    BITMAP8 optionOverride = 1;
+    BITMAP8 optionsMask = 0;
+    BITMAP8 optionsOverride = 1;
   }
 
   request struct MoveToLevelWithOnOffRequest {
     INT8U level = 0;
     INT16U transitionTime = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct MoveWithOnOffRequest {
     MoveMode moveMode = 0;
     INT8U rate = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct StepWithOnOffRequest {
     StepMode stepMode = 0;
     INT8U stepSize = 1;
     INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
+  }
+
+  request struct StopWithOnOffRequest {
+    BITMAP8 optionsMask = 0;
+    BITMAP8 optionsOverride = 1;
   }
 
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
@@ -172,7 +183,7 @@ server cluster LevelControl = 8 {
   command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
   command MoveWithOnOff(MoveWithOnOffRequest): DefaultSuccess = 5;
   command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
-  command StopWithOnOff(): DefaultSuccess = 7;
+  command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
 }
 
 server cluster Descriptor = 29 {
@@ -254,7 +265,7 @@ client cluster AccessControl = 31 {
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable AccessControlEntry latestValue = 4;
-    fabric_idx adminFabricIndex = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   info event access(read: administer) AccessControlExtensionChanged = 1 {
@@ -262,7 +273,7 @@ client cluster AccessControl = 31 {
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable ExtensionEntry latestValue = 4;
-    fabric_idx adminFabricIndex = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   attribute access(read: administer, write: administer) AccessControlEntry acl[] = 0;
@@ -322,7 +333,7 @@ server cluster AccessControl = 31 {
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable AccessControlEntry latestValue = 4;
-    fabric_idx adminFabricIndex = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   info event access(read: administer) AccessControlExtensionChanged = 1 {
@@ -330,7 +341,7 @@ server cluster AccessControl = 31 {
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable ExtensionEntry latestValue = 4;
-    fabric_idx adminFabricIndex = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   attribute access(read: administer, write: administer) AccessControlEntry acl[] = 0;
@@ -420,11 +431,19 @@ server cluster BridgedActions = 37 {
 
   readonly attribute ActionStruct actionList[] = 0;
   readonly attribute EndpointListStruct endpointList[] = 1;
+  readonly attribute long_char_string<512> setupUrl = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct InstantActionRequest {
+    INT16U actionID = 0;
+    optional INT32U invokeID = 1;
+  }
+
+  command InstantAction(InstantActionRequest): DefaultSuccess = 0;
 }
 
 server cluster Basic = 40 {
@@ -441,6 +460,7 @@ server cluster Basic = 40 {
   }
 
   info event Leave = 2 {
+    fabric_idx fabricIndex = 0;
   }
 
   info event ReachableChanged = 3 {
@@ -593,7 +613,7 @@ server cluster GeneralCommissioning = 48 {
 
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
-  command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
+  fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -865,7 +885,7 @@ server cluster GeneralDiagnostics = 51 {
     INT64U eventTrigger = 1;
   }
 
-  command TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
+  command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
 }
 
 server cluster SoftwareDiagnostics = 52 {
@@ -977,6 +997,11 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
   info event ConnectionStatus = 0 {
     ThreadConnectionStatus connectionStatus = 0;
+  }
+
+  info event NetworkFaultChange = 1 {
+    NetworkFault current[] = 0;
+    NetworkFault previous[] = 1;
   }
 
   readonly attribute nullable int16u channel = 0;
@@ -1188,8 +1213,8 @@ server cluster AdministratorCommissioning = 60 {
   }
 
   readonly attribute int8u windowStatus = 0;
-  readonly attribute fabric_idx adminFabricIndex = 1;
-  readonly attribute int16u adminVendorId = 2;
+  readonly attribute nullable fabric_idx adminFabricIndex = 1;
+  readonly attribute nullable int16u adminVendorId = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1222,7 +1247,6 @@ server cluster OperationalCredentials = 62 {
     kMissingCsr = 4;
     kTableFull = 5;
     kInvalidAdminSubject = 6;
-    kInsufficientPrivilege = 8;
     kFabricConflict = 9;
     kLabelConflict = 10;
     kInvalidFabricIndex = 11;
@@ -1248,7 +1272,7 @@ server cluster OperationalCredentials = 62 {
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
-  readonly attribute fabric_idx currentFabricIndex = 5;
+  readonly attribute int8u currentFabricIndex = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1317,8 +1341,8 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+  fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
@@ -1387,10 +1411,10 @@ server cluster GroupKeyManagement = 63 {
     INT16U groupKeySetIDs[] = 0;
   }
 
-  command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
-  command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
-  command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
-  command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
+  fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  fabric command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
 }
 
 server cluster UserLabel = 65 {
@@ -1400,6 +1424,17 @@ server cluster UserLabel = 65 {
   }
 
   attribute access(write: manage) LabelStruct labelList[] = 0;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+server cluster TemperatureMeasurement = 1026 {
+  readonly attribute nullable int16s measuredValue = 0;
+  readonly attribute nullable int16s minMeasuredValue = 1;
+  readonly attribute nullable int16s maxMeasuredValue = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1723,6 +1758,7 @@ endpoint 1 {
   server cluster BridgedActions {
     callback attribute actionList;
     callback attribute endpointList;
+    ram      attribute setupUrl default = "https://example.com";
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -1773,6 +1809,17 @@ endpoint 2 {
     ram      attribute multiPressMax default = 2;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TemperatureMeasurement {
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue default = 0x954D;
+    callback attribute maxMeasuredValue default = 0x7FFF;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision default = 1;
   }
 }
 

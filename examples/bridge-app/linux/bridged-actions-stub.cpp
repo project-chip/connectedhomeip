@@ -57,8 +57,26 @@ constexpr uint16_t BridgedActionsAttrAccess::ClusterRevision;
 
 CHIP_ERROR BridgedActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    // Just return an empty list
-    return aEncoder.EncodeEmptyList();
+    CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
+        std::vector<Action *> actionList = GetActionListInfo(endpoint);
+
+        for (auto action : actionList)
+        {
+            if (action->getIsVisible())
+            {
+                BridgedActions::Structs::ActionStruct::Type actionStruct = { action->getActionId(),
+                                                                             CharSpan::fromCharString(action->getName().c_str()),
+                                                                             action->getType(),
+                                                                             action->getEndpointListId(),
+                                                                             action->getSupportedCommands(),
+                                                                             action->getStatus() };
+                ReturnErrorOnFailure(encoder.Encode(actionStruct));
+            }
+        }
+
+        return CHIP_NO_ERROR;
+    });
+    return err;
 }
 
 CHIP_ERROR BridgedActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)

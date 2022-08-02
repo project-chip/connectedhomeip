@@ -178,8 +178,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
         // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
         // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
         if (!failSafeContext.IsFailSafeArmed() &&
-            Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() !=
-                AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen &&
+            Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen() &&
             commandObj->GetSubjectDescriptor().authMode == Access::AuthMode::kCase)
         {
             response.errorCode = CommissioningError::kBusyWithOtherAdmin;

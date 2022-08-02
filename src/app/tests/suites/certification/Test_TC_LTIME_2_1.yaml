@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    109.2.1. [TC-LTIME-2.1] Read and Write Time Format Localization Cluster
+    4.2.1. [TC-LTIME-2.1] Read and Write Time Format Localization Cluster
     Attributes [DUT as Client]
 
 config:
@@ -26,20 +26,19 @@ tests:
     - label: "DUT reads HourFormat attribute from TH"
       PICS: LTIME.C.A0000
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read hour-format 1 0
+          Verify in DUT as client side: Verify that the HourFormat attribute value
 
           [1657106866.828694][4891:4896] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 2232855152
           [1657106866.828763][4891:4896] CHIP:TOO:   HourFormat: 0
       disabled: true
 
-    - label: "If (LTIME.C.A0000.12HR) DUT writes 0 to HourFormat attribute"
+    - label:
+          "If (LTIME.C.A0000.12HR) DUT writes 0 to HourFormat attribute on TH"
       PICS: LTIME.C.A0000.12HR
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write hour-format 0 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657106893.878113][4897:4902] CHIP:DMG: WriteResponseMessage =
           [1657106893.878138][4897:4902] CHIP:DMG: {
@@ -68,23 +67,22 @@ tests:
           [1657106893.878914][4897:4902] CHIP:DMG: WriteClient moving to [AwaitingDe]
       disabled: true
 
-    - label: "DUT reads HourFormat attribute"
+    - label: "DUT reads HourFormat attribute from TH"
       PICS: LTIME.C.A0000
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read hour-format 1 0
+          Verify in DUT as client side: Verify that the HourFormat attribute value as 0
 
           [1657106866.828694][4891:4896] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 2232855152
           [1657106866.828763][4891:4896] CHIP:TOO:   HourFormat: 0
       disabled: true
 
-    - label: "If (LTIME.C.A0000.24HR) DUT writes 1 to HourFormat attribute"
+    - label:
+          "If (LTIME.C.A0000.24HR) DUT writes 1 to HourFormat attribute on TH"
       PICS: LTIME.C.A0000.24HR
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write hour-format 1 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657106989.102102][4907:4912] CHIP:DMG: WriteResponseMessage =
           [1657106989.102137][4907:4912] CHIP:DMG: {
@@ -113,34 +111,31 @@ tests:
           [1657106989.103306][4907:4912] CHIP:DMG: WriteClient moving to [AwaitingDe]
       disabled: true
 
-    - label: "DUT reads HourFormat attribute"
+    - label: "DUT reads HourFormat attribute on TH"
       PICS: LTIME.C.A0000
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read hour-format 1 0
+          Verify in DUT as client side: Verify that  HourFormat attribute value as 1
           [1654605170.332304][7266:7271] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3185003975
           [1654605170.332388][7266:7271] CHIP:TOO:   HourFormat: 1
           [1654605170.332493][7266:7271] CHIP:EM: Sending Standalone Ack for MessageCounter:6045450 on exchange 44106i
       disabled: true
 
-    - label: "DUT reads ActiveCalendarType attribute from DUT"
+    - label: "DUT reads ActiveCalendarType attribute on TH"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that  the ActiveCalendarType attribute value
 
           [1657107039.005036][4917:4922] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855154
           [1657107039.005112][4917:4922] CHIP:TOO:   ActiveCalendarType: 0
       disabled: true
 
-    - label: "DUT reads SupportedCalendarTypes attribute from DUT"
+    - label: "DUT reads SupportedCalendarTypes attribute TH"
       PICS: LTIME.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read supported-calendar-types 1 0
+          Verify in DUT as client side: Verify that  SupportedCalendarTypes attribute value
 
           [1657107056.982007][4924:4929] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0002 DataVersion: 2232855154
           [1657107056.982095][4924:4929] CHIP:TOO:   SupportedCalendarTypes: 12 entries
@@ -159,13 +154,12 @@ tests:
       disabled: true
 
     - label:
-          "If (0 in LTIME.C.A0002.SCT) DUT writes 0 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.C.A0002.SCT
+          "DUT writes value in PIXIT.LTIME.SCT to ActiveCalendarType attribute
+          on TH, followed by reading the ActiveCalendarType attribute from TH"
+      PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write active-calendar-type 0 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657107074.760869][4932:4937] CHIP:DMG: WriteResponseMessage =
           [1657107074.760897][4932:4937] CHIP:DMG: {
@@ -192,533 +186,16 @@ tests:
           [1657107074.761528][4932:4937] CHIP:DMG:         InteractionModelRevision = 1
           [1657107074.761551][4932:4937] CHIP:DMG: }
           [1657107074.761621][4932:4937] CHIP:DMG: WriteClient moving to [AwaitingDe]
-      disabled: true
-
-    - label: "DUT reads ActiveCalendarType attribute"
-      PICS: LTIME.C.A0001
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
 
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that the  ActiveCalendarType attribute value as 0
 
           [1657107039.005036][4917:4922] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855154
           [1657107039.005112][4917:4922] CHIP:TOO:   ActiveCalendarType: 0
       disabled: true
 
-    - label:
-          "If (1 in LTIME.C.A0002.SCT) DUT writes 1 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.C.A0002.SCT
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization write active-calendar-type 1 1 0
-
-          [1657107238.274764][4949:4954] CHIP:DMG: WriteResponseMessage =
-          [1657107238.274795][4949:4954] CHIP:DMG: {
-          [1657107238.274822][4949:4954] CHIP:DMG:         AttributeStatusIBs =
-          [1657107238.274860][4949:4954] CHIP:DMG:         [
-          [1657107238.274890][4949:4954] CHIP:DMG:                 AttributeStatusIB =
-          [1657107238.274931][4949:4954] CHIP:DMG:                 {
-          [1657107238.274967][4949:4954] CHIP:DMG:                         AttributePathIB =
-          [1657107238.275007][4949:4954] CHIP:DMG:                         {
-          [1657107238.275046][4949:4954] CHIP:DMG:                                 Endpoint = 0x0,
-          [1657107238.275087][4949:4954] CHIP:DMG:                                 Cluster = 0x2c,
-          [1657107238.275128][4949:4954] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1657107238.275167][4949:4954] CHIP:DMG:                         }
-          [1657107238.275211][4949:4954] CHIP:DMG:
-          [1657107238.275248][4949:4954] CHIP:DMG:                         StatusIB =
-          [1657107238.275285][4949:4954] CHIP:DMG:                         {
-          [1657107238.275325][4949:4954] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657107238.275363][4949:4954] CHIP:DMG:                         },
-          [1657107238.275401][4949:4954] CHIP:DMG:
-          [1657107238.275435][4949:4954] CHIP:DMG:                 },
-          [1657107238.275473][4949:4954] CHIP:DMG:
-          [1657107238.275503][4949:4954] CHIP:DMG:         ],
-          [1657107238.275539][4949:4954] CHIP:DMG:
-          [1657107238.275568][4949:4954] CHIP:DMG:         InteractionModelRevision = 1
-          [1657107238.275597][4949:4954] CHIP:DMG: }
-          [1657107238.275676][4949:4954] CHIP:DMG: WriteClient moving to [AwaitingDe]
-      disabled: true
-
-    - label: "DUT reads ActiveCalendarType attribute"
+    - label: "Repeat step 8 for all the values in PIXIT.LTIME.SCT"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-
-          [1657107039.005036][4917:4922] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855154
-          [1657107039.005112][4917:4922] CHIP:TOO:   ActiveCalendarType: 1
-      disabled: true
-
-    - label:
-          "If (2 in LTIME.C.A0002.SCT) DUT writes 2 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.C.A0002.SCT
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization write active-calendar-type 2 1 0
-
-          [1657107378.279674][4960:4965] CHIP:DMG: WriteResponseMessage =
-          [1657107378.279720][4960:4965] CHIP:DMG: {
-          [1657107378.279751][4960:4965] CHIP:DMG:         AttributeStatusIBs =
-          [1657107378.279803][4960:4965] CHIP:DMG:         [
-          [1657107378.279838][4960:4965] CHIP:DMG:                 AttributeStatusIB =
-          [1657107378.279885][4960:4965] CHIP:DMG:                 {
-          [1657107378.279921][4960:4965] CHIP:DMG:                         AttributePathIB =
-          [1657107378.279972][4960:4965] CHIP:DMG:                         {
-          [1657107378.280019][4960:4965] CHIP:DMG:                                 Endpoint = 0x0,
-          [1657107378.280076][4960:4965] CHIP:DMG:                                 Cluster = 0x2c,
-          [1657107378.280133][4960:4965] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1657107378.280176][4960:4965] CHIP:DMG:                         }
-          [1657107378.280235][4960:4965] CHIP:DMG:
-          [1657107378.280285][4960:4965] CHIP:DMG:                         StatusIB =
-          [1657107378.280328][4960:4965] CHIP:DMG:                         {
-          [1657107378.280381][4960:4965] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657107378.280426][4960:4965] CHIP:DMG:                         },
-          [1657107378.280479][4960:4965] CHIP:DMG:
-          [1657107378.280526][4960:4965] CHIP:DMG:                 },
-          [1657107378.280567][4960:4965] CHIP:DMG:
-          [1657107378.280609][4960:4965] CHIP:DMG:         ],
-          [1657107378.280649][4960:4965] CHIP:DMG:
-          [1657107378.280691][4960:4965] CHIP:DMG:         InteractionModelRevision = 1
-          [1657107378.280724][4960:4965] CHIP:DMG: }
-          [1657107378.280825][4960:4965] CHIP:DMG: WriteClient moving to [AwaitingDe]
-      disabled: true
-
-    - label: "DUT reads ActiveCalendarType attribute"
-      PICS: LTIME.C.A0001
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-
-          [1657107404.774339][4968:4973] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855157
-          [1657107404.774453][4968:4973] CHIP:TOO:   ActiveCalendarType: 2
-      disabled: true
-
-    - label:
-          "If (3 in LTIME.C.A0002.SCT) DUT writes 3 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.C.A0002.SCT
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization write active-calendar-type 3 1 0
-
-          [1657107432.589832][4975:4980] CHIP:DMG: WriteResponseMessage =
-          [1657107432.589869][4975:4980] CHIP:DMG: {
-          [1657107432.589901][4975:4980] CHIP:DMG:         AttributeStatusIBs =
-          [1657107432.589946][4975:4980] CHIP:DMG:         [
-          [1657107432.589982][4975:4980] CHIP:DMG:                 AttributeStatusIB =
-          [1657107432.590031][4975:4980] CHIP:DMG:                 {
-          [1657107432.590070][4975:4980] CHIP:DMG:                         AttributePathIB =
-          [1657107432.590116][4975:4980] CHIP:DMG:                         {
-          [1657107432.590162][4975:4980] CHIP:DMG:                                 Endpoint = 0x0,
-          [1657107432.590212][4975:4980] CHIP:DMG:                                 Cluster = 0x2c,
-          [1657107432.590262][4975:4980] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1657107432.590308][4975:4980] CHIP:DMG:                         }
-          [1657107432.590359][4975:4980] CHIP:DMG:
-          [1657107432.590454][4975:4980] CHIP:DMG:                         StatusIB =
-          [1657107432.590502][4975:4980] CHIP:DMG:                         {
-          [1657107432.590547][4975:4980] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657107432.590594][4975:4980] CHIP:DMG:                         },
-          [1657107432.590639][4975:4980] CHIP:DMG:
-          [1657107432.590677][4975:4980] CHIP:DMG:                 },
-          [1657107432.590720][4975:4980] CHIP:DMG:
-          [1657107432.590756][4975:4980] CHIP:DMG:         ],
-          [1657107432.590799][4975:4980] CHIP:DMG:
-          [1657107432.590835][4975:4980] CHIP:DMG:         InteractionModelRevision = 1
-          [1657107432.590869][4975:4980] CHIP:DMG: }
-          [1657107432.590963][4975:4980] CHIP:DMG: WriteClient moving to [AwaitingDe]
-      disabled: true
-
-    - label: "DUT reads ActiveCalendarType attribute"
-      PICS: LTIME.C.A0001
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-
-          [1657107452.389424][4983:4988] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855158
-          [1657107452.389490][4983:4988] CHIP:TOO:   ActiveCalendarType: 3
-      disabled: true
-
-    - label:
-          "If (4 in LTIME.C.A0002.SCT) DUT writes 4 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.C.A0002.SCT
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization write active-calendar-type 4 1 0
-
-          [1657107472.754436][4990:4996] CHIP:DMG: WriteResponseMessage =
-          [1657107472.754462][4990:4996] CHIP:DMG: {
-          [1657107472.754485][4990:4996] CHIP:DMG:         AttributeStatusIBs =
-          [1657107472.754515][4990:4996] CHIP:DMG:         [
-          [1657107472.754539][4990:4996] CHIP:DMG:                 AttributeStatusIB =
-          [1657107472.754567][4990:4996] CHIP:DMG:                 {
-          [1657107472.754593][4990:4996] CHIP:DMG:                         AttributePathIB =
-          [1657107472.754625][4990:4996] CHIP:DMG:                         {
-          [1657107472.754658][4990:4996] CHIP:DMG:                                 Endpoint = 0x0,
-          [1657107472.754691][4990:4996] CHIP:DMG:                                 Cluster = 0x2c,
-          [1657107472.754723][4990:4996] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1657107472.754754][4990:4996] CHIP:DMG:                         }
-          [1657107472.754788][4990:4996] CHIP:DMG:
-          [1657107472.754817][4990:4996] CHIP:DMG:                         StatusIB =
-          [1657107472.754848][4990:4996] CHIP:DMG:                         {
-          [1657107472.754878][4990:4996] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657107472.754911][4990:4996] CHIP:DMG:                         },
-          [1657107472.754941][4990:4996] CHIP:DMG:
-          [1657107472.754966][4990:4996] CHIP:DMG:                 },
-          [1657107472.754994][4990:4996] CHIP:DMG:
-          [1657107472.755018][4990:4996] CHIP:DMG:         ],
-          [1657107472.755046][4990:4996] CHIP:DMG:
-          [1657107472.755070][4990:4996] CHIP:DMG:         InteractionModelRevision = 1
-          [1657107472.755092][4990:4996] CHIP:DMG: }
-          [1657107472.755159][4990:4996] CHIP:DMG: WriteClient moving to [AwaitingDe]
-      disabled: true
-
-    - label: "DUT reads ActiveCalendarType attribute"
-      PICS: LTIME.C.A0001
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-
-          [1657107496.925134][4997:5002] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855159
-          [1657107496.925199][4997:5002] CHIP:TOO:   ActiveCalendarType: 4
-      disabled: true
-
-    - label:
-          "If (5 in LTIME.C.A0002.SCT) DUT writes 5 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.C.A0002.SCT
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization write active-calendar-type 5 1 0
-
-          [1657107518.977989][5005:5010] CHIP:DMG: WriteResponseMessage =
-          [1657107518.978030][5005:5010] CHIP:DMG: {
-          [1657107518.978065][5005:5010] CHIP:DMG:         AttributeStatusIBs =
-          [1657107518.978115][5005:5010] CHIP:DMG:         [
-          [1657107518.978155][5005:5010] CHIP:DMG:                 AttributeStatusIB =
-          [1657107518.978199][5005:5010] CHIP:DMG:                 {
-          [1657107518.978242][5005:5010] CHIP:DMG:                         AttributePathIB =
-          [1657107518.978294][5005:5010] CHIP:DMG:                         {
-          [1657107518.978346][5005:5010] CHIP:DMG:                                 Endpoint = 0x0,
-          [1657107518.978439][5005:5010] CHIP:DMG:                                 Cluster = 0x2c,
-          [1657107518.978496][5005:5010] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1657107518.978547][5005:5010] CHIP:DMG:                         }
-          [1657107518.978604][5005:5010] CHIP:DMG:
-          [1657107518.978654][5005:5010] CHIP:DMG:                         StatusIB =
-          [1657107518.978705][5005:5010] CHIP:DMG:                         {
-          [1657107518.978754][5005:5010] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657107518.978805][5005:5010] CHIP:DMG:                         },
-          [1657107518.978856][5005:5010] CHIP:DMG:
-          [1657107518.978897][5005:5010] CHIP:DMG:                 },
-          [1657107518.978944][5005:5010] CHIP:DMG:
-          [1657107518.978984][5005:5010] CHIP:DMG:         ],
-          [1657107518.979030][5005:5010] CHIP:DMG:
-          [1657107518.979069][5005:5010] CHIP:DMG:         InteractionModelRevision = 1
-          [1657107518.979107][5005:5010] CHIP:DMG: }
-          [1657107518.979214][5005:5010] CHIP:DMG: WriteClient moving to [AwaitingDe]
-      disabled: true
-
-    - label: "DUT reads ActiveCalendarType attribute"
-      PICS: LTIME.C.A0001
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-
-          [1657107552.874504][5011:5016] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855160
-          [1657107552.874572][5011:5016] CHIP:TOO:   ActiveCalendarType: 5
-      disabled: true
-
-    - label:
-          "If (6 in LTIME.C.A0002.SCT) DUT writes 6 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.C.A0002.SCT
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-
-          ./chip-tool timeformatlocalization write active-calendar-type 6 1 0
-
-          [1657107711.004508][5030:5035] CHIP:DMG: WriteResponseMessage =
-          [1657107711.004535][5030:5035] CHIP:DMG: {
-          [1657107711.004565][5030:5035] CHIP:DMG:         AttributeStatusIBs =
-          [1657107711.004599][5030:5035] CHIP:DMG:         [
-          [1657107711.004633][5030:5035] CHIP:DMG:                 AttributeStatusIB =
-          [1657107711.004660][5030:5035] CHIP:DMG:                 {
-          [1657107711.004695][5030:5035] CHIP:DMG:                         AttributePathIB =
-          [1657107711.004736][5030:5035] CHIP:DMG:                         {
-          [1657107711.004769][5030:5035] CHIP:DMG:                                 Endpoint = 0x0,
-          [1657107711.004812][5030:5035] CHIP:DMG:                                 Cluster = 0x2c,
-          [1657107711.004857][5030:5035] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1657107711.004892][5030:5035] CHIP:DMG:                         }
-          [1657107711.004937][5030:5035] CHIP:DMG:
-          [1657107711.004978][5030:5035] CHIP:DMG:                         StatusIB =
-          [1657107711.005012][5030:5035] CHIP:DMG:                         {
-          [1657107711.005053][5030:5035] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657107711.005095][5030:5035] CHIP:DMG:                         },
-          [1657107711.005127][5030:5035] CHIP:DMG:
-          [1657107711.005162][5030:5035] CHIP:DMG:                 },
-          [1657107711.005194][5030:5035] CHIP:DMG:
-          [1657107711.005227][5030:5035] CHIP:DMG:         ],
-          [1657107711.005257][5030:5035] CHIP:DMG:
-          [1657107711.005288][5030:5035] CHIP:DMG:         InteractionModelRevision = 1
-          [1657107711.005312][5030:5035] CHIP:DMG: }
-          [1657107711.005384][5030:5035] CHIP:DMG: WriteClient moving to [AwaitingDe]
-      disabled: true
-
-    - label: "DUT reads ActiveCalendarType attribute"
-      PICS: LTIME.C.A0001
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-
-          [1657107808.981214][5042:5047] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855162
-          [1657107808.981291][5042:5047] CHIP:TOO:   ActiveCalendarType: 6
-      disabled: true
-
-    - label:
-          "If (7 in LTIME.C.A0002.SCT) DUT writes 7 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.C.A0002.SCT
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization write active-calendar-type 7 1 0
-
-          [1657107845.528814][5048:5053] CHIP:DMG: WriteResponseMessage =
-          [1657107845.528843][5048:5053] CHIP:DMG: {
-          [1657107845.528869][5048:5053] CHIP:DMG:         AttributeStatusIBs =
-          [1657107845.528905][5048:5053] CHIP:DMG:         [
-          [1657107845.528933][5048:5053] CHIP:DMG:                 AttributeStatusIB =
-          [1657107845.528968][5048:5053] CHIP:DMG:                 {
-          [1657107845.528998][5048:5053] CHIP:DMG:                         AttributePathIB =
-          [1657107845.529033][5048:5053] CHIP:DMG:                         {
-          [1657107845.529069][5048:5053] CHIP:DMG:                                 Endpoint = 0x0,
-          [1657107845.529107][5048:5053] CHIP:DMG:                                 Cluster = 0x2c,
-          [1657107845.529144][5048:5053] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1657107845.529183][5048:5053] CHIP:DMG:                         }
-          [1657107845.529223][5048:5053] CHIP:DMG:
-          [1657107845.529256][5048:5053] CHIP:DMG:                         StatusIB =
-          [1657107845.529293][5048:5053] CHIP:DMG:                         {
-          [1657107845.529328][5048:5053] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657107845.529367][5048:5053] CHIP:DMG:                         },
-          [1657107845.529401][5048:5053] CHIP:DMG:
-          [1657107845.529432][5048:5053] CHIP:DMG:                 },
-          [1657107845.529465][5048:5053] CHIP:DMG:
-          [1657107845.529493][5048:5053] CHIP:DMG:         ],
-          [1657107845.529526][5048:5053] CHIP:DMG:
-          [1657107845.529553][5048:5053] CHIP:DMG:         InteractionModelRevision = 1
-          [1657107845.529580][5048:5053] CHIP:DMG: }
-          [1657107845.529656][5048:5053] CHIP:DMG: WriteClient moving to [AwaitingDe]
-      disabled: true
-
-    - label: "DUT reads ActiveCalendarType attribute"
-      PICS: LTIME.C.A0001
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-
-          [1657107867.321473][5055:5060] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855163
-          [1657107867.321550][5055:5060] CHIP:TOO:   ActiveCalendarType: 7
-      disabled: true
-
-    - label:
-          "If (8 in LTIME.C.A0002.SCT) DUT writes 8 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.C.A0002.SCT
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization write active-calendar-type 8 1 0
-
-          [1657107895.609252][5062:5067] CHIP:DMG: WriteResponseMessage =
-          [1657107895.609278][5062:5067] CHIP:DMG: {
-          [1657107895.609310][5062:5067] CHIP:DMG:         AttributeStatusIBs =
-          [1657107895.609341][5062:5067] CHIP:DMG:         [
-          [1657107895.609374][5062:5067] CHIP:DMG:                 AttributeStatusIB =
-          [1657107895.609405][5062:5067] CHIP:DMG:                 {
-          [1657107895.609440][5062:5067] CHIP:DMG:                         AttributePathIB =
-          [1657107895.609479][5062:5067] CHIP:DMG:                         {
-          [1657107895.609514][5062:5067] CHIP:DMG:                                 Endpoint = 0x0,
-          [1657107895.609555][5062:5067] CHIP:DMG:                                 Cluster = 0x2c,
-          [1657107895.609598][5062:5067] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1657107895.609633][5062:5067] CHIP:DMG:                         }
-          [1657107895.609679][5062:5067] CHIP:DMG:
-          [1657107895.609720][5062:5067] CHIP:DMG:                         StatusIB =
-          [1657107895.609752][5062:5067] CHIP:DMG:                         {
-          [1657107895.609791][5062:5067] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657107895.609833][5062:5067] CHIP:DMG:                         },
-          [1657107895.609865][5062:5067] CHIP:DMG:
-          [1657107895.609899][5062:5067] CHIP:DMG:                 },
-          [1657107895.609930][5062:5067] CHIP:DMG:
-          [1657107895.609962][5062:5067] CHIP:DMG:         ],
-          [1657107895.609992][5062:5067] CHIP:DMG:
-          [1657107895.610025][5062:5067] CHIP:DMG:         InteractionModelRevision = 1
-          [1657107895.610048][5062:5067] CHIP:DMG: }
-          [1657107895.610133][5062:5067] CHIP:DMG: WriteClient moving to [AwaitingDe]
-      disabled: true
-
-    - label: "DUT reads ActiveCalendarType attribute"
-      PICS: LTIME.C.A0001
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-
-          [1657107912.560322][5068:5073] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855164
-          [1657107912.560397][5068:5073] CHIP:TOO:   ActiveCalendarType: 8
-      disabled: true
-
-    - label:
-          "If (9 in LTIME.C.A0002.SCT) DUT writes 9 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.C.A0002.SCT
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization write active-calendar-type 9 1 0
-
-          [1657107930.629239][5076:5081] CHIP:DMG: WriteResponseMessage =
-          [1657107930.629265][5076:5081] CHIP:DMG: {
-          [1657107930.629287][5076:5081] CHIP:DMG:         AttributeStatusIBs =
-          [1657107930.629317][5076:5081] CHIP:DMG:         [
-          [1657107930.629341][5076:5081] CHIP:DMG:                 AttributeStatusIB =
-          [1657107930.629368][5076:5081] CHIP:DMG:                 {
-          [1657107930.629394][5076:5081] CHIP:DMG:                         AttributePathIB =
-          [1657107930.629430][5076:5081] CHIP:DMG:                         {
-          [1657107930.629462][5076:5081] CHIP:DMG:                                 Endpoint = 0x0,
-          [1657107930.629498][5076:5081] CHIP:DMG:                                 Cluster = 0x2c,
-          [1657107930.629532][5076:5081] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1657107930.629563][5076:5081] CHIP:DMG:                         }
-          [1657107930.629597][5076:5081] CHIP:DMG:
-          [1657107930.629626][5076:5081] CHIP:DMG:                         StatusIB =
-          [1657107930.629658][5076:5081] CHIP:DMG:                         {
-          [1657107930.629689][5076:5081] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657107930.629723][5076:5081] CHIP:DMG:                         },
-          [1657107930.629753][5076:5081] CHIP:DMG:
-          [1657107930.629780][5076:5081] CHIP:DMG:                 },
-          [1657107930.629808][5076:5081] CHIP:DMG:
-          [1657107930.629832][5076:5081] CHIP:DMG:         ],
-          [1657107930.629861][5076:5081] CHIP:DMG:
-          [1657107930.629885][5076:5081] CHIP:DMG:         InteractionModelRevision = 1
-          [1657107930.629908][5076:5081] CHIP:DMG: }
-          [1657107930.629976][5076:5081] CHIP:DMG: WriteClient moving to [AwaitingDe]
-      disabled: true
-
-    - label: "DUT reads ActiveCalendarType attribute"
-      PICS: LTIME.C.A0001
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-
-          [1657107951.056785][5082:5087] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855165
-          [1657107951.056861][5082:5087] CHIP:TOO:   ActiveCalendarType: 9
-      disabled: true
-
-    - label:
-          "If (10 in LTIME.C.A0002.SCT) DUT writes 10 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.C.A0002.SCT
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization write active-calendar-type 10 1 0
-
-          [1657107969.768286][5090:5095] CHIP:DMG: WriteResponseMessage =
-          [1657107969.768313][5090:5095] CHIP:DMG: {
-          [1657107969.768336][5090:5095] CHIP:DMG:         AttributeStatusIBs =
-          [1657107969.768367][5090:5095] CHIP:DMG:         [
-          [1657107969.768392][5090:5095] CHIP:DMG:                 AttributeStatusIB =
-          [1657107969.768420][5090:5095] CHIP:DMG:                 {
-          [1657107969.768445][5090:5095] CHIP:DMG:                         AttributePathIB =
-          [1657107969.768482][5090:5095] CHIP:DMG:                         {
-          [1657107969.768516][5090:5095] CHIP:DMG:                                 Endpoint = 0x0,
-          [1657107969.768554][5090:5095] CHIP:DMG:                                 Cluster = 0x2c,
-          [1657107969.768593][5090:5095] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1657107969.768628][5090:5095] CHIP:DMG:                         }
-          [1657107969.768663][5090:5095] CHIP:DMG:
-          [1657107969.768693][5090:5095] CHIP:DMG:                         StatusIB =
-          [1657107969.768725][5090:5095] CHIP:DMG:                         {
-          [1657107969.768757][5090:5095] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657107969.768789][5090:5095] CHIP:DMG:                         },
-          [1657107969.768819][5090:5095] CHIP:DMG:
-          [1657107969.768845][5090:5095] CHIP:DMG:                 },
-          [1657107969.768874][5090:5095] CHIP:DMG:
-          [1657107969.768897][5090:5095] CHIP:DMG:         ],
-          [1657107969.768926][5090:5095] CHIP:DMG:
-          [1657107969.768950][5090:5095] CHIP:DMG:         InteractionModelRevision = 1
-          [1657107969.768973][5090:5095] CHIP:DMG: }
-          [1657107969.769041][5090:5095] CHIP:DMG: WriteClient moving to [AwaitingDe]
-      disabled: true
-
-    - label: "DUT reads ActiveCalendarType attribute"
-      PICS: LTIME.C.A0001
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-
-          [1657107989.893985][5097:5102] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855166
-          [1657107989.894063][5097:5102] CHIP:TOO:   ActiveCalendarType: 10
-      disabled: true
-
-    - label:
-          "If (11 in LTIME.C.A0002.SCT) DUT writes 11 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.C.A0002.SCT
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization write active-calendar-type 11 1 0
-
-          [1657108006.545369][5103:5108] CHIP:DMG: WriteResponseMessage =
-          [1657108006.545394][5103:5108] CHIP:DMG: {
-          [1657108006.545416][5103:5108] CHIP:DMG:         AttributeStatusIBs =
-          [1657108006.545446][5103:5108] CHIP:DMG:         [
-          [1657108006.545470][5103:5108] CHIP:DMG:                 AttributeStatusIB =
-          [1657108006.545498][5103:5108] CHIP:DMG:                 {
-          [1657108006.545523][5103:5108] CHIP:DMG:                         AttributePathIB =
-          [1657108006.545557][5103:5108] CHIP:DMG:                         {
-          [1657108006.545589][5103:5108] CHIP:DMG:                                 Endpoint = 0x0,
-          [1657108006.545621][5103:5108] CHIP:DMG:                                 Cluster = 0x2c,
-          [1657108006.545652][5103:5108] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1657108006.545682][5103:5108] CHIP:DMG:                         }
-          [1657108006.545717][5103:5108] CHIP:DMG:
-          [1657108006.545750][5103:5108] CHIP:DMG:                         StatusIB =
-          [1657108006.545783][5103:5108] CHIP:DMG:                         {
-          [1657108006.545814][5103:5108] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657108006.545845][5103:5108] CHIP:DMG:                         },
-          [1657108006.545875][5103:5108] CHIP:DMG:
-          [1657108006.545900][5103:5108] CHIP:DMG:                 },
-          [1657108006.545929][5103:5108] CHIP:DMG:
-          [1657108006.545952][5103:5108] CHIP:DMG:         ],
-          [1657108006.545981][5103:5108] CHIP:DMG:
-          [1657108006.546004][5103:5108] CHIP:DMG:         InteractionModelRevision = 1
-          [1657108006.546027][5103:5108] CHIP:DMG: }
-          [1657108006.546092][5103:5108] CHIP:DMG: WriteClient moving to [AwaitingDe]
-      disabled: true
-
-    - label: "DUT reads ActiveCalendarType attribute"
-      PICS: LTIME.C.A0001
-      verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-
-          [1657108026.518564][5111:5116] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855167
-          [1657108026.518640][5111:5116] CHIP:TOO:   ActiveCalendarType: 11
+          Repeat the test step 8 for below mentioned values 1, 2,3, 4, 5, 6,7, 8, 9,10 and 11 and verify that TH receives the write command and updates the respective value. Verify that TH reads ActiveCalendarType attribute value and it is the same as the value that was set before
       disabled: true

@@ -29,19 +29,19 @@ public class ChipEventStructs {
     public @Nullable Integer adminPasscodeID;
     public Integer changeType;
     public @Nullable ChipStructs.AccessControlClusterAccessControlEntry latestValue;
-    public Integer adminFabricIndex;
+    public Integer fabricIndex;
 
     public AccessControlClusterAccessControlEntryChangedEvent(
         @Nullable Long adminNodeID,
         @Nullable Integer adminPasscodeID,
         Integer changeType,
         @Nullable ChipStructs.AccessControlClusterAccessControlEntry latestValue,
-        Integer adminFabricIndex) {
+        Integer fabricIndex) {
       this.adminNodeID = adminNodeID;
       this.adminPasscodeID = adminPasscodeID;
       this.changeType = changeType;
       this.latestValue = latestValue;
-      this.adminFabricIndex = adminFabricIndex;
+      this.fabricIndex = fabricIndex;
     }
 
     @Override
@@ -60,8 +60,8 @@ public class ChipEventStructs {
       output.append("\tlatestValue: ");
       output.append(latestValue);
       output.append("\n");
-      output.append("\tadminFabricIndex: ");
-      output.append(adminFabricIndex);
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -73,19 +73,19 @@ public class ChipEventStructs {
     public @Nullable Integer adminPasscodeID;
     public Integer changeType;
     public @Nullable ChipStructs.AccessControlClusterExtensionEntry latestValue;
-    public Integer adminFabricIndex;
+    public Integer fabricIndex;
 
     public AccessControlClusterAccessControlExtensionChangedEvent(
         @Nullable Long adminNodeID,
         @Nullable Integer adminPasscodeID,
         Integer changeType,
         @Nullable ChipStructs.AccessControlClusterExtensionEntry latestValue,
-        Integer adminFabricIndex) {
+        Integer fabricIndex) {
       this.adminNodeID = adminNodeID;
       this.adminPasscodeID = adminPasscodeID;
       this.changeType = changeType;
       this.latestValue = latestValue;
-      this.adminFabricIndex = adminFabricIndex;
+      this.fabricIndex = fabricIndex;
     }
 
     @Override
@@ -104,8 +104,8 @@ public class ChipEventStructs {
       output.append("\tlatestValue: ");
       output.append(latestValue);
       output.append("\n");
-      output.append("\tadminFabricIndex: ");
-      output.append(adminFabricIndex);
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -210,13 +210,19 @@ public class ChipEventStructs {
   }
 
   public static class BasicClusterLeaveEvent {
+    public Integer fabricIndex;
 
-    public BasicClusterLeaveEvent() {}
+    public BasicClusterLeaveEvent(Integer fabricIndex) {
+      this.fabricIndex = fabricIndex;
+    }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("BasicClusterLeaveEvent {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
       output.append("}\n");
       return output.toString();
     }
@@ -479,6 +485,31 @@ public class ChipEventStructs {
       output.append("ThreadNetworkDiagnosticsClusterConnectionStatusEvent {\n");
       output.append("\tconnectionStatus: ");
       output.append(connectionStatus);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent {
+    public ArrayList<Object> current;
+    public ArrayList<Object> previous;
+
+    public ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent(
+        ArrayList<Object> current, ArrayList<Object> previous) {
+      this.current = current;
+      this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent {\n");
+      output.append("\tcurrent: ");
+      output.append(current);
+      output.append("\n");
+      output.append("\tprevious: ");
+      output.append(previous);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -1248,18 +1279,18 @@ public class ChipEventStructs {
   }
 
   public static class TestClusterClusterTestFabricScopedEventEvent {
-    public Integer arg1;
+    public Integer fabricIndex;
 
-    public TestClusterClusterTestFabricScopedEventEvent(Integer arg1) {
-      this.arg1 = arg1;
+    public TestClusterClusterTestFabricScopedEventEvent(Integer fabricIndex) {
+      this.fabricIndex = fabricIndex;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("TestClusterClusterTestFabricScopedEventEvent {\n");
-      output.append("\targ1: ");
-      output.append(arg1);
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();

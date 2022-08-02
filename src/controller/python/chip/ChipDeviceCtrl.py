@@ -120,7 +120,7 @@ class DCState(enum.IntEnum):
 class ChipDeviceController():
     activeList = set()
 
-    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, fabricIndex: int, nodeId: int, adminVendorId: int, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
+    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         self._ChipStack = builtins.chipStack
@@ -134,8 +134,10 @@ class ChipDeviceController():
 
         res = self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateController(ctypes.c_void_p(
-                opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId, adminVendorId, ctypes.c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
+                opCredsContext), pointer(devCtrl), fabricId, nodeId, adminVendorId, ctypes.c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
         )
+
+        self.nodeId = nodeId
 
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
@@ -144,6 +146,9 @@ class ChipDeviceController():
 
         self._Cluster = ChipClusters(builtins.chipStack)
         self._Cluster.InitLib(self._dmLib)
+
+        def GetNodeId(self):
+            return self.nodeId
 
         def HandleKeyExchangeComplete(err):
             if err != 0:
@@ -563,7 +568,7 @@ class ChipDeviceController():
 
         return self._Cluster
 
-    def GetConnectedDeviceSync(self, nodeid, allowPASE=True):
+    def GetConnectedDeviceSync(self, nodeid, allowPASE=True, timeoutMs: int = None):
         self.CheckIsActive()
 
         returnDevice = c_void_p(None)
@@ -582,13 +587,13 @@ class ChipDeviceController():
 
         if allowPASE:
             res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
-                self.devCtrl, nodeid, byref(returnDevice)))
+                self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
             if res == 0:
                 print('Using PASE connection')
                 return returnDevice
 
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
-            self.devCtrl, nodeid, DeviceAvailableCallback))
+            self.devCtrl, nodeid, DeviceAvailableCallback), timeoutMs)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
@@ -596,43 +601,66 @@ class ChipDeviceController():
         # Check if the device is already set before waiting for the callback.
         if returnDevice.value is None:
             with deviceAvailableCV:
-                deviceAvailableCV.wait()
+                timeout = None
+                if (timeoutMs):
+                    timeout = float(timeoutMs) / 1000
+
+                ret = deviceAvailableCV.wait(timeout)
+                if ret is False:
+                    raise TimeoutError("Timed out waiting for DNS-SD resolution")
 
         if returnDevice.value is None:
             raise self._ChipStack.ErrorToException(returnErr)
         return returnDevice
 
-    async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None, timedRequestTimeoutMs: int = None):
+    def ComputeRoundTripTimeout(self, nodeid, upperLayerProcessingTimeoutMs: int = 0):
+        ''' Returns a computed timeout value based on the round-trip time it takes for the peer at the other end of the session to
+            receive a message, process it and send it back. This is computed based on the session type, the type of transport, sleepy
+            characteristics of the target and a caller-provided value for the time it takes to process a message at the upper layer on
+            the target For group sessions.
+
+            This will result in a session being established if one wasn't already.
+        '''
+        device = self.GetConnectedDeviceSync(nodeid)
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_ComputeRoundTripTimeout(
+            device, upperLayerProcessingTimeoutMs))
+        return res
+
+    async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None, timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive the response.
         If a valid responseType is passed in, that will be used to deserialize the object. If not, the type will be automatically deduced
         from the metadata received over the wire.
 
         timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
+        interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the right
+                              timeout value based on transport characteristics as well as the responsiveness of the target.
         '''
         self.CheckIsActive()
 
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        device = self.GetConnectedDeviceSync(nodeid)
+        device = self.GetConnectedDeviceSync(nodeid, timeoutMs=interactionTimeoutMs)
         res = ClusterCommand.SendCommand(
             future, eventLoop, responseType, device, ClusterCommand.CommandPath(
                 EndpointId=endpoint,
                 ClusterId=payload.cluster_id,
                 CommandId=payload.command_id,
-            ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs)
+            ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs)
         if res != 0:
             future.set_exception(self._ChipStack.ErrorToException(res))
         return await future
 
-    async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]], timedRequestTimeoutMs: int = None):
+    async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]], timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None):
         '''
         Write a list of attributes on a target node.
 
         nodeId: Target's Node ID
         timedWriteTimeoutMs: Timeout for a timed write request. Omit or set to 'None' to indicate a non-timed request.
         attributes: A list of tuples of type (endpoint, cluster-object):
+        interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the right
+                              timeout value based on transport characteristics as well as the responsiveness of the target.
 
         E.g
             (1, Clusters.TestCluster.Attributes.XYZAttribute('hello')) -- Write 'hello' to the XYZ attribute on the test cluster to endpoint 1
@@ -642,7 +670,7 @@ class ChipDeviceController():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        device = self.GetConnectedDeviceSync(nodeid)
+        device = self.GetConnectedDeviceSync(nodeid, timeoutMs=interactionTimeoutMs)
 
         attrs = []
         for v in attributes:
@@ -654,7 +682,7 @@ class ChipDeviceController():
                     v[0], v[1], v[2], 1, v[1].value))
 
         res = ClusterAttribute.WriteAttributes(
-            future, eventLoop, device, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs)
+            future, eventLoop, device, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         return await future

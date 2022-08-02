@@ -36,20 +36,19 @@ tests:
       response:
           value: 1
           constraints:
-              type: uint16
+              type: int16u
 
-    - label: "Read the optional global attribute: FeatureMap"
+    - label: "Read the global attribute: FeatureMap"
       PICS: CONTENTLAUNCHER.S.CS || CONTENTLAUNCHER.S.UP
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
-              type: map32
+              type: bitmap32
               minValue: 0
               maxValue: 3
 
     - label: "Read the global attribute: AttributeList"
-      PICS: CONTENTLAUNCHER.S.A0000 && CONTENTLAUNCHER.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:

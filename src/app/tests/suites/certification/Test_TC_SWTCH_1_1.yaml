@@ -11,110 +11,142 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 74.1.1. [TC-SWTCH-1.1] Global attributes with server as DUT
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Switch"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
-      verification: |
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
+    - label: "Read the global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          saveAs: FeatureMapValue
 
-    - label: "Read FeatureMap (global attribute 65532)"
-      verification: |
-          ./chip-tool switch read feature-map 1 1
-
-          Verify on the TH Log:
-
-          [1655271856.827371][2855:2860] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFFC DataVersion: 4291766665
-          [1655271856.827493][2855:2860] CHIP:TOO:   FeatureMap: 1
-      disabled: true
-
-    - label: "Check values of flags in this FeatureMap"
+    - label:
+          "Read the FeatureMap value and verify LS is set to 1; MS, MSR, MSL,
+          MSM are all set to 0"
       PICS: SWTCH.S.F00
-      verification: |
-          no Matter messages, but TH internal checking
-      disabled: true
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: FeatureMapValue
 
     - label: "Check values of flags in this FeatureMap"
-      PICS: SWTCH.S.F01
       verification: |
-          no Matter messages, but TH internal checking
-      disabled: true
+          LS is set to 0; MS is set to 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && SWTCH.S.F01
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Check values of flags in this FeatureMap"
-      PICS: SWTCH.S.F02
       verification: |
-          no Matter messages, but TH internal checking
-      disabled: true
+          LS is set to 0; MS, MSR are set to 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && SWTCH.S.F02
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Check values of flags in this FeatureMap"
-      PICS: SWTCH.S.F03
       verification: |
-          no Matter messages, but TH internal checking
-      disabled: true
+          LS is set to 0; MS, MSR, MSL are all set to 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && SWTCH.S.F03
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Check values of flags in this FeatureMap"
+      verification: |
+          LS is set to 0; MS, MSR, MSM are all set to 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && SWTCH.S.F04
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+
+    - label: "Read the global attribute: AttributeList"
       PICS: SWTCH.S.F04
-      verification: |
-          no Matter messages, but TH internal checking
-      disabled: true
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Read ClusterRevision (global attribute 65533)"
-      verification: |
-          ./chip-tool switch read cluster-revision 1 1
+    - label: "Read the global attribute: AttributeList"
+      PICS: "!SWTCH.S.F04"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
-          Verify on the TH Log:
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: []
 
-          [1651563714.073979][8331:8336] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFFD DataVersion: 3331396879
-          [1651563714.074140][8331:8336] CHIP:TOO:   ClusterRevision: 1
-      disabled: true
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-    - label: "Read AttributeList (global attribute 65531)"
-      verification: |
-          ./chip-tool switch read attribute-list 1 1
-
-          Verify on the TH Log:
-
-          [1651563753.140074][8338:8343] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFFB DataVersion: 3331396879
-          [1651563753.140200][8338:8343] CHIP:TOO:   AttributeList: 8 entries
-          [1651563753.140246][8338:8343] CHIP:TOO:     [1]: 0
-          [1651563753.140283][8338:8343] CHIP:TOO:     [2]: 1
-          [1651563753.140319][8338:8343] CHIP:TOO:     [3]: 2
-          [1651563753.140355][8338:8343] CHIP:TOO:     [4]: 65528
-          [1651563753.140389][8338:8343] CHIP:TOO:     [5]: 65529
-          [1651563753.140425][8338:8343] CHIP:TOO:     [6]: 65531
-          [1651563753.140460][8338:8343] CHIP:TOO:     [7]: 65532
-          [1651563753.140495][8338:8343] CHIP:TOO:     [8]: 65533
-      disabled: true
-
-    - label: "Read EventList (global attribute 65530)"
+    #issue #15011
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
       verification: |
           OUT OF SCOPE FOR V1.0
-      disabled: true
-
-    - label: "Read AcceptedCommandList (global attribute 65529)"
-      verification: |
-          ./chip-tool switch read  accepted-command-list 1 1
-
-          Verify on the TH Log:
-
-          [1651563822.164319][8348:8353] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFF9 DataVersion: 3331396879
-          [1651563822.164424][8348:8353] CHIP:TOO:   AcceptedCommandList: 0 entries
-      disabled: true
-
-    - label: "Read GeneratedCommandList (global attribute 65528)"
-      verification: |
-          ./chip-tool switch read  generated-command-list   1 1
-
-          Verify on the TH Log:
-
-          [1651563849.608873][8355:8361] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFF8 DataVersion: 3331396879
-          [1651563849.608977][8355:8361] CHIP:TOO:   GeneratedCommandList: 0 entries
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

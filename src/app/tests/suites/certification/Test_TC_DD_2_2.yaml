@@ -23,46 +23,44 @@ config:
     endpoint: 0
 
 tests:
-    - label:
-          "If (PICS_BLE) TH starts matter announcement procedure using BLE
-          transport"
+    - label: "TH starts matter announcement procedure using BLE transport"
       PICS: MCORE.DD.BLE
       verification: |
-          $ ./out/all-clusters-app/chip-all-clusters-app --wifi --discriminator 3841
+          $ ./out/ble/chip-all-clusters-app --ble-device 1 --discriminator 3841
 
-          [1653087913.247229][8083:8083] CHIP:SVR: Server Listening...
-          [1653087913.247636][8083:8083] CHIP:DL: Device Configuration:
-          [1653087913.248094][8083:8083] CHIP:DL:   Serial Number: TEST_SN
-          [1653087913.248608][8083:8083] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1653087913.249146][8083:8083] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1653087913.249610][8083:8083] CHIP:DL:   Hardware Version: 0
-          [1653087913.250082][8083:8083] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
-          [1653087913.250739][8083:8083] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3841 (0xF01)
-          [1653087913.251234][8083:8083] CHIP:DL:   Manufacturing Date: (not set)
-          [1653087913.251732][8083:8083] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1653087913.252171][8083:8083] CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
-          [1653087913.252710][8083:8083] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1653087913.253175][8083:8083] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
-          [1653087913.253681][8083:8083] CHIP:SVR: Manual pairing code: [749701123365521327694]
-          [1653087913.254268][8083:8083] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to 29f72814
+          [1657221603.350406][368108:368108] CHIP:DL: Device Configuration:
+          [1657221603.350445][368108:368108] CHIP:DL:   Serial Number: TEST_SN
+          [1657221603.350488][368108:368108] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1657221603.350523][368108:368108] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1657221603.350555][368108:368108] CHIP:DL:   Hardware Version: 0
+          [1657221603.350579][368108:368108] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1657221603.350599][368108:368108] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3841 (0xF01)
+          [1657221603.350627][368108:368108] CHIP:DL:   Manufacturing Date: (not set)
+          [1657221603.350649][368108:368108] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1657221603.350684][368108:368108] CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
+          [1657221603.350719][368108:368108] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1657221603.350739][368108:368108] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
+          [1657221603.350773][368108:368108] CHIP:SVR: Manual pairing code: [749701123365521327694]
+          [1657221603.350846][368108:368108] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to 4dd11284
+          [1657221603.353048][368108:368113] CHIP:DL: TRACE: Bluez mainloop starting Thread
+          [1657221603.353167][368108:368111] CHIP:DL: TRACE: Bus acquired for name MATTER-3841
       disabled: true
 
     - label:
-          "If (PICS_BLE) DUT starts BLE scan across all three advertising
-          channels with a sufficient dwell time, interval, and overall duration
-          of scan"
+          "DUT starts BLE scan across all three advertising channels with a
+          sufficient dwell time, interval, and overall duration of scan"
       PICS: MCORE.DD.BLE
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing
 
-          DUT Logs
-          $  ./out/chip-tool/chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841
+          Verify in TH as server side
+          $  ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841
           [1651743342.299897][3461:3464] CHIP:BLE: New device scanned: E4:5F:01:0F:1A:02
           [1651743342.299951][3461:3464] CHIP:BLE: Device discriminator match. Attempting to connect.
           [1651743342.303783][3461:3464] CHIP:BLE: Scan complete notification without an active scan.
           [1651743346.244175][3461:3464] CHIP:DL: ConnectDevice complete
 
-          TH Logs
+          Verify in DUT as client side
           [1651743346.152716][5072:5075] CHIP:DL: Device E4:5F:01:0F:3B:B1 (Path: /org/bluez/hci0/dev_E4_5F_01_0F_3B_B1) Connected
           [1651743347.908807][5072:5075] CHIP:DL: BluezCharacteristicAcquireWrite is called, conn: 0xffffa0043700
           [1651743347.911151][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
@@ -108,19 +106,19 @@ tests:
           [1651743348.446962][5072:5072] CHIP:SVR: Commissioning completed session establishment step
       disabled: true
 
-    - label: "If (PICS_BLE) DUT starts scan in background using BLE transport"
+    - label: "DUT starts scan in background using BLE transport"
       PICS: MCORE.DD.BLE
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing command
 
-          DUT Logs
-          $  ./out/chip-tool/chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841
+          Verify in TH as server side
+          $  ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841
           [1651743342.299897][3461:3464] CHIP:BLE: New device scanned: E4:5F:01:0F:1A:02
           [1651743342.299951][3461:3464] CHIP:BLE: Device discriminator match. Attempting to connect.
           [1651743342.303783][3461:3464] CHIP:BLE: Scan complete notification without an active scan.
           [1651743346.244175][3461:3464] CHIP:DL: ConnectDevice complete
 
-          TH Logs
+          Verify in DUT as client side
           [1651743346.152716][5072:5075] CHIP:DL: Device E4:5F:01:0F:3B:B1 (Path: /org/bluez/hci0/dev_E4_5F_01_0F_3B_B1) Connected
           [1651743347.908807][5072:5075] CHIP:DL: BluezCharacteristicAcquireWrite is called, conn: 0xffffa0043700
           [1651743347.911151][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
@@ -166,11 +164,12 @@ tests:
           [1651743348.446962][5072:5072] CHIP:SVR: Commissioning completed session establishment step
       disabled: true
 
-    - label: "If (PICS_BLE) TH starts matter announcement using BLE transport"
+    - label: "TH starts matter announcement using BLE transport"
       PICS: MCORE.DD.BLE
       verification: |
           $ ./out/all-clusters-app/chip-all-clusters-app --wifi --discriminator 3841
 
+          Verify in TH as server side
           [1653087913.247229][8083:8083] CHIP:SVR: Server Listening...
           [1653087913.247636][8083:8083] CHIP:DL: Device Configuration:
           [1653087913.248094][8083:8083] CHIP:DL:   Serial Number: TEST_SN
@@ -183,52 +182,55 @@ tests:
           [1653087913.251732][8083:8083] CHIP:DL:   Device Type: 65535 (0xFFFF)
           [1653087913.252171][8083:8083] CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
           [1653087913.252710][8083:8083] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1653087913.253175][8083:8083] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
+          [1653087913.253175][8083:8083] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
           [1653087913.253681][8083:8083] CHIP:SVR: Manual pairing code: [749701123365521327694]
           [1653087913.254268][8083:8083] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to 29f72814
       disabled: true
 
-    - label:
-          "If (PICS_WIFI) TH starts SoftAP and begin matter announcement
-          procedure"
-      PICS: MCORE.DD.WIFI
+    - label: "TH starts SoftAP and begin matter announcement procedure"
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          BLOCKED: SoftAP commissioning not currently supported on DUT=chip-tool
+          Out of Scope V1.0
+          SoftAP commissioning not currently supported on TH=all-clusters-app
       disabled: true
 
     - label:
-          "If (PICS_WIFI) DUT starts Wi-Fi scan of all 2.4 GHz Wi-Fi channels
-          allowed per its operational regulatory domain (channels 1, 6, and 11
-          are preferred)"
-      PICS: MCORE.DD.WIFI
+          "DUT starts Wi-Fi scan of all 2.4 GHz Wi-Fi channels allowed per its
+          operational regulatory domain (channels 1, 6, and 11 are preferred)"
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          BLOCKED: SoftAP commissioning not currently supported on DUT=chip-tool
+          Out of Scope V1.0
+          SoftAP commissioning not currently supported on TH=all-clusters-app
       disabled: true
 
-    - label: "If (PICS_WIFI) DUT scans using Wi-Fi in background"
-      PICS: MCORE.DD.WIFI
+    - label: "DUT scans using Wi-Fi in background"
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          BLOCKED: SoftAP commissioning not currently supported on DUT=chip-tool
+          Out of Scope V1.0
+          SoftAP commissioning not currently supported on TH=all-clusters-app
+      disabled: true
+
+    - label: "TH starts SoftAP and begin matter announcement procedure"
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
+      verification: |
+          Out of Scope V1.0
+          SoftAP commissioning not currently supported on TH=all-clusters-app
       disabled: true
 
     - label:
-          "If (PICS_WIFI) TH starts SoftAP and begin matter announcement
-          procedure"
-      PICS: MCORE.DD.WIFI
+          "With DUT and TH connected to the same network over IP, DUT performs
+          service discovery using DNS-SD"
       verification: |
-          BLOCKED: SoftAP commissioning not currently supported on DUT=chip-tool
-      disabled: true
+          1. TH is in commissioning mode and discoverable by DUT over IP through DNS-SD advertisements
 
-    - label: "DUT performs service discovery using DNS-SD"
-      verification: |
-          $  ./out/chip-tool/chip-tool discover commissionables
+          Verify in DUT as client side
+          $  ./chip-tool discover commissionables
           [1651256405894] [18453:593886] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
           [1651256405894] [18453:593886] CHIP: [DIS]         Vendor ID: 65521
           [1651256405894] [18453:593886] CHIP: [DIS]         Product ID: 32769
           [1651256405894] [18453:593886] CHIP: [DIS]         Long Discriminator: 3840
           [1651256405894] [18453:593886] CHIP: [DIS]         Pairing Hint: 33
-          [1651256405894] [18453:593886] CHIP: [DIS]         Hostname: DCA6328D2B9F0000
-          [1651256405894] [18453:593886] CHIP: [DIS]         Instance Name: 8FFEE04E82830E26
+          [1651256405894] [18453:593886] CHIP: [DIS]         Hostname: DCA6328D2B9F0000        [1651256405894] [18453:593886] CHIP: [DIS]         Instance Name: 8FFEE04E82830E26
           [1651256405894] [18453:593886] CHIP: [DIS]         IP Address #1: fd54:23a1:c6de:4637:dea6:32ff:fe8d:2b9f
           [1651256405894] [18453:593886] CHIP: [DIS]         IP Address #2: fe80::dea6:32ff:fe8d:2b9f
           [1651256405894] [18453:593886] CHIP: [DIS]         IP Address #3: fe80::dea6:32ff:fe8d:2ba0

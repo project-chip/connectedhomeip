@@ -6,6 +6,20 @@ struct LabelStruct {
     char_string<16> value = 1;
 }
 
+server cluster Descriptor = 29 {
+  struct DeviceType {
+    devtype_id type = 0;
+    int16u revision = 1;
+  }
+
+  readonly attribute DeviceType deviceList[] = 0;
+  readonly attribute CLUSTER_ID serverList[] = 1;
+  readonly attribute CLUSTER_ID clientList[] = 2;
+  readonly attribute ENDPOINT_NO partsList[] = 3;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 server cluster AccessControl = 31 {
   enum AuthMode : ENUM8 {
     kPase = 1;
@@ -51,7 +65,7 @@ server cluster AccessControl = 31 {
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable AccessControlEntry latestValue = 4;
-    fabric_idx adminFabricIndex = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   info event access(read: administer) AccessControlExtensionChanged = 1 {
@@ -59,7 +73,7 @@ server cluster AccessControl = 31 {
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
     nullable ExtensionEntry latestValue = 4;
-    fabric_idx adminFabricIndex = 254;
+    fabric_idx fabricIndex = 254;
   }
 
   attribute access(read: administer, write: administer) AccessControlEntry acl[] = 0;
@@ -86,6 +100,7 @@ server cluster Basic = 40 {
   }
 
   info event Leave = 2 {
+    fabric_idx fabricIndex = 0;
   }
 
   info event ReachableChanged = 3 {
@@ -342,7 +357,7 @@ server cluster GeneralCommissioning = 48 {
 
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
-  command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
+  fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -576,7 +591,7 @@ server cluster GeneralDiagnostics = 51 {
     INT64U eventTrigger = 1;
   }
 
-  command TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
+  command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
 }
 
 server cluster AdministratorCommissioning = 60 {
@@ -593,8 +608,8 @@ server cluster AdministratorCommissioning = 60 {
   }
 
   readonly attribute int8u windowStatus = 0;
-  readonly attribute fabric_idx adminFabricIndex = 1;
-  readonly attribute int16u adminVendorId = 2;
+  readonly attribute nullable fabric_idx adminFabricIndex = 1;
+  readonly attribute nullable int16u adminVendorId = 2;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -624,7 +639,6 @@ server cluster OperationalCredentials = 62 {
     kMissingCsr = 4;
     kTableFull = 5;
     kInvalidAdminSubject = 6;
-    kInsufficientPrivilege = 8;
     kFabricConflict = 9;
     kLabelConflict = 10;
     kInvalidFabricIndex = 11;
@@ -650,7 +664,7 @@ server cluster OperationalCredentials = 62 {
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
-  readonly attribute fabric_idx currentFabricIndex = 5;
+  readonly attribute int8u currentFabricIndex = 5;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -716,8 +730,8 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+  fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
@@ -783,10 +797,10 @@ server cluster GroupKeyManagement = 63 {
     INT16U groupKeySetIDs[] = 0;
   }
 
-  command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
-  command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
-  command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
-  command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
+  fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  fabric command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
 }
 
 server cluster FixedLabel = 64 {
@@ -804,6 +818,15 @@ server cluster UserLabel = 65 {
 endpoint 0 {
   device type rootdevice = 22;
   binding cluster OtaSoftwareUpdateProvider;
+
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    ram      attribute featureMap;
+    callback attribute clusterRevision default = 1;
+  }
 
   server cluster AccessControl {
     callback attribute acl;
@@ -944,6 +967,15 @@ endpoint 0 {
 }
 endpoint 65534 {
   device type anonymousEndpointType = 61442;
+
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    ram      attribute featureMap;
+    callback attribute clusterRevision default = 1;
+  }
 
   server cluster NetworkCommissioning {
     callback attribute maxNetworks;

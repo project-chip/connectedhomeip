@@ -116,6 +116,14 @@ buildconfig_header("system_buildconfig") {
   } else {
     defines += [ "CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE=<system/SystemLayerImpl${chip_system_config_event_loop}.h>" ]
   }
+
+  if (chip_system_config_use_sockets && current_os != "zephyr") {
+    defines += [
+      "CHIP_SYSTEM_CONFIG_MULTICAST_HOMING=${chip_system_config_use_sockets} ",
+    ]
+  } else {
+    defines += [ "CHIP_SYSTEM_CONFIG_MULTICAST_HOMING=0 " ]
+  }
 }
 
 config("system_config") {

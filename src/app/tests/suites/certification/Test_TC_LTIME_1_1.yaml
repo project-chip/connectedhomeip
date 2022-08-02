@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 109.1.1. [TC-LTIME-1.1] Global Attributes [DUT as Client]
+name: 4.1.1. [TC-LTIME-1.1] Global Attributes [DUT as Client]
 
 config:
     nodeId: 0x12344321
@@ -21,30 +21,37 @@ config:
     endpoint: 0
 
 tests:
-    - label: "DUT reads from the TH the (0xFFFD) ClusterRevision attribute"
+    - label: "Commission DUT to TH"
       verification: |
-          Verify in TH all-clusters-app
+          verification step to be updated.
+      disabled: true
 
+    - label: "{DUTread} (0xFFFD) ClusterRevision attribute"
+      PICS: LTIME.C.Afffd
+      verification: |
           ./chip-tool timeformatlocalization read  cluster-revision 1 0
+          Verify in DUT as client side:  verify that TH sends ClusterRevision attribute value as 1
 
           [1651185991606] [10988:109915] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFD DataVersion: 3316530441
           [1651185991606] [10988:109915] CHIP: [TOO]   ClusterRevision: 1
       disabled: true
 
-    - label: "DUT reads from the TH the (0xFFFC) FeatureMap attribute"
+    - label: "{DUTread} (0xFFFC) FeatureMap attribute"
+      PICS: LTIME.C.Afffc
       verification: |
-          Verify in TH all-clusters-app
-
           ./chip-tool timeformatlocalization read feature-map 1 0
+
+          Verify in DUT as client side:  verify that TH sends  FeatureMap attribute value as 1
+
           [1653379129.497852][7509:7514] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFC DataVersion: 724978222
           [1653379129.497936][7509:7514] CHIP:TOO:   FeatureMap: 0
       disabled: true
 
-    - label: "DUT reads from the TH the (0xFFFB) AttributeList attribute"
+    - label: "{DUTread} (0xFFFB) AttributeList attribute"
+      PICS: LTIME.C.Afffb
       verification: |
-          Verify in TH all-clusters-app
-
           ./chip-tool timeformatlocalization read attribute-list 1 0
+          Verify in DUT as client side: verify that TH  sends a list of supported attributes
           [1653999139.214139][7477:7482] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFB DataVersion: 3201720795
           [1653999139.214208][7477:7482] CHIP:TOO:   AttributeList: 8 entries
           [1653999139.214241][7477:7482] CHIP:TOO:     [1]: 0
@@ -58,25 +65,27 @@ tests:
           [1653999139.214522][7477:7482] CHIP:EM: Sending Standalone Ack for MessageCounter:5643805 on exchange 4737i
       disabled: true
 
-    - label: "DUT reads from the TH the (0xFFFA) EventList attribute"
+    - label: "{DUTread} (0xFFFA) EventList attribute"
+      PICS: LTIME.C.Afffa
       verification: |
           Out of scope for V1.0
       disabled: true
 
-    - label: "DUT reads from the TH the (0xFFF9) AcceptedCommandList attribute"
+    - label: "{DUTread} (0xFFF9) AcceptedCommandList attribute"
+      PICS: LTIME.C.Afff9
       verification: |
-          Verify in TH all-clusters-app
-
           ./chip-tool timeformatlocalization read accepted-command-list 1 0
+          Verify in DUT as client side: verify that TH  responsds as list of Accepted Command as 0 entries.
+
           [1651186189564] [11076:112595] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFF9 DataVersion: 3316530441
           [1651186189564] [11076:112595] CHIP: [TOO]   AcceptedCommandList: 0 entries
       disabled: true
 
-    - label: "DUT reads from the TH the (0xFFF8) GeneratedCommandList attribute"
+    - label: "{DUTread} (0xFFF8) GeneratedCommandList attribute"
+      PICS: LTIME.C.Afff8
       verification: |
-          Verify in TH all-clusters-app
-
           ./chip-tool timeformatlocalization read generated-command-list 1 0
+          Verify in DUT as client side:  verify that TH responsds as list of GeneratedCommandList as 0 entries.
           [1651191789962] [13591:180646] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFF8 DataVersion: 3316530441
           [1651191789963] [13591:180646] CHIP: [TOO]   GeneratedCommandList: 0 entries
       disabled: true

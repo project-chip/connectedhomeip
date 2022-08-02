@@ -125,6 +125,7 @@ struct CommonResolutionData
         {
             ChipLogDetail(Discovery, "\tMrp Interval active: not present");
         }
+        ChipLogDetail(Discovery, "\tTCP Supported: %d", supportsTcp);
     }
 };
 
@@ -243,6 +244,7 @@ struct DiscoveredNodeData
 
     void LogDetail() const
     {
+        ChipLogDetail(Discovery, "Discovered node:");
         resolutionData.LogDetail();
         commissionData.LogDetail();
     }

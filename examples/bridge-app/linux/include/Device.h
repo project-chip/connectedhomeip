@@ -127,6 +127,33 @@ private:
     DeviceCallback_fn mChanged_CB;
 };
 
+class DeviceTempSensor : public Device
+{
+public:
+    enum Changed_t
+    {
+        kChanged_MeasurementValue = kChanged_Last << 1,
+    } Changed;
+
+    DeviceTempSensor(const char * szDeviceName, std::string szLocation, int16_t min, int16_t max, int16_t measuredValue);
+
+    inline int16_t GetMeasuredValue() { return mMeasurement; };
+    void SetMeasuredValue(int16_t measurement);
+
+    using DeviceCallback_fn = std::function<void(DeviceTempSensor *, DeviceTempSensor::Changed_t)>;
+    void SetChangeCallback(DeviceCallback_fn aChanged_CB);
+
+    const int16_t mMin;
+    const int16_t mMax;
+
+private:
+    void HandleDeviceChange(Device * device, Device::Changed_t changeMask);
+
+private:
+    int16_t mMeasurement;
+    DeviceCallback_fn mChanged_CB;
+};
+
 class ComposedDevice : public Device
 {
 public:
@@ -216,4 +243,29 @@ private:
     std::string mName;
     uint16_t mEndpointListId;
     chip::app::Clusters::BridgedActions::EndpointListTypeEnum mType;
+};
+
+class Action
+{
+public:
+    Action(uint16_t actionId, std::string name, chip::app::Clusters::BridgedActions::ActionTypeEnum type, uint16_t endpointListId,
+           uint16_t supportedCommands, chip::app::Clusters::BridgedActions::ActionStateEnum status, bool isVisible);
+    inline void setName(std::string name) { mName = name; };
+    inline std::string getName() { return mName; };
+    inline chip::app::Clusters::BridgedActions::ActionTypeEnum getType() { return mType; };
+    inline chip::app::Clusters::BridgedActions::ActionStateEnum getStatus() { return mStatus; };
+    inline uint16_t getActionId() { return mActionId; };
+    inline uint16_t getEndpointListId() { return mEndpointListId; };
+    inline uint16_t getSupportedCommands() { return mSupportedCommands; };
+    inline void setIsVisible(bool isVisible) { mIsVisible = isVisible; };
+    inline bool getIsVisible() { return mIsVisible; };
+
+private:
+    std::string mName;
+    chip::app::Clusters::BridgedActions::ActionTypeEnum mType;
+    chip::app::Clusters::BridgedActions::ActionStateEnum mStatus;
+    uint16_t mActionId;
+    uint16_t mEndpointListId;
+    uint16_t mSupportedCommands;
+    bool mIsVisible;
 };

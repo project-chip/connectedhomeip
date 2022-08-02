@@ -97,8 +97,6 @@ using namespace chip::Encoding;
 using namespace chip::Protocols::UserDirectedCommissioning;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-constexpr uint32_t kSessionEstablishmentTimeout = 40 * kMillisecondsPerSecond;
-
 DeviceController::DeviceController()
 {
     mState = State::NotInitialized;
@@ -156,6 +154,7 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
     Credentials::P256PublicKeySpan rootPublicKeySpan;
     FabricId fabricId;
+    NodeId nodeId;
     bool hasExternallyOwnedKeypair                   = false;
     Crypto::P256Keypair * externalOperationalKeypair = nullptr;
     VendorId newFabricVendorId                       = params.controllerVendorId;
@@ -197,15 +196,50 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     MutableByteSpan nocSpan = MutableByteSpan(nocBuf.Get(), chipCertAllocatedLen);
 
     ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerNOC, nocSpan));
-    ReturnErrorOnFailure(ExtractFabricIdFromCert(nocSpan, &fabricId));
+    ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(nocSpan, &nodeId, &fabricId));
 
-    auto * fabricTable      = params.systemState->Fabrics();
-    auto * fabricInfo       = fabricTable->FindFabric(rootPublicKey, fabricId);
+    auto * fabricTable            = params.systemState->Fabrics();
+    const FabricInfo * fabricInfo = nullptr;
+
+    //
+    // When multiple controllers are permitted on the same fabric, we need to find fabrics with
+    // nodeId as an extra discriminant since we can have multiple FabricInfo objects that all
+    // collide on the same fabric. Not doing so may result in a match with an existing FabricInfo
+    // instance that matches the fabric in the provided NOC but is associated with a different NodeId
+    // that is already in use by another active controller instance. That will effectively cause it
+    // to change its identity inadvertently, which is not acceptable.
+    //
+    // TODO: Figure out how to clean up unreclaimed FabricInfos restored from persistent
+    //       storage that are not in use by active DeviceController instances. Also, figure out
+    //       how to reclaim FabricInfo slots when a DeviceController instance is deleted.
+    //
+    if (params.permitMultiControllerFabrics)
+    {
+        fabricInfo = fabricTable->FindIdentity(rootPublicKey, fabricId, nodeId);
+    }
+    else
+    {
+        fabricInfo = fabricTable->FindFabric(rootPublicKey, fabricId);
+    }
+
     bool fabricFoundInTable = (fabricInfo != nullptr);
 
     FabricIndex fabricIndex = fabricFoundInTable ? fabricInfo->GetFabricIndex() : kUndefinedFabricIndex;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    //
+    // We permit colliding fabrics when multiple controllers are present on the same logical fabric
+    // since each controller is associated with a unique FabricInfo 'identity' object and consequently,
+    // a unique FabricIndex.
+    //
+    // This sets a flag that will be cleared automatically when the fabric is committed/reverted later
+    // in this function.
+    //
+    if (params.permitMultiControllerFabrics)
+    {
+        fabricTable->PermitCollidingFabrics();
+    }
 
     // We have 4 cases to handle legacy usage of direct operational key injection
     if (externalOperationalKeypair)
@@ -323,14 +357,14 @@ void DeviceController::ReleaseOperationalDevice(NodeId remoteNodeId)
 {
     VerifyOrReturn(mState == State::Initialized && mFabricIndex != kUndefinedFabricIndex,
                    ChipLogError(Controller, "ReleaseOperationalDevice was called in incorrect state"));
-    mSystemState->CASESessionMgr()->ReleaseSession(PeerId(GetCompressedFabricId(), remoteNodeId));
+    mSystemState->CASESessionMgr()->ReleaseSession(GetPeerScopedId(remoteNodeId));
 }
 
 CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
 {
     ChipLogProgress(Controller, "Force close session for node 0x%" PRIx64, nodeId);
 
-    OperationalDeviceProxy * proxy = mSystemState->CASESessionMgr()->FindExistingSession(PeerId(GetCompressedFabricId(), nodeId));
+    OperationalDeviceProxy * proxy = mSystemState->CASESessionMgr()->FindExistingSession(GetPeerScopedId(nodeId));
     if (proxy == nullptr)
     {
         ChipLogProgress(Controller, "Attempted to close a session that does not exist.");
@@ -355,11 +389,11 @@ CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port)
+CHIP_ERROR DeviceController::GetPeerAddressAndPort(NodeId peerId, Inet::IPAddress & addr, uint16_t & port)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
     Transport::PeerAddress peerAddr;
-    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(peerId, peerAddr));
+    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(GetPeerScopedId(peerId), peerAddr));
     addr = peerAddr.GetIPAddress();
     port = peerAddr.GetPort();
     return CHIP_NO_ERROR;
@@ -368,8 +402,8 @@ CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddres
 CHIP_ERROR DeviceController::GetPeerAddress(NodeId nodeId, Transport::PeerAddress & addr)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(
-        PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(nodeId), addr));
+    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(GetPeerScopedId(nodeId), addr));
+
     return CHIP_NO_ERROR;
 }
 
@@ -546,6 +580,10 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
     {
         mDeviceInPASEEstablishment = nullptr;
     }
+    if (mDeviceBeingCommissioned == device)
+    {
+        mDeviceBeingCommissioned = nullptr;
+    }
 }
 
 CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** out_device)
@@ -682,7 +720,9 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         }
         else if (params.HasDiscriminator())
         {
-            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(params.GetDiscriminator()));
+            SetupDiscriminator discriminator;
+            discriminator.SetLongValue(params.GetDiscriminator());
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(discriminator));
         }
         else
         {
@@ -758,9 +798,6 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
     }
 
     ChipLogProgress(Controller, "Commission called for node ID 0x" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
-
-    mSystemState->SystemLayer()->StartTimer(chip::System::Clock::Milliseconds32(kSessionEstablishmentTimeout),
-                                            OnSessionEstablishmentTimeoutCallback, this);
 
     mDefaultCommissioner->SetOperationalCredentialsDelegate(mOperationalCredentialsDelegate);
     if (device->IsSecureConnected())
@@ -859,9 +896,6 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 
 void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 {
-    // PASE session establishment failure.
-    mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
-
     if (mPairingDelegate != nullptr)
     {
         mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingFailed);
@@ -976,6 +1010,12 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
 {
     MATTER_TRACE_EVENT_SCOPE("OnDeviceAttestationInformationVerification", "DeviceCommissioner");
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+
+    if (!commissioner->mDeviceBeingCommissioned)
+    {
+        ChipLogError(Controller, "Device attestation verification result received when we're not commissioning a device");
+        return;
+    }
 
     if (result != AttestationVerificationResult::kSuccess)
     {
@@ -1277,8 +1317,6 @@ CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCrede
         return CHIP_ERROR_INVALID_ADMIN_SUBJECT;
     case OperationalCertStatus::kFabricConflict:
         return CHIP_ERROR_FABRIC_EXISTS;
-    case OperationalCertStatus::kInsufficientPrivilege:
-        return CHIP_ERROR_INSUFFICIENT_PRIVILEGE;
     case OperationalCertStatus::kLabelConflict:
         return CHIP_ERROR_INVALID_ARGUMENT;
     case OperationalCertStatus::kInvalidFabricIndex:
@@ -1365,8 +1403,6 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(De
     ChipLogProgress(Controller, "Operational credentials provisioned on device %p", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
-
     if (mPairingDelegate != nullptr)
     {
         mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
@@ -1396,26 +1432,6 @@ void DeviceCommissioner::CloseBleConnection()
     mSystemState->BleLayer()->CloseAllBleConnections();
 }
 #endif
-
-void DeviceCommissioner::OnSessionEstablishmentTimeout()
-{
-    // This is called from the session establishment timer. Please see
-    // https://github.com/project-chip/connectedhomeip/issues/14650
-    VerifyOrReturn(mState == State::Initialized);
-    VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
-
-    StopPairing(mDeviceBeingCommissioned->GetDeviceId());
-
-    if (mPairingDelegate != nullptr)
-    {
-        mPairingDelegate->OnPairingComplete(CHIP_ERROR_TIMEOUT);
-    }
-}
-
-void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState)
-{
-    static_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
-}
 
 CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter)
 {
@@ -1524,6 +1540,10 @@ void DeviceCommissioner::OnDisarmFailsafeFailure(void * context, CHIP_ERROR erro
 
 void DeviceCommissioner::DisarmDone()
 {
+    // If someone nulled out our mDeviceBeingCommissioned, there's nothing else
+    // to do here.
+    VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
+
     // At this point, we also want to close off the pase session so we need to re-establish
     CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(mDeviceBeingCommissioned->GetDeviceId());
 
@@ -1619,7 +1639,7 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
     }
 }
 
-void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
+void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     // CASE session establishment failed.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -2121,6 +2141,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(err);
             return;
         }
+
         err = proxy->SetPeerId(params.GetRootCert().Value(), params.GetNoc().Value());
         if (err != CHIP_NO_ERROR)
         {
@@ -2235,18 +2256,18 @@ CHIP_ERROR DeviceController::UpdateDevice(NodeId peerNodeId)
 {
     VerifyOrReturnError(mState == State::Initialized && mFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INCORRECT_STATE);
 
-    OperationalDeviceProxy * proxy = GetDeviceSession(PeerId(GetCompressedFabricId(), peerNodeId));
+    OperationalDeviceProxy * proxy = GetDeviceSession(GetPeerScopedId(peerNodeId));
     VerifyOrReturnError(proxy != nullptr, CHIP_ERROR_NOT_FOUND);
 
     return proxy->LookupPeerAddress();
 }
 
-OperationalDeviceProxy * DeviceController::GetDeviceSession(const PeerId & peerId)
+OperationalDeviceProxy * DeviceController::GetDeviceSession(const ScopedNodeId & peerId)
 {
     return mSystemState->CASESessionMgr()->FindExistingSession(peerId);
 }
 
-OperationalDeviceProxy * DeviceCommissioner::GetDeviceSession(const PeerId & peerId)
+OperationalDeviceProxy * DeviceCommissioner::GetDeviceSession(const ScopedNodeId & peerId)
 {
     mSystemState->CASESessionMgr()->FindOrEstablishSession(peerId, &mOnDeviceConnectedCallback,
                                                            &mOnDeviceConnectionFailureCallback);

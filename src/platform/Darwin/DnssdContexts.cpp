@@ -262,7 +262,7 @@ RegisterContext::RegisterContext(const char * sType, DnssdPublishCallback cb, vo
 
 void RegisterContext::DispatchFailure(DNSServiceErrorType err)
 {
-    ChipLogError(DeviceLayer, "Register (%s)", Error::ToString(err));
+    ChipLogError(Discovery, "Mdns: Register failure (%s)", Error::ToString(err));
     callback(context, nullptr, CHIP_ERROR_INTERNAL);
     MdnsContexts::GetInstance().Remove(this);
 }
@@ -283,7 +283,7 @@ BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServ
 
 void BrowseContext::DispatchFailure(DNSServiceErrorType err)
 {
-    ChipLogError(DeviceLayer, "Browse (%s)", Error::ToString(err));
+    ChipLogError(Discovery, "Mdns: Browse failure (%s)", Error::ToString(err));
     callback(context, nullptr, 0, CHIP_ERROR_INTERNAL);
     MdnsContexts::GetInstance().Remove(this);
 }
@@ -302,14 +302,11 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
     protocol = GetProtocol(cbAddressType);
 }
 
-ResolveContext::~ResolveContext()
-{
-    RemoveInterfaces();
-}
+ResolveContext::~ResolveContext() {}
 
 void ResolveContext::DispatchFailure(DNSServiceErrorType err)
 {
-    ChipLogError(DeviceLayer, "Resolve (%s)", Error::ToString(err));
+    ChipLogError(Discovery, "Mdns: Resolve failure (%s)", Error::ToString(err));
     callback(context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
     MdnsContexts::GetInstance().Remove(this);
 }
@@ -326,6 +323,7 @@ void ResolveContext::DispatchSuccess()
             continue;
         }
 
+        ChipLogDetail(Discovery, "Mdns: Resolve success on interface %" PRIu32, interface.first);
         callback(context, &interface.second.service, Span<Inet::IPAddress>(ips.data(), ips.size()), CHIP_NO_ERROR);
         break;
     }
@@ -342,7 +340,7 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
 #ifdef CHIP_DETAIL_LOGGING
     char addrStr[INET6_ADDRSTRLEN];
     ip.ToString(addrStr, sizeof(addrStr));
-    ChipLogDetail(DeviceLayer, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
+    ChipLogDetail(Discovery, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
 #endif // CHIP_DETAIL_LOGGING
 
     return CHIP_NO_ERROR;
@@ -376,8 +374,8 @@ bool ResolveContext::HasAddress()
 void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostnameWithDomain, uint16_t port,
                                     uint16_t txtLen, const unsigned char * txtRecord)
 {
-    ChipLogDetail(DeviceLayer, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32, __func__, hostnameWithDomain, fullname,
-                  interfaceId);
+    ChipLogDetail(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%.*s\"", __func__,
+                  hostnameWithDomain, fullname, interfaceId, port, static_cast<int>(txtLen), txtRecord);
 
     InterfaceInfo interface;
     interface.service.mPort = ntohs(port);
@@ -405,7 +403,7 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     // resolving.
     interface.fullyQualifiedDomainName = hostnameWithDomain;
 
-    interfaces.insert(std::pair<uint32_t, InterfaceInfo>(interfaceId, interface));
+    interfaces.insert(std::make_pair(interfaceId, std::move(interface)));
 }
 
 bool ResolveContext::HasInterface()
@@ -413,21 +411,37 @@ bool ResolveContext::HasInterface()
     return interfaces.size();
 }
 
-void ResolveContext::RemoveInterfaces()
+InterfaceInfo::InterfaceInfo()
 {
-    for (auto & interface : interfaces)
+    service.mTextEntrySize = 0;
+    service.mTextEntries   = nullptr;
+}
+
+InterfaceInfo::InterfaceInfo(InterfaceInfo && other) :
+    service(std::move(other.service)), addresses(std::move(other.addresses)),
+    fullyQualifiedDomainName(std::move(other.fullyQualifiedDomainName))
+{
+    // Make sure we're not trying to free any state from the other DnssdService,
+    // since we took over ownership of its allocated bits.
+    other.service.mTextEntrySize = 0;
+    other.service.mTextEntries   = nullptr;
+}
+
+InterfaceInfo::~InterfaceInfo()
+{
+    if (service.mTextEntries == nullptr)
     {
-        size_t count = interface.second.service.mTextEntrySize;
-        for (size_t i = 0; i < count; i++)
-        {
-            const auto & textEntry = interface.second.service.mTextEntries[i];
-            free(const_cast<char *>(textEntry.mKey));
-            free(const_cast<uint8_t *>(textEntry.mData));
-        }
-        Platform::MemoryFree(const_cast<TextEntry *>(interface.second.service.mTextEntries));
+        return;
     }
 
-    interfaces.clear();
+    const size_t count = service.mTextEntrySize;
+    for (size_t i = 0; i < count; i++)
+    {
+        const auto & textEntry = service.mTextEntries[i];
+        free(const_cast<char *>(textEntry.mKey));
+        free(const_cast<uint8_t *>(textEntry.mData));
+    }
+    Platform::MemoryFree(const_cast<TextEntry *>(service.mTextEntries));
 }
 
 } // namespace Dnssd

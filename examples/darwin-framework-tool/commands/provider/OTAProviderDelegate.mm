@@ -17,11 +17,15 @@
 
 #include "OTAProviderDelegate.h"
 #import <Matter/Matter.h>
+#include <fstream>
 
 constexpr uint8_t kUpdateTokenLen = 32;
 
 @interface OTAProviderDelegate ()
 @property NSString * mOTAFilePath;
+@property NSFileHandle * mFileHandle;
+@property NSNumber * mFileOffset;
+@property NSNumber * mFileEndOffset;
 @property DeviceSoftwareVersionModel * candidate;
 @end
 
@@ -30,22 +34,21 @@ constexpr uint8_t kUpdateTokenLen = 32;
 - (instancetype)init
 {
     if (self = [super init]) {
-        _nodeID = @(0);
         _selectedCandidate = [[DeviceSoftwareVersionModel alloc] init];
         _userConsentState = OTAProviderUserUnknown;
     }
     return self;
 }
 
-// TODO: When BDX is added to Matter.framework, update to initialize
-// it when there is an update available.
 - (void)handleQueryImage:(MTROtaSoftwareUpdateProviderClusterQueryImageParams * _Nonnull)params
        completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                              NSError * _Nullable error))completionHandler
 {
     NSError * error;
-    _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable);
-    if (![params.protocolsSupported containsObject:@(MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)]) {
+
+    auto isBDXProtocolSupported =
+        [params.protocolsSupported containsObject:@(MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
+    if (!isBDXProtocolSupported) {
         _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported);
         error =
             [[NSError alloc] initWithDomain:@"OTAProviderDomain"
@@ -55,42 +58,47 @@ constexpr uint8_t kUpdateTokenLen = 32;
         return;
     }
 
-    if ([self SelectOTACandidate:params.vendorId rPID:params.productId rSV:params.softwareVersion]) {
-        _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable);
-        _selectedCandidate.updateToken = [self generateUpdateToken];
-        if (params.requestorCanConsent.integerValue == 1) {
-            _selectedCandidate.userConsentNeeded
-                = (_userConsentState == OTAProviderUserUnknown || _userConsentState == OTAProviderUserDenied) ? @(1) : @(0);
-            NSLog(@"User Consent Needed: %@", _selectedCandidate.userConsentNeeded);
-        } else {
-            NSLog(@"Requestor cannot obtain user consent. Our State: %hhu", _userConsentState);
-            switch (_userConsentState) {
-            case OTAProviderUserGranted:
-                NSLog(@"User Consent Granted");
-                _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable;
-                break;
-
-            case OTAProviderUserObtaining:
-                NSLog(@"User Consent Obtaining");
-                _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusBusy;
-                break;
-
-            case OTAProviderUserDenied:
-            case OTAProviderUserUnknown:
-                NSLog(@"User Consent Denied or Uknown");
-                _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable;
-                break;
-            }
-            _selectedCandidate.status = @(_queryImageStatus);
-        }
-    } else {
+    auto hasCandidate = [self SelectOTACandidate:params.vendorId rPID:params.productId rSV:params.softwareVersion];
+    if (!hasCandidate) {
         NSLog(@"Unable to select OTA Image.");
         _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable);
         error = [[NSError alloc]
             initWithDomain:@"OTAProviderDomain"
                       code:MTRErrorCodeInvalidState
                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Unable to select Candidate.", nil) }];
+        return;
     }
+
+    _selectedCandidate.updateToken = [self generateUpdateToken];
+
+    if (params.requestorCanConsent.integerValue == 1) {
+        _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable);
+        _selectedCandidate.userConsentNeeded
+            = (_userConsentState == OTAProviderUserUnknown || _userConsentState == OTAProviderUserDenied) ? @(1) : @(0);
+        NSLog(@"User Consent Needed: %@", _selectedCandidate.userConsentNeeded);
+        completionHandler(_selectedCandidate, error);
+        return;
+    }
+
+    NSLog(@"Requestor cannot obtain user consent. Our State: %hhu", _userConsentState);
+    switch (_userConsentState) {
+    case OTAProviderUserGranted:
+        NSLog(@"User Consent Granted");
+        _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable;
+        break;
+
+    case OTAProviderUserObtaining:
+        NSLog(@"User Consent Obtaining");
+        _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusBusy;
+        break;
+
+    case OTAProviderUserDenied:
+    case OTAProviderUserUnknown:
+        NSLog(@"User Consent Denied or Uknown");
+        _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable;
+        break;
+    }
+    _selectedCandidate.status = @(_queryImageStatus);
     completionHandler(_selectedCandidate, error);
 }
 
@@ -98,16 +106,95 @@ constexpr uint8_t kUpdateTokenLen = 32;
                completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler
 {
-    MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * applyUpdateResponsePrams =
+    MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * applyUpdateResponseParams =
         [[MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
-    applyUpdateResponsePrams.action = @(MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed);
-    completionHandler(applyUpdateResponsePrams, nil);
+    applyUpdateResponseParams.action = @(MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed);
+    completionHandler(applyUpdateResponseParams, nil);
 }
 
 - (void)handleNotifyUpdateApplied:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * _Nonnull)params
                 completionHandler:(StatusCompletion _Nonnull)completionHandler
 {
     completionHandler(nil);
+}
+
+- (void)handleBDXTransferSessionBegin:(NSString * _Nonnull)fileDesignator
+                               offset:(NSNumber * _Nonnull)offset
+                    completionHandler:(void (^)(NSError * error))completionHandler
+{
+    NSLog(@"BDX TransferSession begin with %@ (offset: %@)", fileDesignator, offset);
+
+    auto * handle = [NSFileHandle fileHandleForReadingAtPath:fileDesignator];
+    if (handle == nil) {
+        auto errorString = [NSString stringWithFormat:@"Error accessing file at at %@", fileDesignator];
+        auto error = [[NSError alloc] initWithDomain:@"OTAProviderDomain"
+                                                code:MTRErrorCodeGeneralError
+                                            userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(errorString, nil) }];
+        completionHandler(error);
+        return;
+    }
+
+    NSError * seekError = nil;
+    [handle seekToOffset:[offset unsignedLongValue] error:&seekError];
+    if (seekError != nil) {
+        auto errorString = [NSString stringWithFormat:@"Error seeking file (%@) to offset %@", fileDesignator, offset];
+        auto error = [[NSError alloc] initWithDomain:@"OTAProviderDomain"
+                                                code:MTRErrorCodeGeneralError
+                                            userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(errorString, nil) }];
+        completionHandler(error);
+        return;
+    }
+
+    uint64_t endOffset;
+    if (![handle seekToEndReturningOffset:&endOffset error:&seekError]) {
+        auto errorString = [NSString stringWithFormat:@"Error seeking file (%@) to end offset", fileDesignator];
+        auto error = [[NSError alloc] initWithDomain:@"OTAProviderDomain"
+                                                code:MTRErrorCodeGeneralError
+                                            userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(errorString, nil) }];
+        completionHandler(error);
+        return;
+    }
+
+    _mFileHandle = handle;
+    _mFileOffset = offset;
+    _mFileEndOffset = @(endOffset);
+    completionHandler(nil);
+}
+
+- (void)handleBDXTransferSessionEnd:(NSError * _Nullable)error
+{
+    NSLog(@"BDX TransferSession end with error: %@", error);
+    _mFileHandle = nil;
+    _mFileOffset = nil;
+    _mFileEndOffset = nil;
+}
+
+- (void)handleBDXQuery:(NSNumber * _Nonnull)blockSize
+            blockIndex:(NSNumber * _Nonnull)blockIndex
+           bytesToSkip:(NSNumber * _Nonnull)bytesToSkip
+     completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler
+{
+    NSLog(@"BDX Query received blockSize: %@, blockIndex: %@", blockSize, blockIndex);
+
+    NSError * error = nil;
+    auto offset = [_mFileOffset unsignedLongValue] + [bytesToSkip unsignedLongLongValue]
+        + ([blockSize unsignedLongValue] * [blockIndex unsignedLongValue]);
+    [_mFileHandle seekToOffset:offset error:&error];
+    if (error != nil) {
+        NSLog(@"Error seeking to offset %@", @(offset));
+        completionHandler(nil, NO);
+        return;
+    }
+
+    NSData * data = [_mFileHandle readDataUpToLength:[blockSize unsignedLongValue] error:&error];
+    if (error != nil) {
+        NSLog(@"Error reading file %@", _mFileHandle);
+        completionHandler(nil, NO);
+        return;
+    }
+
+    BOOL isEOF = offset + [blockSize unsignedLongValue] >= [_mFileEndOffset unsignedLongLongValue];
+    completionHandler(data, isEOF);
 }
 
 - (void)SetOTAFilePath:(const char *)path
@@ -130,23 +217,30 @@ constexpr uint8_t kUpdateTokenLen = 32;
                       rPID:(NSNumber *)requestorProductID
                        rSV:(NSNumber *)requestorSoftwareVersion
 {
+    auto vendorId = [requestorVendorID unsignedIntValue];
+    auto productId = [requestorProductID unsignedIntValue];
+    auto softwareVersion = [requestorSoftwareVersion unsignedLongValue];
+
     bool candidateFound = false;
     NSArray * sortedArray = [_candidates sortedArrayUsingSelector:@selector(CompareSoftwareVersions:)];
     for (DeviceSoftwareVersionModel * candidate : sortedArray) {
-        if (candidate.deviceModelData.softwareVersionValid
-            && ([requestorSoftwareVersion unsignedLongValue] < [candidate.softwareVersion unsignedLongValue])
-            && ([requestorSoftwareVersion unsignedLongValue] >=
-                [candidate.deviceModelData.minApplicableSoftwareVersion unsignedLongValue])
-            && ([requestorSoftwareVersion unsignedLongValue] <=
-                [candidate.deviceModelData.maxApplicableSoftwareVersion unsignedLongValue])
-            && ([requestorVendorID unsignedIntValue] == [candidate.deviceModelData.vendorId unsignedIntValue])
-            && ([requestorProductID unsignedIntValue] == [candidate.deviceModelData.productId unsignedIntValue])) {
-            candidateFound = true;
+        auto candidateSoftwareVersionValid = candidate.deviceModelData.softwareVersionValid;
+        auto candidateSoftwareVersion = [candidate.softwareVersion unsignedLongValue];
+        auto candidateMinApplicableSoftwareVersion = [candidate.deviceModelData.minApplicableSoftwareVersion unsignedLongValue];
+        auto candidateMaxApplicableSoftwareVersion = [candidate.deviceModelData.maxApplicableSoftwareVersion unsignedLongValue];
+        auto candidateVendorId = [candidate.deviceModelData.vendorId unsignedIntValue];
+        auto candidateProductId = [candidate.deviceModelData.productId unsignedIntValue];
+
+        if (candidateSoftwareVersionValid && (softwareVersion < candidateSoftwareVersion)
+            && (softwareVersion >= candidateMinApplicableSoftwareVersion)
+            && (softwareVersion <= candidateMaxApplicableSoftwareVersion) && (vendorId == candidateVendorId)
+            && (productId == candidateProductId)) {
             _selectedCandidate = candidate;
-            _selectedCandidate.imageURI = [NSString
-                stringWithFormat:@"bdx://%016llX/%@", [_nodeID unsignedLongLongValue], _selectedCandidate.deviceModelData.otaURL];
+            _selectedCandidate.imageURI = candidate.deviceModelData.otaURL;
+            candidateFound = true;
         }
     }
+
     return candidateFound;
 }
 
