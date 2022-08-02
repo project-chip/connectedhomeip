@@ -1530,6 +1530,37 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    auto other = [[MTRThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent alloc] init];
+
+    other.current = self.current;
+    other.previous = self.previous;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: current:%@; previous:%@; >", NSStringFromClass([self class]), _current, _previous];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRWiFiNetworkDiagnosticsClusterDisconnectionEvent
 - (instancetype)init
 {
