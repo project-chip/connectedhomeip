@@ -142,7 +142,7 @@ static void WifiStaConnected(void)
 {
     char ap_ssid[64];
     WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
-     
+
     if (ConnectivityManagerImpl::mWiFiStationState == ConnectivityManager::kWiFiStationState_Connected)
     {
         return;

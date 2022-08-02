@@ -179,7 +179,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         ifp->offPremiseServicesReachableIPv4.SetNull();
         ifp->offPremiseServicesReachableIPv6.SetNull();
         bl_efuse_read_mac(mac_addr);
-        memcpy(ifp->MacAddress, mac_addr, sizeof(mac_addr)); 
+        memcpy(ifp->MacAddress, mac_addr, sizeof(mac_addr));
     }
 
     return CHIP_NO_ERROR;
