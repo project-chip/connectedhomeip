@@ -821,7 +821,7 @@ void DoorLockServer::sendGetCredentialResponse(chip::app::CommandHandler * comma
         response.userIndex.SetNull();
     }
     uint16_t nextCredentialIndex = 0;
-    if (findUnoccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
+    if (findOccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
                                      nextCredentialIndex))
     {
         response.nextCredentialIndex.SetNonNull(nextCredentialIndex);
