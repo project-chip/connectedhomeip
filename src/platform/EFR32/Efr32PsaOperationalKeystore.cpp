@@ -131,6 +131,21 @@ CHIP_ERROR Efr32PsaOperationalKeystore::Init()
     return CHIP_NO_ERROR;
 }
 
+EFR32OpaqueKeyId Efr32PsaOperationalKeystore::FindKeyIdForFabric(FabricIndex fabricIndex) const
+{
+    // Search the map linearly to find a matching index slot
+    for (size_t i = 0; i < SL_MATTER_MAX_STORED_OP_KEYS; i++)
+    {
+        if (mKeyMapping[i] == fabricIndex)
+        {
+            // Found a match
+            return i + kEFR32OpaqueKeyIdPersistentMin;
+        }
+    }
+
+    return kEFR32OpaqueKeyIdUnknown;
+}
+
 bool Efr32PsaOperationalKeystore::HasOpKeypairForFabric(FabricIndex fabricIndex) const
 {
     VerifyOrReturnError(mIsInitialized, false);
@@ -142,13 +157,10 @@ bool Efr32PsaOperationalKeystore::HasOpKeypairForFabric(FabricIndex fabricIndex)
         return true;
     }
 
-    // Scroll the map linearly
-    for (size_t i = 0; i < SL_MATTER_MAX_STORED_OP_KEYS; i++)
+    // Check whether we have a match in the map
+    if (FindKeyIdForFabric(fabricIndex) != kEFR32OpaqueKeyIdUnknown)
     {
-        if (fabricIndex == mKeyMapping[i])
-        {
-            return true;
-        }
+        return true;
     }
 
     return false;
@@ -192,15 +204,8 @@ CHIP_ERROR Efr32PsaOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabric
 
     if (id == kEFR32OpaqueKeyIdUnknown)
     {
-        // Find empty slot in keymap
-        for (size_t i = 0; i < SL_MATTER_MAX_STORED_OP_KEYS; i++)
-        {
-            if (mKeyMapping[i] == kUndefinedFabricIndex)
-            {
-                id = i + kEFR32OpaqueKeyIdPersistentMin;
-                break;
-            }
-        }
+        // Try to find an available opaque ID in the map
+        id = FindKeyIdForFabric(kUndefinedFabricIndex);
 
         if (!mPendingKeypair)
         {
@@ -208,7 +213,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabric
         }
     }
 
-    if (id < kEFR32OpaqueKeyIdPersistentMin || id > kEFR32OpaqueKeyIdPersistentMax)
+    if (id == kEFR32OpaqueKeyIdUnknown)
     {
         // Could not find a free spot in the map
         return CHIP_ERROR_NO_MEMORY;
@@ -311,25 +316,15 @@ CHIP_ERROR Efr32PsaOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fab
         RevertPendingKeypair();
     }
 
-    // Figure out which key ID we're looking for
-    EFR32OpaqueKeyId id = 0;
-    for (size_t i = 0; i < SL_MATTER_MAX_STORED_OP_KEYS; i++)
-    {
-        if (mKeyMapping[i] == fabricIndex)
-        {
-            id = i + kEFR32OpaqueKeyIdPersistentMin;
-
-            // Reset the key mapping since we'll be deleting this key
-            mKeyMapping[i] = kUndefinedFabricIndex;
-            break;
-        }
-    }
-
-    if (id < kEFR32OpaqueKeyIdPersistentMin || id > kEFR32OpaqueKeyIdPersistentMax)
+    EFR32OpaqueKeyId id = FindKeyIdForFabric(fabricIndex);
+    if (id == kEFR32OpaqueKeyIdUnknown)
     {
         // Fabric is not in the map, so assume it's gone already
         return CHIP_NO_ERROR;
     }
+
+    // Reset the key mapping since we'll be deleting this key
+    mKeyMapping[id - kEFR32OpaqueKeyIdPersistentMin] = kUndefinedFabricIndex;
 
     // Persist key map
     CHIP_ERROR error = EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMapping, sizeof(mKeyMapping));
@@ -383,17 +378,9 @@ CHIP_ERROR Efr32PsaOperationalKeystore::SignWithOpKeypair(FabricIndex fabricInde
     }
 
     // Figure out which key ID we're looking for
-    EFR32OpaqueKeyId id = 0;
-    for (size_t i = 0; i < SL_MATTER_MAX_STORED_OP_KEYS; i++)
-    {
-        if (mKeyMapping[i] == fabricIndex)
-        {
-            id = i + kEFR32OpaqueKeyIdPersistentMin;
-            break;
-        }
-    }
+    EFR32OpaqueKeyId id = FindKeyIdForFabric(fabricIndex);
 
-    if (id < kEFR32OpaqueKeyIdPersistentMin || id > kEFR32OpaqueKeyIdPersistentMax)
+    if (id == kEFR32OpaqueKeyIdUnknown)
     {
         // Fabric is not in the map, but the caller thinks it's there?
         return CHIP_ERROR_INTERNAL;

@@ -49,7 +49,7 @@ public:
     virtual ~EFR32OpaqueKeypair();
 
     /**
-     * @brief Load a keypair with give key ID
+     * @brief Load a keypair with given key ID
      *
      * If no key exists under the given ID, an error is returned
      * and the object is unusable for operations.

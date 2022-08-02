@@ -81,9 +81,8 @@ static void _log_mbedTLS_error(int error_code)
 
 static void _log_PSA_error(psa_status_t status)
 {
-    if (status != 0)
+    if (status != PSA_SUCCESS)
     {
-        // Error codes defined in 16-bit negative hex numbers. Ease lookup by printing likewise
         ChipLogError(Crypto, "PSA error: %ld", status);
     }
 }

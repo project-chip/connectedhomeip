@@ -97,6 +97,19 @@ private:
         mIsPendingKeypairActive = false;
         mPendingFabricIndex     = kUndefinedFabricIndex;
     }
+
+    /**
+     * @brief Find the opaque key ID stored in the map for a given
+     *        fabric ID.
+     *
+     * @param fabricIndex The fabric index to find the opaque key ID for.
+     *                    Can also be kUndefinedFabricIndex to find the first
+     *                    unoccupied key ID.
+     *
+     * @return a valid key ID on match, or kEFR32OpaqueKeyIdUnknown if no
+     *         match is found.
+     */
+    EFR32OpaqueKeyId FindKeyIdForFabric(FabricIndex fabricIndex) const;
 };
 
 } // namespace Internal
