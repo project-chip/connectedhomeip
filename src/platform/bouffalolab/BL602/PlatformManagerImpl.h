@@ -55,20 +55,23 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
-
+    System::Clock::Timestamp GetStartTime() { return mStartTime; }
     /* none so far */
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack(void);
+    void _Shutdown();
 
     // ===== Members for internal use by the following friends.
 
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class Internal::BLEManagerImpl;
-    friend void event_cb_wifi_event(input_event_t * event, void * private_data);
+    friend void OnWiFiPlatformEvent(input_event_t * event, void * private_data);
+
+    System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
     static PlatformManagerImpl sInstance;
 

@@ -324,9 +324,9 @@ CHIP_ERROR GetConfiguredNetwork(Network & network)
 void BLWiFiDriver::OnNetworkStatusChange()
 {
     Network configuredNetwork;
-    bool staEnabled = false, staConnected = false;
+    bool staConnected = false;
     // VerifyOrReturn(ESP32Utils::IsStationEnabled(staEnabled) == CHIP_NO_ERROR);
-    VerifyOrReturn(staEnabled && mpStatusChangeCallback != nullptr);
+    VerifyOrReturn(mpStatusChangeCallback != nullptr);
     CHIP_ERROR err = GetConfiguredNetwork(configuredNetwork);
     if (err != CHIP_NO_ERROR)
     {
@@ -346,7 +346,8 @@ void BLWiFiDriver::OnNetworkStatusChange()
         return;
     }
     mpStatusChangeCallback->OnNetworkingStatusChange(
-        Status::kSuccess, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)), NullOptional);
+        Status::kSuccess, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
+        MakeOptional(GetLastDisconnectReason()));
 }
 
 CHIP_ERROR BLWiFiDriver::SetLastDisconnectReason(const ChipDeviceEvent * event)
