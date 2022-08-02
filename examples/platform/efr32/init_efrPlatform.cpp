@@ -64,11 +64,7 @@ void initAntenna(void);
 
 void init_efrPlatform(void)
 {
-#if CHIP_ENABLE_OPENTHREAD
-    otSysInit(0, NULL);
-#else
     sl_system_init();
-#endif
     sl_mbedtls_init();
 
 #if DISPLAY_ENABLED
@@ -78,6 +74,10 @@ void init_efrPlatform(void)
 #if EFR32_LOG_ENABLED
     efr32InitLog();
 #endif
+
+#if CHIP_ENABLE_OPENTHREAD
+    sl_ot_sys_init();
+#endif // CHIP_ENABLE_OPENTHREAD
 }
 
 #ifdef __cplusplus
