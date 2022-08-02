@@ -35,7 +35,8 @@ tests:
 
     - label: "DUT generates 32-byte AttestationNonce"
       verification: |
-          DUT as commissioner side:
+          Verify  attestation Nonce in DUT as commissioner side:
+
           [1655374218.117635][35023:35028] CHIP:CTL: Sent Attestation request, waiting for the Attestation Information
           [1655374218.117686][35023:35028] CHIP:DMG: ICR moving to [AwaitingDe]
           [1655374218.204040][35023:35028] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
@@ -181,7 +182,7 @@ tests:
           "DUT sends AttestationRequest Command with AttestationNonce as field
           to the TH1."
       verification: |
-          DUT as commissioner side:
+          DUT  Verify  attestation Nonce in DUT as commissioner side:
 
           [1655374218.459627][35023:35028] CHIP:DMG:     Attestation Nonce (32) = 762B6B9DA08F7FC63BB693E38634EC6F87CEFF28AB1554A16AD43DCEC24C2466
           [1655374218.459664][35023:35028] CHIP:DMG:     Timestamp = 0
@@ -197,10 +198,10 @@ tests:
 
     - label: "TH1 responds with a well-formed AttestationResponse Command"
       verification: |
-          DUT as commissioner side:
+          Verify TH responds with a well-formed AttestationResponse Command
 
-          'SendDACCertificateRequest' -> 'SendAttestationRequest'
-          [1655979686.298628][22876:22881] CHIP:CTL: Performing next commissioning step 'SendAttestationRequest'
+          "SendDACCertificateRequest" -> "SendAttestationRequest"
+          [1655979686.298628][22876:22881] CHIP:CTL: Performing next commissioning step "SendAttestationRequest"
           [1655979686.298679][22876:22881] CHIP:CTL: Sending Attestation Request to the device.
           [1655979686.298730][22876:22881] CHIP:CTL: Sending Attestation request to 0xffff9c000b60 device
           [1655979686.298850][22876:22881] CHIP:DMG: ICR moving to [AddingComm]
@@ -435,26 +436,8 @@ tests:
           [1655979686.741254][22876:22881] CHIP:DMG: },
           [1655979686.741316][22876:22881] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
           [1655979686.741353][22876:22881] CHIP:CTL: Received Attestation Information from the device
-          [1655979686.741382][22876:22881] CHIP:CTL: Successfully finished commissioning step 'SendAttestationRequest'
-          [1655979686.741451][22876:22881] CHIP:CTL: Commissioning stage next step: 'SendAttestationRequest' -> 'AttestationVerification'
-      disabled: true
-
-    #Verify that DUT Completes the commissioning process successfully
-    - label: "TH1 responds with a well-formed AttestationResponse Command"
-      verification: |
-          Both on DUT and TH side
-          DUT as commissioner side:
-
-          [1655979694.071847][22876:22881] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          [1655979694.071913][22876:22881] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
-          [1655979694.071968][22876:22881] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1655979694.072031][22876:22881] CHIP:CTL: Performing next commissioning step 'Cleanup'
-          [1655979694.072081][22876:22881] CHIP:DIS: Closing all BLE connections
-          [1655979694.072136][22876:22881] CHIP:IN: Clearing BLE pending packets.
-          [1655979694.072268][22876:22881] CHIP:BLE: Auto-closing end point's BLE connection.
-          [1655979694.072328][22876:22881] CHIP:DL: Closing BLE GATT connection (con 0xffffa806f3f0)
-          [1655979694.072477][22876:22881] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
-          [1655979694.072547][22876:22881] CHIP:TOO: Device commissioning completed with success
+          [1655979686.741382][22876:22881] CHIP:CTL: Successfully finished commissioning step "SendAttestationRequest"
+          [1655979686.741451][22876:22881] CHIP:CTL: Commissioning stage next step: "SendAttestationRequest" -> "AttestationVerification"
       disabled: true
 
     - label: "Factory Reset TH1 so that it is commissionable again"
@@ -475,7 +458,7 @@ tests:
 
     - label: "DUT generates 32-byte AttestationNonce"
       verification: |
-          DUT as commissioner side:
+          Verify  attestation Nonce in DUT as commissioner side:
 
           [1655968443.635813][21387:21392] CHIP:DMG:     }
           [1655968443.635876][21387:21392] CHIP:DMG:     Attestation Nonce (32) = 8A02A4533766C4310201E4E6DE820A51877AF337961BF2D12848268B8F323363
@@ -487,10 +470,10 @@ tests:
           "DUT sends AttestationRequest Command with AttestationNonce as field
           to the TH1."
       verification: |
-          DUT as commissioner side:
+          DUT  Verify  attestation Nonce in DUT as commissioner side:
 
-          [1655968443.238850][21387:21392] CHIP:CTL: Commissioning stage next step: 'SendDACCertificateRequest' -> 'SendAttestationRequest'
-          [1655968443.238918][21387:21392] CHIP:CTL: Performing next commissioning step 'SendAttestationRequest'
+          [1655968443.238850][21387:21392] CHIP:CTL: Commissioning stage next step: "SendDACCertificateRequest" -> "SendAttestationRequest"
+          [1655968443.238918][21387:21392] CHIP:CTL: Performing next commissioning step "SendAttestationRequest"
           [1655968443.238971][21387:21392] CHIP:CTL: Sending Attestation Request to the device.
           [1655968443.239021][21387:21392] CHIP:CTL: Sending Attestation request to 0xffff88000b60 device
           [1655968443.239143][21387:21392] CHIP:DMG: ICR moving to [AddingComm]
@@ -725,7 +708,7 @@ tests:
           [1655968443.639799][21387:21392] CHIP:DMG: },
           [1655968443.639943][21387:21392] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
           [1655968443.640024][21387:21392] CHIP:CTL: Received Attestation Information from the device
-          [1655968443.640090][21387:21392] CHIP:CTL: Successfully finished commissioning step 'SendAttestationRequest'
+          [1655968443.640090][21387:21392] CHIP:CTL: Successfully finished commissioning step "SendAttestationRequest"
       disabled: true
 
     - label:
@@ -733,12 +716,4 @@ tests:
           Nonce_2"
       verification: |
           See above
-      disabled: true
-
-    #Verify that the Nonce_1 and Nonce_2 are different.
-    - label:
-          "TH1 records the AttestationNonce received in AttestationRequest as
-          Nonce_2"
-      verification: |
-          Verify the value of NONCE in step 9 and 3 are different
       disabled: true

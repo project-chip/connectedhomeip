@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.3.2. [TC-DGSW-3.2] Commands generated with client as DUT
+name: 3.3.2. [TC-DGSW-3.2] Commands Generated [{DUT_Client}]
 
 config:
     nodeId: 0x12344321
@@ -21,44 +21,47 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "Commission TH to DUT"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
-    - label: "TH sends ResetWatermarks to DUT"
-      PICS: DGSW.S.C00.Rsp
+    - label: "DUT sends ResetWatermarks to TH."
+      PICS: DGSW.C.C00.Tx
       verification: |
-          ./chip-tool softwarediagnostics reset-watermarks 1 0
+          ./chip-tool softwarediagnostics read reset-watermarks 1 0
 
-          CHIP:DMG: InvokeResponseMessage =
-          [1649662992.857322][8036:8041] CHIP:DMG: {
-          [1649662992.857373][8036:8041] CHIP:DMG:         suppressResponse = false,
-          [1649662992.857426][8036:8041] CHIP:DMG:         InvokeResponseIBs =
-          [1649662992.857491][8036:8041] CHIP:DMG:         [
-          [1649662992.857543][8036:8041] CHIP:DMG:                 InvokeResponseIB =
-          [1649662992.857615][8036:8041] CHIP:DMG:                 {
-          [1649662992.857673][8036:8041] CHIP:DMG:                         CommandStatusIB =
-          [1649662992.857741][8036:8041] CHIP:DMG:                         {
-          [1649662992.857810][8036:8041] CHIP:DMG:                                 CommandPathIB =
-          [1649662992.857880][8036:8041] CHIP:DMG:                                 {
-          [1649662992.857952][8036:8041] CHIP:DMG:                                         EndpointId = 0x0,
-          [1649662992.858026][8036:8041] CHIP:DMG:                                         ClusterId = 0x34,
-          [1649662992.858096][8036:8041] CHIP:DMG:                                         CommandId = 0x0,
-          [1649662992.858165][8036:8041] CHIP:DMG:                                 },
-          [1649662992.858251][8036:8041] CHIP:DMG:
-          [1649662992.858315][8036:8041] CHIP:DMG:                                 StatusIB =
-          [1649662992.858386][8036:8041] CHIP:DMG:                                 {
-          [1649662992.858464][8036:8041] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1649662992.858552][8036:8041] CHIP:DMG:                                 },
-          [1649662992.858635][8036:8041] CHIP:DMG:
-          [1649662992.858710][8036:8041] CHIP:DMG:                         },
-          [1649662992.858796][8036:8041] CHIP:DMG:
-          [1649662992.858897][8036:8041] CHIP:DMG:                 },
-          [1649662992.858987][8036:8041] CHIP:DMG:
-          [1649662992.859046][8036:8041] CHIP:DMG:         ],
-          [1649662992.859120][8036:8041] CHIP:DMG:
-          [1649662992.859179][8036:8041] CHIP:DMG:         InteractionModelRevision = 1
-          [1649662992.859237][8036:8041] CHIP:DMG: },
-          [1649662992.859377][8036:8041] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0034 Command=0x0000_0000 Status=0x0
+          Verify the success response in DUT as client side Log:
+
+          [1657022305.316864][7266:7271] CHIP:DMG: InvokeResponseMessage =
+          [1657022305.316900][7266:7271] CHIP:DMG: {
+          [1657022305.316935][7266:7271] CHIP:DMG:         suppressResponse = false,
+          [1657022305.316972][7266:7271] CHIP:DMG:         InvokeResponseIBs =
+          [1657022305.317018][7266:7271] CHIP:DMG:         [
+          [1657022305.317055][7266:7271] CHIP:DMG:                 InvokeResponseIB =
+          [1657022305.317109][7266:7271] CHIP:DMG:                 {
+          [1657022305.317151][7266:7271] CHIP:DMG:                         CommandStatusIB =
+          [1657022305.317200][7266:7271] CHIP:DMG:                         {
+          [1657022305.317244][7266:7271] CHIP:DMG:                                 CommandPathIB =
+          [1657022305.317294][7266:7271] CHIP:DMG:                                 {
+          [1657022305.317344][7266:7271] CHIP:DMG:                                         EndpointId = 0x0,
+          [1657022305.317397][7266:7271] CHIP:DMG:                                         ClusterId = 0x34,
+          [1657022305.317447][7266:7271] CHIP:DMG:                                         CommandId = 0x0,
+          [1657022305.317496][7266:7271] CHIP:DMG:                                 },
+          [1657022305.317551][7266:7271] CHIP:DMG:
+          [1657022305.317596][7266:7271] CHIP:DMG:                                 StatusIB =
+          [1657022305.317645][7266:7271] CHIP:DMG:                                 {
+          [1657022305.317694][7266:7271] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1657022305.317743][7266:7271] CHIP:DMG:                                 },
+          [1657022305.317797][7266:7271] CHIP:DMG:
+          [1657022305.317928][7266:7271] CHIP:DMG:                         },
+          [1657022305.317980][7266:7271] CHIP:DMG:
+          [1657022305.318021][7266:7271] CHIP:DMG:                 },
+          [1657022305.318067][7266:7271] CHIP:DMG:
+          [1657022305.318103][7266:7271] CHIP:DMG:         ],
+          [1657022305.318146][7266:7271] CHIP:DMG:
+          [1657022305.318182][7266:7271] CHIP:DMG:         InteractionModelRevision = 1
+          [1657022305.318217][7266:7271] CHIP:DMG: },
+          [1657022305.318300][7266:7271] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0034 Command=0x0000_0000 Status=0x0
+          [1657022305.318359][7266:7271] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true

@@ -56,7 +56,7 @@ tests:
           [1657200303.724647][2509:2514] CHIP:TOO:      }
       disabled: true
 
-    - label: 'TH reads "ServerList" attribute.'
+    - label: "TH reads ServerList attribute."
       PICS: DESC.S.A0001
       verification: |
           ./chip-tool descriptor read server-list 1 0
@@ -92,7 +92,7 @@ tests:
           [1654155402.957473][3701:3706] CHIP:TOO:     [26]: 1029
       disabled: true
 
-    - label: 'TH reads "ClientList" attribute'
+    - label: "TH reads ClientList attribute"
       PICS: DESC.S.A0002
       verification: |
           ./chip-tool descriptor read client-list 1 0
@@ -104,7 +104,7 @@ tests:
           [1650281818.533563][9679:9684] CHIP:TOO:     [1]: 41
       disabled: true
 
-    - label: 'TH reads "PartsList" attribute.'
+    - label: "TH reads PartsList attribute."
       PICS: DESC.S.A0003
       verification: |
           ./chip-tool descriptor read  parts-list 1 0
@@ -124,5 +124,5 @@ tests:
           to make sure all mandatory (and applicable optional)
           attributes/commands are implemented."
       verification: |
-
+          verification step to be updated.
       disabled: true

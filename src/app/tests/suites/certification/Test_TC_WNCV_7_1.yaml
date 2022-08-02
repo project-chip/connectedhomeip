@@ -23,17 +23,16 @@ config:
 tests:
     - label: "Check GoToLiftPercentage command 50%"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT sends GoToLiftPercentage command with 50% to TH"
       PICS: WNCV.C.C05.Tx
       verification: |
-          On TestHarnes (all-cluster-app) a received GoToLift for WindowCovering looks like this
-
           ./chip-tool windowcovering go-to-lift-percentage 50 1 1
 
-          Verify in TH all-clusters-app log
+
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
 
           [1657103392.913017][4682:4687] CHIP:DMG: InvokeResponseMessage =
           [1657103392.913042][4682:4687] CHIP:DMG: {
@@ -70,17 +69,16 @@ tests:
 
     - label: "Check GoToTiltPercentage command 50%"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT sends GoToTiltPercentage command with 50% to TH"
       PICS: WNCV.C.C08.Tx
       verification: |
-          On TestHarnes (all-cluster-app) a received GoToTilt for WindowCovering looks like this
-
           ./chip-tool windowcovering go-to-tilt-percentage 50 1 1
 
-          Verify in TH all-clusters-app log
+
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
 
           [1657103413.915095][4688:4693] CHIP:DMG: InvokeResponseMessage =
           [1657103413.915136][4688:4693] CHIP:DMG: {
