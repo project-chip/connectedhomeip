@@ -25,391 +25,326 @@
 #include <controller-clusters/zap-generated/CHIPClusters.h>
 
 @interface MTRBaseClusterIdentify ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::IdentifyCluster * cppCluster;
-- (chip::Controller::IdentifyCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterGroups ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::GroupsCluster * cppCluster;
-- (chip::Controller::GroupsCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterScenes ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::ScenesCluster * cppCluster;
-- (chip::Controller::ScenesCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterOnOff ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::OnOffCluster * cppCluster;
-- (chip::Controller::OnOffCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterOnOffSwitchConfiguration ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::OnOffSwitchConfigurationCluster * cppCluster;
-- (chip::Controller::OnOffSwitchConfigurationCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterLevelControl ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::LevelControlCluster * cppCluster;
-- (chip::Controller::LevelControlCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterBinaryInputBasic ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::BinaryInputBasicCluster * cppCluster;
-- (chip::Controller::BinaryInputBasicCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterDescriptor ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::DescriptorCluster * cppCluster;
-- (chip::Controller::DescriptorCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterBinding ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::BindingCluster * cppCluster;
-- (chip::Controller::BindingCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterAccessControl ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::AccessControlCluster * cppCluster;
-- (chip::Controller::AccessControlCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterBridgedActions ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::BridgedActionsCluster * cppCluster;
-- (chip::Controller::BridgedActionsCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterBasic ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::BasicCluster * cppCluster;
-- (chip::Controller::BasicCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterOtaSoftwareUpdateProvider ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::OtaSoftwareUpdateProviderCluster * cppCluster;
-- (chip::Controller::OtaSoftwareUpdateProviderCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterOtaSoftwareUpdateRequestor ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::OtaSoftwareUpdateRequestorCluster * cppCluster;
-- (chip::Controller::OtaSoftwareUpdateRequestorCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterLocalizationConfiguration ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::LocalizationConfigurationCluster * cppCluster;
-- (chip::Controller::LocalizationConfigurationCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterTimeFormatLocalization ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::TimeFormatLocalizationCluster * cppCluster;
-- (chip::Controller::TimeFormatLocalizationCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterUnitLocalization ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::UnitLocalizationCluster * cppCluster;
-- (chip::Controller::UnitLocalizationCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterPowerSourceConfiguration ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::PowerSourceConfigurationCluster * cppCluster;
-- (chip::Controller::PowerSourceConfigurationCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterPowerSource ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::PowerSourceCluster * cppCluster;
-- (chip::Controller::PowerSourceCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterGeneralCommissioning ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::GeneralCommissioningCluster * cppCluster;
-- (chip::Controller::GeneralCommissioningCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterNetworkCommissioning ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::NetworkCommissioningCluster * cppCluster;
-- (chip::Controller::NetworkCommissioningCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterDiagnosticLogs ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::DiagnosticLogsCluster * cppCluster;
-- (chip::Controller::DiagnosticLogsCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterGeneralDiagnostics ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::GeneralDiagnosticsCluster * cppCluster;
-- (chip::Controller::GeneralDiagnosticsCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterSoftwareDiagnostics ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::SoftwareDiagnosticsCluster * cppCluster;
-- (chip::Controller::SoftwareDiagnosticsCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterThreadNetworkDiagnostics ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::ThreadNetworkDiagnosticsCluster * cppCluster;
-- (chip::Controller::ThreadNetworkDiagnosticsCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterWiFiNetworkDiagnostics ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::WiFiNetworkDiagnosticsCluster * cppCluster;
-- (chip::Controller::WiFiNetworkDiagnosticsCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterEthernetNetworkDiagnostics ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::EthernetNetworkDiagnosticsCluster * cppCluster;
-- (chip::Controller::EthernetNetworkDiagnosticsCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterBridgedDeviceBasic ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::BridgedDeviceBasicCluster * cppCluster;
-- (chip::Controller::BridgedDeviceBasicCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterSwitch ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::SwitchCluster * cppCluster;
-- (chip::Controller::SwitchCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterAdministratorCommissioning ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::AdministratorCommissioningCluster * cppCluster;
-- (chip::Controller::AdministratorCommissioningCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterOperationalCredentials ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::OperationalCredentialsCluster * cppCluster;
-- (chip::Controller::OperationalCredentialsCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterGroupKeyManagement ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::GroupKeyManagementCluster * cppCluster;
-- (chip::Controller::GroupKeyManagementCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterFixedLabel ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::FixedLabelCluster * cppCluster;
-- (chip::Controller::FixedLabelCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterUserLabel ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::UserLabelCluster * cppCluster;
-- (chip::Controller::UserLabelCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterBooleanState ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::BooleanStateCluster * cppCluster;
-- (chip::Controller::BooleanStateCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterModeSelect ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::ModeSelectCluster * cppCluster;
-- (chip::Controller::ModeSelectCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterDoorLock ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::DoorLockCluster * cppCluster;
-- (chip::Controller::DoorLockCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterWindowCovering ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::WindowCoveringCluster * cppCluster;
-- (chip::Controller::WindowCoveringCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterBarrierControl ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::BarrierControlCluster * cppCluster;
-- (chip::Controller::BarrierControlCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterPumpConfigurationAndControl ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::PumpConfigurationAndControlCluster * cppCluster;
-- (chip::Controller::PumpConfigurationAndControlCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterThermostat ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::ThermostatCluster * cppCluster;
-- (chip::Controller::ThermostatCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterFanControl ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::FanControlCluster * cppCluster;
-- (chip::Controller::FanControlCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterThermostatUserInterfaceConfiguration ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::ThermostatUserInterfaceConfigurationCluster * cppCluster;
-- (chip::Controller::ThermostatUserInterfaceConfigurationCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterColorControl ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::ColorControlCluster * cppCluster;
-- (chip::Controller::ColorControlCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterBallastConfiguration ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::BallastConfigurationCluster * cppCluster;
-- (chip::Controller::BallastConfigurationCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterIlluminanceMeasurement ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::IlluminanceMeasurementCluster * cppCluster;
-- (chip::Controller::IlluminanceMeasurementCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterTemperatureMeasurement ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::TemperatureMeasurementCluster * cppCluster;
-- (chip::Controller::TemperatureMeasurementCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterPressureMeasurement ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::PressureMeasurementCluster * cppCluster;
-- (chip::Controller::PressureMeasurementCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterFlowMeasurement ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::FlowMeasurementCluster * cppCluster;
-- (chip::Controller::FlowMeasurementCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterRelativeHumidityMeasurement ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::RelativeHumidityMeasurementCluster * cppCluster;
-- (chip::Controller::RelativeHumidityMeasurementCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterOccupancySensing ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::OccupancySensingCluster * cppCluster;
-- (chip::Controller::OccupancySensingCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterWakeOnLan ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::WakeOnLanCluster * cppCluster;
-- (chip::Controller::WakeOnLanCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterChannel ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::ChannelCluster * cppCluster;
-- (chip::Controller::ChannelCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterTargetNavigator ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::TargetNavigatorCluster * cppCluster;
-- (chip::Controller::TargetNavigatorCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterMediaPlayback ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::MediaPlaybackCluster * cppCluster;
-- (chip::Controller::MediaPlaybackCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterMediaInput ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::MediaInputCluster * cppCluster;
-- (chip::Controller::MediaInputCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterLowPower ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::LowPowerCluster * cppCluster;
-- (chip::Controller::LowPowerCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterKeypadInput ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::KeypadInputCluster * cppCluster;
-- (chip::Controller::KeypadInputCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterContentLauncher ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::ContentLauncherCluster * cppCluster;
-- (chip::Controller::ContentLauncherCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterAudioOutput ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::AudioOutputCluster * cppCluster;
-- (chip::Controller::AudioOutputCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterApplicationLauncher ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::ApplicationLauncherCluster * cppCluster;
-- (chip::Controller::ApplicationLauncherCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterApplicationBasic ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::ApplicationBasicCluster * cppCluster;
-- (chip::Controller::ApplicationBasicCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterAccountLogin ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::AccountLoginCluster * cppCluster;
-- (chip::Controller::AccountLoginCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterElectricalMeasurement ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::ElectricalMeasurementCluster * cppCluster;
-- (chip::Controller::ElectricalMeasurementCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
 @interface MTRBaseClusterTestCluster ()
-// Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::TestClusterCluster * cppCluster;
-- (chip::Controller::TestClusterCluster **)cppClusterSlot;
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end

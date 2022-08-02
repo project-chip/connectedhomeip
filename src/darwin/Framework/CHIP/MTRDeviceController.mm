@@ -496,7 +496,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     });
     VerifyOrReturnValue(success, nil);
 
-    return [[MTRBaseDevice alloc] initWithDevice:deviceProxy];
+    return [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
 }
 
 - (BOOL)getBaseDevice:(uint64_t)deviceID
@@ -511,19 +511,24 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         return NO;
     }
 
-    dispatch_async(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning]);
-
-        auto connectionBridge = new MTRDeviceConnectionBridge(completionHandler, queue);
-        auto errorCode = connectionBridge->connect(self->_cppCommissioner, deviceID);
-        if ([self checkForError:errorCode logMsg:kErrorGetPairedDevice error:nil]) {
-            // Errors are propagated to the caller through completionHandler.
-            // No extra error handling is needed here.
-            return;
-        }
-    });
-
-    return YES;
+    // We know getSessionForNode will return YES here, since we already checked
+    // that we are running.
+    return [self getSessionForNode:deviceID
+                 completionHandler:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+                     const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
+                     // Create an MTRBaseDevice for the node id involved, now that our
+                     // CASE session is primed.  We don't actually care about the session
+                     // information here.
+                     dispatch_async(queue, ^{
+                         MTRBaseDevice * device;
+                         if (error == nil) {
+                             device = [[MTRBaseDevice alloc] initWithNodeID:deviceID controller:self];
+                         } else {
+                             device = nil;
+                         }
+                         completionHandler(device, error);
+                     });
+                 }];
 }
 
 - (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
@@ -693,6 +698,29 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     return deviceProxy->GetDeviceTransportType() == chip::Transport::Type::kBle;
 }
 
+- (BOOL)getSessionForNode:(chip::NodeId)nodeID completionHandler:(MTRInternalDeviceConnectionCallback)completionHandler
+{
+    if (![self checkIsRunning]) {
+        return NO;
+    }
+
+    dispatch_async(_chipWorkQueue, ^{
+        NSError * error;
+        if (![self checkIsRunning:&error]) {
+            completionHandler(nullptr, chip::NullOptional, error);
+            return;
+        }
+
+        auto connectionBridge = new MTRDeviceConnectionBridge(completionHandler);
+
+        // MTRDeviceConnectionBridge always delivers errors async via
+        // completionHandler.
+        connectionBridge->connect(self->_cppCommissioner, nodeID);
+    });
+
+    return YES;
+}
+
 @end
 
 @implementation MTRDeviceController (InternalMethods)
@@ -734,4 +762,19 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     return CHIP_NO_ERROR;
 }
 
+- (void)invalidateCASESessionForNode:(chip::NodeId)nodeID;
+{
+    if (![self checkIsRunning]) {
+        return;
+    }
+
+    dispatch_sync(_chipWorkQueue, ^{
+        if (![self checkIsRunning]) {
+            return;
+        }
+
+        // TODO: This is a hack and needs to go away or use some sane API.
+        self->_cppCommissioner->DisconnectDevice(nodeID);
+    });
+}
 @end
