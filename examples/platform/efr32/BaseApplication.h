@@ -27,7 +27,6 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include "BaseApplication.h"
 #include "FreeRTOS.h"
 #include "sl_simple_button_instances.h"
 #include "timers.h" // provides FreeRTOS timer support
@@ -49,25 +48,30 @@
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
 
 /**********************************************************
- * AppTask Declaration
+ * BaseApplication Declaration
  *********************************************************/
 
-class AppTask : public BaseApplication
+class BaseApplication
 {
 
 public:
-    AppTask() = default;
-
-    static AppTask & GetAppTask() { return sAppTask; }
+    BaseApplication() = default;
+    virtual ~BaseApplication(){};
 
     /**
-     * @brief AppTask task main loop function
+     * @brief Create AppTask task and Event Queue
+     * If an error occurs during creation, application will hang after printing out error code
      *
-     * @param pvParameter FreeRTOS task parameter
+     * @return CHIP_ERROR CHIP_NO_ERROR if no errors
      */
-    static void AppTaskMain(void * pvParameter);
+    CHIP_ERROR StartAppTask(TaskFunction_t taskFunction);
 
-    CHIP_ERROR StartAppTask();
+    /**
+     * @brief PostEvent function that add event to AppTask queue for processing
+     *
+     * @param event AppEvent to post
+     */
+    static void PostEvent(const AppEvent * event);
 
     /**
      * @brief Event handler when a button is pressed
@@ -77,31 +81,66 @@ public:
      * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
-    void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction) override;
+    virtual void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction) = 0;
 
     /**
-     * @brief Callback called by the identify-server when an identify command is received
-     *
-     * @param identify identify structure the command applies on
+     * @brief Function called to start the LED light timer
      */
-    static void OnIdentifyStart(Identify * identify);
+    void StartLightTimer(void);
 
     /**
-     * @brief Callback called by the identify-server when an identify command is stopped or finished
-     *
-     * @param identify identify structure the command applies on
+     * @brief Function to stop LED light timer
+     *        Turns off Status LED before stopping timer
      */
-    static void OnIdentifyStop(Identify * identify);
+    void CancelLightTimer(void);
 
-private:
-    static AppTask sAppTask;
+    enum Function_t
+    {
+        kFunction_NoneSelected   = 0,
+        kFunction_SoftwareUpdate = 0,
+        kFunction_StartBleAdv    = 1,
+        kFunction_FactoryReset   = 2,
+
+        kFunction_Invalid
+    } Function;
+
+protected:
+    CHIP_ERROR Init(Identify * identifyObj);
 
     /**
-     * @brief AppTask initialisation function
+     * @brief Function called to start the function timer
      *
-     * @return CHIP_ERROR
+     * @param aTimeoutMs timer duration in ms
      */
-    CHIP_ERROR Init();
+    static void StartFunctionTimer(uint32_t aTimeoutMs);
+
+    /**
+     * @brief Function to stop function timer
+     */
+    static void CancelFunctionTimer(void);
+
+    /**
+     * @brief Function call event callback function for processing
+     *
+     * @param event triggered event to be processed
+     */
+    void DispatchEvent(AppEvent * event);
+
+    /**
+     * @brief Function Timer finished callback function
+     *        Post an FunctionEventHandler event
+     *
+     * @param xTimer timer that finished
+     */
+    static void FunctionTimerEventHandler(TimerHandle_t xTimer);
+
+    /**
+     * @brief Timer Event processing function
+     *        Trigger factory if Press and Hold duration is respected
+     *
+     * @param aEvent post event being processed
+     */
+    static void FunctionEventHandler(AppEvent * aEvent);
 
     /**
      * @brief PB0 Button event processing function
@@ -113,10 +152,21 @@ private:
     static void ButtonHandler(AppEvent * aEvent);
 
     /**
-     * @brief PB1 Button event processing function
-     *        Function triggers a switch action sent to the CHIP task
+     * @brief Light Timer finished callback function
+     *        Calls LED processing function
      *
-     * @param aEvent button event being processed
+     * @param xTimer timer that finished
      */
-    static void SwitchActionEventHandler(AppEvent * aEvent);
+    static void LightTimerEventHandler(TimerHandle_t xTimer);
+
+    /**
+     * @brief Updates device LEDs
+     */
+    static void LightEventHandler();
+
+    /**********************************************************
+     * Private Attributes declaration
+     *********************************************************/
+
+    bool mSyncClusterToButtonAction;
 };

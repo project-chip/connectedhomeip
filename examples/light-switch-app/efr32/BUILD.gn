@@ -169,6 +169,7 @@ efr32_executable("light_switch_app") {
   defines = []
 
   sources = [
+    "${examples_plat_dir}/BaseApplication.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/efr32_utils.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
