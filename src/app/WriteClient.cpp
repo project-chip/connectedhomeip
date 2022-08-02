@@ -423,7 +423,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
         MoveToState(State::ResponseReceived);
     }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
     bool sendStatusResponse = false;
     // Assert that the exchange context matches the client's current context.
     // This should never fail because even if SendWriteRequest is called

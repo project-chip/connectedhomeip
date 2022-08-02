@@ -96,7 +96,7 @@ public:
     }
     void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override
     {
-        mError     = chipError;
+        mError = chipError;
         mOnErrorCalled++;
     }
     void OnDone(WriteClient * apWriteClient) override { mOnDoneCalled++; }
@@ -575,11 +575,11 @@ void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void 
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
 
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 3;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 3;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    ctx.GetLoopback().mDroppedMessageCount = 0;
-    err                                            = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+    ctx.GetLoopback().mDroppedMessageCount              = 0;
+    err                                                 = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
@@ -598,17 +598,17 @@ void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void 
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
 
     rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 0;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    ctx.GetLoopback().mDroppedMessageCount = 0;
+    ctx.GetLoopback().mDroppedMessageCount              = 0;
     err = writeClient.OnMessageReceived(writeClient.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INVALID_MESSAGE_TYPE);
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(apSuite, callback.mError == CHIP_ERROR_INVALID_MESSAGE_TYPE);
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
 
-    //Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
+    // Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
     NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
     engine->Shutdown();
@@ -618,7 +618,8 @@ void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void 
     ctx.CreateSessionBobToAlice();
 }
 
-// Write Client sends the write request, and process the invalid write response message error via OnMessageReceived to close the client.
+// Write Client sends the write request, and process the invalid write response message error via OnMessageReceived to close the
+// client.
 void TestWriteInteraction::TestWriteInvalidMessage2(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -641,11 +642,11 @@ void TestWriteInteraction::TestWriteInvalidMessage2(nlTestSuite * apSuite, void 
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
 
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 3;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 3;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    ctx.GetLoopback().mDroppedMessageCount = 0;
-    err                                            = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+    ctx.GetLoopback().mDroppedMessageCount              = 0;
+    err                                                 = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
@@ -664,17 +665,17 @@ void TestWriteInteraction::TestWriteInvalidMessage2(nlTestSuite * apSuite, void 
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::WriteResponse);
 
     rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 0;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    ctx.GetLoopback().mDroppedMessageCount = 0;
+    ctx.GetLoopback().mDroppedMessageCount              = 0;
     err = writeClient.OnMessageReceived(writeClient.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_END_OF_TLV);
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(apSuite, callback.mError == CHIP_ERROR_END_OF_TLV);
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
 
-    //Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
+    // Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
     NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
     engine->Shutdown();
@@ -684,7 +685,8 @@ void TestWriteInteraction::TestWriteInvalidMessage2(nlTestSuite * apSuite, void 
     ctx.CreateSessionBobToAlice();
 }
 
-// Write Client sends the write request, and process the malformed status response message error via OnMessageReceived to close the client.
+// Write Client sends the write request, and process the malformed status response message error via OnMessageReceived to close the
+// client.
 void TestWriteInteraction::TestWriteInvalidMessage3(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -707,11 +709,11 @@ void TestWriteInteraction::TestWriteInvalidMessage3(nlTestSuite * apSuite, void 
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
 
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 3;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 3;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    ctx.GetLoopback().mDroppedMessageCount = 0;
-    err                                            = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+    ctx.GetLoopback().mDroppedMessageCount              = 0;
+    err                                                 = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
@@ -730,17 +732,17 @@ void TestWriteInteraction::TestWriteInvalidMessage3(nlTestSuite * apSuite, void 
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
     rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 0;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    ctx.GetLoopback().mDroppedMessageCount = 0;
+    ctx.GetLoopback().mDroppedMessageCount              = 0;
     err = writeClient.OnMessageReceived(writeClient.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_END_OF_TLV);
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(apSuite, callback.mError == CHIP_ERROR_END_OF_TLV);
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
 
-    //Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
+    // Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
     NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
     engine->Shutdown();
@@ -750,7 +752,8 @@ void TestWriteInteraction::TestWriteInvalidMessage3(nlTestSuite * apSuite, void 
     ctx.CreateSessionBobToAlice();
 }
 
-// Write Client sends the write request, and process the busy status response message error via OnMessageReceived to close the client.
+// Write Client sends the write request, and process the busy status response message error via OnMessageReceived to close the
+// client.
 void TestWriteInteraction::TestWriteInvalidMessage4(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -773,11 +776,11 @@ void TestWriteInteraction::TestWriteInvalidMessage4(nlTestSuite * apSuite, void 
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
 
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 3;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 3;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    ctx.GetLoopback().mDroppedMessageCount = 0;
-    err                                            = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+    ctx.GetLoopback().mDroppedMessageCount              = 0;
+    err                                                 = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
@@ -797,17 +800,17 @@ void TestWriteInteraction::TestWriteInvalidMessage4(nlTestSuite * apSuite, void 
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
     rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
-    ctx.GetLoopback().mSentMessageCount            = 0;
-    ctx.GetLoopback().mNumMessagesToDrop           = 0;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    ctx.GetLoopback().mDroppedMessageCount = 0;
+    ctx.GetLoopback().mDroppedMessageCount              = 0;
     err = writeClient.OnMessageReceived(writeClient.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_IM_GLOBAL_STATUS(Busy));
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(apSuite, callback.mError == CHIP_IM_GLOBAL_STATUS(Busy));
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
 
-    //Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
+    // Client sents status report with invalid action, server's exchange has been closed, and it would send MRP Ack
     NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
     engine->Shutdown();
