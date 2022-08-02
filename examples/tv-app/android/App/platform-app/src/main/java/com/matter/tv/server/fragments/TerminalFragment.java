@@ -22,15 +22,15 @@ public class TerminalFragment extends Fragment {
   private AppPlatformShellCommands shellCommands;
 
   private static String TERMINAL_INSTRUCTIONS =
-      "add <vid> [<pid>]    Add app with given vendor ID [1, 2, 9050]. Usage: app add 9050\r\n"
-          + "remove <endpoint>    Remove app at given endpoint [6, 7, etc]. Usage: app remove 6\r\n"
-          + "setpin <endpoint> <pincode>  Set pincode for app with given endpoint ID. Usage: app setpin 6 34567890\r\n"
+      "add <vid> [<pid>]    Add app with given vendor ID [1, 2, 9050]. Usage: add 9050\r\n"
+          + "remove <endpoint>    Remove app at given endpoint [6, 7, etc]. Usage: remove 6\r\n"
+          + "setpin <endpoint> <pincode>  Set pincode for app with given endpoint ID. Usage: setpin 6 34567890\r\n"
           + "commission <udc-entry>     Commission given udc-entry using given pincode from corresponding app. Usage:"
-          + "app commission 0\r\n"
-          + "add-admin-vendor <vid> Add vendor ID to list which will receive admin privileges. Usage: app "
+          + "commission 0\r\n"
+          + "add-admin-vendor <vid> Add vendor ID to list which will receive admin privileges. Usage: "
           + "add-admin-vendor 65521\r\n"
-          + "print-app-access     Print all ACLs for app platform fabric. Usage: app print-app-access\r\n"
-          + "remove-app-access    Remove all ACLs for app platform fabric. Usage: app remove-app-access\r\n";
+          + "print-app-access     Print all ACLs for app platform fabric. Usage: print-app-access\r\n"
+          + "remove-app-access    Remove all ACLs for app platform fabric. Usage: remove-app-access\r\n";
 
   public TerminalFragment() {
     // Required empty public constructor
@@ -80,7 +80,7 @@ public class TerminalFragment extends Fragment {
 
               AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-              builder.setMessage(response).setTitle("Response").create().show();
+              builder.setMessage(response).create().show();
             });
   }
 }
