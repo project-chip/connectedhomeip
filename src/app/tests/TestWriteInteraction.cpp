@@ -94,10 +94,10 @@ public:
         mStatus = status;
         mOnSuccessCalled++;
     }
-    void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override 
-    { 
+    void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override
+    {
         mError     = chipError;
-        mOnErrorCalled++; 
+        mOnErrorCalled++;
     }
     void OnDone(WriteClient * apWriteClient) override { mOnDoneCalled++; }
 
