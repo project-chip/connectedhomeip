@@ -23,7 +23,6 @@
 
 #include "Efr32OpaqueKeypair.h"
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/EFR32/EFR32Config.h>
 
 #ifndef SL_MATTER_MAX_STORED_OP_KEYS
 #define SL_MATTER_MAX_STORED_OP_KEYS (kMaxValidFabricIndex - kMinValidFabricIndex + 1)

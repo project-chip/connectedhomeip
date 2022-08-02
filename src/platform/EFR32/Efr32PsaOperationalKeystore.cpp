@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "Efr32PsaOperationalKeystore.h"
 
 #include <crypto/OperationalKeystore.h>
 #include <lib/core/CHIPError.h>
@@ -25,7 +26,6 @@
 
 #include "EFR32Config.h"
 #include "Efr32OpaqueKeypair.h"
-#include "Efr32PsaOperationalKeystore.h"
 
 namespace chip {
 namespace DeviceLayer {
