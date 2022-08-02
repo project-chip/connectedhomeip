@@ -29,6 +29,7 @@
 #include <OTAConfig.h>
 #endif
 #include <app/clusters/door-lock-server/door-lock-server.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <inet/EndPointStateOpenThread.h>
@@ -78,6 +79,13 @@ static wiced_led_config_t chip_lighting_led_config[2] = {
         .led    = PLATFORM_LED_2,
         .bright = 50,
     },
+};
+
+static Identify gIdentify = {
+    chip::EndpointId{ 1 },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
 };
 
 APPLICATION_START()
