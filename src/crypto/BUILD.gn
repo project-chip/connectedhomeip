@@ -64,18 +64,69 @@ buildconfig_header("crypto_buildconfig") {
   }
 }
 
+source_set("public_headers") {
+  sources = [
+    "CHIPCryptoPAL.h",
+    "OperationalKeystore.h",
+  ]
+
+  public_deps = [
+    ":crypto_buildconfig",
+    "${chip_root}/src/lib/asn1",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${nlassert_root}:nlassert",
+  ]
+}
+
 if (chip_crypto == "openssl") {
   import("${build_root}/config/linux/pkg_config.gni")
 
   pkg_config("openssl_config") {
     packages = [ "openssl" ]
   }
+
+  source_set("cryptopal_openssl") {
+    sources = [ "CHIPCryptoPALOpenSSL.cpp" ]
+    public_configs = [ ":openssl_config" ]
+    public_deps = [ ":public_headers" ]
+  }
 } else if (chip_crypto == "boringssl") {
   import("//build_overrides/boringssl.gni")
+
+  source_set("cryptopal_boringssl") {
+    # BoringSSL is close enough to OpenSSL that isd uses same PAL, with minor #ifdef differences
+    sources = [ "CHIPCryptoPALOpenSSL.cpp" ]
+    public_deps = [
+      "${boringssl_root}:boringssl",
+      ":public_headers",
+    ]
+  }
 } else if (chip_crypto == "mbedtls") {
   import("//build_overrides/mbedtls.gni")
+
+  source_set("cryptopal_mbedtls") {
+    sources = [ "CHIPCryptoPALmbedTLS.cpp" ]
+
+    external_mbedtls = current_os == "zephyr"
+
+    if (!external_mbedtls) {
+      public_deps = [
+        "${mbedtls_root}:mbedtls",
+        ":public_headers",
+      ]
+    }
+  }
 } else if (chip_crypto == "tinycrypt") {
   import("//build_overrides/mbedtls.gni")
+
+  source_set("cryptopal_tinycrypt") {
+    sources = [ "CHIPCryptoPALTinyCrypt.cpp" ]
+    public_deps = [
+      "${mbedtls_root}:mbedtls",
+      ":public_headers",
+    ]
+  }
 }
 
 static_library("crypto") {
@@ -83,8 +134,6 @@ static_library("crypto") {
 
   sources = [
     "CHIPCryptoPAL.cpp",
-    "CHIPCryptoPAL.h",
-    "OperationalKeystore.h",
     "PersistentStorageOperationalKeystore.cpp",
     "PersistentStorageOperationalKeystore.h",
     "RandUtils.cpp",
@@ -96,31 +145,17 @@ static_library("crypto") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    ":crypto_buildconfig",
-    "${chip_root}/src/lib/asn1",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-    "${nlassert_root}:nlassert",
+    ":public_headers",
   ]
 
   if (chip_crypto == "mbedtls") {
-    sources += [ "CHIPCryptoPALmbedTLS.cpp" ]
-
-    external_mbedtls = current_os == "zephyr"
-
-    if (!external_mbedtls) {
-      public_deps += [ "${mbedtls_root}:mbedtls" ]
-    }
+    public_deps += [":cryptopal_mbedtls"]
   } else if (chip_crypto == "openssl") {
-    sources += [ "CHIPCryptoPALOpenSSL.cpp" ]
-    public_configs += [ ":openssl_config" ]
+    public_deps += [":cryptopal_openssl"]
   } else if (chip_crypto == "boringssl") {
-    # BoringSSL is close enough to OpenSSL that isd uses same PAL, with minor #ifdef differences
-    sources += [ "CHIPCryptoPALOpenSSL.cpp" ]
-    public_deps += [ "${boringssl_root}:boringssl" ]
+    public_deps += [":cryptopal_boringssl"]
   } else if (chip_crypto == "tinycrypt") {
-    sources += [ "CHIPCryptoPALTinyCrypt.cpp" ]
-    public_deps += [ "${mbedtls_root}:mbedtls" ]
+    public_deps += [":cryptopal_tinycrypt"]
   } else if (chip_crypto == "platform") {
     # Platform implementation is responsible for bringing their
     # own implementation and dependencies
