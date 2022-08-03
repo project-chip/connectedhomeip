@@ -301,7 +301,6 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIpk", "()[B", &getIpk);
     SuccessOrExit(err);
 
-    // TODO: remove adminSubject?
     jmethodID getAdminSubject;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAdminSubject", "()J", &getAdminSubject);
     SuccessOrExit(err);
@@ -331,7 +330,6 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         if (adminSubject != kUndefinedNodeId)
         {
             // if there is a valid adminSubject in the ControllerParams, then remember it
-
             CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
             commissioningParams.SetAdminSubject(adminSubject);
             err = wrapper->UpdateCommissioningParameters(commissioningParams);
