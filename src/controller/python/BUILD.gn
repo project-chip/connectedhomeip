@@ -55,6 +55,8 @@ shared_library("ChipDeviceCtrl") {
       "ChipDeviceController-ScriptBinding.cpp",
       "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
       "ChipDeviceController-ScriptDevicePairingDelegate.h",
+      "ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.cpp",
+      "ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.h",
       "ChipDeviceController-StorageDelegate.cpp",
       "ChipDeviceController-StorageDelegate.h",
       "OpCredsBinding.cpp",
@@ -281,6 +283,12 @@ chip_python_wheel_action("chip-core") {
     "pyyaml",
     "ipdb",
     "deprecation",
+    "mobly",
+
+    # Crypto libraries for complex tests and internal Python controller usage
+    "cryptography",
+    "pycrypto",
+    "ecdsa",
   ]
 
   if (current_os == "mac") {
@@ -397,6 +405,7 @@ chip_python_wheel_action("chip-repl") {
     "ipython!=8.1.0",
     "rich",
     "ipykernel",
+    "mobly",
   ]
 
   py_package_name = "chip-repl"

@@ -117,6 +117,19 @@ class DCState(enum.IntEnum):
     COMMISSIONING = 5
 
 
+class DiscoveryFilterType(enum.IntEnum):
+    # These must match chip::Dnssd::DiscoveryFilterType values (barring the naming convention)
+    NONE = 0
+    SHORT_DISCRIMINATOR = 1
+    LONG_DISCRIMINATOR = 2
+    VENDOR_ID = 3
+    DEVICE_TYPE = 4
+    COMMISSIONING_MODE = 5
+    INSTANCE_NAME = 6
+    COMMISSIONER = 7
+    COMPRESSED_FABRIC_ID = 8
+
+
 class ChipDeviceController():
     activeList = set()
 
@@ -150,20 +163,6 @@ class ChipDeviceController():
         def GetNodeId(self):
             return self.nodeId
 
-        def HandleKeyExchangeComplete(err):
-            if err != 0:
-                print("Failed to establish secure session to device: {}".format(err))
-                self._ChipStack.callbackRes = self._ChipStack.ErrorToException(
-                    err)
-            else:
-                print("Established secure session with Device")
-            if self.state != DCState.COMMISSIONING:
-                # During Commissioning, HandleKeyExchangeComplete will also be called,
-                # in this case the async operation should be marked as finished by
-                # HandleCommissioningComplete instead this function.
-                self.state = DCState.IDLE
-                self._ChipStack.completeEvent.set()
-
         def HandleCommissioningComplete(nodeid, err):
             if err != 0:
                 print("Failed to commission: {}".format(err))
@@ -174,6 +173,26 @@ class ChipDeviceController():
             self._ChipStack.commissioningEventRes = err
             self._ChipStack.commissioningCompleteEvent.set()
             self._ChipStack.completeEvent.set()
+
+        def HandleKeyExchangeComplete(err):
+            if err != 0:
+                print("Failed to establish secure session to device: {}".format(err))
+                self._ChipStack.callbackRes = self._ChipStack.ErrorToException(
+                    err)
+            else:
+                print("Established secure session with Device")
+
+            if self.state != DCState.COMMISSIONING:
+                # During Commissioning, HandleKeyExchangeComplete will also be called,
+                # in this case the async operation should be marked as finished by
+                # HandleCommissioningComplete instead this function.
+                self.state = DCState.IDLE
+                self._ChipStack.completeEvent.set()
+            else:
+                # When commissioning, getting an error during key exhange
+                # needs to unblock the entire commissioning flow.
+                if err != 0:
+                    HandleCommissioningComplete(0, err)
 
         self.cbHandleKeyExchangeCompleteFunct = _DevicePairingDelegate_OnPairingCompleteFunct(
             HandleKeyExchangeComplete)
@@ -344,6 +363,44 @@ class ChipDeviceController():
 
     def CheckTestCommissionerPaseConnection(self, nodeid):
         return self._dmLib.pychip_TestPaseConnection(nodeid)
+
+    def CommissionOnNetwork(self, nodeId: int, setupPinCode: int, filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None):
+        '''
+        Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
+        Supported filters are:
+
+            DiscoveryFilterType.NONE
+            DiscoveryFilterType.SHORT_DISCRIMINATOR
+            DiscoveryFilterType.LONG_DISCRIMINATOR
+            DiscoveryFilterType.VENDOR_ID
+            DiscoveryFilterType.DEVICE_TYPE
+            DiscoveryFilterType.COMMISSIONING_MODE
+            DiscoveryFilterType.INSTANCE_NAME
+            DiscoveryFilterType.COMMISSIONER
+            DiscoveryFilterType.COMPRESSED_FABRIC_ID
+
+        The filter can be an integer, a string or None depending on the actual type of selected filter.
+        '''
+        self.CheckIsActive()
+
+        # IP connection will run through full commissioning, so we need to wait
+        # for the commissioning complete event, not just any callback.
+        self.state = DCState.COMMISSIONING
+
+        # Convert numerical filters to string for passing down to binding.
+        if isinstance(filter, int):
+            filter = str(filter)
+
+        self._ChipStack.commissioningCompleteEvent.clear()
+
+        self._ChipStack.CallAsync(
+            lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
+                self.devCtrl, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") + b"\x00" if filter is not None else None)
+        )
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            # Error 50 is a timeout
+            return False
+        return self._ChipStack.commissioningEventRes == 0
 
     def CommissionWithCode(self, setupPayload: str, nodeid: int):
         self.CheckIsActive()
@@ -1075,6 +1132,9 @@ class ChipDeviceController():
             self._dmLib.pychip_DeviceController_Commission.argtypes = [
                 c_void_p, c_uint64]
             self._dmLib.pychip_DeviceController_Commission.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_OnNetworkCommission.argtypes = [c_void_p, c_uint64, c_uint32, c_uint8, c_char_p]
+            self._dmLib.pychip_DeviceController_OnNetworkCommission.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.argtypes = [
                 c_void_p]
