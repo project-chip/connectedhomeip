@@ -24,10 +24,6 @@
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
 
-typedef void (^ResponseHandler)(id _Nullable value, NSError * _Nullable error);
-typedef void (^StatusCompletion)(NSError * _Nullable error);
-typedef void (^SubscriptionEstablishedHandler)(void);
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
