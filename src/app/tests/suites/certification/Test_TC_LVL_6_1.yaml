@@ -14,6 +14,9 @@
 
 name: 24.6.1. [TC-LVL-6.1] Stop Verification (DUT as Server)
 
+PICS:
+    - LVL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Level Control"
@@ -48,54 +51,49 @@ tests:
       arguments:
           value: 0
 
-    - label: "Reads Minlevel attribute from DUT"
-      PICS: LVL.S.A0002
-      command: "readAttribute"
-      attribute: "MinLevel"
-      response:
-          saveAs: MinlevelValue
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 255
+    - label: "TH sends On command to DUT"
+      cluster: "On/Off"
+      PICS: OO.S.C01.Rsp
+      command: "On"
 
-    - label: "Sends MoveToLevelWithOnOff command to DUT"
-      PICS: LVL.S.C04.Rsp
-      command: "MoveToLevelWithOnOff"
+    - label:
+          "TH sends a MoveToLevel command to DUT, with Level =50 and
+          TransitionTime =0 (immediate)"
+      PICS: LVL.S.C00.Rsp
+      command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
-                value: 1
-              - name: "transitionTime"
+              - name: "Level"
+                value: 50
+              - name: "TransitionTime"
                 value: 0
-              - name: "optionsMask"
-                value: 1
-              - name: "optionsOverride"
-                value: 1
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
-    - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0000 && LVL.S.C04.Rsp
+    - label: "TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.A0000 && LVL.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
-          saveAs: CurrentLevelValue
-          constraints:
-              minValue: 0
-              maxValue: 255
+          value: 50
 
-    - label: "Sends a move up command to DUT"
+    - label:
+          "TH sends a Move command to the DUT, with the MoveMode field set to
+          0x00 (move up) and the Rate field set to 0x05 (5 units/s)"
       PICS: LVL.S.C01.Rsp
       command: "Move"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 0
-              - name: "rate"
+              - name: "Rate"
                 value: 5
-              - name: "optionsMask"
-                value: 1
-              - name: "optionsOverride"
-                value: 1
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
     - label: "Wait 5000ms"
       cluster: "DelayCommands"
@@ -104,16 +102,6 @@ tests:
           values:
               - name: "ms"
                 value: 5000
-
-    - label: "Sends stop command to DUT"
-      PICS: LVL.S.C03.Rsp
-      command: "Stop"
-      arguments:
-          values:
-              - name: "optionsMask"
-                value: 1
-              - name: "optionsOverride"
-                value: 1
 
     - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
@@ -126,29 +114,40 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads CurrentLevel attribute from DUT"
+    - label: "Sends stop command to DUT"
+      PICS: LVL.S.C03.Rsp
+      command: "Stop"
+      arguments:
+          values:
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.C03.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
           constraints:
-              minValue: 21
-              maxValue: 29
-              notValue: CurrentLevelValue
+              minValue: 64
+              maxValue: 86
 
-    - label: "Sends a move up command to DUT"
+    - label:
+          "TH sends a Move command to the DUT, with the MoveMode field set to
+          0x00 (move up) and the Rate field set to 0x05 (5 units/s)"
       PICS: LVL.S.C01.Rsp
       command: "Move"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 0
-              - name: "rate"
+              - name: "Rate"
                 value: 5
-              - name: "optionsMask"
-                value: 1
-              - name: "optionsOverride"
-                value: 1
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
     - label: "Wait 5000ms"
       cluster: "DelayCommands"
@@ -158,15 +157,15 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "Sends StopWithOnOff command to DUT"
+    - label: "TH sends a StopWithOnOff command to the DUT"
       PICS: LVL.S.C07.Rsp
       command: "StopWithOnOff"
       arguments:
           values:
-              - name: "optionsMask"
-                value: 1
-              - name: "optionsOverride"
-                value: 1
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
     - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
@@ -185,9 +184,8 @@ tests:
       attribute: "CurrentLevel"
       response:
           constraints:
-              minValue: 43
-              maxValue: 57
-              notValue: CurrentLevelValue
+              minValue: 85
+              maxValue: 115
 
     - label: "Precondition send Off Command"
       cluster: "On/Off"

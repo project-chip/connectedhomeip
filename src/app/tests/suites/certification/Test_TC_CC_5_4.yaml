@@ -15,6 +15,9 @@
 
 name: 3.2.13. [TC-CC-5.4] Color functionality with client as DUT
 
+PICS:
+    - CC.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -62,8 +65,10 @@ tests:
           [1657911753.689496][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0007
       disabled: true
 
-    - label: "Over TransitionTime, DUT reads CurrentX attribute from TH."
-      PICS: CC.C.A0003
+    - label:
+          "Over TransitionTime, DUT reads CurrentX and CurrentY attributes from
+          TH."
+      PICS: CC.C.C07.Rsp && CC.C.A0003 && CC.C.A0004
       verification: |
           ./chip-tool colorcontrol read current-x 1 1
 
@@ -92,12 +97,9 @@ tests:
           [1657911771.966164][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
           [1657911771.966196][2977:2977] CHIP:DMG: AccessControl: allowed
           [1657911771.966254][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
-      disabled: true
 
-    - label: "Over TransitionTime, DUT reads CurrentY attribute from TH."
-      PICS: CC.C.A0004
-      verification: |
-          ./chip-tool colorcontrol read current-y 1 1
+
+          "./chip-tool colorcontrol read current-y 1 1
 
           Verify in DUT as client side log:
           [1657911790.232595][2977:2977] CHIP:IM: Received Read request
@@ -124,6 +126,8 @@ tests:
           [1657911790.233328][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
           [1657911790.233360][2977:2977] CHIP:DMG: AccessControl: allowed
           [1657911790.233415][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
+
+          "
       disabled: true
 
     - label: "DUT sends MoveColor command to TH"
@@ -166,8 +170,8 @@ tests:
           [1657911814.840624][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0008
       disabled: true
 
-    - label: "DUT reads CurrentX attribute from TH."
-      PICS: CC.C.A0003
+    - label: "DUT reads CurrentX and CurrentY attributes from TH."
+      PICS: CC.C.C08.Rsp && CC.C.A0003 && CC.C.A0004
       verification: |
           ./chip-tool colorcontrol read current-x 1 1
 
@@ -196,12 +200,9 @@ tests:
           [1657911771.966164][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
           [1657911771.966196][2977:2977] CHIP:DMG: AccessControl: allowed
           [1657911771.966254][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
-      disabled: true
 
-    - label: "DUT reads CurrentY attribute from TH."
-      PICS: CC.C.A0004
-      verification: |
-          ./chip-tool colorcontrol read current-y 1 1
+
+          "./chip-tool colorcontrol read current-y 1 1
 
           Verify in DUT as client side log:
           [1657911790.232595][2977:2977] CHIP:IM: Received Read request
@@ -228,6 +229,8 @@ tests:
           [1657911790.233328][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
           [1657911790.233360][2977:2977] CHIP:DMG: AccessControl: allowed
           [1657911790.233415][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
+
+          "
       disabled: true
 
     - label: "DUT sends StepColor command to TH"
@@ -270,8 +273,10 @@ tests:
           [1657911853.251340][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0009
       disabled: true
 
-    - label: "Over TransitionTime, DUT reads CurrentX attribute from TH."
-      PICS: CC.C.A0003
+    - label:
+          "Over TransitionTime, DUT reads CurrentX and CurrentY attributes from
+          TH."
+      PICS: CC.C.C09.Rsp && CC.C.A0003 && CC.C.A0004
       verification: |
           ./chip-tool colorcontrol read current-x 1 1
 
@@ -300,12 +305,9 @@ tests:
           [1657911771.966164][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
           [1657911771.966196][2977:2977] CHIP:DMG: AccessControl: allowed
           [1657911771.966254][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
-      disabled: true
 
-    - label: "Over TransitionTime, DUT reads CurrentY attribute from TH."
-      PICS: CC.C.A0004
-      verification: |
-          ./chip-tool colorcontrol read current-y 1 1
+
+          "./chip-tool colorcontrol read current-y 1 1
 
           Verify in DUT as client side log:
           [1657911790.232595][2977:2977] CHIP:IM: Received Read request
@@ -332,6 +334,8 @@ tests:
           [1657911790.233328][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
           [1657911790.233360][2977:2977] CHIP:DMG: AccessControl: allowed
           [1657911790.233415][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
+
+          "
       disabled: true
 
     - label: "DUT sends StopMoveStep command to TH."

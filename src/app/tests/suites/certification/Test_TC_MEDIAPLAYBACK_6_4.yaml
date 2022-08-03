@@ -14,6 +14,9 @@
 
 name: 19.8.4. [TC-MEDIAPLAYBACK-6.4] Variable Speed Media Playback Verification
 
+PICS:
+    - MEDIAPLAYBACK.S
+
 config:
     nodeId: 0x12344321
     cluster: "Media Playback"
@@ -46,7 +49,7 @@ tests:
           value: 1
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
-      PICS: MEDIAPLAYBACK.S.A0004
+      PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C01.Rsp
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
@@ -113,7 +116,7 @@ tests:
           [1655114487.018421][41855:41860] CHIP:EM: Sending Standalone Ack for MessageCounter:163883813 on exchange 24959
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0004
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C06.Rsp
       arguments:
           values:
               - name: "message"
@@ -138,7 +141,7 @@ tests:
           [1655114711.400853][41871:41876] CHIP:EM: Sending Standalone Ack for MessageCounter:17386470 on exchange 38376
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0004
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C06.Rsp
       arguments:
           values:
               - name: "message"

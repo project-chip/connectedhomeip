@@ -15,6 +15,9 @@
 
 name: 19.5.4. [TC-MEDIAINPUT-3.13] Rename Input Verification
 
+PICS:
+    - MEDIAINPUT.S
+
 config:
     nodeId: 0x12344321
     cluster: "Media Input"
@@ -42,7 +45,7 @@ tests:
       attribute: "InputList"
 
     - label: "Rename Input Command"
-      PICS: MEDIAINPUT.S.C0003
+      PICS: MEDIAINPUT.S.C03.Rsp
       command: "RenameInput"
       arguments:
           values:
@@ -73,7 +76,7 @@ tests:
           [1651055193.215585][155444:155449] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MEDIAINPUT.S.A0000 && MEDIAINPUT.S.C0003
+      PICS: PICS_USER_PROMPT && MEDIAINPUT.S.A0000 && MEDIAINPUT.S.C03.Rsp
       arguments:
           values:
               - name: "message"
