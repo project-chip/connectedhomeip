@@ -303,14 +303,22 @@ CHIP_ERROR CastingServer::LevelControl_Step(chip::app::Clusters::LevelControl::S
                                             std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mStepCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
-    return mStepCommand.Invoke(stepMode, stepSize, transitionTime, optionMask, optionOverride, responseCallback);
+
+    app::DataModel::Nullable<uint16_t> nullableTransitionTime;
+    nullableTransitionTime.SetNonNull(transitionTime);
+
+    return mStepCommand.Invoke(stepMode, stepSize, nullableTransitionTime, optionMask, optionOverride, responseCallback);
 }
 
 CHIP_ERROR CastingServer::LevelControl_MoveToLevel(uint8_t level, uint16_t transitionTime, uint8_t optionMask,
                                                    uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mMoveToLevelCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
-    return mMoveToLevelCommand.Invoke(level, transitionTime, optionMask, optionOverride, responseCallback);
+
+    app::DataModel::Nullable<uint16_t> nullableTransitionTime;
+    nullableTransitionTime.SetNonNull(transitionTime);
+
+    return mMoveToLevelCommand.Invoke(level, nullableTransitionTime, optionMask, optionOverride, responseCallback);
 }
 
 CHIP_ERROR CastingServer::MediaPlayback_Play(std::function<void(CHIP_ERROR)> responseCallback)

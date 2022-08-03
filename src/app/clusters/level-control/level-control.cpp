@@ -112,12 +112,13 @@ static EmberAfLevelControlState stateTable[kLevelControlStateTableSize];
 
 static EmberAfLevelControlState * getState(EndpointId endpoint);
 
-static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level, uint16_t transitionTimeDs,
-                                        uint8_t optionsMask, uint8_t optionsOverride, uint16_t storedLevel);
-static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMode, uint8_t rate, uint8_t optionsMask,
-                        uint8_t optionsOverride);
-static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTimeDs,
+static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level,
+                                        app::DataModel::Nullable<uint16_t> transitionTimeDs, uint8_t optionsMask,
+                                        uint8_t optionsOverride, uint16_t storedLevel);
+static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMode, app::DataModel::Nullable<uint8_t> rate,
                         uint8_t optionsMask, uint8_t optionsOverride);
+static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMode, uint8_t stepSize,
+                        app::DataModel::Nullable<uint16_t> transitionTimeDs, uint8_t optionsMask, uint8_t optionsOverride);
 static void stopHandler(EndpointId endpoint, CommandId commandId, uint8_t optionsMask, uint8_t optionsOverride);
 
 static void setOnOffValue(EndpointId endpoint, bool onOff);
@@ -180,7 +181,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
 {
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
-    uint8_t currentLevel;
+    app::DataModel::Nullable<uint8_t> currentLevel;
 
     if (state == nullptr)
     {
@@ -190,36 +191,37 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     state->elapsedTimeMs += state->eventDurationMs;
 
     // Read the attribute; print error message and return if it can't be read
-    status = Attributes::CurrentLevel::Get(endpoint, &currentLevel);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS || currentLevel.IsNull())
     {
         emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
         writeRemainingTime(endpoint, 0);
         return;
     }
 
-    emberAfLevelControlClusterPrint("Event: move from %d", currentLevel);
+    emberAfLevelControlClusterPrint("Event: move from %d", currentLevel.Value());
 
     // adjust by the proper amount, either up or down
     if (state->transitionTimeMs == 0)
     {
         // Immediate, not over a time interval.
-        currentLevel = state->moveToLevel;
+        currentLevel.SetNonNull(state->moveToLevel);
     }
     else if (state->increasing)
     {
-        assert(currentLevel < state->maxLevel);
-        assert(currentLevel < state->moveToLevel);
-        currentLevel++;
+        assert(currentLevel.Value() < state->maxLevel);
+        assert(currentLevel.Value() < state->moveToLevel);
+        currentLevel.SetNonNull(static_cast<uint8_t>(currentLevel.Value() + 1));
     }
     else
     {
-        assert(state->minLevel < currentLevel);
-        assert(state->moveToLevel < currentLevel);
-        currentLevel--;
+        assert(state->minLevel < currentLevel.Value());
+        assert(state->moveToLevel < currentLevel.Value());
+        currentLevel.SetNonNull(static_cast<uint8_t>(currentLevel.Value() - 1));
     }
 
-    emberAfLevelControlClusterPrint(" to %d ", currentLevel);
+    emberAfLevelControlClusterPrint(" to %d ", currentLevel.Value());
     emberAfLevelControlClusterPrintln("(diff %c1)", state->increasing ? '+' : '-');
 
     status = Attributes::CurrentLevel::Set(endpoint, currentLevel);
@@ -241,12 +243,12 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
 #endif // EMBER_AF_PLUGIN_SCENES
 
     // Are we at the requested level?
-    if (currentLevel == state->moveToLevel)
+    if (currentLevel.Value() == state->moveToLevel)
     {
         if (state->commandId == Commands::MoveToLevelWithOnOff::Id || state->commandId == Commands::MoveWithOnOff::Id ||
             state->commandId == Commands::StepWithOnOff::Id)
         {
-            setOnOffValue(endpoint, (currentLevel != state->minLevel));
+            setOnOffValue(endpoint, (currentLevel.Value() != state->minLevel));
         }
         else
         {
@@ -408,8 +410,17 @@ bool emberAfLevelControlClusterMoveToLevelCallback(app::CommandHandler * command
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
-    emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL %x %2x %x %x", "RX level-control:", level, transitionTime, optionsMask,
-                                      optionsOverride);
+    if (transitionTime.IsNull())
+    {
+        emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL %x null %x %x", "RX level-control:", level, optionsMask,
+                                          optionsOverride);
+    }
+    else
+    {
+        emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL %x %2x %x %x", "RX level-control:", level, transitionTime.Value(),
+                                          optionsMask, optionsOverride);
+    }
+
     EmberAfStatus status =
         moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevel::Id, level, transitionTime, optionsMask, optionsOverride,
                            INVALID_STORED_LEVEL); // Don't revert to the stored level
@@ -428,7 +439,17 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler 
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
-    emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL_WITH_ON_OFF %x %2x", "RX level-control:", level, transitionTime);
+    if (transitionTime.IsNull())
+    {
+        emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL_WITH_ON_OFF %x null %x %x", "RX level-control:", level, optionsMask,
+                                          optionsOverride);
+    }
+    else
+    {
+        emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL_WITH_ON_OFF %x %2x %x %x", "RX level-control:", level,
+                                          transitionTime.Value(), optionsMask, optionsOverride);
+    }
+
     EmberAfStatus status = moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevelWithOnOff::Id, level, transitionTime,
                                               optionsMask, optionsOverride,
                                               INVALID_STORED_LEVEL); // Don't revert to the stored level
@@ -446,7 +467,16 @@ bool emberAfLevelControlClusterMoveCallback(app::CommandHandler * commandObj, co
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
-    emberAfLevelControlClusterPrintln("%pMOVE %x %x", "RX level-control:", moveMode, rate);
+    if (rate.IsNull())
+    {
+        emberAfLevelControlClusterPrintln("%pMOVE %x null %x %x", "RX level-control:", moveMode, optionsMask, optionsOverride);
+    }
+    else
+    {
+        emberAfLevelControlClusterPrintln("%pMOVE %x %u %x %x", "RX level-control:", moveMode, rate.Value(), optionsMask,
+                                          optionsOverride);
+    }
+
     moveHandler(commandPath.mEndpointId, Commands::Move::Id, moveMode, rate, optionsMask, optionsOverride);
     return true;
 }
@@ -459,7 +489,17 @@ bool emberAfLevelControlClusterMoveWithOnOffCallback(app::CommandHandler * comma
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
-    emberAfLevelControlClusterPrintln("%pMOVE_WITH_ON_OFF %x %x", "RX level-control:", moveMode, rate);
+    if (rate.IsNull())
+    {
+        emberAfLevelControlClusterPrintln("%pMOVE_WITH_ON_OFF %x null %x %x", "RX level-control:", moveMode, optionsMask,
+                                          optionsOverride);
+    }
+    else
+    {
+        emberAfLevelControlClusterPrintln("%pMOVE_WITH_ON_OFF %u %2x %x %x", "RX level-control:", moveMode, rate.Value(),
+                                          optionsMask, optionsOverride);
+    }
+
     moveHandler(commandPath.mEndpointId, Commands::MoveWithOnOff::Id, moveMode, rate, optionsMask, optionsOverride);
     return true;
 }
@@ -473,7 +513,17 @@ bool emberAfLevelControlClusterStepCallback(app::CommandHandler * commandObj, co
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
-    emberAfLevelControlClusterPrintln("%pSTEP %x %x %2x", "RX level-control:", stepMode, stepSize, transitionTime);
+    if (transitionTime.IsNull())
+    {
+        emberAfLevelControlClusterPrintln("%pSTEP %x %x null %x %x", "RX level-control:", stepMode, stepSize, optionsMask,
+                                          optionsOverride);
+    }
+    else
+    {
+        emberAfLevelControlClusterPrintln("%pSTEP %x %x %2x %x %x", "RX level-control:", stepMode, stepSize, transitionTime.Value(),
+                                          optionsMask, optionsOverride);
+    }
+
     stepHandler(commandPath.mEndpointId, Commands::Step::Id, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     return true;
 }
@@ -487,7 +537,17 @@ bool emberAfLevelControlClusterStepWithOnOffCallback(app::CommandHandler * comma
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
-    emberAfLevelControlClusterPrintln("%pSTEP_WITH_ON_OFF %x %x %2x", "RX level-control:", stepMode, stepSize, transitionTime);
+    if (transitionTime.IsNull())
+    {
+        emberAfLevelControlClusterPrintln("%pSTEP_WITH_ON_OFF %x %x null %x %x", "RX level-control:", stepMode, stepSize,
+                                          optionsMask, optionsOverride);
+    }
+    else
+    {
+        emberAfLevelControlClusterPrintln("%pSTEP_WITH_ON_OFF %x %x %2x %x %x", "RX level-control:", stepMode, stepSize,
+                                          transitionTime.Value(), optionsMask, optionsOverride);
+    }
+
     stepHandler(commandPath.mEndpointId, Commands::StepWithOnOff::Id, stepMode, stepSize, transitionTime, optionsMask,
                 optionsOverride);
     return true;
@@ -514,12 +574,13 @@ bool emberAfLevelControlClusterStopWithOnOffCallback(app::CommandHandler * comma
     return true;
 }
 
-static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level, uint16_t transitionTimeDs,
-                                        uint8_t optionsMask, uint8_t optionsOverride, uint16_t storedLevel)
+static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level,
+                                        app::DataModel::Nullable<uint16_t> transitionTimeDs, uint8_t optionsMask,
+                                        uint8_t optionsOverride, uint16_t storedLevel)
 {
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
-    uint8_t currentLevel;
+    app::DataModel::Nullable<uint8_t> currentLevel;
     uint8_t actualStepSize;
 
     if (state == nullptr)
@@ -540,11 +601,17 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
     // Cancel any currently active command before fiddling with the state.
     deactivate(endpoint);
 
-    status = Attributes::CurrentLevel::Get(endpoint, &currentLevel);
+    status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
         return status;
+    }
+
+    if (currentLevel.IsNull())
+    {
+        emberAfLevelControlClusterPrintln("ERR: Current Level is null");
+        return EMBER_ZCL_STATUS_FAILURE;
     }
 
     state->commandId = commandId;
@@ -568,36 +635,37 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
     // logic is to prevent a light from transitioning from off to bright to dim.
     // Instead, a light that is off will stay off until the target level is
     // reached.
-    if (currentLevel <= state->moveToLevel)
+    if (currentLevel.Value() <= state->moveToLevel)
     {
         if (commandId == Commands::MoveToLevelWithOnOff::Id)
         {
             setOnOffValue(endpoint, (state->moveToLevel != state->minLevel));
         }
-        if (currentLevel == state->moveToLevel)
+        if (currentLevel.Value() == state->moveToLevel)
         {
             return EMBER_ZCL_STATUS_SUCCESS;
         }
         state->increasing = true;
-        actualStepSize    = static_cast<uint8_t>(state->moveToLevel - currentLevel);
+        actualStepSize    = static_cast<uint8_t>(state->moveToLevel - currentLevel.Value());
     }
     else
     {
         state->increasing = false;
-        actualStepSize    = static_cast<uint8_t>(currentLevel - state->moveToLevel);
+        actualStepSize    = static_cast<uint8_t>(currentLevel.Value() - state->moveToLevel);
     }
 
-    // If the Transition time field takes the value 0xFFFF, then the time taken
+    // If the Transition time field takes the value null, then the time taken
     // to move to the new level shall instead be determined by the On/Off
     // Transition Time attribute.  If On/Off Transition Time, which is an
     // optional attribute, is not present, the device shall move to its new level
     // as fast as it is able.
-    if (transitionTimeDs == 0xFFFF)
+    if (transitionTimeDs.IsNull())
     {
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
         if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnOffTransitionTime::Id))
         {
-            status = Attributes::OnOffTransitionTime::Get(endpoint, &transitionTimeDs);
+            uint16_t onOffTransitionTime = 0;
+            status                       = Attributes::OnOffTransitionTime::Get(endpoint, &onOffTransitionTime);
             if (status != EMBER_ZCL_STATUS_SUCCESS)
             {
                 emberAfLevelControlClusterPrintln("ERR: reading on/off transition time %x", status);
@@ -606,7 +674,7 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
 
             // Transition time comes in (or is stored, in the case of On/Off Transition
             // Time) as tenths of a second, but we work in milliseconds.
-            state->transitionTimeMs = (transitionTimeDs * MILLISECOND_TICKS_PER_SECOND / 10);
+            state->transitionTimeMs = (onOffTransitionTime * MILLISECOND_TICKS_PER_SECOND / 10);
         }
         else
         {
@@ -623,7 +691,7 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
     {
         // Transition time comes in (or is stored, in the case of On/Off Transition
         // Time) as tenths of a second, but we work in milliseconds.
-        state->transitionTimeMs = (transitionTimeDs * MILLISECOND_TICKS_PER_SECOND / 10);
+        state->transitionTimeMs = (transitionTimeDs.Value() * MILLISECOND_TICKS_PER_SECOND / 10);
     }
 
     // The duration between events will be the transition time divided by the
@@ -650,12 +718,12 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
     return status;
 }
 
-static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMode, uint8_t rate, uint8_t optionsMask,
-                        uint8_t optionsOverride)
+static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMode, app::DataModel::Nullable<uint8_t> rate,
+                        uint8_t optionsMask, uint8_t optionsOverride)
 {
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
-    uint8_t currentLevel;
+    app::DataModel::Nullable<uint8_t> currentLevel;
     uint8_t difference;
 
     if (state == nullptr)
@@ -664,7 +732,7 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
         goto send_default_response;
     }
 
-    if (rate == 0 || !shouldExecuteIfOff(endpoint, commandId, optionsMask, optionsOverride))
+    if (!shouldExecuteIfOff(endpoint, commandId, optionsMask, optionsOverride))
     {
         status = EMBER_ZCL_STATUS_SUCCESS;
         goto send_default_response;
@@ -673,10 +741,18 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
     // Cancel any currently active command before fiddling with the state.
     deactivate(endpoint);
 
-    status = Attributes::CurrentLevel::Get(endpoint, &currentLevel);
+    status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
+        goto send_default_response;
+    }
+
+    if (currentLevel.IsNull())
+    {
+        emberAfLevelControlClusterPrintln("ERR: Current Level is null");
+        status = EMBER_ZCL_STATUS_FAILURE;
+
         goto send_default_response;
     }
 
@@ -689,12 +765,12 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
     case EMBER_ZCL_MOVE_MODE_UP:
         state->increasing  = true;
         state->moveToLevel = state->maxLevel;
-        difference         = static_cast<uint8_t>(state->maxLevel - currentLevel);
+        difference         = static_cast<uint8_t>(state->maxLevel - currentLevel.Value());
         break;
     case EMBER_ZCL_MOVE_MODE_DOWN:
         state->increasing  = false;
         state->moveToLevel = state->minLevel;
-        difference         = static_cast<uint8_t>(currentLevel - state->minLevel);
+        difference         = static_cast<uint8_t>(currentLevel.Value() - state->minLevel);
         break;
     default:
         status = EMBER_ZCL_STATUS_INVALID_FIELD;
@@ -705,22 +781,22 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
     // logic is to prevent a light from transitioning from off to bright to dim.
     // Instead, a light that is off will stay off until the target level is
     // reached.
-    if (currentLevel <= state->moveToLevel)
+    if (currentLevel.Value() <= state->moveToLevel)
     {
         if (commandId == Commands::MoveWithOnOff::Id)
         {
             setOnOffValue(endpoint, (state->moveToLevel != state->minLevel));
         }
-        if (currentLevel == state->moveToLevel)
+        if (currentLevel.Value() == state->moveToLevel)
         {
             status = EMBER_ZCL_STATUS_SUCCESS;
             goto send_default_response;
         }
     }
 
-    // If the Rate field is 0xFF, the device should move at the default move rate, if available,
+    // If the Rate field is null, the device should move at the default move rate, if available,
     // Otherwise, move as fast as possible
-    if (rate == 0xFF)
+    if (rate.IsNull())
     {
         app::DataModel::Nullable<uint8_t> defaultMoveRate;
         status = Attributes::DefaultMoveRate::Get(endpoint, defaultMoveRate);
@@ -742,7 +818,7 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
     }
     else
     {
-        state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / rate;
+        state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / rate.Value();
     }
 
     state->transitionTimeMs = difference * state->eventDurationMs;
@@ -759,12 +835,12 @@ send_default_response:
     emberAfSendImmediateDefaultResponse(status);
 }
 
-static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTimeDs,
-                        uint8_t optionsMask, uint8_t optionsOverride)
+static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMode, uint8_t stepSize,
+                        app::DataModel::Nullable<uint16_t> transitionTimeDs, uint8_t optionsMask, uint8_t optionsOverride)
 {
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
-    uint8_t currentLevel;
+    app::DataModel::Nullable<uint8_t> currentLevel;
     uint8_t actualStepSize = stepSize;
 
     if (state == nullptr)
@@ -782,10 +858,18 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
     // Cancel any currently active command before fiddling with the state.
     deactivate(endpoint);
 
-    status = Attributes::CurrentLevel::Get(endpoint, &currentLevel);
+    status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
+        goto send_default_response;
+    }
+
+    if (currentLevel.IsNull())
+    {
+        emberAfLevelControlClusterPrintln("ERR: Current Level is null");
+        status = EMBER_ZCL_STATUS_FAILURE;
+
         goto send_default_response;
     }
 
@@ -797,26 +881,26 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
     {
     case EMBER_ZCL_STEP_MODE_UP:
         state->increasing = true;
-        if (state->maxLevel - currentLevel < stepSize)
+        if (state->maxLevel - currentLevel.Value() < stepSize)
         {
             state->moveToLevel = state->maxLevel;
-            actualStepSize     = static_cast<uint8_t>(state->maxLevel - currentLevel);
+            actualStepSize     = static_cast<uint8_t>(state->maxLevel - currentLevel.Value());
         }
         else
         {
-            state->moveToLevel = static_cast<uint8_t>(currentLevel + stepSize);
+            state->moveToLevel = static_cast<uint8_t>(currentLevel.Value() + stepSize);
         }
         break;
     case EMBER_ZCL_STEP_MODE_DOWN:
         state->increasing = false;
-        if (currentLevel - state->minLevel < stepSize)
+        if (currentLevel.Value() - state->minLevel < stepSize)
         {
             state->moveToLevel = state->minLevel;
-            actualStepSize     = static_cast<uint8_t>(currentLevel - state->minLevel);
+            actualStepSize     = static_cast<uint8_t>(currentLevel.Value() - state->minLevel);
         }
         else
         {
-            state->moveToLevel = static_cast<uint8_t>(currentLevel - stepSize);
+            state->moveToLevel = static_cast<uint8_t>(currentLevel.Value() - stepSize);
         }
         break;
     default:
@@ -828,22 +912,22 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
     // logic is to prevent a light from transitioning from off to bright to dim.
     // Instead, a light that is off will stay off until the target level is
     // reached.
-    if (currentLevel <= state->moveToLevel)
+    if (currentLevel.Value() <= state->moveToLevel)
     {
         if (commandId == Commands::StepWithOnOff::Id)
         {
             setOnOffValue(endpoint, (state->moveToLevel != state->minLevel));
         }
-        if (currentLevel == state->moveToLevel)
+        if (currentLevel.Value() == state->moveToLevel)
         {
             status = EMBER_ZCL_STATUS_SUCCESS;
             goto send_default_response;
         }
     }
 
-    // If the Transition Time field is 0xFFFF, the device should move as fast as
+    // If the Transition Time field is null, the device should move as fast as
     // it is able.
-    if (transitionTimeDs == 0xFFFF)
+    if (transitionTimeDs.IsNull())
     {
         state->transitionTimeMs = FASTEST_TRANSITION_TIME_MS;
     }
@@ -851,7 +935,7 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
     {
         // Transition time comes in as tenths of a second, but we work in
         // milliseconds.
-        state->transitionTimeMs = (transitionTimeDs * MILLISECOND_TICKS_PER_SECOND / 10);
+        state->transitionTimeMs = (transitionTimeDs.Value() * MILLISECOND_TICKS_PER_SECOND / 10);
         // If the new level was pegged at the minimum level, the transition time
         // shall be proportionally reduced.  This is done after the conversion to
         // milliseconds to reduce rounding errors in integer division.
@@ -908,7 +992,8 @@ send_default_response:
 void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool newValue)
 {
     app::DataModel::Nullable<uint8_t> resolvedLevel;
-    uint8_t temporaryCurrentLevelCache;
+    app::DataModel::Nullable<uint8_t> temporaryCurrentLevelCache;
+
     uint16_t currentOnOffTransitionTime;
     EmberAfStatus status;
     bool useOnLevel = false;
@@ -923,10 +1008,16 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     uint8_t minimumLevelAllowedForTheDevice = state->minLevel;
 
     // "Temporarily store CurrentLevel."
-    status = Attributes::CurrentLevel::Get(endpoint, &temporaryCurrentLevelCache);
+    status = Attributes::CurrentLevel::Get(endpoint, temporaryCurrentLevelCache);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
+        return;
+    }
+
+    if (temporaryCurrentLevelCache.IsNull())
+    {
+        emberAfLevelControlClusterPrintln("ERR: Current Level is null");
         return;
     }
 
@@ -943,7 +1034,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         if (resolvedLevel.IsNull())
         {
             // OnLevel has undefined value; fall back to CurrentLevel.
-            resolvedLevel.SetNonNull(temporaryCurrentLevelCache);
+            resolvedLevel.SetNonNull(temporaryCurrentLevelCache.Value());
         }
         else
         {
@@ -952,10 +1043,10 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     }
     else
     {
-        resolvedLevel.SetNonNull(temporaryCurrentLevelCache);
+        resolvedLevel.SetNonNull(temporaryCurrentLevelCache.Value());
     }
 #else
-    resolvedLevel.SetNonNull(temporaryCurrentLevelCache);
+    resolvedLevel.SetNonNull(temporaryCurrentLevelCache.Value());
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_ON_LEVEL_ATTRIBUTE
 
     // Read the OnOffTransitionTime attribute.
@@ -977,6 +1068,9 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     currentOnOffTransitionTime = 0xFFFF;
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
 
+    app::DataModel::Nullable<uint16_t> transitionTime;
+    transitionTime.SetNonNull(currentOnOffTransitionTime);
+
     if (newValue)
     {
         // If newValue is OnOff::Commands::On::Id...
@@ -990,7 +1084,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 
         // "Move CurrentLevel to OnLevel, or to the stored level if OnLevel is not
         // defined, over the time period OnOffTransitionTime."
-        moveToLevelHandler(endpoint, Commands::MoveToLevel::Id, resolvedLevel.Value(), currentOnOffTransitionTime, 0xFF, 0xFF,
+        moveToLevelHandler(endpoint, Commands::MoveToLevel::Id, resolvedLevel.Value(), transitionTime, 0xFF, 0xFF,
                            INVALID_STORED_LEVEL); // Don't revert to stored level
     }
     else
@@ -1000,15 +1094,16 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         // time period OnOffTransitionTime."
         if (useOnLevel)
         {
+
             // If OnLevel is defined, don't revert to stored level.
-            moveToLevelHandler(endpoint, Commands::MoveToLevel::Id, minimumLevelAllowedForTheDevice, currentOnOffTransitionTime,
-                               0xFF, 0xFF, INVALID_STORED_LEVEL);
+            moveToLevelHandler(endpoint, Commands::MoveToLevel::Id, minimumLevelAllowedForTheDevice, transitionTime, 0xFF, 0xFF,
+                               INVALID_STORED_LEVEL);
         }
         else
         {
             // If OnLevel is not defined, set the CurrentLevel to the stored level.
-            moveToLevelHandler(endpoint, Commands::MoveToLevel::Id, minimumLevelAllowedForTheDevice, currentOnOffTransitionTime,
-                               0xFF, 0xFF, temporaryCurrentLevelCache);
+            moveToLevelHandler(endpoint, Commands::MoveToLevel::Id, minimumLevelAllowedForTheDevice, transitionTime, 0xFF, 0xFF,
+                               temporaryCurrentLevelCache.Value());
         }
     }
 }
@@ -1046,8 +1141,8 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
         }
     }
 
-    uint8_t currentLevel = 0;
-    EmberAfStatus status = Attributes::CurrentLevel::Get(endpoint, &currentLevel);
+    app::DataModel::Nullable<uint8_t> currentLevel;
+    EmberAfStatus status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
@@ -1075,7 +1170,7 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
                 {
                     if (startUpCurrentLevel.Value() == STARTUP_CURRENT_LEVEL_USE_DEVICE_MINIMUM)
                     {
-                        currentLevel = state->minLevel;
+                        currentLevel.SetNonNull(state->minLevel);
                     }
                     else
                     {
@@ -1084,15 +1179,15 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
                         // Spec doesn't mention this.
                         if (startUpCurrentLevel.Value() < state->minLevel)
                         {
-                            currentLevel = state->minLevel;
+                            currentLevel.SetNonNull(state->minLevel);
                         }
                         else if (startUpCurrentLevel.Value() > state->maxLevel)
                         {
-                            currentLevel = state->maxLevel;
+                            currentLevel.SetNonNull(state->maxLevel);
                         }
                         else
                         {
-                            currentLevel = startUpCurrentLevel.Value();
+                            currentLevel.SetNonNull(startUpCurrentLevel.Value());
                         }
                     }
                 }
@@ -1103,11 +1198,11 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
         }
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
        // In any case, we make sure that the respects min/max
-        if (currentLevel < state->minLevel)
+        if (currentLevel.IsNull() || currentLevel.Value() < state->minLevel)
         {
             Attributes::CurrentLevel::Set(endpoint, state->minLevel);
         }
-        else if (currentLevel > state->maxLevel)
+        else if (currentLevel.Value() > state->maxLevel)
         {
             Attributes::CurrentLevel::Set(endpoint, state->maxLevel);
         }
