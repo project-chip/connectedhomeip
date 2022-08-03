@@ -1398,7 +1398,7 @@ using CHIP_ERROR = ::chip::ChipError;
  *  @def CHIP_ERROR_INVALID_SUBSCRIPTION
  *
  *  @brief
- *    SUBSCRIPTION ID is not matching
+ *    A message was received as part of a subscription exchange that has a mis-matching subscription id.
  *
  */
 #define CHIP_ERROR_INVALID_SUBSCRIPTION                               CHIP_CORE_ERROR(0x6b)
