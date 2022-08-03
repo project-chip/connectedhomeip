@@ -323,17 +323,14 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
     }
 
-    void onPrivacyEnabled()
-    {
-        ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
-    }
+    void onPrivacyEnabled() { ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__); }
 };
 
 #pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 struct CHIPService : public ble::GattServer::EventHandler
 {
     CHIPService() {}
-    CHIPService(const CHIPService &)             = delete;
+    CHIPService(const CHIPService &) = delete;
     CHIPService & operator=(const CHIPService &) = delete;
 
     CHIP_ERROR init(ble::BLE & ble_interface)

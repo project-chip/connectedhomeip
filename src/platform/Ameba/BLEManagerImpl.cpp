@@ -148,7 +148,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(!mFlags.Has(Flags::kAMEBABLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
 
     err = MapBLEError(bt_matter_adapter_init());
-    chip_blemgr_set_callback_func((chip_blemgr_callback) (ble_callback_dispatcher), this);
+    chip_blemgr_set_callback_func((chip_blemgr_callback)(ble_callback_dispatcher), this);
     SuccessOrExit(err);
 
     // Set related flags
@@ -202,8 +202,8 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(int conn_id, int indicationsEnabled, 
     // whether the client is enabling or disabling indications.
     {
         ChipDeviceEvent event;
-        event.Type                    = (indicationsEnabled || notificationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe
-                                                                                     : DeviceEventType::kCHIPoBLEUnsubscribe;
+        event.Type = (indicationsEnabled || notificationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe
+                                                                  : DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = conn_id;
         PlatformMgr().PostEventOrDie(&event);
     }

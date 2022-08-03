@@ -840,7 +840,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     adv_params.ownAddressType                       = gBleAddrTypePublic_c;
     adv_params.peerAddressType                      = gBleAddrTypePublic_c;
     memset(adv_params.peerAddress, 0, gcBleDeviceAddressSize_c);
-    adv_params.channelMap   = (gapAdvertisingChannelMapFlags_t) (gAdvChanMapFlag37_c | gAdvChanMapFlag38_c | gAdvChanMapFlag39_c);
+    adv_params.channelMap   = (gapAdvertisingChannelMapFlags_t)(gAdvChanMapFlag37_c | gAdvChanMapFlag38_c | gAdvChanMapFlag39_c);
     adv_params.filterPolicy = gProcessAll_c;
 
     err = blekw_start_advertising(&adv_params, &adv, &scanRsp);
