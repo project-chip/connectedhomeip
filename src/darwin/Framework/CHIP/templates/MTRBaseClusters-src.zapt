@@ -18,6 +18,9 @@
 using chip::Callback::Callback;
 using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
+using chip::Messaging::ExchangeManager;
+using chip::SessionHandle;
+
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#chip_client_clusters includeAll=true}}
 @implementation MTRBaseCluster{{asUpperCamelCase name}}
@@ -29,20 +32,10 @@ using namespace chip::app::Clusters;
             return nil;
         }
 
-        // Must allocate cppCluster on the Matter queue.
-        dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-          *[self cppClusterSlot] = new chip::Controller::{{asUpperCamelCase name}}Cluster(*[device internalDevice]->GetExchangeManager(), [device internalDevice]->GetSecureSession().Value(), endpoint);
-        });
-        if (self.cppCluster == nullptr) {
-            return nil;
-        }
+        _device = device;
+        _endpoint = endpoint;
     }
     return self;
-}
-
-- (chip::Controller::{{asUpperCamelCase name}}Cluster **) cppClusterSlot
-{
-    return &_cppCluster;
 }
 
 {{#chip_cluster_commands}}
@@ -55,34 +48,10 @@ using namespace chip::app::Clusters;
 {{/unless}}
 - (void){{asLowerCamelCase name}}WithParams: (MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=.}})completionHandler
 {
-    chip::Optional<uint16_t> timedInvokeTimeoutMs;
-    ListFreer listFreer;
-    {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
-    if (params != nil) {
-      if (params.timedInvokeTimeoutMs != nil) {
-        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-      }
-    }
-    {{#if mustUseTimedInvoke}}
-    if (!timedInvokeTimeoutMs.HasValue()) {
-      timedInvokeTimeoutMs.SetValue(10000);
-    }
-    {{/if}}
-    {{#chip_cluster_command_arguments}}
-      {{#first}}
-        {{#unless (commandHasRequiredField parent)}}
-        if (params != nil) {
-        {{/unless}}
-      {{/first}}
-      {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "params." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return;" depth=0}}
-      {{#last}}
-        {{#unless (commandHasRequiredField parent)}}
-        }
-       {{/unless}}
-      {{/last}}
-    {{/chip_cluster_command_arguments}}
-
+    // Make a copy of params before we go async.
+    params = [params copy];
     new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
+      self.device,
       {{#if hasSpecificResponse}}
         {{! This treats completionHandler as taking an id for the data.  This is
             not great from a type-safety perspective, of course. }}
@@ -95,10 +64,38 @@ using namespace chip::app::Clusters;
           completionHandler(error);
         },
       {{/if}}
-      ^(Cancelable * success, Cancelable * failure) {
+      ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        chip::Optional<uint16_t> timedInvokeTimeoutMs;
+        ListFreer listFreer;
+        {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
+        if (params != nil) {
+          if (params.timedInvokeTimeoutMs != nil) {
+            timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+          }
+        }
+        {{#if mustUseTimedInvoke}}
+        if (!timedInvokeTimeoutMs.HasValue()) {
+          timedInvokeTimeoutMs.SetValue(10000);
+        }
+        {{/if}}
+        {{#chip_cluster_command_arguments}}
+          {{#first}}
+            {{#unless (commandHasRequiredField parent)}}
+            if (params != nil) {
+            {{/unless}}
+          {{/first}}
+          {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "params." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
+          {{#last}}
+            {{#unless (commandHasRequiredField parent)}}
+            }
+           {{/unless}}
+          {{/last}}
+        {{/chip_cluster_command_arguments}}
+
         auto successFn = Callback<{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster->InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+        chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
+        return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
     });
 }
 {{/chip_cluster_commands}}
@@ -113,15 +110,21 @@ using namespace chip::app::Clusters;
 {{~/if_is_fabric_scoped_struct~}}
 (void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
 {
+    {{~#if_is_fabric_scoped_struct type}}
+    // Make a copy of params before we go async.
+    params = [params copy];
+    {{/if_is_fabric_scoped_struct~}}
     new MTR{{>attribute_data_callback_name}}CallbackBridge(self.callbackQueue,
+      self.device,
       {{! This treats completionHandler as taking an id for the data.  This is
           not great from a type-safety perspective, of course. }}
       completionHandler,
-      ^(Cancelable * success, Cancelable * failure) {
+      ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
           auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-          return self.cppCluster->ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall
+          chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
+          return cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall
           {{~#if_is_fabric_scoped_struct type~}}
           , params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]
           {{~/if_is_fabric_scoped_struct~}}
@@ -137,33 +140,40 @@ using namespace chip::app::Clusters;
 }
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(MTRWriteParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler
 {
-    chip::Optional<uint16_t> timedWriteTimeout;
-    if (params != nil) {
-      if (params.timedWriteTimeout != nil){
-        timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-      }
-    }
-    {{#if mustUseTimedInvoke}}
-    if (!timedWriteTimeout.HasValue()) {
-      timedWriteTimeout.SetValue(10000);
-    }
-    {{/if}}
+    // Make a copy of params before we go async.
+    params = [params copy];
+    value = [value copy];
 
     new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
+      self.device,
       {{! For now, don't change the bridge API; instead just use an adapter
           to invoke our completion handler. This is not great from a
           type-safety perspective, of course. }}
       ^(id _Nullable ignored, NSError * _Nullable error) {
         completionHandler(error);
       },
-      ^(Cancelable * success, Cancelable * failure) {
+      ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        chip::Optional<uint16_t> timedWriteTimeout;
+        if (params != nil) {
+          if (params.timedWriteTimeout != nil){
+            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
+          }
+        }
+        {{#if mustUseTimedInvoke}}
+        if (!timedWriteTimeout.HasValue()) {
+          timedWriteTimeout.SetValue(10000);
+        }
+        {{/if}}
+
         ListFreer listFreer;
         using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
         TypeInfo::Type cppValue;
         {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
         auto successFn = Callback<{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall, timedWriteTimeout);
+
+        chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
+        return cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall, timedWriteTimeout);
     });
 
 }
@@ -174,11 +184,16 @@ using namespace chip::app::Clusters;
        params:(MTRSubscribeParams * _Nullable)params
 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
 {
+    // Make a copy of params before we go async.
+    minInterval = [minInterval copy];
+    maxInterval = [maxInterval copy];
+    params = [params copy];
     new MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge(self.callbackQueue,
+      self.device,
       {{! This treats reportHandler as taking an id for the data.  This is
           not great from a type-safety perspective, of course. }}
       reportHandler,
-      ^(Cancelable * success, Cancelable * failure) {
+      ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
           if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
               // We don't support disabling auto-resubscribe.
               return CHIP_ERROR_INVALID_ARGUMENT;
@@ -186,7 +201,9 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
           auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-          return self.cppCluster->SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [minInterval unsignedShortValue], [maxInterval unsignedShortValue], MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished, nil,
+
+          chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
+          return cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [minInterval unsignedShortValue], [maxInterval unsignedShortValue], MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished, nil,
               params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
               params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]
           );
@@ -219,16 +236,6 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 {{/if}}
 {{/chip_server_cluster_attributes}}
-
-- (void)dealloc
-{
-    // Must delete cppCluster on the Matter queue.
-    dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-        if (self.cppCluster != nullptr) {
-            delete self.cppCluster;
-        }
-    });
-}
 
 @end
 

@@ -51,6 +51,7 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 
 #include <controller/python/ChipDeviceController-ScriptDevicePairingDelegate.h>
+#include <controller/python/ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.h>
 #include <controller/python/ChipDeviceController-StorageDelegate.h>
 #include <controller/python/chip/interaction_model/Delegate.h>
 
@@ -98,6 +99,7 @@ chip::Controller::CommissioningParameters sCommissioningParameters;
 } // namespace
 
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
+chip::Controller::ScriptPairingDeviceDiscoveryDelegate sPairingDeviceDiscoveryDelegate;
 chip::Controller::Python::StorageAdapter * sStorageAdapter = nullptr;
 chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
@@ -152,6 +154,11 @@ ChipError::StorageType pychip_DeviceController_DiscoverCommissionableNodesDevice
                                                                                      uint16_t device_type);
 ChipError::StorageType
 pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl);
+
+ChipError::StorageType pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl, uint64_t nodeId,
+                                                                   uint32_t setupPasscode, const uint8_t filterType,
+                                                                   const char * filterParam);
+
 ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFunct callback, void * pythonContext);
 
 ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
@@ -381,6 +388,48 @@ ChipError::StorageType pychip_DeviceController_ConnectWithCode(chip::Controller:
     return devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters).AsInteger();
 }
 
+ChipError::StorageType pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl, uint64_t nodeId,
+                                                                   uint32_t setupPasscode, const uint8_t filterType,
+                                                                   const char * filterParam)
+{
+    Dnssd::DiscoveryFilter filter(static_cast<Dnssd::DiscoveryFilterType>(filterType));
+    switch (static_cast<Dnssd::DiscoveryFilterType>(filterType))
+    {
+    case chip::Dnssd::DiscoveryFilterType::kNone:
+        break;
+    case chip::Dnssd::DiscoveryFilterType::kShortDiscriminator:
+    case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator:
+    case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
+    case chip::Dnssd::DiscoveryFilterType::kVendorId:
+    case chip::Dnssd::DiscoveryFilterType::kDeviceType: {
+        // For any numerical filter, convert the string to a filter value
+        errno                               = 0;
+        unsigned long long int numericalArg = strtoull(filterParam, nullptr, 0);
+        if ((numericalArg == ULLONG_MAX) && (errno == ERANGE))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT.AsInteger();
+        }
+        filter.code = static_cast<uint64_t>(numericalArg);
+        break;
+    }
+    case chip::Dnssd::DiscoveryFilterType::kCommissioningMode:
+        break;
+    case chip::Dnssd::DiscoveryFilterType::kCommissioner:
+        filter.code = 1;
+        break;
+    case chip::Dnssd::DiscoveryFilterType::kInstanceName:
+        filter.code         = 0;
+        filter.instanceName = filterParam;
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT.AsInteger();
+    }
+
+    sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, &sPairingDelegate, devCtrl);
+    devCtrl->RegisterDeviceDiscoveryDelegate(&sPairingDeviceDiscoveryDelegate);
+    return devCtrl->DiscoverCommissionableNodes(filter).AsInteger();
+}
+
 ChipError::StorageType pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size)
 {
     ReturnErrorCodeIf(!sThreadBuf.Alloc(size), CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -405,7 +454,28 @@ ChipError::StorageType pychip_DeviceController_SetWiFiCredentials(const char * s
 
 ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
+#if 0
+    //
+    // Since we permit multiple controllers per fabric and each is associated with a unique fabric index, closing a session
+    // requires us to do so across all controllers on the same logical fabric.
+    //
+    // TODO: Enable this and remove the call below to DisconnectDevice once #19259 is completed. This is because
+    //       OperationalDeviceProxy instances that are currently active will remain un-affected by this call and still
+    //       provide a valid SessionHandle in the OnDeviceConnected call later when we call DeviceController::GetConnectedDevice.
+    //       However, it provides a SessionHandle that is incapable of actually vending exchanges since it is in a defunct state.
+    //
+    //       For now, calling DisconnectDevice will at least just correctly de-activate a currently active OperationalDeviceProxy
+    //       instance and ensure that subsequent attempts to acquire one will correctly re-establish CASE on the fabric associated
+    //       with the provided devCtrl.
+    //
+    auto err = devCtrl->SessionMgr()->ForEachCollidingSession(ScopedNodeId(nodeid, devCtrl->GetFabricIndex()), [](auto *session) {
+        session->MarkAsDefunct();
+    });
+
+    ReturnErrorOnFailure(err.AsInteger());
+#else
     return devCtrl->DisconnectDevice(nodeid).AsInteger();
+#endif
 }
 
 ChipError::StorageType pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl,
@@ -643,7 +713,12 @@ ChipError::StorageType pychip_ExpireSessions(chip::Controller::DeviceCommissione
 {
     VerifyOrReturnError((devCtrl != nullptr) && (devCtrl->SessionMgr() != nullptr), CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     (void) devCtrl->ReleaseOperationalDevice(nodeId);
-    devCtrl->SessionMgr()->ExpireAllSessions(ScopedNodeId(nodeId, devCtrl->GetFabricIndex()));
+
+    //
+    // Since we permit multiple controllers on the same fabric each associated with a different fabric index, expiring a session
+    // needs to correctly expire sessions on other controllers on matching fabrics as well.
+    //
+    devCtrl->SessionMgr()->ExpireAllSessionsOnLogicalFabric(ScopedNodeId(nodeId, devCtrl->GetFabricIndex()));
     return CHIP_NO_ERROR.AsInteger();
 }
 

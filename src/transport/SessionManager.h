@@ -174,8 +174,179 @@ public:
     Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType,
                                             const ScopedNodeId & sessionEvictionHint);
 
+    /**
+     *  A set of templated helper function that call a provided lambda
+     *  on all sessions in the underlying session table that match the provided
+     *  query criteria.
+     *
+     */
+
+    /**
+     * Call the provided lambda on sessions whose remote side match the provided ScopedNodeId.
+     *
+     */
+    template <typename Function>
+    void ForEachMatchingSession(const ScopedNodeId & node, Function && function)
+    {
+        mSecureSessions.ForEachSession([&](auto * session) {
+            if (session->GetPeer() == node)
+            {
+                function(session);
+            }
+
+            return Loop::Continue;
+        });
+    }
+
+    /**
+     * Call the provided lambda on sessions that match the provided fabric index.
+     *
+     */
+    template <typename Function>
+    void ForEachMatchingSession(FabricIndex fabricIndex, Function && function)
+    {
+        mSecureSessions.ForEachSession([&](auto * session) {
+            if (session->GetFabricIndex() == fabricIndex)
+            {
+                function(session);
+            }
+
+            return Loop::Continue;
+        });
+    }
+
+    /**
+     * Call the provided lambda on all sessions whose remote side match the logical fabric
+     * associated with the provided ScopedNodeId and target the same logical remote node.
+     *
+     * *NOTE* This is identical in behavior to ForEachMatchingSession(const ScopedNodeId ..)
+     *        EXCEPT if there are multiple FabricInfo instances in the FabricTable that collide
+     *        on the same logical fabric (i.e root public key + fabric ID tuple).
+     *        This can ONLY happen if multiple controller instances on the same fabric is permitted
+     *        and each is assigned a unique fabric index.
+     */
+    template <typename Function>
+    CHIP_ERROR ForEachMatchingSessionOnLogicalFabric(const ScopedNodeId & node, Function && function)
+    {
+        Crypto::P256PublicKey targetPubKey;
+
+        auto * targetFabric = mFabricTable->FindFabricWithIndex(node.GetFabricIndex());
+        VerifyOrReturnError(targetFabric != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+        auto err = targetFabric->FetchRootPubkey(targetPubKey);
+        VerifyOrDie(err == CHIP_NO_ERROR);
+
+        mSecureSessions.ForEachSession([&](auto * session) {
+            Crypto::P256PublicKey comparePubKey;
+
+            //
+            // It's entirely possible to either come across a PASE session OR, a CASE session
+            // that has yet to be activated (i.e a CASEServer holding onto a SecureSession object
+            // waiting for a Sigma1 message to arrive). Let's skip those.
+            //
+            if (!session->IsCASESession() || session->GetFabricIndex() == kUndefinedFabricIndex)
+            {
+                return Loop::Continue;
+            }
+
+            auto * compareFabric = mFabricTable->FindFabricWithIndex(session->GetFabricIndex());
+            VerifyOrDie(compareFabric != nullptr);
+
+            err = compareFabric->FetchRootPubkey(comparePubKey);
+            VerifyOrDie(err == CHIP_NO_ERROR);
+
+            if (comparePubKey.Matches(targetPubKey) && targetFabric->GetFabricId() == compareFabric->GetFabricId() &&
+                session->GetPeerNodeId() == node.GetNodeId())
+            {
+                function(session);
+            }
+
+            return Loop::Continue;
+        });
+
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Call the provided lambda on all sessions that match the logical fabric
+     * associated with the provided fabric index.
+     *
+     * *NOTE* This is identical in behavior to ForEachMatchingSession(FabricIndex ..)
+     *        EXCEPT if there are multiple FabricInfo instances in the FabricTable that collide
+     *        on the same logical fabric (i.e root public key + fabric ID tuple).
+     *        This can ONLY happen if multiple controller instances on the same fabric is permitted
+     *        and each is assigned a unique fabric index.
+     */
+    template <typename Function>
+    CHIP_ERROR ForEachMatchingSessionOnLogicalFabric(FabricIndex fabricIndex, Function && function)
+    {
+        Crypto::P256PublicKey targetPubKey;
+
+        auto * targetFabric = mFabricTable->FindFabricWithIndex(fabricIndex);
+        VerifyOrReturnError(targetFabric != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+        auto err = targetFabric->FetchRootPubkey(targetPubKey);
+        VerifyOrDie(err == CHIP_NO_ERROR);
+
+        mSecureSessions.ForEachSession([&](auto * session) {
+            Crypto::P256PublicKey comparePubKey;
+
+            //
+            // It's entirely possible to either come across a PASE session OR, a CASE session
+            // that has yet to be activated (i.e a CASEServer holding onto a SecureSession object
+            // waiting for a Sigma1 message to arrive). Let's skip those.
+            //
+            if (!session->IsCASESession() || session->GetFabricIndex() == kUndefinedFabricIndex)
+            {
+                return Loop::Continue;
+            }
+
+            auto * compareFabric = mFabricTable->FindFabricWithIndex(session->GetFabricIndex());
+            VerifyOrDie(compareFabric != nullptr);
+
+            err = compareFabric->FetchRootPubkey(comparePubKey);
+            VerifyOrDie(err == CHIP_NO_ERROR);
+
+            if (comparePubKey.Matches(targetPubKey) && targetFabric->GetFabricId() == compareFabric->GetFabricId())
+            {
+                function(session);
+            }
+
+            return Loop::Continue;
+        });
+
+        return CHIP_NO_ERROR;
+    }
+
     void ExpireAllSessions(const ScopedNodeId & node);
     void ExpireAllSessionsForFabric(FabricIndex fabricIndex);
+
+    /**
+     * Expire all sessions whose remote side matches the logical fabric
+     * associated with the provided ScopedNodeId and target the same logical remote node.
+     *
+     * *NOTE* This is identical in behavior to ExpireAllSessions(const ScopedNodeId ..)
+     *        EXCEPT if there are multiple FabricInfo instances in the FabricTable that collide
+     *        on the same logical fabric (i.e root public key + fabric ID tuple).  This can ONLY happen
+     *        if multiple controller instances on the same fabric is permitted and each is assigned
+     *        a unique fabric index.
+     *
+     */
+    CHIP_ERROR ExpireAllSessionsOnLogicalFabric(const ScopedNodeId & node);
+
+    /**
+     * Expire all sessions whose remote side matches the logical fabric
+     * associated with the provided fabric index.
+     *
+     * *NOTE* This is identical in behavior to ExpireAllSessExpireAllSessionsForFabricions(FabricIndex ..)
+     *        EXCEPT if there are multiple FabricInfo instances in the FabricTable that collide
+     *        on the same logical fabric (i.e root public key + fabric ID tuple).  This can ONLY happen
+     *        if multiple controller instances on the same fabric is permitted and each is assigned
+     *        a unique fabric index.
+     *
+     */
+    CHIP_ERROR ExpireAllSessionsOnLogicalFabric(FabricIndex fabricIndex);
+
     void ExpireAllPASESessions();
 
     /**

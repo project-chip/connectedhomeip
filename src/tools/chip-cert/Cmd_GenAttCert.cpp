@@ -533,7 +533,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
 
     if (gInKeyFileName != nullptr)
     {
-        res = ReadKey(gInKeyFileName, newKey.get());
+        res = ReadKey(gInKeyFileName, newKey);
         VerifyTrueOrExit(res);
     }
     else
@@ -564,7 +564,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
         res = ReadCert(gCACertFileName, caCert.get());
         VerifyTrueOrExit(res);
 
-        res = ReadKey(gCAKeyFileName, caKey.get(), gCertConfig.IsErrorTestCaseEnabled());
+        res = ReadKey(gCAKeyFileName, caKey, gCertConfig.IsErrorTestCaseEnabled());
         VerifyTrueOrExit(res);
 
         res = MakeAttCert(gAttCertType, gSubjectCN, gSubjectVID, gSubjectPID, gEncodeVIDandPIDasCN, caCert.get(), caKey.get(),

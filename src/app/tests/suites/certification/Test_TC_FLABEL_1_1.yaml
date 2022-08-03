@@ -23,14 +23,14 @@ config:
 tests:
     - label: "Commission DUT to TH"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "TH reads the ClusterRevision from DUT"
       verification: |
           ./chip-tool fixedlabel read cluster-revision 1 0
 
-          On TH, verify that  DUT  responsds ClusterRevision attribute as the value 1
+          On TH, verify that  DUT  responsds ClusterRevision attribute  value as 1
 
           [1651124058.497301][2367:2372] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_FFFD DataVersion: 3688229931
           [1651124058.498753][2367:2372] CHIP:TOO:   ClusterRevision: 1
@@ -41,7 +41,7 @@ tests:
       verification: |
           ./chip-tool fixedlabel read feature-map 1 0
 
-          On TH, verify that DUT responsds FeatureMap attribute as the value 0
+          On TH, verify that DUT responsds FeatureMap attribute  value as 0
 
           [1653459204.749193][24610:24615] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_FFFC DataVersion: 4022759920
           [1653459204.749266][24610:24615] CHIP:TOO:   FeatureMap: 0

@@ -419,6 +419,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(nullable NSZone *)zone;
 @end
 
+@interface MTRThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSArray * _Nonnull current;
+@property (nonatomic, copy) NSArray * _Nonnull previous;
+
+- (instancetype)init;
+- (id)copyWithZone:(nullable NSZone *)zone;
+@end
+
 @interface MTRWiFiNetworkDiagnosticsClusterDisconnectionEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull reasonCode;
 

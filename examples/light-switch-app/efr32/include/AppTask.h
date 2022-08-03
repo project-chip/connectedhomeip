@@ -27,6 +27,7 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
+#include "BaseApplication.h"
 #include "FreeRTOS.h"
 #include "sl_simple_button_instances.h"
 #include "timers.h" // provides FreeRTOS timer support
@@ -51,21 +52,13 @@
  * AppTask Declaration
  *********************************************************/
 
-class AppTask
+class AppTask : public BaseApplication
 {
 
 public:
-    /**********************************************************
-     * Public Function Declaration
-     *********************************************************/
+    AppTask() = default;
 
-    /**
-     * @brief Create AppTask task and Event Queue
-     * If an error occurs during creation, application will hang after printing out error code
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR if no errors
-     */
-    CHIP_ERROR StartAppTask();
+    static AppTask & GetAppTask() { return sAppTask; }
 
     /**
      * @brief AppTask task main loop function
@@ -74,12 +67,7 @@ public:
      */
     static void AppTaskMain(void * pvParameter);
 
-    /**
-     * @brief PostEvent function that add event to AppTask queue for processing
-     *
-     * @param event AppEvent to post
-     */
-    void PostEvent(const AppEvent * event);
+    CHIP_ERROR StartAppTask();
 
     /**
      * @brief Event handler when a button is pressed
@@ -89,7 +77,7 @@ public:
      * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
-    void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction);
+    void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction) override;
 
     /**
      * @brief Callback called by the identify-server when an identify command is received
@@ -105,23 +93,8 @@ public:
      */
     static void OnIdentifyStop(Identify * identify);
 
-    /**
-     * @brief Function called to start the LED light timer
-     */
-    void StartLightTimer(void);
-
-    /**
-     * @brief Function to stop LED light timer
-     *        Turns off Status LED before stopping timer
-     */
-    void CancelLightTimer(void);
-
 private:
-    /**********************************************************
-     * Private Function Declaration
-     *********************************************************/
-
-    friend AppTask & GetAppTask(void);
+    static AppTask sAppTask;
 
     /**
      * @brief AppTask initialisation function
@@ -129,41 +102,6 @@ private:
      * @return CHIP_ERROR
      */
     CHIP_ERROR Init();
-
-    /**
-     * @brief Function called to start the function timer
-     *
-     * @param aTimeoutMs timer duration in ms
-     */
-    void StartFunctionTimer(uint32_t aTimeoutMs);
-
-    /**
-     * @brief Function to stop function timer
-     */
-    void CancelFunctionTimer(void);
-
-    /**
-     * @brief Function call event callback function for processing
-     *
-     * @param event triggered event to be processed
-     */
-    void DispatchEvent(AppEvent * event);
-
-    /**
-     * @brief Function Timer finished callback function
-     *        Post an FunctionEventHandler event
-     *
-     * @param xTimer timer that finished
-     */
-    static void FunctionTimerEventHandler(TimerHandle_t xTimer);
-
-    /**
-     * @brief Timer Event processing function
-     *        Trigger factory if Press and Hold duration is respected
-     *
-     * @param aEvent post event being processed
-     */
-    static void FunctionEventHandler(AppEvent * aEvent);
 
     /**
      * @brief PB0 Button event processing function
@@ -181,42 +119,4 @@ private:
      * @param aEvent button event being processed
      */
     static void SwitchActionEventHandler(AppEvent * aEvent);
-
-    /**
-     * @brief Light Timer finished callback function
-     *        Calls LED processing function
-     *
-     * @param xTimer timer that finished
-     */
-    static void LightTimerEventHandler(TimerHandle_t xTimer);
-
-    /**
-     * @brief Updates device LEDs
-     */
-    static void LightEventHandler();
-
-    /**********************************************************
-     * Private Attributes declaration
-     *********************************************************/
-
-    enum Function_t
-    {
-        kFunction_NoneSelected   = 0,
-        kFunction_SoftwareUpdate = 0,
-        kFunction_StartBleAdv    = 1,
-        kFunction_FactoryReset   = 2,
-
-        kFunction_Invalid
-    } Function;
-
-    Function_t mFunction;
-    bool mFunctionTimerActive;
-    bool mSyncClusterToButtonAction;
-
-    static AppTask sAppTask;
 };
-
-inline AppTask & GetAppTask(void)
-{
-    return AppTask::sAppTask;
-}

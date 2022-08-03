@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.1.8. [TC-CADMIN-1.8] Commissioning window handling timeout and revocation
+    4.1.8. [TC-CADMIN-1.8] Commissioning window handling timeout and revocation
     using BCM [DUT - Commissioner]
 
 config:
@@ -116,7 +116,7 @@ tests:
           BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On your DUT controller open commissioning widow using BCM.
+          On your first controller open commissioning widow using BCM.
 
           Below is the example while using chip tool as controller,
 
@@ -289,9 +289,10 @@ tests:
           [1649245940.790033][10110:10115] CHIP:DMG: }
           [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
+          Verify read attribute returns the updated value written
           ./chip-tool basic read node-label 2 0
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
-          [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te8
+          [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te5new
           [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
       disabled: true
 

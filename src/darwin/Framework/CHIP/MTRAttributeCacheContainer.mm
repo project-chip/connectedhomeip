@@ -58,7 +58,7 @@ static CHIP_ERROR AppendAttibuteValueToArray(
     chip::TLV::TLVReader reader;
     CHIP_ERROR err = cache->Get(path, reader);
     if (err == CHIP_NO_ERROR) {
-        id obj = NSObjectFromCHIPTLV(&reader);
+        id obj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
         if (obj) {
             [array addObject:@ { MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:path], MTRDataKey : obj }];
             return CHIP_NO_ERROR;

@@ -436,7 +436,10 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
         mSystemLayer->CancelTimer(OnDeviceDiscoveredTimeoutCallback, this);
 
         ResetDiscoveryState();
-        pairingDelegate->OnPairingComplete(error);
+        if (pairingDelegate != nullptr)
+        {
+            pairingDelegate->OnPairingComplete(error);
+        }
         return;
     }
 
@@ -449,7 +452,10 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
         return;
     }
 
-    pairingDelegate->OnPairingComplete(error);
+    if (pairingDelegate != nullptr)
+    {
+        pairingDelegate->OnPairingComplete(error);
+    }
 }
 
 void SetUpCodePairer::OnPairingDeleted(CHIP_ERROR error)

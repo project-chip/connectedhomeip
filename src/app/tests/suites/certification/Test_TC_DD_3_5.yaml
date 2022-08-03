@@ -25,11 +25,12 @@ tests:
           "Commissioner has regulatory and fabric information available and has
           accurate date, time and timezone"
       verification: |
-          On TH:
           sudo ./chip-all-clusters-app --wifi --discriminator 3841
 
+          Verify in TH as server side
+
           [1653471956.966855][10713:10713] CHIP:SPT: PASE PBKDF iterations set to 1000
-          [1653471956.966887][10713:10713] CHIP:SPT: LinuxCommissionableDataProvider didn't get a PASE salt, generating one.
+          [1653471956.966887][10713:10713] CHIP:SPT: LinuxCommissionableDataProvider didn"t get a PASE salt, generating one.
           [1653471956.972152][10713:10713] CHIP:DL: Device Configuration:
           [1653471956.972270][10713:10713] CHIP:DL:   Serial Number: TEST_SN
           [1653471956.972315][10713:10713] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
@@ -50,16 +51,17 @@ tests:
           [1653471956.972769][10713:10713] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
           [1653471956.972803][10713:10713] CHIP:SVR: Manual pairing code: [749701123365521327694]
 
-          On DUT:
+
           ./chip-tool pairing code 1 MT:-24J0CEK01KA0648G00
-          ...
+          Verify in DUT as client side
+
           [1657226543861] [30621:16744161] CHIP: [IN] SecureSession[0x6000007cc000]: Activated - Type:1 LSID:47293
           [1657226543861] [30621:16744161] CHIP: [IN] New secure session activated for device <FFFFFFFB00000000, 0>, LSID:47293 PSID:201!
           [1657226543861] [30621:16744161] CHIP: [CTL] Remote device completed SPAKE2+ handshake
           [1657226543861] [30621:16744161] CHIP: [CTL] Stopping commissioning discovery over DNS-SD
           [1657226543861] [30621:16744161] CHIP: [TOO] Pairing Success
           [1657226543861] [30621:16744161] CHIP: [TOO] PASE establishment successful
-          [1657226543861] [30621:16744161] CHIP: [CTL] Commissioning stage next step: 'SecurePairing' -> 'ReadCommissioningInfo'
+          [1657226543861] [30621:16744161] CHIP: [CTL] Commissioning stage next step: "SecurePairing" -> "ReadCommissioningInfo"
       disabled: true
 
     - label:
@@ -69,7 +71,7 @@ tests:
           (DNS-SD)"
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
-          On DUT:
+          Verify in DUT as client side
           ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
           ...
           [1657226543861] [30621:16744161] CHIP: [IN] SecureSession[0x6000007cc000]: Activated - Type:1 LSID:47293
@@ -78,10 +80,10 @@ tests:
           [1657226543861] [30621:16744161] CHIP: [CTL] Stopping commissioning discovery over DNS-SD
           [1657226543861] [30621:16744161] CHIP: [TOO] Pairing Success
           [1657226543861] [30621:16744161] CHIP: [TOO] PASE establishment successful
-          [1657226543861] [30621:16744161] CHIP: [CTL] Commissioning stage next step: 'SecurePairing' -> 'ReadCommissioningInfo'
+          [1657226543861] [30621:16744161] CHIP: [CTL] Commissioning stage next step: "SecurePairing" -> "ReadCommissioningInfo"
 
 
-          On TH:
+          Verify in TH as server side
           $ ./out/all-clusters-app/chip-all-clusters-app
           ...
           [1657226543.948995][369114:369114] CHIP:IN: SecureSession[0xaaaab60788e0]: Activated - Type:1 LSID:201
@@ -95,7 +97,7 @@ tests:
       verification: |
           Verify that the responder receives the PBKDFParamRequest message
 
-          Check on TH:
+          Verify in DUT as client side
           CHIP:SC: Received PBKDF param request
           CHIP:SC: Peer assigned session ID 18450
           CHIP:SC: Found MRP parameters in the message
@@ -105,7 +107,7 @@ tests:
           CHIP:IN: Sending unauthenticated msg 0xaaaaad340560 with MessageCounter:1341084110 to 0x0000000000000000 at monotonic time: 0000000000FBA380 msec
           CHIP:SC: Sent PBKDF param response
 
-          Check on DUT:
+          Verify in TH as server side
           Sent PBKDF param request
           [1653471961.364996][30157:30162] CHIP:CTL: Setting wifi credentials from parameters
           [1653471961.365051][30157:30162] CHIP:CTL: Setting attestation nonce to random value
@@ -123,13 +125,12 @@ tests:
           "Commissioner SHALL re-arm Fail-safe timer on Commissionee within 60s
           (the autonomously Fail-safe timer length set by Commissionee)"
       verification: |
-          Verify on TH:
-
+          Verify in TH as server side
           CHIP:DL: NVS set: chip-config/fail-safe-armed = true
 
-          Verify on DUT:
+          Verify in DUT as client side
 
-          : Performing next commissioning step 'ArmFailSafe'
+          : Performing next commissioning step "ArmFailSafe"
           [1653471968.064493][30157:30162] CHIP:CTL: Arming failsafe (60 seconds)
       disabled: true
 
@@ -138,13 +139,12 @@ tests:
           Commissionee."
       PICS: MCORE.DD.WIRELESS
       verification: |
-          Verify on DUT Log:
-
-          Performing next commissioning step 'ConfigRegulatory'
+          Verify in DUT as client side
+          Performing next commissioning step "ConfigRegulatory"
           [1653471968.202645][30157:30162] CHIP:CTL: Setting Regulatory Config
           [1653471968.202666][30157:30162] CHIP:CTL: No regulatory config supplied by controller, leaving as device default (0)
 
-          Verify on TH:
+          Verify in TH as server side
            NVS set: chip-config/regulatory-location = 0 (0x0)
       disabled: true
 
@@ -154,11 +154,12 @@ tests:
       verification: |
           Verify the following on DUT after commissioning
 
+          Verify in TH as server side
           [1646909537.102263][3145:3150] CHIP:CTL: Received Attestation Information from the device
           [1646909537.102418][3145:3150] CHIP:CTL: Verifying attestation
-          [1646909537.115081][3145:3150] CHIP:CTL: Successfully validated 'Attestation Information' command received from the device.
+          [1646909537.115081][3145:3150] CHIP:CTL: Successfully validated "Attestation Information" command received from the device.
 
-          Verify on TH:
+          Verify in DUT as client side
           CHIP:ZCL: OpCreds: commissioner has requested a CSR
           CHIP:ZCL: OpCreds: NewCertificateSigningRequest returned ../../third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1114: Success
       disabled: true
@@ -167,11 +168,11 @@ tests:
           "Commissioner configures operational credentials on DUT if not
           previously installed"
       verification: |
-          Verify on TH:
+          Verify in DUT as client side
 
           OpCreds: Received an AddTrustedRootCertificate command
 
-          Verify on DUT:
+          Verify in TH as server side
 
           Sending root certificate to the device
           CHIP:DMG: ICR moving to [AddingComm]
@@ -186,10 +187,10 @@ tests:
           "Commissioner configures itself as administrator in ACL on TH if
           needed"
       verification: |
-          Verify the following on DUT after commissioning
+          Verify in DUT as client side after commissioning
 
-          CHIP:CTL: Commissioning stage next step: 'SendTrustedRootCert' -> 'SendNOC'
-          [1653471969.812357][30157:30162] CHIP:CTL: Performing next commissioning step 'SendNOC'
+          CHIP:CTL: Commissioning stage next step: "SendTrustedRootCert" -> "SendNOC"
+          [1653471969.812357][30157:30162] CHIP:CTL: Performing next commissioning step "SendNOC"
           [1653471969.812478][30157:30162] CHIP:DMG: ICR moving to [AddingComm]
           [1653471969.812559][30157:30162] CHIP:DMG: ICR moving to [AddedComma]
           [1653471969.812778][30157:30162] CHIP:IN: Prepared secure message 0xffffa4ce0998 to 0xFFFFFFFB00000000 (0)  of type 0x8 and protocolId (0, 1) on exchange 24000i with MessageCounter:211813.
@@ -238,9 +239,9 @@ tests:
           [1653471970.347339][30157:30162] CHIP:CTL: Device returned status 0 on receiving the NOC
           [1653471970.347381][30157:30162] CHIP:CTL: Operational credentials provisioned on device 0xffff90000b60
           [1653471970.347439][30157:30162] CHIP:TOO: Secure Pairing Success
-          [1653471970.347485][30157:30162] CHIP:CTL: Successfully finished commissioning step 'SendNOC'
+          [1653471970.347485][30157:30162] CHIP:CTL: Successfully finished commissioning step "SendNOC"
 
-          Verify on TH:
+          Verify in DUT as client side
 
            OpCreds: Received an AddNOC command
       disabled: true
@@ -249,7 +250,7 @@ tests:
           "Commissioner configures operational network on TH if TH both supports
           and requires"
       verification: |
-          Verify the following on DUT after commissioning
+          Verify in DUT as client side after commissioning
 
           [1646909537.345068][3145:3150] CHIP:CTL: Received certificate signing request from the device
       disabled: true
@@ -258,7 +259,7 @@ tests:
           "Commissioner instructs Commissionee to connect to operational network
           if not already connected"
       verification: |
-          Verify the following on DUT after commissioning
+          Verify in DUT as client side after commissioning
 
           [1646909537.976592][3145:3150] CHIP:CTL: Operational credentials provisioned on device 0xffffac001730
           [1646909537.976664][3145:3150] CHIP:TOO: Secure Pairing Success
@@ -266,10 +267,10 @@ tests:
 
     - label: "Commissioner starts discovery of TH using Operational Discovery"
       verification: |
-          Verify the following on DUT:
+          Verify in DUT as client side
 
-          Commissioning stage next step: 'WiFiNetworkEnable' -> 'FindOperational'
-          [1653471976.344532][30157:30162] CHIP:CTL: Performing next commissioning step 'FindOperational'
+          Commissioning stage next step: "WiFiNetworkEnable" -> "FindOperational"
+          [1653471976.344532][30157:30162] CHIP:CTL: Performing next commissioning step "FindOperational"
           [1653471976.344586][30157:30162] CHIP:CSM: FindOrEstablishSession: PeerId = CCCB8A2597E4538B:0000000000000001
           [1653471976.344642][30157:30162] CHIP:CSM: FindOrEstablishSession: No existing OperationalDeviceProxy instance found
           [1653471976.344715][30157:30162] CHIP:CTL: OperationalDeviceProxy[CCCB8A2597E4538B:0000000000000001]: State change 1 --> 2
@@ -278,8 +279,7 @@ tests:
           [1653471976.347000][30157:30162] CHIP:DMG: ICR moving to [AwaitingDe]
           [1653471976.348514][30157:30162] CHIP:DL: Avahi resolve found
           [1653471976.348597][30157:30162] CHIP:DIS: Node ID resolved for CCCB8A2597E4538B:0000000000000001
-          [1653471976.348633][30157:30162] CHIP:DIS:         Hostname: E45F010F27530000
-          [1653471976.348670][30157:30162] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2753
+          [1653471976.348633][30157:30162] CHIP:DIS:         Hostname: E45F010F27530000        [1653471976.348670][30157:30162] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2753
           [1653471976.348702][30157:30162] CHIP:DIS:         Port: 5540
           [1653471976.348732][30157:30162] CHIP:DIS:         Mrp Interval idle: 5000 ms
           [1653471976.348762][30157:30162] CHIP:DIS:         Mrp Interval active: 300 ms
@@ -289,7 +289,7 @@ tests:
     - label:
           "Commissioner opens a CASE session with TH over operational network"
       verification: |
-          Verify the following on TH:
+          Verify in DUT as client side
 
            CASE Server enabling CASE session setups
           [1653471957.713139][10713:10713] CHIP:SVR: Joining Multicast groups
@@ -300,7 +300,7 @@ tests:
 
     - label: "Commissioner sends CommissioningComplete command"
       verification: |
-          Verify the following on DUT:
+          Received CommissioningComplete response
 
           CHIP:CTL: Received CommissioningComplete response
       disabled: true
@@ -309,18 +309,18 @@ tests:
           "Commissioning channel between the Commissioner and Commissionee is
           terminated."
       verification: |
-          Verify the following on DUT:
+          Verify in DUT as client side
 
-          CHIP:CTL: Successfully finished commissioning step 'SendComplete'
-          CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          CHIP:CTL: Performing next commissioning step 'Cleanup'
-          CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          CHIP:CTL: Successfully finished commissioning step "SendComplete"
+          CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
+          CHIP:CTL: Performing next commissioning step "Cleanup"
+          CHIP:CTL: Successfully finished commissioning step "Cleanup"
           CHIP:TOO: Device commissioning completed with success
-          CHIP:CTL: Performing next commissioning step 'Cleanup'
+          CHIP:CTL: Performing next commissioning step "Cleanup"
           CHIP:DIS: Closing all BLE connections
           CHIP:IN: Clearing BLE pending packets.
-          CHIP:BLE: Auto-closing end point's BLE connection.
+          CHIP:BLE: Auto-closing end point"s BLE connection.
           CHIP:DL: Closing BLE GATT connection (con 0xffff9c04df70)
-          CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          CHIP:CTL: Successfully finished commissioning step "Cleanup"
           CHIP:TOO: Device commissioning completed with success
       disabled: true

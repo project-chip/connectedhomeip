@@ -17,42 +17,161 @@
 
 #import <Foundation/Foundation.h>
 
+#import "MTRBaseDevice_Internal.h"
+#import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "zap-generated/MTRBaseClusters.h"
 
 #include <app/data-model/NullObject.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <transport/SessionHandle.h>
 
-typedef CHIP_ERROR (^MTRActionBlock)(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure);
+/**
+ * Bridge that allows invoking a given MTRActionBlock on the Matter queue, after
+ * communication with the device in question has been established, as far as we
+ * know.
+ */
+
+// TODO: ADD NS_ASSUME_NONNULL_BEGIN to this header.  When that happens, note
+// that in MTRActionBlock the two callback pointers are nonnull.
+
+typedef CHIP_ERROR (^MTRActionBlock)(chip::Messaging::ExchangeManager & exchangeManager, const chip::SessionHandle & session,
+    chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure);
+typedef CHIP_ERROR (^MTRLocalActionBlock)(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure);
 typedef void (*DefaultFailureCallbackType)(void *, CHIP_ERROR);
 
 template <class T> class MTRCallbackBridge {
 public:
-    MTRCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, T OnSuccessFn, bool keepAlive)
+    /**
+     * Run the given MTRLocalActionBlock on the Matter thread, then handle
+     * converting the value produced by the success callback to the right type
+     * so it can be passed to a callback of the type we're templated over.
+     *
+     * Does not attempt to establish any sessions to devices.  Must not be used
+     * with any action blocks that need a session.
+     */
+    MTRCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action, T OnSuccessFn, bool keepAlive)
         : mQueue(queue)
         , mHandler(handler)
         , mKeepAlive(keepAlive)
         , mSuccess(OnSuccessFn, this)
         , mFailure(OnFailureFn, this)
     {
+        LogRequestStart();
+
+        // For now keep sync dispatch here.
+        dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+            CHIP_ERROR err = action(mSuccess.Cancel(), mFailure.Cancel());
+            if (err != CHIP_NO_ERROR) {
+                NSLog(@"Failure performing action. C++-mangled success callback type: '%s', error: %s", typeid(T).name(),
+                    chip::ErrorStr(err));
+
+                // Take the normal async error-reporting codepath.  This will also
+                // handle cleaning us up properly.
+                OnFailureFn(this, err);
+            }
+        });
+    }
+
+    /**
+     * Run the given MTRActionBlock on the Matter thread, after getting a CASE
+     * session (possibly pre-existing) to the given node ID on the fabric
+     * represented by the given MTRDeviceController.  On success, convert the
+     * success value to whatever type it needs to be to call the callback type
+     * we're templated over.
+     */
+    MTRCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, T OnSuccessFn, bool keepAlive)
+        : mQueue(queue)
+        , mHandler(handler)
+        , mAction(action)
+        , mKeepAlive(keepAlive)
+        , mSuccess(OnSuccessFn, this)
+        , mFailure(OnFailureFn, this)
+    {
+        ActionWithNodeID(nodeID, controller);
+    }
+
+    /**
+     * Run the given MTRActionBlock on the Matter thread (possibly
+     * synchronously, if the MTRBaseDevice represents a PASE connection), after
+     * getting a secure session corresponding to the given MTRBaseDevice.  On
+     * success, convert the success value to whatever type it needs to be to
+     * call the callback type we're templated over.
+     */
+    MTRCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action, T OnSuccessFn,
+        bool keepAlive)
+        : mQueue(queue)
+        , mHandler(handler)
+        , mAction(action)
+        , mKeepAlive(keepAlive)
+        , mSuccess(OnSuccessFn, this)
+        , mFailure(OnFailureFn, this)
+    {
+        auto * paseDevice = [device paseDevice];
+        if (paseDevice != nullptr) {
+            ActionWithDevice(paseDevice);
+        } else {
+            ActionWithNodeID(device.nodeID, device.deviceController);
+        }
+    };
+
+    void ActionWithDevice(chip::DeviceProxy * device)
+    {
+        LogRequestStart();
+
+        // Keep doing dispatch_sync here for now, because we don't want device
+        // to become stale.
+        dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+            MaybeDoAction(device->GetExchangeManager(), device->GetSecureSession(), nil);
+        });
+    }
+
+    void ActionWithNodeID(chip::NodeId nodeID, MTRDeviceController * controller)
+    {
+        LogRequestStart();
+
+        BOOL ok = [controller getSessionForNode:nodeID
+                              completionHandler:^(chip::Messaging::ExchangeManager * exchangeManager,
+                                  const chip::Optional<chip::SessionHandle> & session, NSError * error) {
+                                  MaybeDoAction(exchangeManager, session, error);
+                              }];
+
+        if (ok == NO) {
+            OnFailureFn(this, CHIP_ERROR_INCORRECT_STATE);
+        }
+    }
+
+    void LogRequestStart()
+    {
         mRequestTime = [NSDate date];
         // Generate a unique cookie to track this operation
         mCookie = [NSString stringWithFormat:@"Response Time: %s+%u", typeid(T).name(), arc4random()];
         ChipLogDetail(Controller, "%s", mCookie.UTF8String);
-        __block CHIP_ERROR err = CHIP_NO_ERROR;
-        dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-            err = action(mSuccess.Cancel(), mFailure.Cancel());
-        });
+    }
 
-        if (CHIP_NO_ERROR != err) {
+    void MaybeDoAction(
+        chip::Messaging::ExchangeManager * exchangeManager, const chip::Optional<chip::SessionHandle> & session, NSError * error)
+    {
+        // Make sure we don't hold on to our action longer than we have to.
+        auto action = mAction;
+        mAction = nil;
+        if (error != nil) {
+            DispatchFailure(this, error);
+            return;
+        }
+
+        CHIP_ERROR err = action(*exchangeManager, session.Value(), mSuccess.Cancel(), mFailure.Cancel());
+        if (err != CHIP_NO_ERROR) {
             NSLog(@"Failure performing action. C++-mangled success callback type: '%s', error: %s", typeid(T).name(),
                 chip::ErrorStr(err));
 
             // Take the normal async error-reporting codepath.  This will also
             // handle cleaning us up properly.
-            DispatchFailure(this, [MTRError errorForCHIPErrorCode:err]);
+            OnFailureFn(this, err);
         }
-    };
+    }
 
     virtual ~MTRCallbackBridge() {};
 
@@ -95,6 +214,7 @@ private:
     }
 
     ResponseHandler mHandler;
+    MTRActionBlock mAction;
     bool mKeepAlive;
 
     chip::Callback::Callback<T> mSuccess;

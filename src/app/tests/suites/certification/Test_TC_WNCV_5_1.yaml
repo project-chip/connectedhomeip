@@ -23,7 +23,7 @@ config:
 tests:
     - label: "Check Attribute defining the cluster Features"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT reads the (65532) _FeatureMap_ attribute from T"
@@ -33,7 +33,7 @@ tests:
 
           ./chip-tool windowcovering read feature-map 1 1
 
-          Verify in TH all-clusters-app log
+          Verify in TH all-clusters-app log data type is map32
 
           [1657103226.784391][4633:4638] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_FFFC DataVersion: 383647307
           [1657103226.784460][4633:4638] CHIP:TOO:   FeatureMap: 23
@@ -41,7 +41,7 @@ tests:
 
     - label: "Check Attribute defining the product"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT reads the Type attribute from TH"
@@ -51,7 +51,7 @@ tests:
 
           ./chip-tool windowcovering read type 1 1
 
-          Verify in TH all-clusters-app log
+          Verify in TH all-clusters-app log  data type is enum8
 
           [1657103199.191382][4627:4632] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0000 DataVersion: 383647307
           [1657103199.191447][4627:4632] CHIP:TOO:   Type: 8
@@ -64,7 +64,7 @@ tests:
 
           ./chip-tool windowcovering read end-product-type 1 1
 
-          Verify in TH all-clusters-app log
+          Verify in TH all-clusters-app log  data type is enum8
 
           [1657103251.203086][4641:4646] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_000D DataVersion: 383647307
           [1657103251.203153][4641:4646] CHIP:TOO:   EndProductType: 0
@@ -72,7 +72,7 @@ tests:
 
     - label: "Check Attribute defining the working status"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT reads the Mode attribute from TH"
@@ -82,7 +82,7 @@ tests:
 
           ./chip-tool windowcovering read mode 1 1
 
-          Verify in TH all-clusters-app log
+          Verify in TH all-clusters-app log  data type is map8
 
           [1657103273.905725][4647:4652] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0017 DataVersion: 383647307
           [1657103273.905816][4647:4652] CHIP:TOO:   Mode: 0
@@ -95,7 +95,7 @@ tests:
 
           ./chip-tool windowcovering read config-status 1 1
 
-          Verify in TH all-clusters-app log
+          Verify in TH all-clusters-app log  data type is map8
 
           [1657103295.608407][4654:4659] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0007 DataVersion: 383647307
           [1657103295.608521][4654:4659] CHIP:TOO:   ConfigStatus: 27

@@ -71,6 +71,9 @@ const BL602Config::Key BL602Config::kConfigKey_RegulatoryLocation          = { "
 const BL602Config::Key BL602Config::kConfigKey_CountryCode                 = { "country-code" };
 const BL602Config::Key BL602Config::kConfigKey_UniqueId                    = { "unique-id" };
 
+const BL602Config::Key BL602Config::kCounterKey_RebootCount           = { "reboot-count" };
+const BL602Config::Key BL602Config::kCounterKey_TotalOperationalHours = { "total-hours" };
+
 CHIP_ERROR BL602Config::Init()
 {
     EfErrCode err = easyflash_init();

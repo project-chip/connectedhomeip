@@ -180,8 +180,20 @@ imx-thermostat
 imx-thermostat-release
 infineon-p6-all-clusters
 infineon-p6-all-clusters-minimal
+infineon-p6-all-clusters-minimal-ota (NOGLOB: Reduce default build variants)
+infineon-p6-all-clusters-minimal-ota-updateimage (NOGLOB: Reduce default build variants)
+infineon-p6-all-clusters-minimal-updateimage (NOGLOB: Reduce default build variants)
+infineon-p6-all-clusters-ota (NOGLOB: Reduce default build variants)
+infineon-p6-all-clusters-ota-updateimage (NOGLOB: Reduce default build variants)
+infineon-p6-all-clusters-updateimage (NOGLOB: Reduce default build variants)
 infineon-p6-light
+infineon-p6-light-ota (NOGLOB: Reduce default build variants)
+infineon-p6-light-ota-updateimage (NOGLOB: Reduce default build variants)
+infineon-p6-light-updateimage (NOGLOB: Reduce default build variants)
 infineon-p6-lock
+infineon-p6-lock-ota (NOGLOB: Reduce default build variants)
+infineon-p6-lock-ota-updateimage (NOGLOB: Reduce default build variants)
+infineon-p6-lock-updateimage (NOGLOB: Reduce default build variants)
 k32w-light-ota-se (NOGLOB: Only on demand build)
 k32w-light-release-no-ota
 k32w-lock-low-power-release (NOGLOB: Only on demand build)

@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.1.17. [TC-CADMIN-1.17] Removing Fabrics from DUT and Fabric index
-    enumeration using ECM [DUT - Commissioner]
+    4.1.17. [TC-CADMIN-1.17] Removing Fabrics from DUT and Fabric index
+    enumeration using ECM [DUT -    Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -25,7 +25,7 @@ config:
 tests:
     - label: "Reset DUT_CR1 to factory defaults"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT_CR1 starts a commissioning process with TH_CE"
@@ -91,7 +91,7 @@ tests:
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.C.C00.Tx
       verification: |
-          On your DUT controller chip tool, open commissioning window
+          On your first controller chip tool, open commissioning window
 
           Below is the example when using chip tool as controller
 
@@ -137,7 +137,7 @@ tests:
           Device commissioning completed with success
       disabled: true
 
-    - label: "TH_CR2 sends command to TH_CE to read the list of Fabrics"
+    - label: "DUT_CR1 sends command to TH_CE to read the list of Fabrics"
       PICS: OPCREDS.C.A0001
       verification: |
           On 2nd controller using chip tool, read fabrics list
@@ -173,7 +173,7 @@ tests:
           CHIP:EM: Sending Standalone Ack for MessageCounter:9143157 on exchange 1147i
       disabled: true
 
-    - label: "TH_CR2 sends RemoveFabric with FabricIndex = 2command to TH_CE"
+    - label: "DUT_CR1 sends RemoveFabric with FabricIndex = 2 command to TH_CE"
       PICS: OPCREDS.C.C0a.Tx
       verification: |
           on 2nd controller using chip tool, remove fabric with FabricIndex=2
@@ -214,7 +214,7 @@ tests:
           "DUT_CR1 sends command to TH_CE to read the list of Fabrics on TH_CE"
       PICS: OPCREDS.C.A0001
       verification: |
-          On DUT controller, read fabrics list
+          On first controller, read fabrics list
 
           Below is the command using chip tool controller
 
@@ -242,31 +242,11 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to read the list of Fabrics on TH_CE"
-      PICS: OPCREDS.C.A0001
-      verification: |
-          grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
-          + wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
-          + wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
-          = wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
-          hostname = [E45F010F27530000.local]
-          address = [fe80::e65f:1ff:fe0f:2753]
-          port = [5540]
-          txt = ["T=1" "SAI=300" "SII=5000"]
-          = wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
-          hostname = [E45F010F27530000.local]
-          address = [fe80::e65f:1ff:fe0f:2753]
-          port = [5540]
-          txt = ["T=1" "SAI=300" "SII=5000"]
-          grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$
-      disabled: true
-
-    - label:
           "DUT_CR1 sends command to TH_CE to open a commissioning window with a
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.C.C00.Tx
       verification: |
-          On DUT controller chip tool, open commissioning window
+          On first controller chip tool, open commissioning window
 
           Below is the example when using chip tool as controller
 
@@ -298,10 +278,10 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to read the list of Fabrics on TH_CE"
+          "TH_CR2 sends command to TH_CE to read the list of Fabrics on TH_CE"
       PICS: OPCREDS.C.A0001
       verification: |
-          On DUT controller, read fabrics list
+          On second controller, read fabrics list
 
           Below is the command using chip tool controller
 

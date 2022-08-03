@@ -22,10 +22,11 @@ config:
 
 tests:
     - label: "TH reads the SupportedModes attribute from the DUT"
+      PICS: MOD.S.A0002
       verification: |
           /chip-tool modeselect read supported-modes 1 1
 
-          Verify on the TH Log:
+          on TH,Verify that the DUT response provides a list of supported modes
 
 
           [1654595268.854568][14400:14405] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
@@ -61,13 +62,26 @@ tests:
           [1649677252.376252][10804:10809] CHIP:TOO:      }
       disabled: true
 
+    - label: "TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003
+      verification: |
+          ./chip-tool modeselect read current-mode 1 1
+
+          on TH,Verify that the DUT responds with the integer provided in step 2a.
+
+          [1649678800.298128][10854:10861] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
+
+          [1649678800.298279][10854:10861] CHIP:TOO:   CurrentMode: 0
+      disabled: true
+
     - label:
           "TH sends a ChangeToMode command to the DUT with a integer from the
-          list in step 1"
+          list in step 1."
+      PICS: MOD.S.C00.Rsp
       verification: |
           ./chip-tool modeselect change-to-mode 4 1 1
 
-          Verify on the TH Log:
+          on TH,Verify that the DUT response with a successful (value 0x00) status response
 
 
           [1649677293.280207][10810:10815] CHIP:DMG:                                 StatusIB =
@@ -77,10 +91,11 @@ tests:
       disabled: true
 
     - label: "TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify on the TH Log:
+          on TH,Verify that the DUT responds with the integer provided in step 2a.
 
           [1649678800.298128][10854:10861] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
 
@@ -89,11 +104,12 @@ tests:
 
     - label:
           "TH sends a Change to Mode command to the DUT with a integer that is
-          not in the list in step 1"
+          not in the list in step 1."
+      PICS: MOD.S.C00.Rsp
       verification: |
           ./chip-tool modeselect change-to-mode 2 1 1
 
-          Verify on the TH Log:
+          on TH,Verify DUT responds with a INVALID_COMMAND (hex value 0x85/decimal 133)
 
           CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x85
           CHIP:TOO: Error: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)

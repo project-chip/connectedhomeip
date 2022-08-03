@@ -155,6 +155,16 @@ tests:
               contains: [55, 56, 57]
 
     - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label:
+          "Read Feature dependent(TSTAT.S.F03(SCH)) commands in
+          AcceptedCommandList"
       PICS: TSTAT.S.F03
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -162,15 +172,6 @@ tests:
           constraints:
               type: list
               contains: [0, 1, 2, 3]
-
-    - label: "Read the global attribute: AcceptedCommandList"
-      PICS: " !TSTAT.S.F03 "
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          constraints:
-              type: list
-              contains: [0]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"

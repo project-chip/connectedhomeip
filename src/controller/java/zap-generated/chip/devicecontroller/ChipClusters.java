@@ -9651,7 +9651,15 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface AdminFabricIndexAttributeCallback {
-      void onSuccess(Integer value);
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface AdminVendorIdAttributeCallback {
+      void onSuccess(@Nullable Integer value);
 
       void onError(Exception ex);
 
@@ -9700,12 +9708,12 @@ public class ChipClusters {
       subscribeAdminFabricIndexAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readAdminVendorIdAttribute(IntegerAttributeCallback callback) {
+    public void readAdminVendorIdAttribute(AdminVendorIdAttributeCallback callback) {
       readAdminVendorIdAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeAdminVendorIdAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        AdminVendorIdAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeAdminVendorIdAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -9770,10 +9778,13 @@ public class ChipClusters {
         int maxInterval);
 
     private native void readAdminVendorIdAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, AdminVendorIdAttributeCallback callback);
 
     private native void subscribeAdminVendorIdAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        AdminVendorIdAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);

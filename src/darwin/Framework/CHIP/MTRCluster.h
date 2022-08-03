@@ -17,6 +17,10 @@
 
 #import <Foundation/Foundation.h>
 
+typedef void (^ResponseHandler)(id _Nullable value, NSError * _Nullable error);
+typedef void (^StatusCompletion)(NSError * _Nullable error);
+typedef void (^SubscriptionEstablishedHandler)(void);
+
 @class MTRBaseDevice;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -36,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
  *    If not provided (i.e. nil passed for the CHIPWriteParams argument), will be
  *    treated as if a default-initialized object was passed in.
  */
-@interface MTRWriteParams : NSObject
+@interface MTRWriteParams : NSObject <NSCopying>
 
 /**
  * Controls whether the write is a timed write.
@@ -65,6 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * dataVersion;
 
 - (instancetype)init;
+- (id)copyWithZone:(nullable NSZone *)zone;
 
 @end
 
@@ -74,7 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
  *    If not provided (i.e. nil passed for the MTRReadParams argument), will be
  *    treated as if a default-initialized object was passed in.
  */
-@interface MTRReadParams : NSObject
+@interface MTRReadParams : NSObject <NSCopying>
 
 /**
  * Whether the read/subscribe is fabric-filtered. nil (the default value) is
@@ -89,6 +94,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * fabricFiltered;
 
 - (instancetype)init;
+- (id)copyWithZone:(nullable NSZone *)zone;
 
 @end
 
@@ -126,6 +132,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * autoResubscribe;
 
 - (instancetype)init;
+- (id)copyWithZone:(nullable NSZone *)zone;
 
 @end
 
