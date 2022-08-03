@@ -438,9 +438,7 @@ private:
             // Remove access control entries in reverse order (it could be any order, but reverse order
             // will cause less churn in persistent storage).
 
-            // TODO(#19898): The fabric removal not trigger ACL cluster updates
             // TODO(#19899): The fabric removal not remove ACL extensions
-
             CHIP_ERROR aclErr = Access::GetAccessControl().DeleteAllEntriesForFabric(fabricIndex);
             if (aclErr != CHIP_NO_ERROR)
             {
