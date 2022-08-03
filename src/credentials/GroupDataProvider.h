@@ -318,9 +318,6 @@ public:
     // Key Sets
     //
 
-    static CHIP_ERROR DeriveOperationalKey(const ByteSpan & epoch_key, const ByteSpan & compressed_fabric_id,
-                                           OperationalKey & operational_credentials);
-
     virtual CHIP_ERROR SetKeySet(FabricIndex fabric_index, const ByteSpan & compressed_fabric_id, const KeySet & keys) = 0;
     virtual CHIP_ERROR GetKeySet(FabricIndex fabric_index, KeysetId keyset_id, KeySet & keys)                          = 0;
     virtual CHIP_ERROR RemoveKeySet(FabricIndex fabric_index, KeysetId keyset_id)                                      = 0;
