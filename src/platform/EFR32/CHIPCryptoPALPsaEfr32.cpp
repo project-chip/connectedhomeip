@@ -894,84 +894,8 @@ P256Keypair::~P256Keypair()
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
-#if defined(MBEDTLS_X509_CSR_WRITE_C)
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
-    size_t out_length;
-    psa_status_t status                       = PSA_ERROR_BAD_STATE;
-    mbedtls_svc_key_id_t key_id               = 0;
-    psa_key_attributes_t attr                 = PSA_KEY_ATTRIBUTES_INIT;
-    const psa_plaintext_ecp_keypair * keypair = to_const_keypair(&mKeypair);
-
-    mbedtls_x509write_csr csr;
-    mbedtls_x509write_csr_init(&csr);
-
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
-
-    // Step 1: import plaintext key from context into PSA
-    psa_crypto_init();
-
-    psa_set_key_type(&attr, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
-    psa_set_key_bits(&attr, keypair->bitlen);
-    psa_set_key_algorithm(&attr, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
-    psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_SIGN_HASH);
-
-    status = psa_import_key(&attr, keypair->privkey, PSA_BITS_TO_BYTES(keypair->bitlen), &key_id);
-
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-
-    // Step 2: Use PSA key to generate CSR
-    mbedtls_pk_context pk;
-    mbedtls_pk_init(&pk);
-    result = mbedtls_pk_setup_opaque(&pk, key_id);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(pk.CHIP_CRYPTO_PAL_PRIVATE(pk_info) != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    mbedtls_x509write_csr_set_key(&csr, &pk);
-
-    mbedtls_x509write_csr_set_md_alg(&csr, MBEDTLS_MD_SHA256);
-
-    // TODO: mbedTLS CSR parser fails if the subject name is not set (or if empty).
-    //       CHIP Spec doesn't specify the subject name that can be used.
-    //       Figure out the correct value and update this code.
-    result = mbedtls_x509write_csr_set_subject_name(&csr, "O=CSR");
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_x509write_csr_der(&csr, out_csr, csr_length, CryptoRNG, nullptr);
-    VerifyOrExit(result > 0, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<size_t>(result), error = CHIP_ERROR_INTERNAL);
-
-    out_length = static_cast<size_t>(result);
-    result     = 0;
-    VerifyOrExit(out_length <= csr_length, error = CHIP_ERROR_INTERNAL);
-
-    if (csr_length != out_length)
-    {
-        // mbedTLS API writes the CSR at the end of the provided buffer.
-        // Let's move it to the start of the buffer.
-        size_t offset = csr_length - out_length;
-        memmove(out_csr, &out_csr[offset], out_length);
-    }
-
-    csr_length = out_length;
-
-exit:
-    mbedtls_x509write_csr_free(&csr);
-
-    // destroy imported key
-    psa_reset_key_attributes(&attr);
-    if (key_id != 0)
-    {
-        psa_destroy_key(key_id);
-    }
-
-    _log_mbedTLS_error(result);
-    _log_PSA_error(status);
-    return error;
-#else
-    ChipLogError(Crypto, "MBEDTLS_X509_CSR_WRITE_C is not enabled. CSR cannot be created");
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
+    MutableByteSpan csr(out_csr, csr_length);
+    return GenerateCertificateSigningRequest(this, csr);
 }
 
 CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_length, P256PublicKey & pubkey)
