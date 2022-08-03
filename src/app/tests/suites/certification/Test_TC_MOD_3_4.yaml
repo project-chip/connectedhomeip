@@ -15,6 +15,11 @@
 
 name: 80.3.4. [TC-MOD-3.4] OnMode Overwriting StartUpMode (DUT as Server)
 
+PICS:
+    - MOD.S.A0004
+    - MOD.S.A0005
+    - OO.S.A4003
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -55,7 +60,7 @@ tests:
           If the StartUpMode and OnMode attributes have the same value, proceed to step 2c,  Otherwise proceed to step 3.
       disabled: true
 
-    - label: "TH reads the _SupportedModes attribute_ from the DUT"
+    - label: "TH reads the SupportedModes attribute from the DUT"
       PICS: MOD.S.A0002
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
@@ -95,8 +100,8 @@ tests:
 
     - label:
           "Select a value from the list in step 2c with a different value than
-          the _StartUpMode_ value read in step 1. TH sends a write command for
-          _OnMode_ to the DUT with the selected value."
+          the StartUpMode value read in step 1. TH sends a write command for
+          OnMode to the DUT with the selected value."
       PICS: MOD.S.A0002 && MOD.S.C00.Rsp
       verification: |
           ./chip-tool modeselect write on-mode 7 1 1
@@ -129,7 +134,7 @@ tests:
           [1651099941887] [84269:7567211] CHIP: [DMG] }
       disabled: true
 
-    - label: "TH reads the _OnMode attribute_ from the DUT"
+    - label: "TH reads the OnMode attribute from the DUT"
       PICS: MOD.S.F00 && MOD.S.A0005
       verification: |
           ./chip-tool modeselect read on-mode 1 1
@@ -141,8 +146,7 @@ tests:
       disabled: true
 
     - label:
-          "TH writes 1 to _StartUpOnOff attribute_ of the OnOff Cluster of the
-          DUT"
+          "TH writes 1 to StartUpOnOff attribute of the OnOff Cluster of the DUT"
       PICS: OO.S.A4003
       verification: |
           ./chip-tool onoff write start-up-on-off 1 1 1

@@ -15,6 +15,9 @@
 
 name: 3.1.2. [TC-BR-2] Changing the set of Bridged Devices
 
+PICS:
+    - MCORE.BRIDGE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -836,6 +839,85 @@ tests:
       PICS: MCORE.BRIDGE
       verification: |
           Verify step 6 and 7 of TC-BR-1 for bridged device added in step 2 of TC-BR-2
+
+          For actuator follow below steps:
+          1) Choose on-off cluster as the bridged devices which is an actuator
+          2) ./chip-tool onoff read on-off 1 3
+          Verify the actual state of the bridged device in TH Log
+          [1657004454.213279][4792:4798] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3808303315
+          [1657004454.213319][4792:4798] CHIP:TOO:   OnOff: FALSE
+
+          3) ./chip-tool onoff toggle 1 3
+          Verify On bridge-app
+          [1657522278.538831][18140:18140] CHIP:DMG: Received command for Endpoint=3 Cluster=0x0000_0006 Command=0x0000_0002
+          [1657522278.538861][18140:18140] CHIP:ZCL: On/Off set value: 3 2
+          [1657522278.538887][18140:18140] CHIP:DL: HandleReadOnOffAttribute: attrId=0, maxReadLength=1
+          [1657522278.538910][18140:18140] CHIP:ZCL: Toggle on/off from 0 to 1
+          [1657522278.538936][18140:18140] CHIP:DL: HandleWriteOnOffAttribute: attrId=0
+          [1657522278.538957][18140:18140] CHIP:DL: Device[Light 1]: ON
+
+          Verify actual state of the bridged device changes accordingly in TH Log
+          [1657522278.539407][16698:16703] CHIP:DMG: {
+          [1657522278.539447][16698:16703] CHIP:DMG:         suppressResponse = false,
+          [1657522278.539495][16698:16703] CHIP:DMG:         InvokeResponseIBs =
+          [1657522278.539545][16698:16703] CHIP:DMG:         [
+          [1657522278.539585][16698:16703] CHIP:DMG:                 InvokeResponseIB =
+          [1657522278.539641][16698:16703] CHIP:DMG:                 {
+          [1657522278.539688][16698:16703] CHIP:DMG:                         CommandStatusIB =
+          [1657522278.539746][16698:16703] CHIP:DMG:                         {
+          [1657522278.539795][16698:16703] CHIP:DMG:                                 CommandPathIB =
+          [1657522278.539856][16698:16703] CHIP:DMG:                                 {
+          [1657522278.539912][16698:16703] CHIP:DMG:                                         EndpointId = 0x3,
+          [1657522278.539977][16698:16703] CHIP:DMG:                                         ClusterId = 0x6,
+          [1657522278.540039][16698:16703] CHIP:DMG:                                         CommandId = 0x2,
+          [1657522278.540097][16698:16703] CHIP:DMG:                                 },
+          [1657522278.540162][16698:16703] CHIP:DMG:
+          [1657522278.540214][16698:16703] CHIP:DMG:                                 StatusIB =
+          [1657522278.540276][16698:16703] CHIP:DMG:                                 {
+          [1657522278.540332][16698:16703] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1657522278.540386][16698:16703] CHIP:DMG:                                 },
+          [1657522278.540446][16698:16703] CHIP:DMG:
+          [1657522278.540499][16698:16703] CHIP:DMG:                         },
+          [1657522278.540560][16698:16703] CHIP:DMG:
+          [1657522278.540605][16698:16703] CHIP:DMG:                 },
+          [1657522278.540658][16698:16703] CHIP:DMG:
+          [1657522278.540696][16698:16703] CHIP:DMG:         ],
+          [1657522278.540744][16698:16703] CHIP:DMG:
+          [1657522278.540783][16698:16703] CHIP:DMG:         InteractionModelRevision = 1
+          [1657522278.540825][16698:16703] CHIP:DMG: },
+          [1657522278.540916][16698:16703] CHIP:DMG: Received Command Response Status for Endpoint=3 Cluster=0x0000_0006 Command=0x0000_0002 Status=0x0
+          [1657522278.540981][16698:16703] CHIP:DMG: ICR moving to [AwaitingDe]
+
+          4)./chip-tool onoff read on-off 1 3
+          Verify the value of onoff matches the value of onoff in step 6c in TH Log
+          [1657004565.254591][4804:4809] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3808303316
+          [1657004565.254635][4804:4809] CHIP:TOO:   OnOff: TRUE
+
+
+
+
+
+
+          For sensor follow below steps:
+          1) Choose a sensor device (e.g. temperature sensor, being added to bridge-app)
+          2) ./chip-tool temperaturemeasurement read measured-value 1 4
+          [1659351487.005743][12201:12207] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0402 Attribute 0x0000_0000 DataVersion: 2406690152
+          [1659351487.005831][12201:12207] CHIP:TOO:   MeasuredValue: 100
+          [1659351487.005924][12201:12207] CHIP:EM: Sending Standalone Ack for MessageCounter:236763897 on exchange 8128i
+
+          3) Press a key "tbd" on bridge-app to change the simulated temperature
+          [1659351537.115828][14237:14242] CHIP:DL: TempSensorDevice[TempSensor 1]: New measurement=""200""
+          [1659351537.115987][14237:14242] CHIP:DL: TempSensorDevice[TempSensor 2]: New measurement=""200""
+          [1659351537.116097][14237:14242] CHIP:DL: TempSensorDevice[Composed TempSensor 1]: New measurement=""200""
+          [1659351537.116158][14237:14237] CHIP:DMG: Endpoint 4, Cluster 0x0000_0402 update version to 8f732d69
+          [1659351537.116300][14237:14237] CHIP:DMG: Endpoint 5, Cluster 0x0000_0402 update version to 36be37c5
+          [1659351537.116393][14237:14237] CHIP:DMG: Endpoint 7, Cluster 0x0000_0402 update version to 2cf2064d
+          [1659351537.116179][14237:14242] CHIP:DL: TempSensorDevice[Composed TempSensor 2]: New measurement=""200""
+
+          4)./chip-tool temperaturemeasurement read measured-value 1 4
+          [1659351542.393349][12212:12217] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0402 Attribute 0x0000_0000 DataVersion: 2406690153
+          [1659351542.393429][12212:12217] CHIP:TOO:   MeasuredValue: 200
+          [1659351542.393552][12212:12217] CHIP:EM: Sending Standalone Ack for MessageCounter:120981971 on exchange 25924i
       disabled: true
 
     - label:

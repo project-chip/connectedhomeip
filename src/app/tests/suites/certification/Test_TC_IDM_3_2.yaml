@@ -15,6 +15,9 @@
 
 name: 3.3.2. [TC-IDM-3.2] Write Response Action from DUT to TH. [{DUT_Server}]
 
+PICS:
+    - MCORE.IDM.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -75,8 +78,9 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] TH sends the WriteRequestMessage to the DUT to write an
-          attribute of data type bool."
+          "TH sends the WriteRequestMessage to the DUT to write an attribute of
+          data type bool. +"
+      PICS: MCORE.IDM.S.Attribute_W.DataType_Bool
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
@@ -119,8 +123,9 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] TH sends the WriteRequestMessage to the DUT to write an
-          attribute of data type string."
+          "TH sends the WriteRequestMessage to the DUT to write an attribute of
+          data type string. +"
+      PICS: MCORE.IDM.S.Attribute_W.DataType_String
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
@@ -163,8 +168,9 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] TH sends the WriteRequestMessage to the DUT to write an
-          attribute of data type unsigned integer."
+          "TH sends the WriteRequestMessage to the DUT to write an attribute of
+          data type unsigned integer. +"
+      PICS: MCORE.IDM.S.Attribute_W.DataType_UnsignedInteger
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
@@ -207,43 +213,49 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] TH sends the WriteRequestMessage to the DUT to write an
-          attribute of data type signed integer."
+          "TH sends the WriteRequestMessage to the DUT to write an attribute of
+          data type signed integer. +"
+      PICS: MCORE.IDM.S.Attribute_W.DataType_SignedInteger
       verification: |
           DUT implementation required to verify write an attribute of data type signed integer.
       disabled: true
 
     - label:
-          "[Optional] TH sends the WriteRequestMessage to the DUT to write an
-          attribute of data type floating point."
+          "TH sends the WriteRequestMessage to the DUT to write an attribute of
+          data type floating point. +"
+      PICS: MCORE.IDM.S.Attribute_W.DataType_FloatingPoint
       verification: |
           DUT implementation required to verify write an attribute of data type float
       disabled: true
 
     - label:
-          "[Optional] TH sends the WriteRequestMessage to the DUT to write an
-          attribute of data type Octet String."
+          "TH sends the WriteRequestMessage to the DUT to write an attribute of
+          data type Octet String. +"
+      PICS: MCORE.IDM.S.Attribute_W.DataType_OctetString
       verification: |
           DUT implementation required to verify write an attribute of data type Octet String
       disabled: true
 
     - label:
-          "[Optional] TH sends the WriteRequestMessage to the DUT to write an
-          attribute of data type Struct."
+          "TH sends the WriteRequestMessage to the DUT to write an attribute of
+          data type Struct. +"
+      PICS: MCORE.IDM.S.Attribute_W.DataType_Struct
       verification: |
           DUT implementation required to verify write an attribute ofdata type Struct
       disabled: true
 
     - label:
-          "[Optional] TH sends the WriteRequestMessage to the DUT to write an
-          attribute of data type List."
+          "TH sends the WriteRequestMessage to the DUT to write an attribute of
+          data type List. +"
+      PICS: MCORE.IDM.S.Attribute_W.DataType_List
       verification: |
           DUT implementation required to verify write an attribute of  data type List
       disabled: true
 
     - label:
-          "[Optional] TH sends the WriteRequestMessage to the DUT to write an
-          attribute of data type enum."
+          "TH sends the WriteRequestMessage to the DUT to write an attribute of
+          data type enum. +"
+      PICS: MCORE.IDM.S.Attribute_W.DataType_Enum
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
@@ -286,8 +298,9 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] TH sends the WriteRequestMessage to the DUT to write an
-          attribute of data type bitmap."
+          "TH sends the WriteRequestMessage to the DUT to write an attribute of
+          data type bitmap. +"
+      PICS: MCORE.IDM.S.Attribute_W.DataType_Bitmap
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
@@ -496,43 +509,68 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
+
           To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
-          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
+          Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except identify cluster command if try to send any other command will get status as unsupported access.
 
-           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]" 1 0
+          [1659419722.669629][1915:1920] CHIP:DMG: WriteResponseMessage =
+          [1659419722.669657][1915:1920] CHIP:DMG: {
+          [1659419722.669687][1915:1920] CHIP:DMG:         AttributeStatusIBs =
+          [1659419722.669727][1915:1920] CHIP:DMG:         [
+          [1659419722.669758][1915:1920] CHIP:DMG:                 AttributeStatusIB =
+          [1659419722.669796][1915:1920] CHIP:DMG:                 {
+          [1659419722.669833][1915:1920] CHIP:DMG:                         AttributePathIB =
+          [1659419722.669871][1915:1920] CHIP:DMG:                         {
+          [1659419722.669912][1915:1920] CHIP:DMG:                                 Endpoint = 0x0,
+          [1659419722.669953][1915:1920] CHIP:DMG:                                 Cluster = 0x1f,
+          [1659419722.669993][1915:1920] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1659419722.670034][1915:1920] CHIP:DMG:                         }
+          [1659419722.670077][1915:1920] CHIP:DMG:
+          [1659419722.670114][1915:1920] CHIP:DMG:                         StatusIB =
+          [1659419722.670153][1915:1920] CHIP:DMG:                         {
+          [1659419722.670191][1915:1920] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1659419722.670229][1915:1920] CHIP:DMG:                         },
+          [1659419722.670266][1915:1920] CHIP:DMG:
+          [1659419722.670300][1915:1920] CHIP:DMG:                 },
+          [1659419722.670343][1915:1920] CHIP:DMG:
+          [1659419722.670373][1915:1920] CHIP:DMG:                 AttributeStatusIB =
+          [1659419722.670405][1915:1920] CHIP:DMG:                 {
+          [1659419722.670436][1915:1920] CHIP:DMG:                         AttributePathIB =
+          [1659419722.670471][1915:1920] CHIP:DMG:                         {
+          [1659419722.670510][1915:1920] CHIP:DMG:                                 Endpoint = 0x0,
+          [1659419722.670550][1915:1920] CHIP:DMG:                                 Cluster = 0x1f,
+          [1659419722.670590][1915:1920] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1659419722.670661][1915:1920] CHIP:DMG:                                 ListIndex = Null,
+          [1659419722.670700][1915:1920] CHIP:DMG:                         }
+          [1659419722.670740][1915:1920] CHIP:DMG:
+          [1659419722.670776][1915:1920] CHIP:DMG:                         StatusIB =
+          [1659419722.670813][1915:1920] CHIP:DMG:                         {
+          [1659419722.670851][1915:1920] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1659419722.670888][1915:1920] CHIP:DMG:                         },
+          [1659419722.670925][1915:1920] CHIP:DMG:
+          [1659419722.670958][1915:1920] CHIP:DMG:                 },
+          [1659419722.670994][1915:1920] CHIP:DMG:
+          [1659419722.671022][1915:1920] CHIP:DMG:         ],
+          [1659419722.671062][1915:1920] CHIP:DMG:
+          [1659419722.671092][1915:1920] CHIP:DMG:         InteractionModelRevision = 1
+          [1659419722.671120][1915:1920] CHIP:DMG: }
+          [1659419722.671244][1915:1920] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1659419722.671314][1915:1920] CHIP:EM: Sending Standalone Ack for MessageCounter:153124628 on
 
-          sudo ./chip-tool thermostatuserinterfaceconfiguration write temperature-display-mode 2 1 1
 
-          verify DUT is responsds with UNSUPPORTED_ACCESS  for the data sent in the above command
 
-          [1650552778.852950][17227:17232] CHIP:DMG: WriteResponseMessage =
-          [1650552778.852981][17227:17232] CHIP:DMG: {
-          [1650552778.853009][17227:17232] CHIP:DMG:         AttributeStatusIBs =
-          [1650552778.853058][17227:17232] CHIP:DMG:         [
-          [1650552778.853089][17227:17232] CHIP:DMG:                 AttributeStatusIB =
-          [1650552778.853127][17227:17232] CHIP:DMG:                 {
-          [1650552778.853162][17227:17232] CHIP:DMG:                         AttributePathIB =
-          [1650552778.853203][17227:17232] CHIP:DMG:                         {
-          [1650552778.853241][17227:17232] CHIP:DMG:                                 Endpoint = 0x1,
-          [1650552778.853282][17227:17232] CHIP:DMG:                                 Cluster = 0x204,
-          [1650552778.853324][17227:17232] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1650552778.853366][17227:17232] CHIP:DMG:                         }
-          [1650552778.853413][17227:17232] CHIP:DMG:
-          [1650552778.853454][17227:17232] CHIP:DMG:                         StatusIB =
-          [1650552778.853490][17227:17232] CHIP:DMG:                         {
-          [1650552778.853531][17227:17232] CHIP:DMG:                                 status = 0x7e (UNSUPPORTED_ACCESS),
-          [1650552778.853566][17227:17232] CHIP:DMG:                         },
-          [1650552778.853608][17227:17232] CHIP:DMG:
-          [1650552778.853642][17227:17232] CHIP:DMG:                 },
-          [1650552778.853680][17227:17232] CHIP:DMG:
-          [1650552778.853712][17227:17232] CHIP:DMG:         ],
-          [1650552778.853751][17227:17232] CHIP:DMG:
-          [1650552778.853780][17227:17232] CHIP:DMG:         InteractionModelRevision = 1
-          [1650552778.853813][17227:17232] CHIP:DMG: }
-          [1650552778.853890][17227:17232] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1650552778.853935][17227:17232] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          ./chip-tool thermostatuserinterfaceconfiguration write temperature-display-mode 2 1 1
+          On TH, verify DUT  responsds as UNSUPPORTED_ACCESS  for the data sent in the above command
+          [1659422521.638063][2076:2081] CHIP:DMG: }
+          [1659422521.638147][2076:2081] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1659422521.638185][2076:2081] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1659422521.638246][2076:2081] CHIP:EM: Sending Standalone Ack for MessageCounter:223304501 on exchange 20701i
 
-          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
+
+          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to  send below mentioned command to Grant access to all clusters again.
+
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode":2, "subjects":[112233], "targets":null}]" 1 0
       disabled: true
 
     - label:
@@ -612,28 +650,28 @@ tests:
 
     - label:
           "TH sends the WriteRequestMessage to the DUT to modify the value of
-          one attribute on a given cluster and endpoint to null."
+          one attribute on a given cluster and endpoint to null. +"
       verification: |
           Out of Scope for V1.0
       disabled: true
 
     - label:
           "TH sends the WriteRequestMessage to the DUT to append an attribute
-          value"
+          value +"
       verification: |
           Out of Scope for V1.0
       disabled: true
 
     - label:
           "TH sends the WriteRequestMessage to the DUT to delete an attribute
-          value"
+          value +"
       verification: |
           Out of Scope for V1.0
       disabled: true
 
     - label:
           "TH sends the WriteRequestMessage to the DUT to modify the value of
-          one attribute and Set SuppressResponse to True."
+          one attribute and Set SuppressResponse to True. +"
       verification: |
           Out of Scope for V1.0
       disabled: true
@@ -643,7 +681,8 @@ tests:
           any cluster. DUT returns with a report data action with the attribute
           values and the dataversion of the cluster. TH sends a
           WriteRequestMessage to the DUT to modify the value of one attribute
-          with the DataVersion field set to the one received in the prior step."
+          with the DataVersion field set to the one received in the prior step.
+          +"
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 

@@ -15,6 +15,9 @@
 
 name: 3.3.5. [TC-DD-3.5] Commissioning Flow - Concurrent [DUT - Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -137,7 +140,7 @@ tests:
     - label:
           "Commissioner SHALL configure regulatory information in the
           Commissionee."
-      PICS: MCORE.DD.WIRELESS
+      PICS: MCORE.COM.WIRELESS
       verification: |
           Verify in DUT as client side
           Performing next commissioning step "ConfigRegulatory"
