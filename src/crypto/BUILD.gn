@@ -107,14 +107,12 @@ if (chip_crypto == "openssl") {
 
   source_set("cryptopal_mbedtls") {
     sources = [ "CHIPCryptoPALmbedTLS.cpp" ]
+    public_deps = [ ":public_headers" ]
 
     external_mbedtls = current_os == "zephyr"
 
     if (!external_mbedtls) {
-      public_deps = [
-        "${mbedtls_root}:mbedtls",
-        ":public_headers",
-      ]
+      public_deps += [ "${mbedtls_root}:mbedtls" ]
     }
   }
 } else if (chip_crypto == "tinycrypt") {
