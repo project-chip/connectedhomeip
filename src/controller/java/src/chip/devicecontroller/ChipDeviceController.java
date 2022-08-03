@@ -744,7 +744,13 @@ public class ChipDeviceController {
         byte[] pai);
   }
 
-  /** Interface to listen for scn networks callbacks from CHIPDeviceController. */
+  /** 
+   * Interface to listen for scan networks callbacks from CHIPDeviceController. 
+   * 
+   * Set the AttemptNetworkScanWiFi or AttemptNetworkScanThread to configure the 
+   * enable/disable WiFi or Thread network scan during commissioning in the the default CommissioningDelegate
+   * used by the ChipDeviceCommissioner.
+   */
   public interface ScanNetworksListener {
     /** Notifies when scan networks call fails. */
     void onScanNetworksFailure(int errorCode);

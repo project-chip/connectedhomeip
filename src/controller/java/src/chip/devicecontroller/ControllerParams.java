@@ -152,6 +152,9 @@ public final class ControllerParams {
      * Specifically, this sets AttemptWiFiNetworkScan in the CommissioningParameters passed to the 
      * CommissioningDelegate.
      * 
+     * When a WiFi scan is attempted, the result will be propagated to the ScanNetworksListener assigned
+     * to the ChipDeviceController.
+     * 
      * @param attemptNetworkScanWiFi
      * @return
      */
@@ -166,6 +169,9 @@ public final class ControllerParams {
      * 
      * Specifically, this sets AttemptThreadNetworkScan in the CommissioningParameters passed to the 
      * CommissioningDelegate.
+     * 
+     * When a Thread scan is attempted, the result will be propagated to the ScanNetworksListener assigned
+     * to the ChipDeviceController.
      * 
      * @param attemptNetworkScanWiFi
      * @return
