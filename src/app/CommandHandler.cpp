@@ -186,7 +186,7 @@ void CommandHandler::DecrementHoldOff()
         return;
     }
 
-    if (!mExchangeCtx->IsGroupExchangeContext() && !mSentStatusResponse)
+    if (mExchangeCtx.Get() != nullptr && !mExchangeCtx->IsGroupExchangeContext() && !mSentStatusResponse)
     {
         CHIP_ERROR err = SendCommandResponse();
         if (err != CHIP_NO_ERROR)
