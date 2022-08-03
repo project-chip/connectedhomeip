@@ -1422,9 +1422,9 @@ server cluster Thermostat = 513 {
   attribute access(write: manage) int8s minSetpointDeadBand = 25;
   attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
   attribute access(write: manage) enum8 systemMode = 28;
-  readonly attribute enum8 startOfWeek = 32;
-  readonly attribute int8u numberOfWeeklyTransitions = 33;
-  readonly attribute int8u numberOfDailyTransitions = 34;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -1433,29 +1433,7 @@ server cluster Thermostat = 513 {
     INT8S amount = 1;
   }
 
-  request struct SetWeeklyScheduleRequest {
-    INT8U numberOfTransitionsForSequence = 0;
-    DayOfWeek dayOfWeekForSequence = 1;
-    ModeForSequence modeForSequence = 2;
-    ThermostatScheduleTransition transitions[] = 3;
-  }
-
-  request struct GetWeeklyScheduleRequest {
-    DayOfWeek daysToReturn = 0;
-    ModeForSequence modeToReturn = 1;
-  }
-
-  response struct GetWeeklyScheduleResponse = 0 {
-    INT8U numberOfTransitionsForSequence = 0;
-    DayOfWeek dayOfWeekForSequence = 1;
-    ModeForSequence modeForSequence = 2;
-    ThermostatScheduleTransition transitions[] = 3;
-  }
-
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
-  command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
-  command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
-  command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
 }
 
 endpoint 0 {
@@ -1805,10 +1783,10 @@ endpoint 1 {
     ram      attribute minSetpointDeadBand default = 0x19;
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;
-    ram      attribute startOfWeek;
-    ram      attribute numberOfWeeklyTransitions default = 7;
-    ram      attribute numberOfDailyTransitions default = 4;
-    ram      attribute featureMap default = 0x000b;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x23;
     ram      attribute clusterRevision default = 5;
   }
 }
