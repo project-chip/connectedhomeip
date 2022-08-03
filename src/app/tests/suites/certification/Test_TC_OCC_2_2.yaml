@@ -20,8 +20,8 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Occupancy Sensing"
+    endpoint: 1
 
 tests:
     - label: "Commission DUT to TH"
