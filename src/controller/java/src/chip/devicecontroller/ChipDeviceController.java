@@ -197,19 +197,26 @@ public class ChipDeviceController {
   }
 
   /**
+   * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded
+   * will be called when the NOC CSR needs to be signed. This allows for custom credentials
+   * issuer implementations, for example, when a proprietary cloud API will perform the
+   * CSR signing.
    * 
-   * The following fields on the ControllerParams object must be populated:
-   * - ipk
-   * - rootCertificate
-   * - intermediateCertificate
-   * - operationalCertificate
-   * - adminSubject
+   * The commissioning workflow will stop upon the onNOCChainGenerationNeeded callback
+   * and resume once onNOCChainGeneration is called.
+   * 
+   * The following fields on the ControllerParams object MUST be populated:
+   * rootCertificate, intermediateCertificate, operationalCertificate
+   * 
+   * If ipk and adminSubject are set on the ControllerParams object, then they will be used
+   * in the AddNOC command set to the commissionee. If they are not populated, then the values
+   * provided in the ChipDeviceController initialization will be used.
    * 
    * @param params
-   * @return
+   * @return CHIP_ERROR error code (0 is no error)
    */
-  public int setNOCChain(ControllerParams params) {
-    return setNOCChain(deviceControllerPtr, params);
+  public int onNOCChainGeneration(ControllerParams params) {
+    return onNOCChainGeneration(deviceControllerPtr, params);
   }
 
 
@@ -685,7 +692,7 @@ public class ChipDeviceController {
   private native void updateCommissioningNetworkCredentials(
       long deviceControllerPtr, NetworkCredentials networkCredentials);
 
-  private native int setNOCChain(long deviceControllerPtr, ControllerParams params);
+  private native int onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
   private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
 
@@ -708,15 +715,22 @@ public class ChipDeviceController {
   /** Interface to implement custom operational credentials issuer (NOC chain generation). */
   public interface NOCChainIssuer {
     /** 
-     * Notifies when operational cert generation is needed. 
+     * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded
+     * will be called when the NOC CSR needs to be signed. This allows for custom credentials
+     * issuer implementations, for example, when a proprietary cloud API will perform the
+     * CSR signing.
      * 
-     * Once generated, implementor should populate the following fields on the ControllerParams object
-     * and call setNOCChain():
-     * - ipk
-     * - rootCertificate
-     * - intermediateCertificate
-     * - operationalCertificate
-     * - adminSubject
+     * The commissioning workflow will stop upon the onNOCChainGenerationNeeded callback
+     * and resume once onNOCChainGeneration is called.
+     * 
+     * The following fields on the ControllerParams object passed to onNOCChainGeneration
+     * MUST be populated: rootCertificate, intermediateCertificate, operationalCertificate
+     * 
+     * If ipk and adminSubject are set on the ControllerParams object, then they will be used
+     * in the AddNOC command set to the commissionee. If they are not populated, then the values
+     * provided in the ChipDeviceController initialization will be used.
+     * 
+     * All csr and attestation fields are provided to allow for custom attestestation checks.
      */
     void onNOCChainGenerationNeeded(
         byte[] csrElements, 
