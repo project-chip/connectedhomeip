@@ -1842,7 +1842,7 @@ void GroupDataProviderImpl::GroupKeyContext::Release()
     mProvider.mGroupKeyContexPool.ReleaseObject(this);
 }
 
-CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::EncryptMessage(const ByteSpan & plaintext, const ByteSpan & aad,
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::MessageEncrypt(const ByteSpan & plaintext, const ByteSpan & aad,
                                                                   const ByteSpan & nonce, MutableByteSpan & mic,
                                                                   MutableByteSpan & ciphertext) const
 {
@@ -1851,7 +1851,7 @@ CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::EncryptMessage(const ByteSpan
                                    Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output, mic.data(), mic.size());
 }
 
-CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::DecryptMessage(const ByteSpan & ciphertext, const ByteSpan & aad,
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::MessageDecrypt(const ByteSpan & ciphertext, const ByteSpan & aad,
                                                                   const ByteSpan & nonce, const ByteSpan & mic,
                                                                   MutableByteSpan & plaintext) const
 {
