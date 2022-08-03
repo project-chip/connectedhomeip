@@ -1496,16 +1496,23 @@ exit:
 
 uint32_t identifyTimerCount;
 constexpr uint32_t kIdentifyTimerDelayMS = 250;
+typedef struct _Identify_Timer
+{
+    EndpointId ep;
+    uint32_t identifyTimerCount;
+} Identify_Time_t;
+Identify_Time_t id_time[MAX_ENDPOINT_COUNT];
 
 void IdentifyTimerHandler(System::Layer * systemLayer, void * appState)
 {
-    PRINTF(" -> %s(%u) \r\n", __FUNCTION__, identifyTimerCount);
-    if (identifyTimerCount)
+    Identify_Time_t *pidt = (Identify_Time_t *)appState;
+    PRINTF(" -> %s(%u, %u) \r\n", __FUNCTION__, pidt->ep, pidt->identifyTimerCount);
+    if (pidt->identifyTimerCount)
     {
-        identifyTimerCount--;
-        emAfWriteAttribute(1, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, (uint8_t *) &identifyTimerCount,
+        pidt->identifyTimerCount--;
+        emAfWriteAttribute(pidt->ep, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, (uint8_t *) &pidt->identifyTimerCount,
                            sizeof(identifyTimerCount), true, false);
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, nullptr);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, pidt);
     }
 }
 
@@ -1513,13 +1520,14 @@ static void OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, Attribu
 {
     VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
                  ChipLogError(DeviceLayer, "[%s] Unhandled Attribute ID: '0x%04lx", TAG, attributeId));
-    VerifyOrExit(endpointId == 1, ChipLogError(DeviceLayer, "[%s] Unexpected EndPoint ID: `0x%02x'", TAG, endpointId));
-
-    if (identifyTimerCount != *value)
+    VerifyOrExit((endpointId < MAX_ENDPOINT_COUNT),
+                 ChipLogError(DeviceLayer, "[%s] EndPoint > max: [%u, %u]", TAG, endpointId, MAX_ENDPOINT_COUNT));
+    if (id_time[endpointId].identifyTimerCount != *value)
     {
-        identifyTimerCount = *value;
-        PRINTF("-> Identify: %u \r\n", identifyTimerCount);
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, nullptr);
+        id_time[endpointId].ep = endpointId;
+        id_time[endpointId].identifyTimerCount = *value;
+        PRINTF("-> Identify: %u \r\n", id_time[endpointId].identifyTimerCount);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, &id_time[endpointId]);
     }
 
 exit:
