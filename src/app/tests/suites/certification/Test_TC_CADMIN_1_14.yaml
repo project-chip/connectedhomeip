@@ -17,28 +17,36 @@ name:
     4.1.14. [TC-CADMIN-1.14] Open commissioning window twice on DUT using BCM
     then ECM [DUT - Commissioner]
 
+PICS:
+    - CADMIN.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
-    - label: "Reset DUT_CE to factory defaults"
+    - label: "DUT_CR1 starts a commissioning process with TH_CE"
+      PICS: CADMIN.C
       verification: |
           verification step to be updated.
       disabled: true
 
-    - label: "TH_CR1 starts a commissioning process with DUT_CE"
-      PICS: CADMIN.S
+    - label:
+          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM and
+          TH_CR3 Commissions with TH_CE"
+      PICS: CADMIN.C.C01.Tx
       verification: |
           "1. Provision the device using your DUT controller (use above instructions) ,
           "
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
-      PICS: CADMIN.S.C00.Rsp
+          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM and
+          TH_CR2 Commissions with TH_CE"
+      PICS: CADMIN.C.C01.Tx
       verification: |
           On your DUT controller, open commissioning window using ECM
 
@@ -57,8 +65,10 @@ tests:
           [1635874557.417577][4549:4554] CHIP:CTL: SetupQRCode: [MT:00000CQM00AT-F5A510]
       disabled: true
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
-      PICS: CADMIN.S
+    - label:
+          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+      PICS: CADMIN.C.C01.Tx
       verification: |
           On 2nd controller using chip tool connect using manual code
           ./chip-tool pairing code 1 35484132896
@@ -68,9 +78,10 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
-      PICS: CADMIN.S.C00.Rsp
+          "Before the expiration of PIXIT.CADMIN.CwDuration seconds that is set
+          in step 4, DUT_CR1 sends command to TH_CE to read WindowStatus
+          attribute"
+      PICS: CADMIN.C.A0000
       verification: |
           On your DUT controller, open commissioning window using ECM
 
@@ -89,8 +100,12 @@ tests:
           [1635874557.417577][4549:4554] CHIP:CTL: SetupQRCode: [MT:00000CQM00AT-F5A510]
       disabled: true
 
-    - label: "TH_CR3 starts a commissioning process with DUT_CE"
-      PICS: CADMIN.S
+    - label:
+          "Before the expiration of PIXIT.CADMIN.CwDuration seconds that is set
+          in step 4, DUT_CR1 sends command to TH_CE to open a 2nd commissioning
+          window with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds
+          using ECM"
+      PICS: CADMIN.C.C00.Tx
       verification: |
           On 3rd controller using chip tool connect using manual code
           ./chip-tool pairing code 3 35484132896
@@ -99,8 +114,9 @@ tests:
           Device commissioning completed with success
       disabled: true
 
-    - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
-      PICS: OPCREDS.S.A0001
+    - label:
+          "Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that is
+          set in step 4"
       verification: |
           On 1st controller using chip tool, read fabrics list
 
@@ -134,8 +150,11 @@ tests:
           [1650527361.428335][15792:15797] CHIP:TOO:      }
       disabled: true
 
-    - label: "TH_CR2 sends RemoveFabric with FabricIndex = 2 command to DUT_CE"
-      PICS: OPCREDS.S.C0a.Rsp
+    - label:
+          "DUT_CR1 sends command to TH_CE to re-opens a commissioning window
+          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
+          ECM"
+      PICS: CADMIN.C.C00.Tx
       verification: |
           on 2nd controller using chip tool, remove fabric with FabricIndex=2
 
@@ -151,9 +170,10 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR2 writes and reads the Basic Information Clusters NodeLabel
-          mandatory attribute of DUT_CE"
-      PICS: BINFO.S.A0005
+          "Before the expiration of PIXIT.CADMIN.CwDuration seconds that is set
+          in step 8, DUT_CR1 sends command to TH_CE to read WindowStatus
+          attribute"
+      PICS: CADMIN.C.A0000
       verification: |
           Using your 2nd controller, write attribute and read attribute to and from TH_CE
 
@@ -171,8 +191,12 @@ tests:
           [1651819620.929700][4359:4364] CHIP:-: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter at ../../commands/clusters/ModelCommand.cpp:53
       disabled: true
 
-    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
-      PICS: OPCREDS.S.A0001
+    - label:
+          "Before the expiration of PIXIT.CADMIN.CwDuration seconds that is set
+          in step 8, TH_CR3 sends command to TH_CE to open a 2nd commissioning
+          window with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds
+          using ECM"
+      PICS: CADMIN.C.C00.Tx
       verification: |
           On 1st controller using chip tool, read fabrics list
 
@@ -202,9 +226,29 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
-      PICS: CADMIN.S.C00.Rsp
+          "Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that is
+          set in step 8"
+      verification: |
+          grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
+          + wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
+          + wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
+          = wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
+             hostname = [E45F010F27530000.local]
+             address = [fe80::e65f:1ff:fe0f:2753]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
+          = wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
+             hostname = [E45F010F27530000.local]
+             address = [fe80::e65f:1ff:fe0f:2753]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
+          grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$
+      disabled: true
+
+    - label:
+          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+      PICS: CADMIN.C.C00.Tx
       verification: |
           On 1st controller chip tool, open commissioning window
 
@@ -223,8 +267,12 @@ tests:
           [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
       disabled: true
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
-      PICS: CADMIN.S
+    - label:
+          "Before the expiration of PIXIT.CADMIN.CwDuration seconds that is set
+          in step 12, TH_CR2 sends command to TH_CE to open a second
+          commissioning window with a commissioning timeout of
+          PIXIT.CADMIN.CwDuration seconds using ECM"
+      PICS: CADMIN.C.C00.Tx
       verification: |
           On 2nd controller using chip tool connect to the accessory
 
@@ -235,8 +283,9 @@ tests:
           Device commissioning completed with success
       disabled: true
 
-    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
-      PICS: OPCREDS.S.A0001
+    - label:
+          "Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that is
+          set in step 12"
       verification: |
           On 1st controller, read fabrics list
 
@@ -271,4 +320,42 @@ tests:
           [1647863342.982460][9309:9314] CHIP:TOO:       FabricIndex: 4
           [1647863342.982512][9309:9314] CHIP:TOO:      }
           [1647863342.982738][9309:9314] CHIP:EM: Sending Standalone Ack for MessageCounter:5772016 on exchange 3310i
+      disabled: true
+
+    - label: "DUT_CR1 sends command to TH_CE to read WindowStatus attribute"
+      PICS: CADMIN.C.A0000
+      verification: |
+          Verify DUT successfully reads window status
+
+
+          ./chip-tool administratorcommissioning read window-status 1 0
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 2849200592
+          [1651137648.760469][14047:14052] CHIP:TOO:   WindowStatus: 0
+          [1651137648.760534][14047:14052] CHIP:EM: Sending Standalone Ack for MessageCounter:5527412 on exchange 14590i"
+      disabled: true
+
+    - label: "DUT_CR1 sends command to TH_CE to read AdminFabricIndex attribute"
+      PICS: CADMIN.C.A0001
+      verification: |
+          Verifu DUT successfully reads AdminFabricIndex
+
+          ./chip-tool administratorcommissioning read admin-fabric-index  1 0
+
+          [1659097193.389295][11728:11733] CHIP:DMG: }
+          [1659097193.389588][11728:11733] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 1299585105
+          [1659097193.389731][11728:11733] CHIP:TOO:   AdminFabricIndex: 0
+          [1659097193.389913][11728:11733] CHIP:EM: Sending Standalone Ack for MessageCounter:195671426 on exchange 34244i
+      disabled: true
+
+    - label: "DUT_CR1 sends command to TH_CE to read AdminVendorId attribute"
+      PICS: CADMIN.C.A0002
+      verification: |
+          Verify DUT successfully reads AdminVendoeId
+
+          ./chip-tool administratorcommissioning read admin-vendor-id 1 0
+
+          [1658838521.588942][9317:9322] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 2423106591
+          [1658838521.589005][9317:9322] CHIP:TOO:   AdminVendorId: 0
+          [1658838521.589079][9317:9322] CHIP:EM: Sending Standalone Ack for MessageCounter:217165763 on exchange 55683i
       disabled: true

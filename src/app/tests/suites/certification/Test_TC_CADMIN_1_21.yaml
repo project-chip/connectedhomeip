@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    24.1.21. [TC-CADMIN-1.21] max number of Commissioned Fabrics and
-    SupportedFabrics rollover using ECM [DUT - Commissioner]
+    4.1.21. [TC-CADMIN-1.21] Open commissioning window - durations max and max+1
+    [BCM] [DUT - Commissionee]
+
+PICS:
+    - CADMIN.S
 
 config:
     nodeId: 0x12344321
@@ -25,77 +28,103 @@ config:
 tests:
     - label: "Reset DUT_CE to factory defaults"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
-    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+    - label: "TH_CR1 starts a commissioning process with DUT_CE using BCM"
+      PICS: CADMIN.S.C01.Rsp
       verification: |
           "1. Provision the device using 1st controller chip tool(use above instructions) ,
           "
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
-      PICS: CADMIN.S.C00.Rsp
+          "TH_CR1 opens a commissioning window on DUT_CE with a value of 900
+          seconds"
+      PICS: CADMIN.S.C01.Rsp
       verification: |
           On 1st controller chip tool, open commissioning window
 
-          Below is the example when using chip tool as controller
+          For BCM,
 
-          ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
 
-          [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
-          [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
-          [1635925713.966938][9695:9700] CHIP:CTL: OpenCommissioningWindow for device ID 1
-          [1635925713.972601][9695:9700] CHIP:DMG: ICR moving to [AddingComm]
-          [1635925713.972705][9695:9700] CHIP:DMG: ICR moving to [AddedComma]
-          [1635925713.972815][9695:9700] CHIP:IN: Prepared encrypted message 0xaaaad9b57d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 31056i with MessageCounter:0.
-          [1635925713.972876][9695:9700] CHIP:IN: Sending encrypted msg 0xaaaad9b57d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 13449459 msec
-          [1635925713.973006][9695:9700] CHIP:DMG: ICR moving to [CommandSen]
-          [1635925713.973061][9695:9700] CHIP:CTL: Manual pairing code: [36217551633]
-          [1635925713.973120][9695:9700] CHIP:CTL: SetupQRCode: [MT:00000CQM00A7F87ZT10]
-          [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 900 2 0 --timedInteractionTimeoutMs 1000
+
+
+          CHIP:DMG: InvokeResponseMessage =
+          [1650278416.248379][11064:11069] CHIP:DMG: {
+          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
+          [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
+          [1650278416.248570][11064:11069] CHIP:DMG:         [
+          [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
+          [1650278416.248718][11064:11069] CHIP:DMG:                 {
+          [1650278416.248783][11064:11069] CHIP:DMG:                         CommandStatusIB =
+          [1650278416.248860][11064:11069] CHIP:DMG:                         {
+          [1650278416.248931][11064:11069] CHIP:DMG:                                 CommandPathIB =
+          [1650278416.249011][11064:11069] CHIP:DMG:                                 {
+          [1650278416.249100][11064:11069] CHIP:DMG:                                         EndpointId = 0x0,
+          [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
+          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
+          [1650278416.249430][11064:11069] CHIP:DMG:
+          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
+          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
+          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
+          [1650278416.249823][11064:11069] CHIP:DMG:
+          [1650278416.249889][11064:11069] CHIP:DMG:                         },
+          [1650278416.249969][11064:11069] CHIP:DMG:
+          [1650278416.250035][11064:11069] CHIP:DMG:                 },
+          [1650278416.250113][11064:11069] CHIP:DMG:
+          [1650278416.250169][11064:11069] CHIP:DMG:         ],
+          [1650278416.250241][11064:11069] CHIP:DMG:
+          [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
+          [1650278416.250355][11064:11069] CHIP:DMG: },
+          [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
+          [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label: "THn starts a commissioning process with DUT_CE"
+    - label: "Wait for commissioning Window to 901 seconds"
       verification: |
-          On nth controller using chip tool connect to the accessory
-
-
-          ./chip-tool pairing code 1 36217551633
-
-          Verify you got below message
-          Device commissioning completed with success
+          Wait for commissioning Window to Timeout
       disabled: true
 
     - label:
-          "Repeat Step 3 and Step 4 an additional (SupportedFabrics - 2) times
-          to reach an index value of SupportedFabrics on DUT_CE"
-      PICS: CADMIN.S.C00.Rsp
+          "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+      PICS: CADMIN.S.A0000
       verification: |
-          Repeat step 3 until  CommissionedFabrics=SupportedFabrics
+          ./chip-tool administratorcommissioning read window-status 1 0
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 2849200592
+          [1651137648.760469][14047:14052] CHIP:TOO:   WindowStatus: 0
+          [1651137648.760534][14047:14052] CHIP:EM: Sending Standalone Ack for MessageCounter:5527412 on exchange 14590i
       disabled: true
 
     - label:
-          "THn starts a commissioning process and opens a commissioning window
-          with DUT_CE"
+          "TH_CR1 opens a commissioning window on DUT_CE with a value of 901
+          seconds"
+      PICS: CADMIN.S.C01.Rsp
       verification: |
-          On nth controller using chip tool connect to the accessory
+          On 1st controller chip tool, open commissioning window
 
+          For BCM,
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 901 2 0 --timedInteractionTimeoutMs 1000
 
-          ./chip-tool pairing code 1 36217551633
-
-          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1649756670.402192][10794:10799] CHIP:CTL: Device returned status 5 on receiving the NOC
-          [1649756670.402221][10794:10799] CHIP:CTL: Add NOC failed with error ../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1110: CHIP Error 0x0000000B: No memory
-          [1649756670.402241][10794:10799] CHIP:CTL: Failed to perform commissioning step 12
+          CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x85
+          [1652860801.225084][9512:9517] CHIP:TOO: Error: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
+          [1652860801.225173][9512:9517] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1652860801.225294][9512:9517] CHIP:EM: Sending Standalone Ack for MessageCounter:4191961 on exchange 37827i
       disabled: true
 
-    - label: "TH_CR1 removes FabricIndex1"
-      PICS: OPCREDS.S.C0a.Rsp
+    - label:
+          "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+      PICS: CADMIN.S.A0000
       verification: |
-          on 1st controller using chip tool, remove fabric with FabricIndex=1
+          On  1st controller read  window status
 
-          ./chip-tool operationalcredentials remove-fabric 1 1 0
+          ./chip-tool administratorcommissioning read window-status 1 0
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 2849200592
+          [1651137648.760469][14047:14052] CHIP:TOO:   WindowStatus: 0
+          [1651137648.760534][14047:14052] CHIP:EM: Sending Standalone Ack for MessageCounter:5527412 on exchange 14590i
       disabled: true
