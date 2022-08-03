@@ -213,13 +213,13 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
         else
         {
 #endif
-        // write the new on/off value
-        status = Attributes::OnOff::Set(endpoint, newValue);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            emberAfOnOffClusterPrintln("ERR: writing on/off %x", status);
-            return status;
-        }
+            // write the new on/off value
+            status = Attributes::OnOff::Set(endpoint, newValue);
+            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                emberAfOnOffClusterPrintln("ERR: writing on/off %x", status);
+                return status;
+            }
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         }
 #endif
