@@ -17,6 +17,9 @@ name:
     3.4.3. [TC-IDM-4.3] Report Data Messages post Subscription Activation from
     DUT Test Cases. [{DUT_Server}]
 
+PICS:
+    - MCORE.IDM.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -35,7 +38,7 @@ tests:
     - label:
           "DUT and TH activate the subscription. Change the value of the
           attribute which has been subscribed on the DUT by sending an IMWrite
-          or Invoke message to the DUT from the TH."
+          or Invoke message to the DUT from the TH. +"
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
@@ -160,20 +163,21 @@ tests:
       disabled: true
 
     - label:
-          'DUT and TH activate the subscription. Change the value of the
+          "DUT and TH activate the subscription. Change the value of the
           attribute which has been subscribed on the DUT. TH force sends a
-          status response with an "inactive subscription". Change the value of
-          the attribute which has been subscribed on the DUT.'
+          status response with an inactive subscription. Change the value of the
+          attribute which has been subscribed on the DUT."
       verification: |
-          This tester needs to be tested by changing the controls available in the DUT and then read the value.  And can't be tested with RPI& has dependency of Vendor specific DUT support.
+          This tester needs to be tested by changing the controls available in the DUT and then read the value.  And can"t be tested with RPI& has dependency of Vendor specific DUT support.
       disabled: true
 
     - label:
-          "[OPTIONAL] Activate the subscription between the DUT and the TH for
-          an attribute of data type bool. Modify that attribute on the DUT. DUT
-          should send the report data with the modified attribute value. Modify
-          the attribute multiple times (3 times) before the max interval time
+          "Activate the subscription between the DUT and the TH for an attribute
+          of data type bool. Modify that attribute on the DUT. DUT should send
+          the report data with the modified attribute value. Modify the
+          attribute multiple times (3 times) before the max interval time
           specified during the subscription activation."
+      PICS: MCORE.IDM.S.Attribute.DataType_Bool
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
@@ -254,11 +258,12 @@ tests:
       disabled: true
 
     - label:
-          "[OPTIONAL] Activate the subscription between the DUT and the TH for
-          an attribute of data type string. Modify that attribute on the DUT.
-          DUT should send the report data with the modified attribute value
-          Modify the attribute multiple times (3 times) before the max interval
-          time specified during the subscription activation."
+          "Activate the subscription between the DUT and the TH for an attribute
+          of data type string. Modify that attribute on the DUT. DUT should send
+          the report data with the modified attribute value Modify the attribute
+          multiple times (3 times) before the max interval time specified during
+          the subscription activation."
+      PICS: MCORE.IDM.S.Attribute.DataType_String
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
@@ -298,7 +303,7 @@ tests:
           [1657452002.282628][11635:11640] CHIP:TOO:   NodeLabel: new
           [1657452002.282717][11635:11640] CHIP:DMG: MoveToState ReadClient[0xffff940092b0]: Moving to [AwaitingSu]
 
-
+          here is an example command the TH can write an attribute in the basic cluster in the DUT to change the value that the TH subscribed in the above command.
            basic write node-label sve 1 0
           [1657452091.179574][11635:11640] CHIP:EM: Handling via exchange: 8527r, Delegate: 0xaaaacf201a78
           [1657452091.179661][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -337,11 +342,12 @@ tests:
       disabled: true
 
     - label:
-          '[OPTIONAL] Activate the subscription between the DUT and the TH for
-          an attribute of data type "unsigned integer". Modify that attribute on
-          the DUT. DUT should send the report data with the modified attribute
-          value. Modify the attribute multiple times (3 times) before the max
-          interval time specified during the subscription activation.'
+          "Activate the subscription between the DUT and the TH for an attribute
+          of data type unsigned integer. Modify that attribute on the DUT. DUT
+          should send the report data with the modified attribute value. Modify
+          the attribute multiple times (3 times) before the max interval time
+          specified during the subscription activation."
+      PICS: MCORE.IDM.S.Attribute.DataType_UnsignedInteger
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
@@ -380,6 +386,7 @@ tests:
           [1657452196.620215][11635:11640] CHIP:TOO:   on off transition time: 1
           [1657452196.620308][11635:11640] CHIP:DMG: MoveToState ReadClient[0xffff94005b60]: Moving to [AwaitingSu]
 
+          here is an example command the TH can write an attribute in the levelcontrol cluster in the DUT to change the value that the TH subscribed in the above command.
           any write-by-id  0x0008 0x0010 1 1 1
           [1657452254.600544][11635:11640] CHIP:EM: Handling via exchange: 8529r, Delegate: 0xaaaacf201a78
           [1657452254.600720][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -419,31 +426,34 @@ tests:
       disabled: true
 
     - label:
-          '[OPTIONAL] Activate the subscription between the DUT and the TH for
-          an attribute of data type "signed integer". Modify that attribute on
-          the DUT. DUT should send the report data with the modified attribute
-          value. Modify the attribute multiple times (3 times)before the max
-          interval time specified during the subscription activation.'
+          "Activate the subscription between the DUT and the TH for an attribute
+          of data type signed integer. Modify that attribute on the DUT. DUT
+          should send the report data with the modified attribute value. Modify
+          the attribute multiple times (3 times)before the max interval time
+          specified during the subscription activation."
+      PICS: MCORE.IDM.S.Attribute.DataType_SignedInteger
       verification: |
           Subscribe to an attribute of type signed integer to the Harness
       disabled: true
 
     - label:
-          '[OPTIONAL] Activate the subscription between the DUT and the TH for
-          an attribute of data type "floating point". Modify that attribute on
-          the DUT. DUT should send the report data with the modified attribute
-          value. Modify the attribute multiple times (3 times) before the max
-          interval time specified during the subscription activation.'
+          "Activate the subscription between the DUT and the TH for an attribute
+          of data type floating point. Modify that attribute on the DUT. DUT
+          should send the report data with the modified attribute value. Modify
+          the attribute multiple times (3 times) before the max interval time
+          specified during the subscription activation."
+      PICS: MCORE.IDM.S.Attribute.DataType_FloatingPoint
       verification: |
           Subscribe to an attribute of type floating point to the Harness
       disabled: true
 
     - label:
-          "[OPTIONAL] Activate the subscription between the DUT and the TH for
-          an attribute of data type list. Modify that attribute on the DUT. DUT
-          should send the report data with the modified attribute value. Modify
-          the attribute multiple times (3 times) before the max interval time
+          "Activate the subscription between the DUT and the TH for an attribute
+          of data type list. Modify that attribute on the DUT. DUT should send
+          the report data with the modified attribute value. Modify the
+          attribute multiple times (3 times) before the max interval time
           specified during the subscription activation."
+      PICS: MCORE.IDM.S.Attribute.DataType_List
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
@@ -455,8 +465,8 @@ tests:
           [1655896309.160795][1885:1890] CHIP:TOO:   label list: 0 entries
           [1655896309.160851][1885:1890] CHIP:DMG: MoveToState ReadClient[0xffffa0005710]: Moving to [AwaitingSu]
 
-
-           userlabel write label-list '[{"label":"room", "value":"bedroom 1"}, {"label":"orientation", "value":"east"}]' 1 0
+          here is an example command the TH can write an attribute in the userlabel cluster in the DUT to change the value that the TH subscribed in the above command.
+           userlabel write label-list "[{"label":"room", "value":"bedroom 1"}, {"label":"orientation", "value":"east"}]" 1 0
 
           ./chip-tool userlabel subscribe label-list 100 500 1 0
           [1655896422.936972][1899:1904] CHIP:DMG: }
@@ -632,7 +642,7 @@ tests:
           [1657453503.540798][11635:11640] CHIP:DMG: MoveToState ReadClient[0xffff94005b60]: Moving to [AwaitingSu]
 
 
-
+          here is an example command the TH can write an attribute in the levelcontrol cluster in the DUT to change the value that the TH subscribed in the above command.
           levelcontrol write   on-level 1 1 1
           [1657453616.542219][11635:11640] CHIP:EM: Handling via exchange: 8542r, Delegate: 0xaaaacf201a78
           [1657453616.542386][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -705,7 +715,7 @@ tests:
           [1657453718.439173][11635:11640] CHIP:TOO:   OnTime: 0
           [1657453718.439260][11635:11640] CHIP:DMG: MoveToState ReadClient[0xffff94005970]: Moving to [AwaitingSu]
 
-           If you try to change attribute value by sending
+          here is an example command the TH can write an attribute in the onoff cluster in the DUT to change the value that the TH subscribed in the above command.
             onoff write on-time 1  1 1
           There are no attribute value changes before MaxInterval elapses
       disabled: true
@@ -722,7 +732,7 @@ tests:
           >>>  onoff subscribe off-wait-time 10 500 1 1 --keepSubscriptions 1
 
 
-          On TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not for both attributes
+          On TH verify that DUT is responds right attribute value for above command and then send write command to change the attribute value, verify the attribute value is modified or not for both attributes
 
 
           [1657454078.091825][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -786,6 +796,8 @@ tests:
           [1657454092.664339][11635:11640] CHIP:TOO:   OnTime: 1
           [1657454092.664427][11635:11640] CHIP:DMG: MoveToState ReadClient[0xffff94005b60]: Moving to [AwaitingSu]
 
+
+          here is an example command the TH can write an attribute in the onoff cluster in the DUT to change the value that the TH subscribed in the above command.
           onoff write off-wait-time 3 1 1
           [1657454115.799139][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657454115.799209][11635:11640] CHIP:DMG: {
@@ -817,6 +829,8 @@ tests:
           [1657454115.801027][11635:11640] CHIP:TOO:   OffWaitTime: 3
           [1657454115.801076][11635:11640] CHIP:DMG: Refresh LivenessCheckTime for 525000 milliseconds with SubscriptionId = 0x732d29f8 Peer = 01:0000000000000001
 
+
+          here is an example command the TH can write an attribute in the onoff cluster in the DUT to change the value that the TH subscribed in the above command.
            onoff write on-time 2 1 1
           [1657454129.447088][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657454129.447157][11635:11640] CHIP:DMG: {
@@ -861,9 +875,7 @@ tests:
 
           onoff subscribe on-time 10 100 1 1 --keepSubscriptions 1
 
-          On TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not for both attributes. Verify that the first subscription is terminated after the MaxInterval of the first subscription is reached.
-
-
+          After sending above command verify that the subscription is activated between DUT and TH
           1657454443.310644][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657454443.310712][11635:11640] CHIP:DMG: {
           [1657454443.310773][11635:11640] CHIP:DMG:      SubscriptionId = 0xae2db075,
@@ -912,6 +924,7 @@ tests:
 
 
           onoff subscribe off-wait-time 100 1000 1 1 --keepSubscriptions 0
+          After sending above command verify that the subscription is activated between DUT and TH. here keepSubscription field set false to terminate existing subscriptions from initiator
           [1657454614.583250][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733186 from RetransTable on exchange 33672i
           [1657454614.583348][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657454614.583440][11635:11640] CHIP:DMG: {
@@ -943,7 +956,11 @@ tests:
           [1657454614.585029][11635:11640] CHIP:TOO:   OffWaitTime: 3
           [1657454614.585094][11635:11640] CHIP:DMG: MoveToState ReadClient[0xffff940092b0]: Moving to [AwaitingSu]
 
+          here is an example command the TH can write an attribute in the onoff cluster in the DUT to change the value that the TH subscribed in the above command.
+
+
           onoff write on-time 1 1 1
+           on TH Verify that  subscription is terminated after the MaxInterval of the first subscription is reached.
           [1657455187.367198][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657455187.367281][11635:11640] CHIP:DMG: {
           [1657455187.367324][11635:11640] CHIP:DMG:      SubscriptionId = 0x50a6822b,
@@ -960,21 +977,18 @@ tests:
           [1657455187.367875][11635:11640] CHIP:DMG:                                      Cluster = 0x6,
           [1657455187.367934][11635:11640] CHIP:DMG:                                      Attribute = 0x0000_4001,
           [1657455187.367985][11635:11640] CHIP:DMG:                              }
-          [1657455187.368042][11635:11640] CHIP:DMG:
-          [1657455187.368094][11635:11640] CHIP:DMG:                              Data = 1,
-          [1657455187.368137][11635:11640] CHIP:DMG:                      },
-          [1657455187.368187][11635:11640] CHIP:DMG:
-          [1657455187.368226][11635:11640] CHIP:DMG:              },
-          [1657455187.368270][11635:11640] CHIP:DMG:
-          [1657455187.368306][11635:11640] CHIP:DMG:      ],
-          [1657455187.368351][11635:11640] CHIP:DMG:
-          [1657455187.368389][11635:11640] CHIP:DMG:      InteractionModelRevision = 1
-          [1657455187.368425][11635:11640] CHIP:DMG: }
-          [1657455187.368558][11635:11640] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_4001 DataVersion: 26713157
-          [1657455187.368613][11635:11640] CHIP:TOO:   OnTime: 1
-          [1657455187.368680][11635:11640] CHIP:DMG: Refresh LivenessCheckTime for 125000 milliseconds with SubscriptionId = 0x50a6822b Peer = 01:0000000000000001
+          [1657455187.788687][11635:11640] CHIP:DMG:                        StatusIB =
+          [1657455187.788687][11635:11640] CHIP:DMG:                         {
+          [1657455253.788687][11635:11640] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657455187.788687][11635:11640] CHIP:DMG:                         },
+          [1657455187.788687][11635:11640] CHIP:DMG:
+          [1657455187.788687][11635:11640] CHIP:DMG:               },
 
-          sudo ./chip-tool onoff write off-wait-time 1 1 1
+          here is an example command the TH can write an attribute in the onoff cluster in the DUT to change the value that the TH subscribed in the above command.
+           onoff write off-wait-time 1 1 1
+
+          On TH verify that, TH  received a report data from DUT
+
           [1657455253.788543][11635:11640] CHIP:EM: Handling via exchange: 8557r, Delegate: 0xaaaacf201a78
           [1657455253.788629][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657455253.788660][11635:11640] CHIP:DMG: {
@@ -1013,28 +1027,28 @@ tests:
       disabled: true
 
     - label:
-          'TH sends a subscription request action for an attribute and all
-          events. Set the MinIntervalFloor to some value say "N"(seconds).
-          Change the value of the attribute and trigger an action on the DUT to
-          trigger any event.'
+          "TH sends a subscription request action for an attribute and all
+          events. Set the MinIntervalFloor to some value say N(seconds). Change
+          the value of the attribute and trigger an action on the DUT to trigger
+          any event."
       verification: |
           https://github.com/project-chip/connectedhomeip/issues/20479
       disabled: true
 
     - label:
-          'TH sends a subscription request action for attribute wildcard -
+          "TH sends a subscription request action for attribute wildcard -
           AttributePath = [[Endpoint = EndpointID, Cluster = ClusterID]]. Set
-          the MinIntervalFloor to some value say "N"(seconds). Change all or few
-          of the attributes on the DUT'
+          the MinIntervalFloor to some value say N(seconds). Change all or few
+          of the attributes on the DUT"
       verification: |
           Out of Scope for V1.0
       disabled: true
 
     - label:
-          'TH sends a subscription request to subscribe to an attribute on a
+          "TH sends a subscription request to subscribe to an attribute on a
           specific cluster from all endpoints AttributePath = [[Attribute =
           Attribute, Cluster = ClusterID ]]. Set the MinIntervalFloor to some
-          value say "N"(seconds). Change the attribute on the DUT'
+          value say N(seconds). Change the attribute on the DUT"
       verification: |
           onoff subscribe-by-id 0x4001 200 700  1 0xFFFF
            on TH, verify that DUT is responds right attribute value for  command and then send write command to change the attribute value,
@@ -1122,28 +1136,28 @@ tests:
       disabled: true
 
     - label:
-          'TH sends a subscription request to subscribe to all attributes from
+          "TH sends a subscription request to subscribe to all attributes from
           all clusters from all endpoints. AttributePath = [[]]. Set the
-          MinIntervalFloor to some value say "N"(seconds). Change all or few of
-          the attributes on the DUT'
+          MinIntervalFloor to some value say N(seconds). Change all or few of
+          the attributes on the DUT"
       verification: |
           Out of Scope for V1.0
       disabled: true
 
     - label:
-          'TH sends a subscription request to subscribe to all attributes from
+          "TH sends a subscription request to subscribe to all attributes from
           all clusters on an endpoint. AttributePath = [[Endpoint =
-          EndpointID]]. Set the MinIntervalFloor to some value say "N"(seconds).
-          Change all or few of the attributes on the DUT'
+          EndpointID]]. Set the MinIntervalFloor to some value say N(seconds).
+          Change all or few of the attributes on the DUT"
       verification: |
           Out of Scope for V1.0
       disabled: true
 
     - label:
-          'TH sends a subscription request to subscribe to all attributes from a
+          "TH sends a subscription request to subscribe to all attributes from a
           specific cluster on all endpoints. AttributePath = [[Cluster =
-          ClusterID]]. Set the MinIntervalFloor to some value say "N"(seconds).
-          Change all or few of the attributes on the DUT'
+          ClusterID]]. Set the MinIntervalFloor to some value say N(seconds).
+          Change all or few of the attributes on the DUT"
       verification: |
           Out of Scope for V1.0
       disabled: true

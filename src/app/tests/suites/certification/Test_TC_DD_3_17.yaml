@@ -17,6 +17,10 @@ name:
     3.3.17. [TC-DD-3.17] Commissioning Flow - 21-digit Manual Pairing Code -
     Negative Scenario [DUT    - Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.21_MANUAL_PC
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -26,7 +30,6 @@ tests:
     - label:
           "Provide the 21-digit Manual Pairing Code from the Commissionee to the
           DUT in any format supported by DUT"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           Verify in TH as server side
           $ ./out/all-clusters-app/chip-all-clusters-app
@@ -56,7 +59,6 @@ tests:
           "VERSION: Using the manual code from Step 1, generate a new manual
           code but substituting out the current VERSION with an invalid VERSION:
           2"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           1. Use chip-tool"s "payload verhoeff-generate" command to help generate the new, invalid Manual code
 
@@ -72,7 +74,6 @@ tests:
     - label:
           "Provide the Manual Pairing Code, generated in the previous step, to
           the DUT in any format supported by the DUT"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           $  ./chip-tool pairing code 1 849701123365521327693
 
@@ -84,7 +85,6 @@ tests:
           "VID_PID_PRESENT: Using the manual code from Step 1, generate a new
           manual code but substituting out the current VID_PID_PRESENT with an
           invalid VID_PID_PRESENT set to 0"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           1. Use chip-tool"s "payload verhoeff-generate" command to help generate the new, invalid Manual code
           $ ./chip-tool payload verhoeff-generate 34970112336552132769
@@ -99,7 +99,6 @@ tests:
     - label:
           "Provide the Manual Pairing Code, generated in the previous step, to
           the DUT in any format supported by the DUT"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           $  ./chip-tool pairing code 1 349701123365521327696
 
@@ -117,7 +116,6 @@ tests:
           that changes any of the 4 most-significant bits of Step 1s 12-bit
           discriminator value and adheres to rules of section 5.1.1.5.
           Discriminator value)"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           1. Use chip-tool"s "payload generate-manualcode" command to help generate the new, invalid Manual code
 
@@ -129,7 +127,6 @@ tests:
     - label:
           "Provide the Manual Pairing Code, generated in the previous step, to
           the DUT in any format supported by the DUT"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           $  ./chip-tool pairing code 1 733317123365521327692
 
@@ -149,7 +146,6 @@ tests:
           code using all the same Onboarding Payload components and one Passcode
           from the list: 00000000, 11111111, 22222222, 33333333, 44444444,
           55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           1. Use this as an example of how to generate a manual code with an invalid passcode. In this example the invalid passcode=00000000
 
@@ -163,7 +159,6 @@ tests:
     - label:
           "Provide each of the Manual Pairing Codes, generated in the previous
           step, to the DUT in any format supported by the DUT"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           Verify in DUT as client side
 
@@ -233,7 +228,6 @@ tests:
           component to one of the invalid Test VENDOR_IDs and generate a new
           manual code using all the same Onboarding Payload components and one
           Test VENDOR_ID from the list: 0xFFF1, 0xFFF2, 0xFFF3, 0xFFF4"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           1. Use this as an example of how to generate a manual code with an invalid vendor IDs
 
@@ -245,7 +239,6 @@ tests:
     - label:
           "Provide each of the Manual Pairing Codes, generated in the previous
           step, to the DUT in any format supported by the DUT"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           (0xFFF1)
            $  ./chip-tool pairing code 1 749701123365521327694
@@ -267,7 +260,6 @@ tests:
           code but substituting out the current PRODUCT_ID with an invalid
           PRODUCT_ID of 0x0000(i.e. While following section 2.5.3. Product
           Identifier)"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           1. Use chip-tool"s "payload generate-manualcode" command to help generate the new, invalid Manual code
 
@@ -279,7 +271,6 @@ tests:
     - label:
           "Provide the Manual Pairing Code, generated in the previous step, to
           the DUT in any format supported by the DUT"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           Verify in DUT as client side
           $  ./chip-tool pairing code 1 749701123365521000006
@@ -293,7 +284,6 @@ tests:
           CHECK_DIGIT (i.e. Any different CHECK_DIGIT than the commissionees
           CHECK_DIGIT while following Table 39. Encoding Method with Vendor and
           Product IDs included (VID_PID_Present == 1))"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           1. Use chip-tool"s "payload verhoeff-verify" command to help verify that the check-digit is invalid
 
@@ -307,7 +297,6 @@ tests:
     - label:
           "Provide the Manual Pairing Code, generated in the previous step, to
           the DUT in any format supported by the DUT"
-      PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           $  ./chip-tool pairing code 1 749701123365521327693
 

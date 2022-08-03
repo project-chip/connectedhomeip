@@ -15,6 +15,9 @@
 
 name: 3.3.2. [TC-DGETH-3.2] Command Generated {DUT_Client}]
 
+PICS:
+    - DGETH.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -27,7 +30,7 @@ tests:
       disabled: true
 
     - label: "DUT sends ResetCounts to TH."
-      PICS: DGETH.S.C00.Rsp
+      PICS: DGETH.C.C00.Tx
       verification: |
           Verify Command data recieved from running the below command is a success
 

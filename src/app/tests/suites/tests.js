@@ -95,6 +95,7 @@ function getManualTests() {
         "Test_TC_BR_1",
         "Test_TC_BR_2",
         "Test_TC_BR_3",
+        "Test_TC_BR_4",
     ];
 
     const DeviceAttestation = [
@@ -302,6 +303,7 @@ function getManualTests() {
         "Test_TC_SC_3_2",
         "Test_TC_SC_3_3",
         "Test_TC_SC_3_4",
+        "Test_TC_SC_3_6",
         "Test_TC_SC_4_1",
         "Test_TC_SC_4_3",
         "Test_TC_SC_4_4",
