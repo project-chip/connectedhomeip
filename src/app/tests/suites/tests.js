@@ -864,7 +864,7 @@ function getTests() {
     ];
 
     const DoorLock = [
-        "DL_UsersAndCredentials",
+        //"DL_UsersAndCredentials", TODO: This test is not aligned with spec
         "DL_LockUnlock",
         "DL_Schedules",
         "Test_TC_DRLK_2_2",
@@ -872,7 +872,7 @@ function getTests() {
         "Test_TC_DRLK_2_4",
         "Test_TC_DRLK_2_5",
         "Test_TC_DRLK_2_7",
-        "Test_TC_DRLK_2_9",
+        //"Test_TC_DRLK_2_9", TODO: This test is not aligned with spec
     ];
 
     const Groups = [
