@@ -131,6 +131,9 @@ public final class ControllerParams {
      * CommissioningParameters. Increasing this value from its default will allow more time 
      * for network scans, cloud op cert signing calls, and user interaction.
      * 
+     * Note: It is also possible for internal logic (within Autocommissioner, etc) to re-call 
+     * ArmFailSafe to account for network config delays.
+     * 
      * @param failsafeTimerSeconds
      * @return
      */
