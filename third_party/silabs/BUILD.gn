@@ -69,9 +69,8 @@ if (chip_use_ot_lib) {
     include_dirs = [
       "${chip_root}/examples/platform/efr32",
       "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}",
-      "${sl_ot_efr32_root}/src/",
-      "${sl_ot_efr32_root}/src/cli",
       "${sl_ot_efr32_root}/src/src",
+      "${sl_openthread_root}/src/",
     ]
   }
 
@@ -132,6 +131,7 @@ if (chip_use_ot_lib) {
       ":libopenthread-platform",
       ":openthread_core_config_efr32",
       "${segger_rtt_root}:segger_rtt",
+      "${sl_openthread_root}/include/openthread:openthread",
       "${sl_openthread_root}/src/core/:libopenthread_core_headers",
     ]
 
@@ -147,7 +147,7 @@ if (chip_use_ot_lib) {
 
     libs = [
       "${sl_ot_efr32_root}/libs/libsl_ot_stack_${XTD}_${efr32_family}_gcc.a",
-      "${sl_ot_efr32_root}/libs/libsl_platform_${XTD}_${efr32_family}_gcc.a",
+      "${sl_ot_efr32_root}/libs/libsl_platform_${XTD}_dmp_${efr32_family}_gcc.a",
     ]
   }
 }
