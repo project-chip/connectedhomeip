@@ -55,7 +55,6 @@ public:
      * @param[in] csrNonce             CSR nonce as described in 6.4.6.1
      * @param[in] attestationSignature Attestation signature as per specifications section 11.22.7.6. CSRResponse Command.
      * @param[in] attestationChallenge Attestation challenge as per 11.18.5.7
-     * @param[in] attestationElements  Attestation elements portion of Attestation Response (raw TLV)
      * @param[in] DAC                  Device attestation certificate received from the device being commissioned
      * @param[in] PAI                  Product Attestation Intermediate certificate
      * @param[in] onCompletion         Callback handler to provide generated NOC chain to the caller of GenerateNOCChain()
@@ -64,7 +63,7 @@ public:
      */
     virtual CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
                                         const ByteSpan & attestationSignature, const ByteSpan & attestationChallenge,
-                                        const ByteSpan & attestationElements, const ByteSpan & DAC, const ByteSpan & PAI,
+                                        const ByteSpan & DAC, const ByteSpan & PAI,
                                         Callback::Callback<OnNOCChainGeneration> * onCompletion) = 0;
 
     /**

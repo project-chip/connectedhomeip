@@ -40,7 +40,8 @@ using namespace Credentials;
 using namespace Crypto;
 using namespace TLV;
 
-CHIP_ERROR AndroidOperationalCredentialsIssuer::Initialize(PersistentStorageDelegate & storage, jobject javaObjectRef)
+CHIP_ERROR AndroidOperationalCredentialsIssuer::Initialize(PersistentStorageDelegate & storage, AutoCommissioner * autoCommissioner,
+                                                           jobject javaObjectRef)
 {
     using namespace ASN1;
     ASN1UniversalTime effectiveTime;
@@ -71,6 +72,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     }
 
     mStorage       = &storage;
+    mAutoCommissioner = autoCommissioner;
     mJavaObjectRef = javaObjectRef;
 
     mInitialized = true;
@@ -125,28 +127,24 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
                                                                  const ByteSpan & attestationSignature,
-                                                                 const ByteSpan & attestationChallenge,
-                                                                 const ByteSpan & attestationElements, const ByteSpan & DAC,
+                                                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC,
                                                                  const ByteSpan & PAI,
                                                                  Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     if (mUseJavaCallbackForNOCRequest)
     {
-        return CallbackGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, attestationElements, DAC,
-                                        PAI, onCompletion);
+        return CallbackGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC, PAI, onCompletion);
     }
     else
     {
-        return LocalGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, attestationElements, DAC,
-                                     PAI, onCompletion);
+        return LocalGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC, PAI, onCompletion);
     }
 }
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
                                                                          const ByteSpan & attestationSignature,
                                                                          const ByteSpan & attestationChallenge,
-                                                                         const ByteSpan & attestationElements, const ByteSpan & DAC,
-                                                                         const ByteSpan & PAI,
+                                                                         const ByteSpan & DAC, const ByteSpan & PAI,
                                                                          Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     jmethodID method;
@@ -179,6 +177,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), attestationChallenge.data(),
                                                attestationChallenge.size(), javaAttestationChallenge);
 
+    const ByteSpan & attestationElements = mAutoCommissioner->GetCommissioningParameters().GetAttestationElements().Value();
     jbyteArray javaAttestationElements;
     JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), attestationElements.data(),
                                                attestationElements.size(), javaAttestationElements);
@@ -213,8 +212,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::NOCChainGenerated(CHIP_ERROR sta
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
                                                                       const ByteSpan & attestationSignature,
-                                                                      const ByteSpan & attestationChallenge,
-                                                                      const ByteSpan & attestationElements, const ByteSpan & DAC,
+                                                                      const ByteSpan & attestationChallenge, const ByteSpan & DAC,
                                                                       const ByteSpan & PAI,
                                                                       Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {

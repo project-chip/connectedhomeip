@@ -75,11 +75,6 @@ public:
      */
     CHIP_ERROR UpdateCommissioningParameters(const chip::Controller::CommissioningParameters & params);
 
-    /**
-     * Update the CommissioningParameters used by the active device commissioner and set the NOC Chain
-     */
-    CHIP_ERROR SetNOCChain(const chip::Controller::CommissioningParameters & params);
-
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;

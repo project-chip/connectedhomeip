@@ -179,7 +179,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     initParams.opCertStore = &wrapper->mOpCertStore;
 
     // TODO: Init IPK Epoch Key in opcreds issuer, so that commissionees get the right IPK
-    opCredsIssuer->Initialize(*wrapper.get(), wrapper.get()->mJavaObjectRef);
+    opCredsIssuer->Initialize(*wrapper.get(), &wrapper->mAutoCommissioner, wrapper.get()->mJavaObjectRef);
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
     if (!noc.Alloc(kMaxCHIPDERCertLength))
@@ -240,9 +240,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         }
         setupParams.operationalKeypair                   = &ephemeralKey;
         setupParams.hasExternallyOwnedOperationalKeypair = false;
-
-        // TODO: make this conditional based upon state passed from java
-        opCredsIssuer->SetUseJavaCallbackForNOCRequest(true);
 
         *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId,
                                                                            /* fabricId = */ 1, cats, ephemeralKey.Pubkey(),

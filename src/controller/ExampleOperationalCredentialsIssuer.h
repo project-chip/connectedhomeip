@@ -56,8 +56,8 @@ public:
     ~ExampleOperationalCredentialsIssuer() override {}
 
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
-                                const ByteSpan & attestationChallenge, const ByteSpan & attestationElements, const ByteSpan & DAC,
-                                const ByteSpan & PAI, Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
+                                const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
+                                Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
 
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override
     {

@@ -62,7 +62,15 @@ public class ChipDeviceController {
     scanNetworksListener = listener;
   }
 
+  /**
+   * Sets this DeviceController to use the given issuer for issuing operational certs.
+   * By default, the DeviceController uses an internal, OperationalCredentialsDelegate
+   * (see AndroidOperationalCredentialsIssuer)
+   * 
+   * @param issuer
+   */
   public void setNOCChainIssuer(NOCChainIssuer issuer) {
+    setUseJavaCallbackForNOCRequest(deviceControllerPtr, issuer != null);
     nocChainIssuer = issuer;
   }
 
@@ -188,6 +196,18 @@ public class ChipDeviceController {
     resumeCommissioning(deviceControllerPtr);
   }
 
+  /**
+   * 
+   * The following fields on the ControllerParams object must be populated:
+   * - ipk
+   * - rootCertificate
+   * - intermediateCertificate
+   * - operationalCertificate
+   * - adminSubject
+   * 
+   * @param params
+   * @return
+   */
   public int setNOCChain(ControllerParams params) {
     return setNOCChain(deviceControllerPtr, params);
   }
@@ -657,6 +677,8 @@ public class ChipDeviceController {
   private native void pauseCommissioning(long deviceControllerPtr);
 
   private native void resumeCommissioning(long deviceControllerPtr);
+
+  private native void setUseJavaCallbackForNOCRequest(long deviceControllerPtr, boolean useCallback);
 
   private native void updateCommissioningNetworkCredentials(
       long deviceControllerPtr, NetworkCredentials networkCredentials);
