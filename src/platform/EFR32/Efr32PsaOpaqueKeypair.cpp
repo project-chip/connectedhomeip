@@ -19,15 +19,6 @@
 #include "em_device.h"
 #include <psa/crypto.h>
 
-// Includes needed for certificate parsing
-#if defined(MBEDTLS_X509_CRT_PARSE_C)
-#include <mbedtls/x509_crt.h>
-#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
-#include <mbedtls/md.h>
-#include <mbedtls/oid.h>
-#include <mbedtls/x509.h>
-#include <mbedtls/x509_csr.h>
-
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/SafeInt.h>
@@ -63,21 +54,6 @@ static_assert((kEFR32OpaqueKeyIdPersistentMax - kEFR32OpaqueKeyIdPersistentMin) 
 #else
 #define PSA_CRYPTO_LOCATION_FOR_DEVICE PSA_KEY_LOCATION_LOCAL_STORAGE
 #endif
-
-static void _log_mbedTLS_error(int error_code)
-{
-    if (error_code != 0)
-    {
-#if defined(MBEDTLS_ERROR_C)
-        char error_str[MAX_ERROR_STR_LEN];
-        mbedtls_strerror(error_code, error_str, sizeof(error_str));
-        ChipLogError(Crypto, "mbedTLS error: %s", error_str);
-#else
-        // Error codes defined in 16-bit negative hex numbers. Ease lookup by printing likewise
-        ChipLogError(Crypto, "mbedTLS error: -0x%04X", -static_cast<uint16_t>(error_code));
-#endif
-    }
-}
 
 static void _log_PSA_error(psa_status_t status)
 {
@@ -403,63 +379,8 @@ CHIP_ERROR EFR32OpaqueP256Keypair::Deserialize(P256SerializedKeypair & input)
 
 CHIP_ERROR EFR32OpaqueP256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
-    // Copied from mbedTLS, since x.509 is part of the TLS layer.
-#if defined(MBEDTLS_X509_CSR_WRITE_C)
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
-    size_t out_length;
-
-    mbedtls_x509write_csr csr;
-    mbedtls_x509write_csr_init(&csr);
-
-    VerifyOrExit(mHasKey, error = CHIP_ERROR_INCORRECT_STATE);
-
-    psa_crypto_init();
-
-    // Use PSA key to generate CSR
-    mbedtls_pk_context pk;
-    mbedtls_pk_init(&pk);
-    result = mbedtls_pk_setup_opaque(&pk, *((mbedtls_svc_key_id_t *) mContext));
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(pk.MBEDTLS_PRIVATE(pk_info) != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    mbedtls_x509write_csr_set_key(&csr, &pk);
-
-    mbedtls_x509write_csr_set_md_alg(&csr, MBEDTLS_MD_SHA256);
-
-    // TODO: mbedTLS CSR parser fails if the subject name is not set (or if empty).
-    //       CHIP Spec doesn't specify the subject name that can be used.
-    //       Figure out the correct value and update this code.
-    result = mbedtls_x509write_csr_set_subject_name(&csr, "O=CSR");
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_x509write_csr_der(&csr, out_csr, csr_length, nullptr, nullptr);
-    VerifyOrExit(result > 0, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<size_t>(result), error = CHIP_ERROR_INTERNAL);
-
-    out_length = static_cast<size_t>(result);
-    result     = 0;
-    VerifyOrExit(out_length <= csr_length, error = CHIP_ERROR_INTERNAL);
-
-    if (csr_length != out_length)
-    {
-        // mbedTLS API writes the CSR at the end of the provided buffer.
-        // Let's move it to the start of the buffer.
-        size_t offset = csr_length - out_length;
-        memmove(out_csr, &out_csr[offset], out_length);
-    }
-
-    csr_length = out_length;
-
-exit:
-    mbedtls_x509write_csr_free(&csr);
-
-    _log_mbedTLS_error(result);
-    return error;
-#else
-    ChipLogError(Crypto, "MBEDTLS_X509_CSR_WRITE_C is not enabled. CSR cannot be created");
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
+    MutableByteSpan csr(out_csr, csr_length);
+    return GenerateCertificateSigningRequest(this, csr);
 }
 
 CHIP_ERROR EFR32OpaqueP256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const
