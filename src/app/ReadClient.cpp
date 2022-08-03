@@ -504,11 +504,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     err = report.GetSubscriptionId(&subscriptionId);
     if (CHIP_NO_ERROR == err)
     {
-        if (!IsSubscriptionType())
-        {
-            err = CHIP_ERROR_INVALID_ARGUMENT;
-            goto exit;
-        }
+        VerifyOrExit(IsSubscriptionType(), err = CHIP_ERROR_INVALID_ARGUMENT);
         if (mWaitingForFirstPrimingReport)
         {
             mSubscriptionId = subscriptionId;
