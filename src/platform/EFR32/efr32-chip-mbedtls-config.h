@@ -45,10 +45,11 @@
 #define MBEDTLS_AES_C
 #define MBEDTLS_ECP_C
 #define MBEDTLS_ECDH_C
+#if CHIP_CRYPTO_MBEDTLS
 #define MBEDTLS_ENTROPY_C
+#endif
 #define MBEDTLS_SHA224_C
 #define MBEDTLS_SHA256_C
-#define MBEDTLS_TRNG_C
 
 #define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
 
@@ -84,7 +85,7 @@
 #define MBEDTLS_PK_C
 #define MBEDTLS_PK_PARSE_C
 #define MBEDTLS_PK_WRITE_C
-#if !CHIP_CRYPTO_PLATFORM
+#if CHIP_CRYPTO_MBEDTLS
 #define MBEDTLS_PKCS5_C
 #endif
 #define MBEDTLS_PLATFORM_C
@@ -107,9 +108,11 @@
 #define MBEDTLS_SSL_PROTO_DTLS
 #define MBEDTLS_SSL_SRV_C
 #define MBEDTLS_SSL_TLS_C
+
 #if CHIP_CRYPTO_PLATFORM
 #define MBEDTLS_USE_PSA_CRYPTO
 #endif
+
 #define MBEDTLS_X509_CREATE_C
 #define MBEDTLS_X509_CSR_WRITE_C
 #define MBEDTLS_X509_CRL_PARSE_C
@@ -136,5 +139,5 @@
 
 #include "check_crypto_config.h"
 #include "config-device-acceleration.h"
-#include "mbedtls/check_config.h"
 #include "mbedtls/config_psa.h"
+#include "mbedtls/check_config.h"
