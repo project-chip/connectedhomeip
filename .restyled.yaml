@@ -73,6 +73,7 @@ exclude:
     - "examples/chef/sample_app_util/test_files/*.yaml"
     - "examples/chef/zzz_generated/**/*"
     - "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.mm" # https://github.com/project-chip/connectedhomeip/issues/20236
+    - "src/darwin/Framework/CHIP/zap-generated/MTRClusters.mm"
 
 
 changed_paths:

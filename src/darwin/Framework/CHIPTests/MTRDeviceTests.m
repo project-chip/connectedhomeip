@@ -1249,7 +1249,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
-    XCTAssertTrue([output isEqualTo:input]);
+    XCTAssertTrue([output isEqual:input]);
 }
 
 - (void)testSignedInteger64Bits
@@ -1260,7 +1260,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
-    XCTAssertTrue([output isEqualTo:input]);
+    XCTAssertTrue([output isEqual:input]);
 }
 
 - (void)testUnsignedInteger
@@ -1271,7 +1271,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
-    XCTAssertTrue([output isEqualTo:input]);
+    XCTAssertTrue([output isEqual:input]);
 }
 
 - (void)testUnsignedInteger64Bits
@@ -1282,7 +1282,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
-    XCTAssertTrue([output isEqualTo:input]);
+    XCTAssertTrue([output isEqual:input]);
 }
 
 - (void)testBoolean
@@ -1293,7 +1293,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
-    XCTAssertTrue([output isEqualTo:input]);
+    XCTAssertTrue([output isEqual:input]);
 }
 
 - (void)testUTF8String
@@ -1303,7 +1303,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
-    XCTAssertTrue([output isEqualTo:input]);
+    XCTAssertTrue([output isEqual:input]);
 }
 
 - (void)testOctetString
@@ -1315,7 +1315,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
-    XCTAssertTrue([output isEqualTo:input]);
+    XCTAssertTrue([output isEqual:input]);
 }
 
 - (void)testFloat
@@ -1349,7 +1349,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
-    XCTAssertTrue([output isEqualTo:input]);
+    XCTAssertTrue([output isEqual:input]);
 }
 
 - (void)testStructure
@@ -1371,7 +1371,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
 
-    XCTAssertTrue([output isEqualTo:inputValue]);
+    XCTAssertTrue([output isEqual:inputValue]);
 }
 
 - (void)testArray
@@ -1385,7 +1385,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Conversion input: %@\nOutput: %@", inputValue, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
-    XCTAssertTrue([output isEqualTo:inputValue]);
+    XCTAssertTrue([output isEqual:inputValue]);
 }
 
 @end

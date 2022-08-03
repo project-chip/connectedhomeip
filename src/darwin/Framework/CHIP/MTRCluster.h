@@ -17,6 +17,10 @@
 
 #import <Foundation/Foundation.h>
 
+typedef void (^ResponseHandler)(id _Nullable value, NSError * _Nullable error);
+typedef void (^StatusCompletion)(NSError * _Nullable error);
+typedef void (^SubscriptionEstablishedHandler)(void);
+
 @class MTRBaseDevice;
 
 NS_ASSUME_NONNULL_BEGIN

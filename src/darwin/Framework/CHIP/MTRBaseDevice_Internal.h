@@ -20,6 +20,7 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/DeviceProxy.h>
 
 @class MTRDeviceController;
@@ -71,7 +72,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithPath:(const chip::app::ConcreteCommandPath &)path;
 @end
 
+@interface MTRAttributeReport ()
+- (instancetype)initWithPath:(const chip::app::ConcreteDataAttributePath &)path
+                       value:(nullable id)value
+                       error:(nullable NSError *)error;
+@end
+
+@interface MTREventReport ()
+- (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path
+                 eventNumber:(NSNumber *)eventNumber
+                    priority:(NSNumber *)priority
+                   timestamp:(NSNumber *)timestamp
+                       value:(nullable id)value
+                       error:(nullable NSError *)error;
+@end
+
 // Exported utility function
-id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data);
+// Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
+id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data);
 
 NS_ASSUME_NONNULL_END
