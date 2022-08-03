@@ -67,6 +67,8 @@ NS_ASSUME_NONNULL_BEGIN
  *                MTRDataKey : Data-value NSDictionary object.
  */
 typedef void (^MTRDeviceResponseHandler)(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error);
+typedef void (^MTRDeviceReportHandler)(NSArray * values);
+typedef void (^MTRDeviceErrorHandler)(NSError * error);
 
 extern NSString * const MTRAttributePathKey;
 extern NSString * const MTRCommandPathKey;
@@ -129,12 +131,12 @@ extern NSString * const MTRArrayValueType;
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
                 minInterval:(uint16_t)minInterval
                 maxInterval:(uint16_t)maxInterval
-                     params:(nullable MTRSubscribeParams *)params
+                     params:(MTRSubscribeParams * _Nullable)params
              cacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
-     attributeReportHandler:(nullable void (^)(NSArray * value))attributeReportHandler
-         eventReportHandler:(nullable void (^)(NSArray * value))eventReportHandler
-               errorHandler:(void (^)(NSError * error))errorHandler
-    subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
+     attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
+         eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
+               errorHandler:(MTRDeviceErrorHandler)errorHandler
+    subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler;
 
 /**
  * Read attribute in a designated attribute path
@@ -211,7 +213,7 @@ extern NSString * const MTRArrayValueType;
 
 @end
 
-@interface MTRAttributePath : NSObject
+@interface MTRAttributePath : NSObject <NSCopying>
 @property (nonatomic, readonly, strong, nonnull) NSNumber * endpoint;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * attribute;

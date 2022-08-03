@@ -1,0 +1,140 @@
+{{> header}}
+
+#import <Foundation/Foundation.h>
+
+#import "MTRAttributeCacheContainer_Internal.h"
+#import "MTRBaseDevice_internal.h"
+#import "MTRClusterConstants.h"
+#import "MTRClusters_internal.h"
+#import "MTRDevice.h"
+#import "MTRDevice_Internal.h"
+#import "MTRCallbackBridge_internal.h"
+#import "MTRCluster_internal.h"
+#import "MTRStructsObjc.h"
+#import "MTRCommandPayloadsObjc.h"
+
+#include <lib/support/CHIPListUtils.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <type_traits>
+
+using chip::Callback::Callback;
+using chip::Callback::Cancelable;
+using namespace chip::app::Clusters;
+using chip::Messaging::ExchangeManager;
+using chip::SessionHandle;
+
+// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
+{{#chip_client_clusters includeAll=true}}
+@implementation MTRCluster{{asUpperCamelCase name}}
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = endpoint;
+        _device = device;
+    }
+    return self;
+}
+
+{{#chip_cluster_commands}}
+{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}CommandSuccess{{/if}}{{/inline}}
+{{#unless (hasArguments)}}
+- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler
+{
+  [self {{asLowerCamelCase name}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
+}
+{{/unless}}
+- (void){{asLowerCamelCase name}}WithParams: (MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler
+{
+    // Make a copy of params before we go async.
+    params = [params copy];
+    [self.device connectAndPerformAsync:^(MTRBaseDevice * baseDevice) {
+        new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
+          baseDevice,
+          {{#if hasSpecificResponse}}
+            {{! This treats completionHandler as taking an id for the data.  This is
+                not great from a type-safety perspective, of course. }}
+            completionHandler,
+          {{else}}
+            {{! For now, don't change the bridge API; instead just use an adapter
+                to invoke our completion handler. This is not great from a
+                type-safety perspective, of course. }}
+            ^(id _Nullable value, NSError * _Nullable error) {
+              completionHandler(error);
+            },
+          {{/if}}
+          ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            chip::Optional<uint16_t> timedInvokeTimeoutMs;
+            ListFreer listFreer;
+            {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
+            if (params != nil) {
+              if (params.timedInvokeTimeoutMs != nil) {
+                timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+              }
+            }
+            {{#if mustUseTimedInvoke}}
+            if (!timedInvokeTimeoutMs.HasValue()) {
+              timedInvokeTimeoutMs.SetValue(10000);
+            }
+            {{/if}}
+            {{#chip_cluster_command_arguments}}
+              {{#first}}
+                {{#unless (commandHasRequiredField parent)}}
+                if (params != nil) {
+                {{/unless}}
+              {{/first}}
+              {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "params." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
+              {{#last}}
+                {{#unless (commandHasRequiredField parent)}}
+                }
+               {{/unless}}
+              {{/last}}
+            {{/chip_cluster_command_arguments}}
+
+            auto successFn = Callback<{{>callbackName}}CallbackType>::FromCancelable(success);
+            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+            chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
+            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+        });
+    }];
+
+    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+}
+{{/chip_cluster_commands}}
+
+{{#chip_server_cluster_attributes}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
+- (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
+    return [self.device readAttributeWithEndpointId:@(_endpoint) clusterId:@(MTRCluster{{asUpperCamelCase parent.name}}ID) attributeId:@(MTRCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) params:params];
+}
+
+{{#if isWritableAttribute}}
+{{#*inline "callbackName"}}DefaultSuccess{{/inline}}
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+  [self write{{>attribute}}WithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber *waitTimeInMs = params.timedWriteTimeout;
+    {{#if mustUseTimedInvoke}}
+    if (!waitTimeInMs) {
+        waitTimeInMs = @(10000);
+    }
+    {{/if}}
+
+    [self.device writeAttributeWithEndpointId:@(_endpoint) clusterId:@(MTRCluster{{asUpperCamelCase parent.name}}ID) attributeId:@(MTRCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:waitTimeInMs];
+}
+
+{{/if}}
+
+{{/chip_server_cluster_attributes}}
+
+@end
+
+{{/chip_client_clusters}}
+// NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
