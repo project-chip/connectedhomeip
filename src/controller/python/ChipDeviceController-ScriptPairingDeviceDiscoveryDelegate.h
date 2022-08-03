@@ -29,7 +29,7 @@ class ScriptPairingDeviceDiscoveryDelegate : public DeviceDiscoveryDelegate
 {
 public:
     void Init(NodeId nodeId, uint32_t setupPasscode, CommissioningParameters commissioningParams,
-               ScriptDevicePairingDelegate * pairingDelegate, DeviceCommissioner * activeDeviceCommissioner)
+              ScriptDevicePairingDelegate * pairingDelegate, DeviceCommissioner * activeDeviceCommissioner)
     {
         mNodeId                   = nodeId;
         mSetupPasscode            = setupPasscode;

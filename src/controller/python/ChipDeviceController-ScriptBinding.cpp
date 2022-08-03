@@ -403,7 +403,7 @@ ChipError::StorageType pychip_DeviceController_OnNetworkCommission(chip::Control
     case chip::Dnssd::DiscoveryFilterType::kVendorId:
     case chip::Dnssd::DiscoveryFilterType::kDeviceType: {
         // For any numerical filter, convert the string to a filter value
-        errno = 0;
+        errno                               = 0;
         unsigned long long int numericalArg = strtoull(filterParam, nullptr, 0);
         if ((numericalArg == ULLONG_MAX) && (errno == ERANGE))
         {
