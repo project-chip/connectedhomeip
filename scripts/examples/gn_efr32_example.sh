@@ -151,7 +151,7 @@ else
                 if [ "$2" = "WPA_WPA2" ]; then
                     optArgs+="wifi_enable_security_wpa3=false "
                 elif [ "$2" = "WPA3_ONLY" ]; then
-				    optArgs+="wifi_enable_security_wpa3=true "
+                    optArgs+="wifi_enable_security_wpa3=true "
                 else
                     echo "Set security usage: --rs911x_setSecurityType WPA_WPA2|WPA3_ONLY"
                     exit 1
