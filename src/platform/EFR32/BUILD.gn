@@ -84,7 +84,7 @@ static_library("EFR32") {
 
     public_deps += [
       "${chip_root}/src/crypto",
-      "${mbedtls_root}:mbedtls"
+      "${mbedtls_root}:mbedtls",
     ]
   }
 

@@ -98,8 +98,8 @@ if (chip_crypto == "openssl") {
     # BoringSSL is close enough to OpenSSL that isd uses same PAL, with minor #ifdef differences
     sources = [ "CHIPCryptoPALOpenSSL.cpp" ]
     public_deps = [
-      "${boringssl_root}:boringssl",
       ":public_headers",
+      "${boringssl_root}:boringssl",
     ]
   }
 } else if (chip_crypto == "mbedtls") {
@@ -121,8 +121,8 @@ if (chip_crypto == "openssl") {
   source_set("cryptopal_tinycrypt") {
     sources = [ "CHIPCryptoPALTinyCrypt.cpp" ]
     public_deps = [
-      "${mbedtls_root}:mbedtls",
       ":public_headers",
+      "${mbedtls_root}:mbedtls",
     ]
   }
 }
@@ -142,18 +142,16 @@ static_library("crypto") {
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [
-    ":public_headers",
-  ]
+  public_deps = [ ":public_headers" ]
 
   if (chip_crypto == "mbedtls") {
-    public_deps += [":cryptopal_mbedtls"]
+    public_deps += [ ":cryptopal_mbedtls" ]
   } else if (chip_crypto == "openssl") {
-    public_deps += [":cryptopal_openssl"]
+    public_deps += [ ":cryptopal_openssl" ]
   } else if (chip_crypto == "boringssl") {
-    public_deps += [":cryptopal_boringssl"]
+    public_deps += [ ":cryptopal_boringssl" ]
   } else if (chip_crypto == "tinycrypt") {
-    public_deps += [":cryptopal_tinycrypt"]
+    public_deps += [ ":cryptopal_tinycrypt" ]
   } else if (chip_crypto == "platform") {
     # Platform implementation is responsible for bringing their
     # own implementation and dependencies
