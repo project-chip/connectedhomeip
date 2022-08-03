@@ -63,9 +63,9 @@ public class ChipDeviceController {
   }
 
   /**
-   * Sets this DeviceController to use the given issuer for issuing operational certs.
-   * By default, the DeviceController uses an internal, OperationalCredentialsDelegate
-   * (see AndroidOperationalCredentialsIssuer)
+   * Sets this DeviceController to use the given issuer for issuing operational certs. By default,
+   * the DeviceController uses an internal, OperationalCredentialsDelegate (see
+   * AndroidOperationalCredentialsIssuer)
    *
    * @param issuer
    */
@@ -197,20 +197,19 @@ public class ChipDeviceController {
   }
 
   /**
-   * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded
-   * will be called when the NOC CSR needs to be signed. This allows for custom credentials
-   * issuer implementations, for example, when a proprietary cloud API will perform the
-   * CSR signing.
+   * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
+   * called when the NOC CSR needs to be signed. This allows for custom credentials issuer
+   * implementations, for example, when a proprietary cloud API will perform the CSR signing.
    *
-   * The commissioning workflow will stop upon the onNOCChainGenerationNeeded callback
-   * and resume once onNOCChainGeneration is called.
+   * <p>The commissioning workflow will stop upon the onNOCChainGenerationNeeded callback and resume
+   * once onNOCChainGeneration is called.
    *
-   * The following fields on the ControllerParams object MUST be populated:
-   * rootCertificate, intermediateCertificate, operationalCertificate
+   * <p>The following fields on the ControllerParams object MUST be populated: rootCertificate,
+   * intermediateCertificate, operationalCertificate
    *
-   * If ipk and adminSubject are set on the ControllerParams object, then they will be used
-   * in the AddNOC command set to the commissionee. If they are not populated, then the values
-   * provided in the ChipDeviceController initialization will be used.
+   * <p>If ipk and adminSubject are set on the ControllerParams object, then they will be used in
+   * the AddNOC command set to the commissionee. If they are not populated, then the values provided
+   * in the ChipDeviceController initialization will be used.
    *
    * @param params
    * @return CHIP_ERROR error code (0 is no error)
@@ -218,7 +217,6 @@ public class ChipDeviceController {
   public int onNOCChainGeneration(ControllerParams params) {
     return onNOCChainGeneration(deviceControllerPtr, params);
   }
-
 
   /**
    * Update the network credentials held by the commissioner for the current commissioning session.
@@ -363,8 +361,15 @@ public class ChipDeviceController {
       byte[] pai) {
     if (nocChainIssuer != null) {
       nocChainIssuer.onNOCChainGenerationNeeded(
-          csrElements, csrNonce, csrElementsSignature, attestationChallenge,
-          attestationElements, attestationNonce, attestationElementsSignature, dac, pai);
+          csrElements,
+          csrNonce,
+          csrElementsSignature,
+          attestationChallenge,
+          attestationElements,
+          attestationNonce,
+          attestationElementsSignature,
+          dac,
+          pai);
     }
   }
 
@@ -687,7 +692,8 @@ public class ChipDeviceController {
 
   private native void resumeCommissioning(long deviceControllerPtr);
 
-  private native void setUseJavaCallbackForNOCRequest(long deviceControllerPtr, boolean useCallback);
+  private native void setUseJavaCallbackForNOCRequest(
+      long deviceControllerPtr, boolean useCallback);
 
   private native void updateCommissioningNetworkCredentials(
       long deviceControllerPtr, NetworkCredentials networkCredentials);
@@ -715,22 +721,21 @@ public class ChipDeviceController {
   /** Interface to implement custom operational credentials issuer (NOC chain generation). */
   public interface NOCChainIssuer {
     /**
-     * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded
-     * will be called when the NOC CSR needs to be signed. This allows for custom credentials
-     * issuer implementations, for example, when a proprietary cloud API will perform the
-     * CSR signing.
+     * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
+     * called when the NOC CSR needs to be signed. This allows for custom credentials issuer
+     * implementations, for example, when a proprietary cloud API will perform the CSR signing.
      *
-     * The commissioning workflow will stop upon the onNOCChainGenerationNeeded callback
-     * and resume once onNOCChainGeneration is called.
+     * <p>The commissioning workflow will stop upon the onNOCChainGenerationNeeded callback and
+     * resume once onNOCChainGeneration is called.
      *
-     * The following fields on the ControllerParams object passed to onNOCChainGeneration
-     * MUST be populated: rootCertificate, intermediateCertificate, operationalCertificate
+     * <p>The following fields on the ControllerParams object passed to onNOCChainGeneration MUST be
+     * populated: rootCertificate, intermediateCertificate, operationalCertificate
      *
-     * If ipk and adminSubject are set on the ControllerParams object, then they will be used
-     * in the AddNOC command set to the commissionee. If they are not populated, then the values
+     * <p>If ipk and adminSubject are set on the ControllerParams object, then they will be used in
+     * the AddNOC command set to the commissionee. If they are not populated, then the values
      * provided in the ChipDeviceController initialization will be used.
      *
-     * All csr and attestation fields are provided to allow for custom attestestation checks.
+     * <p>All csr and attestation fields are provided to allow for custom attestestation checks.
      */
     void onNOCChainGenerationNeeded(
         byte[] csrElements,
@@ -747,9 +752,9 @@ public class ChipDeviceController {
   /**
    * Interface to listen for scan networks callbacks from CHIPDeviceController.
    *
-   * Set the AttemptNetworkScanWiFi or AttemptNetworkScanThread to configure the
-   * enable/disable WiFi or Thread network scan during commissioning in the the default CommissioningDelegate
-   * used by the ChipDeviceCommissioner.
+   * <p>Set the AttemptNetworkScanWiFi or AttemptNetworkScanThread to configure the enable/disable
+   * WiFi or Thread network scan during commissioning in the the default CommissioningDelegate used
+   * by the ChipDeviceCommissioner.
    */
   public interface ScanNetworksListener {
     /** Notifies when scan networks call fails. */
