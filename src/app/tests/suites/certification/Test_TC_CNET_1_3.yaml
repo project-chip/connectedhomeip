@@ -38,7 +38,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "TH reads the FeatureMap from DUT"
       PICS: CNET.S.F00
@@ -48,7 +48,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "TH reads the FeatureMap from DUT"
       PICS: CNET.S.F01
@@ -58,7 +58,7 @@ tests:
       response:
           value: 2
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "TH reads the FeatureMap from DUT"
       PICS: CNET.S.F02
@@ -68,7 +68,7 @@ tests:
       response:
           value: 4
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "TH reads AttributeList from DUT"
       command: "readAttribute"
