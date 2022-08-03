@@ -18,14 +18,21 @@
 #pragma once
 
 #include <crypto/OperationalKeystore.h>
+#include <lib/core/CHIPConfig.h>
 
 #include <psa/crypto.h>
 
 #include "Efr32OpaqueKeypair.h"
 #include <platform/CHIPDeviceLayer.h>
 
+// Set SL_MATTER_MAX_STORED_OP_KEYS to the preferred size of the mapping table
+// between fabric IDs and opaque key indices. It can not be less than
+// CHIP_CONFIG_MAX_FABRICS + 1 (since there would be too few map elements to
+// support all fabrics the application wants to support in addition to an extra
+// pending key), but can be larger in case a consistent on-disk size of the map
+// is required.
 #ifndef SL_MATTER_MAX_STORED_OP_KEYS
-#define SL_MATTER_MAX_STORED_OP_KEYS (kMaxValidFabricIndex - kMinValidFabricIndex + 1)
+#define SL_MATTER_MAX_STORED_OP_KEYS (CHIP_CONFIG_MAX_FABRICS + 1)
 #endif
 
 namespace chip {
@@ -72,7 +79,8 @@ protected:
     // The keymap maps PSA Crypto persistent key ID offsets against fabric IDs.
     // The keymap is persisted in NVM3, and the keys are stored through the PSA
     // API.
-    FabricIndex mKeyMapping[SL_MATTER_MAX_STORED_OP_KEYS] = { kUndefinedFabricIndex };
+    FabricIndex * mKeyMap = nullptr;
+    size_t mKeyMapSize = 0;
 
     // The key cache is to avoid having to reconstruct keys from the storage
     // backend all the time (since it is rather slow).
@@ -96,6 +104,26 @@ private:
         mPendingKeypair         = nullptr;
         mIsPendingKeypairActive = false;
         mPendingFabricIndex     = kUndefinedFabricIndex;
+    }
+
+    void Deinit()
+    {
+        ResetPendingKey();
+
+        if (mCachedKey != nullptr)
+        {
+            Platform::Delete<EFR32OpaqueP256Keypair>(mCachedKey);
+            mCachedKey = nullptr;
+        }
+
+        if (mKeyMap != nullptr)
+        {
+            Platform::MemoryFree(mKeyMap);
+            mKeyMap = nullptr;
+            mKeyMapSize = 0;
+        }
+
+        mIsInitialized = false;
     }
 
     /**

@@ -32,7 +32,9 @@ namespace DeviceLayer {
 namespace Internal {
 
 static_assert((sizeof(FabricIndex) == 1), "Implementation is not prepared for large fabric indices");
-static_assert(SL_MATTER_MAX_STORED_OP_KEYS <= (kEFR32OpaqueKeyIdPersistentMax - kEFR32OpaqueKeyIdPersistentMin));
+static_assert(SL_MATTER_MAX_STORED_OP_KEYS <= (kEFR32OpaqueKeyIdPersistentMax - kEFR32OpaqueKeyIdPersistentMin), "Not enough opaque keys available to cover all requested operational keys");
+static_assert((CHIP_CONFIG_MAX_FABRICS + 1) <= SL_MATTER_MAX_STORED_OP_KEYS, "Not enough operational keys requested to cover all potential fabrics (+1 staging for fabric update)");
+static_assert(SL_MATTER_MAX_STORED_OP_KEYS >= 1, "Minimum supported amount of operational keys is 1");
 
 using namespace chip::Crypto;
 
@@ -41,90 +43,101 @@ using chip::Platform::MemoryFree;
 
 Efr32PsaOperationalKeystore::~Efr32PsaOperationalKeystore()
 {
-    if (mIsInitialized)
-    {
-        ResetPendingKey();
-        Platform::Delete<EFR32OpaqueP256Keypair>(mCachedKey);
-    }
+    Deinit();
 }
 
 CHIP_ERROR Efr32PsaOperationalKeystore::Init()
 {
-    // Load keymap from storage
-    size_t outLen;
-    CHIP_ERROR error = EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMapping, sizeof(mKeyMapping), outLen);
+    // Detect existing keymap size
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    size_t wantedLen = SL_MATTER_MAX_STORED_OP_KEYS * sizeof(FabricIndex);
+    size_t existingLen = 0;
+    bool update_cache = false;
 
-    if (error == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (EFR32Config::ConfigValueExists(EFR32Config::kConfigKey_OpKeyMap, existingLen))
     {
-        // This can happen with a blank device. Write out the uninitialized map.
-        for (size_t i = 0; i < SL_MATTER_MAX_STORED_OP_KEYS; i++)
+        // There's a pre-existing key map on disk. Size the map to read it fully.
+        size_t outLen = 0;
+
+        if (existingLen > (kEFR32OpaqueKeyIdPersistentMax - kEFR32OpaqueKeyIdPersistentMin) * sizeof(FabricIndex))
         {
-            mKeyMapping[i] = kUndefinedFabricIndex;
+            return CHIP_ERROR_INTERNAL;
         }
 
-        outLen = SL_MATTER_MAX_STORED_OP_KEYS;
+        // Upsize the map if the config was changed
+        if (existingLen < wantedLen)
+        {
+            existingLen = wantedLen;
+        }
+
+        mKeyMap = (FabricIndex *) MemoryCalloc(1, existingLen);
+        VerifyOrExit(mKeyMap, error = CHIP_ERROR_NO_MEMORY);
+
+        // Read the existing key map
+        error = EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, (uint8_t *)mKeyMap, existingLen, outLen);
+        SuccessOrExit(error);
+
+        // If upsizing, extend the map with undefined indices
+        for (size_t i = (outLen / sizeof(FabricIndex)); i < (existingLen / sizeof(FabricIndex)); i++)
+        {
+            mKeyMap[i] = kUndefinedFabricIndex;
+        }
+
+        // If the config has changed, check whether it can be downsized fully or partially
+        if (existingLen > wantedLen)
+        {
+            size_t highest_found_index = 0;
+            for (size_t i = (wantedLen / sizeof(FabricIndex)); i < (existingLen / sizeof(FabricIndex)); i++)
+            {
+                if (mKeyMap[i] != kUndefinedFabricIndex)
+                {
+                    highest_found_index = i;
+                }
+            }
+
+            // set size to the smallest that will fit the upper opaque key ID in use
+            if (highest_found_index > 0)
+            {
+                existingLen = (highest_found_index + 1) * sizeof(FabricIndex);
+                update_cache = true;
+            }
+        }
+
+        // Set the key map size
+        mKeyMapSize = existingLen;
     }
-    else if (error == CHIP_ERROR_BUFFER_TOO_SMALL)
+    else
     {
-        // This can happen when reducing SL_MATTER_MAX_STORED_OP_KEYS on existing devices
-        // We can do a partial recovery.
-        size_t existingLen = 0;
-        if (!EFR32Config::ConfigValueExists(EFR32Config::kConfigKey_OpKeyMap, existingLen))
+        // No key map on disk. Create and initialize a new one.
+        mKeyMap = (FabricIndex *) MemoryCalloc(1, wantedLen);
+        VerifyOrExit(mKeyMap, error = CHIP_ERROR_NO_MEMORY);
+
+        for (size_t i = 0; i < (wantedLen / sizeof(FabricIndex)); i++)
         {
-            return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+            mKeyMap[i] = kUndefinedFabricIndex;
         }
 
-        uint8_t * temp_buf = (uint8_t *) MemoryCalloc(1, existingLen);
-        if (!temp_buf)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        mKeyMapSize = wantedLen;
 
-        error = EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, temp_buf, existingLen, outLen);
-        if (error != CHIP_NO_ERROR)
-        {
-            MemoryFree(temp_buf);
-            return error;
-        }
-
-        memcpy(mKeyMapping, temp_buf, existingLen);
-        MemoryFree(temp_buf);
-
-        for (size_t i = existingLen; i < SL_MATTER_MAX_STORED_OP_KEYS; i++)
-        {
-            mKeyMapping[i] = kUndefinedFabricIndex;
-        }
-
-        outLen = SL_MATTER_MAX_STORED_OP_KEYS;
-    }
-    else if (error != CHIP_NO_ERROR)
-    {
-        return error;
+        update_cache = true;
     }
 
-    if (outLen < SL_MATTER_MAX_STORED_OP_KEYS)
+    // Write-out keymap if needed
+    if (update_cache)
     {
-        // This can happen when increasing SL_MATTER_MAX_STORED_OP_KEYS on existing devices
-        for (size_t i = outLen; i < SL_MATTER_MAX_STORED_OP_KEYS; i++)
-        {
-            mKeyMapping[i] = kUndefinedFabricIndex;
-        }
-
-        outLen = SL_MATTER_MAX_STORED_OP_KEYS;
-    }
-
-    // Update cache
-    error = EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMapping, sizeof(mKeyMapping));
-    if (error != CHIP_NO_ERROR)
-    {
-        return error;
+        error = EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
+        SuccessOrExit(error);
     }
 
     // Initialize cache key
     mCachedKey = Platform::New<EFR32OpaqueP256Keypair>();
-    if (!mCachedKey)
+    VerifyOrExit(mCachedKey, error = CHIP_ERROR_NO_MEMORY);
+
+exit:
+    if (error != CHIP_NO_ERROR)
     {
-        return CHIP_ERROR_NO_MEMORY;
+        Deinit();
+        return error;
     }
 
     mIsInitialized = true;
@@ -134,9 +147,9 @@ CHIP_ERROR Efr32PsaOperationalKeystore::Init()
 EFR32OpaqueKeyId Efr32PsaOperationalKeystore::FindKeyIdForFabric(FabricIndex fabricIndex) const
 {
     // Search the map linearly to find a matching index slot
-    for (size_t i = 0; i < SL_MATTER_MAX_STORED_OP_KEYS; i++)
+    for (size_t i = 0; i < (mKeyMapSize / sizeof(FabricIndex)); i++)
     {
-        if (mKeyMapping[i] == fabricIndex)
+        if (mKeyMap[i] == fabricIndex)
         {
             // Found a match
             return i + kEFR32OpaqueKeyIdPersistentMin;
@@ -280,16 +293,23 @@ CHIP_ERROR Efr32PsaOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fab
         return CHIP_ERROR_INTERNAL;
     }
 
-    if (mKeyMapping[id - kEFR32OpaqueKeyIdPersistentMin] != kUndefinedFabricIndex)
+    // Guard against array out-of-bounds (should not happen with correctly initialised keys)
+    size_t keymap_index = id - kEFR32OpaqueKeyIdPersistentMin;
+    if (keymap_index >= (mKeyMapSize / sizeof(FabricIndex)))
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (mKeyMap[keymap_index] != kUndefinedFabricIndex)
     {
         ResetPendingKey();
         return CHIP_ERROR_INTERNAL;
     }
 
-    mKeyMapping[id - kEFR32OpaqueKeyIdPersistentMin] = fabricIndex;
+    mKeyMap[keymap_index] = fabricIndex;
 
     // Persist key map
-    CHIP_ERROR error = EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMapping, sizeof(mKeyMapping));
+    CHIP_ERROR error = EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
     if (error != CHIP_NO_ERROR)
     {
         return error;
@@ -323,11 +343,18 @@ CHIP_ERROR Efr32PsaOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fab
         return CHIP_NO_ERROR;
     }
 
+    // Guard against array out-of-bounds (should not happen with correctly initialised keys)
+    size_t keymap_index = id - kEFR32OpaqueKeyIdPersistentMin;
+    if (keymap_index >= (mKeyMapSize / sizeof(FabricIndex)))
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
     // Reset the key mapping since we'll be deleting this key
-    mKeyMapping[id - kEFR32OpaqueKeyIdPersistentMin] = kUndefinedFabricIndex;
+    mKeyMap[keymap_index] = kUndefinedFabricIndex;
 
     // Persist key map
-    CHIP_ERROR error = EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMapping, sizeof(mKeyMapping));
+    CHIP_ERROR error = EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
     if (error != CHIP_NO_ERROR)
     {
         return error;
