@@ -103,7 +103,7 @@ public final class ControllerParams {
     private int controllerVendorId = 0xFFFF;
     private int failsafeTimerSeconds = 30;
     private boolean attemptNetworkScanWiFi = false;
-    private boolean attemptNetworkScanThread = true;
+    private boolean attemptNetworkScanThread = false;
     @Nullable private KeypairDelegate keypairDelegate = null;
     @Nullable private byte[] rootCertificate = null;
     @Nullable private byte[] intermediateCertificate = null;
@@ -126,6 +126,14 @@ public final class ControllerParams {
       return this;
     }
 
+    /**
+     * Sets the FailsafeTimer duration passed to ChipDeviceCommissioner's 
+     * CommissioningParameters. Increasing this value from its default will allow more time 
+     * for network scans, cloud op cert signing calls, and user interaction.
+     * 
+     * @param failsafeTimerSeconds
+     * @return
+     */
     public Builder setFailsafeTimerSeconds(int failsafeTimerSeconds) {
       if (failsafeTimerSeconds < 1 || failsafeTimerSeconds > 900) {
         throw new IllegalArgumentException("failsafeTimerSeconds must be between 0 and 900");
@@ -134,11 +142,31 @@ public final class ControllerParams {
       return this;
     }
 
+    /**
+     * Enable/disable wifi network scan during commissioning in the the default CommissioningDelegate
+     * used by the ChipDeviceCommissioner.
+     * 
+     * Specifically, this sets AttemptWiFiNetworkScan in the CommissioningParameters passed to the 
+     * CommissioningDelegate.
+     * 
+     * @param attemptNetworkScanWiFi
+     * @return
+     */
     public Builder setAttemptNetworkScanWiFi(boolean attemptNetworkScanWiFi) {
       this.attemptNetworkScanWiFi = attemptNetworkScanWiFi;
       return this;
     }
 
+    /**
+     * Enable/disable Thread network scan during commissioning in the the default CommissioningDelegate
+     * used by the ChipDeviceCommissioner.
+     * 
+     * Specifically, this sets AttemptThreadNetworkScan in the CommissioningParameters passed to the 
+     * CommissioningDelegate.
+     * 
+     * @param attemptNetworkScanWiFi
+     * @return
+     */
     public Builder setAttemptNetworkScanThread(boolean attemptNetworkScanThread) {
       this.attemptNetworkScanThread = attemptNetworkScanThread;
       return this;
@@ -169,6 +197,14 @@ public final class ControllerParams {
       return this;
     }
 
+    /**
+     * Sets the AdminSubject value passed to ChipDeviceCommissioner's 
+     * CommissioningParameters. This value is passed in the AddNoc command sent to the
+     * commissionee and represents the subject of the default ACL created by that call.
+     * 
+     * @param adminSubject
+     * @return
+     */
     public Builder setAdminSubject(long adminSubject) {
       this.adminSubject = adminSubject;
       return this;
