@@ -28,17 +28,7 @@
 namespace chip {
 namespace Credentials {
 
-typedef struct OperationalKey
-{
-    /// Validity start time in microseconds since 2000-01-01T00:00:00 UTC ("the Epoch")
-    uint64_t start_time;
-    /// Session Id
-    uint16_t hash;
-    /// Operational group key
-    uint8_t value[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-    /// Privacy key
-    uint8_t privacy_key[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-} OperationalKey;
+using GroupOperationalCredentials = Crypto::GroupOperationalCredentials;
 
 class GroupDataProvider
 {

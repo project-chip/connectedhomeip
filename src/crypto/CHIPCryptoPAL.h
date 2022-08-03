@@ -1485,6 +1485,21 @@ CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan 
 CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & x509Cert, AttestationCertVidPid & vidpid);
 
 /**
+ * @brief The set of credentials needed to operate group message security with symmetric keys.
+ */
+typedef struct GroupOperationalCredentials
+{
+    /// Validity start time in microseconds since 2000-01-01T00:00:00 UTC ("the Epoch")
+    uint64_t start_time;
+    /// Session Id
+    uint16_t hash;
+    /// Operational group key
+    uint8_t encryption_key[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    /// Privacy key
+    uint8_t privacy_key[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+} GroupOperationalCredentials;
+
+/**
  * @brief Opaque context used to protect a symmetric key. The key operations must
  *        be performed without exposing the protected key value.
  */
@@ -1578,5 +1593,17 @@ CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & ses
  **/
 CHIP_ERROR DeriveGroupPrivacyKey(const ByteSpan & epoch_key, MutableByteSpan & out_key);
 
+/**
+ *  @brief Derives the complete set of credentials needed for group security.
+ *
+ * This function will derive the Encryption Key, Group Key Hash (Session Id), and Privacy Key
+ * for the given Epoch Key and Compressed Fabric Id.
+ * @param[in] epoch_key  The epoch key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
+ * @param[in] compressed_fabric_id The compressed fabric ID for the fabric (big endian byte string)
+ * @param[out] operational_credentials The set of Symmetric keys used during message processing for group communication.
+ * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INTERNAL if the provided key is invalid.
+ **/
+CHIP_ERROR DeriveGroupOperationalCredentials(const ByteSpan & epoch_key, const ByteSpan & compressed_fabric_id,
+                                             GroupOperationalCredentials & operational_credentials);
 } // namespace Crypto
 } // namespace chip
