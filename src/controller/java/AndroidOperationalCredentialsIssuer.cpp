@@ -71,9 +71,9 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
     }
 
-    mStorage       = &storage;
+    mStorage          = &storage;
     mAutoCommissioner = autoCommissioner;
-    mJavaObjectRef = javaObjectRef;
+    mJavaObjectRef    = javaObjectRef;
 
     mInitialized = true;
     return CHIP_NO_ERROR;
@@ -150,7 +150,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = JniReferences::GetInstance().FindMethod(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef,
-                                                             "onNOCChainGenerationNeeded", "([B[B[B[B[B[B[B[B[B)V", &method);
+                                                  "onNOCChainGenerationNeeded", "([B[B[B[B[B[B[B[B[B)V", &method);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Error invoking onNOCChainGenerationNeeded: %" CHIP_ERROR_FORMAT, err.Format());
@@ -231,7 +231,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const Byte
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = JniReferences::GetInstance().FindMethod(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef,
-                                                             "onOpCSRGenerationComplete", "([B)V", &method);
+                                                  "onOpCSRGenerationComplete", "([B)V", &method);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %" CHIP_ERROR_FORMAT, err.Format());

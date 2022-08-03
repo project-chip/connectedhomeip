@@ -127,13 +127,13 @@ public final class ControllerParams {
     }
 
     /**
-     * Sets the FailsafeTimer duration passed to ChipDeviceCommissioner's 
-     * CommissioningParameters. Increasing this value from its default will allow more time 
-     * for network scans, cloud op cert signing calls, and user interaction.
-     * 
-     * Note: It is also possible for internal logic (within Autocommissioner, etc) to re-call 
+     * Sets the FailsafeTimer duration passed to ChipDeviceCommissioner's CommissioningParameters.
+     * Increasing this value from its default will allow more time for network scans, cloud op cert
+     * signing calls, and user interaction.
+     *
+     * <p>Note: It is also possible for internal logic (within Autocommissioner, etc) to re-call
      * ArmFailSafe to account for network config delays.
-     * 
+     *
      * @param failsafeTimerSeconds
      * @return
      */
@@ -146,15 +146,15 @@ public final class ControllerParams {
     }
 
     /**
-     * Enable/disable wifi network scan during commissioning in the the default CommissioningDelegate
-     * used by the ChipDeviceCommissioner.
-     * 
-     * Specifically, this sets AttemptWiFiNetworkScan in the CommissioningParameters passed to the 
-     * CommissioningDelegate.
-     * 
-     * When a WiFi scan is attempted, the result will be propagated to the ScanNetworksListener assigned
-     * to the ChipDeviceController.
-     * 
+     * Enable/disable wifi network scan during commissioning in the the default
+     * CommissioningDelegate used by the ChipDeviceCommissioner.
+     *
+     * <p>Specifically, this sets AttemptWiFiNetworkScan in the CommissioningParameters passed to
+     * the CommissioningDelegate.
+     *
+     * <p>When a WiFi scan is attempted, the result will be propagated to the ScanNetworksListener
+     * assigned to the ChipDeviceController.
+     *
      * @param attemptNetworkScanWiFi
      * @return
      */
@@ -164,15 +164,15 @@ public final class ControllerParams {
     }
 
     /**
-     * Enable/disable Thread network scan during commissioning in the the default CommissioningDelegate
-     * used by the ChipDeviceCommissioner.
-     * 
-     * Specifically, this sets AttemptThreadNetworkScan in the CommissioningParameters passed to the 
-     * CommissioningDelegate.
-     * 
-     * When a Thread scan is attempted, the result will be propagated to the ScanNetworksListener assigned
-     * to the ChipDeviceController.
-     * 
+     * Enable/disable Thread network scan during commissioning in the the default
+     * CommissioningDelegate used by the ChipDeviceCommissioner.
+     *
+     * <p>Specifically, this sets AttemptThreadNetworkScan in the CommissioningParameters passed to
+     * the CommissioningDelegate.
+     *
+     * <p>When a Thread scan is attempted, the result will be propagated to the ScanNetworksListener
+     * assigned to the ChipDeviceController.
+     *
      * @param attemptNetworkScanWiFi
      * @return
      */
@@ -207,10 +207,10 @@ public final class ControllerParams {
     }
 
     /**
-     * Sets the AdminSubject value passed to ChipDeviceCommissioner's 
-     * CommissioningParameters. This value is passed in the AddNoc command sent to the
-     * commissionee and represents the subject of the default ACL created by that call.
-     * 
+     * Sets the AdminSubject value passed to ChipDeviceCommissioner's CommissioningParameters. This
+     * value is passed in the AddNoc command sent to the commissionee and represents the subject of
+     * the default ACL created by that call.
+     *
      * @param adminSubject
      * @return
      */
