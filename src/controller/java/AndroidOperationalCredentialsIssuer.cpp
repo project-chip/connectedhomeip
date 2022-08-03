@@ -142,7 +142,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
 }
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
-                                                                         const ByteSpan & attestationSignature,
+                                                                         const ByteSpan & csrSignature,
                                                                          const ByteSpan & attestationChallenge,
                                                                          const ByteSpan & DAC, const ByteSpan & PAI,
                                                                          Callback::Callback<OnNOCChainGeneration> * onCompletion)
@@ -150,7 +150,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = JniReferences::GetInstance().FindMethod(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef,
-                                                             "onNOCChainGenerationNeeded", "([B[B[B[B[B[B[B)V", &method);
+                                                             "onNOCChainGenerationNeeded", "([B[B[B[B[B[B[B[B[B)V", &method);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Error invoking onNOCChainGenerationNeeded: %" CHIP_ERROR_FORMAT, err.Format());
@@ -169,9 +169,9 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csrNonce.data(),
                                                csrNonce.size(), javaCsrNonce);
 
-    jbyteArray javaAttestationSignature;
-    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), attestationSignature.data(),
-                                               attestationSignature.size(), javaAttestationSignature);
+    jbyteArray javaCsrSignature;
+    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csrSignature.data(),
+                                               csrSignature.size(), javaCsrSignature);
 
     jbyteArray javaAttestationChallenge;
     JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), attestationChallenge.data(),
@@ -182,6 +182,18 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), attestationElements.data(),
                                                attestationElements.size(), javaAttestationElements);
 
+    const ByteSpan & attestationNonce = mAutoCommissioner->GetCommissioningParameters().GetAttestationNonce().Value();
+    jbyteArray javaAttestationNonce;
+    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), attestationNonce.data(),
+                                               attestationNonce.size(), javaAttestationNonce);
+
+    const ByteSpan & attestationElementsSignature =
+        mAutoCommissioner->GetCommissioningParameters().GetAttestationSignature().Value();
+    jbyteArray javaAttestationElementsSignature;
+    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(),
+                                               attestationElementsSignature.data(), attestationElementsSignature.size(),
+                                               javaAttestationElementsSignature);
+
     jbyteArray javaDAC;
     JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), DAC.data(), DAC.size(),
                                                javaDAC);
@@ -190,9 +202,9 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), PAI.data(), PAI.size(),
                                                javaPAI);
 
-    JniReferences::GetInstance().GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, javaCsr, javaCsrNonce,
-                                                                          javaAttestationSignature, javaAttestationChallenge,
-                                                                          javaAttestationElements, javaDAC, javaPAI);
+    JniReferences::GetInstance().GetEnvForCurrentThread()->CallVoidMethod(
+        mJavaObjectRef, method, javaCsr, javaCsrNonce, javaCsrSignature, javaAttestationChallenge, javaAttestationElements,
+        javaAttestationNonce, javaAttestationElementsSignature, javaDAC, javaPAI);
     return CHIP_NO_ERROR;
 }
 

@@ -347,15 +347,17 @@ public class ChipDeviceController {
   public void onNOCChainGenerationNeeded(
       byte[] csrElements, 
       byte[] csrNonce, 
-      byte[] attestationSignature, 
+      byte[] csrElementsSignature, 
       byte[] attestationChallenge, 
       byte[] attestationElements, 
+      byte[] attestationNonce, 
+      byte[] attestationElementsSignature, 
       byte[] dac, 
       byte[] pai) {
     if (nocChainIssuer != null) {
       nocChainIssuer.onNOCChainGenerationNeeded(
-          csrElements, csrNonce, attestationSignature, attestationChallenge, 
-          attestationElements, dac, pai);
+          csrElements, csrNonce, csrElementsSignature, attestationChallenge, 
+          attestationElements, attestationNonce, attestationElementsSignature, dac, pai);
     }
   }
 
@@ -719,9 +721,11 @@ public class ChipDeviceController {
     void onNOCChainGenerationNeeded(
         byte[] csrElements, 
         byte[] csrNonce, 
-        byte[] attestationSignature, 
+        byte[] csrElementsSignature, 
         byte[] attestationChallenge, 
         byte[] attestationElements, 
+        byte[] attestationNonce, 
+        byte[] attestationElementsSignature, 
         byte[] dac, 
         byte[] pai);
   }
