@@ -412,7 +412,8 @@ bool emberAfLevelControlClusterMoveToLevelCallback(app::CommandHandler * command
 
     if (transitionTime.IsNull())
     {
-        emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL %x null %x %x", "RX level-control:", level, optionsMask, optionsOverride);
+        emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL %x null %x %x", "RX level-control:", level, optionsMask,
+                                          optionsOverride);
     }
     else
     {
@@ -538,8 +539,8 @@ bool emberAfLevelControlClusterStepWithOnOffCallback(app::CommandHandler * comma
 
     if (transitionTime.IsNull())
     {
-        emberAfLevelControlClusterPrintln("%pSTEP_WITH_ON_OFF %x %x null %x %x", "RX level-control:", stepMode, stepSize, optionsMask,
-                                          optionsOverride);
+        emberAfLevelControlClusterPrintln("%pSTEP_WITH_ON_OFF %x %x null %x %x", "RX level-control:", stepMode, stepSize,
+                                          optionsMask, optionsOverride);
     }
     else
     {
@@ -653,7 +654,7 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
         actualStepSize    = static_cast<uint8_t>(currentLevel.Value() - state->moveToLevel);
     }
 
-    // If the Transition time field takes the value 0xFFFF, then the time taken
+    // If the Transition time field takes the value null, then the time taken
     // to move to the new level shall instead be determined by the On/Off
     // Transition Time attribute.  If On/Off Transition Time, which is an
     // optional attribute, is not present, the device shall move to its new level
