@@ -527,6 +527,16 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterEthernetNetworkDiagnosticsAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster TimeSynchronization attributes
+    MTRClusterTimeSynchronizationAttributeUTCTimeID = 0x00000000,
+    MTRClusterTimeSynchronizationAttributeGranularityID = 0x00000001,
+    MTRClusterTimeSynchronizationAttributeTimeSourceID = 0x00000002,
+    MTRClusterTimeSynchronizationAttributeTrustedTimeNodeIdID = 0x00000003,
+    MTRClusterTimeSynchronizationAttributeDefaultNtpID = 0x00000004,
+    MTRClusterTimeSynchronizationAttributeTimeZoneID = 0x00000005,
+    MTRClusterTimeSynchronizationAttributeDstOffsetID = 0x00000006,
+    MTRClusterTimeSynchronizationAttributeLocalTimeID = 0x00000007,
+    MTRClusterTimeSynchronizationAttributeTimeZoneDatabaseID = 0x00000008,
+    MTRClusterTimeSynchronizationAttributeNtpServerPortID = 0x00000009,
     MTRClusterTimeSynchronizationAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
     MTRClusterTimeSynchronizationAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterTimeSynchronizationAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
@@ -1481,6 +1491,9 @@ typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
 
     // Cluster EthernetNetworkDiagnostics commands
     MTRClusterEthernetNetworkDiagnosticsCommandResetCountsID = 0x00000000,
+
+    // Cluster TimeSynchronization commands
+    MTRClusterTimeSynchronizationCommandSetUtcTimeID = 0x00000000,
 
     // Cluster AdministratorCommissioning commands
     MTRClusterAdministratorCommissioningCommandOpenCommissioningWindowID = 0x00000000,

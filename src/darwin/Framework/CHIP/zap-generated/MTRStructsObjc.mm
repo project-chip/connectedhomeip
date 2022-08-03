@@ -1648,6 +1648,74 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRTimeSynchronizationClusterDstOffsetType
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _offset = @(0);
+
+        _validStarting = @(0);
+
+        _validUntil = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    auto other = [[MTRTimeSynchronizationClusterDstOffsetType alloc] init];
+
+    other.offset = self.offset;
+    other.validStarting = self.validStarting;
+    other.validUntil = self.validUntil;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: offset:%@; validStarting:%@; validUntil:%@; >",
+                                             NSStringFromClass([self class]), _offset, _validStarting, _validUntil];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRTimeSynchronizationClusterTimeZoneType
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _offset = @(0);
+
+        _validAt = @(0);
+
+        _name = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    auto other = [[MTRTimeSynchronizationClusterTimeZoneType alloc] init];
+
+    other.offset = self.offset;
+    other.validAt = self.validAt;
+    other.name = self.name;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: offset:%@; validAt:%@; name:%@; >", NSStringFromClass([self class]), _offset, _validAt, _name];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRBridgedDeviceBasicClusterStartUpEvent
 - (instancetype)init
 {

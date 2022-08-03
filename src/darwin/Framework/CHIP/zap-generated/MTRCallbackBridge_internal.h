@@ -328,6 +328,14 @@ typedef void (*EthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallback)(
     void *, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType);
 typedef void (*NullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> &);
+typedef void (*TimeSynchronizationClusterGranularityEnumAttributeCallback)(
+    void *, chip::app::Clusters::TimeSynchronization::GranularityEnum);
+typedef void (*NullableTimeSynchronizationClusterGranularityEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::GranularityEnum> &);
+typedef void (*TimeSynchronizationClusterTimeSourceEnumAttributeCallback)(void *,
+                                                                          chip::app::Clusters::TimeSynchronization::TimeSourceEnum);
+typedef void (*NullableTimeSynchronizationClusterTimeSourceEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::TimeSourceEnum> &);
 typedef void (*AdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback)(
     void *, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus);
 typedef void (*NullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback)(
@@ -13090,6 +13098,121 @@ public:
     MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
         MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<TimeSynchronizationClusterGranularityEnumAttributeCallback>
+{
+public:
+    MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<TimeSynchronizationClusterGranularityEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::TimeSynchronization::GranularityEnum value);
+};
+
+class MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge
+    : public MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge
+{
+public:
+    MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTimeSynchronizationClusterGranularityEnumAttributeCallback>
+{
+public:
+    MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableTimeSynchronizationClusterGranularityEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::GranularityEnum> & value);
+};
+
+class MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<TimeSynchronizationClusterTimeSourceEnumAttributeCallback>
+{
+public:
+    MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<TimeSynchronizationClusterTimeSourceEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::TimeSynchronization::TimeSourceEnum value);
+};
+
+class MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge
+    : public MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge
+{
+public:
+    MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTimeSynchronizationClusterTimeSourceEnumAttributeCallback>
+{
+public:
+    MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableTimeSynchronizationClusterTimeSourceEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::TimeSourceEnum> & value);
+};
+
+class MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
