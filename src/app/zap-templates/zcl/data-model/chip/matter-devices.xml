@@ -2008,13 +2008,13 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0029</deviceId>
         <clusters lockOthers="true">
-            <include cluster="Descriptor" client="true" server="false" clientLocked="true" serverLocked="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
                 <requireAttribute>SERVER_LIST</requireAttribute>
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
+            <include cluster="Binding" client="false" server="true" clientLocked="false" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
             <include cluster="Media Playback" client="true" server="false" clientLocked="false" serverLocked="false"></include>
@@ -2040,13 +2040,13 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002A</deviceId>
         <clusters lockOthers="true">
-            <include cluster="Descriptor" client="true" server="false" clientLocked="true" serverLocked="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
                 <requireAttribute>SERVER_LIST</requireAttribute>
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
+            <include cluster="Binding" client="false" server="true" clientLocked="false" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
             <include cluster="Media Playback" client="true" server="false" clientLocked="true" serverLocked="false"></include>
