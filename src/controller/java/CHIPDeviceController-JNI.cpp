@@ -195,11 +195,36 @@ JNI_METHOD(jint, setNOCChain)
     jbyteArray operationalCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
     VerifyOrReturnValue(operationalCertificate != nullptr, CHIP_ERROR_BAD_REQUEST.AsInteger());
 
+    // use ipk and adminSubject from CommissioningParameters if not set in ControllerParams
+    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+
+    Optional<Crypto::AesCcm128KeySpan> ipkOptional;
+    uint8_t ipkValue[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    Crypto::AesCcm128KeySpan ipkTempSpan(ipkValue);
+
     jbyteArray ipk = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
-    VerifyOrReturnValue(ipk != nullptr, CHIP_ERROR_BAD_REQUEST.AsInteger());
+    if (ipk != nullptr)
+    {
+        JniByteArray jByteArrayIpk(env, ipk);
+
+        VerifyOrReturnValue(jByteArrayIpk.byteSpan().size() == sizeof(ipkValue), CHIP_ERROR_INTERNAL.AsInteger());
+        memcpy(&ipkValue[0], jByteArrayIpk.byteSpan().data(), jByteArrayIpk.byteSpan().size());
+
+        ipkOptional.SetValue(ipkTempSpan);
+    }
+    else if (commissioningParams.GetIpk().HasValue())
+    {
+        // if no value pass in ControllerParams, use value from CommissioningParameters
+        ipkOptional.SetValue(commissioningParams.GetIpk().Value());
+    }
 
     Optional<NodeId> adminSubjectOptional;
     uint64_t adminSubject = env->CallLongMethod(controllerParams, getAdminSubject);
+    if (adminSubject == kUndefinedNodeId)
+    {
+        // if no value pass in ControllerParams, use value from CommissioningParameters
+        adminSubject = commissioningParams.GetAdminSubject().ValueOr(kUndefinedNodeId);
+    }
     if (adminSubject != kUndefinedNodeId)
     {
         adminSubjectOptional.SetValue(adminSubject);
@@ -208,19 +233,10 @@ JNI_METHOD(jint, setNOCChain)
     JniByteArray jByteArrayRcac(env, rootCertificate);
     JniByteArray jByteArrayIcac(env, intermediateCertificate);
     JniByteArray jByteArrayNoc(env, operationalCertificate);
-    JniByteArray jByteArrayIpk(env, ipk);
-
-    // Prepare IPK to be sent back. A more fully-fledged operational credentials delegate
-    // would obtain a suitable key per fabric.
-    uint8_t ipkValue[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-    Crypto::AesCcm128KeySpan ipkSpan(ipkValue);
-
-    VerifyOrReturnValue(jByteArrayIpk.byteSpan().size() == sizeof(ipkValue), CHIP_ERROR_INTERNAL.AsInteger());
-    memcpy(&ipkValue[0], jByteArrayIpk.byteSpan().data(), jByteArrayIpk.byteSpan().size());
 
     err = wrapper->GetAndroidOperationalCredentialsIssuer()->NOCChainGenerated(CHIP_NO_ERROR, jByteArrayNoc.byteSpan(),
                                                                                jByteArrayIcac.byteSpan(), jByteArrayRcac.byteSpan(),
-                                                                               MakeOptional(ipkSpan), adminSubjectOptional);
+                                                                               ipkOptional, adminSubjectOptional);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -285,6 +301,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIpk", "()[B", &getIpk);
     SuccessOrExit(err);
 
+    // TODO: remove adminSubject?
     jmethodID getAdminSubject;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAdminSubject", "()J", &getAdminSubject);
     SuccessOrExit(err);
@@ -307,9 +324,23 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         wrapper = AndroidDeviceControllerWrapper::AllocateNew(
             sJVM, self, kLocalDeviceId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(), DeviceLayer::TCPEndPointManager(),
             DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate, rootCertificate, intermediateCertificate,
-            operationalCertificate, ipk, adminSubject, listenPort, controllerVendorId, failsafeTimerSeconds, attemptNetworkScanWiFi,
+            operationalCertificate, ipk, listenPort, controllerVendorId, failsafeTimerSeconds, attemptNetworkScanWiFi,
             attemptNetworkScanThread, &err);
         SuccessOrExit(err);
+
+        if (adminSubject != kUndefinedNodeId)
+        {
+            // if there is a valid adminSubject in the ControllerParams, then remember it
+
+            CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+            commissioningParams.SetAdminSubject(adminSubject);
+            err = wrapper->UpdateCommissioningParameters(commissioningParams);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+                SuccessOrExit(err);
+            }
+        }
     }
 
     // Create and start the IO thread. Must be called after Controller()->Init
