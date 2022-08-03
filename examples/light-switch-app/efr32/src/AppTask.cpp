@@ -81,7 +81,7 @@ void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * 
     sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    GetAppTask().CancelLightTimer();
+    AppTask::GetAppTask().StopStatusLEDTimer();
 #endif
 }
 } // namespace
@@ -99,7 +99,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    GetAppTask().StartLightTimer();
+    AppTask::GetAppTask().StartStatusLEDTimer();
 #endif
 
     switch (sIdentifyEffect)
@@ -183,7 +183,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
 #if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
-    sAppTask.StartLightTimer();
+    sAppTask.StartStatusLEDTimer();
 #endif
 
     EFR32_LOG("App Task started");
@@ -203,7 +203,7 @@ void AppTask::OnIdentifyStart(Identify * identify)
     ChipLogProgress(Zcl, "onIdentifyStart");
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    sAppTask.StartLightTimer();
+    sAppTask.StartStatusLEDTimer();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 }
 
@@ -212,7 +212,7 @@ void AppTask::OnIdentifyStop(Identify * identify)
     ChipLogProgress(Zcl, "onIdentifyStop");
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    sAppTask.CancelLightTimer();
+    sAppTask.StopStatusLEDTimer();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 }
 

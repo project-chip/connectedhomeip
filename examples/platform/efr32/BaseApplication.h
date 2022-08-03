@@ -86,13 +86,13 @@ public:
     /**
      * @brief Function called to start the LED light timer
      */
-    void StartLightTimer(void);
+    void StartStatusLEDTimer(void);
 
     /**
      * @brief Function to stop LED light timer
      *        Turns off Status LED before stopping timer
      */
-    void CancelLightTimer(void);
+    void StopStatusLEDTimer(void);
 
     enum Function_t
     {

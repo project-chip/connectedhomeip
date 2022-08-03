@@ -75,7 +75,6 @@
 #define SYSTEM_STATE_LED &sl_led_led0
 
 #define APP_FUNCTION_BUTTON &sl_button_btn0
-#define APP_LIGHT_SWITCH &sl_button_btn1
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -255,7 +254,7 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
         StartFunctionTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-        StartLightTimer();
+        StartStatusLEDTimer();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
         mFunction = kFunction_FactoryReset;
@@ -271,7 +270,7 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
         mFunction = kFunction_NoneSelected;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-        CancelLightTimer();
+        StopStatusLEDTimer();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
         chip::Server::GetInstance().ScheduleFactoryReset();
@@ -404,7 +403,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             CancelFunctionTimer();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-            CancelLightTimer();
+            StopStatusLEDTimer();
 #endif
 
             // Change the function to none selected since factory reset has been
@@ -446,7 +445,7 @@ void BaseApplication::StartFunctionTimer(uint32_t aTimeoutInMs)
     mFunctionTimerActive = true;
 }
 
-void BaseApplication::StartLightTimer()
+void BaseApplication::StartStatusLEDTimer()
 {
     if (pdPASS != xTimerStart(sLightTimer, 0))
     {
@@ -455,7 +454,7 @@ void BaseApplication::StartLightTimer()
     }
 }
 
-void BaseApplication::CancelLightTimer()
+void BaseApplication::StopStatusLEDTimer()
 {
     sStatusLED.Set(false);
     if (xTimerStop(sLightTimer, 100) != pdPASS)
