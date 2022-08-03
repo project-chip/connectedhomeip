@@ -46,6 +46,11 @@
 #define SOCK_CLOEXEC 0
 #endif
 
+// On MbedOS, INADDR_ANY does not seem to exist...
+#ifndef INADDR_ANY
+#define INADDR_ANY 0
+#endif
+
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
 #include "ZephyrSocket.h"
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
