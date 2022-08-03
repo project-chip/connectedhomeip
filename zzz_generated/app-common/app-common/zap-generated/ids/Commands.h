@@ -477,6 +477,16 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace EthernetNetworkDiagnostics
 
+namespace TimeSynchronization {
+namespace Commands {
+
+namespace SetUtcTime {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SetUtcTime
+
+} // namespace Commands
+} // namespace TimeSynchronization
+
 namespace AdministratorCommissioning {
 namespace Commands {
 

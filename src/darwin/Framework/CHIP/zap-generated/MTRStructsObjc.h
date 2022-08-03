@@ -449,6 +449,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(nullable NSZone *)zone;
 @end
 
+@interface MTRTimeSynchronizationClusterDstOffsetType : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull offset;
+@property (nonatomic, copy) NSNumber * _Nonnull validStarting;
+@property (nonatomic, copy) NSNumber * _Nonnull validUntil;
+
+- (instancetype)init;
+- (id)copyWithZone:(nullable NSZone *)zone;
+@end
+
+@interface MTRTimeSynchronizationClusterTimeZoneType : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull offset;
+@property (nonatomic, copy) NSNumber * _Nonnull validAt;
+@property (nonatomic, copy) NSString * _Nullable name;
+
+- (instancetype)init;
+- (id)copyWithZone:(nullable NSZone *)zone;
+@end
+
 @interface MTRBridgedDeviceBasicClusterStartUpEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
 
