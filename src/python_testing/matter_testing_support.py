@@ -118,37 +118,37 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
 
 @dataclass
 class MatterTestConfig:
-  storage_path: pathlib.Path = None
-  logs_path: pathlib.Path = None
-  paa_trust_store_path: pathlib.Path = None
+    storage_path: pathlib.Path = None
+    logs_path: pathlib.Path = None
+    paa_trust_store_path: pathlib.Path = None
 
-  admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
-  global_test_params: dict = field(default_factory=dict)
-  # List of explicit tests to run by name. If empty, all tests will run
-  tests: list[str] = field(default_factory=list)
+    admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
+    global_test_params: dict = field(default_factory=dict)
+    # List of explicit tests to run by name. If empty, all tests will run
+    tests: list[str] = field(default_factory=list)
 
-  commissioning_method: str = None
-  discriminator: int = None
-  setup_passcode: int = None
+    commissioning_method: str = None
+    discriminator: int = None
+    setup_passcode: int = None
 
-  qr_code_content: str = None
-  manual_code: str = None
+    qr_code_content: str = None
+    manual_code: str = None
 
-  wifi_ssid: str = None
-  wifi_passphrase: str = None
-  thread_operational_dataset: str = None
+    wifi_ssid: str = None
+    wifi_passphrase: str = None
+    thread_operational_dataset: str = None
 
-  # Node ID for basic DUT
-  dut_node_id: int = _DEFAULT_DUT_NODE_ID
-  # Node ID to use for controller/commissioner
-  controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
-  # Fabric ID which to use
-  fabric_id: int = None
-  # "Alpha" by default
-  root_of_trust_index: int = _DEFAULT_TRUST_ROOT_INDEX
+    # Node ID for basic DUT
+    dut_node_id: int = _DEFAULT_DUT_NODE_ID
+    # Node ID to use for controller/commissioner
+    controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
+    # Fabric ID which to use
+    fabric_id: int = None
+    # "Alpha" by default
+    root_of_trust_index: int = _DEFAULT_TRUST_ROOT_INDEX
 
-  # If this is set, we will reuse root of trust keys at that location
-  chip_tool_credentials_path: pathlib.Path = None
+    # If this is set, we will reuse root of trust keys at that location
+    chip_tool_credentials_path: pathlib.Path = None
 
 
 class MatterStackState:
@@ -170,7 +170,8 @@ class MatterStackState:
     def _init_stack(self, already_initialized: bool, **kwargs):
         if already_initialized:
             self._chip_stack = builtins.chipStack
-            self._logger.warn("Re-using existing ChipStack object found in current interpreter: storage path %s will be ignored!" % (self._config.storage_path))
+            self._logger.warn(
+                "Re-using existing ChipStack object found in current interpreter: storage path %s will be ignored!" % (self._config.storage_path))
             # TODO: Warn that storage will not follow what we set in config
         else:
             self._chip_stack = ChipStack(**kwargs)
@@ -189,7 +190,8 @@ class MatterStackState:
             self._fabric_admins.append(chip.FabricAdmin.FabricAdmin(self._config.admin_vendor_id))
         else:
             for admin_idx in admin_list:
-                self._logger.info(f"Restoring FabricAdmin from storage to manage FabricId {admin_list[admin_idx]['fabricId']}, AdminIndex {admin_idx}")
+                self._logger.info(
+                    f"Restoring FabricAdmin from storage to manage FabricId {admin_list[admin_idx]['fabricId']}, AdminIndex {admin_idx}")
                 self._fabric_admins.append(chip.FabricAdmin.FabricAdmin(vendorId=int(admin_list[admin_idx]['vendorId']),
                                            fabricId=admin_list[admin_idx]['fabricId'], adminIndex=int(admin_idx)))
 
@@ -223,13 +225,12 @@ def bytes_from_hex(hex: str) -> bytes:
 
     Handles any whitespace including newlines, which are all stripped.
     """
-    return unhexlify("".join(hex.replace(":","").replace(" ","").split()))
+    return unhexlify("".join(hex.replace(":", "").replace(" ", "").split()))
 
 
 def hex_from_bytes(b: bytes) -> str:
     """Converts a bytes object `b` into a hex string (reverse of bytes_from_hex)"""
     return hexlify(b).decode("utf-8")
-
 
 
 class MatterBaseTest(base_test.BaseTestClass):
@@ -279,23 +280,23 @@ def generate_mobly_test_config(matter_test_config: MatterTestConfig):
 
 
 def _find_test_class():
-  """Finds the test class in a test script.
-  Walk through module members and find the subclass of MatterBaseTest. Only
-  one subclass is allowed in a test script.
-  Returns:
-    The test class in the test module.
-  Raises:
-    SystemExit: Raised if the number of test classes is not exactly one.
-  """
-  subclasses = utils.find_subclasses_in_module([MatterBaseTest], sys.modules['__main__'])
-  subclasses = [c for c in subclasses if c.__name__ != "MatterBaseTest"]
-  if len(subclasses) != 1:
-      print(
-          'Exactly one subclass of `MatterBaseTest` should be in the main file. Found %s.' %
-          str([subclass.__name__ for subclass in subclasses]))
-      sys.exit(1)
+    """Finds the test class in a test script.
+    Walk through module members and find the subclass of MatterBaseTest. Only
+    one subclass is allowed in a test script.
+    Returns:
+      The test class in the test module.
+    Raises:
+      SystemExit: Raised if the number of test classes is not exactly one.
+    """
+    subclasses = utils.find_subclasses_in_module([MatterBaseTest], sys.modules['__main__'])
+    subclasses = [c for c in subclasses if c.__name__ != "MatterBaseTest"]
+    if len(subclasses) != 1:
+        print(
+            'Exactly one subclass of `MatterBaseTest` should be in the main file. Found %s.' %
+            str([subclass.__name__ for subclass in subclasses]))
+        sys.exit(1)
 
-  return subclasses[0]
+    return subclasses[0]
 
 
 def int_decimal_or_hex(s: str) -> int:
@@ -306,7 +307,7 @@ def int_decimal_or_hex(s: str) -> int:
 
 
 def byte_string_from_hex(s: str) -> bytes:
-    return unhexlify(s.replace(":","").replace(" ","").replace("0x",""))
+    return unhexlify(s.replace(":", "").replace(" ", "").replace("0x", ""))
 
 
 def int_from_manual_code(s: str) -> int:
@@ -388,7 +389,7 @@ def bytes_as_hex_named_arg(s: str) -> tuple[str, bytes]:
 
     name = match.group("name")
     value_str = match.group("value")
-    value_str = value_str.replace(":","")
+    value_str = value_str.replace(":", "")
     if len(value_str) % 2 != 0:
         raise ValueError("Byte string argument value needs to be event number of hex chars")
     value = unhexlify(value_str)
@@ -398,9 +399,9 @@ def bytes_as_hex_named_arg(s: str) -> tuple[str, bytes]:
 
 def root_index(s: str) -> int:
     CHIP_TOOL_COMPATIBILITY = {
-      "alpha": 1,
-      "beta": 2,
-      "gamma": 3
+        "alpha": 1,
+        "beta": 2,
+        "gamma": 3
     }
 
     for name, id in CHIP_TOOL_COMPATIBILITY.items():
@@ -486,7 +487,8 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
 
     # Accumulate all command-line-passed named args
     all_global_args = []
-    argsets = [item for item in (args.int_arg, args.float_arg, args.string_arg, args.json_arg, args.hex_arg, args.bool_arg) if item is not None]
+    argsets = [item for item in (args.int_arg, args.float_arg, args.string_arg, args.json_arg,
+                                 args.hex_arg, args.bool_arg) if item is not None]
     for argset in argsets:
         all_global_args.extend(argset)
 
@@ -495,7 +497,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
         config.global_test_params[name] = value
 
     # Embed the rest of the config in the global test params dict which will be passed to Mobly tests
-    config.global_test_params["meta_config"] = {k: v for k,v in dataclass_asdict(config).items() if k != "global_test_params"}
+    config.global_test_params["meta_config"] = {k: v for k, v in dataclass_asdict(config).items() if k != "global_test_params"}
 
     return config
 
@@ -506,49 +508,50 @@ def parse_matter_test_args(argv: list[str]) -> MatterTestConfig:
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
 
     basic_group.add_argument('--tests',
-                            '--test_case',
-                            action="store",
-                            nargs='+',
-                            type=str,
-                            metavar='test_a test_b...',
-                            help='A list of tests in the test class to execute.')
+                             '--test_case',
+                             action="store",
+                             nargs='+',
+                             type=str,
+                             metavar='test_a test_b...',
+                             help='A list of tests in the test class to execute.')
 
-    basic_group.add_argument('--storage-path', action="store", type=pathlib.Path, metavar="PATH", help="Location for persisted storage of instance")
+    basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
+                             metavar="PATH", help="Location for persisted storage of instance")
     basic_group.add_argument('--logs-path', action="store", type=pathlib.Path, metavar="PATH", help="Location for test logs")
     paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
     basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
                              help="PAA trust store path (default: %s)" % str(paa_path_default))
     basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
-                        metavar='NODE_ID',
-                        default=_DEFAULT_CONTROLLER_NODE_ID,
-                        help='NodeID to use for initial/default controller (default: %d)' % _DEFAULT_CONTROLLER_NODE_ID)
+                             metavar='NODE_ID',
+                             default=_DEFAULT_CONTROLLER_NODE_ID,
+                             help='NodeID to use for initial/default controller (default: %d)' % _DEFAULT_CONTROLLER_NODE_ID)
     basic_group.add_argument('-n', '--dut-node-id', type=int_decimal_or_hex,
-                        metavar='NODE_ID', default=_DEFAULT_DUT_NODE_ID,
-                        help='Node ID for primary DUT communication, and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID)
+                             metavar='NODE_ID', default=_DEFAULT_DUT_NODE_ID,
+                             help='Node ID for primary DUT communication, and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID)
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
-                        metavar='METHOD_NAME',
-                        choices = ["on-network", "ble-wifi", "ble-thread"],
-                        help='Name of commissioning method to use')
+                                  metavar='METHOD_NAME',
+                                  choices=["on-network", "ble-wifi", "ble-thread"],
+                                  help='Name of commissioning method to use')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
-                        metavar='LONG_DISCRIMINATOR',
-                        help='Discriminator to use for commissioning')
+                                  metavar='LONG_DISCRIMINATOR',
+                                  help='Discriminator to use for commissioning')
     commission_group.add_argument('-p', '--passcode', type=int_decimal_or_hex,
-                        metavar='PASSCODE',
-                        help='PAKE passcode to use')
+                                  metavar='PASSCODE',
+                                  help='PAKE passcode to use')
 
     commission_group.add_argument('--wifi-ssid', type=str,
-                        metavar='SSID',
-                        help='Wi-Fi SSID for ble-wifi commissioning')
+                                  metavar='SSID',
+                                  help='Wi-Fi SSID for ble-wifi commissioning')
     commission_group.add_argument('--wifi-passphrase', type=str,
-                        metavar='PASSPHRASE',
-                        help='Wi-Fi passphrase for ble-wifi commissioning')
+                                  metavar='PASSPHRASE',
+                                  help='Wi-Fi passphrase for ble-wifi commissioning')
 
     commission_group.add_argument('--thread-dataset-hex', type=byte_string_from_hex,
-                        metavar='OPERATIONAL_DATASET_HEX',
-                        help='Thread operational dataset as a hex string for ble-thread commissioning')
+                                  metavar='OPERATIONAL_DATASET_HEX',
+                                  help='Thread operational dataset as a hex string for ble-thread commissioning')
 
     commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=_DEFAULT_ADMIN_VENDOR_ID,
                                   metavar="VENDOR_ID", help="VendorID to use during commissioning (default 0x%04X)" % _DEFAULT_ADMIN_VENDOR_ID)
@@ -556,30 +559,37 @@ def parse_matter_test_args(argv: list[str]) -> MatterTestConfig:
     code_group = parser.add_mutually_exclusive_group(required=False)
 
     code_group.add_argument('-q', '--qr-code', type=str,
-                        metavar="QR_CODE", help="QR setup code content (overrides passcode and discriminator)")
+                            metavar="QR_CODE", help="QR setup code content (overrides passcode and discriminator)")
     code_group.add_argument('--manual-code', type=int_from_manual_code,
-                        metavar="MANUAL_CODE", help="Manual setup code content (overrides passcode and discriminator)")
+                            metavar="MANUAL_CODE", help="Manual setup code content (overrides passcode and discriminator)")
 
-    fabric_group = parser.add_argument_group(title="Fabric selection", description="Fabric selection for single-fabric basic usage, and commissioning")
+    fabric_group = parser.add_argument_group(
+        title="Fabric selection", description="Fabric selection for single-fabric basic usage, and commissioning")
     fabric_group.add_argument('-f', '--fabric-id', type=int_decimal_or_hex,
-                        metavar='FABRIC_ID',
-                        help='Fabric ID on which to operate under the root of trust')
+                              metavar='FABRIC_ID',
+                              help='Fabric ID on which to operate under the root of trust')
 
     fabric_group.add_argument('-r', '--root-index', type=root_index,
-                        metavar='ROOT_INDEX_OR_NAME', default=_DEFAULT_TRUST_ROOT_INDEX,
-                        help='Root of trust under which to operate/commission for single-fabric basic usage. alpha/beta/gamma are aliases for 1/2/3. Default (%d)' % _DEFAULT_TRUST_ROOT_INDEX)
+                              metavar='ROOT_INDEX_OR_NAME', default=_DEFAULT_TRUST_ROOT_INDEX,
+                              help='Root of trust under which to operate/commission for single-fabric basic usage. alpha/beta/gamma are aliases for 1/2/3. Default (%d)' % _DEFAULT_TRUST_ROOT_INDEX)
 
     fabric_group.add_argument('-c', '--chip-tool-credentials-path', type=pathlib.Path,
-                        metavar='PATH',
-                        help='Path to chip-tool credentials file root')
+                              metavar='PATH',
+                              help='Path to chip-tool credentials file root')
 
     args_group = parser.add_argument_group(title="Config arguments", description="Test configuration global arguments set")
-    args_group.add_argument('--int-arg', nargs='*', type=int_named_arg, metavar="NAME:VALUE", help="Add a named test argument for an integer as hex or decimal (e.g. -2 or 0xFFFF_1234)")
-    args_group.add_argument('--bool-arg', nargs='*', type=bool_named_arg, metavar="NAME:VALUE", help="Add a named test argument for an boolean value (e.g. true/false or 0/1)")
-    args_group.add_argument('--float-arg', nargs='*', type=float_named_arg, metavar="NAME:VALUE", help="Add a named test argument for a floating point value (e.g. -2.1 or 6.022e23)")
-    args_group.add_argument('--string-arg', nargs='*', type=str_named_arg, metavar="NAME:VALUE", help="Add a named test argument for a string value")
-    args_group.add_argument('--json-arg', nargs='*', type=json_named_arg, metavar="NAME:VALUE", help="Add a named test argument for JSON stored as a list or dict")
-    args_group.add_argument('--hex-arg', nargs='*', type=bytes_as_hex_named_arg, metavar="NAME:VALUE", help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
+    args_group.add_argument('--int-arg', nargs='*', type=int_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for an integer as hex or decimal (e.g. -2 or 0xFFFF_1234)")
+    args_group.add_argument('--bool-arg', nargs='*', type=bool_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for an boolean value (e.g. true/false or 0/1)")
+    args_group.add_argument('--float-arg', nargs='*', type=float_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for a floating point value (e.g. -2.1 or 6.022e23)")
+    args_group.add_argument('--string-arg', nargs='*', type=str_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for a string value")
+    args_group.add_argument('--json-arg', nargs='*', type=json_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for JSON stored as a list or dict")
+    args_group.add_argument('--hex-arg', nargs='*', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
 
     if not argv:
         argv = sys.argv[1:]
@@ -602,10 +612,11 @@ def async_test_body(body):
 
 class CommissionDeviceTest(MatterBaseTest):
     """Test class auto-injected at the start of test list to commission a device when requested"""
+
     def test_run_commissioning(self):
         conf = self.matter_test_config
         logging.info("Starting commissioning for root index %d, fabric ID 0x%016X, node ID 0x%016X" %
-           (conf.root_of_trust_index, conf.fabric_id, conf.dut_node_id))
+                     (conf.root_of_trust_index, conf.fabric_id, conf.dut_node_id))
         logging.info("Commissioning method: %s" % conf.commissioning_method)
 
         if not self._commission_device():

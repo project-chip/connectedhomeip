@@ -116,6 +116,7 @@ class DCState(enum.IntEnum):
     RENDEZVOUS_CONNECTED = 4
     COMMISSIONING = 5
 
+
 class DiscoveryFilterType(enum.IntEnum):
     # These must match chip::Dnssd::DiscoveryFilterType values (barring the naming convention)
     NONE = 0
