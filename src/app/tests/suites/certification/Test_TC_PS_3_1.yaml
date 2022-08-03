@@ -15,6 +15,13 @@
 
 name: 62.3.1. [TC-PS-3.1] Attributes with client as DUT
 
+PICS:
+    - PS.C
+    - PS.C.AM-READ
+    - PS.C.AO-READ
+    - PS.C.AM-WRITE
+    - PS.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -25,11 +32,9 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          On TestHarnes (all-cluster-app) a received read of Staus attribute (id 0) looks like this:
-
           ./chip-tool powersource read status 1 1
 
-          Verify in TH all-clusters-app log
+          Verify,On TestHarnes (all-cluster-app) a received read of Staus attribute looks like this:
 
 
           [1646155382.977445][33190:33190] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:685127 on exchange 16568r
@@ -59,7 +64,7 @@ tests:
 
           ./chip-tool powersource read order 1 1
 
-          Verify in TH all-clusters-app log
+          On TestHarnes (all-cluster-app) a received read of order attribute looks like this:
 
           [1653395573.862606][19412:19412] CHIP:IM: Received Read request
           [1653395573.862690][19412:19412] CHIP:DMG: ReadRequestMessage =
@@ -83,7 +88,7 @@ tests:
 
           ./chip-tool powersource read description 1 1
 
-          Verify in TH all-clusters-app log
+          Verify,On TestHarnes (all-cluster-app) a received read of description attribute looks like this:
 
           CHIP:IM: Received Read request
           [1653395620.020314][19412:19412] CHIP:DMG: ReadRequestMessage =
@@ -109,21 +114,21 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          This cluster doesn't have any  optional attribute
+          This cluster doesn"t have any  optional attribute
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
@@ -132,10 +137,26 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          "On TestHarnes (all-cluster-app) a received read of Staus attribute (id 0) looks like this:
+          ./chip-tool powersource read attribute-list 1 0
+
+          Verify the attribute-list contains list of mandatory attribute in TH all-clusters-app log
+
+          [1658911139.284282][13908:13913] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002F Attribute 0x0000_FFFB DataVersion: 2172946531
+          [1658911139.284369][13908:13913] CHIP:TOO:   AttributeList: 8 entries
+          [1658911139.284417][13908:13913] CHIP:TOO:     [1]: 0
+          [1658911139.284446][13908:13913] CHIP:TOO:     [2]: 1
+          [1658911139.284474][13908:13913] CHIP:TOO:     [3]: 2
+          [1658911139.284501][13908:13913] CHIP:TOO:     [4]: 65528
+          [1658911139.284528][13908:13913] CHIP:TOO:     [5]: 65529
+          [1658911139.284554][13908:13913] CHIP:TOO:     [6]: 65531
+          [1658911139.284581][13908:13913] CHIP:TOO:     [7]: 65532
+          [1658911139.284608][13908:13913] CHIP:TOO:     [8]: 65533
+
+
+
           ./chip-tool powersource read status 1 1
 
-          Verify in TH all-clusters-app log
+          Verify, On TestHarnes (all-cluster-app) a received read of Staus attribute looks like this:
 
           [1646155382.977445][33190:33190] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:685127 on exchange 16568r
           [1646155382.977534][33190:33190] CHIP:EM: Handling via exchange: 16568r, Delegate: 0xaaaace1730c8
@@ -164,7 +185,7 @@ tests:
 
           ./chip-tool powersource read order 1 1
 
-          Verify in TH all-clusters-app log
+          Verify, On TestHarnes (all-cluster-app)  received read of order attribute looks like this:
 
           [1653395573.862606][19412:19412] CHIP:IM: Received Read request
           [1653395573.862690][19412:19412] CHIP:DMG: ReadRequestMessage =
@@ -188,7 +209,7 @@ tests:
 
           ./chip-tool powersource read description 1 1
 
-          Verify in TH all-clusters-app log
+          verify , On TestHarnes (all-cluster-app) a received read of description attribute looks like this:
 
           CHIP:IM: Received Read request
           [1653395620.020314][19412:19412] CHIP:DMG: ReadRequestMessage =
@@ -214,12 +235,12 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          This cluster doesn't have any  optional attribute
+          This cluster doesn"t have any  optional attribute
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true

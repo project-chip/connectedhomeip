@@ -104,12 +104,6 @@ config CHIP_BUILD_TESTS
 	help
 	  This option enables building CHIP unit tests.
 
-config CHIP_DISABLE_CHIPOBLE_ADVERTISING_WHEN_PROVISIONED
-	bool "Disable CHIPoBLE advertising when device is fully provisioned"
-	default y
-	help
-	  Disable CHIPoBLE advertising when the device achieves a fully provisioned state.
-
 config CHIP_ENABLE_PAIRING_AUTOSTART
 	bool "Enable pairing autostart"
 	default n

@@ -81,7 +81,7 @@ ENABLE_SECURE_MOSQUITTO_BROKER_SUPPORT=0
 # ... then code in directories named COMPONENT_foo and COMPONENT_bar will be
 # added to the build
 #
-COMPONENTS=FREERTOS LWIP MBEDTLS RTOS_AWARE WICED_BLE
+COMPONENTS=FREERTOS LWIP MBEDTLS RTOS_AWARE WICED_BLE OTA_MCUBOOT_PSOC
 
 # CHIP: ModusToolbox 2.2 & 2.3 do not have a way to disable indirect library
 # dependencies.  This causes trouble for CHIP because we need to use its
@@ -114,7 +114,7 @@ INCLUDES=./configs
 MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE=<mbedtls_user_config.h>
 
 # Add additional defines to the build process (without a leading -D).
-DEFINES=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RETARGET_IO_CONVERT_LF_TO_CRLF CY_RTOS_AWARE
+DEFINES=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RETARGET_IO_CONVERT_LF_TO_CRLF CY_RTOS_AWARE PSOC_062_2M
 
 # Enable support for Mosquitto Broker based on 'ENABLE_SECURE_MOSQUITTO_BROKER_
 # SUPPORT' variable. See the MQTT Client library's README for more information.

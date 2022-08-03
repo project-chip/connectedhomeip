@@ -95,6 +95,7 @@ function getManualTests() {
         "Test_TC_BR_1",
         "Test_TC_BR_2",
         "Test_TC_BR_3",
+        "Test_TC_BR_4",
     ];
 
     const DeviceAttestation = [
@@ -302,6 +303,7 @@ function getManualTests() {
         "Test_TC_SC_3_2",
         "Test_TC_SC_3_3",
         "Test_TC_SC_3_4",
+        "Test_TC_SC_3_6",
         "Test_TC_SC_4_1",
         "Test_TC_SC_4_3",
         "Test_TC_SC_4_4",
@@ -864,7 +866,7 @@ function getTests() {
     ];
 
     const DoorLock = [
-        "DL_UsersAndCredentials",
+        //"DL_UsersAndCredentials", TODO: This test is not aligned with spec
         "DL_LockUnlock",
         "DL_Schedules",
         "Test_TC_DRLK_2_2",
@@ -872,7 +874,7 @@ function getTests() {
         "Test_TC_DRLK_2_4",
         "Test_TC_DRLK_2_5",
         "Test_TC_DRLK_2_7",
-        "Test_TC_DRLK_2_9",
+        //"Test_TC_DRLK_2_9", TODO: This test is not aligned with spec
     ];
 
     const Groups = [

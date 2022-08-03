@@ -48,7 +48,6 @@ public:
     void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
     void PostEvent(const AppEvent * event);
     void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
-    void AppTask::OtaTask(void);
     void LightStateUpdateEventHandler(void);
 
 private:
@@ -72,6 +71,7 @@ private:
     static void FactoryResetButtonEventHandler(void);
     static void LightingActionButtonEventHandler(void);
     static void InitButtons(void);
+    static void StoreWifiConfig();
     void StartTimer(uint32_t aTimeoutMs);
 
     enum Function_t

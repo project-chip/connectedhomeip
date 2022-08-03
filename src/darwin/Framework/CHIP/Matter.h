@@ -17,15 +17,18 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Matter/MTRAsyncCallbackWorkQueue.h>
 #import <Matter/MTRAttributeCacheContainer.h>
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRCertificates.h>
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRClusterConstants.h>
+#import <Matter/MTRClusters.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
 #import <Matter/MTRCommissioningParameters.h>
 #import <Matter/MTRControllerFactory.h>
+#import <Matter/MTRDevice.h>
 #import <Matter/MTRDeviceAttestationDelegate.h>
 #import <Matter/MTRDeviceController+XPC.h>
 #import <Matter/MTRDeviceController.h>

@@ -16,6 +16,9 @@
 name:
     3.3.2. [TC-DD-3.2] Commissioning Flow - Non-concurrent [DUT - Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -55,7 +58,7 @@ tests:
     - label:
           "Commissioner SHALL configure regulatory information in the
           Commissionee."
-      PICS: MCORE.DD.WIRELESS
+      PICS: MCORE.COM.WIRELESS
       verification: |
           Verify in DUT as client side
 

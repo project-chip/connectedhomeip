@@ -38,6 +38,21 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 #endif
 
+/* The ProductID attribute of the Basic cluster. */
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8004
+
+/* The ProductName attribute of the Basic cluster. */
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "P6-CYW43012 Clusters Minimal"
+
+/* The HardwareVersionString attribute of the Basic cluster. */
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING "P6-43012"
+
+/* The HardwareVersion attribute of the Basic cluster. */
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION 43012
+
+/* The SoftwareVersion attribute of the Basic cluster. */
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 1
+
 // For convenience, Chip Security Test Mode can be enabled and the
 // requirement for authentication in various protocols can be disabled.
 //
@@ -54,7 +69,7 @@
  * physical device, a change to its packaging, and/or a change to its marketing presentation.
  * This value is generally *not* incremented for device software versions.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
+#define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 43012
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
@@ -64,7 +79,7 @@
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.0"
 #endif
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

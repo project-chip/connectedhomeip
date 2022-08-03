@@ -17,6 +17,10 @@ name:
     3.3.16. [TC-DD-3.16] Commissioning Flow - 11-digit Manual Pairing Code -
     Negative Scenario [DUT    - Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.11_MANUAL_PC
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -26,7 +30,6 @@ tests:
     - label:
           "Provide the 11-digit Manual Pairing Code from the Commissionee to the
           DUT in any format supported by DUT"
-      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           Verify in TH as server side
           $ ./out/all-clusters-app/chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 0 --capabilities 4 --discriminator 3840 --passcode 20202021
@@ -51,7 +54,6 @@ tests:
           "VERSION: Using the manual code from Step 1, generate a new manual
           code but substituting out the current VERSION with an invalid VERSION:
           2"
-      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           1. Use chip-tool"s "payload verhoeff-generate" command to help generate the new, invalid Manual code
 
@@ -66,7 +68,6 @@ tests:
     - label:
           "Provide the Manual Pairing Code, generated in the previous step, to
           the DUT in any format supported by the DUT"
-      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           $  ./chip-tool pairing code 1 84970112331
 
@@ -79,7 +80,6 @@ tests:
           "VID_PID_PRESENT: Using the manual code from Step 1, generate a new
           manual code but substituting out the current VID_PID_PRESENT with an
           invalid VID_PID_PRESENT set to 1"
-      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           $ ./chip-tool payload generate-manualcode --discriminator 0xF00 --setup-pin-code 20202021 --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 2 --force-short-code 1
 
@@ -90,7 +90,6 @@ tests:
     - label:
           "Provide the Manual Pairing Code, generated in the previous step, to
           the DUT in any format supported by the DUT"
-      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           $  ./chip-tool pairing code 1 74970112334
 
@@ -108,7 +107,6 @@ tests:
           that changes any of the 4 most-significant bits of Step 1s 12-bit
           discriminator value and adheres to rules of section 5.1.1.5.
           Discriminator value)"
-      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           1. Use chip-tool"s "payload generate-manualcode" command to help generate the new, invalid Manual code
 
@@ -122,7 +120,6 @@ tests:
     - label:
           "Provide the Manual Pairing Code, generated in the previous step, to
           the DUT in any format supported by the DUT"
-      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           On DUT=chip-tool:
           $  ./chip-tool pairing code 1 33331712336
@@ -140,7 +137,6 @@ tests:
           code using all the same Onboarding Payload components and one Passcode
           from the list: 00000000, 11111111, 22222222, 33333333, 44444444,
           55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321"
-      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           1. Use these as examples of how to generate manual codes with invalid passcodes
 
@@ -198,7 +194,6 @@ tests:
     - label:
           "Provide each of the Manual Pairing Codes, generated in the previous
           step, to the DUT in any format supported by the DUT"
-      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           Verify in DUT as client side
 
@@ -257,7 +252,6 @@ tests:
           CHECK_DIGIT (i.e. Any different CHECK_DIGIT than the commissionees
           CHECK_DIGIT while following Table 38. Encoding Method without Vendor
           and Product IDs (VID_PID_Present == 0))"
-      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           1. Change the last digit of the manual pairing code to a different digit
 
@@ -267,7 +261,6 @@ tests:
     - label:
           "Provide the Manual Pairing Code, generated in the previous step, to
           the DUT in any format supported by the DUT"
-      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           On DUT=chip-tool:
           $ ./chip-tool pairing code 1 34970112331

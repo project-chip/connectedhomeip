@@ -49,7 +49,7 @@ using chip::SessionHandle;
 - (void){{asLowerCamelCase name}}WithParams: (MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=.}})completionHandler
 {
     // Make a copy of params before we go async.
-    params = (params == nil) ? nil : [params copy];
+    params = [params copy];
     new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
       self.device,
       {{#if hasSpecificResponse}}
@@ -112,7 +112,7 @@ using chip::SessionHandle;
 {
     {{~#if_is_fabric_scoped_struct type}}
     // Make a copy of params before we go async.
-    params = (params == nil) ? nil : [params copy];
+    params = [params copy];
     {{/if_is_fabric_scoped_struct~}}
     new MTR{{>attribute_data_callback_name}}CallbackBridge(self.callbackQueue,
       self.device,
@@ -141,7 +141,7 @@ using chip::SessionHandle;
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(MTRWriteParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler
 {
     // Make a copy of params before we go async.
-    params = (params == nil) ? nil : [params copy];
+    params = [params copy];
     value = [value copy];
 
     new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
@@ -187,7 +187,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
     // Make a copy of params before we go async.
     minInterval = [minInterval copy];
     maxInterval = [maxInterval copy];
-    params = (params == nil) ? nil : [params copy];
+    params = [params copy];
     new MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge(self.callbackQueue,
       self.device,
       {{! This treats reportHandler as taking an id for the data.  This is
