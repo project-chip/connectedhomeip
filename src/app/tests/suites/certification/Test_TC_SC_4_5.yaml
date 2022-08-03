@@ -13,7 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 14.4.5. [TC-SC-4.5] Operational Discovery - Thread Node
+name: 15.4.5. [TC-SC-4.5] Discovery [DUT as Commissionee][Thread]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
 
 config:
     nodeId: 0x12344321

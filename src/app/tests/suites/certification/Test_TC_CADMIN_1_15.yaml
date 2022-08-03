@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    24.1.15. [TC-CADMIN-1.15] Removing Fabrics from DUT and Fabric index
-    enumeration using ECM [DUT - Commissionee]
+    4.1.15. [TC-CADMIN-1.15] Removing Fabrics from DUT and Fabric index
+    enumeration using ECM [DUT -    Commissionee]
+
+PICS:
+    - CADMIN.S
 
 config:
     nodeId: 0x12344321
@@ -25,13 +28,13 @@ config:
 tests:
     - label: "Reset DUT_CE to factory defaults"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
-      PICS: CADMIN.C
+      PICS: CADMIN.S
       verification: |
-          "1. Provision the device using 1st controller chip tool(use above instructions) ,
+          "1. Provision the device using 1st controller chip tool(use above instructions) , 
           "
       disabled: true
 
@@ -118,7 +121,7 @@ tests:
           CHIP:TOO:       VendorId: 65521
           CHIP:TOO:       FabricId: 1
           CHIP:TOO:       NodeId: 1
-          CHIP:TOO:       Label:
+          CHIP:TOO:       Label: 
           CHIP:TOO:       FabricIndex: 1
           CHIP:TOO:      }
           CHIP:TOO:     [2]: {
@@ -126,7 +129,7 @@ tests:
           CHIP:TOO:       VendorId: 65521
           CHIP:TOO:       FabricId: 1
           CHIP:TOO:       NodeId: 2
-          CHIP:TOO:       Label:
+          CHIP:TOO:       Label: 
           CHIP:TOO:       FabricIndex: 2
           CHIP:TOO:      }
           CHIP:TOO:     [3]: {
@@ -134,7 +137,7 @@ tests:
           CHIP:TOO:       VendorId: 65521
           CHIP:TOO:       FabricId: 1
           CHIP:TOO:       NodeId: 3
-          CHIP:TOO:       Label:
+          CHIP:TOO:       Label: 
           CHIP:TOO:       FabricIndex: 3
           CHIP:TOO:      }
           CHIP:EM: Sending Standalone Ack for MessageCounter:9143157 on exchange 1147i
@@ -163,7 +166,7 @@ tests:
       verification: |
           Using your 2nd controller, write attribute and read attribute to and from TH_CE
 
-          Below is the example while using chip tool on second controller,
+          Below is the example while using chip tool on second controller, 
           ./chip-tool basic write node-label te5new 2 0
 
            Received error (protocol code 2) during pairing process. ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter
@@ -193,7 +196,7 @@ tests:
           [1647863260.286995][9294:9299] CHIP:TOO:       VendorId: 65521
           [1647863260.287026][9294:9299] CHIP:TOO:       FabricId: 1
           [1647863260.287055][9294:9299] CHIP:TOO:       NodeId: 1
-          [1647863260.287084][9294:9299] CHIP:TOO:       Label:
+          [1647863260.287084][9294:9299] CHIP:TOO:       Label: 
           [1647863260.287113][9294:9299] CHIP:TOO:       FabricIndex: 1
           [1647863260.287144][9294:9299] CHIP:TOO:      }
           [1647863260.287185][9294:9299] CHIP:TOO:     [2]: {
@@ -201,28 +204,29 @@ tests:
           [1647863260.287253][9294:9299] CHIP:TOO:       VendorId: 65521
           [1647863260.287282][9294:9299] CHIP:TOO:       FabricId: 1
           [1647863260.287310][9294:9299] CHIP:TOO:       NodeId: 3
-          [1647863260.287339][9294:9299] CHIP:TOO:       Label:
+          [1647863260.287339][9294:9299] CHIP:TOO:       Label: 
           [1647863260.287368][9294:9299] CHIP:TOO:       FabricIndex: 3
           [1647863260.287396][9294:9299] CHIP:TOO:      }
           [1647863260.287515][9294:9299] CHIP:EM: Sending Standalone Ack for MessageCounter:11301761 on exchange 13180i"
       disabled: true
 
-    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+    - label:
+          "Verify DUT_CE is now discoverable over DNS-SD with 2 Operational
+          service records (_matter._tcp SRV records)."
       verification: |
-          On 1st controller using chip tool, read fabrics list
           grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
           + wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
           + wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
           = wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
-          hostname = [E45F010F27530000.local]
-          address = [fe80::e65f:1ff:fe0f:2753]
-          port = [5540]
-          txt = ["T=1" "SAI=300" "SII=5000"]
+             hostname = [E45F010F27530000.local]
+             address = [fe80::e65f:1ff:fe0f:2753]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
           = wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
-          hostname = [E45F010F27530000.local]
-          address = [fe80::e65f:1ff:fe0f:2753]
-          port = [5540]
-          txt = ["T=1" "SAI=300" "SII=5000"]
+             hostname = [E45F010F27530000.local]
+             address = [fe80::e65f:1ff:fe0f:2753]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
           grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$
       disabled: true
 
@@ -276,7 +280,7 @@ tests:
           [1647863342.981322][9309:9314] CHIP:TOO:       VendorId: 65521
           [1647863342.981380][9309:9314] CHIP:TOO:       FabricId: 1
           [1647863342.981434][9309:9314] CHIP:TOO:       NodeId: 1
-          [1647863342.981486][9309:9314] CHIP:TOO:       Label:
+          [1647863342.981486][9309:9314] CHIP:TOO:       Label: 
           [1647863342.981539][9309:9314] CHIP:TOO:       FabricIndex: 1
           [1647863342.981594][9309:9314] CHIP:TOO:      }
           [1647863342.981671][9309:9314] CHIP:TOO:     [2]: {
@@ -284,7 +288,7 @@ tests:
           [1647863342.981796][9309:9314] CHIP:TOO:       VendorId: 65521
           [1647863342.981849][9309:9314] CHIP:TOO:       FabricId: 1
           [1647863342.981901][9309:9314] CHIP:TOO:       NodeId: 3
-          [1647863342.981952][9309:9314] CHIP:TOO:       Label:
+          [1647863342.981952][9309:9314] CHIP:TOO:       Label: 
           [1647863342.982005][9309:9314] CHIP:TOO:       FabricIndex: 3
           [1647863342.982057][9309:9314] CHIP:TOO:      }
           [1647863342.982131][9309:9314] CHIP:TOO:     [3]: {
@@ -292,7 +296,7 @@ tests:
           [1647863342.982252][9309:9314] CHIP:TOO:       VendorId: 65521
           [1647863342.982305][9309:9314] CHIP:TOO:       FabricId: 1
           [1647863342.982357][9309:9314] CHIP:TOO:       NodeId: 2
-          [1647863342.982409][9309:9314] CHIP:TOO:       Label:
+          [1647863342.982409][9309:9314] CHIP:TOO:       Label: 
           [1647863342.982460][9309:9314] CHIP:TOO:       FabricIndex: 4
           [1647863342.982512][9309:9314] CHIP:TOO:      }
           [1647863342.982738][9309:9314] CHIP:EM: Sending Standalone Ack for MessageCounter:5772016 on exchange 3310i

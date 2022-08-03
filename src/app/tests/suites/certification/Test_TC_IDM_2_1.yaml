@@ -15,6 +15,9 @@
 
 name: 3.2.1. [TC-IDM-2.1] Read Request Action from DUT to TH. [{DUT_Client}]
 
+PICS:
+    - MCORE.IDM.C.ReadRequest
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -28,7 +31,7 @@ tests:
           Attribute]] On receipt of this message, TH should send a report data
           action with the attribute value to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use 
 
           ./chip-tool identify read identify-time 1 1
 
@@ -45,10 +48,10 @@ tests:
           [1655720917.720752][10909:10909] CHIP:DMG:                         Cluster = 0x3,
           [1655720917.720805][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1655720917.720858][10909:10909] CHIP:DMG:                 }
-          [1655720917.720909][10909:10909] CHIP:DMG:
+          [1655720917.720909][10909:10909] CHIP:DMG:                         
           [1655720917.720956][10909:10909] CHIP:DMG:         ],
-          [1655720917.721006][10909:10909] CHIP:DMG:
-          [1655720917.721055][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655720917.721006][10909:10909] CHIP:DMG:                 
+          [1655720917.721055][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655720917.721101][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655720917.721144][10909:10909] CHIP:DMG: },
           [1655720917.721267][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -86,10 +89,10 @@ tests:
           [1655721163.412018][10909:10909] CHIP:DMG:                         Endpoint = 0x0,
           [1655721163.412051][10909:10909] CHIP:DMG:                         Cluster = 0x3,
           [1655721163.412078][10909:10909] CHIP:DMG:                 }
-          [1655721163.412107][10909:10909] CHIP:DMG:
+          [1655721163.412107][10909:10909] CHIP:DMG:                         
           [1655721163.412132][10909:10909] CHIP:DMG:         ],
-          [1655721163.412160][10909:10909] CHIP:DMG:
-          [1655721163.412187][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655721163.412160][10909:10909] CHIP:DMG:                 
+          [1655721163.412187][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655721163.412212][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655721163.412236][10909:10909] CHIP:DMG: },
           [1655721163.412312][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -134,7 +137,7 @@ tests:
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 0xFFFF
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command and
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command and 
           On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
       disabled: true
 
@@ -157,10 +160,10 @@ tests:
           [1655721447.462961][10909:10909] CHIP:DMG:                 AttributePathIB =
           [1655721447.463014][10909:10909] CHIP:DMG:                 {
           [1655721447.463066][10909:10909] CHIP:DMG:                 }
-          [1655721447.463121][10909:10909] CHIP:DMG:
+          [1655721447.463121][10909:10909] CHIP:DMG:                         
           [1655721447.463173][10909:10909] CHIP:DMG:         ],
-          [1655721447.463228][10909:10909] CHIP:DMG:
-          [1655721447.463282][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655721447.463228][10909:10909] CHIP:DMG:                 
+          [1655721447.463282][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655721447.463334][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655721447.463382][10909:10909] CHIP:DMG: },
           [1655721447.463503][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -174,7 +177,7 @@ tests:
           Specific ClusterID]] On receipt of this message, TH should send a
           report data action with the attribute value to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use 
 
           ./chip-tool any read-by-id 0x03 0xFFFFFFFF  1 0xFFFF
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
@@ -189,10 +192,10 @@ tests:
           [1655721586.587998][10909:10909] CHIP:DMG:                 {
           [1655721586.588041][10909:10909] CHIP:DMG:                         Cluster = 0x3,
           [1655721586.588085][10909:10909] CHIP:DMG:                 }
-          [1655721586.588125][10909:10909] CHIP:DMG:
+          [1655721586.588125][10909:10909] CHIP:DMG:                         
           [1655721586.588162][10909:10909] CHIP:DMG:         ],
-          [1655721586.588201][10909:10909] CHIP:DMG:
-          [1655721586.588239][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655721586.588201][10909:10909] CHIP:DMG:                 
+          [1655721586.588239][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655721586.588276][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655721586.588310][10909:10909] CHIP:DMG: },
           [1655721586.588403][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -256,7 +259,7 @@ tests:
           receipt of this message, TH should send a report data action with the
           attribute value to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use 
 
           ./chip-tool any read-by-id 0x03 0x01  1 0xFFFF
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
@@ -271,10 +274,10 @@ tests:
           [1655721699.305442][10909:10909] CHIP:DMG:                         Cluster = 0x3,
           [1655721699.305516][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1655721699.305568][10909:10909] CHIP:DMG:                 }
-          [1655721699.305635][10909:10909] CHIP:DMG:
+          [1655721699.305635][10909:10909] CHIP:DMG:                         
           [1655721699.305682][10909:10909] CHIP:DMG:         ],
-          [1655721699.305733][10909:10909] CHIP:DMG:
-          [1655721699.305780][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655721699.305733][10909:10909] CHIP:DMG:                 
+          [1655721699.305780][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655721699.305827][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655721699.305870][10909:10909] CHIP:DMG: },
           [1655721699.305990][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -295,7 +298,7 @@ tests:
           Specific Endpoint]] On receipt of this message, TH should send a
           report data action with the attribute value to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use 
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 1
 
@@ -311,10 +314,10 @@ tests:
           [1655721846.894320][10909:10909] CHIP:DMG:                 {
           [1655721846.894360][10909:10909] CHIP:DMG:                         Endpoint = 0x1,
           [1655721846.894403][10909:10909] CHIP:DMG:                 }
-          [1655721846.894443][10909:10909] CHIP:DMG:
+          [1655721846.894443][10909:10909] CHIP:DMG:                         
           [1655721846.894479][10909:10909] CHIP:DMG:         ],
-          [1655721846.894519][10909:10909] CHIP:DMG:
-          [1655721846.894557][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655721846.894519][10909:10909] CHIP:DMG:                 
+          [1655721846.894557][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655721846.894594][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655721846.894628][10909:10909] CHIP:DMG: },
           [1655721846.894724][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -331,7 +334,7 @@ tests:
           attribute]] On receipt of this message, TH should send a report data
           action with the attribute value to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use 
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD  1 0
 
@@ -348,10 +351,10 @@ tests:
           [1655721935.483934][10909:10909] CHIP:DMG:                         Endpoint = 0x0,
           [1655721935.484022][10909:10909] CHIP:DMG:                         Attribute = 0x0000_FFFD,
           [1655721935.484095][10909:10909] CHIP:DMG:                 }
-          [1655721935.484156][10909:10909] CHIP:DMG:
+          [1655721935.484156][10909:10909] CHIP:DMG:                         
           [1655721935.484225][10909:10909] CHIP:DMG:         ],
-          [1655721935.484279][10909:10909] CHIP:DMG:
-          [1655721935.484344][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655721935.484279][10909:10909] CHIP:DMG:                 
+          [1655721935.484344][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655721935.484392][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655721935.484450][10909:10909] CHIP:DMG: },
           [1655721935.484595][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -415,10 +418,11 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type bool."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type bool."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Bool
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use 
 
            ./chip-tool onoff read on-off 1 1
 
@@ -436,10 +440,10 @@ tests:
           [1655722298.459034][10909:10909] CHIP:DMG:                         Cluster = 0x6,
           [1655722298.459114][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1655722298.459208][10909:10909] CHIP:DMG:                 }
-          [1655722298.459283][10909:10909] CHIP:DMG:
+          [1655722298.459283][10909:10909] CHIP:DMG:                         
           [1655722298.459366][10909:10909] CHIP:DMG:         ],
-          [1655722298.459435][10909:10909] CHIP:DMG:
-          [1655722298.459519][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655722298.459435][10909:10909] CHIP:DMG:                 
+          [1655722298.459519][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655722298.459581][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655722298.459659][10909:10909] CHIP:DMG: },
           [1655722298.459820][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -453,10 +457,11 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type string."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type string."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_String
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use 
 
           ./chip-tool modeselect read description  1 1
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
@@ -473,10 +478,10 @@ tests:
           [1655722750.452854][10909:10909] CHIP:DMG:                         Cluster = 0x50,
           [1655722750.452926][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1655722750.452986][10909:10909] CHIP:DMG:                 }
-          [1655722750.453049][10909:10909] CHIP:DMG:
+          [1655722750.453049][10909:10909] CHIP:DMG:                         
           [1655722750.453102][10909:10909] CHIP:DMG:         ],
-          [1655722750.453160][10909:10909] CHIP:DMG:
-          [1655722750.453215][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655722750.453160][10909:10909] CHIP:DMG:                 
+          [1655722750.453215][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655722750.453268][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655722750.453316][10909:10909] CHIP:DMG: },
           [1655722750.453457][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -490,10 +495,11 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type unsigned integer."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type unsigned integer."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_UnsignedInteger
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use 
 
           ./chip-tool any read-by-id 0x3 0x1 1 0
 
@@ -510,10 +516,10 @@ tests:
           [1655722980.957207][10909:10909] CHIP:DMG:                         Cluster = 0x3,
           [1655722980.957245][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1655722980.957282][10909:10909] CHIP:DMG:                 }
-          [1655722980.957328][10909:10909] CHIP:DMG:
+          [1655722980.957328][10909:10909] CHIP:DMG:                         
           [1655722980.957359][10909:10909] CHIP:DMG:         ],
-          [1655722980.957404][10909:10909] CHIP:DMG:
-          [1655722980.957436][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655722980.957404][10909:10909] CHIP:DMG:                 
+          [1655722980.957436][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655722980.957477][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655722980.957506][10909:10909] CHIP:DMG: },
           [1655722980.957605][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -528,10 +534,11 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type signed integer."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type signed integer."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_SignedInteger
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use 
 
           ./chip-tool pressuremeasurement read measured-value 1 1
 
@@ -548,10 +555,10 @@ tests:
           [1655723021.113096][10909:10909] CHIP:DMG:                         Cluster = 0x403,
           [1655723021.113125][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1655723021.113166][10909:10909] CHIP:DMG:                 }
-          [1655723021.113195][10909:10909] CHIP:DMG:
+          [1655723021.113195][10909:10909] CHIP:DMG:                         
           [1655723021.113228][10909:10909] CHIP:DMG:         ],
-          [1655723021.113257][10909:10909] CHIP:DMG:
-          [1655723021.113292][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655723021.113257][10909:10909] CHIP:DMG:                 
+          [1655723021.113292][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655723021.113318][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723021.113349][10909:10909] CHIP:DMG: },
           [1655723021.113441][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -566,17 +573,19 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type floating point."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type floating point."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_FloatingPoint
       verification: |
           DUT implementation required to verify read an attribute of data type Float
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type Octet String."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type Octet String."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_OctetString
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use  
 
           ./chip-tool operationalcredentials read trusted-root-certificates 1 0
 
@@ -594,10 +603,10 @@ tests:
           [1655723062.690980][10909:10909] CHIP:DMG:                         Cluster = 0x3e,
           [1655723062.691047][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0004,
           [1655723062.691123][10909:10909] CHIP:DMG:                 }
-          [1655723062.691186][10909:10909] CHIP:DMG:
+          [1655723062.691186][10909:10909] CHIP:DMG:                         
           [1655723062.691257][10909:10909] CHIP:DMG:         ],
-          [1655723062.691317][10909:10909] CHIP:DMG:
-          [1655723062.691389][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655723062.691317][10909:10909] CHIP:DMG:                 
+          [1655723062.691389][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655723062.691441][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723062.691494][10909:10909] CHIP:DMG: },
           [1655723062.691635][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -612,10 +621,11 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type Struct."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type Struct."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Struct
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use 
 
            sudo ./chip-tool  generalcommissioning read  basic-commissioning-info   1 0
 
@@ -633,10 +643,10 @@ tests:
           [1655723112.902291][10909:10909] CHIP:DMG:                         Cluster = 0x30,
           [1655723112.902339][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1655723112.902395][10909:10909] CHIP:DMG:                 }
-          [1655723112.902437][10909:10909] CHIP:DMG:
+          [1655723112.902437][10909:10909] CHIP:DMG:                         
           [1655723112.902487][10909:10909] CHIP:DMG:         ],
-          [1655723112.902529][10909:10909] CHIP:DMG:
-          [1655723112.902580][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655723112.902529][10909:10909] CHIP:DMG:                 
+          [1655723112.902580][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655723112.902618][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723112.902664][10909:10909] CHIP:DMG: },
           [1655723112.902782][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -654,10 +664,11 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type List."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type List."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_List
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use 
 
            ./chip-tool modeselect read  supported-modes 1 1
 
@@ -675,10 +686,10 @@ tests:
           [1655723151.159847][10909:10909] CHIP:DMG:                         Cluster = 0x50,
           [1655723151.159892][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1655723151.159934][10909:10909] CHIP:DMG:                 }
-          [1655723151.159967][10909:10909] CHIP:DMG:
+          [1655723151.159967][10909:10909] CHIP:DMG:                         
           [1655723151.160007][10909:10909] CHIP:DMG:         ],
-          [1655723151.160039][10909:10909] CHIP:DMG:
-          [1655723151.160081][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655723151.160039][10909:10909] CHIP:DMG:                 
+          [1655723151.160081][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655723151.160110][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723151.160147][10909:10909] CHIP:DMG: },
           [1655723151.160243][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -720,10 +731,11 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type enum."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type enum."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Enum
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use 
 
           ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
@@ -740,10 +752,10 @@ tests:
           [1655723234.548510][10909:10909] CHIP:DMG:                         Cluster = 0x406,
           [1655723234.548566][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1655723234.548634][10909:10909] CHIP:DMG:                 }
-          [1655723234.548687][10909:10909] CHIP:DMG:
+          [1655723234.548687][10909:10909] CHIP:DMG:                         
           [1655723234.548749][10909:10909] CHIP:DMG:         ],
-          [1655723234.548800][10909:10909] CHIP:DMG:
-          [1655723234.548988][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655723234.548800][10909:10909] CHIP:DMG:                 
+          [1655723234.548988][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655723234.549038][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723234.549097][10909:10909] CHIP:DMG: },
           [1655723234.549241][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -756,10 +768,11 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type bitmap."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type bitmap."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Bitmap
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use  
 
           ./chip-tool levelcontrol read options 1 1
 
@@ -776,10 +789,10 @@ tests:
           [1655723282.097923][10909:10909] CHIP:DMG:                         Cluster = 0x8,
           [1655723282.097954][10909:10909] CHIP:DMG:                         Attribute = 0x0000_000F,
           [1655723282.097982][10909:10909] CHIP:DMG:                 }
-          [1655723282.098009][10909:10909] CHIP:DMG:
+          [1655723282.098009][10909:10909] CHIP:DMG:                         
           [1655723282.098034][10909:10909] CHIP:DMG:         ],
-          [1655723282.098061][10909:10909] CHIP:DMG:
-          [1655723282.098087][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655723282.098061][10909:10909] CHIP:DMG:                 
+          [1655723282.098087][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655723282.098112][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723282.098134][10909:10909] CHIP:DMG: },
           [1655723282.098206][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -797,7 +810,7 @@ tests:
           "DUT sends the Read Request Message to the TH to read an attribute
           Repeat the above steps 3 times."
       verification: |
-          In case of chip tool, here is an example command to use
+          In case of chip tool, here is an example command to use 
 
            ./chip-tool  occupancysensing read occupancy    1 1
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
@@ -813,10 +826,10 @@ tests:
           [1655723372.328644][10909:10909] CHIP:DMG:                         Cluster = 0x406,
           [1655723372.328707][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1655723372.328763][10909:10909] CHIP:DMG:                 }
-          [1655723372.328808][10909:10909] CHIP:DMG:
+          [1655723372.328808][10909:10909] CHIP:DMG:                         
           [1655723372.328861][10909:10909] CHIP:DMG:         ],
-          [1655723372.328903][10909:10909] CHIP:DMG:
-          [1655723372.328954][10909:10909] CHIP:DMG:         isFabricFiltered = true,
+          [1655723372.328903][10909:10909] CHIP:DMG:                 
+          [1655723372.328954][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
           [1655723372.328994][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723372.329041][10909:10909] CHIP:DMG: },
           [1655723372.329162][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -843,10 +856,10 @@ tests:
           spec can be chunked. For every chunked data message received, except
           the last one, DUT sends a status response."
       verification: |
-          DUT implementation required to verify read an attribute which is is larger than 1 MTU(1280 bytes)
+          DUT implementation required to verify read an attribute which is is larger than 1 MTU(1280 bytes) 
           Below sample wildcard read command will read all the attributes from the all-clusters-app and generates 1 MTU size of data.
-          If the dut doesn't support generating the large chunk data, then this test step can be skipped.
-          Verify the last chunked data is having Suppress response True & TH will not send the Ack message.
+          If the dut doesn"t support generating the large chunk data, then this test step can be skipped. 
+          Verify the last chunked data is having Suppress response True & TH will not send the Ack message.  
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
 
@@ -860,13 +873,24 @@ tests:
 
           On TH verify that  The last chunked message should not receive any status response from the DUT
 
-          [1658396687.401934][3726:3731] CHIP:DMG:
+          [1658396687.401934][3726:3731] CHIP:DMG:                         
           [1658396687.401958][3726:3731] CHIP:DMG:                 },
-          [1658396687.401987][3726:3731] CHIP:DMG:
+          [1658396687.401987][3726:3731] CHIP:DMG:                 
           [1658396687.402010][3726:3731] CHIP:DMG:         ],
-          [1658396687.402048][3726:3731] CHIP:DMG:
-          [1658396687.402072][3726:3731] CHIP:DMG:         SuppressResponse = true,
+          [1658396687.402048][3726:3731] CHIP:DMG:         
+          [1658396687.402072][3726:3731] CHIP:DMG:         SuppressResponse = true, 
           [1658396687.402097][3726:3731] CHIP:DMG:         InteractionModelRevision = 1
           [1658396687.402119][3726:3731] CHIP:DMG: }
           [1658396687.402400][3726:3731] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_FFFB DataVersion: 3456275847
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH with Manufacturer
+          specific clusters and attributes to read all attributes in all
+          clusters and all endpoints Path = [[ ]]. On receipt of this message,
+          TH should send a report data action with the attribute values to the
+          DUT."
+      verification: |
+          sudo ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF --timeout 40
+          On TH verify that Read Request Message received from DUT
       disabled: true

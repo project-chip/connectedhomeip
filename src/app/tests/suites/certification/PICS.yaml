@@ -2490,6 +2490,20 @@ PICS:
           its bridged devices, e.g. through a manufacturer-provided app"
       id: MCORE.BRIDGE.AllowDeviceRename
 
+    - label: "Does the DUT support to maintain a list of connected devices"
+      id: MCORE.DEVLIST.UseDevices
+
+    - label: "Does the DUT support to maintain the names of connected devices"
+      id: MCORE.DEVLIST.UseDeviceNames
+
+    - label: "Does the DUT support to maintain the state of connected devices"
+      id: MCORE.DEVLIST.UseDeviceState
+
+    - label:
+          "Does the DUT support maintaining information on battery level of
+          connected devices"
+      id: MCORE.DEVLIST.UseBatInfo
+
     #Bulk Data Exchange Protocol
     - label: "Does the DUT control the rate of the BDX transfer ?"
       id: MCORE.BDX.Driver
@@ -2846,6 +2860,15 @@ PICS:
     - label: "A replaceable battery power source (requires Battery feature)"
       id: PS.S.F03
 
+    - label: "Can the DUT be brought into a Wired Fault state?"
+      id: PS.M.ManualWiredFault
+
+    - label: "Can the DUT be brought into a Battery Fault state?"
+      id: PS.M.ManualBatFault
+
+    - label: "Can the DUT be brought into a Battery Charge Fault state?"
+      id: PS.M.ManualBatChargeFault
+
     #Thermostat User Configuration Cluster
     - label: "Does the device implement the TemperatureDisplayMode attribute?"
       id: TSUIC.S.A0000
@@ -2926,6 +2949,11 @@ PICS:
     - label: "Is the DUT a Controller?"
       id: MCORE.DD.CONTROLLER
 
+    - label:
+          "Does the commissioner support processing devices in the order as
+          indicated in the concatenated QR codes?"
+      id: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1_INORDER
+
     - label: "Does the DUT support scanning concatenated QR codes?"
       id: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
 
@@ -2993,6 +3021,24 @@ PICS:
       id: MCORE.DD.WIRELESS
 
     - label:
+          "Does the device support Wi-Fi or Thread interfaces communication ?"
+      id: MCORE.COM.WIRELESS
+
+    - label:
+          "Does the device support communication over Bluetooth Low Energy (BLE)
+          ?"
+      id: MCORE.COM.BLE
+
+    - label: "Does the device support communication over Wi-Fi ?"
+      id: MCORE.COM.WIFI
+
+    - label: "Does the device support communication over Ethernet ?"
+      id: MCORE.COM.ETH
+
+    - label: "Does the device support communication over Thread ?"
+      id: MCORE.COM.THR
+
+    - label:
           "Does the device support TXT Key 'VP' (Vendor ID / Product ID) in it’s
           DNS-SD TXT Records for Commissionable Node Discovery?"
       id: MCORE.DD.TXT_KEY_VP
@@ -3051,6 +3097,9 @@ PICS:
     #Ethernet Network Diagnostics Cluster
     - label: "Does the device implement the ResetCounts command?"
       id: DGETH.S.C00.Rsp
+
+    - label: "Does the device implement the ResetCounts command?"
+      id: DGETH.C.C00.Tx
 
     - label: "Does the device implement the PHYRate attribute?"
       id: DGETH.S.A0000
@@ -4877,6 +4926,19 @@ PICS:
           mDNS?"
       id: MCORE.SC.PI_KEY
 
+    - label:
+          "Does device support Extended Discovery for Commissionable Node
+          Discovery?"
+      id: MCORE.SC.EXTENDED_DISCOVERY
+
+    - label:
+          "Does device support Extended Discovery for Commissionable Node
+          Discovery?"
+      id: MCORE.SC.SED
+
+    - label: "Does the Controller DUT support Service Advertising?"
+      id: MCORE.SC.ADV
+
     #133.1. Bridged Device Basic Information Cluster
     - label: "Does the DUT(server) support the DataModelRevision attribute?"
       id: BRBINFO.S.A0000
@@ -5024,3 +5086,192 @@ PICS:
 
     - label: "Does the DUT(Client) support the ReachableChanged event?"
       id: BRBINFO.C.E03
+
+    #Interaction Data Model
+    - label:
+          "Is the device a Client and Supports sending a Invoke Request Message"
+      id: MCORE.IDM.C.InvokeRequest
+
+    - label:
+          "Is the device a Client and Supports sending a Read Request Message"
+      id: MCORE.IDM.C.ReadRequest
+
+    - label:
+          "Is the device a Client and Supports sending a Write Request Message"
+      id: MCORE.IDM.C.WriteRequest
+
+    - label:
+          "Is the device a Client and Supports sending a Subscribe Request
+          Message"
+      id: MCORE.IDM.C.SubscribeRequest
+
+    - label: "Is the device a Server and supports an attribute of DataType Bool"
+      id: MCORE.IDM.S.Attribute.DataType_Bool
+
+    - label:
+          "Is the device a Server and supports an attribute of DataType String"
+      id: MCORE.IDM.S.Attribute.DataType_String
+
+    - label:
+          "Is the device a Server and supports an attribute of DataType Unsigned
+          Integer"
+      id: MCORE.IDM.S.Attribute.DataType_UnsignedInteger
+
+    - label:
+          "Is the device a Server and supports an attribute of DataType Signed
+          Integer"
+      id: MCORE.IDM.S.Attribute.DataType_SignedInteger
+
+    - label:
+          "Is the device a Server and supports an attribute of DataType Struct"
+      id: MCORE.IDM.S.Attribute.DataType_Struct
+
+    - label:
+          "Is the device a Server and supports an attribute of DataType Floating
+          Point"
+      id: MCORE.IDM.S.Attribute.DataType_FloatingPoint
+
+    - label: "Is the device a Server and supports an attribute of DataType List"
+      id: MCORE.IDM.S.Attribute.DataType_List
+
+    - label:
+          "Is the device a Server and supports an attribute of DataType Octet
+          String"
+      id: MCORE.IDM.S.Attribute.DataType_OctetString
+
+    - label: "Is the device a Server and supports an attribute of DataType Enum"
+      id: MCORE.IDM.S.Attribute.DataType_Enum
+
+    - label:
+          "Is the device a Server and supports an attribute of DataType Bitmap"
+      id: MCORE.IDM.S.Attribute.DataType_Bitmap
+
+    - label:
+          "Is the device a Client and supports Reading an attribute of DataType
+          Bool"
+      id: MCORE.IDM.C.ReadRequest.Attribute.DataType_Bool
+
+    - label:
+          "Is the device a Client and supports Reading an attribute of DataType
+          String"
+      id: MCORE.IDM.C.ReadRequest.Attribute.DataType_String
+
+    - label:
+          "Is the device a Client and supports Reading an attribute of DataType
+          Unsigned Integer"
+      id: MCORE.IDM.C.ReadRequest.Attribute.DataType_UnsignedInteger
+
+    - label:
+          "Is the device a Client and supports Reading an attribute of DataType
+          Signed Integer"
+      id: MCORE.IDM.C.ReadRequest.Attribute.DataType_SignedInteger
+
+    - label:
+          "Is the device a Client and supports Reading an attribute of DataType
+          Struct"
+      id: MCORE.IDM.C.ReadRequest.Attribute.DataType_Struct
+
+    - label:
+          "Is the device a Client and supports Reading an attribute of DataType
+          Floating Point"
+      id: MCORE.IDM.C.ReadRequest.Attribute.DataType_FloatingPoint
+
+    - label:
+          "Is the device a Client and supports Reading an attribute of DataType
+          List"
+      id: MCORE.IDM.C.ReadRequest.Attribute.DataType_List
+
+    - label:
+          "Is the device a Client and supports Reading an attribute of DataType
+          Octet String"
+      id: MCORE.IDM.C.ReadRequest.Attribute.DataType_OctetString
+
+    - label:
+          "Is the device a Client and supports Reading an attribute of DataType
+          Enum"
+      id: MCORE.IDM.C.ReadRequest.Attribute.DataType_Enum
+
+    - label:
+          "Is the device a Client and supports Reading an attribute of DataType
+          Bitmap"
+      id: MCORE.IDM.C.ReadRequest.Attribute.DataType_Bitmap
+
+    - label:
+          "Is the device a Server and supports a writable attribute of DataType
+          Bool"
+      id: MCORE.IDM.S.Attribute_W.DataType_Bool
+
+    - label:
+          "Is the device a Server and supports a writable attribute of DataType
+          String"
+      id: MCORE.IDM.S.Attribute_W.DataType_String
+
+    - label:
+          "Is the device a Server and supports a writable attribute of DataType
+          UnsignedInteger"
+      id: MCORE.IDM.S.Attribute_W.DataType_UnsignedInteger
+
+    - label:
+          "Is the device a Server and supports a writable attribute of DataType
+          SignedInteger"
+      id: MCORE.IDM.S.Attribute_W.DataType_SignedInteger
+
+    - label:
+          "Is the device a Server and supports a writable attribute of DataType
+          Struct"
+      id: MCORE.IDM.S.Attribute_W.DataType_Struct
+
+    - label:
+          "Is the device a Server and supports a writable attribute of DataType
+          FloatingPoint"
+      id: MCORE.IDM.S.Attribute_W.DataType_FloatingPoint
+
+    - label:
+          "Is the device a Server and supports a writable attribute of DataType
+          List"
+      id: MCORE.IDM.S.Attribute_W.DataType_List
+
+    - label:
+          "Is the device a Server and supports a writable attribute of DataType
+          OctetString"
+      id: MCORE.IDM.S.Attribute_W.DataType_OctetString
+
+    - label:
+          "Is the device a Server and supports a writable attribute of DataType
+          Enum"
+      id: MCORE.IDM.S.Attribute_W.DataType_Enum
+
+    - label:
+          "Is the device a Server and supports a writable attribute of DataType
+          Bitmap"
+      id: MCORE.IDM.S.Attribute_W.DataType_Bitmap
+
+    - label:
+          "Is the device a Client and supports subscribing to an attribute of
+          DataType Bool"
+      id: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_String
+
+    - label:
+          "Is the device a Client and supports subscribing to an attribute of
+          DataType UnsignedInteger"
+      id: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_UnsignedInteger
+
+    - label:
+          "Is the device a Client and supports subscribing to an attribute of
+          DataType Integer"
+      id: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_Integer
+
+    - label:
+          "Is the device a Client and supports subscribing to an attribute of
+          DataType FloatingPoint"
+      id: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_FloatingPoint
+
+    - label:
+          "Is the device a Client and supports subscribing to an attribute of
+          DataType List"
+      id: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_List
+
+    - label:
+          "Is the device a Server and capable of generating large data which is
+          greater than 1 MTU(1280 bytes)"
+      id: MCORE.IDM.S.LargeData

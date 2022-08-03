@@ -15,6 +15,9 @@
 
 name: 80.3.1. [TC-MOD-3.1] OnMode Verification (DUT as Server)
 
+PICS:
+    - MOD.S.A0005
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -94,8 +97,8 @@ tests:
 
     - label:
           "Select a value from the list in step 2c with a different value than
-          the StartUpMode value read in step 1. TH sends a ChangeToMode command
-          to the TH with the selected value."
+          the onMode value read in step 1. TH sends a ChangeToMode command to
+          the TH with the selected value."
       PICS: MOD.S.A0002 && MOD.S.C00.Rsp && MOD.S.F00
       verification: |
           ./chip-tool modeselect change-to-mode 7 1 1
@@ -106,7 +109,7 @@ tests:
       disabled: true
 
     - label: "TH reads sends an Off command to the DUT"
-      PICS: OO.S.C01.Rsp && MOD.S.F00
+      PICS: OO.S.C00.Rsp && MOD.S.F00
       verification: |
           ./chip-tool onoff off 1 1
 

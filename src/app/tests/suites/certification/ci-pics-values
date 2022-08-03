@@ -645,6 +645,10 @@ MCORE.BRIDGE=1
 MCORE.BRIDGE.BatInfo=1
 MCORE.BRIDGE.OtherControl=1
 MCORE.BRIDGE.AllowDeviceRename=1
+MCORE.DEVLIST.UseDevices=1
+MCORE.DEVLIST.UseDeviceState=1
+MCORE.DEVLIST.UseDeviceNames=1
+MCORE.DEVLIST.UseBatInfo=1
 
 #Bulk Data Exchange Protocol
 MCORE.BDX.Driver=1
@@ -758,6 +762,9 @@ PS.S.F00=0
 PS.S.F01=0
 PS.S.F02=0
 PS.S.F03=0
+PS.M.ManualWiredFault=1
+PS.M.ManualBatFault=1
+PS.M.ManualBatChargeFault=1
 
 #Thermostat User Configuration Cluster
 TSUIC.S.A0000=1
@@ -788,6 +795,7 @@ MCORE.DD.PASSCODE=1
 MCORE.DD.UI=1
 MCORE.DD.COMM_DISCOVERY=1
 MCORE.DD.CONTROLLER=1
+MCORE.DD.CTRL_CONCATENATED_QR_CODE_1_INORDER=1
 MCORE.DD.CTRL_CONCATENATED_QR_CODE_1=1
 MCORE.DD.CTRL_CONCATENATED_QR_CODE_2=1
 MCORE.DD.COMMISSIONER=1
@@ -805,6 +813,11 @@ MCORE.DD.SCAN_NFC=1
 MCORE.DD.SCAN_QR_CODE=1
 MCORE.DD.THREAD=1
 MCORE.DD.WIRELESS=1
+MCORE.COM.WIRELESS=1
+MCORE.COM.BLE=1
+MCORE.COM.WIFI=1
+MCORE.COM.ETH=1
+MCORE.COM.THR=1
 MCORE.DD.TXT_KEY_VP=1
 MCORE.DD.TXT_KEY_DT=1
 MCORE.DD.DISCOVERY_BLE=1
@@ -821,6 +834,7 @@ MCORE.DD.COMMISSIONING_SUBTYPE_T=1
 
 #Ethernet Network Diagnostics Cluster
 DGETH.S.C00.Rsp=1
+DGETH.C.C00.Tx=1
 DGETH.S.A0000=1
 DGETH.S.A0001=1
 DGETH.S.A0002=1
@@ -1499,6 +1513,9 @@ MCORE.SC.DN_KEY=1
 MCORE.SC.RI_KEY=1
 MCORE.SC.PH_KEY=1
 MCORE.SC.PI_KEY=1
+MCORE.SC.EXTENDED_DISCOVERY=1
+MCORE.SC.SED=1
+MCORE.SC.ADV=1
 
 #Bridged Device Basic Information
 #server
@@ -1556,3 +1573,45 @@ BRBINFO.C.E00=1
 BRBINFO.C.E01=1
 BRBINFO.C.E02=1
 BRBINFO.C.E03=1
+
+#Interaction Data Model
+MCORE.IDM.C.InvokeRequest=1
+MCORE.IDM.C.ReadRequest=1
+MCORE.IDM.C.WriteRequest=1
+MCORE.IDM.C.SubscribeRequest=1
+MCORE.IDM.S.Attribute.DataType_Bool=1
+MCORE.IDM.S.Attribute.DataType_String=1
+MCORE.IDM.S.Attribute.DataType_UnsignedInteger=1
+MCORE.IDM.S.Attribute.DataType_SignedInteger=1
+MCORE.IDM.S.Attribute.DataType_Struct=1
+MCORE.IDM.S.Attribute.DataType_FloatingPoint=1
+MCORE.IDM.S.Attribute.DataType_List=1
+MCORE.IDM.S.Attribute.DataType_OctetString=1
+MCORE.IDM.S.Attribute.DataType_Enum=1
+MCORE.IDM.S.Attribute.DataType_Bitmap=1
+MCORE.IDM.C.ReadRequest.Attribute.DataType_Bool=1
+MCORE.IDM.C.ReadRequest.Attribute.DataType_String=1
+MCORE.IDM.C.ReadRequest.Attribute.DataType_UnsignedInteger=1
+MCORE.IDM.C.ReadRequest.Attribute.DataType_SignedInteger=1
+MCORE.IDM.C.ReadRequest.Attribute.DataType_Struct=1
+MCORE.IDM.C.ReadRequest.Attribute.DataType_FloatingPoint=1
+MCORE.IDM.C.ReadRequest.Attribute.DataType_List=1
+MCORE.IDM.C.ReadRequest.Attribute.DataType_OctetString=1
+MCORE.IDM.C.ReadRequest.Attribute.DataType_Enum=1
+MCORE.IDM.C.ReadRequest.Attribute.DataType_Bitmap=1
+MCORE.IDM.S.Attribute_W.DataType_Bool=1
+MCORE.IDM.S.Attribute_W.DataType_String=1
+MCORE.IDM.S.Attribute_W.DataType_UnsignedInteger=1
+MCORE.IDM.S.Attribute_W.DataType_SignedInteger=1
+MCORE.IDM.S.Attribute_W.DataType_Struct=1
+MCORE.IDM.S.Attribute_W.DataType_FloatingPoint=1
+MCORE.IDM.S.Attribute_W.DataType_List=1
+MCORE.IDM.S.Attribute_W.DataType_OctetString=1
+MCORE.IDM.S.Attribute_W.DataType_Enum=1
+MCORE.IDM.S.Attribute_W.DataType_Bitmap=1
+MCORE.IDM.C.SubscribeRequest.Attribute.DataType_String=1
+MCORE.IDM.C.SubscribeRequest.Attribute.DataType_UnsignedInteger=1
+MCORE.IDM.C.SubscribeRequest.Attribute.DataType_Integer=1
+MCORE.IDM.C.SubscribeRequest.Attribute.DataType_FloatingPoint=1
+MCORE.IDM.C.SubscribeRequest.Attribute.DataType_List=1
+MCORE.IDM.S.LargeData=1
