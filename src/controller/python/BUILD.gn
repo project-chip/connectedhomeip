@@ -284,6 +284,7 @@ chip_python_wheel_action("chip-core") {
     "ipdb",
     "deprecation",
     "mobly",
+
     # Crypto libraries for complex tests and internal Python controller usage
     "cryptography",
     "pycrypto",
