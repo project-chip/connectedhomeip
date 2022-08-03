@@ -155,7 +155,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     chip::Platform::MemoryShutdown();
 }
 
-JNI_METHOD(jint, setNOCChain)
+JNI_METHOD(jint, onNOCChainGeneration)
 (JNIEnv * env, jobject self, jlong handle, jobject controllerParams)
 {
     chip::DeviceLayer::StackLock lock;
@@ -229,6 +229,9 @@ JNI_METHOD(jint, setNOCChain)
     {
         adminSubjectOptional.SetValue(adminSubject);
     }
+    // NOTE: we are allowing adminSubject to not be set since the OnNOCChainGeneration callback makes this field
+    // optional and includes logic to handle the case where it is not set. It would also make sense to return
+    // an error here since that use case may not be realistic.
 
     JniByteArray jByteArrayRcac(env, rootCertificate);
     JniByteArray jByteArrayIcac(env, intermediateCertificate);

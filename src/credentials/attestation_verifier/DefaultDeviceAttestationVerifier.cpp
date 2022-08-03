@@ -250,9 +250,6 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
         DeviceAttestationVendorReservedDeconstructor vendorReserved;
         ByteSpan certificationDeclarationPayload;
 
-        ChipLogProgress(Support, " ----- DefaultDACVerifier::VerifyAttestationInformation vendorId=0x%04X productId=0x%04X",
-                        info.vendorId, info.productId);
-
         DeviceInfoForAttestation deviceInfo{
             .vendorId     = info.vendorId,
             .productId    = info.productId,
