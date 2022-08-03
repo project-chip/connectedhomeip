@@ -31,11 +31,11 @@ tests:
           all the TH devices)"
       PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
       verification: |
-          Out of Scope for V1.0 as Concatenated QR codes are not supported yet 
-          https://github.com/project-chip/connectedhomeip/issues/5331 
+          Out of Scope for V1.0 as Concatenated QR codes are not supported yet
+          https://github.com/project-chip/connectedhomeip/issues/5331
 
           1. Lauch TH chip-all-clusters-app
-          ubuntu@matter-7:~/Apr18_dut/connectedhomeip/examples/all-clusters-app/linux/out/all-clusters-app$ sudo ./chip-all-clusters-app --wifi 
+          ubuntu@matter-7:~/Apr18_dut/connectedhomeip/examples/all-clusters-app/linux/out/all-clusters-app$ sudo ./chip-all-clusters-app --wifi
 
           [13293:13293] CHIP:DL: Device Configuration:
           [1653306603.740569][13293:13293] CHIP:DL:   Serial Number: TEST_SN
@@ -63,7 +63,7 @@ tests:
           which must be from first to last starting from left to right."
       PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1_INORDER
       verification: |
-          Out of Scope for V1.0 as Concatenated QR codes are not supported yet 
+          Out of Scope for V1.0 as Concatenated QR codes are not supported yet
           https://github.com/project-chip/connectedhomeip/issues/5331
           Vendor specific field testcase
       disabled: true
@@ -75,7 +75,7 @@ tests:
           "!(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) &&
           MCORE.DD.CTRL_CONCATENATED_QR_CODE_2"
       verification: |
-          Out of Scope for V1.0 as Concatenated QR codes are not supported yet 
+          Out of Scope for V1.0 as Concatenated QR codes are not supported yet
           https://github.com/project-chip/connectedhomeip/issues/5331
           Vendor specific field testcase
       disabled: true
@@ -89,7 +89,7 @@ tests:
           "!(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) &&
           !(MCORE.DD.CTRL_CONCATENATED_QR_CODE_2)"
       verification: |
-          Out of Scope for V1.0 as Concatenated QR codes are not supported yet 
+          Out of Scope for V1.0 as Concatenated QR codes are not supported yet
           https://github.com/project-chip/connectedhomeip/issues/5331
           Vendor specific field testcase
       disabled: true

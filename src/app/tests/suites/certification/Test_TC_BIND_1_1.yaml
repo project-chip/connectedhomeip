@@ -33,7 +33,7 @@ tests:
       verification: |
           ./chip-tool binding read cluster-revision 1 1
 
-          On TH, verify  DUT responsds ClusterRevision attribute as the value 1 
+          On TH, verify  DUT responsds ClusterRevision attribute as the value 1
 
           [1649417989.863435][3040:3045] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_FFFD DataVersion: 1411817517
           [1649417989.863557][3040:3045] CHIP:TOO:   ClusterRevision: 1
@@ -54,7 +54,7 @@ tests:
       verification: |
           ./chip-tool binding read attribute-list 1 1
 
-          On TH, verify  DUT responsds list of Attribute 
+          On TH, verify  DUT responsds list of Attribute
 
           [1653560826.815841][3445:3450] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_FFFB DataVersion: 2519252823
           [1653560826.816170][3445:3450] CHIP:TOO:   AttributeList: 6 entries
@@ -75,7 +75,7 @@ tests:
       verification: |
           ./chip-tool binding read accepted-command-list 1 1
 
-          On TH, verify that DUT  responds as list of Accepted Command as 0 entries. 
+          On TH, verify that DUT  responds as list of Accepted Command as 0 entries.
 
           [1653560851.890988][3451:3456] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_FFF9 DataVersion: 2519252823
           [1653560851.891077][3451:3456] CHIP:TOO:   AcceptedCommandList: 0 entries
@@ -85,7 +85,7 @@ tests:
       verification: |
           ./chip-tool binding read generated-command-list 1 1
 
-          On TH, verify that DUT  responds as list of Generated Command as 0 entries. 
+          On TH, verify that DUT  responds as list of Generated Command as 0 entries.
 
           [1653560872.884952][3458:3463] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_FFF8 DataVersion: 2519252823
           [1653560872.885073][3458:3463] CHIP:TOO:   GeneratedCommandList: 0 entries
@@ -93,7 +93,7 @@ tests:
 
     - label: "Factory Reset DUT"
       verification: |
-          Vendor specific action, for chip-tool run 
+          Vendor specific action, for chip-tool run
           rm -rf /tmp/chip*
       disabled: true
 
@@ -122,18 +122,18 @@ tests:
 
 
 
-                           
+
           [1657797710.456056][3796:3801] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           MG:                                 status = 0x00 (SUCCESS),
           [1657797710.457093][3796:3801] CHIP:DMG:                         },
-          [1657797710.457171][3796:3801] CHIP:DMG:                         
+          [1657797710.457171][3796:3801] CHIP:DMG:
           [1657797710.457232][3796:3801] CHIP:DMG:                 },
-          [1657797710.457318][3796:3801] CHIP:DMG:                 
+          [1657797710.457318][3796:3801] CHIP:DMG:
           [1               StatusIB =
           [1657797710.458209][3796:3801] CHIP:DMG:                         {
           [1657797710.458286][3796:3801] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657797710.458369][3796:3801] CHIP:DMG:                         },
-          [1657797710.458444][3796:3801] CHIP:DMG:                         
+          [1657797710.458444][3796:3801] CHIP:DMG:
               pted msg 0xffff7e7cd9d8 with MessageCounter:161235290 to 0x0000000000000001 (1) at monotonic time: 000000000071D1BB msec
           [1657797710.459711][3796:3801] CHIP:EM: Flushed pending ack for MessageCounter:23683634 on exchange 26818i
       disabled: true
@@ -154,14 +154,14 @@ tests:
           [1652330385.328298][3240:3245] CHIP:DMG:                        },
 
 
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}]}]" 3 0 
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}]}]" 3 0
 
           [1650610345.847274][2626:2631] CHIP:DMG:                                StatusIB =
           [1650610345.847317][2626:2631] CHIP:DMG:                                {
           [1650610345.847383][2626:2631] CHIP:DMG:                                        status = 0x00 (SUCCESS),
           [1650610345.847429][2626:2631] CHIP:DMG:                                },
 
-          DUT sends on command in the shell 
+          DUT sends on command in the shell
 
           > switch on
           [1658837711.917557][4764:4764] CHIP:DMG: ICR moving to [AddingComm]
@@ -267,7 +267,7 @@ tests:
           [1657798291.396477][3835:3841] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 4260513117
           [1657798291.396514][3835:3841] CHIP:TOO:   OnOff: TRUE
 
-          ./chip-tool onoff read on-off 3 2  
+          ./chip-tool onoff read on-off 3 2
 
           [1657798691.194894][3869:3874] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 470320746
           [1657798691.194948][3869:3874] CHIP:TOO:   OnOff: TRUE
@@ -291,14 +291,14 @@ tests:
           [1657800844.740275][4000:4006] CHIP:DMG:                                 Cluster = 0x1e,
           [1657800844.740322][4000:4006] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1657800844.740359][4000:4006] CHIP:DMG:                         }
-          [1657800844.740405][4000:4006] CHIP:DMG:                                 
+          [1657800844.740405][4000:4006] CHIP:DMG:
           [1657800844.740444][4000:4006] CHIP:DMG:                         StatusIB =
           [1657800844.740477][4000:4006] CHIP:DMG:                         {
           [1657800844.740516][4000:4006] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657800844.740548][4000:4006] CHIP:DMG:                         },
-          [1657800844.740584][4000:4006] CHIP:DMG:                         
+          [1657800844.740584][4000:4006] CHIP:DMG:
           [1657800844.740607][4000:4006] CHIP:DMG:                 },
-          [1657800844.740653][4000:4006] CHIP:DMG:                 
+          [1657800844.740653][4000:4006] CHIP:DMG:
           [1657800844.740687][4000:4006] CHIP:DMG:                 AttributeStatusIB =
           [1657800844.740714][4000:4006] CHIP:DMG:                 {
           [1657800844.740748][4000:4006] CHIP:DMG:                         AttributePathIB =
@@ -308,16 +308,16 @@ tests:
           [1657800844.740905][4000:4006] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1657800844.740946][4000:4006] CHIP:DMG:                                 ListIndex = Null,
           [1657800844.740981][4000:4006] CHIP:DMG:                         }
-          [1657800844.741025][4000:4006] CHIP:DMG:                                 
+          [1657800844.741025][4000:4006] CHIP:DMG:
           [1657800844.741063][4000:4006] CHIP:DMG:                         StatusIB =
           [1657800844.741094][4000:4006] CHIP:DMG:                         {
           [1657800844.741133][4000:4006] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657800844.741168][4000:4006] CHIP:DMG:                         },
-          [1657800844.741208][4000:4006] CHIP:DMG:                         
+          [1657800844.741208][4000:4006] CHIP:DMG:
           [1657800844.741241][4000:4006] CHIP:DMG:                 },
-          [1657800844.741272][4000:4006] CHIP:DMG:                 
+          [1657800844.741272][4000:4006] CHIP:DMG:
           [1657800844.741295][4000:4006] CHIP:DMG:         ],
-          [1657800844.741336][4000:4006] CHIP:DMG:         
+          [1657800844.741336][4000:4006] CHIP:DMG:
           [1657800844.741369][4000:4006] CHIP:DMG:         InteractionModelRevision = 1
           [1657800844.741392][4000:4006] CHIP:DMG: }
           [1657800844.741511][4000:4006] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -327,7 +327,7 @@ tests:
     - label: "DUT is triggered to send off command to its binding entries"
       PICS: OO.C.C00.Tx
       verification: |
-          DUT sends off command in the shell 
+          DUT sends off command in the shell
 
           > switch off
           [1658838896.810567][4764:4764] CHIP:DMG: ICR moving to [AddingComm]

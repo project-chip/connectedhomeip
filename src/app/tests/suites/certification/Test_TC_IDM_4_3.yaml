@@ -40,10 +40,10 @@ tests:
           attribute which has been subscribed on the DUT by sending an IMWrite
           or Invoke message to the DUT from the TH. +"
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster. 
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
           onoff  subscribe start-up-on-off  30 100 1 1
-          on TH, verify that DUT is responds right attribute value for above command 
+          on TH, verify that DUT is responds right attribute value for above command
 
           [1657451357.177831][11635:11640] CHIP:DMG: {
           [1657451357.177894][11635:11640] CHIP:DMG:      SubscriptionId = 0xf3aa49ef,
@@ -118,7 +118,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
            onoff  subscribe on-off 10 200  1 1
-           on TH  verify Verify that DUT is responds right attribute value for above command 
+           on TH  verify Verify that DUT is responds right attribute value for above command
 
           [1657451491.078934][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657451491.079004][11635:11640] CHIP:DMG: {
@@ -152,7 +152,7 @@ tests:
 
 
            onoff  subscribe on-off 10 200  1 1  --data-version  0x1979c38
-          On TH,  Verify that there is an empty report data message sent from the DUT to the TH 
+          On TH,  Verify that there is an empty report data message sent from the DUT to the TH
           [1657451619.059013][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657451619.059083][11635:11640] CHIP:DMG: {
           [1657451619.059145][11635:11640] CHIP:DMG:      SubscriptionId = 0x28f3dd7,
@@ -337,7 +337,7 @@ tests:
           [1657452091.180436][11635:11640] CHIP:DMG: Refresh LivenessCheckTime for 125000 milliseconds with SubscriptionId = 0xd9323ff2 Peer = 01:0000000000000001
 
 
-            
+
           Verify the above command multiple times(3 times)
       disabled: true
 
@@ -351,7 +351,7 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
-          any subscribe-by-id 0x0008 0x0010 10 100  1 1 
+          any subscribe-by-id 0x0008 0x0010 10 100  1 1
 
            on TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
@@ -684,7 +684,7 @@ tests:
 
 
           On TH Verify that the DUT sends a Report Data action and  There are no attribute value changes before MaxInterval elapses.
-          onoff subscribe on-time 100 1000 1 1 
+          onoff subscribe on-time 100 1000 1 1
           [1657453718.436970][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657453718.437043][11635:11640] CHIP:DMG: {
           [1657453718.437108][11635:11640] CHIP:DMG:      SubscriptionId = 0xce00f651,
@@ -875,7 +875,7 @@ tests:
 
           onoff subscribe on-time 10 100 1 1 --keepSubscriptions 1
 
-          After sending above command verify that the subscription is activated between DUT and TH 
+          After sending above command verify that the subscription is activated between DUT and TH
           1657454443.310644][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657454443.310712][11635:11640] CHIP:DMG: {
           [1657454443.310773][11635:11640] CHIP:DMG:      SubscriptionId = 0xae2db075,
@@ -960,7 +960,7 @@ tests:
 
 
           onoff write on-time 1 1 1
-           on TH Verify that  subscription is terminated after the MaxInterval of the first subscription is reached. 
+           on TH Verify that  subscription is terminated after the MaxInterval of the first subscription is reached.
           [1657455187.367198][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657455187.367281][11635:11640] CHIP:DMG: {
           [1657455187.367324][11635:11640] CHIP:DMG:      SubscriptionId = 0x50a6822b,
@@ -981,11 +981,11 @@ tests:
           [1657455187.788687][11635:11640] CHIP:DMG:                         {
           [1657455253.788687][11635:11640] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657455187.788687][11635:11640] CHIP:DMG:                         },
-          [1657455187.788687][11635:11640] CHIP:DMG:                        
+          [1657455187.788687][11635:11640] CHIP:DMG:
           [1657455187.788687][11635:11640] CHIP:DMG:               },
 
           here is an example command the TH can write an attribute in the onoff cluster in the DUT to change the value that the TH subscribed in the above command.
-           onoff write off-wait-time 1 1 1 
+           onoff write off-wait-time 1 1 1
 
           On TH verify that, TH  received a report data from DUT
 
@@ -1051,7 +1051,7 @@ tests:
           value say N(seconds). Change the attribute on the DUT"
       verification: |
           onoff subscribe-by-id 0x4001 200 700  1 0xFFFF
-           on TH, verify that DUT is responds right attribute value for  command and then send write command to change the attribute value, 
+           on TH, verify that DUT is responds right attribute value for  command and then send write command to change the attribute value,
           [1658322253.825601][4866:4871] CHIP:DMG: ReportDataMessage =
           [1658322253.825662][4866:4871] CHIP:DMG: {
           [1658322253.825714][4866:4871] CHIP:DMG:        SubscriptionId = 0x42baa1,

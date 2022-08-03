@@ -57,9 +57,9 @@ tests:
              port = [33333]
              txt = ["DN=Living Room TV" "DT=35" "VP=123+456"]
 
-             
 
-          to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp 
+
+          to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp
           | grep _matterd
 
           +;eth0;IPv6;_CM;_sub._matterd._udp;local

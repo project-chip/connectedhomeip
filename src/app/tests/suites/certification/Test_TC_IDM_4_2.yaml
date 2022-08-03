@@ -158,7 +158,7 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
-          To Setup the TH2 such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command 
+          To Setup the TH2 such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
 
            accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]" 1 0
@@ -182,22 +182,22 @@ tests:
           [1654862486.785998][32309:32314] CHIP:DMG:                                         Cluster = 0x204,
           [1654862486.786050][32309:32314] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1654862486.786099][32309:32314] CHIP:DMG:                                 }
-          [1654862486.786153][32309:32314] CHIP:DMG:                                         
+          [1654862486.786153][32309:32314] CHIP:DMG:
           [1654862486.786204][32309:32314] CHIP:DMG:                                 StatusIB =
           [1654862486.786253][32309:32314] CHIP:DMG:                                 {
           [1654862486.786302][32309:32314] CHIP:DMG:                                         status = 0x7e (UNSUPPORTED_ACCESS),
           [1654862486.786350][32309:32314] CHIP:DMG:                                 },
-          [1654862486.786399][32309:32314] CHIP:DMG:                                 
+          [1654862486.786399][32309:32314] CHIP:DMG:
           [1654862486.786441][32309:32314] CHIP:DMG:                         },
-          [1654862486.786489][32309:32314] CHIP:DMG:                         
+          [1654862486.786489][32309:32314] CHIP:DMG:
           [1654862486.786528][32309:32314] CHIP:DMG:                 },
-          [1654862486.786572][32309:32314] CHIP:DMG:                 
+          [1654862486.786572][32309:32314] CHIP:DMG:
           [1654862486.786606][32309:32314] CHIP:DMG:         ],
-          [1654862486.786650][32309:32314] CHIP:DMG:         
+          [1654862486.786650][32309:32314] CHIP:DMG:
           [1654862486.786685][32309:32314] CHIP:DMG:         InteractionModelRevision = 1
           [1654862486.786720][32309:32314] CHIP:DMG: }
           [1654862486.786862][32309:32314] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1654862486.786918][32309:32314] CHIP:DMG: MoveToState ReadClient[0xffff840040e0]: Moving to 
+          [1654862486.786918][32309:32314] CHIP:DMG: MoveToState ReadClient[0xffff840040e0]: Moving to
 
 
           With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
@@ -332,7 +332,7 @@ tests:
 
            onoff subscribe on-time 500 100 1 1
 
-          On TH Verify that the DUT sends an error message 
+          On TH Verify that the DUT sends an error message
           [1657451028.957761][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733056 from RetransTable on exchange 33632i
           [1657451028.957867][11635:11640] CHIP:DMG: StatusResponseMessage =
           [1657451028.957963][11635:11640] CHIP:DMG: {

@@ -29,7 +29,7 @@ tests:
           DUT and TH."
       verification: |
           On TH server side:
-          sudo ./chip-bridge-app 
+          sudo ./chip-bridge-app
 
           On DUT as client side:
           ./chip-tool pairing ethernet 1 20202021 3840 fe80::e65f:1ff:fe0f:2753  5540
@@ -374,7 +374,7 @@ tests:
           [1659089560.774681][12236:12236] CHIP:DMG: Endpoint 3, Cluster 0x0000_0006 update version to 83dcb371
 
 
-          Verify in DUT as client side 
+          Verify in DUT as client side
           ./chip-tool onoff read on-off 1 3
 
           [1659089585.162599][8769:8774] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 2212279153
