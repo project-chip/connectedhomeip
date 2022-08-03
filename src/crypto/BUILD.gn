@@ -95,7 +95,7 @@ if (chip_crypto == "openssl") {
   import("//build_overrides/boringssl.gni")
 
   source_set("cryptopal_boringssl") {
-    # BoringSSL is close enough to OpenSSL that isd uses same PAL, with minor #ifdef differences
+    # BoringSSL is close enough to OpenSSL that it uses same PAL, with minor #ifdef differences
     sources = [ "CHIPCryptoPALOpenSSL.cpp" ]
     public_deps = [
       ":public_headers",
