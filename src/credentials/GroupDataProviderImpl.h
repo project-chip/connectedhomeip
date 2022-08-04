@@ -177,8 +177,8 @@ protected:
                                   MutableByteSpan & ciphertext) const override;
         CHIP_ERROR MessageDecrypt(const ByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce, const ByteSpan & mic,
                                   MutableByteSpan & plaintext) const override;
-        CHIP_ERROR PrivacyEncrypt(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const override;
-        CHIP_ERROR PrivacyDecrypt(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const override;
+        CHIP_ERROR PrivacyObfuscate(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const override;
+        CHIP_ERROR PrivacyDeobfuscate(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const override;
 
         void Release() override;
 

@@ -277,7 +277,7 @@ CHIP_ERROR CryptoContext::PrivacyObfuscate(const uint8_t * input, size_t input_l
     CryptoContext::NonceStorage privacyNonce;
     CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac);
 
-    return mKeyContext->PrivacyEncrypt(plaintext, privacyNonce, privacytext);
+    return mKeyContext->PrivacyObfuscate(plaintext, privacyNonce, privacytext);
 }
 
 CHIP_ERROR CryptoContext::PrivacyDeobfuscate(const uint8_t * input, size_t input_length, uint8_t * output,
@@ -295,7 +295,7 @@ CHIP_ERROR CryptoContext::PrivacyDeobfuscate(const uint8_t * input, size_t input
     CryptoContext::NonceStorage privacyNonce;
     CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac);
 
-    return mKeyContext->PrivacyDecrypt(privacytext, privacyNonce, plaintext);
+    return mKeyContext->PrivacyDeobfuscate(privacytext, privacyNonce, plaintext);
 }
 
 } // namespace chip

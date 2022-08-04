@@ -1548,7 +1548,7 @@ public:
      * @param[out] output       Message header obfuscated
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR PrivacyEncrypt(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const = 0;
+    virtual CHIP_ERROR PrivacyObfuscate(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const = 0;
 
     /**
      * @brief Perform privacy decoding as described in 4.8.3. (Privacy Processing of Incoming Messages)
@@ -1557,7 +1557,7 @@ public:
      * @param[out] output       Message header deobfuscated
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR PrivacyDecrypt(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const = 0;
+    virtual CHIP_ERROR PrivacyDeobfuscate(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const = 0;
 
     /**
      * @brief Release resources such as dynamic memory used to allocate this instance of the SymmetricKeyContext
