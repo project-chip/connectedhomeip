@@ -27,7 +27,7 @@ tests:
     - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
       verification: |
           On DUT side:
-          sudo ./chip-bridge-app 
+          sudo ./chip-bridge-app
 
 
           On TH side:
@@ -104,7 +104,7 @@ tests:
     - label: "compare result of step 2d to what was read in step 2b"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          compare result of step 2d to what was read in step 2b, Verify name field in relevant EndpointListStruct has been updated and no other changes in EndpointLists attribute 
+          compare result of step 2d to what was read in step 2b, Verify name field in relevant EndpointListStruct has been updated and no other changes in EndpointLists attribute
 
           Step 2d log
           On TH, verify the EndpointListStructs in TH Log:
@@ -158,7 +158,7 @@ tests:
     - label: "Read EndpointLists attribute again"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          Press f in bridge app 
+          Press f in bridge app
           (in the example, light at ep 3 was moved to kitchen)
       disabled: true
 
@@ -307,7 +307,7 @@ tests:
       verification: |
           Compare step 3d and 3b and verify the name field has been chamged
 
-          Step 3d 
+          Step 3d
           Verify  ActionStructs in TH Log:
           [1658480004.064867][26153:26158] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
           [1658480004.064928][26153:26158] CHIP:TOO:   action list: 2 entries

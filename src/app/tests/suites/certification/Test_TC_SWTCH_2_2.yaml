@@ -32,7 +32,7 @@ tests:
           On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
           echo "{"Name":"SwitchLatched","NewPosition":3}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
 
-          ./chip-tool switch subscribe-event switch-latched 1 100 1 1 
+          ./chip-tool switch subscribe-event switch-latched 1 100 1 1
 
           Verify inTH Log:
 
@@ -125,7 +125,7 @@ tests:
     - label: "Set up subscription to InitialPress event"
       PICS: SWTCH.S.F01
       verification: |
-          ./chip-tool switch subscribe-event initial-press 1 100 1 1 
+          ./chip-tool switch subscribe-event initial-press 1 100 1 1
           Verify inTH Log:
 
           [1646209546.313236][2641:2646] CHIP:DMG: SubscribeResponseMessage =
@@ -190,7 +190,7 @@ tests:
     - label: "Set up subscription to InitialPress and ShortRelease events"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
-          ./chip-tool switch subscribe-event initial-press 1 100 1 1 
+          ./chip-tool switch subscribe-event initial-press 1 100 1 1
 
           ./chip-tool switch subscribe-event short-release 1 100 1 1
       disabled: true
@@ -233,9 +233,9 @@ tests:
       verification: |
           Verify inTH Log:
 
-          ./chip-tool switch subscribe-event initial-press 1 100 1 1 
+          ./chip-tool switch subscribe-event initial-press 1 100 1 1
 
-          ./chip-tool switch subscribe-event short-release 1 100 1 1 
+          ./chip-tool switch subscribe-event short-release 1 100 1 1
 
           [1655272080.983330][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1655272080.983357][2922:2927] CHIP:TOO:          Event number: 2
@@ -351,7 +351,7 @@ tests:
           [1655272080.987869][2922:2927] CHIP:TOO:    }
 
 
-          ./chip-tool switch subscribe-event long-press 1 100 1 1 
+          ./chip-tool switch subscribe-event long-press 1 100 1 1
 
           ./chip-tool switch subscribe-event long-release 1 100 1 1
       disabled: true
@@ -392,11 +392,11 @@ tests:
           MultiPressComplete events"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          ./chip-tool switch subscribe-event initial-press 1 100 1 1 
+          ./chip-tool switch subscribe-event initial-press 1 100 1 1
 
-          ./chip-tool switch subscribe-event short-release 1 100 1 1 
+          ./chip-tool switch subscribe-event short-release 1 100 1 1
 
-          ./chip-tool switch subscribe-event multi-press-ongoing 1 100 1 1 
+          ./chip-tool switch subscribe-event multi-press-ongoing 1 100 1 1
 
           ./chip-tool switch subscribe-event multi-press-complete 1 100 1 1
       disabled: true

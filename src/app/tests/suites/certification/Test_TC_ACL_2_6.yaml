@@ -148,7 +148,7 @@ tests:
           AuthMode field: Group (3) Subjects field: null Targets field: null"
       PICS: ACL.S.E00
       verification: |
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, 
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
           {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects": [], "targets":null}]" 1 0
           Verify in TH log:
 
@@ -379,7 +379,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read-event access-control-entry-changed 1 0
 
-          On TH , Verify DUT  Responds  Successfully 
+          On TH , Verify DUT  Responds  Successfully
 
           1658813186.871698][2504:2509] CHIP:DMG:        ],
           [1658813186.871770][2504:2509] CHIP:DMG:

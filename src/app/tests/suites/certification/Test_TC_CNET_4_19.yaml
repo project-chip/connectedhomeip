@@ -90,7 +90,7 @@ tests:
     - label: "DUT reads LastNetworkID attribute from the TH"
       PICS: CNET.S.A0006
       verification: |
-          ./chip-tool networkcommissioning read last-network-id 1 
+          ./chip-tool networkcommissioning read last-network-id 1
 
           Verify LastNetworkID on the TH/All-cluster-app Log:
 

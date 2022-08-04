@@ -27,7 +27,7 @@ tests:
     - label: "Simulate a Reachable attribute change on the TH"
       PICS: BINFO.C.E03
       verification: |
-          "reachable-changed" Event is an Optional event 
+          "reachable-changed" Event is an Optional event
 
           As its an optional event we cannot generate the event as of now , hence no example logs provided.
 
@@ -37,19 +37,19 @@ tests:
     - label: "Simulate a shutdown on the TH"
       PICS: BINFO.C.E01
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) and TH as all-clusters-app. 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) and TH as all-clusters-app.
 
 
-          To verify shutdown event follow the below commands, 
+          To verify shutdown event follow the below commands,
 
-          1. Launch chip-tool into interactive mode with using the below command 
+          1. Launch chip-tool into interactive mode with using the below command
           ./chip-tool interactive start
 
 
           2.  run below subscribe-event  command in interactive mode shell and then Turn down the TH (all-clusters-app)
           basic subscribe-event shut-down 20 100 1 0
 
-          On DUT as a client side, ,verify that Shutdown event has priority set as CRITICAL 
+          On DUT as a client side, ,verify that Shutdown event has priority set as CRITICAL
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0001
           [1653050528.900202][119367:119372] CHIP:TOO:          Event number: 5
@@ -68,8 +68,8 @@ tests:
            verify that StartUp event has priority set as CRITICAL and software version field on TH(all-clusters-app) log
 
           [1657193007.841105][5422:5427] CHIP:DMG:         ],
-          [1657193007.841137][5422:5427] CHIP:DMG:         
-          [1657193007.841162][5422:5427] CHIP:DMG:         SuppressResponse = true, 
+          [1657193007.841137][5422:5427] CHIP:DMG:
+          [1657193007.841162][5422:5427] CHIP:DMG:         SuppressResponse = true,
           [1657193007.841186][5422:5427] CHIP:DMG:         InteractionModelRevision = 1
           [1657193007.841209][5422:5427] CHIP:DMG: }
           [1657193007.841358][5422:5427] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
@@ -85,7 +85,7 @@ tests:
     - label: "Simulate a leave current fabric operation on the TH"
       PICS: BINFO.C.E02
       verification: |
-          To verify leave event follow the below commands 
+          To verify leave event follow the below commands
 
           1. ./chip-tool interactive start
           2. basic subscribe-event leave 1 100 1 0

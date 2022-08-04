@@ -32,7 +32,7 @@ tests:
       PICS: OPCREDS.S.A0000
       verification: |
           DUT side:
-          sudo ./chip-all-clusters-app --wifi 
+          sudo ./chip-all-clusters-app --wifi
 
           TH side:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
@@ -42,7 +42,7 @@ tests:
 
     - label: "Start the commissioning process of DUT by TH1 on a first Fabric"
       verification: |
-          ./chip-tool generalcommissioning arm-fail-safe 500 600 1 0 
+          ./chip-tool generalcommissioning arm-fail-safe 500 600 1 0
 
           Verify the ErrorCode as "OK"(0) in TH log
 
@@ -50,7 +50,7 @@ tests:
           [1655469679.636600][13173:13178] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1655469679.636738][13173:13178] CHIP:TOO:   ArmFailSafeResponse: {
           [1655469679.636817][13173:13178] CHIP:TOO:     errorCode: 0
-          [1655469679.636876][13173:13178] CHIP:TOO:     debugText: 
+          [1655469679.636876][13173:13178] CHIP:TOO:     debugText:
           [1655469679.636930][13173:13178] CHIP:TOO:    }
       disabled: true
 
@@ -67,7 +67,7 @@ tests:
           [1658223287.237060][5570:5575] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0003
           [1658223287.237122][5570:5575] CHIP:TOO:   SetRegulatoryConfigResponse: {
           [1658223287.237159][5570:5575] CHIP:TOO:     errorCode: 0
-          [1658223287.237183][5570:5575] CHIP:TOO:     debugText: 
+          [1658223287.237183][5570:5575] CHIP:TOO:     debugText:
           [1658223287.237205][5570:5575] CHIP:TOO:    }
       disabled: true
 
@@ -96,7 +96,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials certificate-chain-request 2 1 0
 
-          Verify the CertificateChainResponse and verify that the size of certificate is less than or equal to 600 bytes and of type octstr in TH Log 
+          Verify the CertificateChainResponse and verify that the size of certificate is less than or equal to 600 bytes and of type octstr in TH Log
 
           [1658223566.816155][5951:5956] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
           [1658223566.816246][5951:5956] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003

@@ -182,7 +182,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
 
@@ -203,7 +203,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
            ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
 
@@ -224,7 +224,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning reorder-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning reorder-network hex:47524C50726976617465 3 1 0
 
@@ -245,7 +245,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
 

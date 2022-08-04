@@ -35,8 +35,8 @@ tests:
           verify that StartUp event as priority set has CRITICAL and software verision on TH(chip-tool)
 
           [1657193007.841105][5422:5427] CHIP:DMG:         ],
-          [1657193007.841137][5422:5427] CHIP:DMG:         
-          [1657193007.841162][5422:5427] CHIP:DMG:         SuppressResponse = true, 
+          [1657193007.841137][5422:5427] CHIP:DMG:
+          [1657193007.841162][5422:5427] CHIP:DMG:         SuppressResponse = true,
           [1657193007.841186][5422:5427] CHIP:DMG:         InteractionModelRevision = 1
           [1657193007.841209][5422:5427] CHIP:DMG: }
           [1657193007.841358][5422:5427] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
@@ -55,7 +55,7 @@ tests:
           To verify leave event follow the below commands , Pls use equivalent command on the respective DUT
 
 
-          1. Launch chip-tool into interactive mode with the command 
+          1. Launch chip-tool into interactive mode with the command
 
           ./chip-tool interactive start
           basic subscribe-event shut-down 20 100 1 0
@@ -63,7 +63,7 @@ tests:
           2.  run below command in interactive mode shell and  Turn down the DUT
 
 
-          verify that ShutDown event as priority set has CRITICAL on TH(chip-tool) 
+          verify that ShutDown event as priority set has CRITICAL on TH(chip-tool)
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0001
           [1653050528.900202][119367:119372] CHIP:TOO:          Event number: 5

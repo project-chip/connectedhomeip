@@ -183,7 +183,7 @@ tests:
       PICS: CNET.S.C00.Rsp && CNET.S.C01.Tx
       verification: |
           ./chip-tool networkcommissioning scan-network hex:<your network id in hex> 1 0
-          Below is an example: 
+          Below is an example:
           ./chip-tool networkcommissioning scan-networks 1 0 --Ssid 47524C50726976617465 --Breadcrumb 2
 
           Verify "ScanNetworksResponse and its arguments" on the TH(chip-tool) Log:
