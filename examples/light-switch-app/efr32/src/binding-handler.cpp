@@ -124,9 +124,16 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
         switch (data->clusterId)
         {
         case Clusters::OnOff::Id:
-            VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
-            ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device->GetExchangeManager(),
-                                              peer_device->GetSecureSession().Value());
+            if (peer_device != nullptr)
+            {
+                VerifyOrDie(peer_device->ConnectionReady());
+                ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device->GetExchangeManager(),
+                                                  peer_device->GetSecureSession().Value());
+            }
+            else
+            {
+                ChipLogProgress(NotSpecified, "Binding to self");
+            }
             break;
         }
     }

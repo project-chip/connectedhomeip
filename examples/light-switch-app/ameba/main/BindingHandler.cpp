@@ -122,7 +122,7 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
             break;
         }
     }
-    else if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup)
+    else if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup && peer_device != nullptr)
     {
         switch (data->clusterId)
         {
@@ -130,6 +130,10 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
             ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device);
             break;
         }
+    }
+    else if (binding.type == EMBER_UNICAST_BINDING && peer_device == nullptr)
+    {
+        ChipLogProgress(NotSpecified, "Binding to self");
     }
 }
 

@@ -32,7 +32,8 @@ namespace chip {
  * The connection is managed by the stack and peer_device is guaranteed to be available.
  * The application shall decide the content to be sent to the peer.
  *
- * For unicast bindings peer_device will be a connected peer and group will be empty.
+ * For unicast bindings to self, peer_device and group will be nullptr.
+ * For unicast bindings to other devices, peer_device will be a connected peer and group will be nullptr.
  * For multicast bindings peer_device will be nullptr.
  *
  * E.g. The application will send on/off commands to peer for the OnOff cluster.
@@ -130,6 +131,8 @@ private:
 
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
     void HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error);
+
+    bool IsSelf(const ScopedNodeId & nodeId);
 
     CHIP_ERROR EstablishConnection(const ScopedNodeId & nodeId);
 

@@ -222,7 +222,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & bi
             break;
         }
     }
-    else if (binding.type == EMBER_UNICAST_BINDING && !data->IsGroup)
+    else if (binding.type == EMBER_UNICAST_BINDING && !data->IsGroup && deviceProxy != nullptr)
     {
         switch (data->ClusterId)
         {
@@ -236,6 +236,10 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & bi
             ChipLogError(NotSpecified, "Invalid binding unicast command data");
             break;
         }
+    }
+    else if (binding.type == EMBER_UNICAST_BINDING && deviceProxy == nullptr)
+    {
+        ChipLogProgress(NotSpecified, "Binding to self");
     }
 }
 

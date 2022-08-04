@@ -58,6 +58,10 @@ BindingManager BindingManager::sBindingManager;
 
 CHIP_ERROR BindingManager::UnicastBindingCreated(uint8_t fabricIndex, NodeId nodeId)
 {
+    if (IsSelf(ScopedNodeId(nodeId, fabricIndex)))
+    {
+        return CHIP_NO_ERROR;
+    }
     return EstablishConnection(ScopedNodeId(nodeId, fabricIndex));
 }
 
@@ -190,9 +194,16 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
         {
             if (iter->type == EMBER_UNICAST_BINDING)
             {
-                mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
-                error = EstablishConnection(ScopedNodeId(iter->nodeId, iter->fabricIndex));
-                SuccessOrExit(error == CHIP_NO_ERROR);
+                if (!IsSelf(ScopedNodeId(iter->nodeId, iter->fabricIndex)))
+                {
+                    mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
+                    error = EstablishConnection(ScopedNodeId(iter->nodeId, iter->fabricIndex));
+                    SuccessOrExit(error == CHIP_NO_ERROR);
+                }
+                else
+                {
+                    mBoundDeviceChangedHandler(*iter, nullptr, bindingContext->GetContext());
+                }
             }
             else if (iter->type == EMBER_MULTICAST_BINDING)
             {
@@ -205,6 +216,18 @@ exit:
     bindingContext->DecrementConsumersNumber();
 
     return error;
+}
+
+bool BindingManager::IsSelf(const ScopedNodeId & nodeId)
+{
+    for (const FabricInfo & fabric : (*mInitParams.mFabricTable))
+    {
+        if (fabric.GetScopedNodeId() == nodeId)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 } // namespace chip
