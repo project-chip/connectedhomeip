@@ -1018,8 +1018,8 @@ public:
     {
         AddArgument("Level", 0, UINT8_MAX, &mRequest.level);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask);
-        AddArgument("OptionOverride", 0, UINT8_MAX, &mRequest.optionOverride);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
         ClusterCommand::AddArguments();
     }
 
@@ -1051,8 +1051,8 @@ public:
     {
         AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate);
-        AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask);
-        AddArgument("OptionOverride", 0, UINT8_MAX, &mRequest.optionOverride);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
         ClusterCommand::AddArguments();
     }
 
@@ -1085,8 +1085,8 @@ public:
         AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask);
-        AddArgument("OptionOverride", 0, UINT8_MAX, &mRequest.optionOverride);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
         ClusterCommand::AddArguments();
     }
 
@@ -1116,8 +1116,8 @@ class LevelControlStop : public ClusterCommand
 public:
     LevelControlStop(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop", credsIssuerConfig)
     {
-        AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask);
-        AddArgument("OptionOverride", 0, UINT8_MAX, &mRequest.optionOverride);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
         ClusterCommand::AddArguments();
     }
 
@@ -1150,6 +1150,8 @@ public:
     {
         AddArgument("Level", 0, UINT8_MAX, &mRequest.level);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
         ClusterCommand::AddArguments();
     }
 
@@ -1181,6 +1183,8 @@ public:
     {
         AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
         ClusterCommand::AddArguments();
     }
 
@@ -1213,6 +1217,8 @@ public:
         AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
         ClusterCommand::AddArguments();
     }
 
@@ -1242,6 +1248,8 @@ class LevelControlStopWithOnOff : public ClusterCommand
 public:
     LevelControlStopWithOnOff(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop-with-on-off", credsIssuerConfig)
     {
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
         ClusterCommand::AddArguments();
     }
 
@@ -2746,6 +2754,7 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 | * ConnectionStatus                                                  | 0x0000 |
+| * NetworkFaultChange                                                | 0x0001 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -9625,10 +9634,12 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                         //
-        make_unique<ReadEvent>(Id, "connection-status", Events::ConnectionStatus::Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                    //
-        make_unique<SubscribeEvent>(Id, "connection-status", Events::ConnectionStatus::Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                              //
+        make_unique<ReadEvent>(Id, "connection-status", Events::ConnectionStatus::Id, credsIssuerConfig),           //
+        make_unique<ReadEvent>(Id, "network-fault-change", Events::NetworkFaultChange::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                         //
+        make_unique<SubscribeEvent>(Id, "connection-status", Events::ConnectionStatus::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, "network-fault-change", Events::NetworkFaultChange::Id, credsIssuerConfig), //
     };
 
     commands.Register(clusterName, clusterCommands);

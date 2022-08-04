@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 67.2.2. [TC-BOOL-2.2] Primary Functionality with Server as DUT
+name: 68.2.2. [TC-BOOL-2.2] Primary Functionality with Server as DUT
 
 config:
     nodeId: 0x12344321
@@ -23,7 +23,7 @@ config:
 tests:
     - label: "Commission DUT to TH"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "Bring the DUT into a state so StateValue is FALSE"
@@ -36,6 +36,8 @@ tests:
       PICS: BOOL.M.ManuallyControlled && BOOL.S.A0000
       verification: |
           ./chip-tool booleanstate read state-value 1 1
+
+          On TH, verify the StateValue value as FALSE
 
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: FALSE
@@ -51,6 +53,8 @@ tests:
       PICS: BOOL.M.ManuallyControlled && BOOL.S.A0000
       verification: |
           ./chip-tool booleanstate read state-value 1 1
+
+          On TH, verify the StateValue value as TRUE
 
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: TRUE
@@ -70,7 +74,7 @@ tests:
     - label: "Bring the DUT into a state so StateValue is FALSE"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
-          Verify in TH Log:
+          On TH, verify the StateValue value as FALSE
 
           [1646119162.628169][3311:3316] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646119162.628207][3311:3316] CHIP:TOO:   StateValue: FALSE
@@ -81,7 +85,8 @@ tests:
       verification: |
           ./chip-tool booleanstate read state-value 1 1
 
-          Verify in TH Log:
+          On TH, verify the StateValue value as FALSE
+
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: FALSE
       disabled: true
@@ -89,7 +94,7 @@ tests:
     - label: "Bring the DUT into a state so StateValue is TRUE"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
-          Verify in TH Log:
+          On TH, verify the StateValue value as TRUE
 
           [1646119162.628169][3311:3316] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646119162.628207][3311:3316] CHIP:TOO:   StateValue: TRUE
@@ -100,7 +105,8 @@ tests:
       verification: |
           ./chip-tool booleanstate read state-value 1 1
 
-          Verify in TH Log:
+          On TH, verify the StateValue value as TRUE
+
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: TRUE
       disabled: true

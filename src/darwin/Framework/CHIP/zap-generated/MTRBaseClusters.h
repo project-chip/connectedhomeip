@@ -24,10 +24,6 @@
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
 
-typedef void (^ResponseHandler)(id _Nullable value, NSError * _Nullable error);
-typedef void (^StatusCompletion)(NSError * _Nullable error);
-typedef void (^SubscriptionEstablishedHandler)(void);
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -941,9 +937,8 @@ NS_ASSUME_NONNULL_BEGIN
               completionHandler:(StatusCompletion)completionHandler;
 - (void)stepWithOnOffWithParams:(MTRLevelControlClusterStepWithOnOffParams *)params
               completionHandler:(StatusCompletion)completionHandler;
-- (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams * _Nullable)params
+- (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams *)params
               completionHandler:(StatusCompletion)completionHandler;
-- (void)stopWithOnOffWithCompletionHandler:(StatusCompletion)completionHandler;
 - (void)moveToClosestFrequencyWithParams:(MTRLevelControlClusterMoveToClosestFrequencyParams *)params
                        completionHandler:(StatusCompletion)completionHandler;
 

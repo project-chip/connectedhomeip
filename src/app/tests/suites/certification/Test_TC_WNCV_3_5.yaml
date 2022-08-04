@@ -21,10 +21,10 @@ config:
     cluster: "Window Covering"
     endpoint: 1
     fastMotionDuration:
-        type: INT16U
+        type: int16u
         defaultValue: 3000
     fullMotionDuration:
-        type: INT16U
+        type: int16u
         defaultValue: 6000
 
 tests:

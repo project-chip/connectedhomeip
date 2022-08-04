@@ -177,7 +177,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
 
             fabricDescriptor.fabricIndex = fabricIndex;
             fabricDescriptor.nodeId      = fabricInfo.GetPeerId().GetNodeId();
-            fabricDescriptor.vendorId    = static_cast<chip::VendorId>(fabricInfo.GetVendorId());
+            fabricDescriptor.vendorId    = fabricInfo.GetVendorId();
             fabricDescriptor.fabricId    = fabricInfo.GetFabricId();
 
             fabricDescriptor.label = fabricInfo.GetFabricLabel();
@@ -355,6 +355,7 @@ public:
         {
             // If Basic cluster is implemented on this endpoint
             Basic::Events::Leave::Type event;
+            event.fabricIndex = fabricIndex;
             EventNumber eventNumber;
 
             if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
@@ -737,8 +738,6 @@ exit:
         {
             (void) groupDataProvider->RemoveFabric(newFabricIndex);
         }
-
-        // TODO(#19898): All ACL work done within AddNOC does not trigger ACL cluster updates
 
         (void) Access::GetAccessControl().DeleteAllEntriesForFabric(newFabricIndex);
 

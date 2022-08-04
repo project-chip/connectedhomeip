@@ -25,7 +25,7 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          verify on Reference app receives the right response for the data sent in the above commands
+          verify on Reference app receives the right request for the data sent in the above commands
 
           ./chip-tool modeselect read supported-modes 1 1
 
@@ -84,6 +84,8 @@ tests:
 
            ./chip-tool modeselect read standard-namespace 1 1
 
+          Verify in TH all-clusters-app log
+
           1650968644.223891][12747:12747] CHIP:IM: Received Read request
           [1650968644.223954][12747:12747] CHIP:DMG: ReadRequestMessage =
           [1650968644.223981][12747:12747] CHIP:DMG: {
@@ -112,6 +114,8 @@ tests:
 
           ./chip-tool modeselect read description 1 1
 
+          Verify in TH all-clusters-app log
+
           [1650969447.413679][12747:12747] CHIP:EM: Handling via exchange: 65381r, Delegate: 0xaaaae5201098
           [1650969447.413718][12747:12747] CHIP:IM: Received Read request
           [1650969447.413769][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -138,6 +142,7 @@ tests:
           a manufacturer specific order"
       verification: |
           verify on Reference app receives the right response for the data sent in the above commands
+
           ./chip-tool modeselect read on-mode 1 1
 
           [1650969570.494960][12747:12747] CHIP:IM: Received Read request
@@ -185,14 +190,14 @@ tests:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
@@ -352,5 +357,5 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true

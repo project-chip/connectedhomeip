@@ -2538,6 +2538,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Ba
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Basic::Events::Leave::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -2791,6 +2799,30 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ConnectionStatus'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ThreadNetworkDiagnostics::Events::NetworkFaultChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Current", indent + 1, value.current);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Current'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Previous", indent + 1, value.previous);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Previous'");
             return err;
         }
     }
@@ -4306,74 +4338,74 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case LevelControl::Attributes::CurrentLevel::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current level", 1, value);
+            return DataModelLogger::LogValue("CurrentLevel", 1, value);
         }
         case LevelControl::Attributes::RemainingTime::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("remaining time", 1, value);
+            return DataModelLogger::LogValue("RemainingTime", 1, value);
         }
         case LevelControl::Attributes::MinLevel::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("min level", 1, value);
+            return DataModelLogger::LogValue("MinLevel", 1, value);
         }
         case LevelControl::Attributes::MaxLevel::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("max level", 1, value);
+            return DataModelLogger::LogValue("MaxLevel", 1, value);
         }
         case LevelControl::Attributes::CurrentFrequency::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current frequency", 1, value);
+            return DataModelLogger::LogValue("CurrentFrequency", 1, value);
         }
         case LevelControl::Attributes::MinFrequency::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("min frequency", 1, value);
+            return DataModelLogger::LogValue("MinFrequency", 1, value);
         }
         case LevelControl::Attributes::MaxFrequency::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("max frequency", 1, value);
+            return DataModelLogger::LogValue("MaxFrequency", 1, value);
         }
         case LevelControl::Attributes::Options::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("options", 1, value);
+            return DataModelLogger::LogValue("Options", 1, value);
         }
         case LevelControl::Attributes::OnOffTransitionTime::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("on off transition time", 1, value);
+            return DataModelLogger::LogValue("OnOffTransitionTime", 1, value);
         }
         case LevelControl::Attributes::OnLevel::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("on level", 1, value);
+            return DataModelLogger::LogValue("OnLevel", 1, value);
         }
         case LevelControl::Attributes::OnTransitionTime::Id: {
             chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("on transition time", 1, value);
+            return DataModelLogger::LogValue("OnTransitionTime", 1, value);
         }
         case LevelControl::Attributes::OffTransitionTime::Id: {
             chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("off transition time", 1, value);
+            return DataModelLogger::LogValue("OffTransitionTime", 1, value);
         }
         case LevelControl::Attributes::DefaultMoveRate::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("default move rate", 1, value);
+            return DataModelLogger::LogValue("DefaultMoveRate", 1, value);
         }
         case LevelControl::Attributes::StartUpCurrentLevel::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("start up current level", 1, value);
+            return DataModelLogger::LogValue("StartUpCurrentLevel", 1, value);
         }
         case LevelControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -6204,12 +6236,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("WindowStatus", 1, value);
         }
         case AdministratorCommissioning::Attributes::AdminFabricIndex::Id: {
-            chip::FabricIndex value;
+            chip::app::DataModel::Nullable<chip::FabricIndex> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AdminFabricIndex", 1, value);
         }
         case AdministratorCommissioning::Attributes::AdminVendorId::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AdminVendorId", 1, value);
         }
@@ -6273,7 +6305,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("TrustedRootCertificates", 1, value);
         }
         case OperationalCredentials::Attributes::CurrentFabricIndex::Id: {
-            chip::FabricIndex value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentFabricIndex", 1, value);
         }
@@ -8706,7 +8738,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("VendorName", 1, value);
         }
         case ApplicationBasic::Attributes::VendorID::Id: {
-            uint16_t value;
+            chip::VendorId value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("VendorID", 1, value);
         }
@@ -10329,26 +10361,26 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
     ChipLogProgress(chipTool, "Endpoint: %u Cluster: " ChipLogFormatMEI " Event " ChipLogFormatMEI, header.mPath.mEndpointId,
                     ChipLogValueMEI(header.mPath.mClusterId), ChipLogValueMEI(header.mPath.mEventId));
 
-    ChipLogProgress(chipTool, "\t Event number: %" PRIu64, header.mEventNumber);
+    ChipLogProgress(chipTool, "  Event number: %" PRIu64, header.mEventNumber);
 
     if (header.mPriorityLevel == chip::app::PriorityLevel::Info)
     {
-        ChipLogProgress(chipTool, "\t Priority: Info");
+        ChipLogProgress(chipTool, "  Priority: Info");
     }
     else if (header.mPriorityLevel == chip::app::PriorityLevel::Critical)
     {
-        ChipLogProgress(chipTool, "\t Priority: Critical");
+        ChipLogProgress(chipTool, "  Priority: Critical");
     }
     else if (header.mPriorityLevel == chip::app::PriorityLevel::Debug)
     {
-        ChipLogProgress(chipTool, "\t Priority: Debug");
+        ChipLogProgress(chipTool, "  Priority: Debug");
     }
     else
     {
-        ChipLogProgress(chipTool, "\t Priority: Unknown");
+        ChipLogProgress(chipTool, "  Priority: Unknown");
     }
 
-    ChipLogProgress(chipTool, "\t Timestamp: %" PRIu64, header.mTimestamp.mValue);
+    ChipLogProgress(chipTool, "  Timestamp: %" PRIu64, header.mTimestamp.mValue);
 
     switch (header.mPath.mClusterId)
     {
@@ -10475,6 +10507,11 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ConnectionStatus", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Events::NetworkFaultChange::Id: {
+            chip::app::Clusters::ThreadNetworkDiagnostics::Events::NetworkFaultChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NetworkFaultChange", 1, value);
         }
         }
         break;

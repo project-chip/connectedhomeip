@@ -84,6 +84,14 @@ Note: The profile will expire automatically after some time
    to transfer the profile to the Apple TV
 3. Restart the device
 
+### Enable Developer Mode on your Apple Device
+
+Note: Developer mode is a great way to get logs from your device as well as
+enables other useful developer tools
+
+To enable developer mode, please follow the instructions
+[here](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
+
 ### Ensuring Your Matter Accessory Works with iOS/iPadOS/tvOS
 
 1. Clone the [Matter repo](https://github.com/project-chip/connectedhomeip.git)

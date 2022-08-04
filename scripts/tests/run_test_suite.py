@@ -233,14 +233,6 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             context.obj.in_unshare)
         paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
 
-    # Testing prerequisites: tv app requires a config. Copy it just in case
-    shutil.copyfile(
-        os.path.join(
-            context.obj.root, ('examples/tv-app/linux/include/'
-                               'endpoint-configuration/chip_tv_config.ini')),
-        '/tmp/chip_tv_config.ini'
-    )
-
     logging.info("Each test will be executed %d times" % iterations)
 
     apps_register = AppsRegister()

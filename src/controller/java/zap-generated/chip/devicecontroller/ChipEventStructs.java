@@ -210,13 +210,19 @@ public class ChipEventStructs {
   }
 
   public static class BasicClusterLeaveEvent {
+    public Integer fabricIndex;
 
-    public BasicClusterLeaveEvent() {}
+    public BasicClusterLeaveEvent(Integer fabricIndex) {
+      this.fabricIndex = fabricIndex;
+    }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("BasicClusterLeaveEvent {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
       output.append("}\n");
       return output.toString();
     }
@@ -479,6 +485,31 @@ public class ChipEventStructs {
       output.append("ThreadNetworkDiagnosticsClusterConnectionStatusEvent {\n");
       output.append("\tconnectionStatus: ");
       output.append(connectionStatus);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent {
+    public ArrayList<Object> current;
+    public ArrayList<Object> previous;
+
+    public ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent(
+        ArrayList<Object> current, ArrayList<Object> previous) {
+      this.current = current;
+      this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent {\n");
+      output.append("\tcurrent: ");
+      output.append(current);
+      output.append("\n");
+      output.append("\tprevious: ");
+      output.append(previous);
       output.append("\n");
       output.append("}\n");
       return output.toString();

@@ -51,11 +51,11 @@ tests:
     - label: "Reads Minlevel attribute from DUT"
       PICS: LVL.S.A0002
       command: "readAttribute"
-      attribute: "min level"
+      attribute: "MinLevel"
       response:
           saveAs: MinlevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -68,15 +68,15 @@ tests:
                 value: 1
               - name: "transitionTime"
                 value: 0
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.A0000 && LVL.S.C04.Rsp
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           saveAs: CurrentLevelValue
           constraints:
@@ -92,9 +92,9 @@ tests:
                 value: 0
               - name: "rate"
                 value: 5
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Wait 5000ms"
@@ -110,9 +110,9 @@ tests:
       command: "Stop"
       arguments:
           values:
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Physically verify that the device has stopped transitioning"
@@ -129,7 +129,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.C03.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           constraints:
               minValue: 21
@@ -145,9 +145,9 @@ tests:
                 value: 0
               - name: "rate"
                 value: 5
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Wait 5000ms"
@@ -163,9 +163,9 @@ tests:
       command: "StopWithOnOff"
       arguments:
           values:
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 1
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 1
 
     - label: "Physically verify that the device has stopped transitioning"
@@ -182,7 +182,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.C07.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           constraints:
               minValue: 43

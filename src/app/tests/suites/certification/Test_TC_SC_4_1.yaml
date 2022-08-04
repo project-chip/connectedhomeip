@@ -13,7 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 14.4.1. [TC-SC-4.1] Commissionable Node Discovery - Commissionee Case
+name: 15.4.1. [TC-SC-4.1] Commissionable Node Discovery [DUT as Commissionee]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
 
 config:
     nodeId: 0x12344321
@@ -66,11 +69,19 @@ tests:
       disabled: true
 
     - label: "Check DNS-SD subtypes used by DUT"
+      PICS:
+          MCORE.COM.WIFI && MCORE.COM.ETH && MCORE.COM.THR &&
+          MCORE.SC.VENDOR_SUBTYPE && MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.VP_KEY
+          && MCORE.SC.SII_OP_DISCOVERY_KEY && MCORE.SC.SAI_OP_DISCOVERY_KEY &&
+          MCORE.SC.DT_KEY&& MCORE.SC.DN_KEY && MCORE.SC.RI_KEY &&
+          MCORE.SC.PH_KEY && MCORE.SC.PI_KEY
       verification: |
           avahi-browse -rt _matterc._udp
 
 
           ubuntu@ubuntu:~$   avahi-browse -rt _matterc._udp
+
+          Verify on the DUT Log:
 
           + vethd8d0eac IPv6 279142392CEB80C3                              _matterc._udp        local
           + vethbbadff8 IPv6 279142392CEB80C3                              _matterc._udp        local
@@ -144,7 +155,7 @@ tests:
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 200 1 0 --timedInteractionTimeoutMs 1000
 
-          verify on chip-tool logs:
+          verify on TH logs:
 
           [1652341174.803430][2893:2898] CHIP:DMG: InvokeResponseMessage =
           [1652341174.803488][2893:2898] CHIP:DMG: {
@@ -181,8 +192,16 @@ tests:
       disabled: true
 
     - label: "Check DNS-SD subtypes used by DUT"
+      PICS:
+          MCORE.COM.WIFI && MCORE.COM.ETH && MCORE.COM.THR &&
+          MCORE.SC.VENDOR_SUBTYPE && MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.VP_KEY
+          && MCORE.SC.SII_OP_DISCOVERY_KEY && MCORE.SC.SAI_OP_DISCOVERY_KEY &&
+          MCORE.SC.DT_KEY && MCORE.SC.DN_KEY && MCORE.SC.RI_KEY &&
+          MCORE.SC.PH_KEY && MCORE.SC.PI_KEY
       verification: |
           avahi-browse -rt _matterc._udp
+
+          Verify on the DUT Log:
 
           + veth721e1d9 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
           + veth961779b IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
@@ -255,7 +274,7 @@ tests:
 
           ./chip-tool pairing open-commissioning-window 1 1 200 2000 3840
 
-          verify on chip-tool logs:
+          Verify on the TH Log:
 
           [1652341411.383669][2929:2934] CHIP:DMG: InvokeResponseMessage =
           [1652341411.383720][2929:2934] CHIP:DMG: {
@@ -291,11 +310,19 @@ tests:
       disabled: true
 
     - label: "Check DNS-SD subtypes used by DUT"
+      PICS:
+          MCORE.COM.WIFI && MCORE.COM.ETH && MCORE.COM.THR &&
+          MCORE.SC.VENDOR_SUBTYPE && MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.VP_KEY
+          && MCORE.SC.SII_OP_DISCOVERY_KEY && MCORE.SC.SAI_OP_DISCOVERY_KEY &&
+          MCORE.SC.DT_KEY && MCORE.SC.DN_KEY && MCORE.SC.RI_KEY &&
+          MCORE.SC.PH_KEY && MCORE.SC.PI_KEY
       verification: |
           Same verification steps as Step 3, Except Verify CM flag to be 2
 
 
           ubuntu@ubuntu:~$ avahi-browse -rt _matterc._udp
+
+          Verify on the DUT Log:
 
           + veth721e1d9 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
           + veth721e1d9 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
@@ -351,14 +378,21 @@ tests:
       disabled: true
 
     - label: "If (MCORE.SC.EXTENDED_DISCOVERY ) enable Extended Discovery"
+      PICS: MCORE.SC.EXTENDED_DISCOVERY
       verification: |
           If the device supports Discovery for extended period of time, Device should continue to advertise that duration
 
 
-          Raspberrypi device is not supporting extended discovery.I
+          Raspberrypi device is not supporting extended discovery.
       disabled: true
 
     - label: "If (PICS_EXTENDED_DISCOVERY) check DNS-SD subtypes used by DUT"
+      PICS:
+          MCORE.SC.EXTENDED_DISCOVERY && MCORE.COM.WIFI && MCORE.COM.ETH &&
+          MCORE.COM.THR && MCORE.SC.VENDOR_SUBTYPE && MCORE.SC.DEVTYPE_SUBTYPE
+          && MCORE.SC.VP_KEY && MCORE.SC.SII_OP_DISCOVERY_KEY &&
+          MCORE.SC.SAI_OP_DISCOVERY_KEY && MCORE.SC.DT_KEY && MCORE.SC.DN_KEY &&
+          MCORE.SC.RI_KEY && MCORE.SC.PH_KEY && MCORE.SC.PI_KEY
       verification: |
           avahi-browse -rt _matterc._udp
           +   eth0 IPv6 DD200C20D25AE5F7                              _matterc._udp        local

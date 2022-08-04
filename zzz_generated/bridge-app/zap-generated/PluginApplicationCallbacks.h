@@ -46,4 +46,5 @@
     MatterAdministratorCommissioningPluginServerInitCallback();                                                                    \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterGroupKeyManagementPluginServerInitCallback();                                                                            \
-    MatterUserLabelPluginServerInitCallback();
+    MatterUserLabelPluginServerInitCallback();                                                                                     \
+    MatterTemperatureMeasurementPluginServerInitCallback();

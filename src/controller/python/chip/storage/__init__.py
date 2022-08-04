@@ -90,6 +90,7 @@ class PersistentStorage:
     def __init__(self, path: str):
         self._path = path
         self._handle = chip.native.GetLibraryHandle()
+        self._isActive = True
 
         try:
             self._file = open(path, 'r')
@@ -170,7 +171,15 @@ class PersistentStorage:
     def GetUnderlyingStorageAdapter(self):
         return self._storageAdapterObj
 
-    def __del__(self):
+    def Shutdown(self):
         builtins.chipStack.Call(
             lambda: self._handle.pychip_Storage_ShutdownAdapter()
         )
+
+        self._isActive = False
+
+    def __del__(self):
+        if (self._isActive):
+            builtins.chipStack.Call(
+                lambda: self._handle.pychip_Storage_ShutdownAdapter()
+            )

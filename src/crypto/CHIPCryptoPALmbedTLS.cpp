@@ -1252,6 +1252,14 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
     return CHIP_NO_ERROR;
 }
 
+#if defined(MBEDTLS_X509_CRT_PARSE_C)
+static int mbedTLSCallbackIgnoreCertValidityCheck(void * data, mbedtls_x509_crt * crt, int depth, uint32_t * flags)
+{
+    *flags &= ~(static_cast<uint32_t>(MBEDTLS_X509_BADCERT_EXPIRED | MBEDTLS_X509_BADCERT_FUTURE));
+    return 0;
+}
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+
 CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen,
                                     CertificateChainValidationResult & result)
@@ -1288,7 +1296,8 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     VerifyOrExit(mbedResult == 0, (result = CertificateChainValidationResult::kRootFormatInvalid, error = CHIP_ERROR_INTERNAL));
 
     /* Verify the chain against the root */
-    mbedResult = mbedtls_x509_crt_verify(&certChain, &rootCert, nullptr, nullptr, &flags, nullptr, nullptr);
+    mbedResult =
+        mbedtls_x509_crt_verify(&certChain, &rootCert, nullptr, nullptr, &flags, mbedTLSCallbackIgnoreCertValidityCheck, nullptr);
 
     switch (mbedResult)
     {

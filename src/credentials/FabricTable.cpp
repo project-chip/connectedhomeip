@@ -85,7 +85,7 @@ CHIP_ERROR FabricInfo::Init(const FabricInfo::InitParams & initParams)
     mFabricIndex        = initParams.fabricIndex;
     mCompressedFabricId = initParams.compressedFabricId;
     mRootPublicKey      = initParams.rootPublicKey;
-    mVendorId           = initParams.vendorId;
+    mVendorId           = static_cast<VendorId>(initParams.vendorId);
 
     // Deal with externally injected keys
     if (initParams.operationalKeypair != nullptr)
@@ -446,13 +446,25 @@ CHIP_ERROR FabricTable::VerifyCredentials(const ByteSpan & noc, const ByteSpan &
 
 const FabricInfo * FabricTable::FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId) const
 {
+    return FindFabricCommon(rootPubKey, fabricId);
+}
+
+const FabricInfo * FabricTable::FindIdentity(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId, NodeId nodeId) const
+{
+    return FindFabricCommon(rootPubKey, fabricId, nodeId);
+}
+
+const FabricInfo * FabricTable::FindFabricCommon(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId, NodeId nodeId) const
+{
     P256PublicKey candidatePubKey;
 
     // Try to match pending fabric first if available
     if (HasPendingFabricUpdate())
     {
         bool pubKeyAvailable = (mPendingFabric.FetchRootPubkey(candidatePubKey) == CHIP_NO_ERROR);
-        if (pubKeyAvailable && rootPubKey.Matches(candidatePubKey) && fabricId == mPendingFabric.GetFabricId())
+        auto matchingNodeId  = (nodeId == kUndefinedNodeId) ? mPendingFabric.GetNodeId() : nodeId;
+        if (pubKeyAvailable && rootPubKey.Matches(candidatePubKey) && fabricId == mPendingFabric.GetFabricId() &&
+            matchingNodeId == mPendingFabric.GetNodeId())
         {
             return &mPendingFabric;
         }
@@ -460,6 +472,8 @@ const FabricInfo * FabricTable::FindFabric(const Crypto::P256PublicKey & rootPub
 
     for (auto & fabric : mStates)
     {
+        auto matchingNodeId = (nodeId == kUndefinedNodeId) ? fabric.GetNodeId() : nodeId;
+
         if (!fabric.IsInitialized())
         {
             continue;
@@ -468,7 +482,7 @@ const FabricInfo * FabricTable::FindFabric(const Crypto::P256PublicKey & rootPub
         {
             continue;
         }
-        if (rootPubKey.Matches(candidatePubKey) && fabricId == fabric.GetFabricId())
+        if (rootPubKey.Matches(candidatePubKey) && fabricId == fabric.GetFabricId() && matchingNodeId == fabric.GetNodeId())
         {
             return &fabric;
         }
@@ -664,7 +678,8 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric, FabricIndex newFabr
                     "Fabric index 0x%x was retrieved from storage. Compressed FabricId 0x" ChipLogFormatX64
                     ", FabricId 0x" ChipLogFormatX64 ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
                     static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
-                    ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
+                    ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()),
+                    to_underlying(fabric->GetVendorId()));
 
     return CHIP_NO_ERROR;
 }
@@ -788,7 +803,7 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::
 
         VerifyOrReturnError(fabricEntry != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        newFabricInfo.vendorId    = vendorId;
+        newFabricInfo.vendorId    = static_cast<VendorId>(vendorId);
         newFabricInfo.fabricIndex = fabricIndex;
     }
     else
@@ -1735,6 +1750,7 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
 
     // Check for an existing fabric matching RCAC and FabricID. We must find a correct
     // existing fabric that chains to same root. We assume the stored root is correct.
+    if (!mStateFlags.Has(StateFlags::kAreCollidingFabricsIgnored))
     {
         FabricIndex collidingFabricIndex = kUndefinedFabricIndex;
         ReturnErrorOnFailure(FindExistingFabricByNocChaining(fabricIndex, noc, collidingFabricIndex));

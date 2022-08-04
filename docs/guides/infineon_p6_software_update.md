@@ -23,11 +23,18 @@ option to the build script.
 
 -   Build the P6 OTA Requestor application from the chip root dir:
 
-          $ ./examples/<example directory>/p6/ota_base_build.sh
+           ```
+           $ scripts/build/build_examples.py --enable-flashbundle --target infineon-p6-lock-ota build
+           $ third_party/p6/p6_sdk/ota/ota_base_build.sh out/infineon-p6-lock-ota chip-p6-lock-example
+           ```
 
--   Build the P6 OTA Update application from the chip root dir:
+-   Build the P6 OTA Update application from the chip root dir and create OTA
+    file
 
-          $ ./examples/<example directory>/p6/ota_update_build.sh
+           ```
+           $ scripts/build/build_examples.py --enable-flashbundle --no-log-timestamps --target infineon-p6-lock-ota-updateimage build
+           $ third_party/p6/p6_sdk/ota/ota_update_build.sh out/infineon-p6-lock-ota-updateimage chip-p6-lock-example
+           ```
 
 *   Additionally a pre-compiled bootloader must be flashed to the board using
     [Cypress Programmer](https://softwaretools.infineon.com/tools/com.ifx.tb.tool.cypressprogrammer).
@@ -40,7 +47,7 @@ option to the build script.
 
            ```
            rm -r /tmp/chip_*
-           ./out/debug/chip-ota-provider-app -f chip-p6-lighting-example.ota
+           ./out/debug/chip-ota-provider-app -f chip-p6-lock-example.ota
            ```
 
 *   In a separate terminal run the chip-tool commands to provision the Provider:

@@ -9,8 +9,9 @@
     {{~#chip_tests_iterate_constraints expectedConstraints}}
     {{~#if (isStrEqual constraint "hasValue")}}
       {{~! Already handled above~}}
-    {{~else if (isStrEqual constraint "type")}}VerifyOrReturn(CheckConstraintType("{{asPropertyValue context=..}}", "", "{{value}}"));
-
+    {{~else if (isStrEqual constraint "type")}}
+      {{~assertSameTestType (asTestType ../type ../isArray) value~}}
+      VerifyOrReturn(CheckConstraintType("{{asPropertyValue context=..}}", "{{asTestType ../type ../isArray}}", "{{value}}"));
     {{~else if (isStrEqual constraint "format")}}VerifyOrReturn(CheckConstraintFormat("{{asPropertyValue context=..}}", "", "{{value}}"));
 
     {{~else if (isStrEqual constraint "startsWith")}}VerifyOrReturn(CheckConstraintStartsWith("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, "{{value}}"));

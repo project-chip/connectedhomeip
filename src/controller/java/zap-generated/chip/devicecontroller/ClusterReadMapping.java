@@ -577,7 +577,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readCurrentLevelAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readCurrentLevelAttribute(
+                      (ChipClusters.LevelControlCluster.CurrentLevelAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlCurrentLevelCommandParams);
@@ -5263,7 +5264,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.AdministratorCommissioningCluster) cluster)
-                  .readAdminVendorIdAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readAdminVendorIdAttribute(
+                      (ChipClusters.AdministratorCommissioningCluster
+                              .AdminVendorIdAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readAdministratorCommissioningAdminVendorIdCommandParams);
@@ -5439,9 +5443,7 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OperationalCredentialsCluster) cluster)
                   .readCurrentFabricIndexAttribute(
-                      (ChipClusters.OperationalCredentialsCluster
-                              .CurrentFabricIndexAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readOperationalCredentialsCurrentFabricIndexCommandParams);
@@ -10852,7 +10854,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ApplicationBasicCluster) cluster)
-                  .readVendorIDAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readVendorIDAttribute(
+                      (ChipClusters.ApplicationBasicCluster.VendorIDAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readApplicationBasicVendorIDCommandParams);

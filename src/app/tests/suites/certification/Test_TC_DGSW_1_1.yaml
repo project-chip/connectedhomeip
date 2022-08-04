@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.1.1. [TC-DGSW-1.1] Global attributes with server as DUT
+name: 3.1.1. [TC-DGSW-1.1] Global Attributes [{DUT_Sever}]
 
 config:
     nodeId: 0x12344321
@@ -30,21 +30,28 @@ tests:
       verification: |
           ./chip-tool softwarediagnostics read cluster-revision 1 0
 
+          Verify ClusterRevision attribute is of uint16, in this case it should be 1 in TH Log
+
           [1651787699.397201][241075:241080] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFFD DataVersion: 1343666373
           [1651787699.397254][241075:241080] CHIP:TOO:   ClusterRevision: 1
       disabled: true
 
-    - label: "TH reads the FeatureMap from DUT"
+    - label: "TH reads the FeatureMap from DUT."
       verification: |
           ./chip-tool softwarediagnostics read feature-map 1  0
+
+          Verify the featuremap value is 1 in TH Log
 
           [1651787772.992060][241090:241095] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFFC DataVersion: 1343666373
           [1651787772.992110][241090:241095] CHIP:TOO:   FeatureMap: 1
       disabled: true
 
-    - label: "TH reads AttribubteList from DUT"
+    - label: "TH reads AttributeList from DUT."
       verification: |
           ./chip-tool softwarediagnostics read attribute-list 1 0
+
+          Verify a list of supported attributes in TH Log
+
           [1651787823.737029][241102:241107] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFFB DataVersion: 1343666373
           [1651787823.737115][241102:241107] CHIP:TOO:   AttributeList: 9 entries
           [1651787823.737139][241102:241107] CHIP:TOO:     [1]: 0
@@ -58,24 +65,28 @@ tests:
           [1651787823.737277][241102:241107] CHIP:TOO:     [9]: 65533
       disabled: true
 
-    - label: "TH reads AcceptedCommandList from DUT"
+    - label: "TH reads AcceptedCommandList from DUT."
       verification: |
           ./chip-tool softwarediagnostics read accepted-command-list 1 0
+
+          Verify a list of Accepted Command that DUT implemented as mandatory or optional or features supported
 
           [1651787861.534707][241117:241122] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFF9 DataVersion: 1343666373
           [1651787861.534769][241117:241122] CHIP:TOO:   AcceptedCommandList: 1 entries
           [1651787861.534793][241117:241122] CHIP:TOO:     [1]: 0
       disabled: true
 
-    - label: "TH reads GeneratedCommandList from DUT"
+    - label: "TH reads GeneratedCommandList from DUT."
       verification: |
           ./chip-tool softwarediagnostics read generated-command-list 1 0
+
+          Verify a list of Generated Command, this list should be empty in TH Log
 
           [1651787918.020673][241128:241133] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFF8 DataVersion: 1343666373
           [1651787918.020734][241128:241133] CHIP:TOO:   GeneratedCommandList: 0 entries
       disabled: true
 
-    - label: "TH reads EventList from DUT"
+    - label: "TH reads EventList from DUT."
       verification: |
           Out of scope v1.0
       disabled: true

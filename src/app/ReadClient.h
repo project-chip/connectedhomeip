@@ -293,7 +293,7 @@ public:
      */
     CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
 
-    CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
     auto GetSubscriptionId() const
     {

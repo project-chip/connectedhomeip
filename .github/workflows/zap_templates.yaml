@@ -29,7 +29,7 @@ jobs:
 
         runs-on: ubuntu-20.04
         container:
-            image: connectedhomeip/chip-build-zap:0.5.84
+            image: connectedhomeip/chip-build-zap:0.5.91
         defaults:
             run:
                 shell: sh

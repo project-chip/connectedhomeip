@@ -50,11 +50,11 @@ tests:
       disabled: true
 
     - label:
-          'TH tries to write LabelList attribute of the DUT by setting Label =
-          "Test_Label", Value= "Test_Value"'
+          "TH tries to write LabelList attribute of the DUT by setting Label =
+          Test_Label, Value= Test_Value"
       PICS: FLABEL.S.A0000
       verification: |
-          ./chip-tool fixedlabel write-by-id  0x00 '["label","Testlabel", "value","testvalue"]' 1 0
+          ./chip-tool fixedlabel write-by-id  0x00 "["label","Testlabel", "value","testvalue"]" 1 0
 
           On TH, verify that DUT responds with UNSUPPORTED_WRITE
 

@@ -144,15 +144,14 @@ protected:
 
     void OnDone(chip::app::ReadClient * aReadClient) override
     {
+        InteractionModelReports::CleanupReadClient(aReadClient);
+
         if (!mSubscriptionEstablished)
         {
-            InteractionModelReports::CleanupReadClient(aReadClient);
             SetCommandExitStatus(mError);
         }
-
         // else we must be getting here from Cleanup(), which means we have
-        // already done our exit status thing, and have done the ReadClient
-        // cleanup.
+        // already done our exit status thing.
     }
 
     void Shutdown() override
@@ -161,7 +160,10 @@ protected:
         ReportCommand::Shutdown();
     }
 
-    bool DeferInteractiveCleanup() override { return mSubscriptionEstablished; }
+    // For subscriptions we always defer interactive cleanup.  Either our
+    // ReadClients will terminate themselves (in which case they will be removed
+    // from our list anyway), or they should hang around until shutdown.
+    bool DeferInteractiveCleanup() override { return true; }
 
 private:
     bool mSubscriptionEstablished = false;

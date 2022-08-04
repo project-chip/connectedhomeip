@@ -34,4 +34,4 @@ tests:
       attribute: "StateValue"
       response:
           constraints:
-              type: bool
+              type: boolean

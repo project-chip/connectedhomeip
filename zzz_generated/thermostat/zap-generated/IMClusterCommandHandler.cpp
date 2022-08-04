@@ -682,33 +682,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
-        case Commands::SetWeeklySchedule::Id: {
-            Commands::SetWeeklySchedule::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfThermostatClusterSetWeeklyScheduleCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::GetWeeklySchedule::Id: {
-            Commands::GetWeeklySchedule::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfThermostatClusterGetWeeklyScheduleCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::ClearWeeklySchedule::Id: {
-            Commands::ClearWeeklySchedule::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfThermostatClusterClearWeeklyScheduleCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
         default: {
             // Unrecognized command ID, error status will apply.
             apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);

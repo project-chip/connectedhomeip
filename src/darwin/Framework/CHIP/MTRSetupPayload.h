@@ -43,24 +43,24 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 };
 
 @interface MTROptionalQRCodeInfo : NSObject
-@property (nonatomic, strong) NSNumber * infoType;
-@property (nonatomic, strong) NSNumber * tag;
-@property (nonatomic, strong) NSNumber * integerValue;
-@property (nonatomic, strong) NSString * stringValue;
+@property (nonatomic, copy) NSNumber * infoType;
+@property (nonatomic, copy) NSNumber * tag;
+@property (nonatomic, copy) NSNumber * integerValue;
+@property (nonatomic, copy) NSString * stringValue;
 @end
 
 @interface MTRSetupPayload : NSObject
 
-@property (nonatomic, strong) NSNumber * version;
-@property (nonatomic, strong) NSNumber * vendorID;
-@property (nonatomic, strong) NSNumber * productID;
+@property (nonatomic, copy) NSNumber * version;
+@property (nonatomic, copy) NSNumber * vendorID;
+@property (nonatomic, copy) NSNumber * productID;
 @property (nonatomic, assign) MTRCommissioningFlow commissioningFlow;
 @property (nonatomic, assign) MTRRendezvousInformationFlags rendezvousInformation;
-@property (nonatomic, strong) NSNumber * discriminator;
-@property (nonatomic) BOOL hasShortDiscriminator;
-@property (nonatomic, strong) NSNumber * setUpPINCode;
+@property (nonatomic, copy) NSNumber * discriminator;
+@property (nonatomic, assign) BOOL hasShortDiscriminator;
+@property (nonatomic, copy) NSNumber * setUpPINCode;
 
-@property (nonatomic, strong) NSString * serialNumber;
+@property (nonatomic, copy) NSString * serialNumber;
 - (nullable NSArray<MTROptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
 
 /**

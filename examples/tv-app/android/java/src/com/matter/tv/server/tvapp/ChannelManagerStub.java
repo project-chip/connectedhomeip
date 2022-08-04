@@ -18,34 +18,35 @@
 package com.matter.tv.server.tvapp;
 
 import android.util.Log;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChannelManagerStub implements ChannelManager {
   private static final String TAG = ChannelManagerStub.class.getSimpleName();
 
   private int endpoint;
-  private int mCurrentChannel = 0;
+  private int currentChannelIndex = 0;
+  private ChannelInfo currentChannel;
+  private ChannelInfo[] channelList = {
+    new ChannelInfo(6, 0, "ABC", "KAAL-TV", "KAAL"),
+    new ChannelInfo(9, 1, "PBS", "KCTS-TV", "KCTS"),
+    new ChannelInfo(9, 2, "PBS Kids", "KCTS-TV", "KCTS"),
+    new ChannelInfo(9, 3, "World Channel", "KCTS-TV", "KCTS")
+  };
 
   public ChannelManagerStub(int endpoint) {
     this.endpoint = endpoint;
+    this.currentChannel = channelList[currentChannelIndex];
   }
 
   @Override
   public ChannelInfo[] getChannelList() {
-    ChannelInfo ChannelInfo1 = new ChannelInfo(1, 11, "HDMI1", "callSign1", "affiliateCallSign1");
-    ChannelInfo ChannelInfo2 = new ChannelInfo(2, 22, "HDMI2", null, "");
-    Log.d(TAG, "getChannelList at " + endpoint);
-    return new ChannelInfo[] {ChannelInfo1, ChannelInfo2};
+    return channelList;
   }
 
   @Override
   public ChannelLineupInfo getLineup() {
-    // for null lineup test
-    if (mCurrentChannel == 100) {
-      Log.d(TAG, "getChannelLineup: null at " + endpoint);
-      return null;
-    }
-
-    ChannelLineupInfo lineupInfo = new ChannelLineupInfo("operator", "lineup", "postalCode");
+    ChannelLineupInfo lineupInfo = new ChannelLineupInfo("Comcast", "Comcast King County", "98052");
     Log.d(TAG, "getChannelLineup: " + lineupInfo + " at " + endpoint);
     return lineupInfo;
   }
@@ -53,23 +54,51 @@ public class ChannelManagerStub implements ChannelManager {
   @Override
   public ChannelInfo getCurrentChannel() {
     Log.d(TAG, "getCurrentChannel: at " + endpoint);
-    // for null channel test
-    if (mCurrentChannel == 100) {
-      return null;
-    }
+    return channelList[currentChannelIndex];
+  }
 
-    return new ChannelInfo(1, 1, "HDMI", "callSign", "affiliateCallSign");
+  boolean isChannelMatched(ChannelInfo channel, String match) {
+    String number = channel.majorNumber + "." + channel.minorNumber;
+    boolean nameMatch = channel.name.equals(match);
+    boolean affiliateCallSignMatch = channel.affiliateCallSign.equals(match);
+    boolean callSignMatch = channel.callSign.equals(match);
+    boolean numberMatch = number.equals(match);
+
+    return affiliateCallSignMatch || callSignMatch || nameMatch || numberMatch;
   }
 
   @Override
   public ChannelInfo changeChannel(String match) {
     Log.d(TAG, "changeChannel: " + match + " at " + endpoint);
-    if ("no".equals(match)) {
-      return new ChannelInfo(ChannelInfo.kNoMatches);
-    } else if ("multiple".equals(match)) {
+    List<ChannelInfo> matchedList = new ArrayList<>();
+    int index = 0;
+
+    for (ChannelInfo channel : channelList) {
+      // verify if CharSpan matches channel name
+      // or callSign or affiliateCallSign or majorNumber.minorNumber
+      if (isChannelMatched(channel, match)) {
+        matchedList.add(channel);
+        break;
+      }
+      ;
+      // use index to set current channel at the end
+      ++index;
+    }
+
+    if (matchedList.size() > 1) {
+      // Error: Multiple matches
+      Log.d(TAG, "multiple matches");
       return new ChannelInfo(ChannelInfo.kMultipleMatches);
+    } else if (matchedList.size() == 0) {
+      // Error: No match
+      Log.d(TAG, "no matches");
+      return new ChannelInfo(ChannelInfo.kNoMatches);
     } else {
-      return new ChannelInfo(1, 1, "HDMI", "callSign", "affiliateCallSign");
+      Log.d(TAG, "success 1 match");
+      // Success: 1 match
+      currentChannel = channelList[index];
+      currentChannelIndex = index;
+      return channelList[index];
     }
   }
 
@@ -84,23 +113,33 @@ public class ChannelManagerStub implements ChannelManager {
             + " at "
             + endpoint);
 
-    mCurrentChannel = majorNumber;
+    boolean channelChanged = false;
+    int index = 0;
 
-    // for failed test
-    if (majorNumber == 1 && minorNumber == 1) {
-      return false;
+    for (ChannelInfo channel : channelList) {
+      // verify if major & minor matches one of the channel from the list
+      if (channel.majorNumber == majorNumber && channel.minorNumber == minorNumber) {
+        // verify if channel changed by comparing values of current channel with the requested
+        // channel
+        if (channel.majorNumber != currentChannel.majorNumber
+            || channel.minorNumber != currentChannel.minorNumber) {
+          channelChanged = true;
+          currentChannelIndex = index;
+          currentChannel = channelList[index];
+        }
+      }
+      ++index;
     }
-    return true;
+    return channelChanged;
   }
 
   @Override
   public boolean skipChannel(int count) {
     Log.d(TAG, "skipChannel: count = " + count + " at " + endpoint);
 
-    // for failed test
-    if (count == 100) {
-      return false;
-    }
+    int newChannelIndex = (count + currentChannelIndex) % channelList.length;
+    currentChannelIndex = newChannelIndex;
+    currentChannel = channelList[newChannelIndex];
     return true;
   }
 }

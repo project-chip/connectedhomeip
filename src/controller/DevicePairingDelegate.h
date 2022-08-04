@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <controller/CommissioningDelegate.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
@@ -75,6 +76,26 @@ public:
     {}
 
     virtual void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) {}
+
+    /**
+     * @brief
+     *  Called with the ReadCommissioningInfo returned from the target
+     */
+    virtual void OnReadCommissioningInfo(const ReadCommissioningInfo & info) {}
+
+    /**
+     * @brief
+     *  Called with the NetworkScanResponse returned from the target
+     */
+    virtual void
+    OnScanNetworksSuccess(const app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse)
+    {}
+
+    /**
+     * @brief
+     *  Called when the NetworkScan request fails.
+     */
+    virtual void OnScanNetworksFailure(CHIP_ERROR error) {}
 };
 
 } // namespace Controller

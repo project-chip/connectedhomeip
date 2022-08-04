@@ -56,6 +56,9 @@ declare_args() {
 
   # Argument to Disable IPv4 for wifi(rs911)
   chip_enable_wifi_ipv4 = false
+
+  # Argument to force enable WPA3 security
+  wifi_enable_security_wpa3 = false
 }
 
 declare_args() {
@@ -208,6 +211,10 @@ efr32_executable("window_app") {
 
   if (chip_enable_wifi_ipv4) {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
+  }
+
+  if (wifi_enable_security_wpa3) {
+    defines += [ "WIFI_ENABLE_SECURITY_WPA3=1" ]
   }
 
   # WiFi Settings

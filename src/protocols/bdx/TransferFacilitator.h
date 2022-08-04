@@ -119,6 +119,8 @@ public:
     CHIP_ERROR PrepareForTransfer(System::Layer * layer, TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
                                   uint16_t maxBlockSize, System::Clock::Timeout timeout,
                                   System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
+
+    void ResetTransfer();
 };
 
 /**

@@ -20,14 +20,23 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/DeviceProxy.h>
+
+@class MTRDeviceController;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRBaseDevice ()
 
-- (instancetype)initWithDevice:(chip::DeviceProxy *)device;
-- (chip::DeviceProxy *)internalDevice;
+- (instancetype)initWithPASEDevice:(chip::DeviceProxy *)device controller:(MTRDeviceController *)controller;
+- (instancetype)initWithNodeID:(chip::NodeId)nodeID controller:(MTRDeviceController *)controller;
+
+/**
+ * Only returns non-nil if the device is using a PASE session.  Otherwise, the
+ * deviceController + nodeId should be used to get a CASE session.
+ */
+- (chip::DeviceProxy * _Nullable)paseDevice;
 
 /**
  * Invalidate the CASE session, so an attempt to getConnectedDevice for this
@@ -35,6 +44,23 @@ NS_ASSUME_NONNULL_BEGIN
  * away.
  */
 - (void)invalidateCASESession;
+
+/**
+ * Controller that that this MTRDevice was gotten from.
+ */
+@property (nonatomic, strong, readonly) MTRDeviceController * deviceController;
+
+/**
+ * Node id for this MTRDevice.  Only set to a usable value if this device
+ * represents a CASE session.
+ */
+@property (nonatomic, assign, readonly) chip::NodeId nodeID;
+
+/**
+ * Controllers are created via the MTRControllerFactory object.
+ */
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 
@@ -46,7 +72,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithPath:(const chip::app::ConcreteCommandPath &)path;
 @end
 
+@interface MTRAttributeReport ()
+- (instancetype)initWithPath:(const chip::app::ConcreteDataAttributePath &)path
+                       value:(nullable id)value
+                       error:(nullable NSError *)error;
+@end
+
+@interface MTREventReport ()
+- (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path
+                 eventNumber:(NSNumber *)eventNumber
+                    priority:(NSNumber *)priority
+                   timestamp:(NSNumber *)timestamp
+                       value:(nullable id)value
+                       error:(nullable NSError *)error;
+@end
+
 // Exported utility function
-id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data);
+// Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
+id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data);
 
 NS_ASSUME_NONNULL_END

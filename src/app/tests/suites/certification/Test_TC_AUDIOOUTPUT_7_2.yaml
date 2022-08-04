@@ -35,7 +35,7 @@ tests:
       response:
           saveAs: audioOutputListValues
           constraints:
-              type: OutPutInfo
+              type: list
 
     - label: "Sends a RenameOutput command"
       PICS: AUDIOOUTPUT.S.C0001

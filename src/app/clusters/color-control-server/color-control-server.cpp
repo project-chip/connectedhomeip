@@ -2415,8 +2415,13 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
     {
         uint16_t tempCoupleMin = getTemperatureCoupleToLevelMin(endpoint);
 
-        uint8_t currentLevel = 0x7F;
-        LevelControl::Attributes::CurrentLevel::Get(endpoint, &currentLevel);
+        app::DataModel::Nullable<uint8_t> currentLevel;
+        EmberAfStatus status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
+
+        if (status != EMBER_ZCL_STATUS_SUCCESS || currentLevel.IsNull())
+        {
+            currentLevel.SetNonNull((uint8_t) 0x7F);
+        }
 
         uint16_t tempPhysMax = MAX_TEMPERATURE_VALUE;
         Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysMax);
@@ -2425,17 +2430,17 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
         // Note that mireds varies inversely with level: low level -> high mireds.
         // Peg min/MAX level to MAX/min mireds, otherwise interpolate.
         uint16_t newColorTemp;
-        if (currentLevel <= MIN_CURRENT_LEVEL)
+        if (currentLevel.Value() <= MIN_CURRENT_LEVEL)
         {
             newColorTemp = tempPhysMax;
         }
-        else if (currentLevel >= MAX_CURRENT_LEVEL)
+        else if (currentLevel.Value() >= MAX_CURRENT_LEVEL)
         {
             newColorTemp = tempCoupleMin;
         }
         else
         {
-            uint32_t tempDelta = (((uint32_t) tempPhysMax - (uint32_t) tempCoupleMin) * currentLevel) /
+            uint32_t tempDelta = (((uint32_t) tempPhysMax - (uint32_t) tempCoupleMin) * currentLevel.Value()) /
                 (uint32_t)(MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
             newColorTemp = (uint16_t)((uint32_t) tempPhysMax - tempDelta);
         }

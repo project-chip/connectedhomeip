@@ -27,7 +27,6 @@ template <typename T>
 class otScanResponseIterator : public Iterator<T>
 {
 public:
-    otScanResponseIterator(T * apScanResponse) : mpScanResponse(apScanResponse) {}
     size_t Count() override { return itemCount; }
     bool Next(T & item) override
     {
@@ -62,7 +61,7 @@ private:
     size_t currentIterating           = 0;
     size_t itemCount                  = 0;
     static constexpr size_t kItemSize = sizeof(T);
-    T * mpScanResponse;
+    T * mpScanResponse                = nullptr;
 };
 
 class GenericThreadDriver final : public ThreadDriver
@@ -109,7 +108,6 @@ private:
 
     ThreadNetworkIterator mThreadIterator      = ThreadNetworkIterator(this);
     Thread::OperationalDataset mStagingNetwork = {};
-    Optional<Status> mScanStatus;
 };
 
 } // namespace NetworkCommissioning

@@ -19,10 +19,10 @@ config:
     cluster: "Channel"
     endpoint: 1
     majornumber:
-        type: INT16U
+        type: int16u
         defaultValue: 9
     minornumber:
-        type: INT16U
+        type: int16u
         defaultValue: 1
 
 tests:
@@ -84,4 +84,4 @@ tests:
       response:
           value: [majorNumber: majornumber, minorNumber: minornumber + 1]
           constraints:
-              type: list
+              type: ChannelInfo

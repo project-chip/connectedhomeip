@@ -6,23 +6,27 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#zcl_clusters}}
 {{#zcl_structs}}
-@interface MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}} : NSObject
+@interface MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}} : NSObject <NSCopying>
 {{! Override the getter name because some of our properties start with things
     like "new" or "init" }}
 {{#zcl_struct_items}}
-@property (strong, nonatomic{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName label}};
+@property (nonatomic, copy{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName label}};
 {{/zcl_struct_items}}
-- (instancetype)init;
 
+- (instancetype)init;
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
 
 {{/zcl_structs}}
 
 {{#zcl_events}}
-@interface MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event : NSObject
+@interface MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event : NSObject <NSCopying>
 {{#zcl_event_fields}}
-@property (strong, nonatomic{{#unless (isStrEqual (asGetterName name) (asStructPropertyName name))}}, getter={{asGetterName name}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName name}};
+@property (nonatomic, copy{{#unless (isStrEqual (asGetterName name) (asStructPropertyName name))}}, getter={{asGetterName name}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName name}};
 {{/zcl_event_fields}}
+
+- (instancetype)init;
+- (id)copyWithZone:(nullable NSZone *)zone;
 @end
 
 {{/zcl_events}}

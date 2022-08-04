@@ -82,7 +82,7 @@ jobs:
 
         runs-on: ubuntu-20.04
         container:
-            image: connectedhomeip/chip-build-doxygen:0.5.84
+            image: connectedhomeip/chip-build-doxygen:0.5.91
 
         if: github.actor != 'restyled-io[bot]'
 
