@@ -560,6 +560,7 @@ GenericThreadStackManagerImpl
 GenericWiFiConfigurationManagerImpl
 GetDeviceId
 GetDeviceInfo
+DeviceInstanceInfoProvider
 GetDns
 GetIP
 getManualTests
