@@ -1945,11 +1945,6 @@ PICS:
       id: APPLAUNCHER.S.AP
 
     - label:
-          "Does the device implement the Application Launcher cluster as a
-          server?"
-      id: APPLAUNCHER.S
-
-    - label:
           "Does the DUT support the Application Launcher server cluster
           CatalogList attribute?"
       id: APPLAUNCHER.S.A0000
@@ -2171,16 +2166,6 @@ PICS:
           "Does the DUT support the Application Launcher client cluster HideApp
           command?"
       id: APPLAUNCHER.C.C02.Tx
-
-    - label:
-          "Does the DUT support the Application Launcher server cluster StopApp
-          command?"
-      id: APPLAUNCHER.S.C0001
-
-    - label:
-          "Does the DUT support the Application Launcher server cluster HideApp
-          command?"
-      id: APPLAUNCHER.S.C0002
 
     - label:
           "Does the DUT support the Wake On LAN server cluster MACAddress
@@ -2546,11 +2531,6 @@ PICS:
           "Does the DUT support the Target Navigator server cluster
           CurrentTarget attribute?"
       id: TGTNAV.S.A0001
-
-    - label:
-          "Does the DUT support the Target Navigator server cluster
-          NavigateTarget command?"
-      id: TGTNAV.S.C0000
 
     - label:
           "Does the DUT support the commissioning procedure initiated by a
@@ -4448,10 +4428,6 @@ PICS:
 
     #Device Management
     #Server Attributes
-    - label:
-          "Does the device implement the Basic Information Cluster as a server?"
-      id: BINFO.S
-
     - label: "Does the DUT(server) support the DataModelRevision attribute?"
       id: BINFO.S.A0000
 
