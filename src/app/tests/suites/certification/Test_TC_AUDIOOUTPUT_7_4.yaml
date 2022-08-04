@@ -15,6 +15,9 @@
 
 name: 19.9.4. [TC-AUDIOOUTPUT-7.4] Rename Output Verification (DUT as Client)
 
+PICS:
+    - AUDIOOUTPUT.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -22,7 +25,7 @@ config:
 
 tests:
     - label: "DUT sends RenameOutput command to TH"
-      PICS: AUDIOOUTPUT.S.C0001
+      PICS: AUDIOOUTPUT.C.C01.Tx
       verification: |
           If the DUT knows the Index value, then those can be sent as the argument.
           Else User needs to execute the following command to know the index InputList

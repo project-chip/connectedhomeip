@@ -14,6 +14,9 @@
 
 name: 19.10.1. [TC-TGTNAV-8.1] Navigate Target Verification
 
+PICS:
+    - TGTNAV.S
+
 config:
     nodeId: 0x12344321
     cluster: "Target Navigator"
@@ -54,7 +57,7 @@ tests:
               type: list
 
     - label: "Sends a NavigateTarget command"
-      PICS: TGTNAV.S.C0000
+      PICS: TGTNAV.S.C00.Rsp
       command: "NavigateTarget"
       arguments:
           values:
@@ -62,7 +65,7 @@ tests:
                 value: targetvalue1
 
     - label: "Reads the CurrentTarget attribute"
-      PICS: TGTNAV.S.A0001 && TGTNAV.S.C0000
+      PICS: TGTNAV.S.A0001 && TGTNAV.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentTarget"
       response:

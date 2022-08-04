@@ -15,6 +15,9 @@
 
 name: 131.2.10. [TC-ACL-2.10] Persistence
 
+PICS:
+    - ACL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -88,7 +91,7 @@ tests:
 
           ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta --commissioner-nodeid 223344
 
-          [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step "Cleanup"
           [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
       disabled: true
 
@@ -113,8 +116,8 @@ tests:
           field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233,1111], "targets": null},
-           {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects":[3333] , "targets": null}]' 1 0 --commissioner-nodeid 223344 --commissioner-name beta
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233,1111], "targets": null},
+           {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects":[3333] , "targets": null}]" 1 0 --commissioner-nodeid 223344 --commissioner-name beta
           On TH1 , Verify DUT  Responds  Successfully
           [1658329787.635523][3056:3061] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1658329787.635615][3056:3061] CHIP:DMG: WriteResponseMessage =
@@ -188,8 +191,8 @@ tests:
           field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [223344,2222], "targets": null},
-           {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects":[4444] , "targets": null}]' 2 0 --commissioner-nodeid 223344 --commissioner-name beta
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [223344,2222], "targets": null},
+           {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects":[4444] , "targets": null}]" 2 0 --commissioner-nodeid 223344 --commissioner-name beta
 
 
           On TH2 , Verify DUT  Responds  Successfully
@@ -263,7 +266,7 @@ tests:
           struct Data field: D_OK_EMPTY"
       PICS: ACL.S.A0001
       verification: |
-          ./chip-tool accesscontrol write extension '[{"data":"1718"}]' 1 0
+          ./chip-tool accesscontrol write extension "[{"data":"1718"}]" 1 0
           On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element
           [1658330105.863185][3079:3084] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1658330105.863237][3079:3084] CHIP:DMG: WriteResponseMessage =
@@ -317,51 +320,55 @@ tests:
           1.struct Data field: D_OK_SINGLE"
       PICS: ACL.S.A0001
       verification: |
-          ./chip-tool accesscontrol write extension '[{"data":"1000110010001100"}]' 2 0 --commissioner-nodeid 223344 --commissioner-name beta
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element
+          ./chip-tool accesscontrol write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 2 0 --commissioner-nodeid 223344 --commissioner-name beta
+
           On TH2 , Verify DUT  Responds  Successfully to extension attribute list containg one element .
-          [1657187217.204901][10872:10877] CHIP:DMG: WriteResponseMessage =
-          [1657187217.204928][10872:10877] CHIP:DMG: {
-          [1657187217.204947][10872:10877] CHIP:DMG:         AttributeStatusIBs =
-          [1657187217.204977][10872:10877] CHIP:DMG:         [
-          [1657187217.205002][10872:10877] CHIP:DMG:                 AttributeStatusIB =
-          [1657187217.205029][10872:10877] CHIP:DMG:                 {
-          [1657187217.205055][10872:10877] CHIP:DMG:                         AttributePathIB =
-          [1657187217.205092][10872:10877] CHIP:DMG:                         {
-          [1657187217.205129][10872:10877] CHIP:DMG:                                 Endpoint = 0x0,
-          [1657187217.205160][10872:10877] CHIP:DMG:                                 Cluster = 0x1f,
-          [1657187217.205199][10872:10877] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1657187217.205234][10872:10877] CHIP:DMG:                         }
-          [1657187217.205270][10872:10877] CHIP:DMG:
-          [1657187217.205300][10872:10877] CHIP:DMG:                         StatusIB =
-          [1657187217.205332][10872:10877] CHIP:DMG:                         {
-          [1657187217.205363][10872:10877] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657187217.205395][10872:10877] CHIP:DMG:                         },
-          [1657187217.205425][10872:10877] CHIP:DMG:
-          [1657187217.205451][10872:10877] CHIP:DMG:                 },
-          [1657187217.205486][10872:10877] CHIP:DMG:
-          [1657187217.205511][10872:10877] CHIP:DMG:                 AttributeStatusIB =
-          [1657187217.205537][10872:10877] CHIP:DMG:                 {
-          [1657187217.205562][10872:10877] CHIP:DMG:                         AttributePathIB =
-          [1657187217.205592][10872:10877] CHIP:DMG:                         {
-          [1657187217.205623][10872:10877] CHIP:DMG:                                 Endpoint = 0x0,
-          [1657187217.205660][10872:10877] CHIP:DMG:                                 Cluster = 0x1f,
-          [1657187217.205694][10872:10877] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1657187217.205730][10872:10877] CHIP:DMG:                                 ListIndex = Null,
-          [1657187217.205764][10872:10877] CHIP:DMG:                         }
-          [1657187217.205797][10872:10877] CHIP:DMG:
-          [1657187217.205827][10872:10877] CHIP:DMG:                         StatusIB =
-          [1657187217.205856][10872:10877] CHIP:DMG:                         {
-          [1657187217.205887][10872:10877] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657187217.205922][10872:10877] CHIP:DMG:                         },
-          [1657187217.205953][10872:10877] CHIP:DMG:
-          [1657187217.205978][10872:10877] CHIP:DMG:                 },
-          [1657187217.206007][10872:10877] CHIP:DMG:
-          [1657187217.206031][10872:10877] CHIP:DMG:         ],
-          [1657187217.206063][10872:10877] CHIP:DMG:
-          [1657187217.206086][10872:10877] CHIP:DMG:         InteractionModelRevision = 1
-          [1657187217.206110][10872:10877] CHIP:DMG: }
-          [1657187217.206211][10872:10877] CHIP:DMG: WriteClient moving to [AwaitingDe]
+
+          [1658819083.842765][8349:8354] CHIP:EM: Removed CHIP MessageCounter:249057275 from RetransTable on exchange 59888i
+          [1658819083.842800][8349:8354] CHIP:DMG: WriteClient moving to [ResponseRe]
+          [1658819083.842907][8349:8354] CHIP:DMG: WriteResponseMessage =
+          [1658819083.842939][8349:8354] CHIP:DMG: {
+          [1658819083.842963][8349:8354] CHIP:DMG:         AttributeStatusIBs =
+          [1658819083.843000][8349:8354] CHIP:DMG:         [
+          [1658819083.843026][8349:8354] CHIP:DMG:                 AttributeStatusIB =
+          [1658819083.843057][8349:8354] CHIP:DMG:                 {
+          [1658819083.843086][8349:8354] CHIP:DMG:                         AttributePathIB =
+          [1658819083.843120][8349:8354] CHIP:DMG:                         {
+          [1658819083.843161][8349:8354] CHIP:DMG:                                 Endpoint = 0x0,
+          [1658819083.843201][8349:8354] CHIP:DMG:                                 Cluster = 0x1f,
+          [1658819083.843242][8349:8354] CHIP:DMG:                                 Attribute = 0x0000_0001,
+          [1658819083.843277][8349:8354] CHIP:DMG:                         }
+          [1658819083.843319][8349:8354] CHIP:DMG:
+          [1658819083.843355][8349:8354] CHIP:DMG:                         StatusIB =
+          [1658819083.843393][8349:8354] CHIP:DMG:                         {
+          [1658819083.843431][8349:8354] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658819083.843466][8349:8354] CHIP:DMG:                         },
+          [1658819083.843504][8349:8354] CHIP:DMG:
+          [1658819083.843534][8349:8354] CHIP:DMG:                 },
+          [1658819083.843575][8349:8354] CHIP:DMG:
+          [1658819083.843604][8349:8354] CHIP:DMG:                 AttributeStatusIB =
+          [1658819083.843636][8349:8354] CHIP:DMG:                 {
+          [1658819083.843666][8349:8354] CHIP:DMG:                         AttributePathIB =
+          [1658819083.843700][8349:8354] CHIP:DMG:                         {
+          [1658819083.843734][8349:8354] CHIP:DMG:                                 Endpoint = 0x0,
+          [1658819083.843774][8349:8354] CHIP:DMG:                                 Cluster = 0x1f,
+          [1658819083.843814][8349:8354] CHIP:DMG:                                 Attribute = 0x0000_0001,
+          [1658819083.843853][8349:8354] CHIP:DMG:                                 ListIndex = Null,
+          [1658819083.843888][8349:8354] CHIP:DMG:                         }
+          [1658819083.843926][8349:8354] CHIP:DMG:
+          [1658819083.843962][8349:8354] CHIP:DMG:                         StatusIB =
+          [1658819083.843996][8349:8354] CHIP:DMG:                         {
+          [1658819083.844030][8349:8354] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658819083.844065][8349:8354] CHIP:DMG:                         },
+          [1658819083.844103][8349:8354] CHIP:DMG:
+          [1658819083.844133][8349:8354] CHIP:DMG:                 },
+          [1658819083.844168][8349:8354] CHIP:DMG:
+          [1658819083.844194][8349:8354] CHIP:DMG:         ],
+          [1658819083.844230][8349:8354] CHIP:DMG:
+          [1658819083.844256][8349:8354] CHIP:DMG:         InteractionModelRevision = 1
+          [1658819083.844282][8349:8354] CHIP:DMG: }
+          [1658819083.844389][8349:8354] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1658819083.844452][8349:8354] CHIP:EM: Sending Standalone Ack for MessageCounter:27055873 on exchange 59888i
       disabled: true
 
     - label: "Reboot the DUT"
