@@ -226,14 +226,6 @@ efr32_executable("lighting_app") {
     sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
   }
 
-  if (chip_enable_wifi_ipv4) {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
-  }
-
-  if (wifi_enable_security_wpa3) {
-    defines += [ "WIFI_ENABLE_SECURITY_WPA3=1" ]
-  }
-
   # WiFi Settings
   if (chip_enable_wifi) {
     if (use_rs911x) {
@@ -260,6 +252,14 @@ efr32_executable("lighting_app") {
     } else if (use_wf200) {
       sources += wf200_plat_src
       include_dirs += wf200_plat_incs
+    }
+
+    if (chip_enable_wifi_ipv4) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
+    }
+
+    if (wifi_enable_security_wpa3) {
+      defines += [ "WIFI_ENABLE_SECURITY_WPA3=1" ]
     }
   }
 
