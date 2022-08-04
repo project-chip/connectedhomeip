@@ -55,6 +55,10 @@ def TestFail(message, doCrash=False):
     logger.fatal("Testfail: {}".format(message))
 
     if (doCrash):
+        logger.fatal("--------------------------------")
+        logger.fatal("Backtrace of all Python threads:")
+        logger.fatal("--------------------------------")
+
         #
         # Let's dump the Python backtrace for all threads, since the backtrace we'll
         # get from gdb (if one is attached) won't give us good Python symbol information.
