@@ -52,7 +52,7 @@ constexpr size_t OpKeyTLVMaxSize()
 } // namespace
 
 #define MAX_KEYID_SLOTS_FOR_FABRICS 32
-#define FABRIC_SE05X_KEYID_START 0x56780000
+#define FABRIC_SE05X_KEYID_START 0x7D100000
 
 struct keyidFabIdMapping_t {
     uint32_t keyId;
@@ -66,7 +66,7 @@ uint8_t getEmpytSlotId()
 {
     uint8_t i = 0;
     while(i++ < MAX_KEYID_SLOTS_FOR_FABRICS){
-        if (keyidFabIdMapping[i].keyId == 0){
+        if (keyidFabIdMapping[i].keyId == 0 && keyidFabIdMapping[i].isPending == 0){
             break;
         }
     }
@@ -76,21 +76,23 @@ uint8_t getEmpytSlotId()
 bool PersistentStorageOperationalKeystoreHSM::HasOpKeypairForFabric(FabricIndex fabricIndex) const
 {
     uint8_t i = 0; 
-    ChipLogProgress(Crypto,"Se05x: HasOpKeypairForFabric");
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), false);
 
     // If there was a pending keypair, then there's really a usable key
     if (mIsPendingKeypairActive && (fabricIndex == mPendingFabricIndex) && (mPendingKeypair != nullptr))
     {
+        ChipLogProgress(Crypto,"SE05x: HasOpKeypairForFabric ==> mPendingKeypair found");
         return true;
     }
 
     while(i++ < MAX_KEYID_SLOTS_FOR_FABRICS){
         if (keyidFabIdMapping[i].fabricIndex == fabricIndex){
+            ChipLogProgress(Crypto,"SE05x: HasOpKeypairForFabric ==> stored keyPair found");
             return true;
         }
     }
 
+    ChipLogProgress(Crypto,"SE05x: HasOpKeypairForFabric ==> No key found");
     return false;
 }
 
@@ -103,7 +105,7 @@ CHIP_ERROR PersistentStorageOperationalKeystoreHSM::NewOpKeypairForFabric(Fabric
     VerifyOrReturnError(slotId != 0, CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-    ChipLogProgress(Crypto,"Se05x: New OPS key for Fabric %02x",fabricIndex);
+    ChipLogProgress(Crypto,"SE05x: New OPS key for Fabric %02x",fabricIndex);
 
     // Replace previous pending keypair, if any was previously allocated
     ResetPendingKey();
@@ -136,7 +138,7 @@ CHIP_ERROR PersistentStorageOperationalKeystoreHSM::NewOpKeypairForFabric(Fabric
 CHIP_ERROR PersistentStorageOperationalKeystoreHSM::ActivateOpKeypairForFabric(FabricIndex fabricIndex,
                                                                             const Crypto::P256PublicKey & nocPublicKey)
 {
-    ChipLogProgress(Crypto,"Se05x: ActivateOpKeypair for Fabric %02x",fabricIndex);
+    ChipLogProgress(Crypto,"SE05x: ActivateOpKeypair for Fabric %02x",fabricIndex);
     
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && (fabricIndex == mPendingFabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -159,7 +161,7 @@ CHIP_ERROR PersistentStorageOperationalKeystoreHSM::CommitOpKeypairForFabric(Fab
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && (fabricIndex == mPendingFabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(mIsPendingKeypairActive == true, CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(Crypto,"Se05x: CommitOpKeypair for Fabric %02x",fabricIndex);
+    ChipLogProgress(Crypto,"SE05x: CommitOpKeypair for Fabric %02x",fabricIndex);
 
     while(i++ < MAX_KEYID_SLOTS_FOR_FABRICS){
         if (keyidFabIdMapping[i].fabricIndex == fabricIndex){
@@ -188,7 +190,7 @@ CHIP_ERROR PersistentStorageOperationalKeystoreHSM::RemoveOpKeypairForFabric(Fab
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-    ChipLogProgress(Crypto,"Se05x: RemoveOpKeypair for Fabric %02x",fabricIndex);
+    ChipLogProgress(Crypto,"SE05x: RemoveOpKeypair for Fabric %02x",fabricIndex);
 
     // Remove pending state if matching
     if ((mPendingKeypair != nullptr) && (fabricIndex == mPendingFabricIndex))
@@ -212,7 +214,7 @@ CHIP_ERROR PersistentStorageOperationalKeystoreHSM::RemoveOpKeypairForFabric(Fab
 
 void PersistentStorageOperationalKeystoreHSM::RevertPendingKeypair()
 {
-    ChipLogProgress(Crypto,"Se05x: RevertPendingKeypair");
+    ChipLogProgress(Crypto,"SE05x: RevertPendingKeypair");
     VerifyOrReturn(mStorage != nullptr);
     // Just reset the pending key, we never stored anything
     ResetPendingKey();
@@ -222,31 +224,34 @@ CHIP_ERROR PersistentStorageOperationalKeystoreHSM::SignWithOpKeypair(FabricInde
                                                                    Crypto::P256ECDSASignature & outSignature) const
 {
     uint8_t i = 0;
-    ChipLogProgress(Crypto,"Se05x: SignWithOpKeypair");
+    ChipLogProgress(Crypto,"SE05x: SignWithOpKeypair");
 
     if (mIsPendingKeypairActive && (fabricIndex == mPendingFabricIndex))
     {
         VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_INTERNAL);
         // We have an override key: sign with it!
+        ChipLogProgress(Crypto,"SE05x: SignWithOpKeypair ==> using mPendingKeypair");
         return mPendingKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
 
     }
     else{
         while(i++ < MAX_KEYID_SLOTS_FOR_FABRICS)
         {
-            if (keyidFabIdMapping[i].fabricIndex == fabricIndex)
+            if ((keyidFabIdMapping[i].fabricIndex == fabricIndex)  && (keyidFabIdMapping[i].isPending == 0))
             {
+                ChipLogProgress(Crypto,"SE05x: SignWithOpKeypair ==> using stored keyPair");
                 return keyidFabIdMapping[i].pkeyPair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
             }
         }
     }
 
+    ChipLogProgress(Crypto,"SE05x: SignWithOpKeypair ==> No keyPair found");
     return CHIP_ERROR_INTERNAL;
 }
 
 Crypto::P256Keypair * PersistentStorageOperationalKeystoreHSM::AllocateEphemeralKeypairForCASE()
 {
-    printf("AllocateEphemeralKeypairForCASE using se05x \n");
+    ChipLogProgress(Crypto, "AllocateEphemeralKeypairForCASE using se05x \n");
     Crypto::P256KeypairHSM *pkeyPair = Platform::New<Crypto::P256KeypairHSM>();
     pkeyPair->SetKeyId(kKeyId_case_ephemeral_keyid);
     return pkeyPair;
@@ -254,6 +259,7 @@ Crypto::P256Keypair * PersistentStorageOperationalKeystoreHSM::AllocateEphemeral
 
 void PersistentStorageOperationalKeystoreHSM::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
 {
+    ChipLogProgress(Crypto, "ReleaseEphemeralKeypair using se05x \n");
     Platform::Delete<Crypto::P256Keypair>(keypair);
 }
 
