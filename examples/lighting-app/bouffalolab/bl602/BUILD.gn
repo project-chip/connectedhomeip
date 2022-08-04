@@ -40,6 +40,9 @@ declare_args() {
 
   # Monitor & log memory usage at runtime.
   enable_heap_monitoring = false
+
+  # OTA periodic query timeout in seconds
+  ota_periodic_query_timeout = 86400
 }
 
 show_qr_code = false
@@ -64,6 +67,7 @@ bl602_sdk("sdk") {
   defines = [
     "CONFIG_PSM_EASYFLASH_SIZE=16384",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
+    "OTA_PERIODIC_QUERY_TIMEOUT=${ota_periodic_query_timeout}",
   ]
 
   if (chip_enable_pw_rpc) {

@@ -145,6 +145,7 @@ CHIP_ERROR AppTask::Init()
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gRequestorUser.SetPeriodicQueryTimeout(OTA_PERIODIC_QUERY_TIMEOUT);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     ConfigurationMgr().LogDeviceConfig();
