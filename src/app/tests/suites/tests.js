@@ -866,7 +866,7 @@ function getTests() {
     ];
 
     const DoorLock = [
-        //"DL_UsersAndCredentials", TODO: This test is not aligned with spec
+        "DL_UsersAndCredentials",
         "DL_LockUnlock",
         "DL_Schedules",
         "Test_TC_DRLK_2_2",
