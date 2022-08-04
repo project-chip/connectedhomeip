@@ -15,6 +15,9 @@
 
 name: 12.2.2. [TC-BINFO-2.2] Events [DUT-Server]
 
+PICS:
+    - BINFO.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

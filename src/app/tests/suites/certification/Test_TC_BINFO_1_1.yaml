@@ -17,6 +17,9 @@ name:
     12.1.1. [TC-BINFO-1.1] Global Attributes for Basic Information Cluster
     [DUT-Server]
 
+PICS:
+    - BINFO.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -17,6 +17,9 @@ name:
     4.4.20. [TC-CNET-4.22] [Thread] Verification for ScanNetworks command
     [DUT-Server]
 
+PICS:
+    - CNET.S.F01
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

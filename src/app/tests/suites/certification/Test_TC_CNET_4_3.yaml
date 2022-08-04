@@ -17,6 +17,9 @@ name:
     12.4.3. [TC-CNET-4.3] [Ethernet] Verification for attributes check
     [DUT-Server]
 
+PICS:
+    - CNET.S.F02
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

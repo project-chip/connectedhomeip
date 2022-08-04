@@ -16,6 +16,9 @@
 name:
     12.4.1. [TC-CNET-4.1] [Wi-Fi] Verification for attributes check [DUT-Server]
 
+PICS:
+    - CNET.S.F00
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

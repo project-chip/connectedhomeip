@@ -17,6 +17,9 @@ name:
     12.4.14. [TC-CNET-4.16] [Thread] NetworkIDNotFound returned in
     LastNetworkingStatus field validation [DUT-Server]
 
+PICS:
+    - CNET.S.F01
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

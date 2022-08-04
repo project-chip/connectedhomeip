@@ -17,6 +17,9 @@ name:
     12.4.6. [TC-CNET-4.6] [Thread] FAILSAFE_REQUIRED message Validation
     [DUT-Server]
 
+PICS:
+    - CNET.S.F01
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

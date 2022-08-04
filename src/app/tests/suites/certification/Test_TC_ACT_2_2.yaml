@@ -15,6 +15,9 @@
 
 name: 3.2.2. [TC-ACT-2.2] Primary functionality with server as DUT
 
+PICS:
+    - ACT.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -17,6 +17,9 @@ name:
     12.4.4. [TC-CNET-4.4] [Wi-Fi] Verification for ScanNetworks command
     [DUT-Server]
 
+PICS:
+    - CNET.S.F00
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

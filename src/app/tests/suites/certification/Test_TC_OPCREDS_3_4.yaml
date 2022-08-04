@@ -15,6 +15,9 @@
 
 name: 12.3.4. [TC-OPCREDS-3.4] UpdateNOC-Error Condition [DUT-Server]
 
+PICS:
+    - OPCREDS.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

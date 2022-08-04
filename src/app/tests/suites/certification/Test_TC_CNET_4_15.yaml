@@ -17,6 +17,9 @@ name:
     12.4.13. [TC-CNET-4.15] [Wi-Fi] NetworkIDNotFound returned in
     LastNetworkingStatus field validation [DUT-Server]
 
+PICS:
+    - CNET.S.F00
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

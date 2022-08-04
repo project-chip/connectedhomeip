@@ -17,6 +17,9 @@ name:
     12.4.19. [TC-CNET-4.21] [Thread] Verification for commands check
     [DUT-Client]
 
+PICS:
+    - CNET.C.F01
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

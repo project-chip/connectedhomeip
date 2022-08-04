@@ -17,6 +17,9 @@ name:
     12.4.16. [TC-CNET-4.18] [Thread] Verification for attributes check
     [DUT-Client]
 
+PICS:
+    - CNET.C.F01
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

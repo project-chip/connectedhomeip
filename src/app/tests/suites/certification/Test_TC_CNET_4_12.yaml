@@ -17,6 +17,9 @@ name:
     12.4.10. [TC-CNET-4.12] [Thread] Verification for ConnectNetwork Command
     [DUT-Server]
 
+PICS:
+    - CNET.S.F01
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

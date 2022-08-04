@@ -17,6 +17,9 @@ name:
     12.4.12. [TC-CNET-4.14] [Thread] Verification for ReorderNetwork command
     [DUT-Server]
 
+PICS:
+    - CNET.S.F01
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

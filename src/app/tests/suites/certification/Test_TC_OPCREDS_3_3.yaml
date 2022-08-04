@@ -15,6 +15,9 @@
 
 name: 12.3.3. [TC-OPCREDS-3.3] Attribute-NOCs, Commands [DUT-Client]
 
+PICS:
+    - OPCREDS.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -17,6 +17,9 @@ name:
     12.1.3. [TC-CNET-1.3] Global Attributes for Networking commissioning cluster
     [DUT-Server]
 
+PICS:
+    - CNET.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

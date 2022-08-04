@@ -17,6 +17,9 @@ name:
     12.4.5. [TC-CNET-4.5] [Wi-Fi] FAILSAFE_REQUIRED message Validation
     [DUT-Server]
 
+PICS:
+    - CNET.S.F00
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

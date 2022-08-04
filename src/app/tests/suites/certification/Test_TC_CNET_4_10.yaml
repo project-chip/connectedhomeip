@@ -17,6 +17,9 @@ name:
     12.4.8. [TC-CNET-4.10] [Thread] Verification for RemoveNetwork Command
     [DUT-Server]
 
+PICS:
+    - CNET.S.F01
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
