@@ -50,6 +50,9 @@ jobs:
       - name: Checkout submodules
         run: scripts/checkout_submodules.py --shallow --platform efr32
 
+      - name: Out of Tree verification
+        run: third_party/silabs/out_of_tree_verification.sh
+
       - name: Set up environment for size reports
         if: ${{ !env.ACT }}
         env:
