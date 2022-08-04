@@ -349,13 +349,9 @@ public class ChipDeviceController {
     completionListener.onError(error);
   }
 
-  public void onNOCChainGenerationNeeded(
-      CSRInfo csrInfo,
-      AttestationInfo attestationInfo) {
+  public void onNOCChainGenerationNeeded(CSRInfo csrInfo, AttestationInfo attestationInfo) {
     if (nocChainIssuer != null) {
-      nocChainIssuer.onNOCChainGenerationNeeded(
-          csrInfo,
-          attestationInfo);
+      nocChainIssuer.onNOCChainGenerationNeeded(csrInfo, attestationInfo);
     }
   }
 
@@ -723,9 +719,7 @@ public class ChipDeviceController {
      *
      * <p>All csr and attestation fields are provided to allow for custom attestestation checks.
      */
-    void onNOCChainGenerationNeeded(
-        CSRInfo csrInfo,
-        AttestationInfo attestationInfo);
+    void onNOCChainGenerationNeeded(CSRInfo csrInfo, AttestationInfo attestationInfo);
   }
 
   /**
