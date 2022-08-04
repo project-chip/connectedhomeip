@@ -7,14 +7,15 @@ public final class ControllerParams {
 
   private final int udpListenPort;
   private final int controllerVendorId;
+  private final int failsafeTimerSeconds;
+  private final boolean attemptNetworkScanWiFi;
+  private final boolean attemptNetworkScanThread;
   @Nullable private final KeypairDelegate keypairDelegate;
   @Nullable private final byte[] rootCertificate;
   @Nullable private final byte[] intermediateCertificate;
   @Nullable private final byte[] operationalCertificate;
   @Nullable private final byte[] ipk;
-  private final int failsafeTimerSeconds = 30;
-  private final boolean attemptNetworkScanWiFi = false;
-  private final boolean attemptNetworkScanThread = true;
+  private final long adminSubject;
 
   private static final int LEGACY_GLOBAL_CHIP_PORT = 5540;
 
@@ -22,11 +23,15 @@ public final class ControllerParams {
   private ControllerParams(Builder builder) {
     this.udpListenPort = builder.udpListenPort;
     this.controllerVendorId = builder.controllerVendorId;
+    this.failsafeTimerSeconds = builder.failsafeTimerSeconds;
+    this.attemptNetworkScanWiFi = builder.attemptNetworkScanWiFi;
+    this.attemptNetworkScanThread = builder.attemptNetworkScanThread;
     this.keypairDelegate = builder.keypairDelegate;
     this.rootCertificate = builder.rootCertificate;
     this.intermediateCertificate = builder.intermediateCertificate;
     this.operationalCertificate = builder.operationalCertificate;
     this.ipk = builder.ipk;
+    this.adminSubject = builder.adminSubject;
   }
 
   /** Gets the UDP listening port; 0 indicates "any available port" */
@@ -36,6 +41,18 @@ public final class ControllerParams {
 
   public int getControllerVendorId() {
     return controllerVendorId;
+  }
+
+  public int getFailsafeTimerSeconds() {
+    return failsafeTimerSeconds;
+  }
+
+  public boolean getAttemptNetworkScanWiFi() {
+    return attemptNetworkScanWiFi;
+  }
+
+  public boolean getAttemptNetworkScanThread() {
+    return attemptNetworkScanThread;
   }
 
   public KeypairDelegate getKeypairDelegate() {
@@ -58,16 +75,8 @@ public final class ControllerParams {
     return ipk;
   }
 
-  public int getFailsafeTimerSeconds() {
-    return failsafeTimerSeconds;
-  }
-
-  public boolean getAttemptNetworkScanWiFi() {
-    return attemptNetworkScanWiFi;
-  }
-
-  public boolean getAttemptNetworkScanThread() {
-    return attemptNetworkScanThread;
+  public long getAdminSubject() {
+    return adminSubject;
   }
 
   /** Returns parameters with ephemerally generated operational credentials */
@@ -92,14 +101,15 @@ public final class ControllerParams {
   public static class Builder {
     private int udpListenPort = LEGACY_GLOBAL_CHIP_PORT + 1;
     private int controllerVendorId = 0xFFFF;
+    private int failsafeTimerSeconds = 30;
+    private boolean attemptNetworkScanWiFi = false;
+    private boolean attemptNetworkScanThread = false;
     @Nullable private KeypairDelegate keypairDelegate = null;
     @Nullable private byte[] rootCertificate = null;
     @Nullable private byte[] intermediateCertificate = null;
     @Nullable private byte[] operationalCertificate = null;
     @Nullable private byte[] ipk = null;
-    private int failsafeTimerSeconds = 30;
-    private boolean attemptNetworkScanWiFi = false;
-    private boolean attemptNetworkScanThread = true;
+    private long adminSubject = 0;
 
     private Builder() {}
 
@@ -116,6 +126,17 @@ public final class ControllerParams {
       return this;
     }
 
+    /**
+     * Sets the FailsafeTimer duration passed to ChipDeviceCommissioner's CommissioningParameters.
+     * Increasing this value from its default will allow more time for network scans, cloud op cert
+     * signing calls, and user interaction.
+     *
+     * <p>Note: It is also possible for internal logic (within Autocommissioner, etc) to re-call
+     * ArmFailSafe to account for network config delays.
+     *
+     * @param failsafeTimerSeconds
+     * @return
+     */
     public Builder setFailsafeTimerSeconds(int failsafeTimerSeconds) {
       if (failsafeTimerSeconds < 1 || failsafeTimerSeconds > 900) {
         throw new IllegalArgumentException("failsafeTimerSeconds must be between 0 and 900");
@@ -124,11 +145,37 @@ public final class ControllerParams {
       return this;
     }
 
+    /**
+     * Enable/disable wifi network scan during commissioning in the the default
+     * CommissioningDelegate used by the ChipDeviceCommissioner.
+     *
+     * <p>Specifically, this sets AttemptWiFiNetworkScan in the CommissioningParameters passed to
+     * the CommissioningDelegate.
+     *
+     * <p>When a WiFi scan is attempted, the result will be propagated to the ScanNetworksListener
+     * assigned to the ChipDeviceController.
+     *
+     * @param attemptNetworkScanWiFi
+     * @return
+     */
     public Builder setAttemptNetworkScanWiFi(boolean attemptNetworkScanWiFi) {
       this.attemptNetworkScanWiFi = attemptNetworkScanWiFi;
       return this;
     }
 
+    /**
+     * Enable/disable Thread network scan during commissioning in the the default
+     * CommissioningDelegate used by the ChipDeviceCommissioner.
+     *
+     * <p>Specifically, this sets AttemptThreadNetworkScan in the CommissioningParameters passed to
+     * the CommissioningDelegate.
+     *
+     * <p>When a Thread scan is attempted, the result will be propagated to the ScanNetworksListener
+     * assigned to the ChipDeviceController.
+     *
+     * @param attemptNetworkScanWiFi
+     * @return
+     */
     public Builder setAttemptNetworkScanThread(boolean attemptNetworkScanThread) {
       this.attemptNetworkScanThread = attemptNetworkScanThread;
       return this;
@@ -156,6 +203,19 @@ public final class ControllerParams {
 
     public Builder setIpk(byte[] ipk) {
       this.ipk = ipk;
+      return this;
+    }
+
+    /**
+     * Sets the AdminSubject value passed to ChipDeviceCommissioner's CommissioningParameters. This
+     * value is passed in the AddNoc command sent to the commissionee and represents the subject of
+     * the default ACL created by that call.
+     *
+     * @param adminSubject
+     * @return
+     */
+    public Builder setAdminSubject(long adminSubject) {
+      this.adminSubject = adminSubject;
       return this;
     }
 

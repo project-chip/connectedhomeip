@@ -51,6 +51,12 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         mParams.SetFailsafeTimerSeconds(params.GetFailsafeTimerSeconds().Value());
     }
 
+    if (params.GetAdminSubject().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting adminSubject from parameters");
+        mParams.SetAdminSubject(params.GetAdminSubject().Value());
+    }
+
     if (params.GetThreadOperationalDataset().HasValue())
     {
         ByteSpan dataset = params.GetThreadOperationalDataset().Value();

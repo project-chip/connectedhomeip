@@ -34,6 +34,7 @@ public class ChipDeviceController {
   private int connectionId;
   private CompletionListener completionListener;
   private ScanNetworksListener scanNetworksListener;
+  private NOCChainIssuer nocChainIssuer;
 
   /**
    * To load class and jni, we need to new AndroidChipPlatform after jni load but before new
@@ -59,6 +60,18 @@ public class ChipDeviceController {
 
   public void setScanNetworksListener(ScanNetworksListener listener) {
     scanNetworksListener = listener;
+  }
+
+  /**
+   * Sets this DeviceController to use the given issuer for issuing operational certs. By default,
+   * the DeviceController uses an internal, OperationalCredentialsDelegate (see
+   * AndroidOperationalCredentialsIssuer)
+   *
+   * @param issuer
+   */
+  public void setNOCChainIssuer(NOCChainIssuer issuer) {
+    setUseJavaCallbackForNOCRequest(deviceControllerPtr, issuer != null);
+    nocChainIssuer = issuer;
   }
 
   public void pairDevice(
@@ -181,6 +194,28 @@ public class ChipDeviceController {
 
   public void resumeCommissioning() {
     resumeCommissioning(deviceControllerPtr);
+  }
+
+  /**
+   * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
+   * called when the NOC CSR needs to be signed. This allows for custom credentials issuer
+   * implementations, for example, when a proprietary cloud API will perform the CSR signing.
+   *
+   * <p>The commissioning workflow will stop upon the onNOCChainGenerationNeeded callback and resume
+   * once onNOCChainGeneration is called.
+   *
+   * <p>The following fields on the ControllerParams object MUST be populated: rootCertificate,
+   * intermediateCertificate, operationalCertificate
+   *
+   * <p>If ipk and adminSubject are set on the ControllerParams object, then they will be used in
+   * the AddNOC command set to the commissionee. If they are not populated, then the values provided
+   * in the ChipDeviceController initialization will be used.
+   *
+   * @param params
+   * @return CHIP_ERROR error code (0 is no error)
+   */
+  public int onNOCChainGeneration(ControllerParams params) {
+    return onNOCChainGeneration(deviceControllerPtr, params);
   }
 
   /**
@@ -312,6 +347,30 @@ public class ChipDeviceController {
 
   public void onError(Throwable error) {
     completionListener.onError(error);
+  }
+
+  public void onNOCChainGenerationNeeded(
+      byte[] csrElements,
+      byte[] csrNonce,
+      byte[] csrElementsSignature,
+      byte[] attestationChallenge,
+      byte[] attestationElements,
+      byte[] attestationNonce,
+      byte[] attestationElementsSignature,
+      byte[] dac,
+      byte[] pai) {
+    if (nocChainIssuer != null) {
+      nocChainIssuer.onNOCChainGenerationNeeded(
+          csrElements,
+          csrNonce,
+          csrElementsSignature,
+          attestationChallenge,
+          attestationElements,
+          attestationNonce,
+          attestationElementsSignature,
+          dac,
+          pai);
+    }
   }
 
   public void close() {
@@ -633,8 +692,13 @@ public class ChipDeviceController {
 
   private native void resumeCommissioning(long deviceControllerPtr);
 
+  private native void setUseJavaCallbackForNOCRequest(
+      long deviceControllerPtr, boolean useCallback);
+
   private native void updateCommissioningNetworkCredentials(
       long deviceControllerPtr, NetworkCredentials networkCredentials);
+
+  private native int onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
   private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
 
@@ -654,7 +718,44 @@ public class ChipDeviceController {
     }
   }
 
-  /** Interface to listen for callbacks from CHIPDeviceController. */
+  /** Interface to implement custom operational credentials issuer (NOC chain generation). */
+  public interface NOCChainIssuer {
+    /**
+     * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
+     * called when the NOC CSR needs to be signed. This allows for custom credentials issuer
+     * implementations, for example, when a proprietary cloud API will perform the CSR signing.
+     *
+     * <p>The commissioning workflow will stop upon the onNOCChainGenerationNeeded callback and
+     * resume once onNOCChainGeneration is called.
+     *
+     * <p>The following fields on the ControllerParams object passed to onNOCChainGeneration MUST be
+     * populated: rootCertificate, intermediateCertificate, operationalCertificate
+     *
+     * <p>If ipk and adminSubject are set on the ControllerParams object, then they will be used in
+     * the AddNOC command set to the commissionee. If they are not populated, then the values
+     * provided in the ChipDeviceController initialization will be used.
+     *
+     * <p>All csr and attestation fields are provided to allow for custom attestestation checks.
+     */
+    void onNOCChainGenerationNeeded(
+        byte[] csrElements,
+        byte[] csrNonce,
+        byte[] csrElementsSignature,
+        byte[] attestationChallenge,
+        byte[] attestationElements,
+        byte[] attestationNonce,
+        byte[] attestationElementsSignature,
+        byte[] dac,
+        byte[] pai);
+  }
+
+  /**
+   * Interface to listen for scan networks callbacks from CHIPDeviceController.
+   *
+   * <p>Set the AttemptNetworkScanWiFi or AttemptNetworkScanThread to configure the enable/disable
+   * WiFi or Thread network scan during commissioning in the the default CommissioningDelegate used
+   * by the ChipDeviceCommissioner.
+   */
   public interface ScanNetworksListener {
     /** Notifies when scan networks call fails. */
     void onScanNetworksFailure(int errorCode);
