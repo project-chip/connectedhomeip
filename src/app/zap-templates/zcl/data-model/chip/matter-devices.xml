@@ -187,7 +187,7 @@ limitations under the License.
             <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Bridged Actions" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Actions" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>

@@ -1,5 +1,5 @@
 {
-  "featureLevel": 76,
+  "featureLevel": 77,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -703,7 +703,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "current level",
+              "name": "CurrentLevel",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -2985,7 +2985,7 @@
               "code": 5,
               "mfgCode": null,
               "side": "server",
-              "type": "fabric_idx",
+              "type": "int8u",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -5113,7 +5113,7 @@
               "side": "server",
               "type": "array",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -5129,7 +5129,7 @@
               "side": "server",
               "type": "array",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -5145,7 +5145,7 @@
               "side": "server",
               "type": "array",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -5546,6 +5546,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 61442
     }
-  ],
-  "log": []
+  ]
 }

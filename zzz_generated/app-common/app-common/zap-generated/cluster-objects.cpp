@@ -3122,7 +3122,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Events
 
 } // namespace AccessControl
-namespace BridgedActions {
+namespace Actions {
 namespace Structs {
 namespace ActionStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
@@ -3134,7 +3134,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kType)), type));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEndpointListID)), endpointListID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSupportedCommands)), supportedCommands));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kState)), state));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -3169,8 +3169,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kSupportedCommands):
             ReturnErrorOnFailure(DataModel::Decode(reader, supportedCommands));
             break;
-        case to_underlying(Fields::kStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+        case to_underlying(Fields::kState):
+            ReturnErrorOnFailure(DataModel::Decode(reader, state));
             break;
         default:
             break;
@@ -3761,11 +3761,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ActionList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, actionList));
         break;
-    case Attributes::EndpointList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, endpointList));
+    case Attributes::EndpointLists::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, endpointLists));
         break;
-    case Attributes::SetupUrl::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, setupUrl));
+    case Attributes::SetupURL::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, setupURL));
         break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
@@ -3887,7 +3887,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace ActionFailed.
 } // namespace Events
 
-} // namespace BridgedActions
+} // namespace Actions
 namespace Basic {
 namespace Structs {
 namespace CapabilityMinimaStruct {
@@ -20845,7 +20845,7 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::BridgedActions::Id: {
+    case Clusters::Actions::Id: {
         switch (aCommand)
         {
         default:

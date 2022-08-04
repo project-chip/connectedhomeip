@@ -3630,7 +3630,7 @@ public:
 } // namespace AccessControlExtensionChanged
 } // namespace Events
 } // namespace AccessControl
-namespace BridgedActions {
+namespace Actions {
 namespace Structs {
 namespace ActionStruct {
 enum class Fields
@@ -3640,7 +3640,7 @@ enum class Fields
     kType              = 2,
     kEndpointListID    = 3,
     kSupportedCommands = 4,
-    kStatus            = 5,
+    kState             = 5,
 };
 
 struct Type
@@ -3648,10 +3648,10 @@ struct Type
 public:
     uint16_t actionID = static_cast<uint16_t>(0);
     chip::CharSpan name;
-    ActionTypeEnum type        = static_cast<ActionTypeEnum>(0);
-    uint16_t endpointListID    = static_cast<uint16_t>(0);
-    uint16_t supportedCommands = static_cast<uint16_t>(0);
-    ActionStateEnum status     = static_cast<ActionStateEnum>(0);
+    ActionTypeEnum type                          = static_cast<ActionTypeEnum>(0);
+    uint16_t endpointListID                      = static_cast<uint16_t>(0);
+    chip::BitMask<CommandBits> supportedCommands = static_cast<chip::BitMask<CommandBits>>(0);
+    ActionStateEnum state                        = static_cast<ActionStateEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -3779,7 +3779,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::InstantAction::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -3795,7 +3795,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::InstantAction::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -3815,7 +3815,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::InstantActionWithTransition::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -3832,7 +3832,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::InstantActionWithTransition::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -3852,7 +3852,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StartAction::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -3868,7 +3868,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::StartAction::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -3888,7 +3888,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StartActionWithDuration::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -3905,7 +3905,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::StartActionWithDuration::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -3925,7 +3925,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StopAction::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -3941,7 +3941,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::StopAction::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -3960,7 +3960,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PauseAction::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -3976,7 +3976,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::PauseAction::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -3996,7 +3996,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PauseActionWithDuration::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -4013,7 +4013,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::PauseActionWithDuration::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -4033,7 +4033,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResumeAction::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -4049,7 +4049,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::ResumeAction::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -4068,7 +4068,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EnableAction::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -4084,7 +4084,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::EnableAction::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -4104,7 +4104,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EnableActionWithDuration::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -4121,7 +4121,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::EnableActionWithDuration::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -4141,7 +4141,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::DisableAction::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -4157,7 +4157,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::DisableAction::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -4177,7 +4177,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::DisableActionWithDuration::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -4194,7 +4194,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::DisableActionWithDuration::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID = static_cast<uint16_t>(0);
     Optional<uint32_t> invokeID;
@@ -4209,72 +4209,71 @@ namespace Attributes {
 namespace ActionList {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::BridgedActions::Structs::ActionStruct::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType>;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::Actions::Structs::ActionStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::ActionStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::ActionStruct::DecodableType> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActionList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActionList
-namespace EndpointList {
+namespace EndpointLists {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Actions::Structs::EndpointListStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::EndpointListStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::EndpointListStruct::DecodableType> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::EndpointList::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EndpointLists::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace EndpointList
-namespace SetupUrl {
+} // namespace EndpointLists
+namespace SetupURL {
 struct TypeInfo
 {
     using Type             = chip::CharSpan;
     using DecodableType    = chip::CharSpan;
     using DecodableArgType = chip::CharSpan;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SetupUrl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SetupURL::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
     static constexpr size_t MaxLength() { return 512; }
 };
-} // namespace SetupUrl
+} // namespace SetupURL
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
 struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
 struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 };
 } // namespace ClusterRevision
 
@@ -4282,13 +4281,13 @@ struct TypeInfo
 {
     struct DecodableType
     {
-        static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+        static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::ActionList::TypeInfo::DecodableType actionList;
-        Attributes::EndpointList::TypeInfo::DecodableType endpointList;
-        Attributes::SetupUrl::TypeInfo::DecodableType setupUrl;
+        Attributes::EndpointLists::TypeInfo::DecodableType endpointLists;
+        Attributes::SetupURL::TypeInfo::DecodableType setupURL;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -4313,7 +4312,7 @@ struct Type
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::StateChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
     static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID        = static_cast<uint16_t>(0);
@@ -4328,7 +4327,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::StateChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID        = static_cast<uint16_t>(0);
     uint32_t invokeID        = static_cast<uint32_t>(0);
@@ -4353,7 +4352,7 @@ struct Type
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ActionFailed::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
     static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID        = static_cast<uint16_t>(0);
@@ -4369,7 +4368,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ActionFailed::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 
     uint16_t actionID        = static_cast<uint16_t>(0);
     uint32_t invokeID        = static_cast<uint32_t>(0);
@@ -4380,7 +4379,7 @@ public:
 };
 } // namespace ActionFailed
 } // namespace Events
-} // namespace BridgedActions
+} // namespace Actions
 namespace Basic {
 namespace Structs {
 namespace CapabilityMinimaStruct {

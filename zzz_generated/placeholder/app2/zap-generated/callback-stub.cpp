@@ -29,6 +29,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
+    case ZCL_ACTIONS_CLUSTER_ID:
+        emberAfActionsClusterInitCallback(endpoint);
+        break;
     case ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_ID:
         emberAfAdministratorCommissioningClusterInitCallback(endpoint);
         break;
@@ -40,9 +43,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_BOOLEAN_STATE_CLUSTER_ID:
         emberAfBooleanStateClusterInitCallback(endpoint);
-        break;
-    case ZCL_BRIDGED_ACTIONS_CLUSTER_ID:
-        emberAfBridgedActionsClusterInitCallback(endpoint);
         break;
     case ZCL_COLOR_CONTROL_CLUSTER_ID:
         emberAfColorControlClusterInitCallback(endpoint);
@@ -140,6 +140,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     }
 }
 
+void __attribute__((weak)) emberAfActionsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -156,11 +161,6 @@ void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfBooleanStateClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfBridgedActionsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

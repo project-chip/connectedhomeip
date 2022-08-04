@@ -240,33 +240,33 @@ public class ChipStructs {
     }
   }
 
-  public static class BridgedActionsClusterActionStruct {
+  public static class ActionsClusterActionStruct {
     public Integer actionID;
     public String name;
     public Integer type;
     public Integer endpointListID;
     public Integer supportedCommands;
-    public Integer status;
+    public Integer state;
 
-    public BridgedActionsClusterActionStruct(
+    public ActionsClusterActionStruct(
         Integer actionID,
         String name,
         Integer type,
         Integer endpointListID,
         Integer supportedCommands,
-        Integer status) {
+        Integer state) {
       this.actionID = actionID;
       this.name = name;
       this.type = type;
       this.endpointListID = endpointListID;
       this.supportedCommands = supportedCommands;
-      this.status = status;
+      this.state = state;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BridgedActionsClusterActionStruct {\n");
+      output.append("ActionsClusterActionStruct {\n");
       output.append("\tactionID: ");
       output.append(actionID);
       output.append("\n");
@@ -282,21 +282,21 @@ public class ChipStructs {
       output.append("\tsupportedCommands: ");
       output.append(supportedCommands);
       output.append("\n");
-      output.append("\tstatus: ");
-      output.append(status);
+      output.append("\tstate: ");
+      output.append(state);
       output.append("\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static class BridgedActionsClusterEndpointListStruct {
+  public static class ActionsClusterEndpointListStruct {
     public Integer endpointListID;
     public String name;
     public Integer type;
     public ArrayList<Object> endpoints;
 
-    public BridgedActionsClusterEndpointListStruct(
+    public ActionsClusterEndpointListStruct(
         Integer endpointListID, String name, Integer type, ArrayList<Object> endpoints) {
       this.endpointListID = endpointListID;
       this.name = name;
@@ -307,7 +307,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BridgedActionsClusterEndpointListStruct {\n");
+      output.append("ActionsClusterEndpointListStruct {\n");
       output.append("\tendpointListID: ");
       output.append(endpointListID);
       output.append("\n");

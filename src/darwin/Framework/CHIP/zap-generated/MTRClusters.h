@@ -647,69 +647,69 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Bridged Actions
+ * Cluster Actions
  *
  */
-@interface MTRClusterBridgedActions : MTRCluster
+@interface MTRClusterActions : MTRCluster
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                                endpoint:(uint16_t)endpoint
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)instantActionWithParams:(MTRBridgedActionsClusterInstantActionParams *)params
+- (void)instantActionWithParams:(MTRActionsClusterInstantActionParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
               completionHandler:(StatusCompletion)completionHandler;
-- (void)instantActionWithTransitionWithParams:(MTRBridgedActionsClusterInstantActionWithTransitionParams *)params
+- (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completionHandler:(StatusCompletion)completionHandler;
-- (void)startActionWithParams:(MTRBridgedActionsClusterStartActionParams *)params
+- (void)startActionWithParams:(MTRActionsClusterStartActionParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
-- (void)startActionWithDurationWithParams:(MTRBridgedActionsClusterStartActionWithDurationParams *)params
+- (void)startActionWithDurationWithParams:(MTRActionsClusterStartActionWithDurationParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(StatusCompletion)completionHandler;
-- (void)stopActionWithParams:(MTRBridgedActionsClusterStopActionParams *)params
+- (void)stopActionWithParams:(MTRActionsClusterStopActionParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
            completionHandler:(StatusCompletion)completionHandler;
-- (void)pauseActionWithParams:(MTRBridgedActionsClusterPauseActionParams *)params
+- (void)pauseActionWithParams:(MTRActionsClusterPauseActionParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
-- (void)pauseActionWithDurationWithParams:(MTRBridgedActionsClusterPauseActionWithDurationParams *)params
+- (void)pauseActionWithDurationWithParams:(MTRActionsClusterPauseActionWithDurationParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(StatusCompletion)completionHandler;
-- (void)resumeActionWithParams:(MTRBridgedActionsClusterResumeActionParams *)params
+- (void)resumeActionWithParams:(MTRActionsClusterResumeActionParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
              completionHandler:(StatusCompletion)completionHandler;
-- (void)enableActionWithParams:(MTRBridgedActionsClusterEnableActionParams *)params
+- (void)enableActionWithParams:(MTRActionsClusterEnableActionParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
              completionHandler:(StatusCompletion)completionHandler;
-- (void)enableActionWithDurationWithParams:(MTRBridgedActionsClusterEnableActionWithDurationParams *)params
+- (void)enableActionWithDurationWithParams:(MTRActionsClusterEnableActionWithDurationParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                          completionHandler:(StatusCompletion)completionHandler;
-- (void)disableActionWithParams:(MTRBridgedActionsClusterDisableActionParams *)params
+- (void)disableActionWithParams:(MTRActionsClusterDisableActionParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
               completionHandler:(StatusCompletion)completionHandler;
-- (void)disableActionWithDurationWithParams:(MTRBridgedActionsClusterDisableActionWithDurationParams *)params
+- (void)disableActionWithDurationWithParams:(MTRActionsClusterDisableActionWithDurationParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeActionListWithParams:(MTRReadParams * _Nullable)params;
 
-- (NSDictionary<NSString *, id> *)readAttributeEndpointListWithParams:(MTRReadParams * _Nullable)params;
+- (NSDictionary<NSString *, id> *)readAttributeEndpointListsWithParams:(MTRReadParams * _Nullable)params;
 
-- (NSDictionary<NSString *, id> *)readAttributeSetupUrlWithParams:(MTRReadParams * _Nullable)params;
+- (NSDictionary<NSString *, id> *)readAttributeSetupURLWithParams:(MTRReadParams * _Nullable)params;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params;
 

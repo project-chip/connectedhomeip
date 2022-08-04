@@ -44,7 +44,7 @@
 | Descriptor                                                          | 0x001D |
 | Binding                                                             | 0x001E |
 | AccessControl                                                       | 0x001F |
-| BridgedActions                                                      | 0x0025 |
+| Actions                                                             | 0x0025 |
 | Basic                                                               | 0x0028 |
 | OtaSoftwareUpdateProvider                                           | 0x0029 |
 | OtaSoftwareUpdateRequestor                                          | 0x002A |
@@ -1399,7 +1399,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster BridgedActions                                              | 0x0025 |
+| Cluster Actions                                                     | 0x0025 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * InstantAction                                                     |   0x00 |
@@ -1417,8 +1417,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ActionList                                                        | 0x0000 |
-| * EndpointList                                                      | 0x0001 |
-| * SetupUrl                                                          | 0x0002 |
+| * EndpointLists                                                     | 0x0001 |
+| * SetupURL                                                          | 0x0002 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -1433,10 +1433,10 @@ private:
 /*
  * Command InstantAction
  */
-class BridgedActionsInstantAction : public ClusterCommand
+class ActionsInstantAction : public ClusterCommand
 {
 public:
-    BridgedActionsInstantAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("instant-action", credsIssuerConfig)
+    ActionsInstantAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("instant-action", credsIssuerConfig)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -1458,16 +1458,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::BridgedActions::Commands::InstantAction::Type mRequest;
+    chip::app::Clusters::Actions::Commands::InstantAction::Type mRequest;
 };
 
 /*
  * Command InstantActionWithTransition
  */
-class BridgedActionsInstantActionWithTransition : public ClusterCommand
+class ActionsInstantActionWithTransition : public ClusterCommand
 {
 public:
-    BridgedActionsInstantActionWithTransition(CredentialIssuerCommands * credsIssuerConfig) :
+    ActionsInstantActionWithTransition(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("instant-action-with-transition", credsIssuerConfig)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
@@ -1491,16 +1491,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::Type mRequest;
+    chip::app::Clusters::Actions::Commands::InstantActionWithTransition::Type mRequest;
 };
 
 /*
  * Command StartAction
  */
-class BridgedActionsStartAction : public ClusterCommand
+class ActionsStartAction : public ClusterCommand
 {
 public:
-    BridgedActionsStartAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("start-action", credsIssuerConfig)
+    ActionsStartAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("start-action", credsIssuerConfig)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -1522,16 +1522,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::BridgedActions::Commands::StartAction::Type mRequest;
+    chip::app::Clusters::Actions::Commands::StartAction::Type mRequest;
 };
 
 /*
  * Command StartActionWithDuration
  */
-class BridgedActionsStartActionWithDuration : public ClusterCommand
+class ActionsStartActionWithDuration : public ClusterCommand
 {
 public:
-    BridgedActionsStartActionWithDuration(CredentialIssuerCommands * credsIssuerConfig) :
+    ActionsStartActionWithDuration(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("start-action-with-duration", credsIssuerConfig)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
@@ -1555,16 +1555,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::Type mRequest;
+    chip::app::Clusters::Actions::Commands::StartActionWithDuration::Type mRequest;
 };
 
 /*
  * Command StopAction
  */
-class BridgedActionsStopAction : public ClusterCommand
+class ActionsStopAction : public ClusterCommand
 {
 public:
-    BridgedActionsStopAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop-action", credsIssuerConfig)
+    ActionsStopAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop-action", credsIssuerConfig)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -1586,16 +1586,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::BridgedActions::Commands::StopAction::Type mRequest;
+    chip::app::Clusters::Actions::Commands::StopAction::Type mRequest;
 };
 
 /*
  * Command PauseAction
  */
-class BridgedActionsPauseAction : public ClusterCommand
+class ActionsPauseAction : public ClusterCommand
 {
 public:
-    BridgedActionsPauseAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("pause-action", credsIssuerConfig)
+    ActionsPauseAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("pause-action", credsIssuerConfig)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -1617,16 +1617,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::BridgedActions::Commands::PauseAction::Type mRequest;
+    chip::app::Clusters::Actions::Commands::PauseAction::Type mRequest;
 };
 
 /*
  * Command PauseActionWithDuration
  */
-class BridgedActionsPauseActionWithDuration : public ClusterCommand
+class ActionsPauseActionWithDuration : public ClusterCommand
 {
 public:
-    BridgedActionsPauseActionWithDuration(CredentialIssuerCommands * credsIssuerConfig) :
+    ActionsPauseActionWithDuration(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("pause-action-with-duration", credsIssuerConfig)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
@@ -1650,16 +1650,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::Type mRequest;
+    chip::app::Clusters::Actions::Commands::PauseActionWithDuration::Type mRequest;
 };
 
 /*
  * Command ResumeAction
  */
-class BridgedActionsResumeAction : public ClusterCommand
+class ActionsResumeAction : public ClusterCommand
 {
 public:
-    BridgedActionsResumeAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("resume-action", credsIssuerConfig)
+    ActionsResumeAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("resume-action", credsIssuerConfig)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -1681,16 +1681,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::BridgedActions::Commands::ResumeAction::Type mRequest;
+    chip::app::Clusters::Actions::Commands::ResumeAction::Type mRequest;
 };
 
 /*
  * Command EnableAction
  */
-class BridgedActionsEnableAction : public ClusterCommand
+class ActionsEnableAction : public ClusterCommand
 {
 public:
-    BridgedActionsEnableAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("enable-action", credsIssuerConfig)
+    ActionsEnableAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("enable-action", credsIssuerConfig)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -1712,16 +1712,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::BridgedActions::Commands::EnableAction::Type mRequest;
+    chip::app::Clusters::Actions::Commands::EnableAction::Type mRequest;
 };
 
 /*
  * Command EnableActionWithDuration
  */
-class BridgedActionsEnableActionWithDuration : public ClusterCommand
+class ActionsEnableActionWithDuration : public ClusterCommand
 {
 public:
-    BridgedActionsEnableActionWithDuration(CredentialIssuerCommands * credsIssuerConfig) :
+    ActionsEnableActionWithDuration(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("enable-action-with-duration", credsIssuerConfig)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
@@ -1745,16 +1745,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::Type mRequest;
+    chip::app::Clusters::Actions::Commands::EnableActionWithDuration::Type mRequest;
 };
 
 /*
  * Command DisableAction
  */
-class BridgedActionsDisableAction : public ClusterCommand
+class ActionsDisableAction : public ClusterCommand
 {
 public:
-    BridgedActionsDisableAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("disable-action", credsIssuerConfig)
+    ActionsDisableAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("disable-action", credsIssuerConfig)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -1776,16 +1776,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::BridgedActions::Commands::DisableAction::Type mRequest;
+    chip::app::Clusters::Actions::Commands::DisableAction::Type mRequest;
 };
 
 /*
  * Command DisableActionWithDuration
  */
-class BridgedActionsDisableActionWithDuration : public ClusterCommand
+class ActionsDisableActionWithDuration : public ClusterCommand
 {
 public:
-    BridgedActionsDisableActionWithDuration(CredentialIssuerCommands * credsIssuerConfig) :
+    ActionsDisableActionWithDuration(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("disable-action-with-duration", credsIssuerConfig)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
@@ -1809,7 +1809,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::Type mRequest;
+    chip::app::Clusters::Actions::Commands::DisableActionWithDuration::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -8680,36 +8680,36 @@ void registerClusterAccessControl(Commands & commands, CredentialIssuerCommands 
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterBridgedActions(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterActions(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::BridgedActions;
+    using namespace chip::app::Clusters::Actions;
 
-    const char * clusterName = "BridgedActions";
+    const char * clusterName = "Actions";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                        //
-        make_unique<BridgedActionsInstantAction>(credsIssuerConfig),               //
-        make_unique<BridgedActionsInstantActionWithTransition>(credsIssuerConfig), //
-        make_unique<BridgedActionsStartAction>(credsIssuerConfig),                 //
-        make_unique<BridgedActionsStartActionWithDuration>(credsIssuerConfig),     //
-        make_unique<BridgedActionsStopAction>(credsIssuerConfig),                  //
-        make_unique<BridgedActionsPauseAction>(credsIssuerConfig),                 //
-        make_unique<BridgedActionsPauseActionWithDuration>(credsIssuerConfig),     //
-        make_unique<BridgedActionsResumeAction>(credsIssuerConfig),                //
-        make_unique<BridgedActionsEnableAction>(credsIssuerConfig),                //
-        make_unique<BridgedActionsEnableActionWithDuration>(credsIssuerConfig),    //
-        make_unique<BridgedActionsDisableAction>(credsIssuerConfig),               //
-        make_unique<BridgedActionsDisableActionWithDuration>(credsIssuerConfig),   //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                 //
+        make_unique<ActionsInstantAction>(credsIssuerConfig),               //
+        make_unique<ActionsInstantActionWithTransition>(credsIssuerConfig), //
+        make_unique<ActionsStartAction>(credsIssuerConfig),                 //
+        make_unique<ActionsStartActionWithDuration>(credsIssuerConfig),     //
+        make_unique<ActionsStopAction>(credsIssuerConfig),                  //
+        make_unique<ActionsPauseAction>(credsIssuerConfig),                 //
+        make_unique<ActionsPauseActionWithDuration>(credsIssuerConfig),     //
+        make_unique<ActionsResumeAction>(credsIssuerConfig),                //
+        make_unique<ActionsEnableAction>(credsIssuerConfig),                //
+        make_unique<ActionsEnableActionWithDuration>(credsIssuerConfig),    //
+        make_unique<ActionsDisableAction>(credsIssuerConfig),               //
+        make_unique<ActionsDisableActionWithDuration>(credsIssuerConfig),   //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
         make_unique<ReadAttribute>(Id, "action-list", Attributes::ActionList::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "endpoint-list", Attributes::EndpointList::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "setup-url", Attributes::SetupUrl::Id, credsIssuerConfig),                               //
+        make_unique<ReadAttribute>(Id, "endpoint-lists", Attributes::EndpointLists::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "setup-url", Attributes::SetupURL::Id, credsIssuerConfig),                               //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
@@ -8718,8 +8718,8 @@ void registerClusterBridgedActions(Commands & commands, CredentialIssuerCommands
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                   //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "action-list", Attributes::ActionList::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "endpoint-list", Attributes::EndpointList::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "setup-url", Attributes::SetupUrl::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "endpoint-lists", Attributes::EndpointLists::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "setup-url", Attributes::SetupURL::Id, credsIssuerConfig),                          //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -13164,7 +13164,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterDescriptor(commands, credsIssuerConfig);
     registerClusterBinding(commands, credsIssuerConfig);
     registerClusterAccessControl(commands, credsIssuerConfig);
-    registerClusterBridgedActions(commands, credsIssuerConfig);
+    registerClusterActions(commands, credsIssuerConfig);
     registerClusterBasic(commands, credsIssuerConfig);
     registerClusterOtaSoftwareUpdateProvider(commands, credsIssuerConfig);
     registerClusterOtaSoftwareUpdateRequestor(commands, credsIssuerConfig);

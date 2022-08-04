@@ -2818,7 +2818,7 @@ using chip::SessionHandle;
 
 @end
 
-@implementation MTRClusterBridgedActions
+@implementation MTRClusterActions
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
 {
@@ -2833,7 +2833,7 @@ using chip::SessionHandle;
     return self;
 }
 
-- (void)instantActionWithParams:(MTRBridgedActionsClusterInstantActionParams *)params
+- (void)instantActionWithParams:(MTRActionsClusterInstantActionParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
               completionHandler:(StatusCompletion)completionHandler
@@ -2849,7 +2849,7 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                BridgedActions::Commands::InstantAction::Type request;
+                Actions::Commands::InstantAction::Type request;
                 if (params != nil) {
                     if (params.timedInvokeTimeoutMs != nil) {
                         timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
@@ -2863,7 +2863,7 @@ using chip::SessionHandle;
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::BridgedActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -2872,7 +2872,7 @@ using chip::SessionHandle;
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
 
-- (void)instantActionWithTransitionWithParams:(MTRBridgedActionsClusterInstantActionWithTransitionParams *)params
+- (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completionHandler:(StatusCompletion)completionHandler
@@ -2888,7 +2888,7 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                BridgedActions::Commands::InstantActionWithTransition::Type request;
+                Actions::Commands::InstantActionWithTransition::Type request;
                 if (params != nil) {
                     if (params.timedInvokeTimeoutMs != nil) {
                         timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
@@ -2903,7 +2903,7 @@ using chip::SessionHandle;
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::BridgedActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -2912,7 +2912,7 @@ using chip::SessionHandle;
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
 
-- (void)startActionWithParams:(MTRBridgedActionsClusterStartActionParams *)params
+- (void)startActionWithParams:(MTRActionsClusterStartActionParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler
@@ -2928,7 +2928,7 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                BridgedActions::Commands::StartAction::Type request;
+                Actions::Commands::StartAction::Type request;
                 if (params != nil) {
                     if (params.timedInvokeTimeoutMs != nil) {
                         timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
@@ -2942,7 +2942,7 @@ using chip::SessionHandle;
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::BridgedActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -2951,7 +2951,7 @@ using chip::SessionHandle;
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
 
-- (void)startActionWithDurationWithParams:(MTRBridgedActionsClusterStartActionWithDurationParams *)params
+- (void)startActionWithDurationWithParams:(MTRActionsClusterStartActionWithDurationParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(StatusCompletion)completionHandler
@@ -2967,7 +2967,7 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                BridgedActions::Commands::StartActionWithDuration::Type request;
+                Actions::Commands::StartActionWithDuration::Type request;
                 if (params != nil) {
                     if (params.timedInvokeTimeoutMs != nil) {
                         timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
@@ -2982,7 +2982,7 @@ using chip::SessionHandle;
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::BridgedActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -2991,7 +2991,7 @@ using chip::SessionHandle;
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
 
-- (void)stopActionWithParams:(MTRBridgedActionsClusterStopActionParams *)params
+- (void)stopActionWithParams:(MTRActionsClusterStopActionParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
            completionHandler:(StatusCompletion)completionHandler
@@ -3007,7 +3007,7 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                BridgedActions::Commands::StopAction::Type request;
+                Actions::Commands::StopAction::Type request;
                 if (params != nil) {
                     if (params.timedInvokeTimeoutMs != nil) {
                         timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
@@ -3021,7 +3021,7 @@ using chip::SessionHandle;
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::BridgedActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -3030,7 +3030,7 @@ using chip::SessionHandle;
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
 
-- (void)pauseActionWithParams:(MTRBridgedActionsClusterPauseActionParams *)params
+- (void)pauseActionWithParams:(MTRActionsClusterPauseActionParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler
@@ -3046,7 +3046,7 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                BridgedActions::Commands::PauseAction::Type request;
+                Actions::Commands::PauseAction::Type request;
                 if (params != nil) {
                     if (params.timedInvokeTimeoutMs != nil) {
                         timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
@@ -3060,7 +3060,7 @@ using chip::SessionHandle;
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::BridgedActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -3069,7 +3069,7 @@ using chip::SessionHandle;
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
 
-- (void)pauseActionWithDurationWithParams:(MTRBridgedActionsClusterPauseActionWithDurationParams *)params
+- (void)pauseActionWithDurationWithParams:(MTRActionsClusterPauseActionWithDurationParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(StatusCompletion)completionHandler
@@ -3085,7 +3085,7 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                BridgedActions::Commands::PauseActionWithDuration::Type request;
+                Actions::Commands::PauseActionWithDuration::Type request;
                 if (params != nil) {
                     if (params.timedInvokeTimeoutMs != nil) {
                         timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
@@ -3100,7 +3100,7 @@ using chip::SessionHandle;
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::BridgedActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -3109,7 +3109,7 @@ using chip::SessionHandle;
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
 
-- (void)resumeActionWithParams:(MTRBridgedActionsClusterResumeActionParams *)params
+- (void)resumeActionWithParams:(MTRActionsClusterResumeActionParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
              completionHandler:(StatusCompletion)completionHandler
@@ -3125,7 +3125,7 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                BridgedActions::Commands::ResumeAction::Type request;
+                Actions::Commands::ResumeAction::Type request;
                 if (params != nil) {
                     if (params.timedInvokeTimeoutMs != nil) {
                         timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
@@ -3139,7 +3139,7 @@ using chip::SessionHandle;
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::BridgedActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -3148,7 +3148,7 @@ using chip::SessionHandle;
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
 
-- (void)enableActionWithParams:(MTRBridgedActionsClusterEnableActionParams *)params
+- (void)enableActionWithParams:(MTRActionsClusterEnableActionParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
              completionHandler:(StatusCompletion)completionHandler
@@ -3164,7 +3164,7 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                BridgedActions::Commands::EnableAction::Type request;
+                Actions::Commands::EnableAction::Type request;
                 if (params != nil) {
                     if (params.timedInvokeTimeoutMs != nil) {
                         timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
@@ -3178,7 +3178,7 @@ using chip::SessionHandle;
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::BridgedActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -3187,7 +3187,7 @@ using chip::SessionHandle;
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
 
-- (void)enableActionWithDurationWithParams:(MTRBridgedActionsClusterEnableActionWithDurationParams *)params
+- (void)enableActionWithDurationWithParams:(MTRActionsClusterEnableActionWithDurationParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                          completionHandler:(StatusCompletion)completionHandler
@@ -3203,7 +3203,7 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                BridgedActions::Commands::EnableActionWithDuration::Type request;
+                Actions::Commands::EnableActionWithDuration::Type request;
                 if (params != nil) {
                     if (params.timedInvokeTimeoutMs != nil) {
                         timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
@@ -3218,7 +3218,7 @@ using chip::SessionHandle;
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::BridgedActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -3227,7 +3227,7 @@ using chip::SessionHandle;
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
 
-- (void)disableActionWithParams:(MTRBridgedActionsClusterDisableActionParams *)params
+- (void)disableActionWithParams:(MTRActionsClusterDisableActionParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
               completionHandler:(StatusCompletion)completionHandler
@@ -3243,7 +3243,7 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                BridgedActions::Commands::DisableAction::Type request;
+                Actions::Commands::DisableAction::Type request;
                 if (params != nil) {
                     if (params.timedInvokeTimeoutMs != nil) {
                         timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
@@ -3257,7 +3257,7 @@ using chip::SessionHandle;
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::BridgedActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -3266,7 +3266,7 @@ using chip::SessionHandle;
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
 
-- (void)disableActionWithDurationWithParams:(MTRBridgedActionsClusterDisableActionWithDurationParams *)params
+- (void)disableActionWithDurationWithParams:(MTRActionsClusterDisableActionWithDurationParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completionHandler:(StatusCompletion)completionHandler
@@ -3282,7 +3282,7 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                BridgedActions::Commands::DisableActionWithDuration::Type request;
+                Actions::Commands::DisableActionWithDuration::Type request;
                 if (params != nil) {
                     if (params.timedInvokeTimeoutMs != nil) {
                         timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
@@ -3297,7 +3297,7 @@ using chip::SessionHandle;
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::BridgedActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -3309,64 +3309,64 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeActionListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointId:@(_endpoint)
-                                          clusterId:@(MTRClusterBridgedActionsID)
-                                        attributeId:@(MTRClusterBridgedActionsAttributeActionListID)
+                                          clusterId:@(MTRClusterActionsID)
+                                        attributeId:@(MTRClusterActionsAttributeActionListID)
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeEndpointListWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeEndpointListsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointId:@(_endpoint)
-                                          clusterId:@(MTRClusterBridgedActionsID)
-                                        attributeId:@(MTRClusterBridgedActionsAttributeEndpointListID)
+                                          clusterId:@(MTRClusterActionsID)
+                                        attributeId:@(MTRClusterActionsAttributeEndpointListsID)
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeSetupUrlWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeSetupURLWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointId:@(_endpoint)
-                                          clusterId:@(MTRClusterBridgedActionsID)
-                                        attributeId:@(MTRClusterBridgedActionsAttributeSetupUrlID)
+                                          clusterId:@(MTRClusterActionsID)
+                                        attributeId:@(MTRClusterActionsAttributeSetupURLID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointId:@(_endpoint)
-                                          clusterId:@(MTRClusterBridgedActionsID)
-                                        attributeId:@(MTRClusterBridgedActionsAttributeGeneratedCommandListID)
+                                          clusterId:@(MTRClusterActionsID)
+                                        attributeId:@(MTRClusterActionsAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointId:@(_endpoint)
-                                          clusterId:@(MTRClusterBridgedActionsID)
-                                        attributeId:@(MTRClusterBridgedActionsAttributeAcceptedCommandListID)
+                                          clusterId:@(MTRClusterActionsID)
+                                        attributeId:@(MTRClusterActionsAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointId:@(_endpoint)
-                                          clusterId:@(MTRClusterBridgedActionsID)
-                                        attributeId:@(MTRClusterBridgedActionsAttributeAttributeListID)
+                                          clusterId:@(MTRClusterActionsID)
+                                        attributeId:@(MTRClusterActionsAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointId:@(_endpoint)
-                                          clusterId:@(MTRClusterBridgedActionsID)
-                                        attributeId:@(MTRClusterBridgedActionsAttributeFeatureMapID)
+                                          clusterId:@(MTRClusterActionsID)
+                                        attributeId:@(MTRClusterActionsAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointId:@(_endpoint)
-                                          clusterId:@(MTRClusterBridgedActionsID)
-                                        attributeId:@(MTRClusterBridgedActionsAttributeClusterRevisionID)
+                                          clusterId:@(MTRClusterActionsID)
+                                        attributeId:@(MTRClusterActionsAttributeClusterRevisionID)
                                              params:params];
 }
 

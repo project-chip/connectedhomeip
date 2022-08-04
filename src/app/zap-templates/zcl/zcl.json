@@ -15,7 +15,7 @@
         "basic-information-cluster.xml",
         "binding-cluster.xml",
         "boolean-state-cluster.xml",
-        "bridged-actions-cluster.xml",
+        "actions-cluster.xml",
         "bridged-device-basic.xml",
         "chip-ota.xml",
         "chip-types.xml",

@@ -512,7 +512,7 @@ client cluster AccessControl = 31 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-client cluster BridgedActions = 37 {
+client cluster Actions = 37 {
   enum ActionErrorEnum : ENUM8 {
     kUnknown = 0;
     kInterrupted = 1;
@@ -561,8 +561,8 @@ client cluster BridgedActions = 37 {
     char_string<32> name = 1;
     ActionTypeEnum type = 2;
     int16u endpointListID = 3;
-    int16u supportedCommands = 4;
-    ActionStateEnum status = 5;
+    CommandBits supportedCommands = 4;
+    ActionStateEnum state = 5;
   }
 
   struct EndpointListStruct {
@@ -586,8 +586,8 @@ client cluster BridgedActions = 37 {
   }
 
   readonly attribute ActionStruct actionList[] = 0;
-  readonly attribute EndpointListStruct endpointList[] = 1;
-  readonly attribute long_char_string<512> setupUrl = 2;
+  readonly attribute EndpointListStruct endpointLists[] = 1;
+  readonly attribute long_char_string<512> setupURL = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -4399,7 +4399,7 @@ endpoint 1 {
   binding cluster Descriptor;
   binding cluster Binding;
   binding cluster AccessControl;
-  binding cluster BridgedActions;
+  binding cluster Actions;
   binding cluster Basic;
   binding cluster OtaSoftwareUpdateProvider;
   binding cluster OtaSoftwareUpdateRequestor;

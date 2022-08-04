@@ -16,7 +16,7 @@ name: 77.1.1. [TC-ACT-1.1] Global attributes with server as DUT
 
 config:
     nodeId: 0x12344321
-    cluster: "Bridged Actions"
+    cluster: "Actions"
     endpoint: 1
 
 tests:

@@ -194,7 +194,7 @@
       .generatedCommandList = nullptr ,\
     },\
   { \
-      /* Endpoint: 1, Cluster: Bridged Actions (client) */ \
+      /* Endpoint: 1, Cluster: Actions (client) */ \
       .clusterId = 0x00000025,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
