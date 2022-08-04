@@ -452,6 +452,25 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
     return true;
 }
 
+static uint32_t calculateWaitTimeMS(const chip::System::Clock::Timestamp &enterTime, uint64_t desiredWaitTimeMS)
+{
+    const chip::System::Clock::Timestamp currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
+
+    uint64_t    enterTimeMS = enterTime.count();
+    uint64_t    currentTimeMS = currentTime.count();
+    uint64_t    waitTimeMS = desiredWaitTimeMS;
+    
+    if (currentTimeMS > enterTimeMS)
+    {
+        if ((enterTimeMS + waitTimeMS) > currentTimeMS)
+            waitTimeMS -= (currentTimeMS-enterTimeMS);
+        else 
+            waitTimeMS = 1;
+    }
+
+    return waitTimeMS;
+}
+
 bool OnOffServer::OnWithTimedOffCommand(const app::ConcreteCommandPath & commandPath,
                                         const Commands::OnWithTimedOff::DecodableType & commandData)
 {
@@ -463,6 +482,8 @@ bool OnOffServer::OnWithTimedOffCommand(const app::ConcreteCommandPath & command
     bool isOn                           = false;
     uint16_t currentOffWaitTime         = MAX_TIME_VALUE;
     uint16_t currentOnTime              = 0;
+
+    const chip::System::Clock::Timestamp enterTime = chip::System::SystemClock().GetMonotonicTimestamp();
 
     EmberEventControl * event = configureEventControl(endpoint);
     VerifyOrExit(event != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
@@ -503,7 +524,7 @@ bool OnOffServer::OnWithTimedOffCommand(const app::ConcreteCommandPath & command
 
     if (currentOnTime < MAX_TIME_VALUE && currentOffWaitTime < MAX_TIME_VALUE)
     {
-        emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
+        emberEventControlSetDelayMS(configureEventControl(endpoint), calculateWaitTimeMS(enterTime, UPDATE_TIME_MS));
     }
 
 exit:
@@ -518,6 +539,8 @@ exit:
  */
 void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
 {
+    const chip::System::Clock::Timestamp enterTime = chip::System::SystemClock().GetMonotonicTimestamp();
+
     emberAfOnOffClusterPrintln("Timer callback - Entering callbackc");
 
     bool isOn = false;
@@ -526,7 +549,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
     if (isOn) // OnOff On case
     {
         // Restart Timer
-        emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
+        emberEventControlSetDelayMS(configureEventControl(endpoint), calculateWaitTimeMS(enterTime, UPDATE_TIME_MS));
 
         // Update onTime values
         uint16_t onTime = MIN_TIME_VALUE;
@@ -565,7 +588,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         if (offWaitTime > 0)
         {
             // Restart Timer
-            emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
+            emberEventControlSetDelayMS(configureEventControl(endpoint), calculateWaitTimeMS(enterTime, UPDATE_TIME_MS));
         }
         else
         {
