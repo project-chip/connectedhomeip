@@ -45,8 +45,9 @@ def get_identity():
 
 
 def codesign(args):
-    command = "codesign --force -d --sign {identity} {target}".format(
+    command = "codesign --force -d --sign {identity} --entitlements {entitlement} {target}".format(
         identity=get_identity(),
+        entitlement=args.entitlements_path,
         target=args.target_path)
     command_result = run_command(command)
 
@@ -57,7 +58,9 @@ def codesign(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Codesign the binary')
+        description='Codesign the all-clusters-minimal-app binary')
+    parser.add_argument('--entitlements_path', default='entitlements/all-clusters-minimial-app.entitlements',
+                        help='Set the entitlements for codesign', required=True)
     parser.add_argument(
         '--log_path', help='Output log file destination', required=True)
     parser.add_argument('--target_path', help='Binary to sign', required=True)

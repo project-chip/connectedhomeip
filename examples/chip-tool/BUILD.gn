@@ -128,6 +128,23 @@ executable("chip-tool") {
   output_dir = root_out_dir
 }
 
+if (chip_device_platform == "darwin") {
+  action("codesign") {
+    script = "entitlements/codesign.py"
+    deps = [ ":chip-tool" ]
+
+    args = [
+      "--target_path",
+      rebase_path("${root_build_dir}/chip-all-clusters-app", root_build_dir),
+      "--log_path",
+      rebase_path("${root_build_dir}/codesign_log.txt", root_build_dir),
+    ]
+
+    output_name = "codesign_log.txt"
+    outputs = [ "${root_build_dir}/${output_name}" ]
+  }
+}
+
 group("default") {
   deps = [ ":chip-tool" ]
 }
