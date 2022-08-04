@@ -13,7 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 11.3.4. [TC-OPCREDS-3.4] UpdateNOC-Error Condition [DUT-Server]
+name: 12.3.4. [TC-OPCREDS-3.4] UpdateNOC-Error Condition [DUT-Server]
+
+PICS:
+    - OPCREDS.S
 
 config:
     nodeId: 0x12344321
@@ -21,301 +24,309 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Modify the contents of NOC_Tests Subject and save the certificate"
+    - label: "TH1 fully commissions the DUT"
       verification: |
-          Not Verifiable
-      disabled: true
+          "DUT side:
+          sudo ./chip-all-clusters-app --wifi
 
-    - label: "TH1 Sends CSRRequest command"
-      PICS: OPCREDS.S.C04.Rsp
-      verification: |
-          Verify TH log
+          TH side:
+          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
 
-          [1655290769.343207][5196:5201] CHIP:DMG: >> to BLE | 255378492 | [Interaction Model  (1) / InvokeCommandRequest (0x08) / Session = 25008 / Exchange = 11376]
-          [1655290769.343256][5196:5201] CHIP:DMG: Header Flags =
-          [1655290769.343281][5196:5201] CHIP:DMG: {
-          [1655290769.343318][5196:5201] CHIP:DMG:     Exchange (0x01) =
-          [1655290769.343343][5196:5201] CHIP:DMG:     {
-          [1655290769.343363][5196:5201] CHIP:DMG:         Initiator = true
-          [1655290769.343385][5196:5201] CHIP:DMG:     }
-          [1655290769.343414][5196:5201] CHIP:DMG: }
-          [1655290769.343437][5196:5201] CHIP:DMG:
-          [1655290769.343468][5196:5201] CHIP:DMG: Encrypted Payload (94 bytes) =
-          [1655290769.343491][5196:5201] CHIP:DMG: {
-          [1655290769.343512][5196:5201] CHIP:DMG:     data = 00b061003cc4380f4d9768bc173f4f4f9c6e5969606c83c80018abf7dd286e55fbf860a4e56ed75272350da28dac7364f1bb92a26b42a939719bce6bb880ed47f83a7fde421c7190aa4fb2449e114da8d68aa8dc5f9779aeb49b64b469f3
-          [1655290769.343535][5196:5201] CHIP:DMG:     buffer_ptr = 281472426668912
-          [1655290769.343555][5196:5201] CHIP:DMG: }
-          [1655290769.343574][5196:5201] CHIP:DMG:
-          [1655290769.343652][5196:5201] CHIP:DMG: InvokeRequestMessage =
-          [1655290769.343679][5196:5201] CHIP:DMG: {
-          [1655290769.343702][5196:5201] CHIP:DMG:         suppressResponse = false,
-          [1655290769.343728][5196:5201] CHIP:DMG:         timedRequest = false,
-          [1655290769.343753][5196:5201] CHIP:DMG:         InvokeRequests =
-          [1655290769.343783][5196:5201] CHIP:DMG:         [
-          [1655290769.343807][5196:5201] CHIP:DMG:                 CommandDataIB =
-          [1655290769.343834][5196:5201] CHIP:DMG:                 {
-          [1655290769.343860][5196:5201] CHIP:DMG:                         CommandPathIB =
-          [1655290769.343891][5196:5201] CHIP:DMG:                         {
-          [1655290769.343924][5196:5201] CHIP:DMG:                                 EndpointId = 0x0,
-          [1655290769.343961][5196:5201] CHIP:DMG:                                 ClusterId = 0x3e,
-          [1655290769.343996][5196:5201] CHIP:DMG:                                 CommandId = 0x4,
-          [1655290769.344026][5196:5201] CHIP:DMG:                         },
-          [1655290769.344058][5196:5201] CHIP:DMG:
-          [1655290769.344084][5196:5201] CHIP:DMG:                         CommandFields =
-          [1655290769.344114][5196:5201] CHIP:DMG:                         {
-          [1655290769.344172][5196:5201] CHIP:DMG:                                 0x0 = [
-          [1655290769.344216][5196:5201] CHIP:DMG:                                         0x69, 0xd6, 0xfa, 0x31, 0x2e, 0x58, 0x48, 0x66, 0x0, 0x76, 0xf6, 0x73, 0xc3, 0x5a, 0xc5, 0x76, 0x2, 0x63, 0xa8, 0x50, 0x9e, 0x95, 0xeb, 0xc3, 0xb1, 0x8e, 0xc2, 0x94, 0x86, 0x8, 0x86, 0xb2,
-          [1655290769.344253][5196:5201] CHIP:DMG:                         ]
-          [1655290769.344283][5196:5201] CHIP:DMG:                         },
-          [1655290769.344311][5196:5201] CHIP:DMG:                 },
-          [1655290769.344341][5196:5201] CHIP:DMG:
-          [1655290769.344364][5196:5201] CHIP:DMG:         ],
-          [1655290769.344393][5196:5201] CHIP:DMG:
-          [1655290769.344417][5196:5201] CHIP:DMG:         InteractionModelRevision = 1
-          [1655290769.344440][5196:5201] CHIP:DMG: },
-          [1655290769.344462][5196:5201] CHIP:DMG:
-          [1655290769.344613][5196:5201] CHIP:DMG: ICR moving to [CommandSen]
-          [1655290769.344655][5196:5201] CHIP:CTL: Sent CSR request, waiting for the CSR
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success"
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 900"
+          "TH1 reads the NOCs attribute from the Node Operational Credentials
+          cluster using a fabric-filtered read"
       verification: |
+          ./chip-tool operationalcredentials read nocs 1 0 --fabric-filtered 1
+
           Verify in TH Log
 
-
-          [1655290768.024789][5196:5201] CHIP:CTL: Arming failsafe (60 seconds)
-          [1655290768.024854][5196:5201] CHIP:DMG: ICR moving to [AddingComm]
-          [1655290768.024889][5196:5201] CHIP:DMG: ICR moving to [AddedComma]
-          [1655290768.025167][5196:5201] CHIP:IN: Prepared secure message 0xffff7d789f68 to 0xFFFFFFFB00000000 (0)  of type 0x8 and protocolId (0, 1) on exchange 11371i with MessageCounter:255378487.
-          [1655290768.025218][5196:5201] CHIP:IN: Sending encrypted msg 0xffff7d789f68 with MessageCounter:255378487 to 0xFFFFFFFB00000000 (0) at monotonic time: 000000000166E1CE msec
-          [1655290768.025440][5196:5201] CHIP:DMG: >> to BLE | 255378487 | [Interaction Model  (1) / InvokeCommandRequest (0x08) / Session = 25008 / Exchange = 11371]
-          [1655290768.025482][5196:5201] CHIP:DMG: Header Flags =
-          [1655290768.025508][5196:5201] CHIP:DMG: {
-          [1655290768.025548][5196:5201] CHIP:DMG:     Exchange (0x01) =
-          [1655290768.025573][5196:5201] CHIP:DMG:     {
-          [1655290768.025596][5196:5201] CHIP:DMG:         Initiator = true
-          [1655290768.025620][5196:5201] CHIP:DMG:     }
-          [1655290768.025651][5196:5201] CHIP:DMG: }
-          [1655290768.025676][5196:5201] CHIP:DMG:
-          [1655290768.025707][5196:5201] CHIP:DMG: Encrypted Payload (65 bytes) =
-          [1655290768.025733][5196:5201] CHIP:DMG: {
-          [1655290768.025757][5196:5201] CHIP:DMG:     data = 00b0610037c4380f32a71cf8c0d3c24ad9968f546fa1a79e41adf472a5a1cc15b53b3bd2f08eb249dcab1430fc217708442ac61d1d5c6d70b7631f6efc18c94cc7
-          [1655290768.025783][5196:5201] CHIP:DMG:     buffer_ptr = 281472426648640
-          [1655290768.025806][5196:5201] CHIP:DMG: }
-          [1655290768.025830][5196:5201] CHIP:DMG:
-          [1655290768.025903][5196:5201] CHIP:DMG: InvokeRequestMessage =
-          [1655290768.025933][5196:5201] CHIP:DMG: {
-          [1655290768.025959][5196:5201] CHIP:DMG:         suppressResponse = false,
-          [1655290768.025988][5196:5201] CHIP:DMG:         timedRequest = false,
-          [1655290768.026016][5196:5201] CHIP:DMG:         InvokeRequests =
-          [1655290768.026051][5196:5201] CHIP:DMG:         [
-          [1655290768.026079][5196:5201] CHIP:DMG:                 CommandDataIB =
-          [1655290768.026113][5196:5201] CHIP:DMG:                 {
-          [1655290768.026144][5196:5201] CHIP:DMG:                         CommandPathIB =
-          [1655290768.026180][5196:5201] CHIP:DMG:                         {
-          [1655290768.026216][5196:5201] CHIP:DMG:                                 EndpointId = 0x0,
-          [1655290768.026257][5196:5201] CHIP:DMG:                                 ClusterId = 0x30,
-          [1655290768.026296][5196:5201] CHIP:DMG:                                 CommandId = 0x0,
-          [1655290768.026330][5196:5201] CHIP:DMG:                         },
-          [1655290768.026367][5196:5201] CHIP:DMG:
-          [1655290768.026420][5196:5201] CHIP:DMG:                         CommandFields =
-          [1655290768.026483][5196:5201] CHIP:DMG:                         {
-          [1655290768.026520][5196:5201] CHIP:DMG:                                 0x0 = 60,
-          [1655290768.026558][5196:5201] CHIP:DMG:                                 0x1 = 3,
-          [1655290768.026597][5196:5201] CHIP:DMG:                         },
-          [1655290768.026629][5196:5201] CHIP:DMG:                 },
-          [1655290768.026664][5196:5201] CHIP:DMG:
-          [1655290768.026692][5196:5201] CHIP:DMG:         ],
-          [1655290768.026725][5196:5201] CHIP:DMG:
-          [1655290768.026752][5196:5201] CHIP:DMG:         InteractionModelRevision = 1
-          [1655290768.026779][5196:5201] CHIP:DMG: },
-          [1655290768.026804][5196:5201] CHIP:DMG:
-          [1655290768.026973][5196:5201] CHIP:DMG: ICR moving to [CommandSen]
-          [1655290768.108147][5196:5201] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
-          [1655290768.110051][5196:5199] CHIP:DL: Indication received, conn = 0xffff74039fb0
-          [1655290768.110203][5196:5201] CHIP:DL: HandlePlatformSpecificBLEEvent 16389
-          [1655290768.110746][5196:5201] CHIP:DMG: << from BLE | 192898618 | [Interaction Model  (1) / InvokeCommandResponse (0x09) / Session = 61656 / Exchange = 11371]
-          [1655290768.110799][5196:5201] CHIP:DMG: Header Flags =
-          [1655290768.110822][5196:5201] CHIP:DMG: {
-          [1655290768.110861][5196:5201] CHIP:DMG: }
-          [1655290768.110883][5196:5201] CHIP:DMG:
-          [1655290768.110912][5196:5201] CHIP:DMG: Encrypted Payload (66 bytes) =
-          [1655290768.110935][5196:5201] CHIP:DMG: {
-          [1655290768.110955][5196:5201] CHIP:DMG:     data = 00d8f0003a667f0bb192daf065d175922cac76d987f198e1bcb595497966921cfba210b015e785daeb1231017f0a27715234363b772f1f7816595e2fc99e9f85a274
-          [1655290768.110978][5196:5201] CHIP:DMG:     buffer_ptr = 281472426657904
-          [1655290768.110999][5196:5201] CHIP:DMG: }
-          [1655290768.111019][5196:5201] CHIP:DMG:
-          [1655290768.111084][5196:5201] CHIP:DMG:
-          [1655290768.111121][5196:5201] CHIP:DMG: Additional Fields =
-          [1655290768.111143][5196:5201] CHIP:DMG: {
-          [1655290768.111168][5196:5201] CHIP:DMG:     peer_address = BLE
-          [1655290768.111189][5196:5201] CHIP:DMG: }
-          [1655290768.111209][5196:5201] CHIP:DMG:
-          [1655290768.111239][5196:5201] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:192898618 on exchange 11371i
-          [1655290768.111267][5196:5201] CHIP:EM: Found matching exchange: 11371i, Delegate: 0xffff68003360
-          [1655290768.111311][5196:5201] CHIP:DMG: ICR moving to [ResponseRe]
-          [1655290768.111353][5196:5201] CHIP:DMG: InvokeResponseMessage =
-          [1655290768.111378][5196:5201] CHIP:DMG: {
-          [1655290768.111403][5196:5201] CHIP:DMG:         suppressResponse = false,
-          [1655290768.111427][5196:5201] CHIP:DMG:         InvokeResponseIBs =
-          [1655290768.111458][5196:5201] CHIP:DMG:         [
-          [1655290768.111483][5196:5201] CHIP:DMG:                 InvokeResponseIB =
-          [1655290768.111515][5196:5201] CHIP:DMG:                 {
-          [1655290768.111540][5196:5201] CHIP:DMG:                         CommandDataIB =
-          [1655290768.111573][5196:5201] CHIP:DMG:                         {
-          [1655290768.111603][5196:5201] CHIP:DMG:                                 CommandPathIB =
-          [1655290768.111640][5196:5201] CHIP:DMG:                                 {
-          [1655290768.111678][5196:5201] CHIP:DMG:                                         EndpointId = 0x0,
-          [1655290768.111717][5196:5201] CHIP:DMG:                                         ClusterId = 0x30,
-          [1655290768.111755][5196:5201] CHIP:DMG:                                         CommandId = 0x1,
-          [1655290768.111790][5196:5201] CHIP:DMG:                                 },
-          [1655290768.111825][5196:5201] CHIP:DMG:
-          [1655290768.111855][5196:5201] CHIP:DMG:                                 CommandFields =
-          [1655290768.111891][5196:5201] CHIP:DMG:                                 {
-          [1655290768.111929][5196:5201] CHIP:DMG:                                         0x0 = 0,
-          [1655290768.111966][5196:5201] CHIP:DMG:                                         0x1 = "",
-          [1655290768.112000][5196:5201] CHIP:DMG:                                 },
-          [1655290768.112034][5196:5201] CHIP:DMG:                         },
-          [1655290768.112068][5196:5201] CHIP:DMG:
-          [1655290768.112095][5196:5201] CHIP:DMG:                 },
-          [1655290768.112125][5196:5201] CHIP:DMG:
-          [1655290768.112149][5196:5201] CHIP:DMG:         ],
-          [1655290768.112179][5196:5201] CHIP:DMG:
-          [1655290768.112203][5196:5201] CHIP:DMG:         InteractionModelRevision = 1
-          [1655290768.112226][5196:5201] CHIP:DMG: },
-          [1655290768.112287][5196:5201] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
-          [1655290768.112354][5196:5201] CHIP:CTL: Received ArmFailSafe response errorCode=0
-          [1655290768.112386][5196:5201] CHIP:CTL: Successfully finished commissioning step 'ArmFailSafe'
-          [1655290768.112408][5196:5201] CHIP:CTL: Commissioning stage next step: 'ArmFailSafe' -> 'ConfigRegulatory'
+          [1658736497.592132][3787:3792] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 999376603
+          [1658736497.595396][3787:3792] CHIP:TOO:   NOCs: 1 entries
+          [1658736497.595477][3787:3792] CHIP:TOO:     [1]: {
+          [1658736497.595519][3787:3792] CHIP:TOO:       Noc: 1530010101240201370324130118260480228127260580254D3A3706241501241101182407012408013009410410C15281FE7A04637C46E47E30948152C5F9481B6D62D08C9D476A3D44D26E20C704DCAE97FCA4612B17A2A9B16A2D78BF9220F63E9CD19C6589CFC4CE09FF90370A350128011824020136030402040118300414C8FF1A09BE17C6824D61DA88A603A7B180804009300514574F6879804602B57796FB2D6F7212969A171E7118300B40A969CA49361A3F69E3220B19583F05F6D6B2D156AFE1992FDAD8A67A22049A0A7F62E7F303BA0B8AFDC2826A77AC94A3D042F4C611FDE66B41E34B812CEB3CFB18
+          [1658736497.595588][3787:3792] CHIP:TOO:       Icac: 1530010100240201370324140018260480228127260580254D3A37062413011824070124080130094104650A6D674CF5E46402644A71D2BD59888911C9B997F5797369BAA8545057A2379DDA08AF05269B0C009AF76F940EA120DCBAF0E7720921A44C22DC07BF1BD44C370A3501290118240260300414574F6879804602B57796FB2D6F7212969A171E713005142D48B9286C5E218E5AD7EFFC31E492E297FCA12818300B40604E48C301208B4CA077AD7EEAB2DAFA2A728556A86D610234AD8200E7AE0D85836279320D5F3EFF97D573D53FC9D88B44103602FC3CA8574C844A8379BCC52C18
+          [1658736497.595621][3787:3792] CHIP:TOO:       FabricIndex: 1
+          [1658736497.595662][3787:3792] CHIP:TOO:      }
       disabled: true
 
     - label:
-          "Modify the public key to a value different from Key 1 in the NOC_Test
-          and save the certificate TH sends UpdateNOC Command with NOC_Test to
-          DUT"
+          "TH1 reads the TrustedRootCertificates attribute from the Node
+          Operational Credentials cluster"
       verification: |
-          Not Verifiable
-      disabled: true
+          ./chip-tool operationalcredentials read trusted-root-certificates    1 0
 
-    - label: "TH1 Sends CSRRequest command"
-      PICS: OPCREDS.S.C04.Rsp
-      verification: |
-          Not Verifiable
+          Verify the value returned has a single entry
+
+          [1658736567.913921][3938:3943] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 999376603
+          [1658736567.914057][3938:3943] CHIP:TOO:   TrustedRootCertificates: 1 entries
+          [1658736567.914145][3938:3943] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A3706241400182407012408013009410470D319542F3A50625EF977E66A1277F3E50FCFF4516A5162E25016CB4E170A4D62562797E12184EB9A88A0160697122C9E473B7AA7F776E239CCB4420A82D4FE370A35012901182402603004142D48B9286C5E218E5AD7EFFC31E492E297FCA1283005142D48B9286C5E218E5AD7EFFC31E492E297FCA12818300B40C7EB3A1BA993A52EBC1D2E16C763CD9C9E4BDD82B166084FA72B5DF73437E9EB257271E09C69A8DEB6A2C09D42F833A788FD0E4092F0DA7229992B31587EE9DF18
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
+          "TH1 sends the UpdateNOC command to the Node Operational Credentials
+          cluster with the following fields: NOCValue is set to noc_original
+          ICACValue is to set icac_original"
+      PICS: OPCREDS.S.C07.Rsp
+      verification: |
+          Verify that the DUT responds with FAILSAFE_REQUIRED
+
+          ./chip-tool operationalcredentials update-noc hex:1530010101240201370324130118260480228127260580254D3A3706241501241101182407012408013009410410C15281FE7A04637C46E47E30948152C5F9481B6D62D08C9D476A3D44D26E20C704DCAE97FCA4612B17A2A9B16A2D78BF9220F63E9CD19C6589CFC4CE09FF90370A350128011824020136030402040118300414C8FF1A09BE17C6824D61DA88A603A7B180804009300514574F6879804602B57796FB2D6F7212969A171E7118300B40A969CA49361A3F69E3220B19583F05F6D6B2D156AFE1992FDAD8A67A22049A0A7F62E7F303BA0B8AFDC2826A77AC94A3D042F4C611FDE66B41E34B812CEB3CFB18 1 0
+
+          [1658736631.224352][4080:4085] CHIP:DMG: ICR moving to [ResponseRe]
+          [1658736631.224399][4080:4085] CHIP:DMG: InvokeResponseMessage =
+          [1658736631.224425][4080:4085] CHIP:DMG: {
+          [1658736631.224450][4080:4085] CHIP:DMG:         suppressResponse = false,
+          [1658736631.224476][4080:4085] CHIP:DMG:         InvokeResponseIBs =
+          [1658736631.224506][4080:4085] CHIP:DMG:         [
+          [1658736631.224531][4080:4085] CHIP:DMG:                 InvokeResponseIB =
+          [1658736631.224563][4080:4085] CHIP:DMG:                 {
+          [1658736631.224589][4080:4085] CHIP:DMG:                         CommandStatusIB =
+          [1658736631.224618][4080:4085] CHIP:DMG:                         {
+          [1658736631.224665][4080:4085] CHIP:DMG:                                 CommandPathIB =
+          [1658736631.224706][4080:4085] CHIP:DMG:                                 {
+          [1658736631.224739][4080:4085] CHIP:DMG:                                         EndpointId = 0x0,
+          [1658736631.224776][4080:4085] CHIP:DMG:                                         ClusterId = 0x3e,
+          [1658736631.224807][4080:4085] CHIP:DMG:                                         CommandId = 0x7,
+          [1658736631.224843][4080:4085] CHIP:DMG:                                 },
+          [1658736631.224876][4080:4085] CHIP:DMG:
+          [1658736631.224906][4080:4085] CHIP:DMG:                                 StatusIB =
+          [1658736631.224940][4080:4085] CHIP:DMG:                                 {
+          [1658736631.224977][4080:4085] CHIP:DMG:                                         status = 0xca (FAILSAFE_REQUIRED),
+          [1658736631.225012][4080:4085] CHIP:DMG:                                 },
+          [1658736631.225046][4080:4085] CHIP:DMG:
+          [1658736631.225075][4080:4085] CHIP:DMG:                         },
+          [1658736631.225109][4080:4085] CHIP:DMG:
+          [1658736631.225134][4080:4085] CHIP:DMG:                 },
+          [1658736631.225165][4080:4085] CHIP:DMG:
+          [1658736631.225189][4080:4085] CHIP:DMG:         ],
+          [1658736631.225218][4080:4085] CHIP:DMG:
+          [1658736631.225243][4080:4085] CHIP:DMG:         InteractionModelRevision = 1
+          [1658736631.225271][4080:4085] CHIP:DMG: },
+          [1658736631.225332][4080:4085] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_0007 Status=0xca
+          [1658736631.225367][4080:4085] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
+      disabled: true
+
+    - label:
+          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
           field set to 900"
       verification: |
-          Not Verifiable
+          ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
+
+          Verify the ArmFailSafeResponse with the ErrorCode set to OK is returned
+
+
+          [1658736675.488274][4129:4134] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1658736675.488329][4129:4134] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1658736675.488401][4129:4134] CHIP:TOO:   ArmFailSafeResponse: {
+          [1658736675.488441][4129:4134] CHIP:TOO:     errorCode: 0
+          [1658736675.488471][4129:4134] CHIP:TOO:     debugText:
+          [1658736675.488496][4129:4134] CHIP:TOO:    }
       disabled: true
 
     - label:
-          "Modify the Node Operational ID in the NOC_Test and save the
-          certificate TH sends UpdateNOC Command with NOC_Test to DUT"
+          "TH1 sends the UpdateNOC command to the Node Operational Credentials
+          cluster with the following fields: NOCValue is set to noc_original
+          ICACValue is to set icac_original"
+      PICS: OPCREDS.S.C07.Rsp
       verification: |
-          Not Verifiable
+          Verify that the DUT responds with a NOCResponse with the StatusCode field set to MissingCsr that is status code 4
+
+          ./chip-tool operationalcredentials update-noc hex:1530010101240201370324130118260480228127260580254D3A3706241501241101182407012408013009410410C15281FE7A04637C46E47E30948152C5F9481B6D62D08C9D476A3D44D26E20C704DCAE97FCA4612B17A2A9B16A2D78BF9220F63E9CD19C6589CFC4CE09FF90370A350128011824020136030402040118300414C8FF1A09BE17C6824D61DA88A603A7B180804009300514574F6879804602B57796FB2D6F7212969A171E7118300B40A969CA49361A3F69E3220B19583F05F6D6B2D156AFE1992FDAD8A67A22049A0A7F62E7F303BA0B8AFDC2826A77AC94A3D042F4C611FDE66B41E34B812CEB3CFB18 1 0
+
+          [1658736892.440441][4160:4170] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1658736892.440714][4160:4170] CHIP:TOO:   NOCResponse: {
+          [1658736892.440945][4160:4170] CHIP:TOO:     statusCode: 4
+          [1658736892.441000][4160:4170] CHIP:TOO:    }
+          [1658736892.441078][4160:4170] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label: "TH1 Sends CSRRequest command"
+    - label:
+          "TH1 Sends CSRRequest command with the IsForUpdateNOC field set to
+          false"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
-          Not Verifiable
+          Verify that the DUT returns a CSRResponse and save as csr_not_update
+
+          To get csr nonce give below command 2 times
+           echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom)
+
+          ./chip-tool operationalcredentials csrrequest hex:C11D6EAA00A54066220DA7F3FC5DC0F684C13D8B8FD3758B51163C2AEDD6F10F 1 0 --IsForUpdateNOC 0
+
+          [1658743641.233113][9670:9675] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0005
+          [1658743641.233162][9670:9675] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0005
+          [1658743641.233226][9670:9675] CHIP:TOO:   CSRResponse: {
+          [1658743641.233269][9670:9675] CHIP:TOO:     NOCSRElements: 153001CA3081C73070020100300E310C300A060355040A0C034353523059301306072A8648CE3D020106082A8648CE3D03010703420004D3C12FD39A573184AC822E12F9D76C43EA3872B8D541BF0DCF68FF33AF7E62E71ADB4D4F35AA9E206D00CC290CCA1BAD557537A05BA8D3BAD1B7F3EE323B2CE9A000300A06082A8648CE3D04030203470030440220232B91662198D24E57F5967A06C0A554991CAA02D958D507AAAABB41450AD39002204575858E909DCE43563F33725928FF2AA01A176CECF611F9B248CD9D2CBC76CA300220C11D6EAA00A54066220DA7F3FC5DC0F684C13D8B8FD3758B51163C2AEDD6F10F18
+          [1658743641.233306][9670:9675] CHIP:TOO:     attestationSignature: 2D4052E30061B78A79B5C2D392C93BEFADE17BA5F3547776A545D4913EC935CF446C9105E9F203BF898BF17F87106E63AD8E93E894C5398CAC344F7D6ECE27F6
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 900"
+          "TH1 generates a new NOC chain with ICAC with the following
+          properties: new NOC is generated from the NOCSR returned in
+          csr_not_for_update and is signed by ICA. Save as noc_not_for_update
+          ICAC must be signed by the original key for trusted_root_original.
+          Save as icac_not_for_update"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
-          "Extract a NOC that is not in the TrustedRootCertificates of DUT and
-          save the certificate as NOC_Test TH sends UpdateNOC Command with
-          NOC_Test to DUT"
+          "TH1 sends the UpdateNOC command to the Node Operational Credentials
+          cluster with the following fields: NOCValue is set to
+          noc_not_for_update ICACValue is to set icac_not_for_update"
+      PICS: OPCREDS.S.C07.Rsp
       verification: |
-
+          verification step to be updated.
       disabled: true
 
-    - label: "TH1 Sends CSRRequest command"
+    - label:
+          "TH1 Sends CSRRequest command with the IsForUpdateNOC field set to
+          true"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 900"
+          "TH1 sends the UpdateNOC command to the Node Operational Credentials
+          cluster with the following fields: NOCValue is set to noc_original
+          ICACValue is to set icac_original"
+      PICS: OPCREDS.S.C07.Rsp
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
-          "Start the Commissioning process of TH on DUT TH sends ADDNOC Command
-          with invalid CaseAdminSubject field to DUT"
+          "TH1 generates a new Trusted Root Certificate and Private Key and
+          saves as new_root_cert and new_root_key so that TH can generate an NOC
+          for UpdateNOC that doesnt chain to the original root"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
-    - label: "TH1 Sends CSRRequest command"
+    - label:
+          "TH1 generates a new NOC and ICAC with the following properties: new
+          NOC is generated from the NOCSR returned in csr_update and is signed
+          by new ICA. Save as noc_update_new_root new ICAC is generated and
+          signed by new_root_key. Save as icac_update_new_root"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "TH1 sends the UpdateNOC command to the Node Operational Credentials
+          cluster with the following fields: NOCValue is set to
+          noc_update_new_root ICACValue is to set icac_update_new_root"
+      PICS: OPCREDS.S.C07.Rsp
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "TH1 generates a new NOC and ICAC with the following properties: new
+          NOC is generated from the NOCSR returned in csr_update with the
+          matter-fabric-id set to a different value than noc_original. The NOC
+          is signed by new ICA. Save as noc_update_bad_fabric_on_noc new ICAC is
+          generated with the and matter-fabric-id omitted. ICAC is signed by the
+          original key for trusted_root_original. Save as
+          icac_update_bad_fabric_on_noc"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "TH1 sends the UpdateNOC command to the Node Operational Credentials
+          cluster with the following fields: NOCValue is set to
+          noc_update_bad_fabric_on_noc ICACValue is to set
+          icac_update_bad_fabric_on_noc"
+      PICS: OPCREDS.S.C07.Rsp
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "TH1 generates a new NOC and ICAC with the following properties: new
+          NOC is generated from the NOCSR returned in csr_update with the
+          matter-fabric-id set to the same value as noc_original. The NOC is
+          signed by new ICA. Save as noc_update_bad_fabric_on_icac new ICAC is
+          generated with the and matter-fabric-id included as set to a different
+          value than noc_original. ICAC is signed by the original key for
+          trusted_root_original. Save as icac_update_bad_fabric_on_icac"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "TH1 sends the UpdateNOC command to the Node Operational Credentials
+          cluster with the following fields: NOCValue is set to
+          noc_update_bad_fabric_on_icac ICACValue is to set
+          icac_update_bad_fabric_on_icac"
+      PICS: OPCREDS.S.C07.Rsp
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "TH1 sends AddTrustedRootCertificate command to DUT again with the
+          RootCACertificate field set to new_root_cert"
+      PICS: OPCREDS.S.C0b.Rsp
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "TH1 sends the UpdateNOC command to the Node Operational Credentials
+          cluster with the following fields: NOCValue is set to
+          noc_update_new_root ICACValue is to set icac_update_new_root"
+      PICS: OPCREDS.S.C07.Rsp
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
+          field set to 0"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label: "TH1 sends an OpenCommissioningWindow command to the DUT"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "TH1 connects to the DUT over PASE and sends ArmFailSafe command to
+          the DUT with the ExpiryLengthSeconds field set to 900. Steps 24-26 are
+          all performed over the PASE connection."
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "TH1 Sends CSRRequest command over PASE with the IsForUpdateNOC field
+          set to true"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 900"
+          "TH1 generates a new NOC chain with ICAC with the following
+          properties: new NOC is generated from the NOCSR returned in csr_pase
+          and is signed by ICA. Save as noc_pase ICAC must be signed by the
+          original key for trusted_root_original. Save as icac_pase"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
-          "Start the Commissioning process of TH on DUT TH sends ADDNOC Command
-          with invalid IpkValue to DUT"
+          "TH1 sends the UpdateNOC command to the Node Operational Credentials
+          cluster over PASE with the following fields: NOCValue is set to
+          noc_pase ICACValue is to set icac_pase"
+      PICS: OPCREDS.S.C07.Rsp
       verification: |
-
-      disabled: true
-
-    - label: "TH1 Sends CSRRequest command"
-      PICS: OPCREDS.S.C04.Rsp
-      verification: |
-
-      disabled: true
-
-    - label:
-          "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 900"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "Start the Commissioning process of TH on DUT TH sends ADDNOC Command
-          with valid fields to DUT"
-      verification: |
-
-      disabled: true
-
-    - label: "TH1 Sends CSRRequest command"
-      PICS: OPCREDS.S.C04.Rsp
-      verification: |
-
-      disabled: true
-
-    - label:
-          "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
-          field set to 900"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "TH sends ADDNOC Command with valid fields same as previous step to
-          DUT"
-      verification: |
-
+          verification step to be updated.
       disabled: true

@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.1.1. [TC-BINFO-1.1] Global Attributes for Basic Information Cluster
+    12.1.1. [TC-BINFO-1.1] Global Attributes for Basic Information Cluster
     [DUT-Server]
+
+PICS:
+    - BINFO.S
 
 config:
     nodeId: 0x12344321
@@ -25,7 +28,7 @@ config:
 tests:
     - label: "Commission DUT to TH"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "TH reads the ClusterRevision from DUT"
@@ -37,7 +40,7 @@ tests:
           [1651214669.313472][2666:2671] CHIP:TOO:   ClusterRevision: 1
       disabled: true
 
-    - label: "TH reads the FeatureMap from DUT"
+    - label: "TH reads the FeatureMap from DUTF"
       verification: |
           ./chip-tool basic read feature-map 1 0
 

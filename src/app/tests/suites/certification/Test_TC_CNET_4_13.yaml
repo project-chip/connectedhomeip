@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.11. [TC-CNET-4.13] [Wi-Fi] Verification for ReorderNetwork command
+    12.4.11. [TC-CNET-4.13] [Wi-Fi] Verification for ReorderNetwork command
     [DUT-Server]
+
+PICS:
+    - CNET.S.F00
 
 config:
     nodeId: 0x12344321
@@ -24,8 +27,8 @@ config:
 
 tests:
     - label:
-          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
-          to 900"
+          "TH sends  ArmFailSafe  command to the  DUT
+          with  ExpiryLengthSeco  nds set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
 
@@ -34,8 +37,8 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Networks attribute from the DUT and saves the number of
-          entries as 'NumNetworks'"
+          "TH reads  Networks  attribute from the  DUT and saves the  number of
+          entries  as NumNetworks"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool network-commissioning read networks 1 0
@@ -45,9 +48,9 @@ tests:
       disabled: true
 
     - label:
-          "TH calculates the number of remaining network slots as
-          'MaxNetworksVal ue' - 'NumNetworks' and saves as 'RemainingNetwor
-          kSlots'"
+          "TH calculates the  number of  remaining  network slots
+          as  MaxNetworksVal  ue -  NumNetworks  and saves
+          as  RemainingNetwor  kSlots"
       verification: |
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
@@ -55,8 +58,8 @@ tests:
 
     - label:
           "TH1 sends AddOrUpdateWiFiNetwork command to the DUT with SSID
-          argument value as 'Userwifi_ssid2', Credentials argument value as
-          'Userwifi_Credentials' and Breadcrumb argument value as 1"
+          argument value as Userwifi_ssid2, Credentials argument value as
+          Userwifi_Credentials and Breadcrumb argument value as 1"
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivate092010 1 0 --Breadcrumb 1
 
@@ -65,8 +68,8 @@ tests:
       disabled: true
 
     - label:
-          "TH calculates the midpoint of the network list as floor(('MaxNetwor
-          ksValue' + 1)/2) and saves as 'Midpoint'"
+          "TH calculates the  midpoint of the  network list
+          as  floor((MaxNetwor  ksValue + 1)/2)  and saves as  Midpoint"
       verification: |
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
@@ -84,10 +87,11 @@ tests:
       disabled: true
 
     - label:
-          "TH sends AddOrUpdateWiFi Network command to the DUT. This step should
-          be repeated 'RemainingNetwor kSlots' times using DIFFERENT SSID and
-          credential values and the Breadcrumb field set to 1. Note that these
-          credentials are NOT required to be connectable."
+          "TH sends  AddOrUpdateWiFi  Network  command to the  DUT. This
+          step  should be  repeated  RemainingNetwor  kSlots times
+          using  DIFFERENT SSID  and credential  values and the  Breadcrumb
+          field  set to 1. Note that  these credentials  are NOT required  to be
+          connectable."
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:63686970736574757035 matter123 1 0 --Breadcrumb 1
@@ -97,8 +101,8 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Networks attribute from the DUT and saves the list as
-          'OriginalNetworkL ist'"
+          "TH reads  Networks  attribute from the  DUT and saves the  list
+          as  OriginalNetworkL  ist"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool network-commissioning read networks 1 0
@@ -110,7 +114,7 @@ tests:
     - label:
           "TH sends ReorderNetwo rk Command to the DUT with the following
           fields: 1. NetworkID is PIXIT.CNET .WIFI_1ST_ ACCESSPOI NT_SSID 2.
-          NetworkIn dex is 'MaxNetwo rksValue' 3. Breadcrum b is 2"
+          NetworkIn dex is MaxNetwo rksValue 3. Breadcrum b is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool network-commissioning read networks 1 0
@@ -129,9 +133,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ReorderNetwo rk Command to the DUT with the following
-          fields: 1. NetworkID is a NetworkID value NOT present in 'OriginalNe
-          tworkList' 2. NetworkIn dex is 'Midpoint' 3. Breadcrum b is 2"
+          "TH sends  ReorderNetwo  rk Command  to the DUT  with
+          the  following  fields:  1. NetworkID  is a  NetworkID  value
+          NOT  present in  OriginalNe  tworkList  2.  NetworkIn  dex
+          is  Midpoint  3.  Breadcrum  b is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
@@ -150,7 +155,7 @@ tests:
     - label:
           "TH sends ReorderNetwo rk Command to the DUT with the following
           fields: 1. NetworkID is PIXIT.CNET .WIFI_1ST_ ACCESSPOI NT_SSID 2.
-          NetworkIn dex is 'Midpoint' 3. Breadcrum b is 2"
+          NetworkIn dex is Midpoint 3. Breadcrum b is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool  networkcommissioning reorder-network  hex:47524C50726976617465 1 0 --Breadcrumb 1
@@ -160,7 +165,8 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+          "TH reads  Breadcumb  attribute from
+          the  General  Commissioning  Cluster"
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
@@ -168,7 +174,7 @@ tests:
           ( Pre-Condition)
       disabled: true
 
-    - label: "TH reads Networks attribute list from the DUT"
+    - label: "TH reads  Networks  attribute list from  the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool network-commissioning read networks 1 0
@@ -178,8 +184,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
-          to 0"
+          "TH sends  ArmFailSafe  command to the  DUT
+          with  ExpiryLengthSeco  nds set to 0"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
 
@@ -187,7 +193,7 @@ tests:
           ( Pre-Condition)
       disabled: true
 
-    - label: "TH reads Networks attribute list from the DUT"
+    - label: "TH reads  Networks  attribute list from  the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool network-commissioning read networks 1 0
@@ -208,10 +214,11 @@ tests:
       disabled: true
 
     - label:
-          "TH sends AddOrUpdateWiFi Network command to the DUT. This step should
-          be repeated 'RemainingNetwor kSlots' times using DIFFERENT SSID and
-          credential values and Breadcrumb field set to 1. Note that these
-          credentials are NOT required to be connectable."
+          "TH sends  AddOrUpdateWiFi  Network  command to the  DUT. This
+          step  should be  repeated  RemainingNetwor  kSlots times
+          using  DIFFERENT SSID  and credential  values and  Breadcrumb
+          field  set to 1. Note that  these credentials  are NOT required  to be
+          connectable."
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
@@ -219,9 +226,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ReorderNetwo rk Command to the DUT with the following
-          fields: 1. NetworkID is PIXIT.CNET .WIFI_1ST_ ACCESSPOI NT_SSID 2.
-          NetworkIn dex is 'Midpoint' 3. Breadcrum b is 2"
+          "TH sends  ReorderNetwo  rk Command  to the DUT  with
+          the  following  fields:  1.
+          NetworkID  is  PIXIT.CNET  .WIFI_1ST_  ACCESSPOI  NT_SSID  2.  NetworkIn  dex
+          is  Midpoint  3.  Breadcrum  b is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
@@ -237,8 +245,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
-          to 0"
+          "TH sends  ArmFailSafe  command to the  DUT
+          with  ExpiryLengthSeco  nds set to 0"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
 
@@ -246,7 +254,7 @@ tests:
           ( Pre-Condition)
       disabled: true
 
-    - label: "TH reads Networks attribute list from the DUT"
+    - label: "TH reads  Networks  attribute list from  the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool network-commissioning read networks 1 0

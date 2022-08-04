@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.10. [TC-CNET-4.12] [Thread] Verification for ConnectNetwork Command
+    12.4.10. [TC-CNET-4.12] [Thread] Verification for ConnectNetwork Command
     [DUT-Server]
+
+PICS:
+    - CNET.S.F01
 
 config:
     nodeId: 0x12344321
@@ -29,7 +32,8 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 1 22 0
 
-          Verify on the TH Log:
+          Verify ArmFailSafeResponse on the TH Log:
+
           [1657808518.577084][5979:5984] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657808518.577181][5979:5984] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1657808518.577311][5979:5984] CHIP:TOO:   ArmFailSafeResponse: {
@@ -41,29 +45,30 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Networks attribute from the DUT and saves the number of
-          entries as 'NumNetworks'"
+          "TH reads  Networks  attribute from the  DUT and saves the  number of
+          entries  as NumNetworks"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 22 0
 
-          Verify on the TH Log:
+          Verify Networks entiries and its status on the TH Log:
 
-          [1657808547.048515][5988:5993] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1213114000
-          [1657887601.758284][3446:3451] CHIP:TOO:   Networks: 1 entries
-          [1657887601.758396][3446:3451] CHIP:TOO:     [1]: {
-          [1657887601.758466][3446:3451] CHIP:TOO:       NetworkID: 1111111152222222
-          [1657887601.758524][3446:3451] CHIP:TOO:       Connected: TRUE
-          [1657887601.758578][3446:3451] CHIP:TOO:      }
+          [1658294685.945276][7397:7402] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 4291713161
+          [1658294685.948705][7397:7402] CHIP:TOO:   Networks: 1 entries
+          [1658294685.949116][7397:7402] CHIP:TOO:     [1]: {
+          [1658294685.949204][7397:7402] CHIP:TOO:       NetworkID: 1111071122222222
+          [1658294685.949265][7397:7402] CHIP:TOO:       Connected: TRUE
+          [1658294685.949321][7397:7402] CHIP:TOO:      }
+          [1658294685.949533][7397:7402] CHIP:EM: Sending Standalone Ack for MessageCounter:233126607 on exchange 26309i
 
           [1657808547.049138][5988:5993] CHIP:EM: Sending Standalone Ack for MessageCounter:115176450 on exchange 56560i
       disabled: true
 
     - label:
-          "TH saves the index of the Networks list entry from step 2 as
-          Userth_netidx"
+          "TH saves the index  of the Networks  list entry from  step 2
+          as  Userth_netidx"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
@@ -71,9 +76,13 @@ tests:
           th_xpan and Breadcrumb field set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
-          ./chip-tool networkcommissioning  remove-network hex:1111111152222222 22 0
+          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
 
-          Verify on the TH Log:
+          Below is an example:
+
+          ./chip-tool networkcommissioning  remove-network hex:1111071122222222 22 0
+
+          Verify NetworkConfigResponse and its arguments on the TH Log:
 
           [1657808740.364069][5996:6001] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1657808740.364170][5996:6001] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
@@ -91,9 +100,13 @@ tests:
           ONALDATASET and Breadcrumb field set to 1"
       PICS: CNET.S.C03.Rsp && CNET.S.C05.Tx
       verification: |
-          ./chip-tool networkcommissioning add-or-update-thread-network hex:0e080000000000010000000300000f35060004001fffe0020811111111282222220708fd5930b7d8b62f58051000112233445562778899aabbccddeeff030e4f70656e54687265746444656d6f010212340410005ed405199188e1a5c0dd607282d7480c0402a0fff8 22 0 (second network dataset value)
+          ./chip-tool networkcommissioning add-or-update-thread-network-network hex:<your network id in hex> 1 0
 
-          Verify on the TH Log:
+          Below is an example:
+
+          ./chip-tool networkcommissioning add-or-update-thread-network hex:0e080000000000010000000300000f35060004001fffe0020811111111072222220708fd9957a92dadc7aa051000112233445966778899aabbccddeeff030f4f70656e54687265616444656d6f6a0102123404106ad73489ca556d19f8c47fd2150e58e30c0402a0fff8 48 0(second network dataset value)
+
+          Verify NetworkConfigResponse and its arguments on the TH Log:
 
           [1657809088.095574][6022:6027] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
           [1657809088.095728][6022:6027] CHIP:TOO:   NetworkConfigResponse: {
@@ -104,31 +117,35 @@ tests:
           [1657809088.096131][6022:6027] CHIP:EM: Sending Standalone Ack for MessageCounter:17614664 on exchange 10016i
       disabled: true
 
-    - label: "TH reads Networks attribute from the DUT"
+    - label: "TH reads  Networks  attribute from the  DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 22 0
 
-          Verify on the TH Log:
+          Verify Networks entiries and its status on the TH Log:
 
           [1657809209.998296][6029:6034] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1213114000
           [1657887708.272234][3468:3473] CHIP:TOO:   Networks: 1 entries
           [1657887708.272346][3468:3473] CHIP:TOO:     [1]: {
-          [1657887708.272415][3468:3473] CHIP:TOO:       NetworkID: 1161111128222222
+          [1657887708.272415][3468:3473] CHIP:TOO:       NetworkID: 1111111107222222
           [1657887708.272472][3468:3473] CHIP:TOO:       Connected: FALSE
           [1657887708.272527][3468:3473] CHIP:TOO:      }
           [1657809209.999036][6029:6034] CHIP:EM: Sending Standalone Ack for MessageCounter:117964728 on exchange 14021i
       disabled: true
 
     - label:
-          "TH sends ConnectNetwork command to the DUT with NetworkID field set
-          to PIXIT.CNET.THRE AD_2ND_OPERATI ONALDATASET and Breadcrumb field set
-          to 2"
+          "TH sends  ConnectNetwork  command to the  DUT with  NetworkID
+          field  set to  PIXIT.CNET.THRE  AD_2ND_OPERATI  ONALDATASET  and
+          Breadcrumb  field set to 2"
       PICS: CNET.S.C06.Rsp
       verification: |
-          ./chip-tool networkcommissioning connect-network hex:1161111128222222 1 0 --Breadcrumb 2
+          ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
 
-          Verify on the TH Log:
+          Below is an example:
+
+          ./chip-tool networkcommissioning connect-network hex:1111111107222222 1 0 --Breadcrumb 2
+
+          Verify ConnectNetworkResponse and its arguments on the TH Log:
 
           [1657887765.287786][3477:3482] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1657887765.287890][3477:3482] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
@@ -141,47 +158,48 @@ tests:
       disabled: true
 
     - label:
-          "TH discovers and connects to DUT on the PIXIT.CNET.THRE
-          AD_2ND_OPERATI ONALDATASET operational network"
+          "TH discovers and  connects to DUT  on
+          the  PIXIT.CNET.THRE  AD_2ND_OPERATI  ONALDATASET  operational  network"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
-          "TH reads Breadcrumb attribute from the General Commissioning cluster
-          of the DUT"
+          "TH reads  Breadcrumb  attribute from
+          the  General  Commissioning  cluster of the DUT"
       PICS: CNET.S.C06.Rsp
       verification: |
-
+          ./chip-tool generalcommissioning read breadcrumb 1 0
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
-          to 0. This forcibly disarms the fail-safe and is expected to cause the
-          changes of configuration to NetworkCommissi oning cluster done so far
-          to be reverted."
+          "TH sends  ArmFailSafe  command to the  DUT
+          with  ExpiryLengthSeco  nds set to 0. This  forcibly disarms  the
+          fail-safe and is  expected to cause  the changes of  configuration
+          to  NetworkCommissi  oning cluster done  so far to be  reverted."
       verification: |
-
+          ./chip-tool generalcommissioning arm-fail-safe 0 1 22 0
       disabled: true
 
     - label:
-          "TH changes its WiFi connection to PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT
-          _SSID"
+          "TH changes its  WiFi connection
+          to  PIXIT.CNET.WIFI_  1ST_ACCESSPOINT  _SSID"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
-          "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_
-          1ST_ACCESSPOINT _SSID operational network"
+          "TH discovers and  connects to DUT  on
+          the  PIXIT.CNET.WIFI_  1ST_ACCESSPOINT  _SSID operational  network"
       verification: |
-
+          verification step to be updated.
       disabled: true
-    - label:
-          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
-          to 900"
-      verification: |
 
+    - label:
+          "TH sends  ArmFailSafe  command to the  DUT
+          with  ExpiryLengthSeco  nds set to 900"
+      verification: |
+          verification step to be updated.
       disabled: true
 
     - label:
@@ -189,50 +207,51 @@ tests:
           PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and Breadcrumb field set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
-          "TH sends AddOrUpdateWiFi Network command to the DUT with SSID field
-          set to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_SSID, Credentials field set
-          to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_CREDENTIALS and Breadcrumb field
-          set to 1"
+          "TH sends  AddOrUpdateWiFi  Network  command to the  DUT with
+          SSID  field set
+          to  PIXIT.CNET.WIFI_  2ND_ACCESSPOIN  T_SSID,  Credentials field  set
+          to  PIXIT.CNET.WIFI_  2ND_ACCESSPOIN  T_CREDENTIALS  and
+          Breadcrumb  field set to 1"
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
-          "TH sends ConnectNetwork command to the DUT with NetworkID field set
-          to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_SSID and Breadcrumb field set to
-          3"
+          "TH sends  ConnectNetwork  command to the  DUT with  NetworkID
+          field  set to  PIXIT.CNET.WIFI_  2ND_ACCESSPOIN  T_SSID
+          and  Breadcrumb field  set to 3"
       PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
-          "TH discovers and connects to DUT on the PIXIT.CNET.THRE
-          AD_2ND_OPERATI ONALDATASET operational network"
+          "TH discovers and  connects to DUT  on
+          the  PIXIT.CNET.THRE  AD_2ND_OPERATI  ONALDATASET  operational  network"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
-          "TH reads Breadcrumb attribute from the General Commissioning cluster
-          of the DUT"
+          "TH reads  Breadcrumb  attribute from
+          the  General  Commissioning  cluster of the DUT"
       PICS: CNET.S.C06.Rsp
       verification: |
-
+          verification step to be updated.
       disabled: true
 
-    - label: "TH sends the CommissioningCo mplete command to the DUT"
+    - label: "TH sends the  CommissioningCo  mplete command  to the DUT"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
-    - label: "TH reads Networks attribute from the DUT"
+    - label: "TH reads  Networks  attribute from the  DUT"
       PICS: CNET.S.A0001
       verification: |
-
+          verification step to be updated.
       disabled: true
