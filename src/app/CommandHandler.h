@@ -95,11 +95,13 @@ public:
      * 3) Ensure that the ConcreteCommandPath involved will be known when
      *    sending the response.
      * 4) When ready to send the response:
+     *    * Ensure that no other Matter tasks are running in parallel (e.g. by
+     *      running on the Matter event loop or holding the Matter stack lock).
      *    * Call Get() to get the CommandHandler.
      *    * Check that Get() did not return null.
      *    * Add the response to the CommandHandler via one of the Add* methods.
      *    * Let the Handle get destroyed, or manually call Handle::Release() if
-     *      distruction of the Handle is not desirable for some reason.
+     *      destruction of the Handle is not desirable for some reason.
      *
      * The Invoke Response will not be sent until all outstanding Handles have
      * been destroyed or have had Release called.
