@@ -37,8 +37,8 @@ tests:
 
           [1658530640755] [21882:316283] CHIP: [DMG] InvokeRequestMessage =
           [1658530640755] [21882:316283] CHIP: [DMG] {
-          [1658530640755] [21882:316283] CHIP: [DMG]         suppressResponse = false, 
-          [1658530640755] [21882:316283] CHIP: [DMG]         timedRequest = false, 
+          [1658530640755] [21882:316283] CHIP: [DMG]         suppressResponse = false,
+          [1658530640755] [21882:316283] CHIP: [DMG]         timedRequest = false,
           [1658530640755] [21882:316283] CHIP: [DMG]         InvokeRequests =
           [1658530640755] [21882:316283] CHIP: [DMG]         [
           [1658530640755] [21882:316283] CHIP: [DMG]                 CommandDataIB =
@@ -49,14 +49,14 @@ tests:
           [1658530640755] [21882:316283] CHIP: [DMG]                                 ClusterId = 0x507,
           [1658530640755] [21882:316283] CHIP: [DMG]                                 CommandId = 0x1,
           [1658530640755] [21882:316283] CHIP: [DMG]                         },
-          [1658530640755] [21882:316283] CHIP: [DMG]                         
-          [1658530640755] [21882:316283] CHIP: [DMG]                         CommandFields = 
+          [1658530640755] [21882:316283] CHIP: [DMG]
+          [1658530640755] [21882:316283] CHIP: [DMG]                         CommandFields =
           [1658530640755] [21882:316283] CHIP: [DMG]                         {
           [1658530640755] [21882:316283] CHIP: [DMG]                         },
           [1658530640755] [21882:316283] CHIP: [DMG]                 },
-          [1658530640755] [21882:316283] CHIP: [DMG]                 
+          [1658530640755] [21882:316283] CHIP: [DMG]
           [1658530640755] [21882:316283] CHIP: [DMG]         ],
-          [1658530640755] [21882:316283] CHIP: [DMG]         
+          [1658530640755] [21882:316283] CHIP: [DMG]
           [1658530640755] [21882:316283] CHIP: [DMG]         InteractionModelRevision = 1
           [1658530640755] [21882:316283] CHIP: [DMG] },
       disabled: true

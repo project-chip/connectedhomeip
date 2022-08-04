@@ -295,7 +295,7 @@ tests:
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read door-open-events 1 1  
+          ./chip-tool doorlock read door-open-events 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -315,9 +315,9 @@ tests:
     - label: "TH writes DoorOpenEvents attribute as 0"
       PICS: DRLK.S.A0004
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write-by-id 4 10 1 1 
+          ./chip-tool doorlock write-by-id 4 10 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -341,7 +341,7 @@ tests:
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read door-open-events 1 1  
+          ./chip-tool doorlock read door-open-events 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -363,7 +363,7 @@ tests:
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
-           ./chip-tool doorlock read door-closed-events 1 1 
+           ./chip-tool doorlock read door-closed-events 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -406,9 +406,9 @@ tests:
 
     - label: "TH reads DoorClosedEvents attribute from DUT"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read door-closed-events 1 1 
+          ./chip-tool doorlock read door-closed-events 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -430,7 +430,7 @@ tests:
     - label: "TH reads OpenPeriod attribute from DUT"
       PICS: DRLK.S.F05 && DRLK.S.A0006
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read open-period 1 1
 
@@ -456,9 +456,9 @@ tests:
     - label: "TH writes OpenPeriod attribute as 2 minutes"
       PICS: DRLK.S.A0006
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write-by-id 6 2 1 1 
+          ./chip-tool doorlock write-by-id 6 2 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -478,7 +478,7 @@ tests:
 
     - label: "TH reads OpenPeriod attribute from DUT"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read open-period 1 1
 
@@ -995,7 +995,7 @@ tests:
           Current_LEDSettings value"
       PICS: DRLK.S.A0022
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read ledsettings 1  1
 
@@ -1015,9 +1015,9 @@ tests:
 
     - label: "TH writes LEDSettings attribute as 2"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write ledsettings 1 1 1 
+          ./chip-tool doorlock write ledsettings 1 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -1035,9 +1035,9 @@ tests:
 
     - label: "TH reads LEDSettings attribute from DUT"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read ledsettings 1 1 
+          ./chip-tool doorlock read ledsettings 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -1248,9 +1248,9 @@ tests:
     - label: "TH reads Default ConfigurationRegister attribute from DUT"
       PICS: DRLK.S.A0027
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read default-configuration-register 1 1 
+          ./chip-tool doorlock read default-configuration-register 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -1273,9 +1273,9 @@ tests:
           "TH writes Default ConfigurationRegister attribute as bit 0 is set to
           1"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write-by-id 39 1 1 1  
+          ./chip-tool doorlock write-by-id 39 1 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -1291,9 +1291,9 @@ tests:
 
     - label: "TH reads Default ConfigurationRegister attribute from DUT"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read default-configuration-register 1 1 
+          ./chip-tool doorlock read default-configuration-register 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -1317,9 +1317,9 @@ tests:
           values as Current_EnableLocal Programming value"
       PICS: DRLK.S.A0028
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read enable-local-programming 1 1  
+          ./chip-tool doorlock read enable-local-programming 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -1336,9 +1336,9 @@ tests:
 
     - label: "TH writes EnableLocalProgramming attribute as false"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write enable-local-programming 0 1 1   
+          ./chip-tool doorlock write enable-local-programming 0 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -1355,9 +1355,9 @@ tests:
 
     - label: "TH reads EnableLocalProgramming attribute from DUT"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read enable-local-programming 1 1  
+          ./chip-tool doorlock read enable-local-programming 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -1417,9 +1417,9 @@ tests:
     - label: "TH reads EnableInside StatusLED attribute from DUT"
       PICS: DRLK.S.A002a
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read enable-inside-status-led 1 1 
+          ./chip-tool doorlock read enable-inside-status-led 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -1439,9 +1439,9 @@ tests:
     - label: "TH writes EnableInsideStatusLED attribute as true"
       PICS: DRLK.S.A002a
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write-by-id 42 1 1 1  
+          ./chip-tool doorlock write-by-id 42 1 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -1457,9 +1457,9 @@ tests:
 
     - label: "TH reads EnableInsideStatusLED attribute from DUT"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read enable-inside-status-led 1 1 
+          ./chip-tool doorlock read enable-inside-status-led 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -1525,7 +1525,7 @@ tests:
           values as Current_LocalProgramming Features value"
       PICS: DRLK.S.A002c
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read local-programming-features 1 1
 
@@ -1551,7 +1551,7 @@ tests:
     - label: "TH reads LocalProgrammingFeatures attribute from DUT"
       PICS: DRLK.S.A002c && DRLK.S.A0028
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read local-programming-features 1 1
 
@@ -1579,7 +1579,7 @@ tests:
           (Change all bits to 0)"
       PICS: DRLK.S.A002c && DRLK.S.A0028 && DRLK.S.A002c
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock write-by-id 44 0 1 1
 
@@ -1603,10 +1603,10 @@ tests:
     - label: "TH sets the EnableLocalProgramming attribute to False"
       PICS: DRLK.S.A002c && DRLK.S.A0028 && DRLK.S.A002c
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write enable-local-programming 0 1 1 
-            
+          ./chip-tool doorlock write enable-local-programming 0 1 1
+
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
           [1658988052.124227][2834:2839] CHIP:DMG:                        StatusIB =
@@ -1623,7 +1623,7 @@ tests:
           [1658988052.124577][2834:2839] CHIP:DMG: WriteClient moving to [AwaitingDe]
           [1658988052.124608][2834:2839] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read local-programming-features 1 1
 
@@ -1649,7 +1649,7 @@ tests:
     - label: "TH sets the EnableLocalProgramming attribute to True"
       PICS: DRLK.S.A002c && DRLK.S.A0028 && DRLK.S.A002c
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock write enable-local-programming 1 1 1
 
@@ -1670,7 +1670,7 @@ tests:
           [1658988136.126183][2845:2850] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
 
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read local-programming-features 1 1
 
@@ -1698,7 +1698,7 @@ tests:
           LocalProgrammingFeatures."
       PICS: DRLK.S.A002c && DRLK.S.A002c
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock write-by-id 44 2 1 1
 
@@ -1724,7 +1724,7 @@ tests:
           LocalProgrammingFeatures."
       PICS: DRLK.S.A002c && DRLK.S.A002c
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock write-by-id 44 3 1 1
 
@@ -1896,9 +1896,9 @@ tests:
           as Current_ExpiringUserTimeOut"
       PICS: DRLK.S.F08 && DRLK.S.A0035
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read expiring-user-timeout 1 1  
+          ./chip-tool doorlock read expiring-user-timeout 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 
@@ -1916,7 +1916,7 @@ tests:
 
     - label: "TH writes ExpiringUserTimeout attribute as 10 minutes"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock write-by-id 53 10 1 1
 
@@ -1934,9 +1934,9 @@ tests:
 
     - label: "TH reads ExpiringUserTimeout attribute"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-           ./chip-tool doorlock read expiring-user-timeout 1 1 
+           ./chip-tool doorlock read expiring-user-timeout 1 1
 
           On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
 

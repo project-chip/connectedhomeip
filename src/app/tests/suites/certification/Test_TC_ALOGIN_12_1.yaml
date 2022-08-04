@@ -48,7 +48,7 @@ tests:
           by the product maker."
       PICS: ALOGIN.S.C00.Rsp
       verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):  
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool accountlogin get-setup-pin 1111 1 4 --timedInteractionTimeoutMs 1000
           ./chip-tv-casting-app accountlogin get-setup-pin 1111 1 4 --timedInteractionTimeoutMs 1000
 
@@ -65,7 +65,7 @@ tests:
           product maker."
       PICS: ALOGIN.S.C02.Rsp
       verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):  
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool accountlogin login 11111 34567890 1 4 --timedInteractionTimeoutMs 1000
           ./chip-tv-casting-app accountlogin login 11111 34567890 1 4 --timedInteractionTimeoutMs 1000
 
@@ -78,7 +78,7 @@ tests:
           product maker."
       PICS: ALOGIN.S.C03.Rsp
       verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):  
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool accountlogin logout  1 4 --timedInteractionTimeoutMs 1000
           ./chip-tv-casting-app accountlogin logout  1 4 --timedInteractionTimeoutMs 1000
 
