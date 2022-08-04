@@ -67,6 +67,31 @@ tests:
               type: bitmap32
 
     - label: "TH reads AttributeList from DUT"
+      PICS: CNET.S.F00 || CNET.S.F01
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0xFFFD,
+                      0xFFFC,
+                      0xFFFB,
+                      0xFFF9,
+                      0xFFF8,
+                      0x00,
+                      0x01,
+                      0x02,
+                      0x03,
+                      0x04,
+                      0x05,
+                      0x06,
+                      0x07,
+                  ]
+
+    - label: "TH reads AttributeList from DUT"
+      PICS: " !CNET.S.F00 && !CNET.S.F01 "
       command: "readAttribute"
       attribute: "AttributeList"
       response:
