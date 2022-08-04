@@ -137,5 +137,5 @@
 
 #include "check_crypto_config.h"
 #include "config-device-acceleration.h"
-#include "mbedtls/config_psa.h"
 #include "mbedtls/check_config.h"
+#include "mbedtls/config_psa.h"

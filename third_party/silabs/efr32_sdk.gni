@@ -323,9 +323,7 @@ template("efr32_sdk") {
       "${chip_root}/src/platform/EFR32/efr32-mbedtls-psa-crypto-config.h",
     ]
 
-    public_deps = [
-      "${chip_root}/src/crypto:crypto_buildconfig"
-    ]
+    public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
   }
 
   source_set(sdk_target_name) {
@@ -657,10 +655,10 @@ template("efr32_sdk") {
     }
 
     public_deps = [
+      ":efr32_mbedtls_config",
       "${segger_rtt_root}:segger_rtt",
       "${segger_rtt_root}:segger_rtt_printf",
       "${segger_rtt_root}:segger_rtt_syscalls",
-      ":efr32_mbedtls_config"
     ]
 
     if (defined(invoker.sources)) {

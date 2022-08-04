@@ -80,7 +80,7 @@ protected:
     // The keymap is persisted in NVM3, and the keys are stored through the PSA
     // API.
     FabricIndex * mKeyMap = nullptr;
-    size_t mKeyMapSize = 0;
+    size_t mKeyMapSize    = 0;
 
     // The key cache is to avoid having to reconstruct keys from the storage
     // backend all the time (since it is rather slow).
@@ -119,7 +119,7 @@ private:
         if (mKeyMap != nullptr)
         {
             Platform::MemoryFree(mKeyMap);
-            mKeyMap = nullptr;
+            mKeyMap     = nullptr;
             mKeyMapSize = 0;
         }
 

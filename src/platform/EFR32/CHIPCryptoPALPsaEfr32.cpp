@@ -1012,12 +1012,12 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
     mbedtls_mpi_init(&context->w1);
     mbedtls_mpi_init(&context->xy);
     mbedtls_mpi_init(&context->tempbn);
-    w0 = &context->w0;
-    w1 = &context->w1;
-    xy = &context->xy;
+    w0     = &context->w0;
+    w1     = &context->w1;
+    xy     = &context->xy;
     tempbn = &context->tempbn;
 
-    G = &context->curve.G;
+    G     = &context->curve.G;
     order = &context->curve.N;
 
     return error;
@@ -1196,7 +1196,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1,
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointInvert(void * R)
 {
-    mbedtls_ecp_point * Rp = (mbedtls_ecp_point *) R;
+    mbedtls_ecp_point * Rp    = (mbedtls_ecp_point *) R;
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
     if (mbedtls_mpi_sub_mpi(&Rp->CHIP_CRYPTO_PAL_PRIVATE(Y), &context->curve.P, &Rp->CHIP_CRYPTO_PAL_PRIVATE(Y)) != 0)

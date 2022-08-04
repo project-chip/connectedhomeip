@@ -32,8 +32,10 @@ namespace DeviceLayer {
 namespace Internal {
 
 static_assert((sizeof(FabricIndex) == 1), "Implementation is not prepared for large fabric indices");
-static_assert(SL_MATTER_MAX_STORED_OP_KEYS <= (kEFR32OpaqueKeyIdPersistentMax - kEFR32OpaqueKeyIdPersistentMin), "Not enough opaque keys available to cover all requested operational keys");
-static_assert((CHIP_CONFIG_MAX_FABRICS + 1) <= SL_MATTER_MAX_STORED_OP_KEYS, "Not enough operational keys requested to cover all potential fabrics (+1 staging for fabric update)");
+static_assert(SL_MATTER_MAX_STORED_OP_KEYS <= (kEFR32OpaqueKeyIdPersistentMax - kEFR32OpaqueKeyIdPersistentMin),
+              "Not enough opaque keys available to cover all requested operational keys");
+static_assert((CHIP_CONFIG_MAX_FABRICS + 1) <= SL_MATTER_MAX_STORED_OP_KEYS,
+              "Not enough operational keys requested to cover all potential fabrics (+1 staging for fabric update)");
 static_assert(SL_MATTER_MAX_STORED_OP_KEYS >= 1, "Minimum supported amount of operational keys is 1");
 
 using namespace chip::Crypto;
@@ -49,10 +51,10 @@ Efr32PsaOperationalKeystore::~Efr32PsaOperationalKeystore()
 CHIP_ERROR Efr32PsaOperationalKeystore::Init()
 {
     // Detect existing keymap size
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    size_t wantedLen = SL_MATTER_MAX_STORED_OP_KEYS * sizeof(FabricIndex);
+    CHIP_ERROR error   = CHIP_NO_ERROR;
+    size_t wantedLen   = SL_MATTER_MAX_STORED_OP_KEYS * sizeof(FabricIndex);
     size_t existingLen = 0;
-    bool update_cache = false;
+    bool update_cache  = false;
 
     if (EFR32Config::ConfigValueExists(EFR32Config::kConfigKey_OpKeyMap, existingLen))
     {
@@ -74,7 +76,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::Init()
         VerifyOrExit(mKeyMap, error = CHIP_ERROR_NO_MEMORY);
 
         // Read the existing key map
-        error = EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, (uint8_t *)mKeyMap, existingLen, outLen);
+        error = EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, (uint8_t *) mKeyMap, existingLen, outLen);
         SuccessOrExit(error);
 
         // If upsizing, extend the map with undefined indices
@@ -98,7 +100,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::Init()
             // set size to the smallest that will fit the upper opaque key ID in use
             if (highest_found_index > 0)
             {
-                existingLen = (highest_found_index + 1) * sizeof(FabricIndex);
+                existingLen  = (highest_found_index + 1) * sizeof(FabricIndex);
                 update_cache = true;
             }
         }
