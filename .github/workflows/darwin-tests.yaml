@@ -102,7 +102,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --chip-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT}/darwin-framework-tool \
-                     --target-skip-glob '{TestGroupMessaging,TestAccessControlConstraints}' \
+                     --target-skip-glob '{TestAccessControlConstraints}' \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
