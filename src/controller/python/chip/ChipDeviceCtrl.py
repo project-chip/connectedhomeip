@@ -124,7 +124,10 @@ class DeviceProxyWrapper():
 
     def __del__(self):
         if (self._dmLib is not None and builtins.chipStack is not None):
-            builtins.chipStack.Call(lambda: self._dmLib.pychip_FreeOperationalDeviceProxy(self._deviceProxy))
+            # This destructor is called from any threading context, including on the Matter threading context.
+            # So, we cannot call chipStack.Call or chipStack.CallAsync which waits for the posted work to
+            # actually be executed. Instead, we just post/schedule the work and move on.
+            builtins.chipStack.PostTaskOnChipThread(lambda: self._dmLib.pychip_FreeOperationalDeviceProxy(self._deviceProxy))
 
     @property
     def deviceProxy(self) -> ctypes.c_void_p:

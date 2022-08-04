@@ -781,8 +781,8 @@ class AsyncReadTransaction:
         pass
 
     def handleReportEnd(self):
-        # self._handleReportEnd()
-        self._event_loop.call_soon_threadsafe(self._handleReportEnd)
+        # self._event_loop.call_soon_threadsafe(self._handleReportEnd)
+        self._handleReportEnd()
 
 
 class AsyncWriteTransaction:
