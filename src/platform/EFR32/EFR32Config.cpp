@@ -394,6 +394,22 @@ bool EFR32Config::ConfigValueExists(Key key)
     return (err == CHIP_NO_ERROR);
 }
 
+bool EFR32Config::ConfigValueExists(Key key, size_t & dataLen)
+{
+    uint32_t objectType;
+    size_t dLen;
+
+    // Find object with key id.
+    CHIP_ERROR err = MapNvm3Error(nvm3_getObjectInfo(nvm3_defaultHandle, key, &objectType, &dLen));
+
+    if (err == CHIP_NO_ERROR)
+    {
+        dataLen = dLen;
+    }
+
+    return (err == CHIP_NO_ERROR);
+}
+
 CHIP_ERROR EFR32Config::FactoryResetConfig(void)
 {
     // Deletes all nvm3 'Config' type objects.
