@@ -437,12 +437,21 @@ private:
 
             // Remove access control entries in reverse order (it could be any order, but reverse order
             // will cause less churn in persistent storage).
-
-            // TODO(#19899): The fabric removal not remove ACL extensions
             CHIP_ERROR aclErr = Access::GetAccessControl().DeleteAllEntriesForFabric(fabricIndex);
             if (aclErr != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Warning, failed to delete access control state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                             static_cast<unsigned>(fabricIndex), aclErr.Format());
+            }
+
+            //  Remove ACL extension entry for the given fabricIndex.
+            auto & storage = mServer->GetPersistentStorage();
+            DefaultStorageKeyAllocator key;
+            aclErr = storage.SyncDeleteKeyValue(key.AccessControlExtensionEntry(fabricIndex));
+
+            if (aclErr != CHIP_NO_ERROR && aclErr != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+            {
+                ChipLogError(AppServer, "Warning, failed to delete ACL extension entry for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
                              static_cast<unsigned>(fabricIndex), aclErr.Format());
             }
 
