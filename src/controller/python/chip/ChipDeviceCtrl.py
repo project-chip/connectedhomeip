@@ -118,6 +118,12 @@ class DCState(enum.IntEnum):
 
 
 class DeviceProxyWrapper():
+    ''' Encapsulates a pointer to OperationalDeviceProxy on the c++ side that needs to be
+        freed when DeviceProxyWrapper goes out of scope. There is a potential issue where
+        if this is copied around that a double free will occure, but how this is used today
+        that is not an issue that needs to be accounted for and it will become very apparent
+        if that happens.
+    '''
     def __init__(self, deviceProxy: ctypes.c_void_p, dmLib=None):
         self._deviceProxy = deviceProxy
         self._dmLib = dmLib

@@ -445,15 +445,20 @@ void SessionManager::ExpireAllPASESessions()
     });
 }
 
-bool SessionManager::MarkSessionAsDefunct(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type)
+bool SessionManager::MarkSessionsAsDefunct(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type)
 {
-    auto optionalSessionHandle = FindSecureSessionForNode(node, type);
-    if (optionalSessionHandle.HasValue())
-    {
-        optionalSessionHandle.Value()->AsSecureSession()->MarkAsDefunct();
-        return true;
-    }
-    return false;
+    bool found = false;
+    mSecureSessions.ForEachSession([&node, &type, &found](auto session) {
+        if (session->IsActiveSession() && session->GetPeer() == node &&
+            (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
+        {
+            session->AsSecureSession()->MarkAsDefunct();
+            found = true;
+        }
+        return Loop::Continue;
+    });
+
+    return found;
 }
 
 Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,

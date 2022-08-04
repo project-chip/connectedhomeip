@@ -351,14 +351,14 @@ public:
 
     /**
      * @brief
-     *   Mark most recently active session that matches provided arguments as defunct.
+     *   Marks all active session that matches provided arguments as defunct.
      *
-     * @param node    Scoped node ID of the session we should mark as defunct.
+     * @param node    Scoped node ID of the active sessions we should mark as defunct.
      * @param type    Type of session we are looking to mark as defunct. If matching
      *                against all types of sessions is desired, NullOptional should
      *                be passed into type.
      */
-    bool MarkSessionAsDefunct(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type);
+    bool MarkSessionsAsDefunct(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type);
 
     /**
      * @brief
