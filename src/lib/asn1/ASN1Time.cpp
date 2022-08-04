@@ -138,5 +138,10 @@ CHIP_ERROR ASN1UniversalTime::ExportTo_ASN1_TIME_string(MutableCharSpan & asn1_t
     return CHIP_NO_ERROR;
 }
 
+bool ASN1UniversalTime::ExportTo_UnixTime(uint32_t & unixEpoch)
+{
+    return CalendarTimeToSecondsSinceUnixEpoch(Year, Month, Day, Hour, Minute, Second, unixEpoch);
+}
+
 } // namespace ASN1
 } // namespace chip

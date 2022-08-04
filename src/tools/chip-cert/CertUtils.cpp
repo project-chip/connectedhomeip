@@ -242,7 +242,9 @@ bool SetCertTimeField(ASN1_TIME * asn1Time, const struct tm & value)
 {
     char timeStr[ASN1UniversalTime::kASN1TimeStringMaxLength + 1];
     MutableCharSpan timeSpan(timeStr);
-    ASN1UniversalTime val = { .Year   = static_cast<uint16_t>(value.tm_year + 1900),
+    ASN1UniversalTime val = { .Year   = static_cast<uint16_t>((value.tm_year == kX509NoWellDefinedExpirationDateYear)
+                                                                ? kX509NoWellDefinedExpirationDateYear
+                                                                : (value.tm_year + 1900)),
                               .Month  = static_cast<uint8_t>(value.tm_mon + 1),
                               .Day    = static_cast<uint8_t>(value.tm_mday),
                               .Hour   = static_cast<uint8_t>(value.tm_hour),
