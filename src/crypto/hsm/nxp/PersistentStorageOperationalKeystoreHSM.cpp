@@ -26,8 +26,9 @@
 #include <lib/support/SafeInt.h>
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #include "CHIPCryptoPALHsm_SE05X_utils.h"
-#include "PersistentStorageOperationalKeystoreHSM_SE05X.h"
+#include "PersistentStorageOperationalKeystoreHSM.h"
 
+#if ENABLE_HSM_GENERATE_EC_KEY
 
 namespace chip {
 
@@ -105,7 +106,7 @@ CHIP_ERROR PersistentStorageOperationalKeystoreHSM::NewOpKeypairForFabric(Fabric
     VerifyOrReturnError(slotId != 0, CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-    ChipLogProgress(Crypto,"SE05x: New OPS key for Fabric %02x",fabricIndex);
+    ChipLogProgress(Crypto,"SE05x: New Op Keypair for Fabric %02x",fabricIndex);
 
     // Replace previous pending keypair, if any was previously allocated
     ResetPendingKey();
@@ -251,7 +252,7 @@ CHIP_ERROR PersistentStorageOperationalKeystoreHSM::SignWithOpKeypair(FabricInde
 
 Crypto::P256Keypair * PersistentStorageOperationalKeystoreHSM::AllocateEphemeralKeypairForCASE()
 {
-    ChipLogProgress(Crypto, "AllocateEphemeralKeypairForCASE using se05x \n");
+    ChipLogProgress(Crypto, "SE05x: AllocateEphemeralKeypairForCASE using se05x");
     Crypto::P256KeypairHSM *pkeyPair = Platform::New<Crypto::P256KeypairHSM>();
     pkeyPair->SetKeyId(kKeyId_case_ephemeral_keyid);
     return pkeyPair;
@@ -259,8 +260,10 @@ Crypto::P256Keypair * PersistentStorageOperationalKeystoreHSM::AllocateEphemeral
 
 void PersistentStorageOperationalKeystoreHSM::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
 {
-    ChipLogProgress(Crypto, "ReleaseEphemeralKeypair using se05x \n");
+    ChipLogProgress(Crypto, "SE05x: ReleaseEphemeralKeypair using se05x");
     Platform::Delete<Crypto::P256Keypair>(keypair);
 }
 
 } // namespace chip
+
+#endif //#if ENABLE_HSM_GENERATE_EC_KEY

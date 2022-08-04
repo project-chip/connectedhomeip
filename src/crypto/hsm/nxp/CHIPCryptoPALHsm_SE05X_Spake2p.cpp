@@ -27,13 +27,13 @@
 #if ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER))
 
 #if ENABLE_HSM_SPAKE_VERIFIER
-const uint32_t w0in_id_v = 0x2347;
-const uint32_t Lin_id_v  = 0x2348;
+const uint32_t w0in_id_v = 0x7D200001;
+const uint32_t Lin_id_v  = 0x7D200002;
 #endif
 
 #if ENABLE_HSM_SPAKE_PROVER
-const uint32_t w0in_id_p = 0x2349;
-const uint32_t w1in_id_p = 0x2350;
+const uint32_t w0in_id_p = 0x7D200003;
+const uint32_t w1in_id_p = 0x7D200004;
 #endif
 
 void Spake2p_Finish_HSM(hsm_pake_context_t * phsm_pake_context)
