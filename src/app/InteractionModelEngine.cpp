@@ -531,9 +531,7 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
         {
             continue;
         }
-
-        VerifyOrReturnError(readClient->OnUnsolicitedReportData(apExchangeContext, std::move(aPayload)) == CHIP_NO_ERROR,
-                            Status::InvalidAction);
+        readClient->OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
         return Status::Success;
     }
 

@@ -175,7 +175,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     initParams.opCertStore = &wrapper->mOpCertStore;
 
     // TODO: Init IPK Epoch Key in opcreds issuer, so that commissionees get the right IPK
-    opCredsIssuer->Initialize(*wrapper.get(), wrapper.get()->mJavaObjectRef);
+    opCredsIssuer->Initialize(*wrapper.get(), &wrapper->mAutoCommissioner, wrapper.get()->mJavaObjectRef);
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
     if (!noc.Alloc(kMaxCHIPDERCertLength))
@@ -425,7 +425,7 @@ void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onCommissioningStatusUpdateMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningStatusUpdate",
-                                                             "(JLJAVA/LANG/STRING;I)V", &onCommissioningStatusUpdateMethod);
+                                                             "(JLjava/lang/string;I)V", &onCommissioningStatusUpdateMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
 
     UtfString jStageCompleted(env, StageToString(stageCompleted));

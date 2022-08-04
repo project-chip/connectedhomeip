@@ -38,6 +38,7 @@ import chip.native
 import chip.FabricAdmin
 import copy
 import secrets
+import faulthandler
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -50,9 +51,27 @@ sh.setStream(sys.stdout)
 logger.addHandler(sh)
 
 
-def TestFail(message):
+def TestFail(message, doCrash=False):
     logger.fatal("Testfail: {}".format(message))
-    os._exit(1)
+
+    if (doCrash):
+        logger.fatal("--------------------------------")
+        logger.fatal("Backtrace of all Python threads:")
+        logger.fatal("--------------------------------")
+
+        #
+        # Let's dump the Python backtrace for all threads, since the backtrace we'll
+        # get from gdb (if one is attached) won't give us good Python symbol information.
+        #
+        faulthandler.dump_traceback()
+
+        #
+        # Cause a crash to happen so that we can actually get a meaningful
+        # backtrace when run through GDB.
+        #
+        chip.native.GetLibraryHandle().pychip_CauseCrash()
+    else:
+        os._exit(1)
 
 
 def FailIfNot(cond, message):
@@ -143,7 +162,7 @@ class TestTimeout(threading.Thread):
                 self._cv.wait(wait_time)
                 wait_time = stop_time - time.time()
         if time.time() > stop_time:
-            TestFail("Timeout")
+            TestFail("Timeout", doCrash=True)
 
 
 class TestResult:

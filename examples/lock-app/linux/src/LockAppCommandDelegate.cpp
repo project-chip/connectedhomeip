@@ -31,7 +31,8 @@ public:
 
     static void HandleCommand(intptr_t context);
 
-    LockAppCommandHandler(std::string cmd, Json::Value params) : mCommandName(std::move(cmd)), mCommandParameters(std::move(params))
+    LockAppCommandHandler(std::string && cmd, Json::Value && params) :
+        mCommandName(std::move(cmd)), mCommandParameters(std::move(params))
     {}
 
 private:
@@ -74,7 +75,7 @@ LockAppCommandHandler * LockAppCommandHandler::FromJSON(const char * json)
         params = value["Params"];
     }
     auto commandName = value["Cmd"].asString();
-    return chip::Platform::New<LockAppCommandHandler>(commandName, params);
+    return chip::Platform::New<LockAppCommandHandler>(std::move(commandName), std::move(params));
 }
 
 void LockAppCommandHandler::HandleCommand(intptr_t context)

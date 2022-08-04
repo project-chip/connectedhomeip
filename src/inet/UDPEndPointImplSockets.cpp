@@ -46,6 +46,11 @@
 #define SOCK_CLOEXEC 0
 #endif
 
+// On MbedOS, INADDR_ANY does not seem to exist...
+#ifndef INADDR_ANY
+#define INADDR_ANY 0
+#endif
+
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
 #include "ZephyrSocket.h"
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
@@ -729,27 +734,39 @@ exit:
 
 CHIP_ERROR UDPEndPointImplSockets::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
-    IPAddress lInterfaceAddress;
-    bool lInterfaceAddressFound = false;
+    in_addr interfaceAddr;
 
-    for (InterfaceAddressIterator lAddressIterator; lAddressIterator.HasCurrent(); lAddressIterator.Next())
+    if (aInterfaceId.IsPresent())
     {
-        IPAddress lCurrentAddress;
-        if ((lAddressIterator.GetInterfaceId() == aInterfaceId) && (lAddressIterator.GetAddress(lCurrentAddress) == CHIP_NO_ERROR))
+        IPAddress lInterfaceAddress;
+        bool lInterfaceAddressFound = false;
+
+        for (InterfaceAddressIterator lAddressIterator; lAddressIterator.HasCurrent(); lAddressIterator.Next())
         {
-            if (lCurrentAddress.IsIPv4())
+            IPAddress lCurrentAddress;
+            if ((lAddressIterator.GetInterfaceId() == aInterfaceId) &&
+                (lAddressIterator.GetAddress(lCurrentAddress) == CHIP_NO_ERROR))
             {
-                lInterfaceAddressFound = true;
-                lInterfaceAddress      = lCurrentAddress;
-                break;
+                if (lCurrentAddress.IsIPv4())
+                {
+                    lInterfaceAddressFound = true;
+                    lInterfaceAddress      = lCurrentAddress;
+                    break;
+                }
             }
         }
+        VerifyOrReturnError(lInterfaceAddressFound, INET_ERROR_ADDRESS_NOT_FOUND);
+
+        interfaceAddr = lInterfaceAddress.ToIPv4();
     }
-    VerifyOrReturnError(lInterfaceAddressFound, INET_ERROR_ADDRESS_NOT_FOUND);
+    else
+    {
+        interfaceAddr.s_addr = htonl(INADDR_ANY);
+    }
 
     struct ip_mreq lMulticastRequest;
     memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));
-    lMulticastRequest.imr_interface = lInterfaceAddress.ToIPv4();
+    lMulticastRequest.imr_interface = interfaceAddr;
     lMulticastRequest.imr_multiaddr = aAddress.ToIPv4();
 
     const int command = join ? IP_ADD_MEMBERSHIP : IP_DROP_MEMBERSHIP;
@@ -773,6 +790,62 @@ CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId a
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 
 #ifdef IPV6_MULTICAST_IMPLEMENTED
+    if (!aInterfaceId.IsPresent())
+    {
+        // Do it on all the viable interfaces.
+        bool interfaceFound = false;
+
+        InterfaceIterator interfaceIt;
+        while (interfaceIt.Next())
+        {
+            if (!interfaceIt.SupportsMulticast() || !interfaceIt.IsUp())
+            {
+                continue;
+            }
+
+            InterfaceId interfaceId = interfaceIt.GetInterfaceId();
+
+            IPAddress ifAddr;
+            if (interfaceId.GetLinkLocalAddr(&ifAddr) != CHIP_NO_ERROR)
+            {
+                continue;
+            }
+
+            if (ifAddr.Type() != IPAddressType::kIPv6)
+            {
+                // Not the right sort of interface.
+                continue;
+            }
+
+            interfaceFound = true;
+
+            char ifName[InterfaceId::kMaxIfNameLength];
+            interfaceIt.GetInterfaceName(ifName, sizeof(ifName));
+
+            // Ignore errors here, except for logging, because we expect some of
+            // these interfaces to not work, and some (e.g. loopback) to always
+            // work.
+            CHIP_ERROR err = IPv6JoinLeaveMulticastGroupImpl(interfaceId, aAddress, join);
+            if (err == CHIP_NO_ERROR)
+            {
+                ChipLogDetail(Inet, "  %s multicast group on interface %s", (join ? "Joined" : "Left"), ifName);
+            }
+            else
+            {
+                ChipLogError(Inet, "  Failed to %s multicast group on interface %s", (join ? "join" : "leave"), ifName);
+            }
+        }
+
+        if (interfaceFound)
+        {
+            // Assume we're good.
+            return CHIP_NO_ERROR;
+        }
+
+        // Else go ahead and try to work with the default interface.
+        ChipLogError(Inet, "No valid IPv6 multicast interface found");
+    }
+
     const InterfaceId::PlatformType lIfIndex = aInterfaceId.GetPlatformInterface();
 
     struct ipv6_mreq lMulticastRequest;

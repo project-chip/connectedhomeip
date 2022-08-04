@@ -155,6 +155,99 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     chip::Platform::MemoryShutdown();
 }
 
+JNI_METHOD(jint, onNOCChainGeneration)
+(JNIEnv * env, jobject self, jlong handle, jobject controllerParams)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    ChipLogProgress(Controller, "setNOCChain() called");
+
+    jmethodID getRootCertificate;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getRootCertificate", "()[B", &getRootCertificate);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+
+    jmethodID getIntermediateCertificate;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIntermediateCertificate", "()[B",
+                                                        &getIntermediateCertificate);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+
+    jmethodID getOperationalCertificate;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getOperationalCertificate", "()[B",
+                                                        &getOperationalCertificate);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+
+    jmethodID getIpk;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIpk", "()[B", &getIpk);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+
+    jmethodID getAdminSubject;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAdminSubject", "()J", &getAdminSubject);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+
+    jbyteArray rootCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getRootCertificate);
+    VerifyOrReturnValue(rootCertificate != nullptr, CHIP_ERROR_BAD_REQUEST.AsInteger());
+
+    jbyteArray intermediateCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getIntermediateCertificate);
+    VerifyOrReturnValue(intermediateCertificate != nullptr, CHIP_ERROR_BAD_REQUEST.AsInteger());
+
+    jbyteArray operationalCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
+    VerifyOrReturnValue(operationalCertificate != nullptr, CHIP_ERROR_BAD_REQUEST.AsInteger());
+
+    // use ipk and adminSubject from CommissioningParameters if not set in ControllerParams
+    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+
+    Optional<Crypto::AesCcm128KeySpan> ipkOptional;
+    uint8_t ipkValue[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    Crypto::AesCcm128KeySpan ipkTempSpan(ipkValue);
+
+    jbyteArray ipk = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
+    if (ipk != nullptr)
+    {
+        JniByteArray jByteArrayIpk(env, ipk);
+
+        VerifyOrReturnValue(jByteArrayIpk.byteSpan().size() == sizeof(ipkValue), CHIP_ERROR_INTERNAL.AsInteger());
+        memcpy(&ipkValue[0], jByteArrayIpk.byteSpan().data(), jByteArrayIpk.byteSpan().size());
+
+        ipkOptional.SetValue(ipkTempSpan);
+    }
+    else if (commissioningParams.GetIpk().HasValue())
+    {
+        // if no value pass in ControllerParams, use value from CommissioningParameters
+        ipkOptional.SetValue(commissioningParams.GetIpk().Value());
+    }
+
+    Optional<NodeId> adminSubjectOptional;
+    uint64_t adminSubject = env->CallLongMethod(controllerParams, getAdminSubject);
+    if (adminSubject == kUndefinedNodeId)
+    {
+        // if no value pass in ControllerParams, use value from CommissioningParameters
+        adminSubject = commissioningParams.GetAdminSubject().ValueOr(kUndefinedNodeId);
+    }
+    if (adminSubject != kUndefinedNodeId)
+    {
+        adminSubjectOptional.SetValue(adminSubject);
+    }
+    // NOTE: we are allowing adminSubject to not be set since the OnNOCChainGeneration callback makes this field
+    // optional and includes logic to handle the case where it is not set. It would also make sense to return
+    // an error here since that use case may not be realistic.
+
+    JniByteArray jByteArrayRcac(env, rootCertificate);
+    JniByteArray jByteArrayIcac(env, intermediateCertificate);
+    JniByteArray jByteArrayNoc(env, operationalCertificate);
+
+    err = wrapper->GetAndroidOperationalCredentialsIssuer()->NOCChainGenerated(CHIP_NO_ERROR, jByteArrayNoc.byteSpan(),
+                                                                               jByteArrayIcac.byteSpan(), jByteArrayRcac.byteSpan(),
+                                                                               ipkOptional, adminSubjectOptional);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to SetNocChain for the device: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return err.AsInteger();
+}
+
 JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject controllerParams)
 {
     chip::DeviceLayer::StackLock lock;
@@ -211,6 +304,10 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIpk", "()[B", &getIpk);
     SuccessOrExit(err);
 
+    jmethodID getAdminSubject;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAdminSubject", "()J", &getAdminSubject);
+    SuccessOrExit(err);
+
     {
         uint16_t listenPort                = env->CallIntMethod(controllerParams, getUdpListenPort);
         uint16_t controllerVendorId        = env->CallIntMethod(controllerParams, getControllerVendorId);
@@ -220,8 +317,9 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         jbyteArray operationalCertificate  = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
         jbyteArray ipk                     = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
         uint16_t failsafeTimerSeconds      = env->CallIntMethod(controllerParams, getFailsafeTimerSeconds);
-        bool attemptNetworkScanWiFi        = env->CallIntMethod(controllerParams, getAttemptNetworkScanWiFi);
-        bool attemptNetworkScanThread      = env->CallIntMethod(controllerParams, getAttemptNetworkScanThread);
+        bool attemptNetworkScanWiFi        = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanWiFi);
+        bool attemptNetworkScanThread      = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
+        uint64_t adminSubject              = env->CallLongMethod(controllerParams, getAdminSubject);
 
         std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
             new chip::Controller::AndroidOperationalCredentialsIssuer());
@@ -231,6 +329,19 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
             operationalCertificate, ipk, listenPort, controllerVendorId, failsafeTimerSeconds, attemptNetworkScanWiFi,
             attemptNetworkScanThread, &err);
         SuccessOrExit(err);
+
+        if (adminSubject != kUndefinedNodeId)
+        {
+            // if there is a valid adminSubject in the ControllerParams, then remember it
+            CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+            commissioningParams.SetAdminSubject(adminSubject);
+            err = wrapper->UpdateCommissioningParameters(commissioningParams);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+                SuccessOrExit(err);
+            }
+        }
     }
 
     // Create and start the IO thread. Must be called after Controller()->Init
@@ -420,6 +531,16 @@ JNI_METHOD(void, resumeCommissioning)
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     wrapper->GetAutoCommissioner()->ResumeCommissioning();
+}
+
+JNI_METHOD(void, setUseJavaCallbackForNOCRequest)
+(JNIEnv * env, jobject self, jlong handle, jboolean useCallback)
+{
+    ChipLogProgress(Controller, "setUseJavaCallbackForNOCRequest() called");
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    wrapper->GetAndroidOperationalCredentialsIssuer()->SetUseJavaCallbackForNOCRequest(useCallback);
 }
 
 JNI_METHOD(void, updateCommissioningNetworkCredentials)

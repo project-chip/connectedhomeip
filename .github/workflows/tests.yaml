@@ -196,7 +196,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --chip-tool ./out/darwin-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --target-skip-glob '{TestGroupMessaging,Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
+                     --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \

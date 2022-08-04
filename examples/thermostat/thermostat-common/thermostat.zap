@@ -1,5 +1,5 @@
 {
-  "featureLevel": 76,
+  "featureLevel": 77,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -4963,7 +4963,7 @@
               "code": 5,
               "mfgCode": null,
               "side": "server",
-              "type": "fabric_idx",
+              "type": "int8u",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -10943,7 +10943,7 @@
               "code": 1,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -10951,7 +10951,7 @@
               "code": 2,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -10959,7 +10959,7 @@
               "code": 3,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             }
           ],
@@ -10996,7 +10996,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -11262,7 +11262,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "enum8",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -11278,7 +11278,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -11294,7 +11294,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -11302,6 +11302,54 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "GeneratedCommandList",
+              "code": 65528,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AcceptedCommandList",
+              "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AttributeList",
+              "code": 65531,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -11314,7 +11362,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x000b",
+              "defaultValue": "0x23",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -13729,7 +13777,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "int16u",
+              "type": "vendor_id",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,

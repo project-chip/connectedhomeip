@@ -56,7 +56,7 @@ AllClustersAppCommandHandler * AllClustersAppCommandHandler::FromJSON(const char
         return nullptr;
     }
 
-    return Platform::New<AllClustersAppCommandHandler>(value);
+    return Platform::New<AllClustersAppCommandHandler>(std::move(value));
 }
 
 void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
