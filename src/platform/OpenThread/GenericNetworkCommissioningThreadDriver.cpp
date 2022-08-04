@@ -85,14 +85,22 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     // since the fail-safe was armed, so return with no error.
     ReturnErrorCodeIf(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
 
+    ChipLogProgress(NetworkProvisioning, "Reverting Thread operational dataset");
+
+    if (error == CHIP_NO_ERROR)
+    {
+        error = mStagingNetwork.Init(ByteSpan(datasetBytes, datasetLength));
+    }
+
+    if (error == CHIP_NO_ERROR)
+    {
+        error = DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, /* callback */ nullptr);
+    }
+
     // Always remove the backup, regardless if it can be successfully restored.
     KeyValueStoreMgr().Delete(key.FailSafeNetworkConfig());
-    ReturnErrorOnFailure(error);
 
-    ReturnErrorOnFailure(mStagingNetwork.Init(ByteSpan(datasetBytes, datasetLength)));
-    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, /* callback */ nullptr));
-
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 Status GenericThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText,
