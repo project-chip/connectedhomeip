@@ -15,6 +15,9 @@
 
 name: 3.2.2. [TC-LOWPOWER-2.2] Low Power Mode Verification (DUT as Client)
 
+PICS:
+    - LOWPOWER.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -22,37 +25,37 @@ config:
 
 tests:
     - label: "DUT sends Sleep command to TH"
-      PICS: LOWPOWER.C
+      PICS: LOWPOWER.C.C00.Tx
       verification: |
-          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
           ./chip-tool lowpower sleep 1 1
-          [1651046221.469028][62780:62785] CHIP:DMG: InvokeResponseMessage =
-          [1651046221.469045][62780:62785] CHIP:DMG: {
-          [1651046221.469062][62780:62785] CHIP:DMG:         suppressResponse = false,
-          [1651046221.469078][62780:62785] CHIP:DMG:         InvokeResponseIBs =
-          [1651046221.469104][62780:62785] CHIP:DMG:         [
-          [1651046221.469119][62780:62785] CHIP:DMG:                 InvokeResponseIB =
-          [1651046221.469143][62780:62785] CHIP:DMG:                 {
-          [1651046221.469159][62780:62785] CHIP:DMG:                         CommandStatusIB =
-          [1651046221.469178][62780:62785] CHIP:DMG:                         {
-          [1651046221.469193][62780:62785] CHIP:DMG:                                 CommandPathIB =
-          [1651046221.469213][62780:62785] CHIP:DMG:                                 {
-          [1651046221.469232][62780:62785] CHIP:DMG:                                         EndpointId = 0x1,
-          [1651046221.469253][62780:62785] CHIP:DMG:                                         ClusterId = 0x508,
-          [1651046221.469276][62780:62785] CHIP:DMG:                                         CommandId = 0x0,
-          [1651046221.469294][62780:62785] CHIP:DMG:                                 },
-          [1651046221.469320][62780:62785] CHIP:DMG:
-          [1651046221.469335][62780:62785] CHIP:DMG:                                 StatusIB =
-          [1651046221.469355][62780:62785] CHIP:DMG:                                 {
-          [1651046221.469373][62780:62785] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1651046221.469390][62780:62785] CHIP:DMG:                                 },
-          [1651046221.469409][62780:62785] CHIP:DMG:
-          [1651046221.469426][62780:62785] CHIP:DMG:                         },
-          [1651046221.469449][62780:62785] CHIP:DMG:
-          [1651046221.469465][62780:62785] CHIP:DMG:                 },
-          [1651046221.469493][62780:62785] CHIP:DMG:
-          [1651046221.469508][62780:62785] CHIP:DMG:         ],
-          [1651046221.469531][62780:62785] CHIP:DMG:
-          [1651046221.469548][62780:62785] CHIP:DMG:         InteractionModelRevision = 1
-          [1651046221.469563][62780:62785] CHIP:DMG: }
+          ./chip-tv-casting-app lowpower sleep 1 1
+
+
+          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
+
+          [1658530100234] [21469:308294] CHIP: [DMG] InvokeRequestMessage =
+          [1658530100234] [21469:308294] CHIP: [DMG] {
+          [1658530100234] [21469:308294] CHIP: [DMG]         suppressResponse = false,
+          [1658530100234] [21469:308294] CHIP: [DMG]         timedRequest = false,
+          [1658530100234] [21469:308294] CHIP: [DMG]         InvokeRequests =
+          [1658530100234] [21469:308294] CHIP: [DMG]         [
+          [1658530100234] [21469:308294] CHIP: [DMG]                 CommandDataIB =
+          [1658530100234] [21469:308294] CHIP: [DMG]                 {
+          [1658530100234] [21469:308294] CHIP: [DMG]                         CommandPathIB =
+          [1658530100234] [21469:308294] CHIP: [DMG]                         {
+          [1658530100234] [21469:308294] CHIP: [DMG]                                 EndpointId = 0x1,
+          [1658530100234] [21469:308294] CHIP: [DMG]                                 ClusterId = 0x508,
+          [1658530100234] [21469:308294] CHIP: [DMG]                                 CommandId = 0x0,
+          [1658530100234] [21469:308294] CHIP: [DMG]                         },
+          [1658530100234] [21469:308294] CHIP: [DMG]
+          [1658530100234] [21469:308294] CHIP: [DMG]                         CommandFields =
+          [1658530100234] [21469:308294] CHIP: [DMG]                         {
+          [1658530100234] [21469:308294] CHIP: [DMG]                         },
+          [1658530100234] [21469:308294] CHIP: [DMG]                 },
+          [1658530100234] [21469:308294] CHIP: [DMG]
+          [1658530100234] [21469:308294] CHIP: [DMG]         ],
+          [1658530100234] [21469:308294] CHIP: [DMG]
+          [1658530100234] [21469:308294] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658530100234] [21469:308294] CHIP: [DMG] },
       disabled: true

@@ -840,6 +840,9 @@ PICS:
     - label: "Does the device implement the Position Aware Lift feature?"
       id: WNCV.S.F04
 
+    - label: "Does the device implement the Absolute positioning feature ?"
+      id: WNCV.S.F03
+
       ## WC-Attributes
     - label: "Does the device implement the 65533 ClusterRevision attribute?"
       id: WNCV.S.Afffd
@@ -1408,25 +1411,25 @@ PICS:
       id: G.C.A0000
 
     - label: "Does the DUT(client) implement receiving AddGroup Command?"
-      id: G.C.C00.Rsp
+      id: G.C.C00.Tx
 
     - label: "Does the DUT(client) implement receiving ViewGroup Command?"
-      id: G.C.C01.Rsp
+      id: G.C.C01.Tx
 
     - label:
           "Does the DUT(client) implement receiving GetGroupMembership Command?"
-      id: G.C.C02.Rsp
+      id: G.C.C02.Tx
 
     - label: "Does the DUT(client) implement receiving RemoveGroup Command?"
-      id: G.C.C03.Rsp
+      id: G.C.C03.Tx
 
     - label: "Does the DUT(client) implement receiving RemoveAllGroups Command?"
-      id: G.C.C04.Rsp
+      id: G.C.C04.Tx
 
     - label:
           "Does the DUT(client) implement receiving AddGroupIfIdentifying
           Command?"
-      id: G.C.C05.Rsp
+      id: G.C.C05.Tx
 
     #Identify Cluster
     - label: "Does the device implement the IdentifyTime attribute?"
@@ -1667,13 +1670,13 @@ PICS:
     - label:
           "Does the DUT support sending the UserConsentNeeded field in
           QueryImageResponse Command?"
-      id: OTAS.S.M.UserConsentNeeded
+      id: OTAP.S.M.UserConsentNeeded
 
     - label: "Does the DUT support sending the AnnounceOTAProvider Command?"
-      id: OTAC.C.M.AnnounceOTAProvider
+      id: OTAR.C.M.AnnounceOTAProvider
 
     - label: "Does the DUT support sending the NotifyUpdateApplied Command?"
-      id: OTAC.C.M.NotifyUpdateApplied
+      id: OTAR.C.M.NotifyUpdateApplied
 
     #Time Format Localization Cluster
     - label: "Does the DUT (Server) support HourFormat attribute?"
@@ -1932,6 +1935,11 @@ PICS:
       id: KEYPADINPUT.S.NK
 
     - label:
+          "Does the DUT support the Keypad Input server cluster, SendKey
+          command?"
+      id: KEYPADINPUT.S.C00.Rsp
+
+    - label:
           "Does the DUT support the Application Launcher server cluster
           Application Platform feature?"
       id: APPLAUNCHER.S.AP
@@ -2017,6 +2025,10 @@ PICS:
       id: TGTNAV.S.A0001
 
     - label:
+          "Does the device implement the Application Basic cluster as a server?"
+      id: APBSC.S
+
+    - label:
           "Does the DUT support the Application Basic server cluster VendorName
           attribute?"
       id: APBSC.S.A0000
@@ -2057,24 +2069,30 @@ PICS:
     - label: "Does the device implement the Low Power cluster as a client?"
       id: LOWPOWER.C
 
+    - label: "Does the DUT support the Low Power server cluster, Sleep command?"
+      id: LOWPOWER.S.C00.Rsp
+
+    - label: "Does the DUT support the Low Power client cluster, Sleep command?"
+      id: LOWPOWER.C.C00.Tx
+
     - label:
           "Does the DUT support the Media Input server cluster SelectInput
           command?"
-      id: MEDIAINPUT.S.C0000
+      id: MEDIAINPUT.S.C00.Rsp
 
     - label:
           "Does the DUT support the Media Input server cluster ShowStatus
           command?"
-      id: MEDIAINPUT.S.C0001
+      id: MEDIAINPUT.S.C01.Rsp
 
     - label:
           "Does the DUT support the Media Input server cluster HideStatus
           command"
-      id: MEDIAINPUT.S.C0002
+      id: MEDIAINPUT.S.C02.Rsp
 
     - label:
           "Does the DUT support the Media Input server cluster Rename command?"
-      id: MEDIAINPUT.S.C0003
+      id: MEDIAINPUT.S.C03.Rsp
 
     - label:
           "Does the DUT support the Media Input server cluster Name Updates
@@ -2101,6 +2119,25 @@ PICS:
       id: MEDIAINPUT.C.C0003
 
     - label:
+          "Does the DUT support the Media Input client cluster SelectInput
+          command?"
+      id: MEDIAINPUT.C.C00.Tx
+
+    - label:
+          "Does the DUT support the Media Input client cluster ShowStatus
+          command?"
+      id: MEDIAINPUT.C.C01.Tx
+
+    - label:
+          "Does the DUT support the Media Input client cluster HideStatus
+          command?"
+      id: MEDIAINPUT.C.C02.Tx
+
+    - label:
+          "Does the DUT support the Media Input server cluster Rename command?"
+      id: MEDIAINPUT.C.C03.Tx
+
+    - label:
           "Does the DUT support the Application Launcher client cluster
           LaunchApp command?"
       id: APPLAUNCHER.C.C0000
@@ -2116,14 +2153,19 @@ PICS:
       id: APPLAUNCHER.C.C0002
 
     - label:
-          "Does the DUT support the Application Launcher server cluster StopApp
-          command?"
-      id: APPLAUNCHER.S.C0001
+          "Does the DUT support the Application Launcher client cluster
+          LaunchApp command?"
+      id: APPLAUNCHER.C.C00.Tx
 
     - label:
-          "Does the DUT support the Application Launcher server cluster HideApp
+          "Does the DUT support the Application Launcher client cluster StopApp
           command?"
-      id: APPLAUNCHER.S.C0002
+      id: APPLAUNCHER.C.C01.Tx
+
+    - label:
+          "Does the DUT support the Application Launcher client cluster HideApp
+          command?"
+      id: APPLAUNCHER.C.C02.Tx
 
     - label:
           "Does the DUT support the Wake On LAN server cluster MACAddress
@@ -2287,6 +2329,9 @@ PICS:
           command?"
       id: MEDIAPLAYBACK.C.C09.Tx
 
+    - label: "Does the device implement the Audio Output cluster as a server?"
+      id: AUDIOOUTPUT.S
+
     - label:
           "Does the DUT support the Audio Output server cluster OutputList
           attribute?"
@@ -2300,17 +2345,30 @@ PICS:
     - label:
           "Does the DUT support the Audio Output server cluster SelectOutput
           command?"
-      id: AUDIOOUTPUT.S.C0000
+      id: AUDIOOUTPUT.S.C00.Rsp
 
     - label:
           "Does the DUT support the Audio Output server cluster RenameOutput
           command?"
-      id: AUDIOOUTPUT.S.C0001
+      id: AUDIOOUTPUT.S.C01.Rsp
+
+    - label: "Does the device implement the Audio Output cluster as a client?"
+      id: AUDIOOUTPUT.C
 
     - label:
           "Does the DUT support the Audio Ouput server cluster Name Updates
           feature?"
       id: AUDIOOUTPUT.S.NU
+
+    - label:
+          "Does the DUT support the Audio Output client cluster, SelectOutput
+          command?"
+      id: AUDIOOUTPUT.C.C00.Tx
+
+    - label:
+          "Does the DUT support the Audio Output client cluster, RenameOutput
+          command?"
+      id: AUDIOOUTPUT.C.C01.Tx
 
     - label:
           "Does the DUT support the Target Navigator server cluster TargetList
@@ -2325,7 +2383,7 @@ PICS:
     - label:
           "Does the DUT support the Target Navigator server cluster
           NavigateTarget command?"
-      id: TGTNAV.S.C0000
+      id: TGTNAV.S.C00.Rsp
 
     - label:
           "Does the DUT support the Application Basic server cluster VendorName
@@ -2398,6 +2456,26 @@ PICS:
       id: CONTENTLAUNCHER.C.C0001
 
     - label:
+          "Does the DUT support the Content Launcher client cluster,
+          LaunchContent command?"
+      id: CONTENTLAUNCHER.C.C00.Tx
+
+    - label:
+          "Does the DUT support the Content Launcher client cluster, LaunchURL
+          command?"
+      id: CONTENTLAUNCHER.C.C01.Tx
+
+    - label:
+          "Does the DUT support the Content Launcher server cluster,
+          LaunchContent command?"
+      id: CONTENTLAUNCHER.S.C00.Rsp
+
+    - label:
+          "Does the DUT support the Content Launcher server cluster, LaunchURL
+          command?"
+      id: CONTENTLAUNCHER.S.C01.Rsp
+
+    - label:
           "Does the DUT support the Content Launcher server cluster and is
           Commissionable?"
       id: ALOGIN.S.COMMISSIONABLE
@@ -2408,9 +2486,38 @@ PICS:
       id: ALOGIN.S.C0000
 
     - label:
+          "Does the DUT support the Account Login server cluster, GetSetupPIN
+          command?"
+      id: ALOGIN.S.C00.Rsp
+
+    - label:
+          "Does the DUT support the Account Login server cluster, Login command?"
+      id: ALOGIN.S.C02.Rsp
+
+    - label:
+          "Does the DUT support the Account Login server cluster, Logout
+          command?"
+      id: ALOGIN.S.C03.Rsp
+
+    - label:
           "Does the DUT support the Account Login client cluster GetSetupPIN
           command?"
       id: ALOGIN.C.C0000
+
+    - label:
+          "Does the DUT support the Account Login Client cluster, GetSetupPIN
+          command?"
+      id: ALOGIN.C.C00.Tx
+
+    - label:
+          "Does the DUT support the Account Login Client  cluster, Login
+          command?"
+      id: ALOGIN.C.C02.Tx
+
+    - label:
+          "Does the DUT support the Account Login Client cluster, Logout
+          command?"
+      id: ALOGIN.C.C03.Tx
 
     - label: "Does the device implement the Keypad Input cluster as a client?"
       id: KEYPADINPUT.C
@@ -2424,11 +2531,6 @@ PICS:
           "Does the DUT support the Target Navigator server cluster
           CurrentTarget attribute?"
       id: TGTNAV.S.A0001
-
-    - label:
-          "Does the DUT support the Target Navigator server cluster
-          NavigateTarget command?"
-      id: TGTNAV.S.C0000
 
     - label:
           "Does the DUT support the commissioning procedure initiated by a
@@ -2458,19 +2560,33 @@ PICS:
       id: CHANNEL.C.C0003
 
     - label:
+          "Does the DUT support the Channel client cluster, ChangeChannel
+          command?"
+      id: CHANNEL.C.C00.Tx
+
+    - label:
+          "Does the DUT support the Channel client cluster,
+          ChangeChannelByNumber command?"
+      id: CHANNEL.C.C02.Tx
+
+    - label:
+          "Does the DUT support the Channel client cluster, SkipChannel command?"
+      id: CHANNEL.C.C03.Tx
+
+    - label:
           "Does the DUT support the Application Launcher server cluster,
           LaunchApp command?"
-      id: APPLAUNCHER.S.C0000
+      id: APPLAUNCHER.S.C00.Rsp
 
     - label:
           "Does the DUT support the Application Launcher server cluster, StopApp
           command?"
-      id: APPLAUNCHER.S.C0001
+      id: APPLAUNCHER.S.C01.Rsp
 
     - label:
           "Does the DUT support the Application Launcher server cluster, HideApp
           command?"
-      id: APPLAUNCHER.S.C0002
+      id: APPLAUNCHER.S.C02.Rsp
     #Bridge
     - label: "Does the DUT implement a Bridge"
       id: MCORE.BRIDGE
@@ -3779,6 +3895,12 @@ PICS:
 
     #Door Lock
     #server attributes
+    - label: "Does the DUT(server) support simulating a Not Fully Locked State?"
+      id: DRLK.S.Simulate.NotFullyLocked
+
+    - label: "Does the DUT(server) detect a LockJammed State?"
+      id: DRLK.S.DetectLockJammed
+
     - label: "Does the DUT-server support the LockState attribute?"
       id: DRLK.S.A0000
 

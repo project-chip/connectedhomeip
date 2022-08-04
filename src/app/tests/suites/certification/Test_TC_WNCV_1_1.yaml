@@ -14,6 +14,9 @@
 
 name: Window Covering [TC-WNCV-1.1] Global attributes with server as DUT
 
+PICS:
+    - WNCV.S
+
 config:
     nodeId: 0x12344321
     cluster: "Window Covering"
@@ -68,6 +71,77 @@ tests:
           constraints:
               type: list
               contains: [26]
+
+    - label:
+          "Read the Feature dependent(WNCV.S.F00 & WNCV.S.F02 & WNCV.S.F03)
+          attribute in AttributeList"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.F03 && WNCV.S.Afffb
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1, 3, 16, 17]
+
+    - label:
+          "Read the Feature dependent(WNCV.S.F01 & WNCV.S.F04 & WNCV.S.F03)
+          attribute in AttributeList"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.F03 && WNCV.S.Afffb
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2, 4, 18, 19]
+
+    - label: "Read the Feature dependent(WNCV.S.F00) attribute in AttributeList"
+      PICS: WNCV.S.F00 && WNCV.S.Afffb
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
+
+    - label: "Read the Feature dependent(WNCV.S.F00) attribute in AttributeList"
+      PICS: WNCV.S.F00 && WNCV.S.Afffb
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [6]
+
+    - label: "Read the Feature dependent(WNCV.S.F01) attribute in AttributeList"
+      PICS: WNCV.S.F01 && WNCV.S.Afffb
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [6]
+
+    - label:
+          "Read the Feature dependent(WNCV.S.F00 & WNCV.S.F02 ) attribute in
+          AttributeList"
+      PICS: WNCV.S.F00 && WNCV.S.F00 && WNCV.S.Afffb
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [8, 11, 14]
+
+    - label:
+          "Read the Feature dependent(WNCV.S.F01 & WNCV.S.F04 ) attribute in
+          AttributeList"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.Afffb
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [9, 12, 15]
 
     - label: "TH reads from the DUT the (0xFFF9) AcceptedCommandList attribute"
       PICS: WNCV.S.Afff9
