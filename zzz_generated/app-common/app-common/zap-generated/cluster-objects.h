@@ -2273,8 +2273,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToLevel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    uint8_t level           = static_cast<uint8_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
+    uint8_t level = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint16_t> transitionTime;
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
@@ -2291,8 +2291,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToLevel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    uint8_t level           = static_cast<uint8_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
+    uint8_t level = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint16_t> transitionTime;
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -2314,8 +2314,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Move::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode       = static_cast<MoveMode>(0);
-    uint8_t rate            = static_cast<uint8_t>(0);
+    MoveMode moveMode = static_cast<MoveMode>(0);
+    DataModel::Nullable<uint8_t> rate;
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
@@ -2332,8 +2332,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Move::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode       = static_cast<MoveMode>(0);
-    uint8_t rate            = static_cast<uint8_t>(0);
+    MoveMode moveMode = static_cast<MoveMode>(0);
+    DataModel::Nullable<uint8_t> rate;
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -2356,9 +2356,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    StepMode stepMode       = static_cast<StepMode>(0);
-    uint8_t stepSize        = static_cast<uint8_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
+    StepMode stepMode = static_cast<StepMode>(0);
+    uint8_t stepSize  = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint16_t> transitionTime;
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
@@ -2375,9 +2375,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    StepMode stepMode       = static_cast<StepMode>(0);
-    uint8_t stepSize        = static_cast<uint8_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
+    StepMode stepMode = static_cast<StepMode>(0);
+    uint8_t stepSize  = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint16_t> transitionTime;
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -2434,8 +2434,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToLevelWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    uint8_t level           = static_cast<uint8_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
+    uint8_t level = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint16_t> transitionTime;
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
@@ -2452,8 +2452,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToLevelWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    uint8_t level           = static_cast<uint8_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
+    uint8_t level = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint16_t> transitionTime;
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -2475,8 +2475,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode       = static_cast<MoveMode>(0);
-    uint8_t rate            = static_cast<uint8_t>(0);
+    MoveMode moveMode = static_cast<MoveMode>(0);
+    DataModel::Nullable<uint8_t> rate;
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
@@ -2493,8 +2493,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode       = static_cast<MoveMode>(0);
-    uint8_t rate            = static_cast<uint8_t>(0);
+    MoveMode moveMode = static_cast<MoveMode>(0);
+    DataModel::Nullable<uint8_t> rate;
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -2517,9 +2517,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    StepMode stepMode       = static_cast<StepMode>(0);
-    uint8_t stepSize        = static_cast<uint8_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
+    StepMode stepMode = static_cast<StepMode>(0);
+    uint8_t stepSize  = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint16_t> transitionTime;
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
 
@@ -2536,9 +2536,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    StepMode stepMode       = static_cast<StepMode>(0);
-    uint8_t stepSize        = static_cast<uint8_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
+    StepMode stepMode = static_cast<StepMode>(0);
+    uint8_t stepSize  = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint16_t> transitionTime;
     uint8_t optionsMask     = static_cast<uint8_t>(0);
     uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -2618,9 +2618,9 @@ namespace Attributes {
 namespace CurrentLevel {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentLevel::Id; }
@@ -2822,7 +2822,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::CurrentLevel::TypeInfo::DecodableType currentLevel               = static_cast<uint8_t>(0);
+        Attributes::CurrentLevel::TypeInfo::DecodableType currentLevel;
         Attributes::RemainingTime::TypeInfo::DecodableType remainingTime             = static_cast<uint16_t>(0);
         Attributes::MinLevel::TypeInfo::DecodableType minLevel                       = static_cast<uint8_t>(0);
         Attributes::MaxLevel::TypeInfo::DecodableType maxLevel                       = static_cast<uint8_t>(0);

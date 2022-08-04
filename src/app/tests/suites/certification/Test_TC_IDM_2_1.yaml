@@ -15,6 +15,9 @@
 
 name: 3.2.1. [TC-IDM-2.1] Read Request Action from DUT to TH. [{DUT_Client}]
 
+PICS:
+    - MCORE.IDM.C.ReadRequest
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -415,8 +418,9 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type bool."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type bool."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Bool
       verification: |
           In case of chip tool, here is an example command to use
 
@@ -453,8 +457,9 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type string."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type string."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_String
       verification: |
           In case of chip tool, here is an example command to use
 
@@ -490,8 +495,9 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type unsigned integer."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type unsigned integer."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_UnsignedInteger
       verification: |
           In case of chip tool, here is an example command to use
 
@@ -528,8 +534,9 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type signed integer."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type signed integer."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_SignedInteger
       verification: |
           In case of chip tool, here is an example command to use
 
@@ -566,15 +573,17 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type floating point."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type floating point."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_FloatingPoint
       verification: |
           DUT implementation required to verify read an attribute of data type Float
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type Octet String."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type Octet String."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_OctetString
       verification: |
           In case of chip tool, here is an example command to use
 
@@ -612,8 +621,9 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type Struct."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type Struct."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Struct
       verification: |
           In case of chip tool, here is an example command to use
 
@@ -654,8 +664,9 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type List."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type List."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_List
       verification: |
           In case of chip tool, here is an example command to use
 
@@ -720,8 +731,9 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type enum."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type enum."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Enum
       verification: |
           In case of chip tool, here is an example command to use
 
@@ -756,8 +768,9 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the Read Request Message to the TH to read an
-          attribute of data type bitmap."
+          "DUT sends the Read Request Message to the TH to read an attribute of
+          data type bitmap."
+      PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Bitmap
       verification: |
           In case of chip tool, here is an example command to use
 
@@ -845,7 +858,7 @@ tests:
       verification: |
           DUT implementation required to verify read an attribute which is is larger than 1 MTU(1280 bytes)
           Below sample wildcard read command will read all the attributes from the all-clusters-app and generates 1 MTU size of data.
-          If the dut doesn't support generating the large chunk data, then this test step can be skipped.
+          If the dut doesn"t support generating the large chunk data, then this test step can be skipped.
           Verify the last chunked data is having Suppress response True & TH will not send the Ack message.
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
@@ -869,4 +882,15 @@ tests:
           [1658396687.402097][3726:3731] CHIP:DMG:         InteractionModelRevision = 1
           [1658396687.402119][3726:3731] CHIP:DMG: }
           [1658396687.402400][3726:3731] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_FFFB DataVersion: 3456275847
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH with Manufacturer
+          specific clusters and attributes to read all attributes in all
+          clusters and all endpoints Path = [[ ]]. On receipt of this message,
+          TH should send a report data action with the attribute values to the
+          DUT."
+      verification: |
+          sudo ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF --timeout 40
+          On TH verify that Read Request Message received from DUT
       disabled: true

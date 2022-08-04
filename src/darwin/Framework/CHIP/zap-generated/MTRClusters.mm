@@ -1632,7 +1632,12 @@ using chip::SessionHandle;
                     }
                 }
                 request.level = params.level.unsignedCharValue;
-                request.transitionTime = params.transitionTime.unsignedShortValue;
+                if (params.transitionTime == nil) {
+                    request.transitionTime.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.transitionTime.SetNonNull();
+                    nonNullValue_0 = params.transitionTime.unsignedShortValue;
+                }
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
@@ -1671,7 +1676,12 @@ using chip::SessionHandle;
                 }
                 request.moveMode
                     = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
-                request.rate = params.rate.unsignedCharValue;
+                if (params.rate == nil) {
+                    request.rate.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.rate.SetNonNull();
+                    nonNullValue_0 = params.rate.unsignedCharValue;
+                }
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
@@ -1711,7 +1721,12 @@ using chip::SessionHandle;
                 request.stepMode
                     = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
                 request.stepSize = params.stepSize.unsignedCharValue;
-                request.transitionTime = params.transitionTime.unsignedShortValue;
+                if (params.transitionTime == nil) {
+                    request.transitionTime.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.transitionTime.SetNonNull();
+                    nonNullValue_0 = params.transitionTime.unsignedShortValue;
+                }
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
@@ -1785,7 +1800,12 @@ using chip::SessionHandle;
                     }
                 }
                 request.level = params.level.unsignedCharValue;
-                request.transitionTime = params.transitionTime.unsignedShortValue;
+                if (params.transitionTime == nil) {
+                    request.transitionTime.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.transitionTime.SetNonNull();
+                    nonNullValue_0 = params.transitionTime.unsignedShortValue;
+                }
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
@@ -1824,7 +1844,12 @@ using chip::SessionHandle;
                 }
                 request.moveMode
                     = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
-                request.rate = params.rate.unsignedCharValue;
+                if (params.rate == nil) {
+                    request.rate.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.rate.SetNonNull();
+                    nonNullValue_0 = params.rate.unsignedCharValue;
+                }
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
@@ -1864,7 +1889,12 @@ using chip::SessionHandle;
                 request.stepMode
                     = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
                 request.stepSize = params.stepSize.unsignedCharValue;
-                request.transitionTime = params.transitionTime.unsignedShortValue;
+                if (params.transitionTime == nil) {
+                    request.transitionTime.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.transitionTime.SetNonNull();
+                    nonNullValue_0 = params.transitionTime.unsignedShortValue;
+                }
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 

@@ -209,7 +209,7 @@ CHIP_ERROR DefaultSessionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
             ChipLogError(
                 SecureChannel,
                 "Session resumption cache is in an inconsistent state!  "
-                "Unable to save session resumption index during atetmpted deletion of fabric index %u: %" CHIP_ERROR_FORMAT,
+                "Unable to save session resumption index during attempted deletion of fabric index %u: %" CHIP_ERROR_FORMAT,
                 fabricIndex, err.Format());
         }
     }

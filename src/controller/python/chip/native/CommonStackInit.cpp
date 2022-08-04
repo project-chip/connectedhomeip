@@ -49,6 +49,17 @@ struct __attribute__((packed)) PyCommonStackInitParams
     uint32_t mBluetoothAdapterId;
 };
 
+/**
+ * Function to artifically cause a crash to happen
+ * that can be used in place of os.exit() in Python so that
+ * when run through GDB, you'll get a backtrace of what happened.
+ */
+void pychip_CauseCrash()
+{
+    uint8_t * ptr = nullptr;
+    *ptr          = 0;
+}
+
 ChipError::StorageType pychip_CommonStackInit(const PyCommonStackInitParams * aParams)
 {
     ReturnErrorOnFailure(Platform::MemoryInit().AsInteger());

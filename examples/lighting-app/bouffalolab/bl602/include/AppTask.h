@@ -71,7 +71,6 @@ private:
     static void FactoryResetButtonEventHandler(void);
     static void LightingActionButtonEventHandler(void);
     static void InitButtons(void);
-    static void StoreWifiConfig();
     void StartTimer(uint32_t aTimeoutMs);
 
     enum Function_t

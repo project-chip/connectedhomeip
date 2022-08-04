@@ -43,6 +43,7 @@
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 
+#include <lib/asn1/ASN1.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
@@ -1650,6 +1651,26 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
 
     status = X509_STORE_CTX_init(verifyCtx, store, x509LeafCertificate, chain);
     VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
+
+    // Set time used in the X509 certificate chain validation to the notBefore time of the leaf certificate.
+    // That way the X509_verify_cert() validates that intermediate and root certificates were
+    // valid at the time of the leaf certificate generation.
+    {
+        X509_VERIFY_PARAM * param = X509_STORE_CTX_get0_param(verifyCtx);
+        chip::ASN1::ASN1UniversalTime asn1Time;
+        char * asn1TimeStr = reinterpret_cast<char *>(X509_get_notBefore(x509LeafCertificate)->data);
+        uint32_t unixEpoch;
+
+        VerifyOrExit(param != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
+
+        VerifyOrExit(CHIP_NO_ERROR == asn1Time.ImportFrom_ASN1_TIME_string(CharSpan(asn1TimeStr, strlen(asn1TimeStr))),
+                     (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
+
+        VerifyOrExit(asn1Time.ExportTo_UnixTime(unixEpoch),
+                     (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
+
+        X509_VERIFY_PARAM_set_time(param, unixEpoch);
+    }
 
     status = X509_verify_cert(verifyCtx);
     VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kChainInvalid, err = CHIP_ERROR_CERT_NOT_TRUSTED));

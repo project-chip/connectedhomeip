@@ -1509,7 +1509,7 @@ public class ChipClusters {
     public void moveToLevel(
         DefaultClusterCallback callback,
         Integer level,
-        Integer transitionTime,
+        @Nullable Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride) {
       moveToLevel(
@@ -1519,7 +1519,7 @@ public class ChipClusters {
     public void moveToLevel(
         DefaultClusterCallback callback,
         Integer level,
-        Integer transitionTime,
+        @Nullable Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride,
         int timedInvokeTimeoutMs) {
@@ -1536,7 +1536,7 @@ public class ChipClusters {
     public void move(
         DefaultClusterCallback callback,
         Integer moveMode,
-        Integer rate,
+        @Nullable Integer rate,
         Integer optionsMask,
         Integer optionsOverride) {
       move(chipClusterPtr, callback, moveMode, rate, optionsMask, optionsOverride, null);
@@ -1545,7 +1545,7 @@ public class ChipClusters {
     public void move(
         DefaultClusterCallback callback,
         Integer moveMode,
-        Integer rate,
+        @Nullable Integer rate,
         Integer optionsMask,
         Integer optionsOverride,
         int timedInvokeTimeoutMs) {
@@ -1563,7 +1563,7 @@ public class ChipClusters {
         DefaultClusterCallback callback,
         Integer stepMode,
         Integer stepSize,
-        Integer transitionTime,
+        @Nullable Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride) {
       step(
@@ -1581,7 +1581,7 @@ public class ChipClusters {
         DefaultClusterCallback callback,
         Integer stepMode,
         Integer stepSize,
-        Integer transitionTime,
+        @Nullable Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride,
         int timedInvokeTimeoutMs) {
@@ -1612,7 +1612,7 @@ public class ChipClusters {
     public void moveToLevelWithOnOff(
         DefaultClusterCallback callback,
         Integer level,
-        Integer transitionTime,
+        @Nullable Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride) {
       moveToLevelWithOnOff(
@@ -1622,7 +1622,7 @@ public class ChipClusters {
     public void moveToLevelWithOnOff(
         DefaultClusterCallback callback,
         Integer level,
-        Integer transitionTime,
+        @Nullable Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride,
         int timedInvokeTimeoutMs) {
@@ -1639,7 +1639,7 @@ public class ChipClusters {
     public void moveWithOnOff(
         DefaultClusterCallback callback,
         Integer moveMode,
-        Integer rate,
+        @Nullable Integer rate,
         Integer optionsMask,
         Integer optionsOverride) {
       moveWithOnOff(chipClusterPtr, callback, moveMode, rate, optionsMask, optionsOverride, null);
@@ -1648,7 +1648,7 @@ public class ChipClusters {
     public void moveWithOnOff(
         DefaultClusterCallback callback,
         Integer moveMode,
-        Integer rate,
+        @Nullable Integer rate,
         Integer optionsMask,
         Integer optionsOverride,
         int timedInvokeTimeoutMs) {
@@ -1666,7 +1666,7 @@ public class ChipClusters {
         DefaultClusterCallback callback,
         Integer stepMode,
         Integer stepSize,
-        Integer transitionTime,
+        @Nullable Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride) {
       stepWithOnOff(
@@ -1684,7 +1684,7 @@ public class ChipClusters {
         DefaultClusterCallback callback,
         Integer stepMode,
         Integer stepSize,
-        Integer transitionTime,
+        @Nullable Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride,
         int timedInvokeTimeoutMs) {
@@ -1716,7 +1716,7 @@ public class ChipClusters {
         long chipClusterPtr,
         DefaultClusterCallback Callback,
         Integer level,
-        Integer transitionTime,
+        @Nullable Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride,
         @Nullable Integer timedInvokeTimeoutMs);
@@ -1725,7 +1725,7 @@ public class ChipClusters {
         long chipClusterPtr,
         DefaultClusterCallback Callback,
         Integer moveMode,
-        Integer rate,
+        @Nullable Integer rate,
         Integer optionsMask,
         Integer optionsOverride,
         @Nullable Integer timedInvokeTimeoutMs);
@@ -1735,7 +1735,7 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         Integer stepMode,
         Integer stepSize,
-        Integer transitionTime,
+        @Nullable Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride,
         @Nullable Integer timedInvokeTimeoutMs);
@@ -1751,7 +1751,7 @@ public class ChipClusters {
         long chipClusterPtr,
         DefaultClusterCallback Callback,
         Integer level,
-        Integer transitionTime,
+        @Nullable Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride,
         @Nullable Integer timedInvokeTimeoutMs);
@@ -1760,7 +1760,7 @@ public class ChipClusters {
         long chipClusterPtr,
         DefaultClusterCallback Callback,
         Integer moveMode,
-        Integer rate,
+        @Nullable Integer rate,
         Integer optionsMask,
         Integer optionsOverride,
         @Nullable Integer timedInvokeTimeoutMs);
@@ -1770,7 +1770,7 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         Integer stepMode,
         Integer stepSize,
-        Integer transitionTime,
+        @Nullable Integer transitionTime,
         Integer optionsMask,
         Integer optionsOverride,
         @Nullable Integer timedInvokeTimeoutMs);
@@ -1781,6 +1781,14 @@ public class ChipClusters {
         Integer optionsMask,
         Integer optionsOverride,
         @Nullable Integer timedInvokeTimeoutMs);
+
+    public interface CurrentLevelAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
 
     public interface OnLevelAttributeCallback {
       void onSuccess(@Nullable Integer value);
@@ -1846,12 +1854,12 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readCurrentLevelAttribute(IntegerAttributeCallback callback) {
+    public void readCurrentLevelAttribute(CurrentLevelAttributeCallback callback) {
       readCurrentLevelAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeCurrentLevelAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        CurrentLevelAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeCurrentLevelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -2081,10 +2089,13 @@ public class ChipClusters {
     }
 
     private native void readCurrentLevelAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, CurrentLevelAttributeCallback callback);
 
     private native void subscribeCurrentLevelAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        CurrentLevelAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readRemainingTimeAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

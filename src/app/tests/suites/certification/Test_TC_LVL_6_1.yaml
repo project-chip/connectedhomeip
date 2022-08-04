@@ -51,7 +51,7 @@ tests:
     - label: "Reads Minlevel attribute from DUT"
       PICS: LVL.S.A0002
       command: "readAttribute"
-      attribute: "min level"
+      attribute: "MinLevel"
       response:
           saveAs: MinlevelValue
           constraints:
@@ -76,7 +76,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.A0000 && LVL.S.C04.Rsp
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           saveAs: CurrentLevelValue
           constraints:
@@ -129,7 +129,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.C03.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           constraints:
               minValue: 21
@@ -182,7 +182,7 @@ tests:
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.C07.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           constraints:
               minValue: 43

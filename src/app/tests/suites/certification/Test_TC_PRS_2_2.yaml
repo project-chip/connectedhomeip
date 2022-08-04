@@ -15,23 +15,28 @@
 
 name: 3.2.2. [TC-PRS-2.2] Primary functionality with server as DUT
 
+PICS:
+    - PRS.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "TH reads from the DUT the MeasuredValue attribute"
       PICS: PRS.S.A0000
       verification: |
-          Verify on the TH Log:
-
           ./chip-tool pressuremeasurement read measured-value 1 1
+
+
+          On TH, verify that DUT  responds value  read is successful and note down the value read
 
           CHIP:TOO:   MeasuredValue: 0
       disabled: true

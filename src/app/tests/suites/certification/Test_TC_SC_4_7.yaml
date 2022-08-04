@@ -15,6 +15,9 @@
 
 name: 3.4.7. [TC-SC-4.7] Commissioner Discovery - Commissionee
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -29,12 +32,19 @@ tests:
       disabled: true
 
     - label: "Scan for DNS-SD commissioner advertisements from TH"
+      PICS:
+          MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.VP_KEY && MCORE.SC.DT_KEY &&
+          MCORE.SC.DN_KEY &&
       verification: |
           if DUT supports discovering UDC, DUT should be able to scan the TV-app
 
-          Execute teh below command on TH terminal.
+          Execute the below command on TH terminal.
 
-          ~$ avahi-browse -rt _matterc._udp
+
+
+          ~$ avahi-browse -rt _matterd._udp
+
+          Verify on the TH Log:
 
           =+ wlp3s0 IPv4 DD200C20D25AE5F7                              _matterd._udp        local
           + enp2s0 IPv6 DD200C20D25AE5F7                              _matterd._udp        local
@@ -66,15 +76,18 @@ tests:
           "By any means, TH adds an unknown key/value pair in the advertised
           data(e.g. AB=12345)"
       verification: |
-          avahi-publish-service --subtype=_S3._sub._matterc._udp --subtype=_L840._sub._matterc._udp DD200C20D25AE5F7 --subtype=_CM._sub._matterc._udp _matterc._udp 11111 D=840 CM=2  INVALID_TEST=40
+          avahi-publish-service --subtype=_V123._sub._matterd._udp DD200C20D25AE5F7 _matterd._udp 33333 VP=123+456 DT=35 DN="Living Room TV" INVALID_TEST=40
       disabled: true
 
     - label: "Scan for DNS-SD commissioner advertisements from TH"
       verification: |
-          ubuntu@ubuntu:~$ avahi-browse -rt _matterc._udp
-          +   eth0 IPv6 DD200C20D25AE5F7                              _matterc._udp        local
-          +   eth0 IPv4 DD200C20D25AE5F7                              _matterc._udp        local
-          =   eth0 IPv6 DD200C20D25AE5F7                              _matterc._udp        local
+          ubuntu@ubuntu:~$ avahi-browse -rt _matterd._udp
+
+          Verify on the TH Log:
+
+          +   eth0 IPv6 DD200C20D25AE5F7                              _matterd._udp        local
+          +   eth0 IPv4 DD200C20D25AE5F7                              _matterd._udp        local
+          =   eth0 IPv6 DD200C20D25AE5F7                              _matterd._udp        local
              hostname = [ubuntu-4.local]
              address = [fd00::9e]
              port = [11111]

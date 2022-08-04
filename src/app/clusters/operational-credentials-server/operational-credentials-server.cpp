@@ -739,8 +739,6 @@ exit:
             (void) groupDataProvider->RemoveFabric(newFabricIndex);
         }
 
-        // TODO(#19898): All ACL work done within AddNOC does not trigger ACL cluster updates
-
         (void) Access::GetAccessControl().DeleteAllEntriesForFabric(newFabricIndex);
 
         MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,

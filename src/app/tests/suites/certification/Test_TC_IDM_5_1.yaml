@@ -15,6 +15,9 @@
 
 name: 3.5.1. [TC-IDM-5.1] Timed Request Action from DUT to TH. [{DUT_Client}]
 
+PICS:
+    - MCORE.IDM.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -26,6 +29,7 @@ tests:
           Request Message to the TH after receiving the status response message
           from the TH. The Timed Request Message should contain a timeout value
           in milliseconds. (Example - 200 milliseconds)"
+      PICS: MCORE.IDM.C.InvokeRequest
       verification: |
           In the case of chip tool as a client, here is an example command the client can send invoke request  to the TH
           ./chip-tool onoff on 1 1 --timedInteractionTimeoutMs 200
@@ -115,6 +119,7 @@ tests:
           WriteRequestMessage to the TH after receiving the status response
           message from the TH. The Timed Request Message should contain a
           timeout value in milliseconds. (Example - 200 milliseconds)"
+      PICS: MCORE.IDM.C.WriteRequest
       verification: |
           Chip-tool as controller , here is the example command you can use
            ./chip-tool onoff write  on-time 2 1 1 --timedInteractionTimeoutMs 200
@@ -203,6 +208,7 @@ tests:
           should contain a timeout value in milliseconds. (Example - 200
           milliseconds) Force the TH to not send a response back to the DUT for
           the received timed request."
+      PICS: MCORE.IDM.C.WriteRequest || MCORE.IDM.C.InvokeRequest
       verification: |
           This is not testable in normal scenario, and needs to be tested as part of Unit test.
           https://github.com/CHIP-Specifications/chip-test-plans/issues/1885

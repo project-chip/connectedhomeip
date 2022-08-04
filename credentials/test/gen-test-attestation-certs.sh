@@ -173,6 +173,95 @@ cert_lifetime=4294967295
     done
 }
 
+# Set #6:
+#   Generating certificates chains { PAA, PAI, DAC } with one of the certificates
+#   in the chain either valid in the past or in the future.
+#   Note that all these chains should pass validation according to Matter specifications
+{
+    cert_valid_from_in_future="2031-06-28 14:23:43"
+    cert_lifetime_1year=365
+
+    # Generating DAC with validity in the past with PAA from Set #2 and PAI from Set #5
+    dac=0020
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-ValInPast-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-ValInPast-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac" --subject-vid "$vid" --subject-pid "$pid" --vid-pid-as-cn --valid-from "$cert_valid_from" --lifetime "$cert_lifetime_1year" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+
+    # Generating DAC with validity in the future with PAA from Set #2 and PAI from Set #5
+    dac=0021
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-ValInFuture-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-ValInFuture-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac" --subject-vid "$vid" --subject-pid "$pid" --vid-pid-as-cn --valid-from "$cert_valid_from_in_future" --lifetime "$cert_lifetime" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+
+    # Generating PAI and DAC with validity in the past with PAA from Set #2
+    pid=8005
+    dac=0022
+
+    pai_key_file="$dest_dir/Chip-Test-PAI-$vid-$pid-ValInPast-Key"
+    pai_cert_file="$dest_dir/Chip-Test-PAI-$vid-$pid-ValInPast-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type i --subject-cn "Matter Test PAI" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime_1year" --ca-key "$paa_key_file".pem --ca-cert "$paa_cert_file".pem --out-key "$pai_key_file".pem --out "$pai_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-ValInPast-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-ValInPast-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac" --subject-vid "$vid" --subject-pid "$pid" --vid-pid-as-cn --valid-from "$cert_valid_from" --lifetime "$cert_lifetime_1year" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+
+    # Generating PAI and DAC with validity in the future with PAA from Set #2
+    dac=0023
+
+    pai_key_file="$dest_dir/Chip-Test-PAI-$vid-$pid-ValInFuture-Key"
+    pai_cert_file="$dest_dir/Chip-Test-PAI-$vid-$pid-ValInFuture-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type i --subject-cn "Matter Test PAI" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from_in_future" --lifetime "$cert_lifetime_1year" --ca-key "$paa_key_file".pem --ca-cert "$paa_cert_file".pem --out-key "$pai_key_file".pem --out "$pai_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-ValInFuture-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-ValInFuture-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac" --subject-vid "$vid" --subject-pid "$pid" --vid-pid-as-cn --valid-from "$cert_valid_from_in_future" --lifetime "$cert_lifetime" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+
+    # Generating PAA and PAI with validity in the past with DAC valid in the past but doesn't expire
+    pid=8006
+    dac=0024
+
+    paa_key_file="$dest_dir/Chip-Test-PAA-$vid-ValInPast-Key"
+    paa_cert_file="$dest_dir/Chip-Test-PAA-$vid-ValInPast-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type a --subject-cn "Matter Test PAA" --subject-vid "$vid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime_1year" --out-key "$paa_key_file".pem --out "$paa_cert_file".pem
+
+    pai_key_file="$dest_dir/Chip-Test-PAI-$vid-$pid-ValInPast-Key"
+    pai_cert_file="$dest_dir/Chip-Test-PAI-$vid-$pid-ValInPast-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type i --subject-cn "Matter Test PAI" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime_1year" --ca-key "$paa_key_file".pem --ca-cert "$paa_cert_file".pem --out-key "$pai_key_file".pem --out "$pai_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-ValInPast-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-ValInPast-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac" --subject-vid "$vid" --subject-pid "$pid" --vid-pid-as-cn --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+
+    # Generating PAA and PAI and DAC with validity in the future; the DAC doesn't expire
+    dac=0025
+
+    paa_key_file="$dest_dir/Chip-Test-PAA-$vid-ValInFuture-Key"
+    paa_cert_file="$dest_dir/Chip-Test-PAA-$vid-ValInFuture-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type a --subject-cn "Matter Test PAA" --subject-vid "$vid" --valid-from "$cert_valid_from_in_future" --lifetime "$cert_lifetime_1year" --out-key "$paa_key_file".pem --out "$paa_cert_file".pem
+
+    pai_key_file="$dest_dir/Chip-Test-PAI-$vid-$pid-ValInFuture-Key"
+    pai_cert_file="$dest_dir/Chip-Test-PAI-$vid-$pid-ValInFuture-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type i --subject-cn "Matter Test PAI" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from_in_future" --lifetime "$cert_lifetime_1year" --ca-key "$paa_key_file".pem --ca-cert "$paa_cert_file".pem --out-key "$pai_key_file".pem --out "$pai_cert_file".pem
+
+    dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-ValInFuture-Key"
+    dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-ValInFuture-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac" --subject-vid "$vid" --subject-pid "$pid" --vid-pid-as-cn --valid-from "$cert_valid_from_in_future" --lifetime "$cert_lifetime" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+}
+
 # In addition to PEM format also create certificates in DER form.
 for cert_file_pem in "$dest_dir"/*Cert.pem; do
     cert_file_der="${cert_file_pem/.pem/.der}"
