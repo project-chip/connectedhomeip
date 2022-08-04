@@ -152,7 +152,6 @@ CHIP_ERROR AppTask::Init()
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 
     InitButtons();
-    StoreWifiConfig();
 
 #if PW_RPC_ENABLED
     chip::rpc::Init();
@@ -554,11 +553,6 @@ void AppTask::InitButtons(void)
 {
     Button_Configure_FactoryResetEventHandler(&FactoryResetButtonEventHandler);
     Button_Configure_LightingActionEventHandler(&LightingActionButtonEventHandler);
-}
-
-void AppTask::StoreWifiConfig(void)
-{
-    wifi_mgmr_scan(NULL, NULL);
 }
 
 void AppTask::LightStateUpdateEventHandler(void)
