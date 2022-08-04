@@ -919,6 +919,8 @@ ACT.S.A0001=1
 ACT.S.A0002=1
 ACT.S.M.FillActionList=1
 ACT.S.M.FillEndpointLists=1
+ACT.S.M.SetupURLWithSuffix=1
+ACT.S.M.OverlappingEndpointLists=1
 ACT.C.C00.Tx=0
 ACT.C.C01.Tx=0
 ACT.C.C02.Tx=0
@@ -1503,6 +1505,7 @@ MOD.S.A0003=1
 MOD.S.A0004=1
 MOD.S.A0005=1
 OO.S.A4003=1
+MOD.C.A0002=1
 MOD.C.C00.Tx=1
 MOD.S.C00.Rsp=1
 

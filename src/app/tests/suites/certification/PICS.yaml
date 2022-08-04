@@ -3358,6 +3358,14 @@ PICS:
     - label: "Can the EndpointLists attribute be changed by some means?"
       id: ACT.S.M.FillEndpointLists
 
+    - label: "Can a suffix be used on SetupURL"
+      id: ACT.S.M.SetupURLWithSuffix
+
+    - label:
+          "Does the DUT support exposing an Endpoint in multiple
+          EndpointListStructs"
+      id: ACT.S.M.OverlappingEndpointLists
+
     - label: "Does the DUT support sending the InstantAction command?"
       id: ACT.C.C00.Tx
 
@@ -3869,9 +3877,6 @@ PICS:
           "Does the DUT-client support the OperationalDatasetComponents
           attribute?"
       id: DGTHREAD.C.A003d
-
-    - label: "Does the DUT-client support the ActiveNetworkFaults attribute?"
-      id: DGTHREAD.C.A003e
 
     - label: "Does the DUT-client support the ActiveNetworkFaults attribute?"
       id: DGTHREAD.C.A003e
@@ -4923,6 +4928,9 @@ PICS:
 
     - label: "Does the DUT support receiving the ChangeToMode command?"
       id: MOD.S.C00.Rsp
+
+    - label: "Does the DUT support the SupportedModes attribute?"
+      id: MOD.C.A0002
 
     #Device Attestation
     - label:

@@ -17,10 +17,6 @@ name:
     3.1.5. [TC-DD-1.5] NFC Rules of Advertisement and Onboarding [DUT -
     Commissionee]
 
-PICS:
-    - MCORE.ROLE.COMMISSIONEE
-    - MCORE.DD.NFC
-
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -30,6 +26,7 @@ tests:
     - label:
           "Keep the DUT in packaging and bring in TH NFC scanner close to the
           DUT packaging."
+      PICS: MCORE.DD.SCAN_NFC
       verification: |
           Vendor specific field verification
       disabled: true
@@ -38,6 +35,7 @@ tests:
           "Unpack DUT from its packaging, make sure DUT is not powered on and do
           not put the DUT in pairing mode. Bring in TH NFC scanner close to the
           DUTs NFC tag"
+      PICS: MCORE.DD.SCAN_NFC
       verification: |
           Vendor specific field verification
       disabled: true
@@ -45,7 +43,7 @@ tests:
     - label:
           "Power on DUT and do not put the DUT in pairing mode. Bring in TH NFC
           scanner close to the DUTs NFC tag"
-      PICS: MCORE.DD.PHYSICAL_TAMPERING
+      PICS: MCORE.DD.PHYSICAL_TAMPERING && MCORE.DD.SCAN_NFC
       verification: |
           Vendor specific field verification
       disabled: true
@@ -59,13 +57,13 @@ tests:
     - label:
           "Power on DUT and put the DUT in pairing mode. Bring in TH NFC scanner
           close to NFC tag"
-      PICS: MCORE.DD.PHYSICAL_TAMPERING
+      PICS: MCORE.DD.PHYSICAL_TAMPERING && MCORE.DD.SCAN_NFC
       verification: |
           Vendor specific field verification
       disabled: true
 
     - label: "Power on DUT. Bring in NFC scanner close to NFC tag"
-      PICS: MCORE.DD.PHYSICAL_TAMPERING
+      PICS: MCORE.DD.PHYSICAL_TAMPERING && MCORE.DD.SCAN_NFC
       verification: |
           Vendor specific field verification
       disabled: true
@@ -95,6 +93,7 @@ tests:
       disabled: true
 
     - label: "Using TH NFC scanner - read NFC tag Reader type"
+      PICS: MCORE.DD.SCAN_NFC
       verification: |
           Vendor specific field verification
       disabled: true

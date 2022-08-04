@@ -13,7 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 132.2.4. [TC-ACL-2.4] ACL attribute
+name: 131.2.4. [TC-ACL-2.4] ACL attribute
+
+PICS:
+    - ACL.S
 
 config:
     nodeId: 0x12344321
@@ -688,7 +691,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
           {"fabricIndex": 1, "privilege": 1, "authMode": 2, "subjects":  [111, 222, 333, 444], "targets": null},
-          {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects":  [111, 222, 333, 444], "targets": null}]" 1 0
+          {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects":  [555, 666, 777, 888], "targets": null}]" 1 0
           On TH , Verify DUT  Responds  Successfully to acl attribute with a  value is list of AccessControlEntryStruct containing 3 elements as Target Null.
 
           [1657542060.230268][3398:3403] CHIP:DMG: {
@@ -2366,11 +2369,11 @@ tests:
 
     - label:
           "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute value
-          is list of AccessControlEntryStruct containing 2 elements 1.struct
-          Privilege field: Administer (5) AuthMode field: CASE (2) Subjects
-          field: [N1] Targets field: null 2.struct Privilege field: Operate (3)
-          AuthMode field: CASE (2) Subjects field: null Targets field:
-          [{Endpoint: 255}]"
+          is list of AccessControlEntryStruct containing 2 elements 1.
+          struct  Privilege field: Administer (5)  AuthMode field: CASE
+          (2)  Subjects field: [N1]  Targets field: null 2. struct  Privilege
+          field: Operate (3)  AuthMode field: CASE (2)  Subjects field:
+          null  Targets field: [{Endpoint: 65535}]"
       PICS: ACL.S.A0000
       verification: |
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": null, "endpoint": 65535, "deviceType": null }]}]" 1 0

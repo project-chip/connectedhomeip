@@ -13,7 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 132.2.5. [TC-ACL-2.5] AccessControlExtensionChanged event
+name: 133.2.5. [TC-ACL-2.5] AccessControlExtensionChanged event
+
+PICS:
+    - ACL.S
 
 config:
     nodeId: 0x12344321
