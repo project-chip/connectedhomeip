@@ -709,7 +709,8 @@ ChipError::StorageType pychip_FreeOperationalDeviceProxy(chip::OperationalDevice
 {
     if (deviceProxy != nullptr)
     {
-        delete deviceProxy;
+        // TODO this is a temp experiment to see if cirque passes with this removed
+        // delete deviceProxy;
     }
     return CHIP_NO_ERROR.AsInteger();
 }

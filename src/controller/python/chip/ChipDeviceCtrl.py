@@ -123,10 +123,8 @@ class DeviceProxyWrapper():
         self._dmLib = dmLib
 
     def __del__(self):
-        # TODO this is a temp experiment to see if cirque passes with this removed
-        #if (self._dmLib is not None and builtins.chipStack is not None):
-        #    builtins.chipStack.Call(lambda: self._dmLib.pychip_FreeOperationalDeviceProxy(self._deviceProxy))
-        return
+        if (self._dmLib is not None and builtins.chipStack is not None):
+            builtins.chipStack.Call(lambda: self._dmLib.pychip_FreeOperationalDeviceProxy(self._deviceProxy))
 
     @property
     def deviceProxy(self) -> ctypes.c_void_p:
