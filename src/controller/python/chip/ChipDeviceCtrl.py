@@ -124,6 +124,7 @@ class DeviceProxyWrapper():
         that is not an issue that needs to be accounted for and it will become very apparent
         if that happens.
     '''
+
     def __init__(self, deviceProxy: ctypes.c_void_p, dmLib=None):
         self._deviceProxy = deviceProxy
         self._dmLib = dmLib
