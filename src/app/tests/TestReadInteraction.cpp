@@ -286,6 +286,7 @@ class TestReadInteraction
 {
 public:
     static void TestReadClient(nlTestSuite * apSuite, void * apContext);
+    static void TestReadUnexpectedSubscriptionId(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler(nlTestSuite * apSuite, void * apContext);
     static void TestReadClientGenerateAttributePathList(nlTestSuite * apSuite, void * apContext);
     static void TestReadClientGenerateInvalidAttributePathList(nlTestSuite * apSuite, void * apContext);
@@ -331,11 +332,11 @@ public:
 
 private:
     static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
-                                   bool aNeedInvalidReport, bool aSuppressResponse);
+                                   bool aNeedInvalidReport, bool aSuppressResponse, bool aHasSubscriptionId);
 };
 
 void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
-                                             bool aNeedInvalidReport, bool aSuppressResponse)
+                                             bool aNeedInvalidReport, bool aSuppressResponse, bool aHasSubscriptionId = false)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
@@ -345,6 +346,12 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
 
     err = reportDataMessageBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    if (aHasSubscriptionId)
+    {
+        reportDataMessageBuilder.SubscriptionId(1);
+        NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
+    }
 
     AttributeReportIBs::Builder & attributeReportIBsBuilder = reportDataMessageBuilder.CreateAttributeReportIBs();
     NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
@@ -433,6 +440,32 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     GenerateReportData(apSuite, apContext, buf, false /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
     err = readClient.ProcessReportData(std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+}
+
+void TestReadInteraction::TestReadUnexpectedSubscriptionId(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    MockInteractionModelApp delegate;
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Read);
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    err = readClient.SendRequest(readPrepareParams);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    // We don't actually want to deliver that message, because we want to
+    // synthesize the read response.  But we don't want it hanging around
+    // forever either.
+    ctx.GetLoopback().mNumMessagesToDrop = 1;
+    ctx.DrainAndServiceIO();
+
+    // For read, we don't expect there is subscription id in report data.
+    GenerateReportData(apSuite, apContext, buf, false /*aNeedInvalidReport*/, true /* aSuppressResponse*/,
+                       true /*aHasSubscriptionId*/);
+    err = readClient.ProcessReportData(std::move(buf));
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContext)
@@ -3350,6 +3383,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadChunking", chip::app::TestReadInteraction::TestReadChunking),
     NL_TEST_DEF("TestSetDirtyBetweenChunks", chip::app::TestReadInteraction::TestSetDirtyBetweenChunks),
     NL_TEST_DEF("CheckReadClient", chip::app::TestReadInteraction::TestReadClient),
+    NL_TEST_DEF("TestReadUnexpectedSubscriptionId", chip::app::TestReadInteraction::TestReadUnexpectedSubscriptionId),
     NL_TEST_DEF("CheckReadHandler", chip::app::TestReadInteraction::TestReadHandler),
     NL_TEST_DEF("TestReadClientGenerateAttributePathList", chip::app::TestReadInteraction::TestReadClientGenerateAttributePathList),
     NL_TEST_DEF("TestReadClientGenerateInvalidAttributePathList", chip::app::TestReadInteraction::TestReadClientGenerateInvalidAttributePathList),

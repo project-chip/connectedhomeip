@@ -57,12 +57,12 @@ ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeM
 
 void ReadClient::ClearActiveSubscriptionState()
 {
-    mIsReporting             = false;
-    mIsPrimingReports        = true;
-    mPendingMoreChunks       = false;
-    mMinIntervalFloorSeconds = 0;
-    mMaxInterval             = 0;
-    mSubscriptionId          = 0;
+    mIsReporting                  = false;
+    mWaitingForFirstPrimingReport = true;
+    mPendingMoreChunks            = false;
+    mMinIntervalFloorSeconds      = 0;
+    mMaxInterval                  = 0;
+    mSubscriptionId               = 0;
     MoveToState(ClientState::Idle);
 }
 
@@ -504,7 +504,8 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     err = report.GetSubscriptionId(&subscriptionId);
     if (CHIP_NO_ERROR == err)
     {
-        if (mIsPrimingReports)
+        VerifyOrExit(IsSubscriptionType(), err = CHIP_ERROR_INVALID_ARGUMENT);
+        if (mWaitingForFirstPrimingReport)
         {
             mSubscriptionId = subscriptionId;
         }
@@ -592,7 +593,7 @@ exit:
         err                     = StatusResponse::Send(Status::Success, mExchange.Get(), !noResponseExpected);
     }
 
-    mIsPrimingReports = false;
+    mWaitingForFirstPrimingReport = false;
     return err;
 }
 
