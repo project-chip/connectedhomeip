@@ -15,6 +15,9 @@
 
 name: 4.1.5. [TC-DA-1.5] NOCSR Procedure Validation [DUT - Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -23,7 +26,7 @@ config:
 tests:
     - label: "TH1 fully commissions the DUT"
       verification: |
-          sudo ./chip-all-clusters-app --wifi
+          sudo ./chip-all-clusters-app --wifi --trace_decode 1
 
           Verify in TH log:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
@@ -69,7 +72,7 @@ tests:
           [1658393763.804288][3345:3350] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1658393763.804376][3345:3350] CHIP:TOO:   ArmFailSafeResponse: {
           [1658393763.804424][3345:3350] CHIP:TOO:     errorCode: 0
-          [1658393763.804459][3345:3350] CHIP:TOO:     debugText:
+          [1658393763.804459][3345:3350] CHIP:TOO:     debugText: 
           [1658393763.804491][3345:3350] CHIP:TOO:    }
       disabled: true
 
@@ -120,7 +123,7 @@ tests:
           [1658394142.961297][3378:3383] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1658394142.961363][3378:3383] CHIP:TOO:   ArmFailSafeResponse: {
           [1658394142.961401][3378:3383] CHIP:TOO:     errorCode: 0
-          [1658394142.961427][3378:3383] CHIP:TOO:     debugText:
+          [1658394142.961427][3378:3383] CHIP:TOO:     debugText: 
           [1658394142.961451][3378:3383] CHIP:TOO:    }
       disabled: true
 
@@ -136,7 +139,7 @@ tests:
           [1658393763.804288][3345:3350] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1658393763.804376][3345:3350] CHIP:TOO:   ArmFailSafeResponse: {
           [1658393763.804424][3345:3350] CHIP:TOO:     errorCode: 0
-          [1658393763.804459][3345:3350] CHIP:TOO:     debugText:
+          [1658393763.804459][3345:3350] CHIP:TOO:     debugText: 
           [1658393763.804491][3345:3350] CHIP:TOO:    }
       disabled: true
 
@@ -151,7 +154,7 @@ tests:
           [1658394196.798787][3387:3392] CHIP:DMG: ICR moving to [ResponseRe]
           [1658394196.798859][3387:3392] CHIP:DMG: InvokeResponseMessage =
           [1658394196.798899][3387:3392] CHIP:DMG: {
-          [1658394196.798939][3387:3392] CHIP:DMG:         suppressResponse = false,
+          [1658394196.798939][3387:3392] CHIP:DMG:         suppressResponse = false, 
           [1658394196.798980][3387:3392] CHIP:DMG:         InvokeResponseIBs =
           [1658394196.799031][3387:3392] CHIP:DMG:         [
           [1658394196.799071][3387:3392] CHIP:DMG:                 InvokeResponseIB =
@@ -164,18 +167,18 @@ tests:
           [1658394196.799436][3387:3392] CHIP:DMG:                                         ClusterId = 0x3e,
           [1658394196.799487][3387:3392] CHIP:DMG:                                         CommandId = 0x4,
           [1658394196.799540][3387:3392] CHIP:DMG:                                 },
-          [1658394196.799597][3387:3392] CHIP:DMG:
+          [1658394196.799597][3387:3392] CHIP:DMG:                                 
           [1658394196.799646][3387:3392] CHIP:DMG:                                 StatusIB =
           [1658394196.799705][3387:3392] CHIP:DMG:                                 {
           [1658394196.799760][3387:3392] CHIP:DMG:                                         status = 0x85 (INVALID_COMMAND),
           [1658394196.799809][3387:3392] CHIP:DMG:                                 },
-          [1658394196.799863][3387:3392] CHIP:DMG:
+          [1658394196.799863][3387:3392] CHIP:DMG:                                 
           [1658394196.799907][3387:3392] CHIP:DMG:                         },
-          [1658394196.799962][3387:3392] CHIP:DMG:
+          [1658394196.799962][3387:3392] CHIP:DMG:                         
           [1658394196.800003][3387:3392] CHIP:DMG:                 },
-          [1658394196.800048][3387:3392] CHIP:DMG:
+          [1658394196.800048][3387:3392] CHIP:DMG:                 
           [1658394196.800089][3387:3392] CHIP:DMG:         ],
-          [1658394196.800138][3387:3392] CHIP:DMG:
+          [1658394196.800138][3387:3392] CHIP:DMG:         
           [1658394196.800179][3387:3392] CHIP:DMG:         InteractionModelRevision = 1
           [1658394196.800218][3387:3392] CHIP:DMG: },
           [1658394196.800310][3387:3392] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_0004 Status=0x85
@@ -194,7 +197,7 @@ tests:
           [1658394142.961297][3378:3383] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1658394142.961363][3378:3383] CHIP:TOO:   ArmFailSafeResponse: {
           [1658394142.961401][3378:3383] CHIP:TOO:     errorCode: 0
-          [1658394142.961427][3378:3383] CHIP:TOO:     debugText:
+          [1658394142.961427][3378:3383] CHIP:TOO:     debugText: 
           [1658394142.961451][3378:3383] CHIP:TOO:    }
       disabled: true
 
@@ -244,15 +247,15 @@ tests:
 
     - label: "TH2 extracts the pubic key from noc1 and noc2"
       verification: |
-          Verify both public key of noc1 and noc 2 are different
+          Verify both public key of noc1 and noc 2 are different 
 
           To extract public key follow the below step
           1. Copy the NOCVALUE of TH1 in commissioning log of TH1
-          2. save it in a file
+          2. save it in a file 
           3. give below command to get public key
               ./out/debug/chip-cert print-cert noc_1.txt
 
-          ---> The extracted public key of noc1 is
+          ---> The extracted public key of noc1 is 
           CHIP Certificate:
               Signature Algo  : ECDSAWithSHA256
               Issuer          : [[ MatterICACId = 0000000000000001 ]]
@@ -262,20 +265,20 @@ tests:
                                    MatterNodeId = 0000000000000001 ]]
               Public Key Algo : ECPublicKey
               Curve Id        : prime256v1
-              Public Key      : 04 C0 DC A5 A0 B5 83 94 6B 14 5C 8D B4 B7 99 5E
-                                CA 0B B1 55 A8 1A 8B C2 C0 E0 82 48 81 C3 4E 28
-                                AC 14 AD 2E 9E 96 B1 63 4D D4 D1 1B 80 F4 5D C4
-                                5B F5 12 33 EC 9F E7 6F 37 11 F4 EF 8E 78 54 26
-                                E9
+              Public Key      : 04 C0 DC A5 A0 B5 83 94 6B 14 5C 8D B4 B7 99 5E 
+                                CA 0B B1 55 A8 1A 8B C2 C0 E0 82 48 81 C3 4E 28 
+                                AC 14 AD 2E 9E 96 B1 63 4D D4 D1 1B 80 F4 5D C4 
+                                5B F5 12 33 EC 9F E7 6F 37 11 F4 EF 8E 78 54 26 
+                                E9 
               Extensions:
-                  Key Usage        : DigitalSignature
-                  Key Purpose      : ServerAuth ClientAuth
-                  Subject Key Id   : 8A A3 C2 61 7A D4 D9 58 8A 44 8B E4 8E D7 F0 97 00 C3 48 1E
-                  Authority Key Id : F7 EC B4 D1 CB 3F 1B 16 6A 6C EE 7E 70 A9 2A 8B 3A 39 5C 60
-              Signature       : 30 49 D3 0F 18 29 E6 B6 A2 89 1E D8 DF 2A 12 33
-                                50 C2 C8 6F 78 2D AA 37 AF A1 C9 4A 95 56 78 CD
-                                BA D5 4F AC 3F F0 81 6E 0B D3 E0 BE C9 7E 8E FE
-                                FB 7A 28 67 8E BA 58 8F D9 74 F1 4D C4 82 C5 F4
+                  Key Usage        : DigitalSignature 
+                  Key Purpose      : ServerAuth ClientAuth 
+                  Subject Key Id   : 8A A3 C2 61 7A D4 D9 58 8A 44 8B E4 8E D7 F0 97 00 C3 48 1E 
+                  Authority Key Id : F7 EC B4 D1 CB 3F 1B 16 6A 6C EE 7E 70 A9 2A 8B 3A 39 5C 60 
+              Signature       : 30 49 D3 0F 18 29 E6 B6 A2 89 1E D8 DF 2A 12 33 
+                                50 C2 C8 6F 78 2D AA 37 AF A1 C9 4A 95 56 78 CD 
+                                BA D5 4F AC 3F F0 81 6E 0B D3 E0 BE C9 7E 8E FE 
+                                FB 7A 28 67 8E BA 58 8F D9 74 F1 4D C4 82 C5 F4 
 
           --->Follow the same steps for noc2
           The generated public key for noc2 is
@@ -288,18 +291,18 @@ tests:
                                    MatterNodeId = 0000000000000002 ]]
               Public Key Algo : ECPublicKey
               Curve Id        : prime256v1
-              Public Key      : 04 C8 25 0C E9 78 6E EC 37 84 38 37 2A 32 09 29
-                                7D 4B 62 4B 73 35 89 0F F8 99 9E 65 ED 17 4C BE
-                                12 5F 71 FD A9 78 E2 09 CF CD 88 E4 89 32 70 DF
-                                1A 27 A7 A0 93 0F F0 99 C1 B9 74 43 B3 BC 8D B2
-                                70
+              Public Key      : 04 C8 25 0C E9 78 6E EC 37 84 38 37 2A 32 09 29 
+                                7D 4B 62 4B 73 35 89 0F F8 99 9E 65 ED 17 4C BE 
+                                12 5F 71 FD A9 78 E2 09 CF CD 88 E4 89 32 70 DF 
+                                1A 27 A7 A0 93 0F F0 99 C1 B9 74 43 B3 BC 8D B2 
+                                70 
               Extensions:
-                  Key Usage        : DigitalSignature
-                  Key Purpose      : ServerAuth ClientAuth
-                  Subject Key Id   : 6E 2E D0 9A 98 D0 E4 5D 61 F1 A5 0B 6D A4 83 8D 25 84 DC 8F
-                  Authority Key Id : 71 CD 75 12 5F 58 34 3A B9 38 D5 E7 FF F7 56 51 32 02 DD 47
-              Signature       : 0E 91 72 11 7F 5F 7C F5 E5 35 4C 29 80 54 CB 63
-                                9B CC 7B B9 9D AD 1A E2 01 30 C0 F8 BA 19 30 24
-                                35 73 D1 1C BC DA 98 35 17 4D E0 ED F1 6B 01 4D
+                  Key Usage        : DigitalSignature 
+                  Key Purpose      : ServerAuth ClientAuth 
+                  Subject Key Id   : 6E 2E D0 9A 98 D0 E4 5D 61 F1 A5 0B 6D A4 83 8D 25 84 DC 8F 
+                  Authority Key Id : 71 CD 75 12 5F 58 34 3A B9 38 D5 E7 FF F7 56 51 32 02 DD 47 
+              Signature       : 0E 91 72 11 7F 5F 7C F5 E5 35 4C 29 80 54 CB 63 
+                                9B CC 7B B9 9D AD 1A E2 01 30 C0 F8 BA 19 30 24 
+                                35 73 D1 1C BC DA 98 35 17 4D E0 ED F1 6B 01 4D 
                                 62 AC 64 A5 CE 21 CB 2D 2B D2 22 FE 52 92 30 F9
       disabled: true

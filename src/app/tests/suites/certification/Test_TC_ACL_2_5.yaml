@@ -13,7 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 132.2.5. [TC-ACL-2.5] AccessControlExtensionChanged event
+name: 133.2.5. [TC-ACL-2.5] AccessControlExtensionChanged event
+
+PICS:
+    - ACL.S
 
 config:
     nodeId: 0x12344321
@@ -162,7 +165,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element
+          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element 
           7284747.131523][2411:2416] CHIP:DMG:                        StatusIB =
           [1657284747.131568][2411:2416] CHIP:DMG:                        {
           [1657284747.131618][2411:2416] CHIP:DMG:                                status = 0x00 (SUCCESS),
@@ -385,7 +388,7 @@ tests:
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"1718"},{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
 
-          On TH , Verify DUT  Responds  Successfully to extension attribute
+          On TH , Verify DUT  Responds  Successfully to extension attribute 
 
 
           1657289068.797364][9823:9828] CHIP:DMG: WriteResponseMessage =

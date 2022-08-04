@@ -17,6 +17,9 @@ name:
     4.1.1. [TC-DA-1.1] The NOC SHALL be wiped on Factory Reset [DUT -
     Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -25,10 +28,11 @@ config:
 tests:
     - label: "Commission DUT to TH1s Fabric"
       verification: |
-          sudo ./chip-all-clusters-app --wifi
+          sudo ./chip-all-clusters-app --wifi 
+
+          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
 
           Verify in TH log:
-          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
 
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
@@ -40,7 +44,8 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read fabrics 1 0
 
-          Verify there is single entry in TH log:
+          Verify that there is a single entry in the list
+
           [1655471672.386120][13377:13382] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2667297992
           [1655471672.386213][13377:13382] CHIP:TOO:   Fabrics: 1 entries
           [1655471672.386291][13377:13382] CHIP:TOO:     [1]: {
@@ -48,7 +53,7 @@ tests:
           [1655471672.386378][13377:13382] CHIP:TOO:       VendorId: 65521
           [1655471672.386412][13377:13382] CHIP:TOO:       FabricId: 1
           [1655471672.386445][13377:13382] CHIP:TOO:       NodeId: 1
-          [1655471672.386675][13377:13382] CHIP:TOO:       Label:
+          [1655471672.386675][13377:13382] CHIP:TOO:       Label: 
           [1655471672.386716][13377:13382] CHIP:TOO:       FabricIndex: 1
           [1655471672.386750][13377:13382] CHIP:TOO:      }
       disabled: true
@@ -59,7 +64,8 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read nocs 1 0
 
-          Verify there is single entry in TH log:
+          Verify there is single entry and Fabric ID matches FabricID of TH1
+
           [1658392350.745452][3254:3259] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 1660110003
           [1658392350.748972][3254:3259] CHIP:TOO:   NOCs: 1 entries
           [1658392350.749041][3254:3259] CHIP:TOO:     [1]: {
@@ -73,12 +79,12 @@ tests:
           "Factory reset DUT Perform the device discovery flow checks as covered
           in TC-DD-2.2"
       verification: |
-          1. TH starts matter announcement procedure using BLE transport : verify this by sending
-          "./chip-tool discover commissionables" after launching all-clusters-app on DUT
+          1. TH starts matter announcement procedure using BLE transport : verify this by sending 
+          "./chip-tool discover commissionables" after launching all-clusters-app on DUT 
 
-          2. DUT must find TH and provide onboarding data to for validation.
+          2. DUT must find TH and provide onboarding data to for validation. 
           Pass Criteria: DUT is able to report the Onboarding payload as set on TH : Verify this by commissioning DUT with TH
-          1. TH starts matter announcement procedure using BLE transport : verify this by sending "./chip-tool discover commissionables" after launching all-clusters-app on DUT
+          1. TH starts matter announcement procedure using BLE transport : verify this by sending "./chip-tool discover commissionables" after launching all-clusters-app on DUT 
           2. DUT must find TH and provide onboarding data to for validation. Pass Criteria: DUT is able to report the Onboarding payload as set on TH : Verify this by commissioning DUT with TH by passing "./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1"
       disabled: true
 
@@ -98,9 +104,9 @@ tests:
           [1635691999.946983][3822:3827] CHIP:EM: Flushed pending ack for MessageCounter:3234931243 on exchange 35324i
 
 
-          2. manualcode will be provided by TH when we pass above command pass manualcode in TH2 to commission by using "./chip-tool pairing code 2 36199720672" considering 36199720672 as manualcode generated in TH
+          2. manualcode will be provided by TH when we pass above command pass manualcode in TH2 to commission by using "./chip-tool pairing code 2 36199720672" considering 36199720672 as manualcode generated in TH 
 
-          Verify whether you got below message in the log of TH
+          Verify whether you got below message in the log of TH 
           Device commissioning completed with success
       disabled: true
 
@@ -110,7 +116,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read fabrics 2 0
 
-          Verify there is single entry in TH log:
+          Verify there is single entry and FabricID matches the FabricID of TH2
 
           [1655471672.386120][13377:13382] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2667297992
           [1655471672.386213][13377:13382] CHIP:TOO:   Fabrics: 1 entries
@@ -119,7 +125,7 @@ tests:
           [1655471672.386378][13377:13382] CHIP:TOO:       VendorId: 65521
           [1655471672.386412][13377:13382] CHIP:TOO:       FabricId: 1
           [1655471672.386445][13377:13382] CHIP:TOO:       NodeId: 2
-          [1655471672.386675][13377:13382] CHIP:TOO:       Label:
+          [1655471672.386675][13377:13382] CHIP:TOO:       Label: 
           [1655471672.386716][13377:13382] CHIP:TOO:       FabricIndex: 2
           [1655471672.386750][13377:13382] CHIP:TOO:      }
       disabled: true
@@ -129,7 +135,7 @@ tests:
       verification: |
           "./chip-tool operationalcredentials read nocs 2 0
 
-          Verify there is single entry in TH log:
+          Verify there is single entry and verify the NOC entry of TH1 and NOC entry of TH2 are different
 
           [1655471146.098327][13302:13307] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2667297991
           [1655471146.098416][13302:13307] CHIP:TOO:   NOCs: 1 entries
