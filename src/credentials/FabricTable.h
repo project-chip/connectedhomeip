@@ -230,12 +230,7 @@ protected:
 
     VendorId mVendorId                                  = VendorId::NotSpecified;
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
-
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-    mutable Crypto::P256KeypairHSM * mOperationalKey = nullptr;
-#else
     mutable Crypto::P256Keypair * mOperationalKey = nullptr;
-#endif
     bool mHasExternallyOwnedOperationalKey = false;
 
     CHIP_ERROR CommitToStorage(PersistentStorageDelegate * storage) const;

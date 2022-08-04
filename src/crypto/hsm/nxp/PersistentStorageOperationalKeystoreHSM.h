@@ -24,6 +24,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
+#if ENABLE_HSM_GENERATE_EC_KEY
+
 namespace chip {
 
 class PersistentStorageOperationalKeystoreHSM : public Crypto::OperationalKeystore
@@ -104,3 +106,5 @@ protected:
 };
 
 } // namespace chip
+
+#endif //#if ENABLE_HSM_GENERATE_EC_KEY

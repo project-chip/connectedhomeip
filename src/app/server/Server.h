@@ -39,7 +39,7 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/OperationalKeystore.h>
 #ifdef ENABLE_HSM_EC_KEY
-#include <crypto/hsm/nxp/PersistentStorageOperationalKeystoreHSM_SE05X.h>
+#include <crypto/hsm/nxp/PersistentStorageOperationalKeystoreHSM.h>
 #else
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #endif
