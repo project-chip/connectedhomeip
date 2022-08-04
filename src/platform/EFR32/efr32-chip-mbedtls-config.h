@@ -45,9 +45,7 @@
 #define MBEDTLS_AES_C
 #define MBEDTLS_ECP_C
 #define MBEDTLS_ECDH_C
-#if CHIP_CRYPTO_MBEDTLS
 #define MBEDTLS_ENTROPY_C
-#endif
 #define MBEDTLS_SHA224_C
 #define MBEDTLS_SHA256_C
 
