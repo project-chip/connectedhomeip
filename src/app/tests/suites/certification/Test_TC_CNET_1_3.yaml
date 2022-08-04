@@ -19,7 +19,7 @@ name:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Network Commissioning"
     endpoint: 0
 
 tests:
@@ -32,7 +32,6 @@ tests:
                 value: nodeId
 
     - label: "TH reads the ClusterRevision from DUT"
-      cluster: "Network Commissioning"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -42,7 +41,6 @@ tests:
 
     - label: "TH reads the FeatureMap from DUT"
       PICS: CNET.S.F00
-      cluster: "Network Commissioning"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -52,7 +50,6 @@ tests:
 
     - label: "TH reads the FeatureMap from DUT"
       PICS: CNET.S.F01
-      cluster: "Network Commissioning"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -62,7 +59,6 @@ tests:
 
     - label: "TH reads the FeatureMap from DUT"
       PICS: CNET.S.F02
-      cluster: "Network Commissioning"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -72,7 +68,6 @@ tests:
 
     - label: "TH reads AttributeList from DUT"
       command: "readAttribute"
-      cluster: "Network Commissioning"
       attribute: "AttributeList"
       response:
           constraints:
@@ -99,7 +94,6 @@ tests:
 
     - label: "TH reads AcceptedCommandList from DUT"
       PICS: CNET.S.F00
-      cluster: "Network Commissioning"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -109,7 +103,6 @@ tests:
 
     - label: "TH reads AcceptedCommandList from DUT"
       PICS: CNET.S.F01
-      cluster: "Network Commissioning"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -119,7 +112,6 @@ tests:
 
     - label: "TH reads AcceptedCommandList from DUT"
       PICS: CNET.S.F02
-      cluster: "Network Commissioning"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -127,7 +119,6 @@ tests:
 
     - label: "TH reads GeneratedCommandList from DUT"
       PICS: "CNET.S.F00 || CNET.S.F01"
-      cluster: "Network Commissioning"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
