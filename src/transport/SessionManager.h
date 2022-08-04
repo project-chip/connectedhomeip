@@ -351,10 +351,12 @@ public:
 
     /**
      * @brief
-     *   Mark session that matches provided arguments as defunct
+     *   Mark most recently active session that matches provided arguments as defunct.
      *
      * @param node    Scoped node ID of the session we should mark as defunct.
-     * @param type    the buffer containing a full CHIP message (except for the optional length field).
+     * @param type    Type of session we are looking to mark as defunct. If matching
+     *                against all types of sessions is desired, NullOptional should
+     *                be passed into type.
      */
     bool MarkSessionAsDefunct(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type);
 
