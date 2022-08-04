@@ -101,13 +101,19 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
                       '--log-format', '%(message)s'] + shlex.split(script_args)
 
     if script_gdb:
-        script_command = "gdb -batch -return-child-result -q -ex run -ex bt --args python3".split() + script_command
+        #
+        # When running through Popen, we need to preserve some space-delimited args to GDB as a single logical argument. To do that, let's use '|' as a placeholder
+        # for the space character so that the initial split will not tokenize them, and then replace that with the space char there-after.
+        #
+        script_command = "gdb -batch -return-child-result -q -ex run -ex thread|apply|all|bt --args python3".split() + script_command
     else:
         script_command = "/usr/bin/env python3".split() + script_command
 
-    logging.info(f"Execute: {script_command}")
+    final_script_command = [i.replace('|', ' ') for i in script_command]
+
+    logging.info(f"Execute: {final_script_command}")
     test_script_process = subprocess.Popen(
-        script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        final_script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     DumpProgramOutputToQueue(log_cooking_threads, Fore.GREEN + "TEST" + Style.RESET_ALL,
                              test_script_process, log_queue)
 
