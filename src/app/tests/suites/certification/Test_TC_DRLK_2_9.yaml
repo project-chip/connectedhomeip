@@ -81,7 +81,7 @@ tests:
                 value: null
 
     - label:
-          "TH reads NumberOfTotalUsers Supported attribute and saves for future
+          "TH reads NumberOfTotalUsersSupported attribute and saves for future
           use."
       PICS: DRLK.C.F08 && DRLK.S.A0011
       command: "readAttribute"
