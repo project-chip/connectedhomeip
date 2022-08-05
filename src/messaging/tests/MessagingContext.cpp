@@ -16,6 +16,7 @@
  */
 
 #include "MessagingContext.h"
+#include "system/SystemClock.h"
 
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <lib/support/CodeUtils.h>
@@ -25,6 +26,17 @@ namespace chip {
 namespace Test {
 
 using namespace TestCerts;
+
+//
+// The MessagingContext class is used for unit-tests that simulate two nodes talking to each other
+// on the same stack instance using message loopback. Consequently, we shouldn't use the default
+// idle and active retransmission timeouts since they cause relatively large delays in tests that
+// rely on those values for certain scenarios.
+//
+// Set to a small but non-zero number to still account for some processing delays.
+//
+static constexpr System::Clock::Timeout kTestIdleRetransTimeout   = System::Clock::Milliseconds32(10);
+static constexpr System::Clock::Timeout kTestActiveRetransTimeout = System::Clock::Milliseconds32(10);
 
 CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioContext)
 {
@@ -100,28 +112,43 @@ void MessagingContext::ShutdownAndRestoreExisting(MessagingContext & existing)
 
 CHIP_ERROR MessagingContext::CreateSessionBobToAlice()
 {
-    return mSessionManager.InjectPaseSessionWithTestKey(mSessionBobToAlice, kBobKeyId, GetAliceFabric()->GetNodeId(), kAliceKeyId,
-                                                        mBobFabricIndex, mAliceAddress, CryptoContext::SessionRole::kInitiator);
+    ReturnErrorOnFailure(mSessionManager.InjectPaseSessionWithTestKey(mSessionBobToAlice, kBobKeyId, GetAliceFabric()->GetNodeId(),
+                                                                      kAliceKeyId, mBobFabricIndex, mAliceAddress,
+                                                                      CryptoContext::SessionRole::kInitiator));
+
+    mSessionBobToAlice->AsSecureSession()->SetRemoteMRPConfig(
+        ReliableMessageProtocolConfig(kTestIdleRetransTimeout, kTestActiveRetransTimeout));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
 {
-    return mSessionManager.InjectPaseSessionWithTestKey(mSessionAliceToBob, kAliceKeyId, GetBobFabric()->GetNodeId(), kBobKeyId,
-                                                        mAliceFabricIndex, mBobAddress, CryptoContext::SessionRole::kResponder);
+    ReturnErrorOnFailure(mSessionManager.InjectPaseSessionWithTestKey(mSessionAliceToBob, kAliceKeyId, GetBobFabric()->GetNodeId(),
+                                                                      kBobKeyId, mAliceFabricIndex, mBobAddress,
+                                                                      CryptoContext::SessionRole::kResponder));
+    mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(
+        ReliableMessageProtocolConfig(kTestIdleRetransTimeout, kTestActiveRetransTimeout));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MessagingContext::CreatePASESessionCharlieToDavid()
 {
-    return mSessionManager.InjectPaseSessionWithTestKey(mSessionCharlieToDavid, kCharlieKeyId, 0xdeadbeef, kDavidKeyId,
-                                                        kUndefinedFabricIndex, mDavidAddress,
-                                                        CryptoContext::SessionRole::kInitiator);
+    ReturnErrorOnFailure(mSessionManager.InjectPaseSessionWithTestKey(mSessionCharlieToDavid, kCharlieKeyId, 0xdeadbeef,
+                                                                      kDavidKeyId, kUndefinedFabricIndex, mDavidAddress,
+                                                                      CryptoContext::SessionRole::kInitiator));
+    mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(
+        ReliableMessageProtocolConfig(kTestIdleRetransTimeout, kTestActiveRetransTimeout));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MessagingContext::CreatePASESessionDavidToCharlie()
 {
-    return mSessionManager.InjectPaseSessionWithTestKey(mSessionDavidToCharlie, kDavidKeyId, 0xcafe, kCharlieKeyId,
-                                                        kUndefinedFabricIndex, mCharlieAddress,
-                                                        CryptoContext::SessionRole::kResponder);
+    ReturnErrorOnFailure(mSessionManager.InjectPaseSessionWithTestKey(mSessionDavidToCharlie, kDavidKeyId, 0xcafe, kCharlieKeyId,
+                                                                      kUndefinedFabricIndex, mCharlieAddress,
+                                                                      CryptoContext::SessionRole::kResponder));
+    mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(
+        ReliableMessageProtocolConfig(kTestIdleRetransTimeout, kTestActiveRetransTimeout));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MessagingContext::CreateSessionBobToFriends()
