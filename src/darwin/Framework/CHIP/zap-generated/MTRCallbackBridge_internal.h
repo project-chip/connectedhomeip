@@ -21692,8 +21692,20 @@ class MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge
 {
 public:
     MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        MTRActionBlock action, bool keepAlive = false) :
+                                                                        MTRLocalActionBlock action, bool keepAlive = false) :
         MTRCallbackBridge<TimeSynchronizationClusterGranularityEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                        MTRDeviceController * controller, ResponseHandler handler,
+                                                                        MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<TimeSynchronizationClusterGranularityEnumAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                                      OnSuccessFn, keepAlive){};
+
+    MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                        ResponseHandler handler, MTRActionBlock action,
+                                                                        bool keepAlive = false) :
+        MTRCallbackBridge<TimeSynchronizationClusterGranularityEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
                                                                                       keepAlive){};
 
     static void OnSuccessFn(void * context, chip::app::Clusters::TimeSynchronization::GranularityEnum value);
@@ -21704,8 +21716,16 @@ class MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionB
 {
 public:
     MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, handler, action, true),
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -21720,9 +21740,23 @@ class MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridg
 {
 public:
     MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                MTRActionBlock action, bool keepAlive = false) :
+                                                                                MTRLocalActionBlock action,
+                                                                                bool keepAlive = false) :
         MTRCallbackBridge<NullableTimeSynchronizationClusterGranularityEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                               keepAlive){};
+
+    MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                                MTRDeviceController * controller,
+                                                                                ResponseHandler handler, MTRActionBlock action,
+                                                                                bool keepAlive = false) :
+        MTRCallbackBridge<NullableTimeSynchronizationClusterGranularityEnumAttributeCallback>(queue, nodeID, controller, handler,
+                                                                                              action, OnSuccessFn, keepAlive){};
+
+    MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                                ResponseHandler handler, MTRActionBlock action,
+                                                                                bool keepAlive = false) :
+        MTRCallbackBridge<NullableTimeSynchronizationClusterGranularityEnumAttributeCallback>(queue, device, handler, action,
+                                                                                              OnSuccessFn, keepAlive){};
 
     static void
     OnSuccessFn(void * context,
@@ -21734,8 +21768,17 @@ class MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubsc
 {
 public:
     MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, handler, action, true),
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action,
+                                                                                    true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -21750,8 +21793,20 @@ class MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge
 {
 public:
     MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       MTRActionBlock action, bool keepAlive = false) :
+                                                                       MTRLocalActionBlock action, bool keepAlive = false) :
         MTRCallbackBridge<TimeSynchronizationClusterTimeSourceEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                       MTRDeviceController * controller, ResponseHandler handler,
+                                                                       MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<TimeSynchronizationClusterTimeSourceEnumAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                                     OnSuccessFn, keepAlive){};
+
+    MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                       ResponseHandler handler, MTRActionBlock action,
+                                                                       bool keepAlive = false) :
+        MTRCallbackBridge<TimeSynchronizationClusterTimeSourceEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
     static void OnSuccessFn(void * context, chip::app::Clusters::TimeSynchronization::TimeSourceEnum value);
@@ -21762,8 +21817,16 @@ class MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBr
 {
 public:
     MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, handler, action, true),
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -21778,9 +21841,22 @@ class MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge
 {
 public:
     MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               MTRActionBlock action, bool keepAlive = false) :
+                                                                               MTRLocalActionBlock action, bool keepAlive = false) :
         MTRCallbackBridge<NullableTimeSynchronizationClusterTimeSourceEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                              keepAlive){};
+
+    MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                               MTRDeviceController * controller,
+                                                                               ResponseHandler handler, MTRActionBlock action,
+                                                                               bool keepAlive = false) :
+        MTRCallbackBridge<NullableTimeSynchronizationClusterTimeSourceEnumAttributeCallback>(queue, nodeID, controller, handler,
+                                                                                             action, OnSuccessFn, keepAlive){};
+
+    MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                               ResponseHandler handler, MTRActionBlock action,
+                                                                               bool keepAlive = false) :
+        MTRCallbackBridge<NullableTimeSynchronizationClusterTimeSourceEnumAttributeCallback>(queue, device, handler, action,
+                                                                                             OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::TimeSourceEnum> & value);
@@ -21791,8 +21867,17 @@ class MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscr
 {
 public:
     MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, handler, action, true),
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action,
+                                                                                   true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
