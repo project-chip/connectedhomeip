@@ -230,8 +230,8 @@ protected:
 
     VendorId mVendorId                                  = VendorId::NotSpecified;
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
-    mutable Crypto::P256Keypair * mOperationalKey = nullptr;
-    bool mHasExternallyOwnedOperationalKey = false;
+    mutable Crypto::P256Keypair * mOperationalKey       = nullptr;
+    bool mHasExternallyOwnedOperationalKey              = false;
 
     CHIP_ERROR CommitToStorage(PersistentStorageDelegate * storage) const;
     CHIP_ERROR LoadFromStorage(PersistentStorageDelegate * storage, FabricIndex newFabricIndex, const ByteSpan & rcac,
