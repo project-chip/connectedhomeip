@@ -40,28 +40,29 @@ void TestRendezvousFlags(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload inPayload = GetDefaultPayload();
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kNone);
+    // Not having a value in rendezvousInformation is not allowed for a QR code.
+    inPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kNone);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP);
+    inPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kSoftAP);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
+    inPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kBLE);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
+    inPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation =
-        RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
+    inPayload.rendezvousInformation.SetValue(
+        RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork));
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation =
-        RendezvousInformationFlags(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork);
+    inPayload.rendezvousInformation.SetValue(
+        RendezvousInformationFlags(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork));
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags(
-        RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
+    inPayload.rendezvousInformation.SetValue(RendezvousInformationFlags(
+        RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork));
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 }
 
@@ -83,12 +84,12 @@ void TestMaximumValues(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload inPayload = GetDefaultPayload();
 
-    inPayload.version               = static_cast<uint8_t>((1 << kVersionFieldLengthInBits) - 1);
-    inPayload.vendorID              = 0xFFFF;
-    inPayload.productID             = 0xFFFF;
-    inPayload.commissioningFlow     = CommissioningFlow::kCustom;
-    inPayload.rendezvousInformation = RendezvousInformationFlags(
-        RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
+    inPayload.version           = static_cast<uint8_t>((1 << kVersionFieldLengthInBits) - 1);
+    inPayload.vendorID          = 0xFFFF;
+    inPayload.productID         = 0xFFFF;
+    inPayload.commissioningFlow = CommissioningFlow::kCustom;
+    inPayload.rendezvousInformation.SetValue(RendezvousInformationFlags(
+        RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork));
     inPayload.discriminator.SetLongValue(static_cast<uint16_t>((1 << kPayloadDiscriminatorFieldLengthInBits) - 1));
     inPayload.setUpPINCode = static_cast<uint32_t>((1 << kSetupPINCodeFieldLengthInBits) - 1);
 
@@ -306,7 +307,7 @@ void TestSetupPayloadVerify(nlTestSuite * inSuite, void * inContext)
     RendezvousInformationFlags invalid = RendezvousInformationFlags(
         RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
     invalid.SetRaw(static_cast<uint8_t>(invalid.Raw() + 1));
-    test_payload.rendezvousInformation = invalid;
+    test_payload.rendezvousInformation.SetValue(invalid);
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid setup PIN

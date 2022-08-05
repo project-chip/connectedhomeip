@@ -71,8 +71,8 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
     CHIP_ERROR err = CHIP_NO_ERROR;
     bool isRunning = false;
 
-    bool searchOverAll = payload.rendezvousInformation == RendezvousInformationFlag::kNone;
-    if (searchOverAll || payload.rendezvousInformation == RendezvousInformationFlag::kBLE)
+    bool searchOverAll = !payload.rendezvousInformation.HasValue();
+    if (searchOverAll || payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kBLE))
     {
         if (CHIP_NO_ERROR == (err = StartDiscoverOverBle(payload)))
         {
@@ -81,7 +81,7 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
         VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err || CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err, err);
     }
 
-    if (searchOverAll || payload.rendezvousInformation == RendezvousInformationFlag::kSoftAP)
+    if (searchOverAll || payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kSoftAP))
     {
         if (CHIP_NO_ERROR == (err = StartDiscoverOverSoftAP(payload)))
         {
