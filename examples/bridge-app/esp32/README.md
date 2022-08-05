@@ -1,9 +1,9 @@
 # CHIP ESP32 Bridge App Example
 
-Refer [setup ESP-IDF and CHIP Environment](#setup-esp-idf-and-chip-environment)
-and
+Refer to
+[setup ESP-IDF and CHIP Environment](#setup-esp-idf-and-chip-environment) and
 [Build, Flash, Monitor, and Commissioning](#build-flash-monitor-and-commissioning)
-guide to get started.
+guides to get started.
 
 ---
 

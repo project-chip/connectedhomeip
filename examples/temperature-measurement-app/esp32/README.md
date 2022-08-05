@@ -2,10 +2,10 @@
 
 This example is meant to represent a minimal-sized application.
 
-Refer [setup ESP-IDF and CHIP Environment](#setup-esp-idf-and-chip-environment)
-and
+Refer to
+[setup ESP-IDF and CHIP Environment](#setup-esp-idf-and-chip-environment) and
 [Build, Flash, Monitor, and Commissioning](#build-flash-monitor-and-commissioning)
-guide to get started.
+guides to get started.
 
 ---
 
