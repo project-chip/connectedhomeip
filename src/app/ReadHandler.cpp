@@ -122,6 +122,7 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
     aSendStatusResponse    = true;
     CHIP_ERROR statusError = CHIP_NO_ERROR;
     SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
+    // Since this is a valid Status Response message, we don't have to send a Status Response in reply to it.
     aSendStatusResponse = false;
     SuccessOrExit(err = statusError);
     switch (mState)
