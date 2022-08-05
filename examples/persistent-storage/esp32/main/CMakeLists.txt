@@ -24,4 +24,4 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       PRIV_REQUIRES chip nvs_flash)
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 14)
-target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")
+target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
