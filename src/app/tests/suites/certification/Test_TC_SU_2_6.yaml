@@ -15,6 +15,9 @@
 
 name: 3.4.3. [TC-SU-2.6] NotifyUpdateApplied Command from DUT to OTA-P
 
+PICS:
+    - MCORE.OTA.Requestor
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -24,7 +27,7 @@ tests:
     - label:
           "DUT sends the NotifyUpdateApplied Command to the OTA-P after
           installing the software update."
-      PICS: OTAC.C.M.NotifyUpdateApplied
+      PICS: OTAR.C.M.NotifyUpdateApplied
       verification: |
           Verify that the OTA Provider show NotifyUpdateApplied message received from DUT in the logs
           UpdateToken - verify that it is the same as the one provided by the OTA provider in the QueryImageResponse.

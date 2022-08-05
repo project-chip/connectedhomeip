@@ -29,23 +29,26 @@ tests:
     - label: "Set up subscription to SwitchLatched event"
       PICS: SWTCH.S.F00
       verification: |
+          On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
+          echo "{"Name":"SwitchLatched","NewPosition":3}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
           ./chip-tool switch subscribe-event switch-latched 1 100 1 1
 
           Verify inTH Log:
 
-          [1646209067.917157][2496:2501] CHIP:DMG: SubscribeResponseMessage =
-          [1646209067.917184][2496:2501] CHIP:DMG: {
-          [1646209067.917208][2496:2501] CHIP:DMG:        SubscriptionId = 0xe1d5f4339dd88873,
-          [1646209067.917233][2496:2501] CHIP:DMG:        MinIntervalFloorSeconds = 0x1,
-          [1646209067.917259][2496:2501] CHIP:DMG:        MaxIntervalCeilingSeconds = 0x64,
-          [1646209067.917283][2496:2501] CHIP:DMG:        InteractionModelRevision = 1
-          [1646209067.917306][2496:2501] CHIP:DMG: }
+          [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 4
+          [1659527630.476771][4774:4779] CHIP:TOO:   Priority: Info
+          [1659527630.476799][4774:4779] CHIP:TOO:   Timestamp: 29687894
+          [1659527630.476887][4774:4779] CHIP:TOO:   SwitchLatched: {
+          [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 3
+          [1659527630.476969][4774:4779] CHIP:TOO:    }
       disabled: true
 
     - label: "Operator sets switch to first position"
       PICS: SWTCH.S.F00
       verification: |
-          no Matter messages
+          Manual operation
       disabled: true
 
     - label: "Read CurrentPosition attribute"
@@ -62,8 +65,7 @@ tests:
     - label: "Operator sets switch to second position"
       PICS: SWTCH.S.F00
       verification: |
-          (no chip-tool message to DUT)
-          DUT sends event message
+          Manual operation
       disabled: true
 
     - label: "Read CurrentPosition attribute"
@@ -101,7 +103,7 @@ tests:
           Read CurrentPosition attribute"
       PICS: SWTCH.S.F00
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "Operator returns switch to first position"

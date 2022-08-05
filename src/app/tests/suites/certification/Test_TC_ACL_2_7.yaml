@@ -15,6 +15,9 @@
 
 name: 3.2.7. [TC-ACL-2.7] Extension multi-fabric
 
+PICS:
+    - ACL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -58,7 +61,7 @@ tests:
           Commission TH2 to DUT using manualcode generated in TH1 using open commission window
 
           ./chip-tool pairing code 2 36253605617
-          [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step "Cleanup"
           [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
       disabled: true
 
@@ -74,12 +77,12 @@ tests:
       disabled: true
 
     - label:
-          'TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
+          "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
           value is list of AccessControlExtensionStruct containing 1 element
-          1.struct .Data field: D_OK_EMPTY "1718"'
-      PICS: ACL.S.A0000
+          1.struct .Data field: D_OK_EMPTY 1718"
+      PICS: ACL.S.A0001
       verification: |
-          ./chip-tool accesscontrol write extension '[{"data":"1718"}]' 1 0
+          ./chip-tool accesscontrol write extension "[{"data":"1718"}]" 1 0
 
           ON TH1,Verify DUT  Responds  Successfully to extension attribute list containg one element .
 
@@ -122,13 +125,13 @@ tests:
       disabled: true
 
     - label:
-          'TH2 writes DUT Endpoint 0 AccessControl cluster Extension attribute
+          "TH2 writes DUT Endpoint 0 AccessControl cluster Extension attribute
           value is list of AccessControlExtensionStruct containing 1 element
           1.struct Data field: D_OK_SINGLE
-          "17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"'
-      PICS: ACL.S.A0000
+          17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
+      PICS: ACL.S.A0001
       verification: |
-          ./chip-tool   accesscontrol  write extension '[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]' 2 0
+          ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 2 0
 
           ON TH2,Verify DUT  Responds  Successfully to extension attribute list containg one element .
           1657894672.479983][2433:2438] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -177,7 +180,7 @@ tests:
 
     - label:
           "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute"
-      PICS: ACL.S.A0000
+      PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol read extension 1 0
           On TH1 ,VERIFY DUT RESPONDS SUCCESSFULLY.
@@ -192,7 +195,7 @@ tests:
 
     - label:
           "TH2 reads DUT Endpoint 0 AccessControl cluster Extension attribute"
-      PICS: ACL.S.A0000
+      PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol read extension 2 0
 
@@ -236,9 +239,9 @@ tests:
           On TH2, Verify DUT Responds successfully
 
           [1658327551.622018][4295:4300] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
-          [1658327551.622043][4295:4300] CHIP:TOO: 	 Event number: 6
-          [1658327551.622065][4295:4300] CHIP:TOO: 	 Priority: Info
-          [1658327551.622130][4295:4300] CHIP:TOO: 	 Timestamp: 4633724
+          [1658327551.622043][4295:4300] CHIP:TOO:          Event number: 6
+          [1658327551.622065][4295:4300] CHIP:TOO:          Priority: Info
+          [1658327551.622130][4295:4300] CHIP:TOO:          Timestamp: 4633724
           [1658327551.622239][4295:4300] CHIP:TOO:   AccessControlExtensionChanged: {
           [1658327551.622287][4295:4300] CHIP:TOO:     AdminNodeID: 112233
           [1658327551.622313][4295:4300] CHIP:TOO:     AdminPasscodeID: null

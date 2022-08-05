@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.8. [TC-CNET-4.10] [Thread] Verification for RemoveNetwork Command
+    12.4.8. [TC-CNET-4.10] [Thread] Verification for RemoveNetwork Command
     [DUT-Server]
+
+PICS:
+    - CNET.S.F01
 
 config:
     nodeId: 0x12344321
@@ -42,7 +45,7 @@ tests:
 
     - label:
           "TH1 reads Networks attribute from the DUT and save the number of
-          entries as 'NumNetworks'"
+          entries as NumNetworks"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
@@ -61,9 +64,9 @@ tests:
     - label:
           "TH finds the index of the Networks list entry with NetworkID field
           value PIXIT.CNET.THRE AD_1ST_OPERATI ONALDATASET and saves it as
-          'Userth_netidx'"
+          Userth_netidx"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
@@ -73,7 +76,9 @@ tests:
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
+
           Below is an example:
+
            ./chip-tool networkcommissioning  remove-network hex:1850171990782922 62 0
 
           Verify NetworkConfigResponse and its arguments on the TH Log:
@@ -145,7 +150,9 @@ tests:
       PICS: CNET.S.C04.Rsp
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
+
           Below is an example:
+
           ./chip-tool networkcommissioning connect-network hex:1850171990782922 1 0 --Breadcrumb 2
 
           Verify ConnectNetworkResponse and its arguments on the TH Log:
@@ -233,7 +240,9 @@ tests:
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
+
           Below is an example:
+
           ./chip-tool networkcommissioning  remove-network hex:1850171990782922 32 0 --Breadcrumb 1
 
           Verify NetworkConfigResponse and its arguments on the TH Log:

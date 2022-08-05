@@ -15,6 +15,9 @@
 
 name: 3.12.6. [TC-CONTENTLAUNCHER-10.7] Content Search Verification
 
+PICS:
+    - CONTENTLAUNCHER.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -22,13 +25,16 @@ config:
 
 tests:
     - label:
-          'TH sends a LaunchContent command to the DUT with search parameter
-          consisting of Type As "Actor" and Value as An Actors name, for
-          example, Gaby sHoffman'
-      PICS: CONTENTLAUNCHER.C.C0000
+          "TH sends a LaunchContent command to the DUT with search parameter
+          consisting of Type As Actor and Value as An Actors name, for example,
+          Gaby sHoffman"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "Gaby sHoffman", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
-          Verify in TH Log:
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 0, "value": "Gaby sHoffman", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 0, "value": "Gaby sHoffman", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+
+          On TH  verify the success response (value 0) received  from DUT
           [1651225059.893636][4190:4195] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651225059.893741][4190:4195] CHIP:TOO:   LaunchResponse: {
           [1651225059.893814][4190:4195] CHIP:TOO:     status: 0
@@ -41,14 +47,16 @@ tests:
       disabled: true
 
     - label:
-          'TH sends a LaunchContent command to the DUT with search parameter
-          consisting of Type As "Channel" and Value as Channel Name name, for
-          example, "PBS"'
-      PICS: CONTENTLAUNCHER.C.C0000
+          "TH sends a LaunchContent command to the DUT with search parameter
+          consisting of Type As Channel and Value as Channel Name name, for
+          example, PBS"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 1, "value": "PBS", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 1, "value": "PBS", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 1, "value": "PBS", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
 
-          Verify in TH Log:
+          On TH  verify the success response (value 0) received  from DUT
           [1651225141.737648][4203:4209] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651225141.737778][4203:4209] CHIP:TOO:   LaunchResponse: {
           [1651225141.737854][4203:4209] CHIP:TOO:     status: 0
@@ -61,14 +69,16 @@ tests:
       disabled: true
 
     - label:
-          'TH sends a LaunchContent command to the DUT with search parameter
-          consisting of Type As "Character" and Value as Characters name,for
-          example, Snow White'
-      PICS: CONTENTLAUNCHER.C.C0000
+          "TH sends a LaunchContent command to the DUT with search parameter
+          consisting of Type As Character and Value as Characters name,for
+          example, Snow White"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 2, "value": "Snow White", "externalIDList": [ { "name": "foo", "value": "2"} ] } ] }' 0 1 1
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 2, "value": "Snow White", "externalIDList": [ { "name": "foo", "value": "2"} ] } ] }" 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 2, "value": "Snow White", "externalIDList": [ { "name": "foo", "value": "2"} ] } ] }" 0 1 1
 
-          Verify in TH Log:
+          On TH  verify the success response (value 0) received  from DUT
           [1651578539.231066][9699:9704] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651578539.231135][9699:9704] CHIP:TOO:   LaunchResponse: {
           [1651578539.231184][9699:9704] CHIP:TOO:     status: 0
@@ -81,13 +91,16 @@ tests:
       disabled: true
 
     - label:
-          'TH sends a LaunchContent command to the DUT with search parameter
-          consisting of Type As "Director" and Value as Directors name, for
-          example, Spike Lee'
-      PICS: CONTENTLAUNCHER.C.C0000
+          "TH sends a LaunchContent command to the DUT with search parameter
+          consisting of Type As Director and Value as Directors name, for
+          example, Spike Lee"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 3, "value": "Spike Lee", "externalIDList": [ { "name": "Spike Lee", "value": "3"} ] } ] }' 0 1 1
-          Verify in TH Log:
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 3, "value": "Spike Lee", "externalIDList": [ { "name": "Spike Lee", "value": "3"} ] } ] }" 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 3, "value": "Spike Lee", "externalIDList": [ { "name": "Spike Lee", "value": "3"} ] } ] }" 0 1 1
+
+          On TH  verify the success response (value 0) received  from DUT
           [1651578561.129609][9706:9711] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651578561.129678][9706:9711] CHIP:TOO:   LaunchResponse: {
           [1651578561.129725][9706:9711] CHIP:TOO:     status: 0
@@ -100,13 +113,16 @@ tests:
       disabled: true
 
     - label:
-          'TH sends a LaunchContent command to the DUT with search parameter
-          consisting of Type As "Event" and Value as An Events name , for
-          example "Football games"'
-      PICS: CONTENTLAUNCHER.C.C0000
+          "TH sends a LaunchContent command to the DUT with search parameter
+          consisting of Type As Event and Value as An Events name , for example
+          Football games"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 4, "value": "Football games", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
-          Verify in TH Log:
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 4, "value": "Football games", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 4, "value": "Football games", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+
+          On TH  verify the success response (value 0) received  from DUT
           [1651578612.348295][9717:9722] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651578612.348350][9717:9722] CHIP:TOO:   LaunchResponse: {
           [1651578612.348388][9717:9722] CHIP:TOO:     status: 0
@@ -119,13 +135,16 @@ tests:
       disabled: true
 
     - label:
-          'TH sends a LaunchContent command to the DUT with search parameter
-          consisting of Type As "Franchise" and Value as Franchises name,for
-          example "Star Wars"'
-      PICS: CONTENTLAUNCHER.C.C0000
+          "TH sends a LaunchContent command to the DUT with search parameter
+          consisting of Type As Franchise and Value as Franchises name,for
+          example Star Wars"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 5, "value": "Star Wars", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
-          Verify in TH Log:
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 5, "value": "Star Wars", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 5, "value": "Star Wars", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+
+          On TH  verify the success response (value 0) received  from DUT
 
           [1651578634.392516][9725:9730] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651578634.392581][9725:9730] CHIP:TOO:   LaunchResponse: {
@@ -139,13 +158,16 @@ tests:
       disabled: true
 
     - label:
-          'TH sends a LaunchContent command to the DUT with search parameter
-          consisting of Type As "Genre" and Value as Genres name, for example
-          "Horror"'
-      PICS: CONTENTLAUNCHER.C.C0000
+          "TH sends a LaunchContent command to the DUT with search parameter
+          consisting of Type As Genre and Value as Genres name, for example
+          Horror"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 6, "value": "Horror", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
-          Verify in TH Log:
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 6, "value": "Horror", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 6, "value": "Horror", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+
+          On TH  verify the success response (value 0) received  from DUT
           [1652091775.613303][9916:9922] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_050A Command=0x0000_0002
           [1652091775.613395][9916:9922] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1652091775.613490][9916:9922] CHIP:TOO:   LaunchResponse: {
@@ -159,13 +181,16 @@ tests:
       disabled: true
 
     - label:
-          'TH sends a LaunchContent command to the DUT with search parameter
-          consisting of Type As "League" and Value as Leagues name, for example
-          "NCAA"'
-      PICS: CONTENTLAUNCHER.C.C0000
+          "TH sends a LaunchContent command to the DUT with search parameter
+          consisting of Type As League and Value as Leagues name, for example
+          NCAA"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 7, "value": "NCAA", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
-          Verify in TH Log:
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 7, "value": "NCAA", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 7, "value": "NCAA", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+
+          On TH  verify the success response (value 0) received  from DUT
 
           [1651578662.336318][9733:9738] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651578662.336370][9733:9738] CHIP:TOO:   LaunchResponse: {
@@ -179,12 +204,15 @@ tests:
       disabled: true
 
     - label:
-          'TH sends a LaunchContent command to the DUT with search parameter
-          consisting of Type As "Popularity" and Value as Popularitys name'
-      PICS: CONTENTLAUNCHER.C.C0000
+          "TH sends a LaunchContent command to the DUT with search parameter
+          consisting of Type As Popularity and Value as Popularitys name"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 8, "value": "Popularity", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
-          Verify in TH Log:
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 8, "value": "Popularity", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 8, "value": "Popularity", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+
+          On TH  verify the success response (value 0) received  from DUT
           [1651578680.236952][9740:9745] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651578680.237036][9740:9745] CHIP:TOO:   LaunchResponse: {
           [1651578680.237093][9740:9745] CHIP:TOO:     status: 0
@@ -197,13 +225,16 @@ tests:
       disabled: true
 
     - label:
-          'TH sends a LaunchContent command to the DUT with search parameter
-          consisting of Type As "Provider" and Value as Providers name, for
-          example "Netflix"'
-      PICS: CONTENTLAUNCHER.C.C0000
+          "TH sends a LaunchContent command to the DUT with search parameter
+          consisting of Type As Provider and Value as Providers name, for
+          example Netflix"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 9, "value": "Netflix", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
-          Verify in TH Log:
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 9, "value": "Netflix", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 9, "value": "Netflix", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+
+          On TH  verify the success response (value 0) received  from DUT
           [1651578697.912544][9750:9755] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651578697.912620][9750:9755] CHIP:TOO:   LaunchResponse: {
           [1651578697.912673][9750:9755] CHIP:TOO:     status: 0
@@ -216,14 +247,16 @@ tests:
       disabled: true
 
     - label:
-          'TH sends a LaunchContent command to the DUT with search parameter
-          consisting of Type As "Sport" and Value as Sports name, for example,
-          football'
-      PICS: CONTENTLAUNCHER.C.C0000
+          "TH sends a LaunchContent command to the DUT with search parameter
+          consisting of Type As Sport and Value as Sports name, for example,
+          football"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 10, "value": "football", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 10, "value": "football", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 10, "value": "football", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
 
-          Verify in TH Log:
+          On TH  verify the success response (value 0) received  from DUT
           [1651578716.145536][9757:9762] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651578716.145622][9757:9762] CHIP:TOO:   LaunchResponse: {
           [1651578716.145682][9757:9762] CHIP:TOO:     status: 0
@@ -236,14 +269,16 @@ tests:
       disabled: true
 
     - label:
-          'TH sends a LaunchContent command to the DUT with search parameter
-          consisting of Type As "SportsTeam" and Value as SportTeams name , for
-          example "Arsenel"'
-      PICS: CONTENTLAUNCHER.C.C0000
+          "TH sends a LaunchContent command to the DUT with search parameter
+          consisting of Type As SportsTeam and Value as SportTeams name , for
+          example Arsenel"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 11, "value": "Arsenel", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 11, "value": "Arsenel", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 11, "value": "Arsenel", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
 
-          Verify in TH Log:
+          On TH  verify the success response (value 0) received  from DUT
           [1651578735.341387][9764:9769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651578735.341498][9764:9769] CHIP:TOO:   LaunchResponse: {
           [1651578735.341574][9764:9769] CHIP:TOO:     status: 0
@@ -256,14 +291,16 @@ tests:
       disabled: true
 
     - label:
-          'TH sends a LaunchContent command to the DUT with search parameter
-          consisting of Type As "Type" and Value as Types name, for example
-          "TVSeries",'
-      PICS: CONTENTLAUNCHER.C.C0000
+          "TH sends a LaunchContent command to the DUT with search parameter
+          consisting of Type As Type and Value as Types name, for example
+          TVSeries,"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 12, "value": "TVSeries", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 12, "value": "TVSeries", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 12, "value": "TVSeries", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
 
-          Verify in TH Log:
+          On TH  verify the success response (value 0) received  from DUT
           [1651578755.904379][9773:9778] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651578755.904459][9773:9778] CHIP:TOO:   LaunchResponse: {
           [1651578755.904517][9773:9778] CHIP:TOO:     status: 0

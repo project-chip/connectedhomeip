@@ -15,6 +15,9 @@
 
 name: 3.6.1. [TC-WAKEONLAN-4.1] Wake-On LAN Verification
 
+PICS:
+    - WAKEONLAN.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -24,17 +27,24 @@ tests:
     - label: "TH reads the MACAddress attribute from the DUT"
       PICS: WAKEONLAN.S.A0000
       verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool wakeonlan read macaddress 1 1
+          ./chip-tv-casting-app wakeonlan read macaddress 1 1
 
+          On TH Verify that the response contains a 48-bit MAC Address. Record the MAC address.
           [1654248817.394846][3637:3643] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0503 Attribute 0x0000_0000 DataVersion: 3900236652
           [1654248817.394895][3637:3643] CHIP:TOO:   MACAddress: e4:5f:01:69:61:b1
           [1654248817.394982][3637:3643] CHIP:EM: Sending Standalone Ack for MessageCounter:15292555 on exchange 12123i
       disabled: true
 
     - label: "TH sends a Sleep command to DUT"
-      PICS: PICS_LP
+      PICS: LOWPOWER.S.C00.Rsp
       verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool lowpower sleep 1 1
+          ./chip-tv-casting-app lowpower sleep 1 1
+
+          On TH verify the success response received from DUT
           [1646101689.826629][3009:3014] CHIP:DMG: InvokeResponseMessage =
           [1646101689.826665][3009:3014] CHIP:DMG: {
           [1646101689.826697][3009:3014] CHIP:DMG:        suppressResponse = false,
@@ -70,9 +80,12 @@ tests:
     - label:
           "TH sends a Wake-On LAN magic packet containing the MAC address from
           step 1"
-      PICS: LOWPOWER.S
       verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool lowpower read accepted-command-list 1 1
+          ./chip-tv-casting-app lowpower read accepted-command-list 1 1
+
+          On TH Verify that the DUT is no longer in a low-power state by sending above command
           [1654248854.491911][3652:3657] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0508 Attribute 0x0000_FFF9 DataVersion: 2125568804
           [1654248854.491994][3652:3657] CHIP:TOO:   AcceptedCommandList: 1 entries
           [1654248854.492040][3652:3657] CHIP:TOO:     [1]: 0

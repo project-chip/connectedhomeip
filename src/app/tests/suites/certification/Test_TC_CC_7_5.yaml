@@ -15,6 +15,9 @@
 
 name: 3.2.22. [TC-CC-7.5] Enhanced Hue functionality with client as DUT
 
+PICS:
+    - CC.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -63,8 +66,7 @@ tests:
       disabled: true
 
     - label:
-          "Over TransitionTime, DUT reads CurrentEnhanced Hue attribute from TH
-          periodically."
+          "Over TransitionTime, DUT reads CurrentEnhanced Hue attribute from TH."
       PICS: CC.C.A4000
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
@@ -136,7 +138,7 @@ tests:
           [1657912085.345962][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0041
       disabled: true
 
-    - label: "DUT reads CurrentEnhanced Hue attribute from TH several Times."
+    - label: "DUT reads CurrentEnhanced Hue attribute from TH several times."
       PICS: CC.C.A4000
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1

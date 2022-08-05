@@ -13,22 +13,26 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: "[TC-BINFO-2.2]  Events [DUT - Server]"
+name: 12.2.2. [TC-BINFO-2.2] Events [DUT-Server]
+
+PICS:
+    - BINFO.S
 
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
     - label: "Reboot the DUT TH reads the StartUp event from DUT"
       PICS: BINFO.S.E00
       verification: |
-          On Raspi platform the event is triggered with this command, Pls use equivalent command on the respective DUT
+          To verify StartUp event follow the below commands , Pls use equivalent command on the respective DUT
 
 
           ./chip-tool basic read-event start-up 1 0
 
-          On TH verify that StartUp event has priority set as CRITICAL and software verision
+          verify that StartUp event as priority set has CRITICAL and software verision on TH(chip-tool)
 
           [1657193007.841105][5422:5427] CHIP:DMG:         ],
           [1657193007.841137][5422:5427] CHIP:DMG:
@@ -48,7 +52,7 @@ tests:
     - label: "TH subscribes to the ShutDown event on the DUT. Shutdown DUT."
       PICS: BINFO.S.E01
       verification: |
-          On Raspi platform the event is triggered with this command, Pls use equivalent command on the respective DUT
+          To verify leave event follow the below commands , Pls use equivalent command on the respective DUT
 
 
           1. Launch chip-tool into interactive mode with the command
@@ -59,7 +63,7 @@ tests:
           2.  run below command in interactive mode shell and  Turn down the DUT
 
 
-          On TH verify that StartUp event has priority set as CRITICAL
+          verify that ShutDown event as priority set has CRITICAL on TH(chip-tool)
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0001
           [1653050528.900202][119367:119372] CHIP:TOO:          Event number: 5

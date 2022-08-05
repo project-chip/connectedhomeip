@@ -138,6 +138,11 @@ template("efr32_sdk") {
       "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/autogen",
     ]
 
+    # Note that we're setting the mbedTLS and PSA configuration files through a
+    # define. This means the build system by default does not pick up changes in
+    # the content of these, only when changing the filename itself.
+    # To fix this, these files are also manually depended upon in the source set
+    # declared in efr32_mbedtls_config further down this file.
     defines = [
       "MBEDTLS_CONFIG_FILE=\"efr32-chip-mbedtls-config.h\"",
       "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=\"efr32-mbedtls-psa-crypto-config.h\"",
@@ -306,6 +311,19 @@ template("efr32_sdk") {
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
+  }
+
+  source_set("efr32_mbedtls_config") {
+    # We're setting the mbedTLS config flags here as the efr32_sdk target
+    # acts as the mbedTLS target for EFR32 builds. We need this for the build
+    # system to recompile mbedTLS (= the SDK) when the mbedTLS config gets
+    # edited.
+    sources = [
+      "${chip_root}/src/platform/EFR32/efr32-chip-mbedtls-config.h",
+      "${chip_root}/src/platform/EFR32/efr32-mbedtls-psa-crypto-config.h",
+    ]
+
+    public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
   }
 
   source_set(sdk_target_name) {
@@ -637,6 +655,7 @@ template("efr32_sdk") {
     }
 
     public_deps = [
+      ":efr32_mbedtls_config",
       "${segger_rtt_root}:segger_rtt",
       "${segger_rtt_root}:segger_rtt_printf",
       "${segger_rtt_root}:segger_rtt_syscalls",

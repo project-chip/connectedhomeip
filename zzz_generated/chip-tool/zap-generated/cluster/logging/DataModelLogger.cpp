@@ -5932,42 +5932,42 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Rssi", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BeaconLostCount", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BeaconRxCount", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PacketMulticastRxCount", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PacketMulticastTxCount", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PacketUnicastRxCount", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PacketUnicastTxCount", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id: {
-            uint64_t value;
+            chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMaxRate", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::OverrunCount::Id: {
-            uint64_t value;
+            chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OverrunCount", 1, value);
         }

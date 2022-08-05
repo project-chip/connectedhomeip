@@ -15,6 +15,9 @@
 
 name: 11.2.1. [TC-BINFO-2.1] Attributes [DUT-Server]
 
+PICS:
+    - BINFO.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -118,6 +121,18 @@ tests:
               type: vendor_id
               minValue: 1
               maxValue: 65521
+
+    - label:
+          "Verify that VendorID matches the value assigned to this manufacturer"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BINFO.S.A0002
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH writes VendorID from the DUT."
       PICS: BINFO.S.A0002

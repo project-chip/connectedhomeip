@@ -15,6 +15,9 @@
 
 name: 3.12.4. [TC-CONTENTLAUNCHER-10.5] Launch URL Verification
 
+PICS:
+    - CONTENTLAUNCHER.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -24,10 +27,13 @@ tests:
     - label:
           "TH sends a LaunchURL command to the DUT with a known good content URL
           string"
-      PICS: CONTENTLAUNCHER.C.C0001
+      PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-url "exampleUrl"   '{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-url "exampleUrl"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
+          ./chip-tv-casting-app contentlauncher launch-url "exampleUrl"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
 
+          On TH  verify the success response (value 0) received  from DUT
 
           [1651062947.426589][157354:157359] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651062947.426633][157354:157359] CHIP:TOO:   LaunchResponse: {
@@ -43,11 +49,13 @@ tests:
     - label:
           "TH sends a LaunchURL command to the DUT with a known good content URL
           string and a display string"
-      PICS: CONTENTLAUNCHER.C.C0001
+      PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-url "https://csa-iot.org/"   '{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1 --DisplayString "Custom Display String"
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-url "https://csa-iot.org/"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1 --DisplayString "Custom Display String"
+          ./chip-tv-casting-app contentlauncher launch-url "https://csa-iot.org/"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1 --DisplayString "Custom Display String"
 
-
+          On TH  verify the success response (value 0) received  from DUT
           [1651225659.477000][4263:4268] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651225659.477112][4263:4268] CHIP:TOO:   LaunchResponse: {
           [1651225659.477213][4263:4268] CHIP:TOO:     status: 0
@@ -62,11 +70,13 @@ tests:
     - label:
           "TH sends a LaunchURL command to the DUT with a known good content URL
           string and a brand information object."
-      PICS: CONTENTLAUNCHER.C.C0001
+      PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-url "https://csa-iot.org/"   '{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-url "https://csa-iot.org/"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
+          ./chip-tv-casting-app contentlauncher launch-url "https://csa-iot.org/"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
 
-
+          On TH  verify the success response (value 0) received  from DUT
           [1651225659.477000][4263:4268] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651225659.477112][4263:4268] CHIP:TOO:   LaunchResponse: {
           [1651225659.477213][4263:4268] CHIP:TOO:     status: 0
@@ -81,10 +91,13 @@ tests:
     - label:
           "TH sends a LaunchURL command to the DUT with a known unreachable
           content URL string."
-      PICS: CONTENTLAUNCHER.C.C0001
+      PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-url "https://badurl"   '{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-url "https://badurl"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
+          ./chip-tv-casting-app contentlauncher launch-url "https://badurl"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
 
+          On TH  verify the success response (value 0) received  from DUT
           [1652429829.721244][29660:29665] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1652429829.721301][29660:29665] CHIP:TOO:   LaunchResponse: {
           [1652429829.721341][29660:29665] CHIP:TOO:     status: 1
@@ -102,11 +115,13 @@ tests:
     - label:
           "TH sends a LaunchURL command to the DUT with a known un-authorized
           content URL string."
-      PICS: CONTENTLAUNCHER.C.C0001
+      PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
-          ./chip-tool contentlauncher launch-url "https://csa-iot.org/badauth"   '{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool contentlauncher launch-url "https://csa-iot.org/badauth"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
+          ./chip-tv-casting-app contentlauncher launch-url "https://csa-iot.org/badauth"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
 
-
+          On TH  verify the success response (value 0) received  from DUT
           [1652429857.017897][29666:29671] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1652429857.017968][29666:29671] CHIP:TOO:   LaunchResponse: {
           [1652429857.018031][29666:29671] CHIP:TOO:     status: 2
