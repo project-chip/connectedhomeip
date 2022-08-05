@@ -1,6 +1,9 @@
 # CHIP ESP32 Pigweed Example Application
 
-Refer [setup ESP-IDF and CHIP Environment](#setup-esp-idf-and-chip-environment) and [Build, Flash, Monitor, and Commissioning](#build-flash-monitor-and-commissioning) guide to get started.
+Refer [setup ESP-IDF and CHIP Environment](#setup-esp-idf-and-chip-environment)
+and
+[Build, Flash, Monitor, and Commissioning](#build-flash-monitor-and-commissioning)
+guide to get started.
 
 ---
 

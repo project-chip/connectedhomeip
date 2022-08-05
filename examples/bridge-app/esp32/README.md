@@ -1,6 +1,9 @@
 # CHIP ESP32 Bridge App Example
 
-Refer [setup ESP-IDF and CHIP Environment](#setup-esp-idf-and-chip-environment) and [Build, Flash, Monitor, and Commissioning](#build-flash-monitor-and-commissioning) guide to get started.
+Refer [setup ESP-IDF and CHIP Environment](#setup-esp-idf-and-chip-environment)
+and
+[Build, Flash, Monitor, and Commissioning](#build-flash-monitor-and-commissioning)
+guide to get started.
 
 ---
 
@@ -21,7 +24,6 @@ cluster have been added as endpoints
 2. Light2 at endpoint 6
 3. Light3 at endpoint 4
 4. Light4 at endpoint 5
-
 
 ## Dynamic Endpoints
 

@@ -3,14 +3,20 @@
 A prototype application that demonstrates device commissioning and cluster
 control.
 
-Refer [setup ESP-IDF and CHIP Environment](#setup-esp-idf-and-chip-environment) and [Build, Flash, Monitor, and Commissioning](#build-flash-monitor-and-commissioning) guide to get started.
+Refer [setup ESP-IDF and CHIP Environment](#setup-esp-idf-and-chip-environment)
+and
+[Build, Flash, Monitor, and Commissioning](#build-flash-monitor-and-commissioning)
+guide to get started.
 
 ---
 
 -   [Cluster control](#cluster-control)
 -   [Note](#note)
--   Please refer [Matter OTA guide](../../../docs/guides/esp32/ota.md) for trying out OTA
--   Please refer [RPC console and Device Tracing](../../../docs/guides/esp32/rpc_console.md) for using RPC and device tracing
+-   Please refer [Matter OTA guide](../../../docs/guides/esp32/ota.md) for
+    trying out OTA
+-   Please refer
+    [RPC console and Device Tracing](../../../docs/guides/esp32/rpc_console.md)
+    for using RPC and device tracing
 
 ---
 

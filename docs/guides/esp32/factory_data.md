@@ -1,27 +1,29 @@
 ## Using ESP32 Factory Data Provider
 
-By default applications uses test-mode or default commissionable data provider, 
+By default applications uses test-mode or default commissionable data provider,
 device attestation credentials provider, and device instance info provider.
 
 To use different values for them you can use the ESP32 Factory Data Provider.
 
 ### Configuration Options
 
-Enable config option `CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER` to use
-ESP32 specific implementation of CommissionableDataProvider and
+Enable config option `CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER` to use ESP32
+specific implementation of CommissionableDataProvider and
 DeviceAttestationCredentialsProvider.
 
-[Component config → CHIP Device Layer → Commissioning options → Use ESP32 Factory Data Provider]
+[Component config → CHIP Device Layer → Commissioning options → Use ESP32
+Factory Data Provider]
 
-Enable config option `CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER` to use
-ESP32 specific implementation of DeviceInstanceInfoProvider.
+Enable config option `CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER` to use ESP32
+specific implementation of DeviceInstanceInfoProvider.
 
-[Component config → CHIP Device Layer → Commissioning options → Use ESP32 Device Instance Info Provider]
+[Component config → CHIP Device Layer → Commissioning options → Use ESP32 Device
+Instance Info Provider]
 
-ESP32 implementation reads factory data from nvs partition, chip-factory
-data must be flashed into the configured nvs partition. Factory partition can
-be configured using `CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION_LABEL` option,
-default is "nvs".
+ESP32 implementation reads factory data from nvs partition, chip-factory data
+must be flashed into the configured nvs partition. Factory partition can be
+configured using `CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION_LABEL` option, default
+is "nvs".
 
 ### Generate NVS Binary Image
 
@@ -33,10 +35,12 @@ chip-factory NVS binary image `partition.bin`.
 Script supports adding following data to the NVS binary image:
 
 -   Commissionable data
+
     -   Discriminator
     -   Spake2p verifier, salt, and iteration count
 
 -   Device attestation data
+
     -   Device attestation key and certificate
     -   Product attestation intermediate certificate
     -   Certificate declaration
@@ -48,7 +52,8 @@ Script supports adding following data to the NVS binary image:
     -   Serial Number
     -   Unique identifier
 
-Please check help for available options, `scripts/tools/generate_esp32_chip_factory_bin.py`
+Please check help for available options,
+`scripts/tools/generate_esp32_chip_factory_bin.py`
 
 #### Dependency
 
@@ -73,8 +78,8 @@ export PATH=$PATH:path/to/connectedhomeip/out/host
 
 #### Usage
 
-Below mentioned command generates the nvs image with test DAC with
-VID:0xFFF2 and PID:8000 and some examples values for other fields.
+Below mentioned command generates the nvs image with test DAC with VID:0xFFF2
+and PID:8000 and some examples values for other fields.
 
 ```
 ./generate_esp32_chip_factory_bin.py -d 3434 -p 99663300 \
@@ -89,14 +94,15 @@ VID:0xFFF2 and PID:8000 and some examples values for other fields.
 
 #### Flashing the generated NVS image
 
-Use the following command to flash the NVS image. `0x9000` is default
-address for `nvs` partition.
+Use the following command to flash the NVS image. `0x9000` is default address
+for `nvs` partition.
 
 ```
 esptool.py -p <port> write_flash 0x9000 factory_partition.bin
 ```
 
-NOTE: Above command uses the default NVS address, please flash the NVS image at appropriate address.
+NOTE: Above command uses the default NVS address, please flash the NVS image at
+appropriate address.
 
 ### Securing NVS binary image with NVS Encryption
 

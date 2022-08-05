@@ -12,14 +12,14 @@ $ idf.py fullclean
 
 Alternatively, Enable RPCs in the build using menuconfig:
 
-- Enable the RPC library and Disable ENABLE_CHIP_SHELL
+-   Enable the RPC library and Disable ENABLE_CHIP_SHELL
 
     ```
     Component config → CHIP Core → General Options → Enable Pigweed PRC library
     Component config → CHIP Core → General Options → Disable CHIP Shell
     ```
 
-- Ensure the UART is correctly configured for your board, for m5stack:
+-   Ensure the UART is correctly configured for your board, for m5stack:
 
     ```
     PW RPC Debug channel → UART port number → 0
@@ -38,7 +38,8 @@ $ idf.py flash
 After flashing a build with RPCs enabled you can use the rpc console to send
 commands to the device.
 
-Build or install the [rpc console](../../../examples/common/pigweed/rpc_console/README.md)
+Build or install the
+[rpc console](../../../examples/common/pigweed/rpc_console/README.md)
 
 Start the console
 

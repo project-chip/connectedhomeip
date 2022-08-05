@@ -196,7 +196,8 @@ $ out/debug/chip-tool pairing ble-wifi 12345 MY_SSID MY_PASSWORD 20202021 3840
 -   Discriminator : 3840 (Test discriminator)
 -   Setup Pin Code : 20202021 (Test setup pin code)
 
-If you want to use different values for discriminator and setup pin code please follow [Using ESP32 Factory Data Provider guide](factory_data.md)
+If you want to use different values for discriminator and setup pin code please
+follow [Using ESP32 Factory Data Provider guide](factory_data.md)
 
 ## Flashing app using script
 

@@ -74,4 +74,3 @@ running:
 ```
 source scripts/bootstrap.sh
 ```
-

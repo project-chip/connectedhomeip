@@ -17,13 +17,16 @@ script.
 
 ## Enabling OTA Requestor
 
--   Please make sure `CONFIG_ENABLE_OTA_REQUESTOR` config option is enabled for enabling OTA requestor feature.
--   Currently all-clusters-app, lighting-app, and ota-requestor-app supports OTA requestor functionality.
+-   Please make sure `CONFIG_ENABLE_OTA_REQUESTOR` config option is enabled for
+    enabling OTA requestor feature.
+-   Currently all-clusters-app, lighting-app, and ota-requestor-app supports OTA
+    requestor functionality.
 -   Build and flash any supported app, and commission it.
 
 ## Setup OTA Provider app
 
-Setup any of the OTA Provider, commission it and install the appropriate access control list.
+Setup any of the OTA Provider, commission it and install the appropriate access
+control list.
 
 -   [Linux OTA Provider](../../../examples/ota-provider-app/linux)
 -   [ESP32 OTA Provider](../../../examples/ota-provider-app/esp32)
@@ -51,4 +54,3 @@ chip-tool. On receiving this command OTA requestor will query for OTA image.
 ```
 ./out/debug/chip-tool otasoftwareupdaterequestor announce-ota-provider <PROVIDER NODE ID> 0 0 0 <REQUESTOR NODE ID> 0
 ```
-

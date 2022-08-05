@@ -11,7 +11,8 @@ Documentation References:
 
 -   Enable the Flash encryption [Security features → Enable flash encryption on
     boot]
--   The NVS Encryption is enabled by default when Flash Encryption is enabled, [Component config → NVS → Enable NVS encryption]
+-   The NVS Encryption is enabled by default when Flash Encryption is enabled,
+    [Component config → NVS → Enable NVS encryption]
 -   Use `partitions_encrypted.csv` partition table [Partition Table → Custom
     partition CSV file]
 
@@ -24,9 +25,10 @@ Please enable the below options if you want to use ESP32 Factory Data Provider
 
 ## Generate the factory partition using `generate_esp32_chip_factory_bin.py` script
 
--   Please check [generating factory data guide](factory_data.md) for various available factory data options
--   Provide `-e` option along with other options to generate the
-    encrypted factory partition
+-   Please check [generating factory data guide](factory_data.md) for various
+    available factory data options
+-   Provide `-e` option along with other options to generate the encrypted
+    factory partition
 -   Two partition binaries will be generated `factory_partition.bin` and
     `keys/nvs_key_partition.bin`
 
@@ -34,7 +36,8 @@ Please enable the below options if you want to use ESP32 Factory Data Provider
 
 -   Flash the application using `idf.py flash`.
 
-    NOTE: If not flashing for the first time you will have to use `idf.py encrypted-flash`
+    NOTE: If not flashing for the first time you will have to use
+    `idf.py encrypted-flash`
 
 -   Flash the factory partition, this SHALL be non encrypted write as NVS
     encryption works differently
