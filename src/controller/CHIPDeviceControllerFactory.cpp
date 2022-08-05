@@ -24,7 +24,7 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 
-#include <app/OperationalDeviceProxy.h>
+#include <app/OperationalSessionSetup.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -242,8 +242,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         chip::app::DnssdServer::Instance().StartServer();
     }
 
-    stateParams.operationalDevicePool = Platform::New<DeviceControllerSystemStateParams::OperationalDevicePool>();
-    stateParams.caseClientPool        = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
+    stateParams.sessionSetupPool = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();
+    stateParams.caseClientPool   = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
 
     DeviceProxyInitParams deviceInitParams = {
         .sessionManager           = stateParams.sessionMgr,
@@ -257,7 +257,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
-        .devicePool        = stateParams.operationalDevicePool,
+        .sessionSetupPool  = stateParams.sessionSetupPool,
     };
 
     // TODO: Need to be able to create a CASESessionManagerConfig here!
@@ -390,13 +390,13 @@ void DeviceControllerSystemState::Shutdown()
         mCASESessionManager = nullptr;
     }
 
-    // mCASEClientPool and mDevicePool must be deallocated
+    // mCASEClientPool and mSessionSetupPool must be deallocated
     // after mCASESessionManager, which uses them.
 
-    if (mOperationalDevicePool != nullptr)
+    if (mSessionSetupPool != nullptr)
     {
-        Platform::Delete(mOperationalDevicePool);
-        mOperationalDevicePool = nullptr;
+        Platform::Delete(mSessionSetupPool);
+        mSessionSetupPool = nullptr;
     }
 
     if (mCASEClientPool != nullptr)

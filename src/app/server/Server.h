@@ -25,7 +25,7 @@
 #include <app/CASESessionManager.h>
 #include <app/DefaultAttributePersistenceProvider.h>
 #include <app/FailSafeContext.h>
-#include <app/OperationalDeviceProxyPool.h>
+#include <app/OperationalSessionSetupPool.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/server/AclStorage.h>
 #include <app/server/AppDelegate.h>
@@ -491,7 +491,7 @@ private:
 
     CASESessionManager mCASESessionManager;
     CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
-    OperationalDeviceProxyPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES> mDevicePool;
+    OperationalSessionSetupPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES> mSessionSetupPool;
 
     Protocols::SecureChannel::UnsolicitedStatusHandler mUnsolicitedStatusHandler;
     Messaging::ExchangeManager mExchangeMgr;

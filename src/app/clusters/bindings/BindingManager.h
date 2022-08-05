@@ -37,8 +37,10 @@ namespace chip {
  *
  * E.g. The application will send on/off commands to peer for the OnOff cluster.
  *
+ * The handler is not allowed to hold onto the pointer to the SessionHandler that is passed in.
  */
-using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, DeviceProxy * peer_device, void * context);
+using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device,
+                                           void * context);
 
 /**
  * Application callback function when a context used in NotifyBoundClusterChanged will not be needed and should be
@@ -123,8 +125,8 @@ public:
 private:
     static BindingManager sBindingManager;
 
-    static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device);
-    void HandleDeviceConnected(OperationalDeviceProxy * device);
+    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
 
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
     void HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error);

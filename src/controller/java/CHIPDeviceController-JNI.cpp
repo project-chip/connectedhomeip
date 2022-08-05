@@ -671,6 +671,16 @@ JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong ha
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error invoking GetConnectedDevice"));
 }
 
+JNI_METHOD(void, releaseConnectedDevicePointer)(JNIEnv * env, jobject self, jlong devicePtr)
+{
+    chip::DeviceLayer::StackLock lock;
+    OperationalDeviceProxy * device = reinterpret_cast<OperationalDeviceProxy *>(devicePtr);
+    if (device != NULL)
+    {
+        delete device;
+    }
+}
+
 JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;

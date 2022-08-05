@@ -57,7 +57,8 @@ GetConnectedDeviceCallback::~GetConnectedDeviceCallback()
     env->DeleteGlobalRef(mJavaCallbackRef);
 }
 
-void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
+void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                                     SessionHandle & sessionHandle)
 {
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     auto * self          = static_cast<GetConnectedDeviceCallback *>(context);
@@ -78,6 +79,8 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Operational
     VerifyOrReturn(successMethod != nullptr, ChipLogError(Controller, "Could not find onDeviceConnected method"));
 
     static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a Java handle");
+
+    OperationalDeviceProxy * device = new OperationalDeviceProxy(&exchangeMgr, sessionHandle);
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(javaCallback, successMethod, reinterpret_cast<jlong>(device));
 }
