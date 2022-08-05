@@ -20,7 +20,6 @@
 #include "AppConfig.h"
 #include "BoltLockManager.h"
 #include "LEDWidget.h"
-#include "ThreadUtil.h"
 
 #include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attribute-id.h>
@@ -249,14 +248,6 @@ void AppTask::ButtonEventHandler(uint32_t button_state, uint32_t has_changed)
         sAppTask.PostEvent(&button_event);
     }
 
-    if (THREAD_START_BUTTON_MASK & button_state & has_changed)
-    {
-        button_event.ButtonEvent.PinNo  = THREAD_START_BUTTON;
-        button_event.ButtonEvent.Action = BUTTON_PUSH_EVENT;
-        button_event.Handler            = StartThreadHandler;
-        sAppTask.PostEvent(&button_event);
-    }
-
     if (BLE_ADVERTISEMENT_START_BUTTON_MASK & button_state & has_changed)
     {
         button_event.ButtonEvent.PinNo  = BLE_ADVERTISEMENT_START_BUTTON;
@@ -370,22 +361,6 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
             LOG_INF("Factory Reset has been Canceled");
         }
-    }
-}
-
-void AppTask::StartThreadHandler(AppEvent * aEvent)
-{
-    if (aEvent->ButtonEvent.PinNo != THREAD_START_BUTTON)
-        return;
-
-    if (!ConnectivityMgr().IsThreadProvisioned())
-    {
-        StartDefaultThreadNetwork();
-        LOG_INF("Device is not commissioned to a Thread network. Starting with the default configuration.");
-    }
-    else
-    {
-        LOG_INF("Device is commissioned to a Thread network.");
     }
 }
 
