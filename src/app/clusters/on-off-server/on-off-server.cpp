@@ -544,7 +544,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
     if (isOn) // OnOff On case
     {
         // Restart Timer
-        emberEventControlSetDelayMS(configureEventControl(endpoint), calculateWaitTimeMS(enterTime, chip::System::Clock::Milliseconds32(UPDATE_TIME_MS)).count());
+        emberEventControlSetDelayMS(configureEventControl(endpoint), (uint32_t)(calculateWaitTimeMS(enterTime, chip::System::Clock::Milliseconds32(UPDATE_TIME_MS)).count()));
 
         // Update onTime values
         uint16_t onTime = MIN_TIME_VALUE;
@@ -583,7 +583,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         if (offWaitTime > 0)
         {
             // Restart Timer
-            emberEventControlSetDelayMS(configureEventControl(endpoint), calculateWaitTimeMS(enterTime, chip::System::Clock::Milliseconds32(UPDATE_TIME_MS)).count());
+            emberEventControlSetDelayMS(configureEventControl(endpoint), (uint32_t)(calculateWaitTimeMS(enterTime, chip::System::Clock::Milliseconds32(UPDATE_TIME_MS)).count()));
         }
         else
         {
