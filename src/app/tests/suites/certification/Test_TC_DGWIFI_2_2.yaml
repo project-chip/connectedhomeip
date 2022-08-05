@@ -29,6 +29,7 @@ tests:
           This is an Optional event so its not compulsory to get the expected outcome
 
           ./chip-tool wifinetworkdiagnostics read-event disconnection 1 0
+
           Verify on the TH Log:
 
           [1655734228.476828][18708:18713] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Event 0x0000_0000
@@ -49,6 +50,8 @@ tests:
 
           ./chip-tool wifinetworkdiagnostics read-event association-failure 1 0
 
+          Verify on the TH Log:
+
            CHIP:DMG: ReportDataMessage =
           [1651574380.297222][8941:8946] CHIP:DMG: {
           [1651574380.297245][8941:8946] CHIP:DMG:         SuppressResponse = true,
@@ -63,6 +66,8 @@ tests:
           This is an Optional event so its not compulsory to get the expected outcome
 
           ./chip-tool wifinetworkdiagnostics read-event connection-status 1 0
+
+          Verify on the TH Log:
 
           [1655734276.513474][18731:18736] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Event 0x0000_0002
           [1655734276.513504][18731:18736] CHIP:TOO:          Event number: 3

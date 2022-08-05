@@ -8,6 +8,30 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
 
   private int endpoint;
 
+  private ContentLaunchSearchParameter[] tvShowSearchList = {
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.ACTOR, "Gaby sHofmann"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.CHANNEL, "PBS"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.CHARACTER, "Snow White"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.DIRECTOR, "Spike Lee"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.FRANCHISE, "Star Wars"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.GENRE, "Horror"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.POPULARITY, "Popularity"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.PROVIDER, "Netfxlix"),
+  };
+
+  private ContentLaunchSearchParameter[] sportsShowSearchList = {
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.EVENT, "Football games"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.LEAGUE, "NCAA"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.SPORT, "football"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.SPORTS_TEAM, "Arsenal"),
+    new ContentLaunchSearchParameter(ContentLaunchSearchParameterType.TYPE, "TVSeries"),
+  };
+
+  private ContentLaunchEntry[] entries = {
+    new ContentLaunchEntry("Sports Example", sportsShowSearchList),
+    new ContentLaunchEntry("TV Show Example", tvShowSearchList)
+  };
+
   public ContentLaunchManagerStub(int endpoint) {
     this.endpoint = endpoint;
   }
@@ -33,9 +57,19 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
       ContentLaunchSearchParameter[] search, boolean autoplay, String data) {
     Log.d(TAG, "launchContent:" + data + " autoplay=" + autoplay + " at " + endpoint);
 
-    if (search != null && search.length > 0) {
-      Log.d(TAG, " TEST CASE found match=Example TV Show");
-    } else {
+    boolean found = false;
+    for (ContentLaunchEntry entry : entries) {
+      for (ContentLaunchSearchParameter parameter : entry.parameters) {
+        for (ContentLaunchSearchParameter query : search) {
+          if (query.type == parameter.type && query.data.equals(parameter.data)) {
+            Log.d(TAG, " TEST CASE found match=" + entry.name);
+            found = true;
+          }
+        }
+      }
+    }
+
+    if (!found) {
       Log.d(TAG, " TEST CASE did not find a match");
     }
 

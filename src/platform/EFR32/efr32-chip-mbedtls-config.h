@@ -35,6 +35,10 @@
 #include "em_device.h"
 #include "em_se.h"
 
+#if CHIP_HAVE_CONFIG_H
+#include <crypto/CryptoBuildConfig.h>
+#endif // CHIP_HAVE_CONFIG_H
+
 /**
  * Enable H Crypto and Entropy modules
  */
@@ -44,7 +48,6 @@
 #define MBEDTLS_ENTROPY_C
 #define MBEDTLS_SHA224_C
 #define MBEDTLS_SHA256_C
-#define MBEDTLS_TRNG_C
 
 #define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
 
@@ -80,7 +83,9 @@
 #define MBEDTLS_PK_C
 #define MBEDTLS_PK_PARSE_C
 #define MBEDTLS_PK_WRITE_C
+#if CHIP_CRYPTO_MBEDTLS
 #define MBEDTLS_PKCS5_C
+#endif
 #define MBEDTLS_PLATFORM_C
 #define MBEDTLS_PLATFORM_MEMORY
 #define MBEDTLS_PLATFORM_NO_STD_FUNCTIONS
@@ -101,6 +106,11 @@
 #define MBEDTLS_SSL_PROTO_DTLS
 #define MBEDTLS_SSL_SRV_C
 #define MBEDTLS_SSL_TLS_C
+
+#if CHIP_CRYPTO_PLATFORM
+#define MBEDTLS_USE_PSA_CRYPTO
+#endif
+
 #define MBEDTLS_X509_CREATE_C
 #define MBEDTLS_X509_CSR_WRITE_C
 #define MBEDTLS_X509_CRL_PARSE_C

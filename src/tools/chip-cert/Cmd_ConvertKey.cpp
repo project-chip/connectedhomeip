@@ -228,7 +228,7 @@ bool Cmd_ConvertKey(int argc, char * argv[])
     res = InitOpenSSL();
     VerifyTrueOrExit(res);
 
-    res = ReadKey(gInFileName, key.get());
+    res = ReadKey(gInFileName, key);
     VerifyTrueOrExit(res);
 
     if (IsPrivateKeyFormat(gOutFormat) && EC_KEY_get0_private_key(EVP_PKEY_get1_EC_KEY(key.get())) == nullptr)

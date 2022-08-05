@@ -53,16 +53,13 @@ will then join the network.
 
 *   Build the example application:
 
-          ```
-          $ ./scripts/examples/gn_p6_example.sh ./examples/all-clusters-minimal-app/p6 out/minimal_clusters_app_p6
-          ```
+          $ source scripts/activate.sh
+          $ scripts/build/build_examples.py --no-log-timestamps --target 'infineon-p6-all-clusters-minimal' build
 
 -   To delete generated executable, libraries and object files use:
 
-          ```
           $ cd ~/connectedhomeip
           $ rm -rf out/
-          ```
 
 <a name="flashing"></a>
 
@@ -74,10 +71,8 @@ will then join the network.
 
 -   On the command line:
 
-          ```
           $ cd ~/connectedhomeip
-          $ python3 out/clusters_app_p6/chip-p6-clusters-minimal-example.flash.py
-          ```
+          $ python3 out/infineon-p6-all-clusters-minimal/chip-p6-clusters-minimal-example.flash.py
 
 <a name="Commissioning and cluster control"></a>
 
@@ -94,16 +89,12 @@ perform commissioning and cluster control.
 
 -   Set up python controller.
 
-           ```
            $ cd {path-to-connectedhomeip}
            $ ./scripts/examples/gn_build_example.sh examples/chip-tool out/debug
-           ```
 
 -   Execute the controller.
 
-           ```
            $ ./out/debug/chip-tool
-           ```
 
 <a name="Commissioning over BLE"></a>
 
@@ -112,7 +103,6 @@ perform commissioning and cluster control.
 Run the built executable and pass it the discriminator and pairing code of the
 remote device, as well as the network credentials to use.
 
-         ```
          $ ./out/debug/chip-tool pairing ble-wifi 1234 ${SSID} ${PASSWORD} 20202021 3840
 
          Parameters:
@@ -121,7 +111,6 @@ remote device, as well as the network credentials to use.
          3. Node ID: 1234 (you can assign any node id)
          4. SSID : Wi-Fi SSID
          5. PASSWORD : Wi-Fi Password
-         ```
 
 <a name="Notes"></a>
 
@@ -130,11 +119,9 @@ remote device, as well as the network credentials to use.
 Raspberry Pi 4 BLE connection issues can be avoided by running the following
 commands. These power cycle the BlueTooth hardware and disable BR/EDR mode.
 
-          ```
-          sudo btmgmt -i hci0 power off
-          sudo btmgmt -i hci0 bredr off
-          sudo btmgmt -i hci0 power on
-          ```
+          $ sudo btmgmt -i hci0 power off
+          $ sudo btmgmt -i hci0 bredr off
+          $ sudo btmgmt -i hci0 power on
 
 ## OTA Software Update
 

@@ -56,9 +56,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <platform/P6/OTAImageProcessorImpl.h>
-extern "C" {
-#include "cy_smif_psoc6.h"
-}
+
 using chip::BDXDownloader;
 using chip::CharSpan;
 using chip::DefaultOTARequestor;
@@ -284,11 +282,11 @@ CHIP_ERROR AppTask::Init()
     sLockLED.Init(LOCK_STATE_LED);
     if (state.Value() == DlLockState::kUnlocked)
     {
-        sLockLED.Set(true);
+        sLockLED.Set(false);
     }
     else
     {
-        sLockLED.Set(false);
+        sLockLED.Set(true);
     }
 
     ConfigurationMgr().LogDeviceConfig();
@@ -663,11 +661,12 @@ void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTaskName)
 void AppTask::InitOTARequestor()
 {
     SetRequestorInstance(&gRequestorCore);
+    ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     P6_LOG("Current Software Version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);

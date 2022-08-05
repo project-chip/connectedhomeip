@@ -49,14 +49,14 @@ tests:
     - label: "DUT parses QR code."
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          1. Follow the steps given in the TH's pairing hint to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
+          1. Follow the steps given in the TH"s pairing hint to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
 
           On DUT=chip-tool:
           ./chip-tool pairing code 1 MT:-24J0YXE00KA0648G00
-          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1657234147237] [31454:16822562] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1657234147237] [31454:16822562] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
+          [1657234147237] [31454:16822562] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1657234147237] [31454:16822562] CHIP: [CTL] Performing next commissioning step "Cleanup"
+          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657234147237] [31454:16822562] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
@@ -74,10 +74,10 @@ tests:
 
           On DUT Commissioner=chip-tool:
           ./chip-tool pairing code 1 MT:-24J0YXE00KA0648G00
-          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1657234147237] [31454:16822562] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1657234147237] [31454:16822562] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
+          [1657234147237] [31454:16822562] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1657234147237] [31454:16822562] CHIP: [CTL] Performing next commissioning step "Cleanup"
+          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657234147237] [31454:16822562] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
@@ -106,15 +106,15 @@ tests:
     - label: "DUT parses QR code."
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
-          1. Follow the steps given in the TH's pairing hint to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
+          1. Follow the steps given in the TH"s pairing hint to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
 
 
           On DUT=chip-tool:
           ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
-          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1657234324847] [31475:16824564] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1657234324847] [31475:16824564] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
+          [1657234324847] [31475:16824564] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1657234324847] [31475:16824564] CHIP: [CTL] Performing next commissioning step "Cleanup"
+          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657234324847] [31475:16824564] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
@@ -131,10 +131,10 @@ tests:
 
           On DUT=chip-tool:
           ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
-          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1657234324847] [31475:16824564] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1657234324847] [31475:16824564] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
+          [1657234324847] [31475:16824564] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1657234324847] [31475:16824564] CHIP: [CTL] Performing next commissioning step "Cleanup"
+          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657234324847] [31475:16824564] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 

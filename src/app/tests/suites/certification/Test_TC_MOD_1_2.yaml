@@ -22,10 +22,11 @@ config:
 
 tests:
     - label: "TH reads the SupportedModes attribute from DUT"
+      PICS: MOD.S.A0002
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          Verify on the TH Log:
+          on TH,Verify that the DUT response provides a list of supported modes
 
           [1654595167.600241][14362:14367] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
           [1654595167.600345][14362:14367] CHIP:TOO:   SupportedModes: 3 entries
@@ -59,10 +60,11 @@ tests:
       disabled: true
 
     - label: "TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify on the TH Log:
+          on TH,Verify that the DUT response is an integer that is in the list of modes returned in step 1.
 
           [1645776767.611140][4667:4672] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469718
 
@@ -70,10 +72,11 @@ tests:
       disabled: true
 
     - label: "TH reads the OnMode attribute from the DUT"
+      PICS: MOD.S.A0005
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
-          Verify on the TH Log:
+          on TH,Verify that the DUT response The attribute is nullable, and null is  valid value.
 
 
           [1649676072.465968][10754:10759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065072
@@ -82,10 +85,11 @@ tests:
       disabled: true
 
     - label: "TH reads the StartUpMode attribute from the DUT"
+      PICS: MOD.S.A0004
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
 
-          Verify on the TH Log:
+          on TH,Verify that the DUT response is an integer that is in the list of modes returned in step 1.
 
 
           [1649677014.496348][10778:10784] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 4277065072
@@ -94,10 +98,12 @@ tests:
       disabled: true
 
     - label: "TH reads the Description attribute from the DUT"
+      PICS: MOD.S.A0000
       verification: |
           ./chip-tool modeselect read description 1 1
 
-          Verify on the TH Log:
+
+          on TH,Verify that the DUT response is an integer that is in the list of modes returned in step 1.
 
           [1649677114.614974][10787:10792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000 DataVersion: 4277065072
 
@@ -105,10 +111,14 @@ tests:
       disabled: true
 
     - label: "TH reads the StandardNamespace attribute from the DUT"
+      PICS: MOD.S.A0001
       verification: |
           ./chip-tool modeselect read standard-namespace 1 1
 
-          Verify on the TH Log:
+
+          on TH,Verify that the DUT response  is an integer that is in the list of modes returned in step 1.(OR)
+           The attribute is nullable, and null is  valid value.
+
 
           [1649677167.900539][10795:10801] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0001 DataVersion: 4277065072
 

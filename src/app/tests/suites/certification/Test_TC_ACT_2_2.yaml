@@ -13,7 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 76.2.2. [TC-ACT-2.2] Primary functionality with server as DUT
+name: 3.2.2. [TC-ACT-2.2] Primary functionality with server as DUT
+
+PICS:
+    - ACT.S
 
 config:
     nodeId: 0x12344321
@@ -23,7 +26,12 @@ config:
 tests:
     - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
       verification: |
+          On DUT side:
+          sudo ./chip-bridge-app
 
+
+          On TH side:
+          ./chip-tool pairing ethernet 1 20202021 3840 fe80::e65f:1ff:fe0f:2753  5540
       disabled: true
 
     - label:
@@ -31,13 +39,32 @@ tests:
           each multiple bridged devices (endpoints)"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          no Matter messages
+          Create multiple groups with each multiple bridged devices (endpoints)
       disabled: true
 
     - label: "Read EndpointLists attribute"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          Read EndpointLists attribute
+          ./chip-tool bridgedactions read endpoint-list 1 1
+
+          On TH, verify the EndpointListStructs in TH Log:
+          [1658426570.716289][16527:16532] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3768747568
+          [1658426570.716404][16527:16532] CHIP:TOO:   endpoint list: 2 entries
+          [1658426570.716465][16527:16532] CHIP:TOO:     [1]: {
+          [1658426570.716507][16527:16532] CHIP:TOO:       EndpointListID: 0
+          [1658426570.716534][16527:16532] CHIP:TOO:       Name: living_room
+          [1658426570.716559][16527:16532] CHIP:TOO:       Type: 1
+          [1658426570.716588][16527:16532] CHIP:TOO:       Endpoints: 2 entries
+          [1658426570.716617][16527:16532] CHIP:TOO:         [1]: 2
+          [1658426570.716646][16527:16532] CHIP:TOO:         [2]: 3
+          [1658426570.716673][16527:16532] CHIP:TOO:      }
+          [1658426570.717133][16527:16532] CHIP:TOO:     [2]: {
+          [1658426570.717160][16527:16532] CHIP:TOO:       EndpointListID: 2
+          [1658426570.717185][16527:16532] CHIP:TOO:       Name: office
+          [1658426570.717209][16527:16532] CHIP:TOO:       Type: 1
+          [1658426570.717236][16527:16532] CHIP:TOO:       Endpoints: 1 entries
+          [1658426570.717265][16527:16532] CHIP:TOO:         [1]: 9
+          [1658426570.717292][16527:16532] CHIP:TOO:      }
       disabled: true
 
     - label:
@@ -45,19 +72,79 @@ tests:
           groups"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          Read EndpointLists attribute
+          press r in bridge-app to rename
+          (in the example, renamed "office" to "kitchen")
       disabled: true
 
     - label: "Read EndpointLists attribute again"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          TH internal checking of changes to EndpointLists attribute matching what was changed in 2c
+          ./chip-tool bridgedactions read endpoint-list 1 1
+
+          On TH, verify the EndpointListStructs in TH Log:
+          [1658408033.786811][14495:14500] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3742844648
+          [1658408033.786954][14495:14500] CHIP:TOO:   endpoint list: 2 entries
+          [1658408033.787044][14495:14500] CHIP:TOO:     [1]: {
+          [1658408033.787100][14495:14500] CHIP:TOO:       EndpointListID: 0
+          [1658408033.787135][14495:14500] CHIP:TOO:       Name: living_room
+          [1658408033.787183][14495:14500] CHIP:TOO:       Type: 1
+          [1658408033.787220][14495:14500] CHIP:TOO:       Endpoints: 2 entries
+          [1658408033.787274][14495:14500] CHIP:TOO:         [1]: 2
+          [1658408033.787312][14495:14500] CHIP:TOO:         [2]: 3
+          [1658408033.787343][14495:14500] CHIP:TOO:      }
+          [1658408033.787407][14495:14500] CHIP:TOO:     [2]: {
+          [1658408033.788089][14495:14500] CHIP:TOO:       EndpointListID: 2
+          [1658408033.788123][14495:14500] CHIP:TOO:       Name: kitchen
+          [1658408033.788156][14495:14500] CHIP:TOO:       Type: 1
+          [1658408033.788191][14495:14500] CHIP:TOO:       Endpoints: 1 entries
+          [1658408033.788243][14495:14500] CHIP:TOO:         [1]: 9
+          [1658408033.788278][14495:14500] CHIP:TOO:      }
       disabled: true
 
     - label: "compare result of step 2d to what was read in step 2b"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          no Matter messages
+          compare result of step 2d to what was read in step 2b, Verify name field in relevant EndpointListStruct has been updated and no other changes in EndpointLists attribute
+
+          Step 2d log
+          On TH, verify the EndpointListStructs in TH Log:
+          [1658408033.786811][14495:14500] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3742844648
+          [1658408033.786954][14495:14500] CHIP:TOO:   endpoint list: 2 entries
+          [1658408033.787044][14495:14500] CHIP:TOO:     [1]: {
+          [1658408033.787100][14495:14500] CHIP:TOO:       EndpointListID: 0
+          [1658408033.787135][14495:14500] CHIP:TOO:       Name: living_room
+          [1658408033.787183][14495:14500] CHIP:TOO:       Type: 1
+          [1658408033.787220][14495:14500] CHIP:TOO:       Endpoints: 2 entries
+          [1658408033.787274][14495:14500] CHIP:TOO:         [1]: 2
+          [1658408033.787312][14495:14500] CHIP:TOO:         [2]: 3
+          [1658408033.787343][14495:14500] CHIP:TOO:      }
+          [1658408033.787407][14495:14500] CHIP:TOO:     [2]: {
+          [1658408033.788089][14495:14500] CHIP:TOO:       EndpointListID: 2
+          [1658408033.788123][14495:14500] CHIP:TOO:       Name: kitchen
+          [1658408033.788156][14495:14500] CHIP:TOO:       Type: 1
+          [1658408033.788191][14495:14500] CHIP:TOO:       Endpoints: 1 entries
+          [1658408033.788243][14495:14500] CHIP:TOO:         [1]: 9
+          [1658408033.788278][14495:14500] CHIP:TOO:      }
+
+          Step 2b log
+          On TH, verify the EndpointListStructs in TH Log:
+          [1658426570.716289][16527:16532] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3768747568
+          [1658426570.716404][16527:16532] CHIP:TOO:   endpoint list: 2 entries
+          [1658426570.716465][16527:16532] CHIP:TOO:     [1]: {
+          [1658426570.716507][16527:16532] CHIP:TOO:       EndpointListID: 0
+          [1658426570.716534][16527:16532] CHIP:TOO:       Name: living_room
+          [1658426570.716559][16527:16532] CHIP:TOO:       Type: 1
+          [1658426570.716588][16527:16532] CHIP:TOO:       Endpoints: 2 entries
+          [1658426570.716617][16527:16532] CHIP:TOO:         [1]: 2
+          [1658426570.716646][16527:16532] CHIP:TOO:         [2]: 3
+          [1658426570.716673][16527:16532] CHIP:TOO:      }
+          [1658426570.717133][16527:16532] CHIP:TOO:     [2]: {
+          [1658426570.717160][16527:16532] CHIP:TOO:       EndpointListID: 2
+          [1658426570.717185][16527:16532] CHIP:TOO:       Name: office
+          [1658426570.717209][16527:16532] CHIP:TOO:       Type: 1
+          [1658426570.717236][16527:16532] CHIP:TOO:       Endpoints: 1 entries
+          [1658426570.717265][16527:16532] CHIP:TOO:         [1]: 9
+          [1658426570.717292][16527:16532] CHIP:TOO:      }
       disabled: true
 
     - label:
@@ -65,69 +152,120 @@ tests:
           devices (one endpoint) from one group to another group"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          TH internal checking of changes to EndpointLists attribute matching what was changed in 2f
+          Press f in bridge app  to move one of the bridged devices (one endpoint) from one group to another group
       disabled: true
 
     - label: "Read EndpointLists attribute again"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          no Matter messages
+          Press f in bridge app
+          (in the example, light at ep 3 was moved to kitchen)
       disabled: true
 
     - label: "compare result of step 2g to what was read in step 2e"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          Read EndpointLists attribute
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1980
       disabled: true
 
     - label: "Using the manufacturer provided means, remove one of the groups"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          no Matter messages
+          Press i in bridge-ap to remove one of the groups
       disabled: true
 
     - label: "Read EndpointLists attribute again"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          Read EndpointLists attribute
+          ./chip-tool bridgedactions read endpoint-list 1 1
+
+          On TH, verify the EndpointListStructs in TH Log:
+          [1658426959.409374][16560:16565] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3768747568
+          [1658426959.409476][16560:16565] CHIP:TOO:   endpoint list: 1 entries
+          [1658426959.409543][16560:16565] CHIP:TOO:     [1]: {
+          [1658426959.409580][16560:16565] CHIP:TOO:       EndpointListID: 0
+          [1658426959.409604][16560:16565] CHIP:TOO:       Name: living_room
+          [1658426959.409636][16560:16565] CHIP:TOO:       Type: 1
+          [1658426959.409691][16560:16565] CHIP:TOO:       Endpoints: 1 entries
+          [1658426959.409730][16560:16565] CHIP:TOO:         [1]: 2
+          [1658426959.409755][16560:16565] CHIP:TOO:      }
       disabled: true
 
     - label: "compare result of step 2j to what was read in step 2h"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          TH internal checking of changes to EndpointLists attribute matching what was changed in 2l
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1980
       disabled: true
 
     - label:
           "Using the manufacturer provided means, create a new group, which
           includes one of the bridged devices also present in another group"
-      PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
+      PICS: ACT.S.A0001 && ACT.S.M.OverlappingEndpointLists
       verification: |
-          no Matter messages
+          press l in bridge-app
+          in this example, a zone was created with same light (ep 2)
       disabled: true
 
     - label: "Read EndpointLists attribute again"
-      PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
+      PICS: ACT.S.A0001 && ACT.S.M.OverlappingEndpointLists
       verification: |
-          Read ActionList attribute
+          ./chip-tool bridgedactions read endpoint-list 1 1
+
+          On TH, verify the EndpointListStructs in TH Log:
+          [1658427088.316681][16578:16583] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3768747568
+          [1658427088.316792][16578:16583] CHIP:TOO:   endpoint list: 2 entries
+          [1658427088.316850][16578:16583] CHIP:TOO:     [1]: {
+          [1658427088.316890][16578:16583] CHIP:TOO:       EndpointListID: 0
+          [1658427088.316915][16578:16583] CHIP:TOO:       Name: living_room
+          [1658427088.316939][16578:16583] CHIP:TOO:       Type: 1
+          [1658427088.316965][16578:16583] CHIP:TOO:       Endpoints: 1 entries
+          [1658427088.316993][16578:16583] CHIP:TOO:         [1]: 2
+          [1658427088.317019][16578:16583] CHIP:TOO:      }
+          [1658427088.317558][16578:16583] CHIP:TOO:     [2]: {
+          [1658427088.317583][16578:16583] CHIP:TOO:       EndpointListID: 2
+          [1658427088.317606][16578:16583] CHIP:TOO:       Name: dining
+          [1658427088.317628][16578:16583] CHIP:TOO:       Type: 2
+          [1658427088.317652][16578:16583] CHIP:TOO:       Endpoints: 1 entries
+          [1658427088.317679][16578:16583] CHIP:TOO:         [1]: 2
+          [1658427088.317705][16578:16583] CHIP:TOO:      }
       disabled: true
 
     - label: "compare result of step 2m to what was read in step 2k"
-      PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
+      PICS: ACT.S.A0001 && ACT.S.M.OverlappingEndpointLists
       verification: |
-          no Matter messages
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1980
       disabled: true
 
     - label: "Using the manufacturer provided means, create multiple actions"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          TH internal checking of changes to ActionList attribute matching what was changed in 3c
+          no Matter messages
       disabled: true
 
     - label: "Read ActionList attribute"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          no Matter messages
+          ./chip-tool bridgedactions read action-list 1 1
+
+          Verify  ActionStructs in TH Log:
+          [1658479958.699434][26130:26135] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
+          [1658479958.699494][26130:26135] CHIP:TOO:   action list: 2 entries
+          [1658479958.699549][26130:26135] CHIP:TOO:     [1]: {
+          [1658479958.699582][26130:26135] CHIP:TOO:       ActionID: 4097
+          [1658479958.699597][26130:26135] CHIP:TOO:       Name: Room 1 On
+          [1658479958.699611][26130:26135] CHIP:TOO:       Type: 3
+          [1658479958.699624][26130:26135] CHIP:TOO:       EndpointListID: 57345
+          [1658479958.699638][26130:26135] CHIP:TOO:       SupportedCommands: 1
+          [1658479958.699652][26130:26135] CHIP:TOO:       Status: 0
+          [1658479958.699665][26130:26135] CHIP:TOO:      }
+          [1658479958.699689][26130:26135] CHIP:TOO:     [2]: {
+          [1658479958.699702][26130:26135] CHIP:TOO:       ActionID: 4098
+          [1658479958.699715][26130:26135] CHIP:TOO:       Name: Turn On Room 2
+          [1658479958.699727][26130:26135] CHIP:TOO:       Type: 3
+          [1658479958.699740][26130:26135] CHIP:TOO:       EndpointListID: 57346
+          [1658479958.699753][26130:26135] CHIP:TOO:       SupportedCommands: 1
+          [1658479958.699765][26130:26135] CHIP:TOO:       Status: 0
+          [1658479958.699777][26130:26135] CHIP:TOO:      }
       disabled: true
 
     - label:
@@ -135,19 +273,81 @@ tests:
           actions"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          TH internal checking of changes to ActionList attribute matching what was changed in 3f
+          Press m in bridge-app to update the name of one action
       disabled: true
 
     - label: "Read ActionList attribute again"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          no Matter messages
+          ./chip-tool bridgedactions read action-list 1 1
+
+          Verify  ActionStructs in TH Log:
+          [1658480004.064867][26153:26158] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
+          [1658480004.064928][26153:26158] CHIP:TOO:   action list: 2 entries
+          [1658480004.064992][26153:26158] CHIP:TOO:     [1]: {
+          [1658480004.065024][26153:26158] CHIP:TOO:       ActionID: 4097
+          [1658480004.065041][26153:26158] CHIP:TOO:       Name: Turn On Room 1
+          [1658480004.065057][26153:26158] CHIP:TOO:       Type: 3
+          [1658480004.065073][26153:26158] CHIP:TOO:       EndpointListID: 57345
+          [1658480004.065090][26153:26158] CHIP:TOO:       SupportedCommands: 1
+          [1658480004.065105][26153:26158] CHIP:TOO:       Status: 0
+          [1658480004.065120][26153:26158] CHIP:TOO:      }
+          [1658480004.065148][26153:26158] CHIP:TOO:     [2]: {
+          [1658480004.065165][26153:26158] CHIP:TOO:       ActionID: 4098
+          [1658480004.065179][26153:26158] CHIP:TOO:       Name: Turn On Room 2
+          [1658480004.065194][26153:26158] CHIP:TOO:       Type: 3
+          [1658480004.065209][26153:26158] CHIP:TOO:       EndpointListID: 57346
+          [1658480004.065223][26153:26158] CHIP:TOO:       SupportedCommands: 1
+          [1658480004.065238][26153:26158] CHIP:TOO:       Status: 0
+          [1658480004.065252][26153:26158] CHIP:TOO:      }
       disabled: true
 
     - label: "compare result of step 3d to what was read in step 3b"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          Read ActionList attribute
+          Compare step 3d and 3b and verify the name field has been chamged
+
+          Step 3d
+          Verify  ActionStructs in TH Log:
+          [1658480004.064867][26153:26158] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
+          [1658480004.064928][26153:26158] CHIP:TOO:   action list: 2 entries
+          [1658480004.064992][26153:26158] CHIP:TOO:     [1]: {
+          [1658480004.065024][26153:26158] CHIP:TOO:       ActionID: 4097
+          [1658480004.065041][26153:26158] CHIP:TOO:       Name: Turn On Room 1
+          [1658480004.065057][26153:26158] CHIP:TOO:       Type: 3
+          [1658480004.065073][26153:26158] CHIP:TOO:       EndpointListID: 57345
+          [1658480004.065090][26153:26158] CHIP:TOO:       SupportedCommands: 1
+          [1658480004.065105][26153:26158] CHIP:TOO:       Status: 0
+          [1658480004.065120][26153:26158] CHIP:TOO:      }
+          [1658480004.065148][26153:26158] CHIP:TOO:     [2]: {
+          [1658480004.065165][26153:26158] CHIP:TOO:       ActionID: 4098
+          [1658480004.065179][26153:26158] CHIP:TOO:       Name: Turn On Room 2
+          [1658480004.065194][26153:26158] CHIP:TOO:       Type: 3
+          [1658480004.065209][26153:26158] CHIP:TOO:       EndpointListID: 57346
+          [1658480004.065223][26153:26158] CHIP:TOO:       SupportedCommands: 1
+          [1658480004.065238][26153:26158] CHIP:TOO:       Status: 0
+          [1658480004.065252][26153:26158] CHIP:TOO:      }
+
+          Step 3b Log:
+          Verify  ActionStructs in TH Log:
+          [1658479958.699434][26130:26135] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
+          [1658479958.699494][26130:26135] CHIP:TOO:   action list: 2 entries
+          [1658479958.699549][26130:26135] CHIP:TOO:     [1]: {
+          [1658479958.699582][26130:26135] CHIP:TOO:       ActionID: 4097
+          [1658479958.699597][26130:26135] CHIP:TOO:       Name: Room 1 On
+          [1658479958.699611][26130:26135] CHIP:TOO:       Type: 3
+          [1658479958.699624][26130:26135] CHIP:TOO:       EndpointListID: 57345
+          [1658479958.699638][26130:26135] CHIP:TOO:       SupportedCommands: 1
+          [1658479958.699652][26130:26135] CHIP:TOO:       Status: 0
+          [1658479958.699665][26130:26135] CHIP:TOO:      }
+          [1658479958.699689][26130:26135] CHIP:TOO:     [2]: {
+          [1658479958.699702][26130:26135] CHIP:TOO:       ActionID: 4098
+          [1658479958.699715][26130:26135] CHIP:TOO:       Name: Turn On Room 2
+          [1658479958.699727][26130:26135] CHIP:TOO:       Type: 3
+          [1658479958.699740][26130:26135] CHIP:TOO:       EndpointListID: 57346
+          [1658479958.699753][26130:26135] CHIP:TOO:       SupportedCommands: 1
+          [1658479958.699765][26130:26135] CHIP:TOO:       Status: 0
+          [1658479958.699777][26130:26135] CHIP:TOO:      }
       disabled: true
 
     - label:
@@ -155,58 +355,106 @@ tests:
           actions"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-
+          Press n in bridge-app to remove one of exposed actions
       disabled: true
 
     - label: "Read ActionList attribute again"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          no Matter messages
+          ./chip-tool bridgedactions read action-list 1 1
+
+          Verify  ActionStructs in TH Log:
+          [1658480039.164683][26172:26177] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
+          [1658480039.164758][26172:26177] CHIP:TOO:   action list: 1 entries
+          [1658480039.164815][26172:26177] CHIP:TOO:     [1]: {
+          [1658480039.164846][26172:26177] CHIP:TOO:       ActionID: 4097
+          [1658480039.164872][26172:26177] CHIP:TOO:       Name: Turn On Room 1
+          [1658480039.164897][26172:26177] CHIP:TOO:       Type: 3
+          [1658480039.164920][26172:26177] CHIP:TOO:       EndpointListID: 57345
+          [1658480039.164948][26172:26177] CHIP:TOO:       SupportedCommands: 1
+          [1658480039.164974][26172:26177] CHIP:TOO:       Status: 0
+          [1658480039.164997][26172:26177] CHIP:TOO:      }
       disabled: true
 
     - label: "compare result of step 3g to what was read in step 3e"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          Read ActionList attribute
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1980
       disabled: true
 
     - label: "Using the manufacturer provided means, add a new exposed action"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          sequence of Matter messages as described
+          press o in bridge-app
       disabled: true
 
     - label: "Read ActionList attribute again"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          sequence of Matter messages as described
+          ./chip-tool bridgedactions read action-list 1 1
+
+          Verify  ActionStructs in TH Log:
+          [1658480059.199268][26178:26183] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
+          [1658480059.199349][26178:26183] CHIP:TOO:   action list: 2 entries
+          [1658480059.199410][26178:26183] CHIP:TOO:     [1]: {
+          [1658480059.199440][26178:26183] CHIP:TOO:       ActionID: 4097
+          [1658480059.199457][26178:26183] CHIP:TOO:       Name: Turn On Room 1
+          [1658480059.199473][26178:26183] CHIP:TOO:       Type: 3
+          [1658480059.199488][26178:26183] CHIP:TOO:       EndpointListID: 57345
+          [1658480059.199505][26178:26183] CHIP:TOO:       SupportedCommands: 1
+          [1658480059.199520][26178:26183] CHIP:TOO:       Status: 0
+          [1658480059.199534][26178:26183] CHIP:TOO:      }
+          [1658480059.199562][26178:26183] CHIP:TOO:     [2]: {
+          [1658480059.199578][26178:26183] CHIP:TOO:       ActionID: 4099
+          [1658480059.199593][26178:26183] CHIP:TOO:       Name: Turn Off Room 1
+          [1658480059.199607][26178:26183] CHIP:TOO:       Type: 3
+          [1658480059.199622][26178:26183] CHIP:TOO:       EndpointListID: 57347
+          [1658480059.199636][26178:26183] CHIP:TOO:       SupportedCommands: 1
+          [1658480059.199651][26178:26183] CHIP:TOO:       Status: 0
+          [1658480059.199665][26178:26183] CHIP:TOO:      }
       disabled: true
 
     - label: "compare result of step 3j to what was read in step 3h"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1980
       disabled: true
 
-    - label:
-          "Using the manufacturer provided means, create multiple actions (NOTE
-          if this is not provided, it is assumed the DUT automagically creates
-          these)"
-      PICS: ACT.S.A0000
+    - label: "Using the manufacturer provided means, create multiple actions"
+      PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-
+          no Matter messages
       disabled: true
 
     - label: "Read ActionList attribute"
       PICS: ACT.S.A0000
       verification: |
+          ./chip-tool bridgedactions read action-list 1 1
 
+          Verify  ActionStructs in TH Log:
+          [1658480080.135069][26185:26190] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
+          [1658480080.135130][26185:26190] CHIP:TOO:   action list: 2 entries
+          [1658480080.135191][26185:26190] CHIP:TOO:     [1]: {
+          [1658480080.135222][26185:26190] CHIP:TOO:       ActionID: 4097
+          [1658480080.135238][26185:26190] CHIP:TOO:       Name: Turn On Room 1
+          [1658480080.135253][26185:26190] CHIP:TOO:       Type: 3
+          [1658480080.135269][26185:26190] CHIP:TOO:       EndpointListID: 57345
+          [1658480080.135285][26185:26190] CHIP:TOO:       SupportedCommands: 1
+          [1658480080.135300][26185:26190] CHIP:TOO:       Status: 0
+          [1658480080.135315][26185:26190] CHIP:TOO:      }
+          [1658480080.135342][26185:26190] CHIP:TOO:     [2]: {
+          [1658480080.135357][26185:26190] CHIP:TOO:       ActionID: 4099
+          [1658480080.135371][26185:26190] CHIP:TOO:       Name: Turn Off Room 1
+          [1658480080.135386][26185:26190] CHIP:TOO:       Type: 3
+          [1658480080.135400][26185:26190] CHIP:TOO:       EndpointListID: 57347
+          [1658480080.135415][26185:26190] CHIP:TOO:       SupportedCommands: 1
+          [1658480080.135430][26185:26190] CHIP:TOO:       Status: 0
+          [1658480080.135443][26185:26190] CHIP:TOO:      }
       disabled: true
 
     - label: "subscribe to StateChanged and ActionFailed events"
-      PICS: ACT.S.A0000
       verification: |
-
+          subscribe to events (Needs SDK implemenation)
       disabled: true
 
     - label:
@@ -214,13 +462,11 @@ tests:
           4b), perform one of the actions supported (see SupportedCommands in
           this ActionStruct) by sending the command with this particular
           ActionID and a random value for InvokeID"
-      PICS: ACT.S.A0000
       verification: |
-
+          sequence of Matter messages as described
       disabled: true
 
     - label: "repeat 4d for the other SupportedCommands of each ActionStruct"
-      PICS: ACT.S.A0000
       verification: |
-
+          sequence of Matter messages as described
       disabled: true

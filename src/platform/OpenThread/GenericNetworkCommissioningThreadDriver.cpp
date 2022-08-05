@@ -43,17 +43,15 @@ namespace NetworkCommissioning {
 // KVS slot upon any changes and restored when the fail-safe timeout is triggered or the device
 // reboots without completing all the changes.
 
-// Not all KVS implementations support zero-length values, so use this special value, that is not a valid
-// dataset, to represent an empty dataset. We need that to be able to revert the network configuration
-// in the case of an unsuccessful commissioning.
-constexpr uint8_t kEmptyDataset[1] = {};
-
 CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
 {
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(statusChangeCallback);
+    ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork);
 
-    VerifyOrReturnError(ThreadStackMgrImpl().IsThreadAttached(), CHIP_NO_ERROR);
-    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    // If the network configuration backup exists, it means that the device has been rebooted with
+    // the fail-safe armed. Since OpenThread persists all operational dataset changes, the backup
+    // must be restored on the boot. If there's no backup, the below function is a no-op.
+    RevertConfiguration();
 
     return CHIP_NO_ERROR;
 }
@@ -86,23 +84,23 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     // If no backup could be found, it means that the network configuration has not been modified
     // since the fail-safe was armed, so return with no error.
     ReturnErrorCodeIf(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
-    ReturnErrorOnFailure(error);
 
-    ChipLogError(NetworkProvisioning, "Found Thread configuration backup: reverting configuration");
+    ChipLogProgress(NetworkProvisioning, "Reverting Thread operational dataset");
 
-    // Not all KVS implementations support zero-length values, so handle a special value representing an empty dataset.
-    ByteSpan dataset(datasetBytes, datasetLength);
-
-    if (dataset.data_equal(ByteSpan(kEmptyDataset)))
+    if (error == CHIP_NO_ERROR)
     {
-        dataset = {};
+        error = mStagingNetwork.Init(ByteSpan(datasetBytes, datasetLength));
     }
 
-    ReturnErrorOnFailure(mStagingNetwork.Init(dataset));
-    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, /* callback */ nullptr));
+    if (error == CHIP_NO_ERROR)
+    {
+        error = DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, /* callback */ nullptr);
+    }
 
-    // TODO: What happens on errors above? Why do we not remove the failsafe?
-    return KeyValueStoreMgr().Delete(key.FailSafeNetworkConfig());
+    // Always remove the backup, regardless if it can be successfully restored.
+    KeyValueStoreMgr().Delete(key.FailSafeNetworkConfig());
+
+    return error;
 }
 
 Status GenericThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText,
@@ -203,16 +201,16 @@ Status GenericThreadDriver::MatchesNetworkId(const Thread::OperationalDataset & 
 CHIP_ERROR GenericThreadDriver::BackupConfiguration()
 {
     DefaultStorageKeyAllocator key;
-    uint8_t dummy;
 
     // If configuration is already backed up, return with no error
-    if (KeyValueStoreMgr().Get(key.FailSafeNetworkConfig(), &dummy, 0) == CHIP_ERROR_BUFFER_TOO_SMALL)
+    CHIP_ERROR err = KeyValueStoreMgr().Get(key.FailSafeNetworkConfig(), nullptr, 0);
+
+    if (err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL)
     {
         return CHIP_NO_ERROR;
     }
 
-    // Not all KVS implementations support zero-length values, so use a special value in such a case.
-    ByteSpan dataset = mStagingNetwork.IsEmpty() ? ByteSpan(kEmptyDataset) : mStagingNetwork.AsByteSpan();
+    ByteSpan dataset = mStagingNetwork.AsByteSpan();
 
     return KeyValueStoreMgr().Put(key.FailSafeNetworkConfig(), dataset.data(), dataset.size());
 }

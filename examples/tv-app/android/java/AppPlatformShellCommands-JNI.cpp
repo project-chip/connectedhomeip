@@ -44,12 +44,172 @@ using namespace chip::app::Clusters;
 
 static CHIP_ERROR pairApp(bool printHeader, size_t index)
 {
-    // TODO: add pair app
+
+    if (printHeader)
+    {
+        char str[64];
+        sprintf(str, "udc-commission %ld\r\n", (long) index);
+        strcat(response, str);
+    }
+
+    DeviceCommissioner * commissioner = GetDeviceCommissioner();
+    UDCClientState * state = commissioner->GetUserDirectedCommissioningServer()->GetUDCClients().GetUDCClientState(index);
+    if (state == nullptr)
+    {
+        char str[64];
+        sprintf(str, "udc client[%d] null \r\n", index);
+        strcat(response, str);
+    }
+    else
+    {
+        ContentApp * app = ContentAppPlatform::GetInstance().LoadContentAppByClient(state->GetVendorId(), state->GetProductId());
+        if (app == nullptr)
+        {
+            char str[64];
+            sprintf(str, "no app found for vendor id=%d \r\n", state->GetVendorId());
+            strcat(response, str);
+            return CHIP_ERROR_BAD_REQUEST;
+        }
+
+        if (app->GetAccountLoginDelegate() == nullptr)
+        {
+            char str[64];
+            sprintf(str, "no AccountLogin cluster for app with vendor id=%d \r\n", state->GetVendorId());
+            strcat(response, str);
+            return CHIP_ERROR_BAD_REQUEST;
+        }
+
+        char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
+        Encoding::BytesToUppercaseHexString(state->GetRotatingId(), state->GetRotatingIdLength(), rotatingIdString,
+                                            sizeof(rotatingIdString));
+
+        CharSpan rotatingIdSpan = CharSpan(rotatingIdString, strlen(rotatingIdString));
+
+        static const size_t kSetupPinSize = 12;
+        char setupPin[kSetupPinSize];
+
+        app->GetAccountLoginDelegate()->GetSetupPin(setupPin, kSetupPinSize, rotatingIdSpan);
+        std::string pinString(setupPin);
+
+        char * eptr;
+        uint32_t pincode = (uint32_t) strtol(pinString.c_str(), &eptr, 10);
+        if (pincode == 0)
+        {
+            char str[64];
+            sprintf(str, "udc no pin returned for vendor id=%d rotating ID=%s \r\n", state->GetVendorId(), rotatingIdString);
+            strcat(response, str);
+            return CHIP_ERROR_BAD_REQUEST;
+        }
+
+        return CommissionerPairUDC(pincode, index);
+    }
     return CHIP_NO_ERROR;
+}
+
+void DumpAccessControlEntry(const Access::AccessControl::Entry & entry)
+{
+
+    CHIP_ERROR err;
+
+    {
+        FabricIndex fabricIndex;
+        SuccessOrExit(err = entry.GetFabricIndex(fabricIndex));
+        char str[64];
+        sprintf(str, "fabricIndex: %u\n", fabricIndex);
+        strcat(response, str);
+    }
+
+    {
+        Privilege privilege;
+        SuccessOrExit(err = entry.GetPrivilege(privilege));
+        char str[64];
+        sprintf(str, "privilege: %d\n", to_underlying(privilege));
+        strcat(response, str);
+    }
+
+    {
+        AuthMode authMode;
+        SuccessOrExit(err = entry.GetAuthMode(authMode));
+        char str[64];
+        sprintf(str, "authMode: %d\n", to_underlying(authMode));
+        strcat(response, str);
+    }
+
+    {
+        size_t count;
+        SuccessOrExit(err = entry.GetSubjectCount(count));
+        if (count)
+        {
+
+            char str[64];
+            sprintf(str, "subjects: %u\n", static_cast<unsigned>(count));
+            strcat(response, str);
+
+            for (size_t i = 0; i < count; ++i)
+            {
+                NodeId subject;
+                SuccessOrExit(err = entry.GetSubject(i, subject));
+
+                char buffer[64];
+                sprintf(buffer, "  %u: 0x" ChipLogFormatX64, static_cast<unsigned>(i), ChipLogValueX64(subject));
+                strcat(response, buffer);
+            }
+        }
+    }
+
+    {
+        size_t count;
+        SuccessOrExit(err = entry.GetTargetCount(count));
+        if (count)
+        {
+
+            char str[64];
+            sprintf(str, "\ntargets: %u\n", static_cast<unsigned>(count));
+            strcat(response, str);
+
+            for (size_t i = 0; i < count; ++i)
+            {
+                Access::AccessControl::Entry::Target target;
+                SuccessOrExit(err = entry.GetTarget(i, target));
+                char buffer[64];
+                if (target.flags & Access::AccessControl::Entry::Target::kCluster)
+                {
+                    sprintf(buffer, "  %u: cluster: 0x" ChipLogFormatMEI, static_cast<unsigned>(i),
+                            ChipLogValueMEI(target.cluster));
+                    strcat(buffer, "\n");
+                    strcat(response, buffer);
+                }
+                if (target.flags & Access::AccessControl::Entry::Target::kEndpoint)
+                {
+                    sprintf(buffer, "  %u: endpoint: %u", static_cast<unsigned>(i), target.endpoint);
+                    strcat(buffer, "\n");
+                    strcat(response, buffer);
+                }
+                if (target.flags & Access::AccessControl::Entry::Target::kDeviceType)
+                {
+                    sprintf(buffer, "  %u: deviceType: 0x" ChipLogFormatMEI, static_cast<unsigned>(i),
+                            ChipLogValueMEI(target.deviceType));
+                    strcat(buffer, "\n");
+                    strcat(response, buffer);
+                }
+            }
+        }
+    }
+
+    strcat(response, "----- END ENTRY -----\n");
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "DumpAccessControlEntry: dump failed %" CHIP_ERROR_FORMAT, err.Format());
+        strcpy(response, "Error occurred");
+    }
 }
 
 char * AppPlatformHandler(int argc, char ** argv)
 {
+    CHIP_ERROR err;
+
     if (argc == 0 || strcmp(argv[0], "help") == 0)
     {
         strcpy(response, "check usage instructions on the UI");
@@ -92,6 +252,19 @@ char * AppPlatformHandler(int argc, char ** argv)
 
         strcpy(response, "added app");
 
+        return response;
+    }
+    else if (strcmp(argv[0], "print-app-access") == 0)
+    {
+        Access::AccessControl::EntryIterator iterator;
+        SuccessOrExit(err = Access::GetAccessControl().Entries(GetDeviceCommissioner()->GetFabricIndex(), iterator));
+        // clear entry
+        strcpy(response, "");
+        Access::AccessControl::Entry entry;
+        while (iterator.Next(entry) == CHIP_NO_ERROR)
+        {
+            DumpAccessControlEntry(entry);
+        }
         return response;
     }
     else if (strcmp(argv[0], "remove-app-access") == 0)
@@ -166,8 +339,7 @@ char * AppPlatformHandler(int argc, char ** argv)
         }
         char * eptr;
         size_t index = (size_t) strtol(argv[1], &eptr, 10);
-        pairApp(true, index);
-        strcpy(response, "no supported atm");
+        SuccessOrExit(err = pairApp(true, index));
         return response;
     }
     else
@@ -175,6 +347,10 @@ char * AppPlatformHandler(int argc, char ** argv)
         strcpy(response, "invalid argument");
         return response;
     }
+    return response;
+exit:
+    ChipLogError(DeviceLayer, "Error: %" CHIP_ERROR_FORMAT, err.Format());
+    strcpy(response, "Error occurred");
     return response;
 }
 

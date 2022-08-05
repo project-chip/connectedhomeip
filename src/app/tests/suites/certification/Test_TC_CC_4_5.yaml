@@ -15,6 +15,9 @@
 
 name: 3.2.9. [TC-CC-4.5] Saturation functionality with client as DUT
 
+PICS:
+    - CC.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -64,8 +67,7 @@ tests:
       disabled: true
 
     - label:
-          "Over TransitionTime, DUT reads CurrentSaturation attribute from TH
-          periodically."
+          "Over TransitionTime, DUT reads CurrentSaturation attribute from TH."
       PICS: CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
@@ -138,7 +140,7 @@ tests:
           [1657911543.961152][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0004
       disabled: true
 
-    - label: "DUT reads CurrentSaturation attribute from TH several Times."
+    - label: "DUT reads CurrentSaturation attribute from TH several times."
       PICS: CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
@@ -286,8 +288,10 @@ tests:
           [1657911631.587186][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0006
       disabled: true
 
-    - label: "Over TransitionTime, DUT reads CurrentHue attribute from TH."
-      PICS: CC.C.A0000
+    - label:
+          "Over TransitionTime, DUT reads CurrentHue and CurrentSaturation
+          attributes from TH."
+      PICS: CC.C.A0000 && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-hue 1 1
           Verify in DUT as client side log:
@@ -316,13 +320,9 @@ tests:
           [1657911655.181284][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
           [1657911655.181318][2977:2977] CHIP:DMG: AccessControl: allowed
           [1657911655.181390][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
-      disabled: true
 
-    - label:
-          "Over TransitionTime, DUT reads CurrentSaturation attribute from DUT."
-      PICS: CC.C.A0001
-      verification: |
-          ./chip-tool colorcontrol read current-saturation 1 1
+
+          "./chip-tool colorcontrol read current-saturation 1 1
 
           Verify in DUT as client side log:
 
@@ -350,6 +350,8 @@ tests:
           [1657911674.595039][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
           [1657911674.595073][2977:2977] CHIP:DMG: AccessControl: allowed
           [1657911674.595133][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
+
+          "
       disabled: true
 
     - label: "DUT sends StopMoveStep command to TH."

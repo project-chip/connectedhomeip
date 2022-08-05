@@ -17,6 +17,9 @@ name:
     3.4.2. [TC-IDM-4.2] Subscription Response Messages from DUT Test Cases.
     [{DUT_Server}]
 
+PICS:
+    - MCORE.IDM.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -144,52 +147,7 @@ tests:
           subscribe to all attributes for which it does not have access.
           AttributePath = [[Cluster = ClusterID, Endpoint = EndpointID ]]."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
-
-          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
-          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
-
-          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
-
-
-          any subscribe-by-id 0006 0 10 100 2 1
-
-          verify DUT is responsds with UNSUPPORTED_ACCESS  for the data sent in the above command
-          [1657450420.472568][8713:8718] CHIP:DMG: ReportDataMessage =
-          [1657450420.472633][8713:8718] CHIP:DMG: {
-          [1657450420.472694][8713:8718] CHIP:DMG:        SubscriptionId = 0xa70693c2,
-          [1657450420.472756][8713:8718] CHIP:DMG:        AttributeReportIBs =
-          [1657450420.472830][8713:8718] CHIP:DMG:        [
-          [1657450420.472889][8713:8718] CHIP:DMG:                AttributeReportIB =
-          [1657450420.472972][8713:8718] CHIP:DMG:                {
-          [1657450420.473036][8713:8718] CHIP:DMG:                        AttributeStatusIB =
-          [1657450420.473110][8713:8718] CHIP:DMG:                        {
-          [1657450420.473185][8713:8718] CHIP:DMG:                                AttributePathIB =
-          [1657450420.473267][8713:8718] CHIP:DMG:                                {
-          [1657450420.473350][8713:8718] CHIP:DMG:                                        Endpoint = 0x1,
-          [1657450420.473437][8713:8718] CHIP:DMG:                                        Cluster = 0x6,
-          [1657450420.473522][8713:8718] CHIP:DMG:                                        Attribute = 0x0000_0000,
-          [1657450420.473603][8713:8718] CHIP:DMG:                                }
-          [1657450420.473658][8713:8718] CHIP:DMG:
-          [1657450420.473694][8713:8718] CHIP:DMG:                                StatusIB =
-          [1657450420.473785][8713:8718] CHIP:DMG:                                {
-          [1657450420.473823][8713:8718] CHIP:DMG:                                        status = 0x7e (UNSUPPORTED_ACCESS),
-          [1657450420.473857][8713:8718] CHIP:DMG:                                },
-          [1657450420.473895][8713:8718] CHIP:DMG:
-          [1657450420.473927][8713:8718] CHIP:DMG:                        },
-          [1657450420.473962][8713:8718] CHIP:DMG:
-          [1657450420.473991][8713:8718] CHIP:DMG:                },
-          [1657450420.474022][8713:8718] CHIP:DMG:
-          [1657450420.474046][8713:8718] CHIP:DMG:        ],
-          [1657450420.474078][8713:8718] CHIP:DMG:
-          [1657450420.474103][8713:8718] CHIP:DMG:        InteractionModelRevision = 1
-          [1657450420.474128][8713:8718] CHIP:DMG: }
-          [1657450420.474229][8713:8718] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1657450420.474271][8713:8718] CHIP:DMG: MoveToState ReadClient[0xffffa4008e40]: Moving to [AwaitingSu]
-
-
-
-          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1700
       disabled: true
 
     - label:
@@ -200,10 +158,10 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
-          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          To Setup the TH2 such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
 
-           accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
+           accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]" 1 0
 
           thermostatuserinterfaceconfiguration subscribe temperature-display-mode 100 1000 1 1
 
@@ -251,7 +209,7 @@ tests:
           all endpoints on a Node for which it does not have access.
           AttributePath = [[ ]]."
       verification: |
-          Out of Scope for V1.0
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1700
       disabled: true
 
     - label:
@@ -368,7 +326,7 @@ tests:
 
     - label:
           "TH sends a subscription request action for an attribute and set the
-          MinIntervalFloor value to be greater than MaxIntervalCeiling."
+          MinIntervalFloor value to be greater than MaxIntervalCeiling. +"
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
@@ -388,7 +346,7 @@ tests:
     - label:
           "TH sends a subscription request to subscribe to a specific global
           attribute from all clusters on all endpoints. AttributePath =
-          [[Attribute = Global Attribute]]."
+          [[Attribute = Global Attribute]]. +"
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
@@ -400,7 +358,7 @@ tests:
     - label:
           "TH sends a subscription request to subscribe to a global attribute on
           an endpoint on all clusters. AttributePath = [[Attribute = Global
-          Attribute, Endpoint = EndpointID ]]."
+          Attribute, Endpoint = EndpointID ]]. +"
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 

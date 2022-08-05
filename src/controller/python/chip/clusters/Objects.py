@@ -1584,7 +1584,7 @@ class LevelControl(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="currentLevel", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="currentLevel", Tag=0x00000000, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="remainingTime", Tag=0x00000001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="minLevel", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="maxLevel", Tag=0x00000003, Type=typing.Optional[uint]),
@@ -1605,7 +1605,7 @@ class LevelControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    currentLevel: 'uint' = None
+    currentLevel: 'typing.Union[Nullable, uint]' = None
     remainingTime: 'typing.Optional[uint]' = None
     minLevel: 'typing.Optional[uint]' = None
     maxLevel: 'typing.Optional[uint]' = None
@@ -1648,13 +1648,13 @@ class LevelControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="level", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="transitionTime", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="transitionTime", Tag=1, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="optionsMask", Tag=2, Type=uint),
                             ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
             level: 'uint' = 0
-            transitionTime: 'uint' = 0
+            transitionTime: 'typing.Union[Nullable, uint]' = NullValue
             optionsMask: 'uint' = 0
             optionsOverride: 'uint' = 0
 
@@ -1669,13 +1669,13 @@ class LevelControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="moveMode", Tag=0, Type=LevelControl.Enums.MoveMode),
-                            ClusterObjectFieldDescriptor(Label="rate", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="rate", Tag=1, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="optionsMask", Tag=2, Type=uint),
                             ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
             moveMode: 'LevelControl.Enums.MoveMode' = 0
-            rate: 'uint' = 0
+            rate: 'typing.Union[Nullable, uint]' = NullValue
             optionsMask: 'uint' = 0
             optionsOverride: 'uint' = 0
 
@@ -1691,14 +1691,14 @@ class LevelControl(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="stepMode", Tag=0, Type=LevelControl.Enums.StepMode),
                             ClusterObjectFieldDescriptor(Label="stepSize", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="optionsMask", Tag=3, Type=uint),
                             ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=4, Type=uint),
                     ])
 
             stepMode: 'LevelControl.Enums.StepMode' = 0
             stepSize: 'uint' = 0
-            transitionTime: 'uint' = 0
+            transitionTime: 'typing.Union[Nullable, uint]' = NullValue
             optionsMask: 'uint' = 0
             optionsOverride: 'uint' = 0
 
@@ -1730,13 +1730,13 @@ class LevelControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="level", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="transitionTime", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="transitionTime", Tag=1, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="optionsMask", Tag=2, Type=uint),
                             ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
             level: 'uint' = 0
-            transitionTime: 'uint' = 0
+            transitionTime: 'typing.Union[Nullable, uint]' = NullValue
             optionsMask: 'uint' = 0
             optionsOverride: 'uint' = 0
 
@@ -1751,13 +1751,13 @@ class LevelControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="moveMode", Tag=0, Type=LevelControl.Enums.MoveMode),
-                            ClusterObjectFieldDescriptor(Label="rate", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="rate", Tag=1, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="optionsMask", Tag=2, Type=uint),
                             ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
             moveMode: 'LevelControl.Enums.MoveMode' = 0
-            rate: 'uint' = 0
+            rate: 'typing.Union[Nullable, uint]' = NullValue
             optionsMask: 'uint' = 0
             optionsOverride: 'uint' = 0
 
@@ -1773,14 +1773,14 @@ class LevelControl(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="stepMode", Tag=0, Type=LevelControl.Enums.StepMode),
                             ClusterObjectFieldDescriptor(Label="stepSize", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="optionsMask", Tag=3, Type=uint),
                             ClusterObjectFieldDescriptor(Label="optionsOverride", Tag=4, Type=uint),
                     ])
 
             stepMode: 'LevelControl.Enums.StepMode' = 0
             stepSize: 'uint' = 0
-            transitionTime: 'uint' = 0
+            transitionTime: 'typing.Union[Nullable, uint]' = NullValue
             optionsMask: 'uint' = 0
             optionsOverride: 'uint' = 0
 
@@ -1830,9 +1830,9 @@ class LevelControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'uint' = 0
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class RemainingTime(ClusterAttributeDescriptor):
@@ -9187,6 +9187,27 @@ class ThreadNetworkDiagnostics(Cluster):
 
             connectionStatus: 'ThreadNetworkDiagnostics.Enums.ThreadConnectionStatus' = 0
 
+        @dataclass
+        class NetworkFaultChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0035
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]),
+                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]),
+                    ])
+
+            current: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]' = field(default_factory=lambda: [])
+            previous: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]' = field(default_factory=lambda: [])
+
 
 @dataclass
 class WiFiNetworkDiagnostics(Cluster):
@@ -9201,14 +9222,14 @@ class WiFiNetworkDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="wiFiVersion", Tag=0x00000002, Type=typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.WiFiVersionType]),
                 ClusterObjectFieldDescriptor(Label="channelNumber", Tag=0x00000003, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="rssi", Tag=0x00000004, Type=typing.Union[Nullable, int]),
-                ClusterObjectFieldDescriptor(Label="beaconLostCount", Tag=0x00000005, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="beaconRxCount", Tag=0x00000006, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="packetMulticastRxCount", Tag=0x00000007, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="packetMulticastTxCount", Tag=0x00000008, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="packetUnicastRxCount", Tag=0x00000009, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="packetUnicastTxCount", Tag=0x0000000A, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="currentMaxRate", Tag=0x0000000B, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="overrunCount", Tag=0x0000000C, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="beaconLostCount", Tag=0x00000005, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="beaconRxCount", Tag=0x00000006, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="packetMulticastRxCount", Tag=0x00000007, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="packetMulticastTxCount", Tag=0x00000008, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="packetUnicastRxCount", Tag=0x00000009, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="packetUnicastTxCount", Tag=0x0000000A, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="currentMaxRate", Tag=0x0000000B, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="overrunCount", Tag=0x0000000C, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -9221,14 +9242,14 @@ class WiFiNetworkDiagnostics(Cluster):
     wiFiVersion: 'typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.WiFiVersionType]' = None
     channelNumber: 'typing.Union[Nullable, uint]' = None
     rssi: 'typing.Union[Nullable, int]' = None
-    beaconLostCount: 'typing.Optional[uint]' = None
-    beaconRxCount: 'typing.Optional[uint]' = None
-    packetMulticastRxCount: 'typing.Optional[uint]' = None
-    packetMulticastTxCount: 'typing.Optional[uint]' = None
-    packetUnicastRxCount: 'typing.Optional[uint]' = None
-    packetUnicastTxCount: 'typing.Optional[uint]' = None
-    currentMaxRate: 'typing.Optional[uint]' = None
-    overrunCount: 'typing.Optional[uint]' = None
+    beaconLostCount: 'typing.Union[None, Nullable, uint]' = None
+    beaconRxCount: 'typing.Union[None, Nullable, uint]' = None
+    packetMulticastRxCount: 'typing.Union[None, Nullable, uint]' = None
+    packetMulticastTxCount: 'typing.Union[None, Nullable, uint]' = None
+    packetUnicastRxCount: 'typing.Union[None, Nullable, uint]' = None
+    packetUnicastTxCount: 'typing.Union[None, Nullable, uint]' = None
+    currentMaxRate: 'typing.Union[None, Nullable, uint]' = None
+    overrunCount: 'typing.Union[None, Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -9372,9 +9393,9 @@ class WiFiNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class BeaconRxCount(ClusterAttributeDescriptor):
@@ -9388,9 +9409,9 @@ class WiFiNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class PacketMulticastRxCount(ClusterAttributeDescriptor):
@@ -9404,9 +9425,9 @@ class WiFiNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class PacketMulticastTxCount(ClusterAttributeDescriptor):
@@ -9420,9 +9441,9 @@ class WiFiNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class PacketUnicastRxCount(ClusterAttributeDescriptor):
@@ -9436,9 +9457,9 @@ class WiFiNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class PacketUnicastTxCount(ClusterAttributeDescriptor):
@@ -9452,9 +9473,9 @@ class WiFiNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class CurrentMaxRate(ClusterAttributeDescriptor):
@@ -9468,9 +9489,9 @@ class WiFiNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class OverrunCount(ClusterAttributeDescriptor):
@@ -9484,9 +9505,9 @@ class WiFiNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -10791,8 +10812,8 @@ class AdministratorCommissioning(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="windowStatus", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="adminVendorId", Tag=0x00000002, Type=uint),
+                ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="adminVendorId", Tag=0x00000002, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -10801,8 +10822,8 @@ class AdministratorCommissioning(Cluster):
             ])
 
     windowStatus: 'uint' = None
-    adminFabricIndex: 'uint' = None
-    adminVendorId: 'uint' = None
+    adminFabricIndex: 'typing.Union[Nullable, uint]' = None
+    adminVendorId: 'typing.Union[Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -10916,9 +10937,9 @@ class AdministratorCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'uint' = 0
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class AdminVendorId(ClusterAttributeDescriptor):
@@ -10932,9 +10953,9 @@ class AdministratorCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'uint' = 0
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

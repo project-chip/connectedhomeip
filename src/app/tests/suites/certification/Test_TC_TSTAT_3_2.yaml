@@ -15,6 +15,9 @@
 
 name: 41.3.2. [TC-TSTAT-3.2] Functionality with client as DUT
 
+PICS:
+    - TSTAT.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -31,7 +34,7 @@ tests:
 
           ./chip-tool thermostat setpoint-raise-lower 0 10 1 1
 
-          Verify in TH all-clusters-app Log:
+          Verify in DUT as client side:Verify that Test Harness(Thermostat app) receives the SetpointRaiseLower command from the DUT
 
           [1646064221.719107][33190:33190] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:4540287 on exchange 31012r
           [1646064221.719148][33190:33190] CHIP:EM: Handling via exchange: 31012r, Delegate: 0xaaaace1730c8
@@ -73,7 +76,7 @@ tests:
       verification: |
           ./chip-tool thermostat setpoint-raise-lower 0 -10 1 1
 
-          Verify in TH all-clusters-app Log:
+          Verify in DUT as client side: verify that, Test Harness(thermostat-app) receives the SetpointRaiseLower command from the DUT
 
           [1646064525.675075][33190:33190] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:16717414 on exchange 9698r
           [1646064525.675116][33190:33190] CHIP:EM: Handling via exchange: 9698r, Delegate: 0xaaaace1730c8
@@ -110,38 +113,5 @@ tests:
     - label: "DUT sends a GetRelayStatusLog command to the Test Harness."
       PICS: TSTAT.C.C04.Tx
       verification: |
-          verify on Reference app receives the right Read Request Message for the data sent in the below commands
-
-          ./chip-tool thermostat  get-relay-status-log  1 1
-
-          Verify in TH all-clusters-app Log:
-
-          [1646064788.912273][33190:33190] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:15642355 on exchange 58465r
-          [1646064788.912319][33190:33190] CHIP:EM: Handling via exchange: 58465r, Delegate: 0xaaaace1730c8
-          [1646064788.912604][33190:33190] CHIP:DMG: InvokeRequestMessage =
-          [1646064788.912647][33190:33190] CHIP:DMG: {
-          [1646064788.912673][33190:33190] CHIP:DMG:         suppressResponse = false,
-          [1646064788.912704][33190:33190] CHIP:DMG:         timedRequest = false,
-          [1646064788.912732][33190:33190] CHIP:DMG:         InvokeRequests =
-          [1646064788.912767][33190:33190] CHIP:DMG:         [
-          [1646064788.912794][33190:33190] CHIP:DMG:                 CommandDataIB =
-          [1646064788.912833][33190:33190] CHIP:DMG:                 {
-          [1646064788.912861][33190:33190] CHIP:DMG:                         CommandPathIB =
-          [1646064788.912896][33190:33190] CHIP:DMG:                         {
-          [1646064788.912936][33190:33190] CHIP:DMG:                                 EndpointId = 0x1,
-          [1646064788.912977][33190:33190] CHIP:DMG:                                 ClusterId = 0x201,
-          [1646064788.913010][33190:33190] CHIP:DMG:                                 CommandId = 0x4,
-          [1646064788.913048][33190:33190] CHIP:DMG:                         },
-          [1646064788.913085][33190:33190] CHIP:DMG:
-          [1646064788.913116][33190:33190] CHIP:DMG:                         CommandData =
-          [1646064788.913151][33190:33190] CHIP:DMG:                         {
-          [1646064788.913186][33190:33190] CHIP:DMG:                         },
-          [1646064788.913218][33190:33190] CHIP:DMG:                 },
-          [1646064788.913253][33190:33190] CHIP:DMG:
-          [1646064788.913280][33190:33190] CHIP:DMG:         ],
-          [1646064788.913313][33190:33190] CHIP:DMG:
-          [1646064788.913340][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
-          [1646064788.913366][33190:33190] CHIP:DMG: },
-          [1646064788.913428][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0201 e=1 p=o
-          [1646064788.913476][33190:33190] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0004
+          The GetRelayStatusLogResponse command may not supported in Matter 1.0.
       disabled: true

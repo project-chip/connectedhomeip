@@ -74,6 +74,7 @@ public:
     bool _IsWiFiStationConnected(void);
     void WifiStationStateChange(void);
     void OnStationConnected(void);
+    void ChangeWiFiStationState(WiFiStationState newState);
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.

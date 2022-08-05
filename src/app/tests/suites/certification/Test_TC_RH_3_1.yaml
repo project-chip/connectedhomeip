@@ -13,7 +13,14 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 9.3.1. [TC-RH-3.1] Attributes with Client as DUT
+name: 10.3.1. [TC-RH-3.1] Attributes with Client as DUT
+
+PICS:
+    - RH.C
+    - RH.C.AM-READ
+    - RH.C.AO-READ
+    - RH.C.AM-WRITE
+    - RH.C.AO-WRITE
 
 config:
     nodeId: 0x12344321
@@ -30,7 +37,7 @@ tests:
 
 
           ./chip-tool relativehumiditymeasurement read measured-value 1 1
-          Verify in TH all-clusters-app log
+          Verify in DUT as client side Log
           [1651147639.252032][2336:2336] CHIP:IM: Received Read request
           [1651147639.252086][2336:2336] CHIP:DMG: ReadRequestMessage =
           [1651147639.252136][2336:2336] CHIP:DMG: {
@@ -52,7 +59,7 @@ tests:
           [1651147639.252925][2336:2336] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
            ./chip-tool relativehumiditymeasurement read min-measured-value 1 1
-          Verify in TH all-clusters-app log
+          Verify in DUT as client side Log
           1651147834.075387][2336:2336] CHIP:IM: Received Read request
           [1651147834.075454][2336:2336] CHIP:DMG: ReadRequestMessage =
           [1651147834.075481][2336:2336] CHIP:DMG: {
@@ -74,7 +81,7 @@ tests:
           [1651147834.076111][2336:2336] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
           ./chip-tool relativehumiditymeasurement read max-measured-value 1 1
-          Verify in TH all-clusters-app log
+          Verify in DUT as client side Log
           [1651147902.966904][2336:2336] CHIP:IM: Received Read request
           [1651147902.966980][2336:2336] CHIP:DMG: ReadRequestMessage =
           [1651147902.967012][2336:2336] CHIP:DMG: {
@@ -104,7 +111,7 @@ tests:
           ./chip-tool relativehumiditymeasurement read tolerance 1 1
 
 
-          Verify in TH all-clusters-app log
+          Verify in DUT as client side Log
           [1651148035.585189][2336:2336] CHIP:IM: Received Read request
           [1651148035.585247][2336:2336] CHIP:DMG: ReadRequestMessage =
           [1651148035.585276][2336:2336] CHIP:DMG: {
@@ -130,14 +137,14 @@ tests:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
@@ -147,7 +154,10 @@ tests:
           AttributeList. Commission DUT to TH again"
       verification: |
           ./chip-tool relativehumiditymeasurement read attribute-list  1 1
-          Verify in TH all-clusters-app log
+
+
+          Verify in DUT as client side Log
+
           [1654247077216] [91776:4010112] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0405 Attribute 0x0000_FFFB DataVersion: 1294674518
           [1654247077217] [91776:4010112] CHIP: [TOO]   AttributeList: 8 entries
           [1654247077217] [91776:4010112] CHIP: [TOO]     [1]: 0
@@ -163,9 +173,11 @@ tests:
           "On TestHarnes (all-cluster-app) a received read of MeasuredValue (id 0) looks like this:
 
           ./chip-tool relativehumiditymeasurement read measured-value 1 1
-          Verify in TH all-clusters-app log
+
+          Verify in DUT as client side Log
 
           [1651147639.252032][2336:2336] CHIP:IM: Received Read request
+
           [1651147639.252086][2336:2336] CHIP:DMG: ReadRequestMessage =
           [1651147639.252136][2336:2336] CHIP:DMG: {
           [1651147639.252159][2336:2336] CHIP:DMG:         AttributePathIBs =
@@ -186,9 +198,10 @@ tests:
           [1651147639.252925][2336:2336] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
            ./chip-tool relativehumiditymeasurement read min-measured-value 1 1
-          Verify in TH all-clusters-app log
+          Verify in DUT as client side Log
 
           1651147834.075387][2336:2336] CHIP:IM: Received Read request
+
           [1651147834.075454][2336:2336] CHIP:DMG: ReadRequestMessage =
           [1651147834.075481][2336:2336] CHIP:DMG: {
           [1651147834.075502][2336:2336] CHIP:DMG:         AttributePathIBs =
@@ -209,7 +222,7 @@ tests:
           [1651147834.076111][2336:2336] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
           ./chip-tool relativehumiditymeasurement read max-measured-value 1 1
-          Verify in TH all-clusters-app log
+          Verify in DUT as client side Log
 
           [1651147902.966904][2336:2336] CHIP:IM: Received Read request
           [1651147902.966980][2336:2336] CHIP:DMG: ReadRequestMessage =
@@ -247,5 +260,5 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true

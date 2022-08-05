@@ -47,7 +47,7 @@ tests:
           "DUT fetches commissioning data from DCL using VID and PID from
           Onboarding Payload"
       verification: |
-          1. Observe the TH's DCL on the DUT
+          1. Observe the TH"s DCL on the DUT
       disabled: true
 
     - label:
@@ -62,6 +62,6 @@ tests:
       verification: |
           $  ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
 
-          [1657578523795] [9610:351965] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657578523795] [9610:351965] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657578523795] [9610:351965] CHIP: [TOO] Device commissioning completed with success
       disabled: true

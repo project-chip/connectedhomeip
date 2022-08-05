@@ -73,13 +73,6 @@ public:
     // assume the commissioning mode is kDisabled.
     void SetCommissioningModeProvider(CommissioningModeProvider * provider) { mCommissioningModeProvider = provider; }
 
-    /// Callback from Discovery Expiration timer
-    /// Checks if discovery has expired and if so,
-    /// kicks off extend discovery (when enabled)
-    /// otherwise, stops commissionable node advertising
-    /// Discovery Expiration refers here to commissionable node advertising when in commissioning mode
-    void OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
-
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     /// Sets the extended discovery timeout. Value will be persisted across reboots
     void SetExtendedDiscoveryTimeoutSecs(int32_t secs);

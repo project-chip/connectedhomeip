@@ -94,6 +94,11 @@ public:
         mError = error;
     }
 
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        InteractionModelReports::OnDeallocatePaths(std::move(aReadPrepareParams));
+    }
+
     void Shutdown() override
     {
         // We don't shut down InteractionModelReports here; we leave it for
@@ -144,15 +149,14 @@ protected:
 
     void OnDone(chip::app::ReadClient * aReadClient) override
     {
+        InteractionModelReports::CleanupReadClient(aReadClient);
+
         if (!mSubscriptionEstablished)
         {
-            InteractionModelReports::CleanupReadClient(aReadClient);
             SetCommandExitStatus(mError);
         }
-
         // else we must be getting here from Cleanup(), which means we have
-        // already done our exit status thing, and have done the ReadClient
-        // cleanup.
+        // already done our exit status thing.
     }
 
     void Shutdown() override
@@ -161,7 +165,10 @@ protected:
         ReportCommand::Shutdown();
     }
 
-    bool DeferInteractiveCleanup() override { return mSubscriptionEstablished; }
+    // For subscriptions we always defer interactive cleanup.  Either our
+    // ReadClients will terminate themselves (in which case they will be removed
+    // from our list anyway), or they should hang around until shutdown.
+    bool DeferInteractiveCleanup() override { return true; }
 
 private:
     bool mSubscriptionEstablished = false;
@@ -263,7 +270,7 @@ public:
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return SubscribeCommand::SubscribeAttribute(device, endpointIds, mClusterIds, mAttributeIds, mMinInterval, mMaxInterval,
-                                                    mFabricFiltered, mDataVersion, mKeepSubscriptions);
+                                                    mFabricFiltered, mDataVersion, mKeepSubscriptions, mAutoResubscribe);
     }
 
 private:
@@ -286,6 +293,8 @@ private:
                     "Comma-separated list of data versions for the clusters being subscribed to.");
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions,
                     "Boolean indicating whether to keep existing subscriptions when creating the new one. Defaults to false.");
+        AddArgument("auto-resubscribe", 0, 1, &mAutoResubscribe,
+                    "Boolean indicating whether the subscription should auto-resubscribe.  Defaults to false.");
     }
 
     std::vector<chip::ClusterId> mClusterIds;
@@ -296,6 +305,7 @@ private:
     chip::Optional<bool> mFabricFiltered;
     chip::Optional<std::vector<chip::DataVersion>> mDataVersion;
     chip::Optional<bool> mKeepSubscriptions;
+    chip::Optional<bool> mAutoResubscribe;
 };
 
 class ReadEvent : public ReadCommand
@@ -391,6 +401,8 @@ public:
             "  This argument takes a comma separated list of true/false values.\n"
             "  If the number of paths exceeds the number of entries provided to is-urgent, then isUrgent will be false for the "
             "extra paths.");
+        AddArgument("auto-resubscribe", 0, 1, &mAutoResubscribe,
+                    "Boolean indicating whether the subscription should auto-resubscribe.  Defaults to false.");
     }
 
     ~SubscribeEvent() {}
@@ -398,7 +410,7 @@ public:
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return SubscribeCommand::SubscribeEvent(device, endpointIds, mClusterIds, mEventIds, mMinInterval, mMaxInterval,
-                                                mFabricFiltered, mEventNumber, mKeepSubscriptions, mIsUrgents);
+                                                mFabricFiltered, mEventNumber, mKeepSubscriptions, mIsUrgents, mAutoResubscribe);
     }
 
 private:
@@ -411,6 +423,7 @@ private:
     chip::Optional<chip::EventNumber> mEventNumber;
     chip::Optional<bool> mKeepSubscriptions;
     chip::Optional<std::vector<bool>> mIsUrgents;
+    chip::Optional<bool> mAutoResubscribe;
 };
 
 class ReadAll : public ReadCommand

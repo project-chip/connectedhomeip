@@ -15,6 +15,9 @@
 
 name: 50.1.1. [TC-DGTHREAD-1.1] Global Attributes [DUT-Server]
 
+PICS:
+    - DGTHREAD.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -28,9 +31,9 @@ tests:
 
     - label: "TH reads the ClusterRevision from DUT"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read cluster-revision 65 0
+          ./chip-tool threadnetworkdiagnostics read cluster-revision 54 0
 
-          Verify on the TH Log:
+          Verify ClusterRevision: 1 on the TH Log:
 
           [1649747941.607337][9541:9546] CHIP:DMG:         SuppressResponse = true,
           [1649747941.607399][9541:9546] CHIP:DMG:         InteractionModelRevision = 1
@@ -41,9 +44,9 @@ tests:
 
     - label: "TH reads the FeatureMap from DUT"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read feature-map 65 0
+          ./chip-tool threadnetworkdiagnostics read feature-map 54 0
 
-          Verify on the TH Log:
+          Verify FeatureMap: 15 on the TH Log:
 
           [1649747973.385016][9548:9553] CHIP:DMG:         SuppressResponse = true,
           [1649747973.385080][9548:9553] CHIP:DMG:         InteractionModelRevision = 1
@@ -54,9 +57,9 @@ tests:
 
     - label: "TH reads AttributeList from DUT"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read attribute-list 65 0
+          ./chip-tool threadnetworkdiagnostics read attribute-list 54 0
 
-          Verify on the TH Log:
+          Verify AttributeList on the TH Log:
 
           [1649748119.656589][9559:9564] CHIP:DMG:         SuppressResponse = true,
           [1649748119.656616][9559:9564] CHIP:DMG:         InteractionModelRevision = 1
@@ -140,9 +143,9 @@ tests:
 
     - label: "TH reads AcceptedCommandList from DUT"
       verification: |
-          /chip-tool threadnetworkdiagnostics read accepted-command-list 65 0
+          ./chip-tool threadnetworkdiagnostics read accepted-command-list 54 0
 
-          Verify on the TH Log:
+          Verify AcceptedCommandList: 1 entries on the TH Log:
 
           [1649748231.835572][9579:9584] CHIP:DMG:         SuppressResponse = true,
           [1649748231.835633][9579:9584] CHIP:DMG:         InteractionModelRevision = 1
@@ -154,9 +157,9 @@ tests:
 
     - label: "TH reads GeneratedCommandList from DUT"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read generated-command-list 65 0
+          ./chip-tool threadnetworkdiagnostics read generated-command-list 54 0
 
-          Verify on the TH Log:
+          Verify  GeneratedCommandList: 0 entries on the TH Log:
 
           [1649748201.118100][9570:9575] CHIP:DMG:         SuppressResponse = true,
           [1649748201.118163][9570:9575] CHIP:DMG:         InteractionModelRevision = 1

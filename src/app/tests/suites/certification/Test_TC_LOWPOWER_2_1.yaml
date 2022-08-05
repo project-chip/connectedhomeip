@@ -14,6 +14,9 @@
 
 name: 19.2.1. [TC-LOWPOWER-2.1] Low Power Mode Verification (DUT as Server)
 
+PICS:
+    - LOWPOWER.S
+
 config:
     nodeId: 0x12344321
     cluster: "Low Power"
@@ -29,7 +32,7 @@ tests:
                 value: nodeId
 
     - label: "TH sends Sleep command to DUT"
-      PICS: LOWPOWER.S
+      PICS: LOWPOWER.S.C00.Rsp
       command: "Sleep"
       response:
           error: 0

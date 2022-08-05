@@ -95,6 +95,7 @@ function getManualTests() {
         "Test_TC_BR_1",
         "Test_TC_BR_2",
         "Test_TC_BR_3",
+        "Test_TC_BR_4",
     ];
 
     const DeviceAttestation = [
@@ -108,9 +109,7 @@ function getManualTests() {
     ];
 
     const DeviceManagement = [
-        "Test_TC_BINFO_1_1",
         "Test_TC_OPCREDS_1_2",
-        "Test_TC_CNET_1_3",
         "Test_TC_BINFO_2_2",
         "Test_TC_BINFO_2_4",
         "Test_TC_OPCREDS_3_1",
@@ -302,6 +301,7 @@ function getManualTests() {
         "Test_TC_SC_3_2",
         "Test_TC_SC_3_3",
         "Test_TC_SC_3_4",
+        "Test_TC_SC_3_6",
         "Test_TC_SC_4_1",
         "Test_TC_SC_4_3",
         "Test_TC_SC_4_4",
@@ -503,6 +503,12 @@ function getManualTests() {
         "Test_TC_ULABEL_3_1",
     ];
 
+    const BridgedDeviceBasicInformation = [
+        "Test_TC_BRBINFO_1_1",
+        "Test_TC_BRBINFO_2_1",
+        "Test_TC_BRBINFO_2_2",
+        "Test_TC_BRBINFO_2_3",
+    ];
 
     const tests = [
         DeviceDiscovery,
@@ -553,6 +559,7 @@ function getManualTests() {
         PumpConfigurationControl,
         AccessControl,
         UserLabel,
+        BridgedDeviceBasicInformation,
     ].flat(1);
 
     tests.disable = disable.bind(tests);
@@ -595,7 +602,9 @@ function getTests() {
     ];
 
     const DeviceManagement = [
+        "Test_TC_BINFO_1_1",
         "Test_TC_BINFO_2_1",
+        "Test_TC_CNET_1_3",
     ];
 
     const Descriptor = [
@@ -838,7 +847,8 @@ function getTests() {
         "TestArmFailSafe",
         "TestFanControl",
         "TestAccessControlConstraints",
-        "TestLevelControlWithOnOffDependency"
+        "TestLevelControlWithOnOffDependency",
+        "TestCommissioningWindow",
     ];
 
     const MultiAdmin = [
@@ -856,7 +866,7 @@ function getTests() {
     ];
 
     const DoorLock = [
-        "DL_UsersAndCredentials",
+        //"DL_UsersAndCredentials", TODO: This test is not aligned with spec
         "DL_LockUnlock",
         "DL_Schedules",
         "Test_TC_DRLK_2_2",
@@ -864,7 +874,7 @@ function getTests() {
         "Test_TC_DRLK_2_4",
         "Test_TC_DRLK_2_5",
         "Test_TC_DRLK_2_7",
-        "Test_TC_DRLK_2_9",
+        //"Test_TC_DRLK_2_9", TODO: This test is not aligned with spec
     ];
 
     const Groups = [

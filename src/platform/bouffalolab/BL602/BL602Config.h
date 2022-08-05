@@ -81,6 +81,9 @@ public:
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
 
+    static const Key kCounterKey_RebootCount;
+    static const Key kCounterKey_TotalOperationalHours;
+
     static CHIP_ERROR Init(void);
 
     // Config value accessors.

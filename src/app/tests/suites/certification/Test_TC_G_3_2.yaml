@@ -13,7 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 121.3.2. [TC-G-3.2] Commands [DUT-Client]
+name: 125.3.2. [TC-G-3.2] Commands [DUT-Client]
+
+PICS:
+    - G.C
 
 config:
     nodeId: 0x12344321
@@ -21,43 +24,10 @@ config:
     endpoint: 0
 
 tests:
-    - label: "DUT sends AddGroup command to TH"
-      PICS: G.C.C00.Rsp
-      verification: |
-          ./chip-tool groups add-group 0x0021 gp1 1 1
-
-
-          Verify on the TH Log:
-
-
-          [1657095032.527440][3394:3399] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
-          [1657095032.527552][3394:3399] CHIP:TOO:   AddGroupResponse: {
-          [1657095032.527616][3394:3399] CHIP:TOO:     status: 0
-          [1657095032.527685][3394:3399] CHIP:TOO:     groupId: 33
-          [1657095032.527733][3394:3399] CHIP:TOO:    }
-      disabled: true
-
-    - label: "DUT sends ViewGroup command to TH"
-      PICS: G.C.C01.Rsp
-      verification: |
-          ./chip-tool groups view-group 0x0021 1 1
-
-
-          Verify on the TH Log:
-
-          [1657095093.641399][3404:3409] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
-          [1657095093.641465][3404:3409] CHIP:TOO:   ViewGroupResponse: {
-          [1657095093.641509][3404:3409] CHIP:TOO:     status: 0
-          [1657095093.641541][3404:3409] CHIP:TOO:     groupId: 33
-          [1657095093.641571][3404:3409] CHIP:TOO:     groupName: gp1
-          [1657095093.641601][3404:3409] CHIP:TOO:    }
-          [1657095093.641650][3404:3409] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
-
     - label: "DUT sends GetGroupMembership command to TH"
-      PICS: G.C.C02.Rsp
+      PICS: G.C.C02.Tx
       verification: |
-          ./chip-tool groups get-group-membership '[33]' 1 1
+          ./chip-tool groups get-group-membership "[33]" 1 1
 
           Verify on the TH Log:
 
@@ -70,7 +40,7 @@ tests:
       disabled: true
 
     - label: "DUT sends RemoveGroup command to TH"
-      PICS: G.C.C03.Rsp
+      PICS: G.C.C03.Tx
       verification: |
           ./chip-tool groups remove-group 0x0021 1 1
 
@@ -79,12 +49,12 @@ tests:
           [1657095157.846618][3417:3422] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0003
           [1657095157.846703][3417:3422] CHIP:TOO:   RemoveGroupResponse: {
           [1657095157.846761][3417:3422] CHIP:TOO:     status: 0
-          [1657095157.846804][3417:3422] CHIP:TOO:     groupId: 33
+          [1657095157.846804][3417:3422] CHIP:TOO:     groupId: 21
           [1657095157.846845][3417:3422] CHIP:TOO:    }
       disabled: true
 
-    - label: "DUT sends RemoveAllGroup command to TH"
-      PICS: G.C.C04.Rsp
+    - label: "DUT sends RemoveAllGroups command to TH"
+      PICS: G.C.C04.Tx
       verification: |
           ./chip-tool groups  remove-all-groups 1 1
 
@@ -123,7 +93,7 @@ tests:
       disabled: true
 
     - label: "DUT sends AddGroupIfIdentifying command to TH"
-      PICS: G.C.C05.Rsp
+      PICS: G.C.C05.Tx
       verification: |
           ./chip-tool groups  add-group-if-identifying 0x0052 gp54 1 0
 

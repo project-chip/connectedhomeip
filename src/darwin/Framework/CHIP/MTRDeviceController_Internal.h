@@ -21,13 +21,18 @@
 
 #import <Foundation/Foundation.h>
 
+#import "MTRDeviceConnectionBridge.h" // For MTRInternalDeviceConnectionCallback
 #import "MTRDeviceController.h"
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
+#import "MTRBaseDevice.h"
+#import "MTRDeviceController.h"
+
 @class MTRDeviceControllerStartupParamsInternal;
 @class MTRControllerFactory;
+@class MTRDevice;
 
 namespace chip {
 class FabricTable;
@@ -36,6 +41,8 @@ class FabricTable;
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController (InternalMethods)
+
+#pragma mark - MTRControllerFactory methods
 
 /**
  * Start a new controller.  Returns whether startup succeeded.  If this fails,
@@ -84,6 +91,33 @@ NS_ASSUME_NONNULL_BEGIN
  * Only MTRControllerFactory should be calling this.
  */
 - (void)shutDownCppController;
+
+/**
+ * Ensure we have a CASE session to the given node ID and then call the provided
+ * connection callback.  This may be called on any queue (including the Matter
+ * event queue) and will always call the provided connection callback on the
+ * Matter queue, asynchronously.  Consumers must be prepared to run on the
+ * Matter queue (an in particular must not use any APIs that will try to do sync
+ * dispatch to the Matter queue).
+ *
+ * If the controller is not running when this function is called, will return NO
+ * and never invoke the completionHandler.  If the controller is not running
+ * when the async dispatch on the Matter queue would happen, an error will be
+ * dispatched to the completion handler.
+ */
+- (BOOL)getSessionForNode:(chip::NodeId)nodeID completionHandler:(MTRInternalDeviceConnectionCallback)completionHandler;
+
+/**
+ * Invalidate the CASE session for the given node ID.  This is a temporary thing
+ * just to support MTRBaseDevice's invalidateCASESession.  Must not be called on
+ * the Matter event queue.
+ */
+- (void)invalidateCASESessionForNode:(chip::NodeId)nodeID;
+
+#pragma mark - Device-specific data and SDK access
+// DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
+- (MTRDevice *)deviceForDeviceID:(uint64_t)deviceID;
+- (void)removeDevice:(MTRDevice *)device;
 
 @end
 

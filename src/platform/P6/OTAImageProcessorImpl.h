@@ -28,7 +28,8 @@
 extern "C" {
 #include "bootutil/bootutil.h"
 #include "cy_flash_psoc6.h"
-#include "cy_smif_psoc6.h"
+#include "flash_map_backend.h"
+#include "flash_qspi.h"
 #include "sysflash/sysflash.h"
 }
 

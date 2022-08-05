@@ -14,6 +14,9 @@
 
 name: 19.5.2. [TC-MEDIAINPUT-3.11] Select Input Verification
 
+PICS:
+    - MEDIAINPUT.S
+
 config:
     nodeId: 0x12344321
     cluster: "Media Input"
@@ -41,7 +44,7 @@ tests:
       attribute: "InputList"
 
     - label: "Select Input Command"
-      PICS: MEDIAINPUT.S.C0000
+      PICS: MEDIAINPUT.S.C00.Rsp
       command: "SelectInput"
       arguments:
           values:
@@ -49,7 +52,7 @@ tests:
                 value: 1
 
     - label: "Read current input list"
-      PICS: MEDIAINPUT.S.A0001
+      PICS: MEDIAINPUT.S.A0001 && MEDIAINPUT.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentInput"
       response:

@@ -293,7 +293,7 @@ public:
      */
     CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
 
-    CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
     auto GetSubscriptionId() const
     {
@@ -496,14 +496,15 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeHolder mExchange;
     Callback & mpCallback;
-    ClientState mState                = ClientState::Idle;
-    bool mIsReporting                 = false;
-    bool mIsInitialReport             = true;
-    bool mIsPrimingReports            = true;
-    bool mPendingMoreChunks           = false;
-    uint16_t mMinIntervalFloorSeconds = 0;
-    uint16_t mMaxInterval             = 0;
-    SubscriptionId mSubscriptionId    = 0;
+    ClientState mState    = ClientState::Idle;
+    bool mIsReporting     = false;
+    bool mIsInitialReport = true;
+    // boolean to check if client is waiting for the first priming report
+    bool mWaitingForFirstPrimingReport = true;
+    bool mPendingMoreChunks            = false;
+    uint16_t mMinIntervalFloorSeconds  = 0;
+    uint16_t mMaxInterval              = 0;
+    SubscriptionId mSubscriptionId     = 0;
     ScopedNodeId mPeer;
     InteractionType mInteractionType = InteractionType::Read;
     Timestamp mEventTimestamp;

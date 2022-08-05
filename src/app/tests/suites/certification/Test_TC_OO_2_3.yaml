@@ -14,6 +14,10 @@
 
 name: 3.2.3. [TC-OO-2.3] Secondary functionality with server as DUT
 
+PICS:
+    - OO.S
+    - OO.S.F00(LT)
+
 config:
     nodeId: 0x12344321
     cluster: "On/Off"
@@ -514,9 +518,7 @@ tests:
       attribute: "OffWaitTime"
       PICS: OO.S.A4002
       response:
-          constarints:
-              minValue: 0
-              maxValue: 15
+          value: 0
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -600,9 +602,7 @@ tests:
       attribute: "OffWaitTime"
       PICS: OO.S.A4002
       response:
-          constraints:
-              minValue: 0
-              maxValue: 15
+          value: 0
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -643,9 +643,7 @@ tests:
       attribute: "OffWaitTime"
       PICS: OO.S.A4002
       response:
-          constraints:
-              minValue: 0
-              maxValue: 15
+          value: 0
 
     - label: "17a:Send On Command"
       PICS: OO.S.C01.Rsp
@@ -721,9 +719,7 @@ tests:
       attribute: "OffWaitTime"
       PICS: OO.S.A4002
       response:
-          constraints:
-              minValue: 0
-              maxValue: 15
+          value: 0
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -992,9 +988,7 @@ tests:
       attribute: "OffWaitTime"
       PICS: OO.S.A4002
       response:
-          constraints:
-              minValue: 0
-              maxValue: 15
+          value: 0
 
     - label: "24a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
@@ -1058,10 +1052,4 @@ tests:
       attribute: "OffWaitTime"
       PICS: OO.S.A4002
       response:
-          constraints:
-              minValue: 0
-              maxValue: 15
-
-    - label: "Send Off Command"
-      command: "Off"
-      PICS: OO.S.C00.Rsp
+          value: 0

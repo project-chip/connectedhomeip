@@ -15,6 +15,9 @@
 
 name: 3.2.4. [TC-CC-3.4] Hue functionality with client as DUT
 
+PICS:
+    - CC.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -62,9 +65,7 @@ tests:
           [1657911287.815590][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0000
       disabled: true
 
-    - label:
-          "Over TransitionTime, DUT reads CurrentHue attribute from TH
-          periodically."
+    - label: "Over TransitionTime, DUT reads CurrentHue attribute from TH."
       PICS: CC.C.A0000
       verification: |
           ./chip-tool colorcontrol read current-hue 1  1
@@ -136,7 +137,7 @@ tests:
           [1657911357.569659][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0001
       disabled: true
 
-    - label: "DUT reads CurrentHue attribute from TH several Times."
+    - label: "DUT reads CurrentHue attribute from TH several times."
       PICS: CC.C.A0000
       verification: |
           ./chip-tool colorcontrol read current-hue 1  1

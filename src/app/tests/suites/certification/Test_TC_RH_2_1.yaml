@@ -14,6 +14,9 @@
 
 name: 9.2.1. [TC-RH-2.1] Attributes with server as DUT
 
+PICS:
+    - RH.S
+
 config:
     nodeId: 0x12344321
     cluster: "Relative Humidity Measurement"
@@ -28,17 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads constraints of attribute: MeasuredValue"
-      PICS: RH.S.A0000
-      command: "readAttribute"
-      attribute: "measured value"
-      response:
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 10000
-
-    - label: "Reads constraints of attribute: MinMeasuredValue"
+    - label: "TH reads the MinMeasuredValue attribute from the DUT"
       PICS: RH.S.A0001
       command: "readAttribute"
       attribute: "min measured value"
@@ -48,7 +41,7 @@ tests:
               minValue: 0
               maxValue: 9999
 
-    - label: "Reads constraints of attribute: MaxMeasuredValue"
+    - label: "TH reads the MaxMeasuredValue attribute from the DUT"
       PICS: RH.S.A0002
       command: "readAttribute"
       attribute: "max measured value"
@@ -58,7 +51,17 @@ tests:
               minValue: 1
               maxValue: 10000
 
-    - label: "Reads constraints of attribute: Tolerance"
+    - label: "TH reads the MeasuredValue attribute from the DUT"
+      PICS: RH.S.A0000
+      command: "readAttribute"
+      attribute: "measured value"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 10000
+
+    - label: "TH reads the Tolerance attribute from the DUT"
       PICS: RH.S.A0003
       command: "readAttribute"
       attribute: "tolerance"

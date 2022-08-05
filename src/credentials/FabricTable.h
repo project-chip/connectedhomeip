@@ -104,7 +104,9 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    uint16_t GetVendorId() const { return mVendorId; }
+    CHIP_ERROR FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) const;
+
+    VendorId GetVendorId() const { return mVendorId; }
 
     bool IsInitialized() const { return (mFabricIndex != kUndefinedFabricIndex) && IsOperationalNodeId(mNodeId); }
 
@@ -120,7 +122,7 @@ protected:
         FabricIndex fabricIndex               = kUndefinedFabricIndex;
         CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
         Crypto::P256PublicKey rootPublicKey;
-        uint16_t vendorId                        = VendorId::NotSpecified; /**< Vendor ID for commissioner of fabric */
+        VendorId vendorId                        = VendorId::NotSpecified; /**< Vendor ID for commissioner of fabric */
         Crypto::P256Keypair * operationalKeypair = nullptr;
         bool hasExternallyOwnedKeypair           = false;
 
@@ -185,8 +187,6 @@ protected:
      */
     CHIP_ERROR SignWithOpKeypair(ByteSpan message, Crypto::P256ECDSASignature & outSignature) const;
 
-    CHIP_ERROR FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) const;
-
     /**
      *  Reset the state to a completely uninitialized status.
      */
@@ -228,7 +228,7 @@ protected:
     // We cache the root public key since it's used so often and costly to get.
     Crypto::P256PublicKey mRootPublicKey;
 
-    uint16_t mVendorId                                  = static_cast<uint16_t>(VendorId::NotSpecified);
+    VendorId mVendorId                                  = VendorId::NotSpecified;
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
     mutable Crypto::P256Keypair * mOperationalKey = nullptr;
     bool mHasExternallyOwnedOperationalKey = false;
@@ -401,8 +401,44 @@ public:
     void SendUpdateFabricNotificationForTest(FabricIndex fabricIndex) { NotifyFabricUpdated(fabricIndex); }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
+    /**
+     * Collection of methods to help find a matching FabricInfo instance given a set of query criteria
+     *
+     */
+
+    /**
+     * Finds a matching FabricInfo instance given a root public key and fabric ID that uniquely identifies the fabric in any scope.
+     *
+     * Returns nullptr if no matching instance is found.
+     *
+     */
     const FabricInfo * FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId) const;
+
+    /**
+     * Finds a matching FabricInfo instance given a locally-scoped fabric index.
+     *
+     * Returns nullptr if no matching instance is found.
+     *
+     */
     const FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex) const;
+
+    /**
+     * Finds a matching FabricInfo instance given a root public key, fabric ID AND a matching NodeId. This variant of find
+     * is only to be used when it is possible to have colliding fabrics in the table that are on the same logical fabric
+     * but may be associated with different node identities.
+     *
+     * Returns nullptr if no matching instance is found.
+     *
+     */
+    const FabricInfo * FindIdentity(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId, NodeId nodeId) const;
+
+    /**
+     * Finds a matching FabricInfo instance given a compressed fabric ID. If there are multiple
+     * matching FabricInfo instances given the low but non-zero probability of collision, there is no guarantee
+     * on which instance will be returned.
+     *
+     * Returns nullptr if no matching instance is found.
+     */
     const FabricInfo * FindFabricWithCompressedId(CompressedFabricId compressedFabricId) const;
 
     CHIP_ERROR Init(const FabricTable::InitParams & initParams);
@@ -883,6 +919,14 @@ public:
                                  FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
                                  Crypto::P256PublicKey * outRootPublicKey = nullptr) const;
 
+    /**
+     * @brief Enables FabricInfo instances to collide and reference the same logical fabric (i.e Root Public Key + FabricId).
+     *
+     * *WARNING* This is ONLY to be used when creating multiple controllers on the same fabric OR for test.
+     *
+     */
+    void PermitCollidingFabrics() { mStateFlags.Set(StateFlags::kAreCollidingFabricsIgnored); }
+
     // Add a new fabric for testing. The Operational Key is a raw P256Keypair (public key and private key raw bits) that will
     // get copied (directly) into the fabric table.
     CHIP_ERROR AddNewFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
@@ -893,7 +937,7 @@ public:
     CHIP_ERROR AddNewFabricForTestIgnoringCollisions(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
                                                      const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
     {
-        mStateFlags.Set(StateFlags::kAreCollidingFabricsIgnored);
+        PermitCollidingFabrics();
         CHIP_ERROR err = AddNewFabricForTest(rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
         mStateFlags.Clear(StateFlags::kAreCollidingFabricsIgnored);
         return err;
@@ -987,6 +1031,10 @@ private:
     // Common code for fabric updates, for either OperationalKeystore or injected key scenarios.
     CHIP_ERROR UpdatePendingFabricCommon(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
                                          Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned);
+
+    // Common code for looking up a fabric given a root public key, a fabric ID and an optional node id scoped to that fabric.
+    const FabricInfo * FindFabricCommon(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId,
+                                        NodeId nodeId = kUndefinedNodeId) const;
 
     /**
      * UpdateNextAvailableFabricIndex should only be called when

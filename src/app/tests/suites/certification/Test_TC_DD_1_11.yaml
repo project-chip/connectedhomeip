@@ -17,6 +17,9 @@ name:
     3.1.11. [TC-DD-1.11] Concatenation - QR Code Onboarding Payload Verification
     [DUT - Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -24,8 +27,8 @@ config:
 
 tests:
     - label:
-          "Scan larger QR code that will support the commissioning of all the TH
-          devices"
+          "Scan QR code using concatenation (which supports the commissioning of
+          all the TH devices)"
       PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
       verification: |
           Out of Scope for V1.0 as Concatenated QR codes are not supported yet
@@ -53,4 +56,40 @@ tests:
           [1653306603.741028][13293:13293] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
           [1653306603.741049][13293:13293] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
           [1653306603.741081][13293:13293] CHIP:SVR: Manual pairing code: [749701123365521327694]
+      disabled: true
+
+    - label:
+          "Verify the DUT follows the correct order of onboarding the TH devices
+          which must be from first to last starting from left to right."
+      PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1_INORDER
+      verification: |
+          Out of Scope for V1.0 as Concatenated QR codes are not supported yet
+          https://github.com/project-chip/connectedhomeip/issues/5331
+          Vendor specific field testcase
+      disabled: true
+
+    - label:
+          "Verify the DUT follows the correct order of onboarding the TH devices
+          which must be from first to last starting from left to right."
+      PICS:
+          "!(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) &&
+          MCORE.DD.CTRL_CONCATENATED_QR_CODE_2"
+      verification: |
+          Out of Scope for V1.0 as Concatenated QR codes are not supported yet
+          https://github.com/project-chip/connectedhomeip/issues/5331
+          Vendor specific field testcase
+      disabled: true
+
+    - label:
+          "Verify the DUT does NOT indicate to the user the need to commission
+          TH devices one by one by scanning their individual QR codes, but
+          instead warns the user (in a way described by the provider of the DUT)
+          that the QR code cannot be processed."
+      PICS:
+          "!(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) &&
+          !(MCORE.DD.CTRL_CONCATENATED_QR_CODE_2)"
+      verification: |
+          Out of Scope for V1.0 as Concatenated QR codes are not supported yet
+          https://github.com/project-chip/connectedhomeip/issues/5331
+          Vendor specific field testcase
       disabled: true

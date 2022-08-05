@@ -15,6 +15,9 @@
 
 name: 19.5.3. [TC-MEDIAINPUT-3.12] Show and Hide Input Status Verification
 
+PICS:
+    - MEDIAINPUT.S
+
 config:
     nodeId: 0x12344321
     cluster: "Media Input"
@@ -41,14 +44,14 @@ tests:
       command: "readAttribute"
       attribute: "InputList"
 
-    - label: "Hide Input Status Command"
-      PICS: MEDIAINPUT.S.C0002
-      command: "HideInputStatus"
+    - label: "Show Input Status Command"
+      PICS: MEDIAINPUT.S.C01.Rsp
+      command: "ShowInputStatus"
       response:
           error: 0
 
-    - label: "Show Input Status Command"
-      PICS: MEDIAINPUT.S.C0001
-      command: "ShowInputStatus"
+    - label: "Hide Input Status Command"
+      PICS: MEDIAINPUT.S.C02.Rsp
+      command: "HideInputStatus"
       response:
           error: 0

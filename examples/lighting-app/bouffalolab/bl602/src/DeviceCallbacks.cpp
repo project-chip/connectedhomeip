@@ -71,9 +71,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 
     case DeviceEventType::kWiFiConnectivityChange:
         log_info("Got ip, start advertise\r\n");
-        // chip::app::DnssdServer::Instance().AdvertiseOperational();
         chip::app::DnssdServer::Instance().StartServer();
-        GetAppTask().OtaTask();
         NetworkCommissioning::BLWiFiDriver::GetInstance().SaveConfiguration();
         break;
 

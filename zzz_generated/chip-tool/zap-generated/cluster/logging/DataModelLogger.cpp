@@ -2807,6 +2807,30 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ThreadNetworkDiagnostics::Events::NetworkFaultChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Current", indent + 1, value.current);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Current'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Previous", indent + 1, value.previous);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Previous'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const WiFiNetworkDiagnostics::Events::Disconnection::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -4314,74 +4338,74 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case LevelControl::Attributes::CurrentLevel::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current level", 1, value);
+            return DataModelLogger::LogValue("CurrentLevel", 1, value);
         }
         case LevelControl::Attributes::RemainingTime::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("remaining time", 1, value);
+            return DataModelLogger::LogValue("RemainingTime", 1, value);
         }
         case LevelControl::Attributes::MinLevel::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("min level", 1, value);
+            return DataModelLogger::LogValue("MinLevel", 1, value);
         }
         case LevelControl::Attributes::MaxLevel::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("max level", 1, value);
+            return DataModelLogger::LogValue("MaxLevel", 1, value);
         }
         case LevelControl::Attributes::CurrentFrequency::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current frequency", 1, value);
+            return DataModelLogger::LogValue("CurrentFrequency", 1, value);
         }
         case LevelControl::Attributes::MinFrequency::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("min frequency", 1, value);
+            return DataModelLogger::LogValue("MinFrequency", 1, value);
         }
         case LevelControl::Attributes::MaxFrequency::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("max frequency", 1, value);
+            return DataModelLogger::LogValue("MaxFrequency", 1, value);
         }
         case LevelControl::Attributes::Options::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("options", 1, value);
+            return DataModelLogger::LogValue("Options", 1, value);
         }
         case LevelControl::Attributes::OnOffTransitionTime::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("on off transition time", 1, value);
+            return DataModelLogger::LogValue("OnOffTransitionTime", 1, value);
         }
         case LevelControl::Attributes::OnLevel::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("on level", 1, value);
+            return DataModelLogger::LogValue("OnLevel", 1, value);
         }
         case LevelControl::Attributes::OnTransitionTime::Id: {
             chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("on transition time", 1, value);
+            return DataModelLogger::LogValue("OnTransitionTime", 1, value);
         }
         case LevelControl::Attributes::OffTransitionTime::Id: {
             chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("off transition time", 1, value);
+            return DataModelLogger::LogValue("OffTransitionTime", 1, value);
         }
         case LevelControl::Attributes::DefaultMoveRate::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("default move rate", 1, value);
+            return DataModelLogger::LogValue("DefaultMoveRate", 1, value);
         }
         case LevelControl::Attributes::StartUpCurrentLevel::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("start up current level", 1, value);
+            return DataModelLogger::LogValue("StartUpCurrentLevel", 1, value);
         }
         case LevelControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -5908,42 +5932,42 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Rssi", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BeaconLostCount", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BeaconRxCount", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PacketMulticastRxCount", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PacketMulticastTxCount", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PacketUnicastRxCount", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PacketUnicastTxCount", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id: {
-            uint64_t value;
+            chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMaxRate", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::OverrunCount::Id: {
-            uint64_t value;
+            chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OverrunCount", 1, value);
         }
@@ -6212,12 +6236,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("WindowStatus", 1, value);
         }
         case AdministratorCommissioning::Attributes::AdminFabricIndex::Id: {
-            chip::FabricIndex value;
+            chip::app::DataModel::Nullable<chip::FabricIndex> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AdminFabricIndex", 1, value);
         }
         case AdministratorCommissioning::Attributes::AdminVendorId::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AdminVendorId", 1, value);
         }
@@ -10483,6 +10507,11 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ConnectionStatus", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Events::NetworkFaultChange::Id: {
+            chip::app::Clusters::ThreadNetworkDiagnostics::Events::NetworkFaultChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NetworkFaultChange", 1, value);
         }
         }
         break;

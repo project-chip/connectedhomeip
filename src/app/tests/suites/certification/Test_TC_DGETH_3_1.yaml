@@ -23,17 +23,15 @@ config:
 tests:
     - label: "Commission TH to DUT"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT reads PHYRate attribute from TH."
       PICS: DGETH.S.A0000
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read phyrate 1 0
-          Verify the value of PHYRate is in range of PHYRate enum
+
+          Verify the value of PHYRate is in range of PHYRate enum in DUT as Client side Log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0000 DataVersion: 3872576452
           [1649663425.191426][8076:8082] CHIP:TOO:   PHYRate: 1
@@ -42,11 +40,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read full-duplex 1 0
-          Verify the value of FullDuplex is boolean
+
+          Verify the value of FullDuplex is boolean in DUT as Client side Log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0001 DataVersion: 3872576452
           [1649663520.936873][8088:8093] CHIP:TOO:   FullDuplex: TRUE
@@ -55,11 +51,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read packet-rx-count 1 0
-          Verify the value of PacketRxCount is in range uint64
+
+          Verify the value of PacketRxCount is in range uint64 in DUT as Client side Log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0002 DataVersion: 3872576452
           [1649663623.009973][8103:8108] CHIP:TOO:   PacketRxCount: 3322
@@ -68,11 +62,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0003
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read packet-tx-count 1 0
-          Verify the value of PacketTxCount is in range uint64
+
+          Verify the value of PacketTxCount is in range uint64 in DUT as Client side Log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0003 DataVersion: 3872576452
           [1649663793.192934][8117:8122] CHIP:TOO:   PacketTxCount: 3220
@@ -81,11 +73,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0004
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read tx-err-count 1 1
-          Verify the value of TxErrCount is in range uint64
+
+          Verify the value of TxErrCount is in range uint64 in DUT as Client side Log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0004 DataVersion: 3872576452
           [1649663843.295395][8123:8128] CHIP:TOO:   TxErrCount: 0
@@ -94,11 +84,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0005
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read collision-count 1 1
-          Verify the value of  CollisionCount is in range uint64
+
+          Verify the value of  CollisionCount is in range uint64 in DUT as Client side Log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0005 DataVersion: 3872576452
           [1649663870.221742][8133:8138] CHIP:TOO:   CollisionCount: 0
@@ -107,10 +95,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0006
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read overrun-count 1 1
+
+          Verify in DUT as Client side Log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0006 DataVersion: 3872576452
           [1649663948.738274][8142:8147] CHIP:TOO:   OverrunCount: 0
@@ -119,11 +106,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0007
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read carrier-detect 1 1
-          Verify the value of CarrierDetect is either bool or null
+
+          Verify the value of CarrierDetect is either bool or null in DUT as Client side Log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0007 DataVersion: 3872576452
           [1649663972.829304][8149:8154] CHIP:TOO:   CarrierDetect: null
@@ -132,11 +117,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0008
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read  time-since-reset 1 1
-          Verify the value of TimeSinceReset is in range uint64
+
+          Verify the value of TimeSinceReset is in range uint64 in DUT as Client side Log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0008 DataVersion: 3872576452
           [1649664046.010810][8158:8163] CHIP:TOO:   TimeSinceReset: 5219

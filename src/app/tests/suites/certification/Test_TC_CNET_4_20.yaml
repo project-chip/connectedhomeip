@@ -14,7 +14,10 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.18. [TC-CNET-4.20] [Wi-Fi] Verification for commands check [DUT-Client]
+    12.4.18. [TC-CNET-4.20] [Wi-Fi] Verification for commands check [DUT-Client]
+
+PICS:
+    - CNET.C.F00
 
 config:
     nodeId: 0x12344321
@@ -22,17 +25,12 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
-      verification: |
-
-      disabled: true
-
     - label: "DUT sends the ScanNetwork command to the TH"
       PICS: CNET.C.C00.Tx
       verification: |
           ./chip-tool networkcommissioning scan-networks 1 0 --Ssid null --Breadcrumb 1
 
-          Verify ScanNetworksResponse status on the TH Log:
+          Verify ScanNetworksResponse status on the TH/All-cluster-app Log:
 
           [1653475026.012811][29937:29942] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
           [1653475026.012942][29937:29942] CHIP:TOO:   ScanNetworksResponse: {
@@ -167,7 +165,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
 
-          Verify ArmFailSafeResponse on the TH Log:
+          Verify ArmFailSafeResponse on the TH/All-cluster-app Log:
 
           [1650371269.889246][42481:42486] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1650371269.889331][42481:42486] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -183,10 +181,12 @@ tests:
       PICS: CNET.C.C03.Tx
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network-network hex:<your network id in hex> 1 0
+
           Below is an example:
+
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
 
-          Verify NetworkConfigResponse and its arguments on the TH Log:
+          Verify NetworkConfigResponse and its arguments on the TH/All-cluster-app Log:
 
           [1650371276.622265][42488:42493] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1650371276.622332][42488:42493] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
@@ -202,10 +202,12 @@ tests:
       PICS: CNET.C.C06.Tx
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
+
           Below is an example:
+
            ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
 
-          Verify ConnectNetworkResponse and its arguments on the TH Log:
+          Verify ConnectNetworkResponse and its arguments on the TH/All-cluster-app Log:
 
           [1650376217.124606][42876:42881] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1650376217.124707][42876:42881] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
@@ -221,10 +223,12 @@ tests:
       PICS: CNET.C.C08.Tx
       verification: |
           ./chip-tool networkcommissioning reorder-network hex:<your network id in hex> 1 0
+
           Below is an example:
+
           ./chip-tool networkcommissioning reorder-network hex:47524C50726976617465 3 1 0
 
-          Verify NetworkConfigResponse and its arguments on the TH Log:
+          Verify NetworkConfigResponse and its arguments on the TH/All-cluster-app Log:
 
           [1650381494.820649][44087:44092] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1650381494.820749][44087:44092] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
@@ -240,10 +244,12 @@ tests:
       PICS: CNET.C.C04.Tx
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
+
           Below is an example:
+
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
 
-          Verify NetworkConfigResponse and its arguments on the TH Log:
+          Verify NetworkConfigResponse and its arguments on the TH/All-cluster-app Log:
 
           [1650373300.704806][42697:42702] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1650373300.704864][42697:42702] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005

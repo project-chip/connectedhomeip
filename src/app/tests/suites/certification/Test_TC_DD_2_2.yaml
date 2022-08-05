@@ -17,6 +17,9 @@ name:
     3.2.2. [TC-DD-2.2] Discovery by Commissioner Verification [DUT -
     Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -24,7 +27,7 @@ config:
 
 tests:
     - label: "TH starts matter announcement procedure using BLE transport"
-      PICS: MCORE.DD.BLE
+      PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           $ ./out/ble/chip-all-clusters-app --ble-device 1 --discriminator 3841
 
@@ -49,7 +52,7 @@ tests:
     - label:
           "DUT starts BLE scan across all three advertising channels with a
           sufficient dwell time, interval, and overall duration of scan"
-      PICS: MCORE.DD.BLE
+      PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing
 
@@ -107,7 +110,7 @@ tests:
       disabled: true
 
     - label: "DUT starts scan in background using BLE transport"
-      PICS: MCORE.DD.BLE
+      PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing command
 
@@ -165,7 +168,7 @@ tests:
       disabled: true
 
     - label: "TH starts matter announcement using BLE transport"
-      PICS: MCORE.DD.BLE
+      PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           $ ./out/all-clusters-app/chip-all-clusters-app --wifi --discriminator 3841
 
@@ -187,8 +190,8 @@ tests:
           [1653087913.254268][8083:8083] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to 29f72814
       disabled: true
 
-    - label: "TH starts matter announcement using BLE transport"
-      PICS: MCORE.DD.BLE
+    - label: "DUT must find TH and provide onboarding data for validation."
+      PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing command
 
@@ -275,7 +278,9 @@ tests:
           SoftAP commissioning not currently supported on TH=all-clusters-app
       disabled: true
 
-    - label: "TH starts SoftAP and begin matter announcement procedure"
+    - label:
+          "DUT must find TH and provide onboarding data for validation, Pass
+          Criteria: DUT is able to report the Onboarding payload as set on TH"
       PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
           Out of Scope V1.0
@@ -295,8 +300,7 @@ tests:
           [1651256405894] [18453:593886] CHIP: [DIS]         Product ID: 32769
           [1651256405894] [18453:593886] CHIP: [DIS]         Long Discriminator: 3840
           [1651256405894] [18453:593886] CHIP: [DIS]         Pairing Hint: 33
-          [1651256405894] [18453:593886] CHIP: [DIS]         Hostname: DCA6328D2B9F0000
-          [1651256405894] [18453:593886] CHIP: [DIS]         Instance Name: 8FFEE04E82830E26
+          [1651256405894] [18453:593886] CHIP: [DIS]         Hostname: DCA6328D2B9F0000        [1651256405894] [18453:593886] CHIP: [DIS]         Instance Name: 8FFEE04E82830E26
           [1651256405894] [18453:593886] CHIP: [DIS]         IP Address #1: fd54:23a1:c6de:4637:dea6:32ff:fe8d:2b9f
           [1651256405894] [18453:593886] CHIP: [DIS]         IP Address #2: fe80::dea6:32ff:fe8d:2b9f
           [1651256405894] [18453:593886] CHIP: [DIS]         IP Address #3: fe80::dea6:32ff:fe8d:2ba0
