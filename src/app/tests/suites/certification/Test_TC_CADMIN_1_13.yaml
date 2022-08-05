@@ -19,7 +19,7 @@ name:
 
 config:
     nodeId: 0x12344321
-    timeout: 500
+    timeout: 600
     nodeIdForDuplicateCommissioning:
         type: node_id
         defaultValue: 0x11
@@ -61,7 +61,34 @@ tests:
               - name: "discriminator"
                 value: discriminator
 
-    - label: "Commission from gamma"
+    - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      PICS: CADMIN.S.A0000
+      response:
+          value: 2
+
+    - label: "TH_CR1 reads AdminFabricIndex attribute from DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "AdminFabricIndex"
+      PICS: CADMIN.S.A0001
+      response:
+          constraints:
+              notValue: null
+
+    #Issue https://github.com/CHIP-Specifications/chip-test-plans/issues/1972
+    - label: "TH_CR1 reads AdminVendorId attribute from DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "AdminVendorId"
+      PICS: CADMIN.S.A0002
+      response:
+          constraints:
+              notValue: null
+
+    - label: "TH_CR3 starts a commissioning process with DUT_CE"
       identity: "gamma"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -72,7 +99,7 @@ tests:
               - name: "payload"
                 value: payload
 
-    - label: "TH_CR3 starts a commissioning process with DUT_CE"
+    - label: "DUT_CE is commissioned to TH_CR3 on Fabric ID3 with Node ID3"
       identity: "gamma"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -95,7 +122,7 @@ tests:
               - name: "discriminator"
                 value: discriminator
 
-    - label: "Commission from beta"
+    - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -106,7 +133,7 @@ tests:
               - name: "payload"
                 value: payload
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
+    - label: "DUT_CE is commissioned to TH_CR2 on Fabric ID2 with Node ID2"
       identity: "beta"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -128,7 +155,7 @@ tests:
               - name: "discriminator"
                 value: discriminator
 
-    - label: "TH_CR1 opens a new commissioning window on DUT_CE"
+    - label: "TH_CR1 opens a 2nd commissioning window on DUT_CE"
       identity: "alpha"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
@@ -141,7 +168,7 @@ tests:
               - name: "PAKEVerifier"
                 value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
               - name: "discriminator"
-                value: 3840
+                value: discriminator
               - name: "iterations"
                 value: 1000
               - name: "salt"
@@ -174,7 +201,7 @@ tests:
               - name: "ms"
                 value: 180000
 
-    - label: "TH_CR1 re-opens new commissioning window on DUT_CE"
+    - label: "TH_CR1 re-opens new commissioning window on DUT_CE using ECM"
       identity: "alpha"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
@@ -187,13 +214,21 @@ tests:
               - name: "PAKEVerifier"
                 value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
               - name: "discriminator"
-                value: 3840
+                value: discriminator
               - name: "iterations"
                 value: 1000
               - name: "salt"
                 value: "SPAKE2P Key Salt"
 
-    - label: "TH_CR3 opens a new commissioning window on DUT_CE"
+    - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      PICS: CADMIN.S.A0000
+      response:
+          value: 1
+
+    - label: "TH_CR3 opens a 2nd commissioning window on DUT_CE"
       identity: "gamma"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
@@ -206,7 +241,7 @@ tests:
               - name: "PAKEVerifier"
                 value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
               - name: "discriminator"
-                value: 3840
+                value: discriminator
               - name: "iterations"
                 value: 1000
               - name: "salt"
@@ -252,13 +287,13 @@ tests:
               - name: "PAKEVerifier"
                 value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
               - name: "discriminator"
-                value: 3840
+                value: discriminator
               - name: "iterations"
                 value: 1000
               - name: "salt"
                 value: "SPAKE2P Key Salt"
 
-    - label: "TH_CR2 opens a new commissioning window on DUT_CE"
+    - label: "TH_CR2 opens a 2nd commissioning window on DUT_CE using ECM"
       identity: "beta"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
@@ -271,10 +306,42 @@ tests:
               - name: "PAKEVerifier"
                 value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
               - name: "discriminator"
-                value: 3840
+                value: discriminator
               - name: "iterations"
                 value: 1000
               - name: "salt"
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
+
+    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 180000
+
+    - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      PICS: CADMIN.S.A0000
+      response:
+          value: 0
+
+    - label: "TH_CR1 reads AdminFabricIndex attribute from DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "AdminFabricIndex"
+      PICS: CADMIN.S.A0001
+      response:
+          value: null
+
+    - label: "TH_CR1 reads AdminVendorId attribute from DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "AdminVendorId"
+      PICS: CADMIN.S.A0002
+      response:
+          value: null
