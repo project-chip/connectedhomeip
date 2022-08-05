@@ -96,9 +96,9 @@ protected:
     PersistentStorageDelegate * mStorage = nullptr;
 
     // This pending fabric index is `kUndefinedFabricIndex` if there isn't a pending keypair override for a given fabric.
-    FabricIndex mPendingFabricIndex       = kUndefinedFabricIndex;
+    FabricIndex mPendingFabricIndex          = kUndefinedFabricIndex;
     Crypto::P256KeypairHSM * mPendingKeypair = nullptr;
-    bool mIsPendingKeypairActive          = false;
+    bool mIsPendingKeypairActive             = false;
 
     // If overridding NewOpKeypairForFabric method in a subclass, set this to true in
     // `NewOpKeypairForFabric` if the mPendingKeypair should not be deleted when no longer in use.
