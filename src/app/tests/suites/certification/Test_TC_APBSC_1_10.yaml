@@ -13,104 +13,105 @@
 # limitations under the License.
 
 name:
-  19.1.10. [TC-APBSC-1.10] Global attributes - Application Basic Cluster (DUT
-  as Server)
+    19.1.10. [TC-APBSC-1.10] Global attributes - Application Basic Cluster (DUT
+    as Server)
 
 PICS:
-  - APBSC.S
+    - APBSC.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Application Basic"
-  endpoint: 3
+    nodeId: 0x12344321
+    cluster: "Application Basic"
+    endpoint: 3
 
 tests:
-  - label: "Wait for the commissioned device to be retrieved"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "Read the global attribute: ClusterRevision"
-    command: "readAttribute"
-    attribute: "ClusterRevision"
-    response:
-      value: 1
-      constraints:
-        type: int16u
+    - label: "Read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
-  - label: "Read FeatureMap attribute from the DUT"
-    command: "readAttribute"
-    attribute: "FeatureMap"
-    response:
-      value: 0
-      constraints:
-        type: bitmap32
+    - label: "Read FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
 
-  - label: "Read the global attribute: AttributeList"
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [2, 4, 5, 6, 7, 65528, 65529, 65531, 65532, 65533]
+    - label: "Read the global attribute: AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2, 4, 5, 6, 7, 65528, 65529, 65531, 65532, 65533]
 
-  - label: "Read the optional attribute(VendorName) in AttributeList"
-    PICS: APBSC.S.A0000
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [0]
+    - label: "Read the optional attribute(VendorName) in AttributeList"
+      PICS: APBSC.S.A0000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
 
-  - label: "Read the optional attribute(VendorID) in AttributeList"
-    PICS: APBSC.S.A0001
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [1]
+    - label: "Read the optional attribute(VendorID) in AttributeList"
+      PICS: APBSC.S.A0001
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
 
-  - label: "Read the optional attribute(ProductID) in AttributeList"
-    PICS: APBSC.S.A0003
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [3]
+    - label: "Read the optional attribute(ProductID) in AttributeList"
+      PICS: APBSC.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
 
-  - label: "Read the global attribute: AcceptedCommandList"
-    command: "readAttribute"
-    attribute: "AcceptedCommandList"
-    response:
-      value: []
-      constraints:
-        type: list
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-  - label: "Read the global attribute: GeneratedCommandList"
-    command: "readAttribute"
-    attribute: "GeneratedCommandList"
-    response:
-      value: []
-      constraints:
-        type: list
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-  #issue #11053 disabled steps below Global attributes missing from YAML framework
-  - label: "Read EventList attribute from the DUT and Verify that the DUT
-      response provides a list of supported events."
-    verification: |
-      Not implemented in chip-tool
-    cluster: "LogCommands"
-    command: "UserPrompt"
-    PICS: PICS_USER_PROMPT
-    arguments:
-      values:
-        - name: "message"
-          value: "Please enter 'y' for success"
-        - name: "expectedValue"
-          value: "y"
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

@@ -15,52 +15,54 @@
 name: 43.2.1. [TC-DGSW-2.1] Attributes with server as DUT
 
 PICS:
-  - DGSW.S.A
-  - DGSW.S
+    - DGSW.S.A
+    - DGSW.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Software Diagnostics"
-  endpoint: 0
+    nodeId: 0x12344321
+    cluster: "Software Diagnostics"
+    endpoint: 0
 
 tests:
-  - label: "Wait for the commissioned device to be retrieved"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  #issue 873
-  - label: "Reads a list of ThreadMetrics struct non-global attribute from DUT."
-    command: "readAttribute"
-    attribute: "ThreadMetrics"
-    PICS: DGSW.S.A0000
-    response:
-      constraints:
-        type: list
+    #issue 873
+    - label:
+          "Reads a list of ThreadMetrics struct non-global attribute from DUT."
+      command: "readAttribute"
+      attribute: "ThreadMetrics"
+      PICS: DGSW.S.A0000
+      response:
+          constraints:
+              type: list
 
-  - label: "Reads CurrentHeapFree non-global attribute value from DUT"
-    command: "readAttribute"
-    attribute: "CurrentHeapFree"
-    PICS: DGSW.S.A0001
-    response:
-      constraints:
-        type: int64u
+    - label: "Reads CurrentHeapFree non-global attribute value from DUT"
+      command: "readAttribute"
+      attribute: "CurrentHeapFree"
+      PICS: DGSW.S.A0001
+      response:
+          constraints:
+              type: int64u
 
-  - label: "Reads CurrentHeapUsed non-global attribute value from DUT"
-    command: "readAttribute"
-    attribute: "CurrentHeapUsed"
-    PICS: DGSW.S.A0002
-    response:
-      constraints:
-        type: int64u
+    - label: "Reads CurrentHeapUsed non-global attribute value from DUT"
+      command: "readAttribute"
+      attribute: "CurrentHeapUsed"
+      PICS: DGSW.S.A0002
+      response:
+          constraints:
+              type: int64u
 
-  - label: "Reads CurrentHeapHighWaterMark non-global attribute value from DUT"
-    command: "readAttribute"
-    attribute: "CurrentHeapHighWatermark"
-    PICS: DGSW.S.A0003
-    response:
-      constraints:
-        type: int64u
+    - label:
+          "Reads CurrentHeapHighWaterMark non-global attribute value from DUT"
+      command: "readAttribute"
+      attribute: "CurrentHeapHighWatermark"
+      PICS: DGSW.S.A0003
+      response:
+          constraints:
+              type: int64u

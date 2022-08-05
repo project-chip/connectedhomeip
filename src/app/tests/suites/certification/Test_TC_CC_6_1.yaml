@@ -12,120 +12,121 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 27.2.12. [TC-CC-6.1] Color Temperature MoveTo functionality with server as
-  DUT
+name:
+    27.2.12. [TC-CC-6.1] Color Temperature MoveTo functionality with server as
+    DUT
 
 PICS:
-  - CC.S
+    - CC.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Color Control"
-  endpoint: 1
+    nodeId: 0x12344321
+    cluster: "Color Control"
+    endpoint: 1
 
 tests:
-  - label: "Wait for the commissioned device to be retrieved"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "Turn on light for color control tests"
-    PICS: OO.S.C01.Rsp
-    cluster: "On/Off"
-    command: "on"
+    - label: "Turn on light for color control tests"
+      PICS: OO.S.C01.Rsp
+      cluster: "On/Off"
+      command: "on"
 
-  - label: "Check on/off attribute value is true after on command"
-    cluster: "On/Off"
-    command: "readAttribute"
-    attribute: "OnOff"
-    PICS: OO.S.A0000
-    response:
-      value: 1
+    - label: "Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000
+      response:
+          value: 1
 
-  - label: "TH writes 0 to the Options attribute"
-    PICS: CC.S.F04 && CC.S.A000f
-    command: "writeAttribute"
-    attribute: "Options"
-    arguments:
-      value: 0
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F04 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
 
-  - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
-    PICS: CC.S.F04 && CC.S.A400b
-    command: "readAttribute"
-    attribute: "ColorTempPhysicalMinMireds"
-    response:
-      saveAs: ColorTempPhysicalMinMiredsValue
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65279
+    - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
+      PICS: CC.S.F04 && CC.S.A400b
+      command: "readAttribute"
+      attribute: "ColorTempPhysicalMinMireds"
+      response:
+          saveAs: ColorTempPhysicalMinMiredsValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
 
-  - label: "TH reads ColorTempPhysicalMaxMireds attribute from DUT."
-    PICS: CC.S.F04 && CC.S.A400c
-    command: "readAttribute"
-    attribute: "ColorTempPhysicalMaxMireds"
-    response:
-      saveAs: ColorTempPhysicalMaxMiredsValue
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65279
+    - label: "TH reads ColorTempPhysicalMaxMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A400c
+      command: "readAttribute"
+      attribute: "ColorTempPhysicalMaxMireds"
+      response:
+          saveAs: ColorTempPhysicalMaxMiredsValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
 
-  - label: "TH reads ColorTemperatureMireds attribute from DUT."
-    PICS: CC.S.F04 && CC.S.A0007
-    command: "readAttribute"
-    attribute: "ColorTemperature"
-    response:
-      constraints:
-        type: int16u
-        minValue: ColorTempPhysicalMinMiredsValue
-        maxValue: ColorTempPhysicalMaxMiredsValue
+    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A0007
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorTempPhysicalMinMiredsValue
+              maxValue: ColorTempPhysicalMaxMiredsValue
 
-  - label: "Move To Color Temperature command"
-    PICS: CC.S.F04 && CC.S.C0A.Rsp
-    command: "MoveToColorTemperature"
-    arguments:
-      values:
-        - name: "colorTemperature"
+    - label: "Move To Color Temperature command"
+      PICS: CC.S.F04 && CC.S.C0A.Rsp
+      command: "MoveToColorTemperature"
+      arguments:
+          values:
+              - name: "colorTemperature"
+                value: ColorTempPhysicalMaxMiredsValue
+              - name: "TransitionTime"
+                value: 10
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 1500ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1500
+
+    - label: "Read current color temprature"
+      PICS: CC.S.F04 && CC.S.A0007
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
           value: ColorTempPhysicalMaxMiredsValue
-        - name: "TransitionTime"
-          value: 10
-        - name: "OptionsMask"
+          constraints:
+              type: int16u
+              minValue: ColorTempPhysicalMinMiredsValue
+              maxValue: ColorTempPhysicalMaxMiredsValue
+
+    - label: "Turn off light that we turned on"
+      PICS: OO.S.C00.Rsp
+      cluster: "On/Off"
+      command: "off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000
+      response:
           value: 0
-        - name: "OptionsOverride"
-          value: 0
-
-  - label: "Wait 1500ms"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 1500
-
-  - label: "Read current color temprature"
-    PICS: CC.S.F04 && CC.S.A0007
-    command: "readAttribute"
-    attribute: "ColorTemperature"
-    response:
-      value: ColorTempPhysicalMaxMiredsValue
-      constraints:
-        type: int16u
-        minValue: ColorTempPhysicalMinMiredsValue
-        maxValue: ColorTempPhysicalMaxMiredsValue
-
-  - label: "Turn off light that we turned on"
-    PICS: OO.S.C00.Rsp
-    cluster: "On/Off"
-    command: "off"
-
-  - label: "Check on/off attribute value is false after off command"
-    cluster: "On/Off"
-    command: "readAttribute"
-    attribute: "OnOff"
-    PICS: OO.S.A0000
-    response:
-      value: 0

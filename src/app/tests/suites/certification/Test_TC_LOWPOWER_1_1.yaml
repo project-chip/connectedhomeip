@@ -12,77 +12,79 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 19.1.1. [TC-LOWPOWER-1.1] Global attributes - Low Power Cluster (DUT as
-  Server)
+name:
+    19.1.1. [TC-LOWPOWER-1.1] Global attributes - Low Power Cluster (DUT as
+    Server)
 
 PICS:
-  - LOWPOWER.S
+    - LOWPOWER.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Low Power"
-  endpoint: 1
+    nodeId: 0x12344321
+    cluster: "Low Power"
+    endpoint: 1
 
 tests:
-  - label: "Wait for the commissioned device to be retrieved"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "Read the global attribute: ClusterRevision"
-    command: "readAttribute"
-    attribute: "ClusterRevision"
-    response:
-      value: 1
-      constraints:
-        type: int16u
+    - label: "Read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
-  - label: "Read the global attribute: FeatureMap"
-    command: "readAttribute"
-    attribute: "FeatureMap"
-    response:
-      value: 0
-      constraints:
-        type: bitmap32
+    - label: "Read the global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
 
-  - label: "Read the global attribute: AttributeList"
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      value: [65528, 65529, 65531, 65532, 65533]
-      constraints:
-        type: list
+    - label: "Read the global attribute: AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          value: [65528, 65529, 65531, 65532, 65533]
+          constraints:
+              type: list
 
-  - label: "Read the global attribute: AcceptedCommandList"
-    command: "readAttribute"
-    attribute: "AcceptedCommandList"
-    response:
-      value: [0]
-      constraints:
-        type: list
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: [0]
+          constraints:
+              type: list
 
-  - label: "Read the global attribute: GeneratedCommandList"
-    command: "readAttribute"
-    attribute: "GeneratedCommandList"
-    response:
-      value: []
-      constraints:
-        type: list
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-  #issue #11053 disabled steps below Global attributes missing from YAML framework
-  - label: "Read EventList attribute from the DUT and Verify that the DUT
-      response provides a list of supported events."
-    verification: |
-      Not implemented in chip-tool
-    cluster: "LogCommands"
-    command: "UserPrompt"
-    PICS: PICS_USER_PROMPT
-    arguments:
-      values:
-        - name: "message"
-          value: "Please enter 'y' for success"
-        - name: "expectedValue"
-          value: "y"
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

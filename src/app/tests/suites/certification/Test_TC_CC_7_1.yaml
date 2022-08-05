@@ -15,378 +15,378 @@
 name: 27.2.15. [TC-CC-7.1] Enhanced MoveToHue functionality with server as DUT
 
 PICS:
-  - CC.S
+    - CC.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Color Control"
-  endpoint: 1
-  timeout: 150
-  EnhancedHueConfigValue:
-    type: int16u
-    defaultValue: 1025
-  EnhancedHueShortestDistanceConfigValue:
-    type: int16u
-    defaultValue: 1050
-  EnhancedHueLongestDistanceConfigValue:
-    type: int16u
-    defaultValue: 1200
-  EnhancedHueDirectionUpConfigValue:
-    type: int16u
-    defaultValue: 1300
-  EnhancedHueDirectionDownConfigValue:
-    type: int16u
-    defaultValue: 1100
+    nodeId: 0x12344321
+    cluster: "Color Control"
+    endpoint: 1
+    timeout: 150
+    EnhancedHueConfigValue:
+        type: int16u
+        defaultValue: 1025
+    EnhancedHueShortestDistanceConfigValue:
+        type: int16u
+        defaultValue: 1050
+    EnhancedHueLongestDistanceConfigValue:
+        type: int16u
+        defaultValue: 1200
+    EnhancedHueDirectionUpConfigValue:
+        type: int16u
+        defaultValue: 1300
+    EnhancedHueDirectionDownConfigValue:
+        type: int16u
+        defaultValue: 1100
 
 tests:
-  - label: "Wait for the commissioned device to be retrieved"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "Turn on light for color control tests"
-    PICS: OO.S.C01.Rsp
-    cluster: "On/Off"
-    command: "on"
+    - label: "Turn on light for color control tests"
+      PICS: OO.S.C01.Rsp
+      cluster: "On/Off"
+      command: "on"
 
-  - label: "Check on/off attribute value is true after on command"
-    cluster: "On/Off"
-    command: "readAttribute"
-    attribute: "OnOff"
-    PICS: OO.S.A0000
-    response:
-      value: 1
-
-  - label: "TH writes 0 to the Options attribute"
-    PICS: CC.S.F01 && CC.S.A000f
-    command: "writeAttribute"
-    attribute: "Options"
-    arguments:
-      value: 0
-
-  - label: "TH sends EnhancedMoveToHue command to DUT"
-    PICS: CC.S.F01 && CC.S.C40.Rsp
-    command: "EnhancedMoveToHue"
-    arguments:
-      values:
-        - name: "EnhancedHue"
-          value: EnhancedHueConfigValue
-        - name: "Direction"
-          value: 0
-        - name: "TransitionTime"
-          value: 0
-        - name: "OptionsMask"
-          value: 0
-        - name: "OptionsOverride"
-          value: 0
-
-  - label: "TH reads EnhancedCurrentHue attribute from DUT"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    response:
-      value: EnhancedHueConfigValue
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
-
-  - label: "TH sends EnhancedMoveToHue command to DUT"
-    PICS: CC.S.F01 && CC.S.C40.Rsp
-    command: "EnhancedMoveToHue"
-    arguments:
-      values:
-        - name: "EnhancedHue"
-          value: EnhancedHueShortestDistanceConfigValue
-        - name: "Direction"
-          value: 0
-        - name: "TransitionTime"
-          value: 300
-        - name: "OptionsMask"
-          value: 0
-        - name: "OptionsOverride"
-          value: 0
-
-  - label: "Wait 5500ms"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 5500
-
-  - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    response:
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
-
-  - label: "Wait 5500ms"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 5500
-
-  - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    response:
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
-
-  - label: "Wait 20s"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 20000
-
-  - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    response:
-      value: EnhancedHueShortestDistanceConfigValue
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
-
-  - label: "TH sends EnhancedMoveToHue command to DUT"
-    PICS: CC.S.F01 && CC.S.C40.Rsp
-    command: "EnhancedMoveToHue"
-    arguments:
-      values:
-        - name: "EnhancedHue"
-          value: EnhancedHueLongestDistanceConfigValue
-        - name: "Direction"
+    - label: "Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000
+      response:
           value: 1
-        - name: "TransitionTime"
-          value: 300
-        - name: "OptionsMask"
+
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F01 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
           value: 0
-        - name: "OptionsOverride"
-          value: 0
 
-  - label: "Wait 5500ms"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 5500
+    - label: "TH sends EnhancedMoveToHue command to DUT"
+      PICS: CC.S.F01 && CC.S.C40.Rsp
+      command: "EnhancedMoveToHue"
+      arguments:
+          values:
+              - name: "EnhancedHue"
+                value: EnhancedHueConfigValue
+              - name: "Direction"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
-  - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    response:
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
+    - label: "TH reads EnhancedCurrentHue attribute from DUT"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          value: EnhancedHueConfigValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
-  - label: "Wait 5500ms"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 5500
+    - label: "TH sends EnhancedMoveToHue command to DUT"
+      PICS: CC.S.F01 && CC.S.C40.Rsp
+      command: "EnhancedMoveToHue"
+      arguments:
+          values:
+              - name: "EnhancedHue"
+                value: EnhancedHueShortestDistanceConfigValue
+              - name: "Direction"
+                value: 0
+              - name: "TransitionTime"
+                value: 300
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
-  - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    response:
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
+    - label: "Wait 5500ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5500
 
-  - label: "Wait 20s"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 20000
+    - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
-  - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    response:
-      value: EnhancedHueLongestDistanceConfigValue
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
+    - label: "Wait 5500ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5500
 
-  - label: "TH sends EnhancedMoveToHue command to DUT"
-    PICS: CC.S.F01 && CC.S.C40.Rsp
-    command: "EnhancedMoveToHue"
-    arguments:
-      values:
-        - name: "EnhancedHue"
+    - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 20s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 20000
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          value: EnhancedHueShortestDistanceConfigValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "TH sends EnhancedMoveToHue command to DUT"
+      PICS: CC.S.F01 && CC.S.C40.Rsp
+      command: "EnhancedMoveToHue"
+      arguments:
+          values:
+              - name: "EnhancedHue"
+                value: EnhancedHueLongestDistanceConfigValue
+              - name: "Direction"
+                value: 1
+              - name: "TransitionTime"
+                value: 300
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 5500ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5500
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 5500ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5500
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 20s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 20000
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          value: EnhancedHueLongestDistanceConfigValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "TH sends EnhancedMoveToHue command to DUT"
+      PICS: CC.S.F01 && CC.S.C40.Rsp
+      command: "EnhancedMoveToHue"
+      arguments:
+          values:
+              - name: "EnhancedHue"
+                value: EnhancedHueDirectionUpConfigValue
+              - name: "Direction"
+                value: 2
+              - name: "TransitionTime"
+                value: 300
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 5500ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5500
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 5500ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5500
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 20s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 20000
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
           value: EnhancedHueDirectionUpConfigValue
-        - name: "Direction"
-          value: 2
-        - name: "TransitionTime"
-          value: 300
-        - name: "OptionsMask"
-          value: 0
-        - name: "OptionsOverride"
-          value: 0
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
-  - label: "Wait 5500ms"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 5500
+    - label: "TH sends EnhancedMoveToHue command to DUT "
+      PICS: CC.S.F01 && CC.S.C40.Rsp
+      command: "EnhancedMoveToHue"
+      arguments:
+          values:
+              - name: "EnhancedHue"
+                value: EnhancedHueDirectionDownConfigValue
+              - name: "Direction"
+                value: 3
+              - name: "TransitionTime"
+                value: 300
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
-  - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    response:
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
+    - label: "Wait 5500ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5500
 
-  - label: "Wait 5500ms"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 5500
+    - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
-  - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    response:
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
+    - label: "Wait 5500ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5500
 
-  - label: "Wait 20s"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 20000
+    - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
-  - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    response:
-      value: EnhancedHueDirectionUpConfigValue
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
+    - label: "Wait 20s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 20000
 
-  - label: "TH sends EnhancedMoveToHue command to DUT "
-    PICS: CC.S.F01 && CC.S.C40.Rsp
-    command: "EnhancedMoveToHue"
-    arguments:
-      values:
-        - name: "EnhancedHue"
+    - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
           value: EnhancedHueDirectionDownConfigValue
-        - name: "Direction"
-          value: 3
-        - name: "TransitionTime"
-          value: 300
-        - name: "OptionsMask"
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Turn off light that we turned on"
+      PICS: OO.S.C00.Rsp
+      cluster: "On/Off"
+      command: "off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000
+      response:
           value: 0
-        - name: "OptionsOverride"
-          value: 0
-
-  - label: "Wait 5500ms"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 5500
-
-  - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    response:
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
-
-  - label: "Wait 5500ms"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 5500
-
-  - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    response:
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
-
-  - label: "Wait 20s"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 20000
-
-  - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    response:
-      value: EnhancedHueDirectionDownConfigValue
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
-
-  - label: "Turn off light that we turned on"
-    PICS: OO.S.C00.Rsp
-    cluster: "On/Off"
-    command: "off"
-
-  - label: "Check on/off attribute value is false after off command"
-    cluster: "On/Off"
-    command: "readAttribute"
-    attribute: "OnOff"
-    PICS: OO.S.A0000
-    response:
-      value: 0

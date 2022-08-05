@@ -15,132 +15,132 @@
 name: 27.2.17. [TC-CC-7.3] Enhanced Step functionality with server as DUT
 
 PICS:
-  - CC.S
+    - CC.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Color Control"
-  endpoint: 1
-  StepSizeConfigValue:
-    type: int16u
-    defaultValue: 50
+    nodeId: 0x12344321
+    cluster: "Color Control"
+    endpoint: 1
+    StepSizeConfigValue:
+        type: int16u
+        defaultValue: 50
 
 tests:
-  - label: "Wait for the commissioned device to be retrieved"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "Turn on light for color control tests"
-    PICS: OO.S.C01.Rsp
-    cluster: "On/Off"
-    command: "on"
+    - label: "Turn on light for color control tests"
+      PICS: OO.S.C01.Rsp
+      cluster: "On/Off"
+      command: "on"
 
-  - label: "Check on/off attribute value is true after on command"
-    cluster: "On/Off"
-    command: "readAttribute"
-    attribute: "OnOff"
-    PICS: OO.S.A0000
-    response:
-      value: 1
-
-  - label: "TH writes 0 to the Options attribute"
-    PICS: CC.S.F01 && CC.S.A000f
-    command: "writeAttribute"
-    attribute: "Options"
-    arguments:
-      value: 0
-
-  - label: "TH reads EnhancedCurrentHue attribute from DUT"
-    command: "readAttribute"
-    PICS: CC.S.F01 && CC.S.A4000
-    attribute: "EnhancedCurrentHue"
-    response:
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
-
-  - label: "TH sends EnhancedStepHue command to DUT with StepMode Up"
-    PICS: CC.S.F01 && CC.S.C42.Rsp
-    command: "EnhancedStepHue"
-    arguments:
-      values:
-        - name: "StepMode"
-          value: 0
-        - name: "StepSize"
-          value: StepSizeConfigValue
-        - name: "TransitionTime"
-          value: 10
-        - name: "OptionsMask"
-          value: 0
-        - name: "OptionsOverride"
-          value: 0
-
-  - label: "Wait 1000ms"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 1000
-
-  - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
-    command: "readAttribute"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C42.Rsp
-    attribute: "EnhancedCurrentHue"
-    response:
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
-
-  - label: "TH sends EnhancedStepHue command to DUT with StepMode Down"
-    PICS: CC.S.F01 && CC.S.C42.Rsp
-    command: "EnhancedStepHue"
-    arguments:
-      values:
-        - name: "StepMode"
+    - label: "Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000
+      response:
           value: 1
-        - name: "StepSize"
-          value: StepSizeConfigValue
-        - name: "TransitionTime"
-          value: 10
-        - name: "OptionsMask"
+
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F01 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
           value: 0
-        - name: "OptionsOverride"
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.F01 && CC.S.A4000
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "TH sends EnhancedStepHue command to DUT with StepMode Up"
+      PICS: CC.S.F01 && CC.S.C42.Rsp
+      command: "EnhancedStepHue"
+      arguments:
+          values:
+              - name: "StepMode"
+                value: 0
+              - name: "StepSize"
+                value: StepSizeConfigValue
+              - name: "TransitionTime"
+                value: 10
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C42.Rsp
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "TH sends EnhancedStepHue command to DUT with StepMode Down"
+      PICS: CC.S.F01 && CC.S.C42.Rsp
+      command: "EnhancedStepHue"
+      arguments:
+          values:
+              - name: "StepMode"
+                value: 1
+              - name: "StepSize"
+                value: StepSizeConfigValue
+              - name: "TransitionTime"
+                value: 10
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C42.Rsp
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Turn off light that we turned on"
+      PICS: OO.S.C00.Rsp
+      cluster: "On/Off"
+      command: "off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000
+      response:
           value: 0
-
-  - label: "Wait 1000ms"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 1000
-
-  - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
-    command: "readAttribute"
-    PICS: CC.S.F01 && CC.S.A4000 && CC.S.C42.Rsp
-    attribute: "EnhancedCurrentHue"
-    response:
-      constraints:
-        type: int16u
-        minValue: 0
-        maxValue: 65535
-
-  - label: "Turn off light that we turned on"
-    PICS: OO.S.C00.Rsp
-    cluster: "On/Off"
-    command: "off"
-
-  - label: "Check on/off attribute value is false after off command"
-    cluster: "On/Off"
-    command: "readAttribute"
-    attribute: "OnOff"
-    PICS: OO.S.A0000
-    response:
-      value: 0

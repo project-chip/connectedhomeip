@@ -16,16 +16,16 @@
 name: 29.1.1. [TC-BDX-1.1] Sender Initiated BDX Transfer session
 
 PICS:
-  - MCORE.BDX.Sender
-  - MCORE.BDX.Initiator
+    - MCORE.BDX.Sender
+    - MCORE.BDX.Initiator
 
 config:
-  nodeId: 0x12344321
-  cluster: "Basic"
-  endpoint: 0
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
 
 tests:
-  - label: "DUT sends a SendInit message to TH"
-    verification: |
-      Verify that the SendInit message has the following mandatory fields Proposed Transfer Control - At least one of the PTC[RECEIVER_DRIVE] or PTC[SENDER_DRIVE] field bits shall be set. Range Control Proposed Max Block Size Start Offset - Optional Proposed Max Length - Optional File Designator Length File Designator Metadata - Optional
-    disabled: true
+    - label: "DUT sends a SendInit message to TH"
+      verification: |
+          Verify that the SendInit message has the following mandatory fields Proposed Transfer Control - At least one of the PTC[RECEIVER_DRIVE] or PTC[SENDER_DRIVE] field bits shall be set. Range Control Proposed Max Block Size Start Offset - Optional Proposed Max Length - Optional File Designator Length File Designator Metadata - Optional
+      disabled: true

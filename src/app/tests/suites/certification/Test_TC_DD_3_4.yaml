@@ -16,78 +16,80 @@
 name: 3.3.4. [TC-DD-3.4] User Directed Commissioning [DUT - Commissioner]
 
 PICS:
-  - MCORE.ROLE.COMMISSIONER
-  - MCORE.DD.UI
-  - MCORE.DD.COMM_DISCOVERY
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.UI
+    - MCORE.DD.COMM_DISCOVERY
 
 config:
-  nodeId: 0x12344321
-  cluster: "Basic"
-  endpoint: 0
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
 
 tests:
-  - label: "DUT is instructed to advertise Commissioner Discovery service"
-    verification: |
-      ubuntu@ubuntu:~/may23_DUT/connectedhomeip/examples/tv-app/linux/out/tv-app$ sudo ./chip-tv-app
+    - label: "DUT is instructed to advertise Commissioner Discovery service"
+      verification: |
+          ubuntu@ubuntu:~/may23_DUT/connectedhomeip/examples/tv-app/linux/out/tv-app$ sudo ./chip-tv-app
 
-      Verify in tv-app side:
+          Verify in tv-app side:
 
-      CHIP:DL: Using wifi MAC for hostname
-      CHIP:DIS: Advertise operational node DFC28FF9FE811EF2-FFFFFFEFFFFFFFFF
-      CHIP:DIS: CHIP minimal mDNS configured as "Operational device".
-      CHIP:DIS: Broadcasting mDns reply for query from
-    disabled: true
+          CHIP:DL: Using wifi MAC for hostname
+          CHIP:DIS: Advertise operational node DFC28FF9FE811EF2-FFFFFFEFFFFFFFFF
+          CHIP:DIS: CHIP minimal mDNS configured as "Operational device".
+          CHIP:DIS: Broadcasting mDns reply for query from
+      disabled: true
 
-  - label: "TH starts scanning for available commissioners using Commissioner
-      Discovery"
-    verification: |
-      ubuntu@ubuntu:~/may23_cntrl/connectedhomeip/examples/chip-tool/out/debug$  avahi-browse -rt _matterd._udp
+    - label:
+          "TH starts scanning for available commissioners using Commissioner
+          Discovery"
+      verification: |
+          ubuntu@ubuntu:~/may23_cntrl/connectedhomeip/examples/chip-tool/out/debug$  avahi-browse -rt _matterd._udp
 
-      +   eth0 IPv6 A0BF4D00BE973DEC                              _matterd._udp        local
-      +   eth0 IPv6 252FB62C79E2724B                              _matterd._udp        local
-      =   eth0 IPv6 A0BF4D00BE973DEC                              _matterd._udp        local
-         hostname = [E45F010F27530000.local]
-         address = [fe80::e65f:1ff:fe0f:2755]
-         port = [5650]
-         txt = ["T=1" "SAI=300" "SII=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
-      =   eth0 IPv6 252FB62C79E2724B                              _matterd._udp        local
-         hostname = [E45F010F27530000.local]
-         address = [fe80::e65f:1ff:fe0f:2755]
-         port = [5650]
-         txt = ["T=1" "SAI=300" "SII=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
-    disabled: true
+          +   eth0 IPv6 A0BF4D00BE973DEC                              _matterd._udp        local
+          +   eth0 IPv6 252FB62C79E2724B                              _matterd._udp        local
+          =   eth0 IPv6 A0BF4D00BE973DEC                              _matterd._udp        local
+             hostname = [E45F010F27530000.local]
+             address = [fe80::e65f:1ff:fe0f:2755]
+             port = [5650]
+             txt = ["T=1" "SAI=300" "SII=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
+          =   eth0 IPv6 252FB62C79E2724B                              _matterd._udp        local
+             hostname = [E45F010F27530000.local]
+             address = [fe80::e65f:1ff:fe0f:2755]
+             port = [5650]
+             txt = ["T=1" "SAI=300" "SII=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
+      disabled: true
 
-  - label: "TH is instructed to start the commissioning procedure with the DUT
-      found at Step 2"
-    verification: |
-      Out of scope for V1.0 - IDM functionality
+    - label:
+          "TH is instructed to start the commissioning procedure with the DUT
+          found at Step 2"
+      verification: |
+          Out of scope for V1.0 - IDM functionality
 
-      https://github.com/project-chip/connectedhomeip/issues/11004
-    disabled: true
+          https://github.com/project-chip/connectedhomeip/issues/11004
+      disabled: true
 
-  - label: "DUT verifies the Identification Declaration message"
-    verification: |
-      Out of scope for V1.0 - IDM functionality
+    - label: "DUT verifies the Identification Declaration message"
+      verification: |
+          Out of scope for V1.0 - IDM functionality
 
-      https://github.com/project-chip/connectedhomeip/issues/11004
-    disabled: true
+          https://github.com/project-chip/connectedhomeip/issues/11004
+      disabled: true
 
-  - label: "By any means, DUT prompts user for onboarding payload"
-    verification: |
-      verification step to be updated.
-    disabled: true
+    - label: "By any means, DUT prompts user for onboarding payload"
+      verification: |
+          verification step to be updated.
+      disabled: true
 
-  - label: "DUT starts the commissioning procedure with TH"
-    verification: |
-      ./chip-tool pairing ethernet 1 20202021 3840   fe80::e65f:1ff:fe0f:2755  5640
+    - label: "DUT starts the commissioning procedure with TH"
+      verification: |
+          ./chip-tool pairing ethernet 1 20202021 3840   fe80::e65f:1ff:fe0f:2755  5640
 
-      Verify in DUT as  commissioner side Log:
+          Verify in DUT as  commissioner side Log:
 
-      [1653559159.021348][4240:4246] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
-      [1653559159.021432][4240:4246] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-      [1653559159.021499][4240:4246] CHIP:CTL: Successfully finished commissioning step "SendComplete"
-      [1653559159.021554][4240:4246] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
-      [1653559159.021611][4240:4246] CHIP:CTL: Performing next commissioning step "Cleanup"
-      [1653559159.021725][4240:4246] CHIP:CTL: Successfully finished commissioning step "Cleanup"
-      [1653559159.021790][4240:4246] CHIP:TOO: Device commissioning completed with success
-    disabled: true
+          [1653559159.021348][4240:4246] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1653559159.021432][4240:4246] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          [1653559159.021499][4240:4246] CHIP:CTL: Successfully finished commissioning step "SendComplete"
+          [1653559159.021554][4240:4246] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1653559159.021611][4240:4246] CHIP:CTL: Performing next commissioning step "Cleanup"
+          [1653559159.021725][4240:4246] CHIP:CTL: Successfully finished commissioning step "Cleanup"
+          [1653559159.021790][4240:4246] CHIP:TOO: Device commissioning completed with success
+      disabled: true

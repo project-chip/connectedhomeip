@@ -12,316 +12,319 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 27.2.21. [TC-CC-9.2] ColorLoopSet Validation - change direction without stop
+name:
+    27.2.21. [TC-CC-9.2] ColorLoopSet Validation - change direction without stop
 
 PICS:
-  - CC.S
+    - CC.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Color Control"
-  endpoint: 1
-  timeout: 400
+    nodeId: 0x12344321
+    cluster: "Color Control"
+    endpoint: 1
+    timeout: 400
 
 tests:
-  - label: "Wait for the commissioned device to be retrieved"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "Precondition: Turn on light for color control tests"
-    PICS: OO.S.C01.Rsp
-    cluster: "On/Off"
-    command: "on"
+    - label: "Precondition: Turn on light for color control tests"
+      PICS: OO.S.C01.Rsp
+      cluster: "On/Off"
+      command: "on"
 
-  - label: "Precondition: Check on/off attribute value is true after on command"
-    cluster: "On/Off"
-    command: "readAttribute"
-    attribute: "OnOff"
-    PICS: OO.S.A0000
-    response:
-      value: 1
+    - label:
+          "Precondition: Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000
+      response:
+          value: 1
 
-  - label: "Precondition : Set DUT EnhancedCurrentHue to 0x4000 using
-      EnhancedMoveToHue command"
-    command: "EnhancedMoveToHue"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.C40.Rsp
-    arguments:
-      values:
-        - name: "enhancedHue"
-          value: 16384
-        - name: "direction"
-          value: 0
-        - name: "transitionTime"
-          value: 0
-        - name: "optionsMask"
-          value: 0
-        - name: "optionsOverride"
+    - label:
+          "Precondition : Set DUT EnhancedCurrentHue to 0x4000 using
+          EnhancedMoveToHue command"
+      command: "EnhancedMoveToHue"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.C40.Rsp
+      arguments:
+          values:
+              - name: "enhancedHue"
+                value: 16384
+              - name: "direction"
+                value: 0
+              - name: "transitionTime"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Wait for 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.A000f && CC.S.F02 && CC.S.F01
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
           value: 0
 
-  - label: "Wait for 1000ms"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 1000
+    - label: "Sends ColorLoopSet Command - Set all Attributes"
+      command: "ColorLoopSet"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
+      arguments:
+          values:
+              - name: "updateFlags"
+                value: 15
+              - name: "action"
+                value: 0
+              - name: "direction"
+                value: 0
+              - name: "time"
+                value: 30
+              - name: "startHue"
+                value: 160
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
 
-  - label: "TH writes 0 to the Options attribute"
-    PICS: CC.S.A000f && CC.S.F02 && CC.S.F01
-    command: "writeAttribute"
-    attribute: "Options"
-    arguments:
-      value: 0
+    - label: "Read ColorLoopActive attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4002 && CC.S.C44.Rsp
+      response:
+          value: 0
 
-  - label: "Sends ColorLoopSet Command - Set all Attributes"
-    command: "ColorLoopSet"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
-    arguments:
-      values:
-        - name: "updateFlags"
-          value: 15
-        - name: "action"
+    - label: "Read ColorLoopDirection attribute from DUT."
+      command: "readAttribute"
+      attribute: "ColorLoopDirection"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4003 && CC.S.C44.Rsp
+      response:
           value: 0
-        - name: "direction"
-          value: 0
-        - name: "time"
+
+    - label: "Read ColorLoopTime attribute from DUT."
+      command: "readAttribute"
+      attribute: "ColorLoopTime"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4004 && CC.S.C44.Rsp
+      response:
           value: 30
-        - name: "startHue"
+
+    - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4005 && CC.S.C44.Rsp
+      response:
           value: 160
-        - name: "optionsMask"
-          value: 0
-        - name: "optionsOverride"
-          value: 0
 
-  - label: "Read ColorLoopActive attribute from DUT"
-    command: "readAttribute"
-    attribute: "ColorLoopActive"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4002 && CC.S.C44.Rsp
-    response:
-      value: 0
+    - label: "Color Loop Set Command - Set all Attributes"
+      command: "ColorLoopSet"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
+      arguments:
+          values:
+              - name: "updateFlags"
+                value: 1
+              - name: "action"
+                value: 1
+              - name: "direction"
+                value: 0
+              - name: "time"
+                value: 0
+              - name: "startHue"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
 
-  - label: "Read ColorLoopDirection attribute from DUT."
-    command: "readAttribute"
-    attribute: "ColorLoopDirection"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4003 && CC.S.C44.Rsp
-    response:
-      value: 0
-
-  - label: "Read ColorLoopTime attribute from DUT."
-    command: "readAttribute"
-    attribute: "ColorLoopTime"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4004 && CC.S.C44.Rsp
-    response:
-      value: 30
-
-  - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
-    command: "readAttribute"
-    attribute: "ColorLoopStartEnhancedHue"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4005 && CC.S.C44.Rsp
-    response:
-      value: 160
-
-  - label: "Color Loop Set Command - Set all Attributes"
-    command: "ColorLoopSet"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
-    arguments:
-      values:
-        - name: "updateFlags"
+    - label: "Read ColorLoopActive attribute from DUT."
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4002 && CC.S.C44.Rsp
+      response:
           value: 1
-        - name: "action"
+
+    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "ColorLoopStoredEnhancedHue"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4006 && CC.S.C40.Rsp
+      response:
+          value: 16384
+
+    - label: "Wait for 30S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 30000
+
+    - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4005 && CC.S.C44.Rsp
+      response:
+          saveAs: ColorLoopStartEnhancedHueValue
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueValue
+              maxValue: 65535
+
+    - label: "Wait for 30S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 30000
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueValue
+              maxValue: 65535
+
+    - label: "Color Loop Set Command - Start Color Loop"
+      command: "ColorLoopSet"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
+      arguments:
+          values:
+              - name: "updateFlags"
+                value: 2
+              - name: "action"
+                value: 0
+              - name: "direction"
+                value: 1
+              - name: "time"
+                value: 0
+              - name: "startHue"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopDirection attribute from DUT."
+      command: "readAttribute"
+      attribute: "ColorLoopDirection"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4003 && CC.S.C44.Rsp
+      response:
           value: 1
-        - name: "direction"
-          value: 0
-        - name: "time"
-          value: 0
-        - name: "startHue"
-          value: 0
-        - name: "optionsMask"
-          value: 0
-        - name: "optionsOverride"
-          value: 0
 
-  - label: "Read ColorLoopActive attribute from DUT."
-    command: "readAttribute"
-    attribute: "ColorLoopActive"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4002 && CC.S.C44.Rsp
-    response:
-      value: 1
+    - label: "Wait for 30S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 30000
 
-  - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
-    command: "readAttribute"
-    attribute: "ColorLoopStoredEnhancedHue"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4006 && CC.S.C40.Rsp
-    response:
-      value: 16384
+    - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4005 && CC.S.C44.Rsp
+      response:
+          saveAs: ColorLoopStartEnhancedHue
 
-  - label: "Wait for 30S"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 30000
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHue
+              maxValue: 65535
 
-  - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
-    command: "readAttribute"
-    attribute: "ColorLoopStartEnhancedHue"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4005 && CC.S.C44.Rsp
-    response:
-      saveAs: ColorLoopStartEnhancedHueValue
+    - label: "Wait for 30S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 30000
 
-  - label: "Read EnhancedCurrentHue attribute from DUT"
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
-    response:
-      constraints:
-        type: int16u
-        minValue: ColorLoopStartEnhancedHueValue
-        maxValue: 65535
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHue
+              maxValue: 65535
 
-  - label: "Wait for 30S"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 30000
+    - label: "Color Loop Set Command - Start Color Loop"
+      command: "ColorLoopSet"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
+      arguments:
+          values:
+              - name: "updateFlags"
+                value: 1
+              - name: "action"
+                value: 0
+              - name: "direction"
+                value: 0
+              - name: "time"
+                value: 0
+              - name: "startHue"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
 
-  - label: "Read EnhancedCurrentHue attribute from DUT"
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
-    response:
-      constraints:
-        type: int16u
-        minValue: ColorLoopStartEnhancedHueValue
-        maxValue: 65535
-
-  - label: "Color Loop Set Command - Start Color Loop"
-    command: "ColorLoopSet"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
-    arguments:
-      values:
-        - name: "updateFlags"
-          value: 2
-        - name: "action"
-          value: 0
-        - name: "direction"
-          value: 1
-        - name: "time"
-          value: 0
-        - name: "startHue"
-          value: 0
-        - name: "optionsMask"
-          value: 0
-        - name: "optionsOverride"
+    - label: "Read ColorLoopActive attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4002 && CC.S.C44.Rsp
+      response:
           value: 0
 
-  - label: "Read ColorLoopDirection attribute from DUT."
-    command: "readAttribute"
-    attribute: "ColorLoopDirection"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4003 && CC.S.C44.Rsp
-    response:
-      value: 1
+    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4006 && CC.S.C44.Rsp
+      attribute: "ColorLoopStoredEnhancedHue"
+      response:
+          saveAs: ColorLoopStoredEnhancedHueValue
 
-  - label: "Wait for 30S"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 30000
+    - label: "Read EnhancedCurrentHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
+      response:
+          value: ColorLoopStoredEnhancedHueValue
 
-  - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
-    command: "readAttribute"
-    attribute: "ColorLoopStartEnhancedHue"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4005 && CC.S.C44.Rsp
-    response:
-      saveAs: ColorLoopStartEnhancedHue
+    - label: "Turn off light for color control tests"
+      PICS: OO.S.C00.Rsp
+      cluster: "On/Off"
+      command: "off"
 
-  - label: "Read EnhancedCurrentHue attribute from DUT"
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
-    response:
-      constraints:
-        type: int16u
-        minValue: ColorLoopStartEnhancedHue
-        maxValue: 65535
-
-  - label: "Wait for 30S"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 30000
-
-  - label: "Read EnhancedCurrentHue attribute from DUT"
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
-    response:
-      constraints:
-        type: int16u
-        minValue: ColorLoopStartEnhancedHue
-        maxValue: 65535
-
-  - label: "Color Loop Set Command - Start Color Loop"
-    command: "ColorLoopSet"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
-    arguments:
-      values:
-        - name: "updateFlags"
-          value: 1
-        - name: "action"
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000
+      response:
           value: 0
-        - name: "direction"
-          value: 0
-        - name: "time"
-          value: 0
-        - name: "startHue"
-          value: 0
-        - name: "optionsMask"
-          value: 0
-        - name: "optionsOverride"
-          value: 0
-
-  - label: "Read ColorLoopActive attribute from DUT"
-    command: "readAttribute"
-    attribute: "ColorLoopActive"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4002 && CC.S.C44.Rsp
-    response:
-      value: 0
-
-  - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
-    command: "readAttribute"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4006 && CC.S.C44.Rsp
-    attribute: "ColorLoopStoredEnhancedHue"
-    response:
-      saveAs: ColorLoopStoredEnhancedHueValue
-
-  - label: "Read EnhancedCurrentHue attribute from DUT."
-    command: "readAttribute"
-    attribute: "EnhancedCurrentHue"
-    PICS: CC.S.F01 && CC.S.F02 && CC.S.A4000 && CC.S.C44.Rsp
-    response:
-      value: ColorLoopStoredEnhancedHueValue
-
-  - label: "Turn off light for color control tests"
-    PICS: OO.S.C00.Rsp
-    cluster: "On/Off"
-    command: "off"
-
-  - label: "Check on/off attribute value is false after off command"
-    cluster: "On/Off"
-    command: "readAttribute"
-    attribute: "OnOff"
-    PICS: OO.S.A0000
-    response:
-      value: 0

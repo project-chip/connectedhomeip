@@ -15,83 +15,84 @@
 name: 77.1.1. [TC-ACT-1.1] Global attributes with server as DUT
 
 PICS:
-  - ACT.S
+    - ACT.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Bridged Actions"
-  endpoint: 1
+    nodeId: 0x12344321
+    cluster: "Bridged Actions"
+    endpoint: 1
 
 tests:
-  - label: "Wait for the commissioned device to be retrieved"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "Read the global attribute: ClusterRevision"
-    command: "readAttribute"
-    attribute: "ClusterRevision"
-    response:
-      value: 1
-      constraints:
-        type: int16u
+    - label: "Read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
-  - label: "Read the global attribute: FeatureMap"
-    command: "readAttribute"
-    attribute: "FeatureMap"
-    response:
-      value: 0
-      constraints:
-        type: bitmap32
+    - label: "Read the global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
 
-  - label: "Read the global attribute: AttributeList"
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [0, 1]
+    - label: "Read the global attribute: AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1]
 
-  - label: "Read the optional attribute(SetupURL) in AttributeList"
-    PICS: ACT.S.A0002
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [0, 1, 2]
+    - label: "Read the optional attribute(SetupURL) in AttributeList"
+      PICS: ACT.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2]
 
-  # Checking only type check all attributes are optional
-  - label: "Read the global attribute: AcceptedCommandList"
-    command: "readAttribute"
-    attribute: "AcceptedCommandList"
-    response:
-      constraints:
-        type: list
-        maxLength: 11
+    # Checking only type check all attributes are optional
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              maxLength: 11
 
-  - label: "Read the global attribute: GeneratedCommandList"
-    command: "readAttribute"
-    attribute: "GeneratedCommandList"
-    response:
-      value: []
-      constraints:
-        type: list
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-  #issue #15011
-  - label: "Read EventList attribute from the DUT and Verify that the DUT
-      response provides a list of supported events."
-    verification: |
-      Not implemented in chip-tool
-    cluster: "LogCommands"
-    command: "UserPrompt"
-    PICS: PICS_USER_PROMPT
-    arguments:
-      values:
-        - name: "message"
-          value: "Please enter 'y' for success"
-        - name: "expectedValue"
-          value: "y"
+    #issue #15011
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

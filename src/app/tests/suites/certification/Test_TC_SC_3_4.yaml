@@ -16,100 +16,115 @@
 name: 14.3.4. [TC-SC-3.4] CASE Error Handling [DUT - Responder]
 
 PICS:
-  - MCORE.ROLE.COMMISSIONEE
+    - MCORE.ROLE.COMMISSIONEE
 
 config:
-  nodeId: 0x12344321
-  cluster: "Basic"
-  endpoint: 0
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
 
 tests:
-  - label: "TH constructs and sends a Sigma1 message with a resumptionID and no
-      initiatorResumeMIC to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a Sigma1 message with a resumptionID and no
+          initiatorResumeMIC to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
 
-  - label: "TH constructs and sends a Sigma1 message with a initiatorResumeMIC
-      and no resumptionID to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a Sigma1 message with a initiatorResumeMIC
+          and no resumptionID to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
 
-  - label: "TH constructs and sends a Sigma1 message with an invalid
-      destinationId to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a Sigma1 message with an invalid
+          destinationId to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
 
-  - label: "TH constructs and sends a properly formatted and encoded Sigma1
-      message to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a properly formatted and encoded Sigma1
+          message to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
 
-  - label: "TH constructs and sends a Sigma3 message with improperly generated
-      encrypted integrity data (TBEData3Encrypted) to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a Sigma3 message with improperly generated
+          encrypted integrity data (TBEData3Encrypted) to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
 
-  - label: "TH constructs and sends a properly formatted and encoded Sigma1
-      message to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a properly formatted and encoded Sigma1
+          message to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
 
-  - label: "TH constructs and sends a Sigma3 message with invalid initiatorNOC
-      data to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a Sigma3 message with invalid initiatorNOC
+          data to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
 
-  - label: "TH constructs and sends a properly formatted and encoded Sigma1
-      message to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a properly formatted and encoded Sigma1
+          message to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
 
-  - label: "TH constructs and sends a Sigma3 message with invalid signature data
-      to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a Sigma3 message with invalid signature data
+          to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
 
-  - label: "TH constructs and sends a properly formatted and encoded Sigma1
-      message to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a properly formatted and encoded Sigma1
+          message to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
 
-  - label: "TH constructs and sends a Sigma3 message with invalid initiatorICAC
-      to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a Sigma3 message with invalid initiatorICAC
+          to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
 
-  - label: "TH constructs and sends a properly formatted and encoded Sigma1
-      message to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a properly formatted and encoded Sigma1
+          message to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
 
-  - label: "TH constructs and sends a Sigma3 message with invalid
-      initiatorEphPubKey to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a Sigma3 message with invalid
+          initiatorEphPubKey to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
 
-  - label: "TH constructs and sends a properly formatted and encoded Sigma1
-      message to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a properly formatted and encoded Sigma1
+          message to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
 
-  - label: "TH constructs and sends a Sigma3 message with invalid
-      responderEphPubKey to DUT"
-    verification: |
-      Verify that the DUT receives the message.
-    disabled: true
+    - label:
+          "TH constructs and sends a Sigma3 message with invalid
+          responderEphPubKey to DUT"
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true

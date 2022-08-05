@@ -13,42 +13,53 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 92.4. [TC-ULABEL-2.3] User Label cluster constraint_error verification
-  [DUT-server]
+name:
+    92.4. [TC-ULABEL-2.3] User Label cluster constraint_error verification
+    [DUT-server]
 
 PICS:
-  - ULABEL.S
+    - ULABEL.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "User Label"
-  endpoint: 1
+    nodeId: 0x12344321
+    cluster: "User Label"
+    endpoint: 1
 
 tests:
-  - label: "Wait for the commissioned device to be retrieved"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "TH writes LabelList attribute of the DUT"
-    PICS: ULABEL.S.A0000
-    command: "writeAttribute"
-    attribute: "label list"
-    arguments:
-      value:
-        [{ label: "room", value: "17_bytesIsTooLongforuserlabelnotexpected" }]
-    response:
-      error: CONSTRAINT_ERROR
+    - label: "TH writes LabelList attribute of the DUT"
+      PICS: ULABEL.S.A0000
+      command: "writeAttribute"
+      attribute: "label list"
+      arguments:
+          value:
+              [
+                  {
+                      label: "room",
+                      value: "17_bytesIsTooLongforuserlabelnotexpected",
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
 
-  - label: "TH writes LabelList attribute of the DUT"
-    PICS: ULABEL.S.A0000
-    command: "writeAttribute"
-    attribute: "label list"
-    arguments:
-      value:
-        [{ label: "17_bytesIsTooLongforuserlabelnotexpected", value: "foobar" }]
-    response:
-      error: CONSTRAINT_ERROR
+    - label: "TH writes LabelList attribute of the DUT"
+      PICS: ULABEL.S.A0000
+      command: "writeAttribute"
+      attribute: "label list"
+      arguments:
+          value:
+              [
+                  {
+                      label: "17_bytesIsTooLongforuserlabelnotexpected",
+                      value: "foobar",
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR

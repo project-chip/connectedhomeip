@@ -16,89 +16,89 @@
 name: 3.1.1. [TC-DGWIFI-1.1] Global Attributes [DUT as Server]
 
 PICS:
-  - DGWIFI.S
+    - DGWIFI.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Basic"
-  endpoint: 0
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
 
 tests:
-  - label: "Commission DUT to TH"
-    verification: |
-      ./chip-tool pairing ble-wifi NODEID SSID PASSWD 20202021 3840 (commissioner side)
-    disabled: true
+    - label: "Commission DUT to TH"
+      verification: |
+          ./chip-tool pairing ble-wifi NODEID SSID PASSWD 20202021 3840 (commissioner side)
+      disabled: true
 
-  - label: "TH reads the ClusterRevision from DUT"
-    verification: |
-      ./chip-tool wifinetworkdiagnostics read cluster-revision 1 0
+    - label: "TH reads the ClusterRevision from DUT"
+      verification: |
+          ./chip-tool wifinetworkdiagnostics read cluster-revision 1 0
 
-      On TH, verify that DUT sends ClusterRevision attribute  value as 1
+          On TH, verify that DUT sends ClusterRevision attribute  value as 1
 
-      [1651834623.658618][3910:3916] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFFD DataVersion: 2858283115
-      [1651834623.658776][3910:3916] CHIP:TOO:   ClusterRevision: 1
-    disabled: true
+          [1651834623.658618][3910:3916] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFFD DataVersion: 2858283115
+          [1651834623.658776][3910:3916] CHIP:TOO:   ClusterRevision: 1
+      disabled: true
 
-  - label: "TH reads the FeatureMap from DUT"
-    verification: |
-      ./chip-tool wifinetworkdiagnostics read feature-map 1 0
+    - label: "TH reads the FeatureMap from DUT"
+      verification: |
+          ./chip-tool wifinetworkdiagnostics read feature-map 1 0
 
-      On TH, verify that DUT sends  FeatureMap attribute value as 0
+          On TH, verify that DUT sends  FeatureMap attribute value as 0
 
-      [1651834671.432383][3919:3924] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFFC DataVersion: 2858283115
-      [1651834671.432466][3919:3924] CHIP:TOO:   FeatureMap: 3
-    disabled: true
+          [1651834671.432383][3919:3924] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFFC DataVersion: 2858283115
+          [1651834671.432466][3919:3924] CHIP:TOO:   FeatureMap: 3
+      disabled: true
 
-  - label: "TH reads AttribubteList from DUT"
-    verification: |
-      ./chip-tool wifinetworkdiagnostics read attribute-list 1 0
+    - label: "TH reads AttribubteList from DUT"
+      verification: |
+          ./chip-tool wifinetworkdiagnostics read attribute-list 1 0
 
-      On TH, verify that DUT  sends a list of supported attributes
+          On TH, verify that DUT  sends a list of supported attributes
 
-      [1651834734.844051][3928:3933] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFFB DataVersion: 2858283115
-      [1651834734.844159][3928:3933] CHIP:TOO:   AttributeList: 18 entries
-      [1651834734.844193][3928:3933] CHIP:TOO:     [1]: 0
-      [1651834734.844218][3928:3933] CHIP:TOO:     [2]: 1
-      [1651834734.844240][3928:3933] CHIP:TOO:     [3]: 2
-      [1651834734.844264][3928:3933] CHIP:TOO:     [4]: 3
-      [1651834734.844287][3928:3933] CHIP:TOO:     [5]: 4
-      [1651834734.844311][3928:3933] CHIP:TOO:     [6]: 5
-      [1651834734.844335][3928:3933] CHIP:TOO:     [7]: 6
-      [1651834734.844358][3928:3933] CHIP:TOO:     [8]: 7
-      [1651834734.844382][3928:3933] CHIP:TOO:     [9]: 8
-      [1651834734.844403][3928:3933] CHIP:TOO:     [10]: 9
-      [1651834734.844427][3928:3933] CHIP:TOO:     [11]: 10
-      [1651834734.844451][3928:3933] CHIP:TOO:     [12]: 11
-      [1651834734.844475][3928:3933] CHIP:TOO:     [13]: 12
-      [1651834734.844499][3928:3933] CHIP:TOO:     [14]: 65528
-      [1651834734.844523][3928:3933] CHIP:TOO:     [15]: 65529
-      [1651834734.844548][3928:3933] CHIP:TOO:     [16]: 65531
-      [1651834734.844571][3928:3933] CHIP:TOO:     [17]: 65532
-      [1651834734.844596][3928:3933] CHIP:TOO:     [18]: 65533
-    disabled: true
+          [1651834734.844051][3928:3933] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFFB DataVersion: 2858283115
+          [1651834734.844159][3928:3933] CHIP:TOO:   AttributeList: 18 entries
+          [1651834734.844193][3928:3933] CHIP:TOO:     [1]: 0
+          [1651834734.844218][3928:3933] CHIP:TOO:     [2]: 1
+          [1651834734.844240][3928:3933] CHIP:TOO:     [3]: 2
+          [1651834734.844264][3928:3933] CHIP:TOO:     [4]: 3
+          [1651834734.844287][3928:3933] CHIP:TOO:     [5]: 4
+          [1651834734.844311][3928:3933] CHIP:TOO:     [6]: 5
+          [1651834734.844335][3928:3933] CHIP:TOO:     [7]: 6
+          [1651834734.844358][3928:3933] CHIP:TOO:     [8]: 7
+          [1651834734.844382][3928:3933] CHIP:TOO:     [9]: 8
+          [1651834734.844403][3928:3933] CHIP:TOO:     [10]: 9
+          [1651834734.844427][3928:3933] CHIP:TOO:     [11]: 10
+          [1651834734.844451][3928:3933] CHIP:TOO:     [12]: 11
+          [1651834734.844475][3928:3933] CHIP:TOO:     [13]: 12
+          [1651834734.844499][3928:3933] CHIP:TOO:     [14]: 65528
+          [1651834734.844523][3928:3933] CHIP:TOO:     [15]: 65529
+          [1651834734.844548][3928:3933] CHIP:TOO:     [16]: 65531
+          [1651834734.844571][3928:3933] CHIP:TOO:     [17]: 65532
+          [1651834734.844596][3928:3933] CHIP:TOO:     [18]: 65533
+      disabled: true
 
-  - label: "TH reads AcceptedCommandList from DUT"
-    verification: |
-      ./chip-tool wifinetworkdiagnostics read accepted-command-list 1 0
+    - label: "TH reads AcceptedCommandList from DUT"
+      verification: |
+          ./chip-tool wifinetworkdiagnostics read accepted-command-list 1 0
 
-      On TH, verify that DUT  responds as list of Accepted Command as 1 entries.
+          On TH, verify that DUT  responds as list of Accepted Command as 1 entries.
 
-      [1651788161.332422][241228:241233] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFF9 DataVersion: 3097381936
-      [1651788161.332475][241228:241233] CHIP:TOO:   AcceptedCommandList: 1 entries
-      [1651788161.332500][241228:241233] CHIP:TOO:     [1]: 0
-    disabled: true
+          [1651788161.332422][241228:241233] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFF9 DataVersion: 3097381936
+          [1651788161.332475][241228:241233] CHIP:TOO:   AcceptedCommandList: 1 entries
+          [1651788161.332500][241228:241233] CHIP:TOO:     [1]: 0
+      disabled: true
 
-  - label: "TH reads GeneratedCommandList from DUT"
-    verification: |
-      ./chip-tool wifinetworkdiagnostics read generated-command-list 1 0
+    - label: "TH reads GeneratedCommandList from DUT"
+      verification: |
+          ./chip-tool wifinetworkdiagnostics read generated-command-list 1 0
 
-      On TH, verify that DUT  responds as list of GeneratedCommandList as 0 entries.
+          On TH, verify that DUT  responds as list of GeneratedCommandList as 0 entries.
 
-      [1651788208.608429][241239:241244] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFF8 DataVersion: 3097381936
-      [1651788208.608490][241239:241244] CHIP:TOO:   GeneratedCommandList: 0 entries
-    disabled: true
+          [1651788208.608429][241239:241244] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFF8 DataVersion: 3097381936
+          [1651788208.608490][241239:241244] CHIP:TOO:   GeneratedCommandList: 0 entries
+      disabled: true
 
-  - label: "TH reads EventList from DUT"
-    verification: |
-      (Out of scope for v1.0)
-    disabled: true
+    - label: "TH reads EventList from DUT"
+      verification: |
+          (Out of scope for v1.0)
+      disabled: true

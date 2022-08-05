@@ -15,139 +15,141 @@
 name: 74.1.1. [TC-SWTCH-1.1] Global attributes with server as DUT
 
 PICS:
-  - SWTCH.S
+    - SWTCH.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Switch"
-  endpoint: 1
+    nodeId: 0x12344321
+    cluster: "Switch"
+    endpoint: 1
 
 tests:
-  - label: "Wait for the commissioned device to be retrieved"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "Read the global attribute: FeatureMap"
-    command: "readAttribute"
-    attribute: "FeatureMap"
-    response:
-      saveAs: FeatureMapValue
+    - label: "Read the global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          saveAs: FeatureMapValue
 
-  - label: "Read the FeatureMap value and verify LS is set to 1; MS, MSR, MSL,
-      MSM are all set to 0"
-    PICS: SWTCH.S.F00
-    command: "readAttribute"
-    attribute: "FeatureMap"
-    response:
-      value: FeatureMapValue
+    - label:
+          "Read the FeatureMap value and verify LS is set to 1; MS, MSR, MSL,
+          MSM are all set to 0"
+      PICS: SWTCH.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: FeatureMapValue
 
-  - label: "Check values of flags in this FeatureMap"
-    verification: |
-      LS is set to 0; MS is set to 1
-    cluster: "LogCommands"
-    command: "UserPrompt"
-    PICS: PICS_USER_PROMPT && SWTCH.S.F01
-    arguments:
-      values:
-        - name: "message"
-          value: "Please enter 'y' for success"
-        - name: "expectedValue"
-          value: "y"
+    - label: "Check values of flags in this FeatureMap"
+      verification: |
+          LS is set to 0; MS is set to 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && SWTCH.S.F01
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-  - label: "Check values of flags in this FeatureMap"
-    verification: |
-      LS is set to 0; MS, MSR are set to 1
-    cluster: "LogCommands"
-    command: "UserPrompt"
-    PICS: PICS_USER_PROMPT && SWTCH.S.F02
-    arguments:
-      values:
-        - name: "message"
-          value: "Please enter 'y' for success"
-        - name: "expectedValue"
-          value: "y"
+    - label: "Check values of flags in this FeatureMap"
+      verification: |
+          LS is set to 0; MS, MSR are set to 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && SWTCH.S.F02
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-  - label: "Check values of flags in this FeatureMap"
-    verification: |
-      LS is set to 0; MS, MSR, MSL are all set to 1
-    cluster: "LogCommands"
-    command: "UserPrompt"
-    PICS: PICS_USER_PROMPT && SWTCH.S.F03
-    arguments:
-      values:
-        - name: "message"
-          value: "Please enter 'y' for success"
-        - name: "expectedValue"
-          value: "y"
+    - label: "Check values of flags in this FeatureMap"
+      verification: |
+          LS is set to 0; MS, MSR, MSL are all set to 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && SWTCH.S.F03
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-  - label: "Check values of flags in this FeatureMap"
-    verification: |
-      LS is set to 0; MS, MSR, MSM are all set to 1
-    cluster: "LogCommands"
-    command: "UserPrompt"
-    PICS: PICS_USER_PROMPT && SWTCH.S.F04
-    arguments:
-      values:
-        - name: "message"
-          value: "Please enter 'y' for success"
-        - name: "expectedValue"
-          value: "y"
+    - label: "Check values of flags in this FeatureMap"
+      verification: |
+          LS is set to 0; MS, MSR, MSM are all set to 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && SWTCH.S.F04
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-  - label: "read the global attribute: ClusterRevision"
-    command: "readAttribute"
-    attribute: "ClusterRevision"
-    response:
-      value: 1
+    - label: "read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
 
-  - label: "Read the global attribute: AttributeList"
-    PICS: SWTCH.S.F04
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
+    - label: "Read the global attribute: AttributeList"
+      PICS: SWTCH.S.F04
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
 
-  - label: "Read the global attribute: AttributeList"
-    PICS: "!SWTCH.S.F04"
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
+    - label: "Read the global attribute: AttributeList"
+      PICS: "!SWTCH.S.F04"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
-  - label: "Read the global attribute: AcceptedCommandList"
-    command: "readAttribute"
-    attribute: "AcceptedCommandList"
-    response:
-      constraints:
-        type: list
-        contains: []
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: []
 
-  - label: "Read the global attribute: GeneratedCommandList"
-    command: "readAttribute"
-    attribute: "GeneratedCommandList"
-    response:
-      value: []
-      constraints:
-        type: list
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-  #issue #15011
-  - label: "Read EventList attribute from the DUT and Verify that the DUT
-      response provides a list of supported events."
-    verification: |
-      OUT OF SCOPE FOR V1.0
-    cluster: "LogCommands"
-    command: "UserPrompt"
-    PICS: PICS_USER_PROMPT
-    arguments:
-      values:
-        - name: "message"
-          value: "Please enter 'y' for success"
-        - name: "expectedValue"
-          value: "y"
+    #issue #15011
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          OUT OF SCOPE FOR V1.0
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

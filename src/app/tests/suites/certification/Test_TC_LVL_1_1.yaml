@@ -15,159 +15,163 @@
 name: 18.1.1. [TC-LVL-1.1] Global attributes with server as DUT
 
 PICS:
-  - LVL.S
+    - LVL.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Level Control"
-  endpoint: 1
+    nodeId: 0x12344321
+    cluster: "Level Control"
+    endpoint: 1
 
 tests:
-  - label: "Wait for the commissioned device to be retrieved"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "Read the global attribute: ClusterRevision"
-    command: "readAttribute"
-    attribute: "ClusterRevision"
-    response:
-      value: 5
-      constraints:
-        type: int16u
+    - label: "Read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 5
+          constraints:
+              type: int16u
 
-  - label: "Read the global attribute: FeatureMap"
-    PICS: LVL.S.F00 || LVL.S.F01 || LVL.S.F02
-    command: "readAttribute"
-    attribute: "FeatureMap"
-    response:
-      constraints:
-        type: bitmap32
-        minValue: 0
-        maxValue: 7
+    - label: "Read the global attribute: FeatureMap"
+      PICS: LVL.S.F00 || LVL.S.F01 || LVL.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              minValue: 0
+              maxValue: 7
 
-  - label: "Read the global attribute: AttributeList"
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [0, 15, 17]
+    - label: "Read the global attribute: AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 15, 17]
 
-  - label: "Read the optonal attribute(StartUpCurrentLevel and RemainingTime) in
-      AttributeList"
-    PICS: LVL.S.F01
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [1, 16384]
+    - label:
+          "Read the optonal attribute(StartUpCurrentLevel and RemainingTime) in
+          AttributeList"
+      PICS: LVL.S.F01
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1, 16384]
 
-  - label: "Read the optonal attribute(CurrentFrequency, MinFrequency and
-      MinFrequency) in AttributeList"
-    PICS: LVL.S.F02
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [4, 5, 6]
+    - label:
+          "Read the optonal attribute(CurrentFrequency, MinFrequency and
+          MinFrequency) in AttributeList"
+      PICS: LVL.S.F02
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4, 5, 6]
 
-  - label: "Read the optonal attribute(MinLevel) in AttributeList"
-    PICS: LVL.S.A0002
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [2]
+    - label: "Read the optonal attribute(MinLevel) in AttributeList"
+      PICS: LVL.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
 
-  - label: "Read the optonal attribute(MaxLevel) in AttributeList"
-    PICS: LVL.S.A0003
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [3]
+    - label: "Read the optonal attribute(MaxLevel) in AttributeList"
+      PICS: LVL.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
 
-  - label: "Read the optonal attribute(OnOffTransitionTime) in AttributeList"
-    PICS: LVL.S.A0010
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [16]
+    - label: "Read the optonal attribute(OnOffTransitionTime) in AttributeList"
+      PICS: LVL.S.A0010
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16]
 
-  - label: "Read the optonal attribute(OnTransitionTime) in AttributeList"
-    PICS: LVL.S.A0012
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [18]
+    - label: "Read the optonal attribute(OnTransitionTime) in AttributeList"
+      PICS: LVL.S.A0012
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [18]
 
-  - label: "Read the optonal attribute(OffTransitionTime) in AttributeList"
-    PICS: LVL.S.A0013
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [19]
+    - label: "Read the optonal attribute(OffTransitionTime) in AttributeList"
+      PICS: LVL.S.A0013
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [19]
 
-  - label: "Read the optonal attribute(DefaultMoveRate) in AttributeList"
-    PICS: LVL.S.A0014
-    command: "readAttribute"
-    attribute: "AttributeList"
-    response:
-      constraints:
-        type: list
-        contains: [20]
+    - label: "Read the optonal attribute(DefaultMoveRate) in AttributeList"
+      PICS: LVL.S.A0014
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [20]
 
-  - label: "Read the global attribute: AcceptedCommandList"
-    command: "readAttribute"
-    attribute: "AcceptedCommandList"
-    response:
-      constraints:
-        type: list
-        contains: [0, 1, 2, 3, 4, 5, 6, 7]
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3, 4, 5, 6, 7]
 
-  - label: "Read the Feature-dependent(LVL.S.F02) attribute in
-      AcceptedCommandList"
-    PICS: LVL.S.F02
-    command: "readAttribute"
-    attribute: "AcceptedCommandList"
-    response:
-      constraints:
-        type: list
-        contains: [8]
+    - label:
+          "Read the Feature-dependent(LVL.S.F02) attribute in
+          AcceptedCommandList"
+      PICS: LVL.S.F02
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [8]
 
-  - label: "Read the global attribute: GeneratedCommandList"
-    command: "readAttribute"
-    attribute: "GeneratedCommandList"
-    response:
-      value: []
-      constraints:
-        type: list
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-  #issue #15011
-  - label: "Read EventList attribute from the DUT and Verify that the DUT
-      response provides a list of supported events."
-    verification: |
-      Not implemented in chip-tool
-    cluster: "LogCommands"
-    command: "UserPrompt"
-    PICS: PICS_USER_PROMPT
-    arguments:
-      values:
-        - name: "message"
-          value: "Please enter 'y' for success"
-        - name: "expectedValue"
-          value: "y"
+    #issue #15011
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

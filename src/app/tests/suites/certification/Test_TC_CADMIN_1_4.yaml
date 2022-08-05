@@ -15,203 +15,211 @@
 name: 24.1.4. [TC-CADMIN-1.4] Node Behavior using BCM [DUT - Commissionee]
 
 PICS:
-  - CADMIN.S
+    - CADMIN.S
 
 config:
-  nodeId: 0x12344321
-  timeout: 300
-  nodeId2:
-    type: node_id
-    defaultValue: 0xCAFE
-  endpoint: 0
-  discriminator:
-    type: int16u
-    defaultValue: 3840
-  payload:
-    type: char_string
-    defaultValue: "MT:-24J0AFN00KA0648G00"
+    nodeId: 0x12344321
+    timeout: 300
+    nodeId2:
+        type: node_id
+        defaultValue: 0xCAFE
+    endpoint: 0
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
 
 tests:
-  - label: "TH_CR1 starts a commissioning process with DUT_CE"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    PICS: CADMIN.S
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "TH_CR1 opens a commissioning window on DUT_CE using BCM"
-    cluster: "AdministratorCommissioning"
-    command: "OpenBasicCommissioningWindow"
-    PICS: CADMIN.S.C01.Rsp
-    timedInteractionTimeoutMs: 10000
-    arguments:
-      values:
-        - name: "CommissioningTimeout"
-          value: 180
-        - name: "discriminator"
-          value: discriminator
+    - label: "TH_CR1 opens a commissioning window on DUT_CE using BCM"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      PICS: CADMIN.S.C01.Rsp
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "discriminator"
+                value: discriminator
 
-  - label: "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
-      attribute of DUT_CE"
-    command: "writeAttribute"
-    cluster: "Basic"
-    attribute: "NodeLabel"
-    PICS: BINFO.S.A0005
-    arguments:
-      value: "chiptest"
+    - label:
+          "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      command: "writeAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      PICS: BINFO.S.A0005
+      arguments:
+          value: "chiptest"
 
-  - label: "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
-      attribute of DUT_CE"
-    command: "readAttribute"
-    cluster: "Basic"
-    attribute: "NodeLabel"
-    PICS: BINFO.S.A0005
-    response:
-      constraints:
-        type: char_string
-        maxLength: 32
+    - label:
+          "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      command: "readAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      PICS: BINFO.S.A0005
+      response:
+          constraints:
+              type: char_string
+              maxLength: 32
 
-  - label: "TH_CR2 starts a commissioning process with DUT_CE"
-    identity: "beta"
-    cluster: "CommissionerCommands"
-    command: "PairWithCode"
-    PICS: CADMIN.S
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId2
-        - name: "payload"
-          value: payload
+    - label: "TH_CR2 starts a commissioning process with DUT_CE"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
 
-  - label: "DUT_CE is commissioned by TH_CR2 on Fabric ID2 "
-    identity: "beta"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    PICS: CADMIN.S
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId2
+    - label: "DUT_CE is commissioned by TH_CR2 on Fabric ID2 "
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
 
-  - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
-    command: "readAttribute"
-    cluster: "Operational Credentials"
-    PICS: OPCREDS.S.A0001
-    attribute: "Fabrics"
-    response:
-      value: [{ Label: "", nodeId: nodeId }]
-      constraints:
-        type: list
+    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      PICS: OPCREDS.S.A0001
+      attribute: "Fabrics"
+      response:
+          value: [{ Label: "", nodeId: nodeId }]
+          constraints:
+              type: list
 
-  - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
-    identity: "beta"
-    command: "readAttribute"
-    cluster: "Operational Credentials"
-    attribute: "Fabrics"
-    PICS: OPCREDS.S.A0001
-    response:
-      value: [{ Label: "", nodeId: nodeId2 }]
-      constraints:
-        type: list
+    - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      PICS: OPCREDS.S.A0001
+      response:
+          value: [{ Label: "", nodeId: nodeId2 }]
+          constraints:
+              type: list
 
-  - label: "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
-      attribute of DUT_CE"
-    command: "writeAttribute"
-    cluster: "Basic"
-    attribute: "NodeLabel"
-    PICS: BINFO.S.A0005
-    arguments:
-      value: "chiptest"
+    - label:
+          "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      command: "writeAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      PICS: BINFO.S.A0005
+      arguments:
+          value: "chiptest"
 
-  - label: "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
-      attribute of DUT_CE"
-    command: "readAttribute"
-    cluster: "Basic"
-    attribute: "NodeLabel"
-    PICS: BINFO.S.A0005
-    response:
-      value: "chiptest"
-      constraints:
-        type: char_string
-        maxLength: 32
+    - label:
+          "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      command: "readAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      PICS: BINFO.S.A0005
+      response:
+          value: "chiptest"
+          constraints:
+              type: char_string
+              maxLength: 32
 
-  - label: "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
-      attribute of DUT_CE"
-    identity: "beta"
-    command: "writeAttribute"
-    cluster: "Basic"
-    attribute: "NodeLabel"
-    PICS: BINFO.S.A0005
-    arguments:
-      value: "chiptest"
+    - label:
+          "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      identity: "beta"
+      command: "writeAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      PICS: BINFO.S.A0005
+      arguments:
+          value: "chiptest"
 
-  - label: "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
-      attribute of DUT_CE"
-    identity: "beta"
-    command: "readAttribute"
-    cluster: "Basic"
-    attribute: "NodeLabel"
-    PICS: BINFO.S.A0005
-    response:
-      value: "chiptest"
-      constraints:
-        type: char_string
-        maxLength: 32
+    - label:
+          "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      PICS: BINFO.S.A0005
+      response:
+          value: "chiptest"
+          constraints:
+              type: char_string
+              maxLength: 32
 
-  - label: "TH_CR2 opens a commissioning window on DUT_CE using BCM"
-    cluster: "AdministratorCommissioning"
-    command: "OpenBasicCommissioningWindow"
-    identity: "beta"
-    PICS: CADMIN.S.C01.Rsp
-    timedInteractionTimeoutMs: 10000
-    arguments:
-      values:
-        - name: "CommissioningTimeout"
-          value: 180
-        - name: "discriminator"
-          value: discriminator
+    - label: "TH_CR2 opens a commissioning window on DUT_CE using BCM"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      identity: "beta"
+      PICS: CADMIN.S.C01.Rsp
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "discriminator"
+                value: discriminator
 
-  - label: "Wait for the commissioning window in step 13 to timeout"
-    cluster: "DelayCommands"
-    command: "WaitForMs"
-    arguments:
-      values:
-        - name: "ms"
-          value: 180000
+    - label: "Wait for the commissioning window in step 13 to timeout"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 180000
 
-  - label: "TH_CR2 reads the window status to verify the DUT_CE window is closed"
-    cluster: "AdministratorCommissioning"
-    PICS: CADMIN.S.A0000
-    command: "readAttribute"
-    attribute: "WindowStatus"
-    response:
-      value: 0
+    - label:
+          "TH_CR2 reads the window status to verify the DUT_CE window is closed"
+      cluster: "AdministratorCommissioning"
+      PICS: CADMIN.S.A0000
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      response:
+          value: 0
 
-  - label: "TH_CR2 opens a commissioning window on DUT_CE using BCM"
-    cluster: "AdministratorCommissioning"
-    command: "OpenBasicCommissioningWindow"
-    identity: "beta"
-    PICS: CADMIN.S.C01.Rsp
-    timedInteractionTimeoutMs: 10000
-    arguments:
-      values:
-        - name: "CommissioningTimeout"
-          value: 180
-        - name: "discriminator"
-          value: discriminator
+    - label: "TH_CR2 opens a commissioning window on DUT_CE using BCM"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      identity: "beta"
+      PICS: CADMIN.S.C01.Rsp
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "discriminator"
+                value: discriminator
 
-  - label: "TH_CR1 starts a commissioning process with DUT_CE before the timeout
-      from step 12"
-    cluster: "CommissionerCommands"
-    command: "PairWithCode"
-    PICS: CADMIN.S
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
-        - name: "payload"
-          value: payload
-    response:
-      error: FAILURE
+    - label:
+          "TH_CR1 starts a commissioning process with DUT_CE before the timeout
+          from step 12"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+      response:
+          error: FAILURE

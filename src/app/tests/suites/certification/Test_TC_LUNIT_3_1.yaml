@@ -14,87 +14,87 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-  105.3.1. [TC-LUNIT-3.1] Read and Write Unit Localization Cluster Attributes
-  [DUT as Server]
+    105.3.1. [TC-LUNIT-3.1] Read and Write Unit Localization Cluster Attributes
+    [DUT as Server]
 
 PICS:
-  - LUNIT.S
+    - LUNIT.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Unit Localization"
-  endpoint: 0
+    nodeId: 0x12344321
+    cluster: "Unit Localization"
+    endpoint: 0
 
 tests:
-  - label: "Wait for the commissioned device to be retrieved"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-  - label: "TH reads TemperatureUnit attribute from DUT"
-    PICS: LUNIT.S.A0000
-    command: "readAttribute"
-    attribute: "TemperatureUnit"
-    response:
-      constraints:
-        type: enum8
+    - label: "TH reads TemperatureUnit attribute from DUT"
+      PICS: LUNIT.S.A0000
+      command: "readAttribute"
+      attribute: "TemperatureUnit"
+      response:
+          constraints:
+              type: enum8
 
-  - label: "TH writes 0 (Fahrenheit) to TemperatureUnit attribute"
-    PICS: LUNIT.C.A0000.Fahrenheit
-    cluster: "Unit Localization"
-    command: "writeAttribute"
-    attribute: "TemperatureUnit"
-    arguments:
-      value: 0
+    - label: "TH writes 0 (Fahrenheit) to TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000.Fahrenheit
+      cluster: "Unit Localization"
+      command: "writeAttribute"
+      attribute: "TemperatureUnit"
+      arguments:
+          value: 0
 
-  - label: "TH reads TemperatureUnit attribute"
-    PICS: LUNIT.C.A0000
-    command: "readAttribute"
-    attribute: "TemperatureUnit"
-    response:
-      value: 0
+    - label: "TH reads TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000
+      command: "readAttribute"
+      attribute: "TemperatureUnit"
+      response:
+          value: 0
 
-  - label: "TH writes 1 (Celsius) to TemperatureUnit attribute"
-    PICS: LUNIT.C.A0000.Celsius
-    cluster: "Unit Localization"
-    command: "writeAttribute"
-    attribute: "TemperatureUnit"
-    arguments:
-      value: 1
+    - label: "TH writes 1 (Celsius) to TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000.Celsius
+      cluster: "Unit Localization"
+      command: "writeAttribute"
+      attribute: "TemperatureUnit"
+      arguments:
+          value: 1
 
-  - label: "TH reads TemperatureUnit attribute"
-    PICS: LUNIT.C.A0000
-    command: "readAttribute"
-    attribute: "TemperatureUnit"
-    response:
-      value: 1
+    - label: "TH reads TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000
+      command: "readAttribute"
+      attribute: "TemperatureUnit"
+      response:
+          value: 1
 
-  - label: "TH writes 2 (Kelvin) to TemperatureUnit attribute"
-    PICS: LUNIT.C.A0000.Kelvin
-    cluster: "Unit Localization"
-    command: "writeAttribute"
-    attribute: "TemperatureUnit"
-    arguments:
-      value: 2
+    - label: "TH writes 2 (Kelvin) to TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000.Kelvin
+      cluster: "Unit Localization"
+      command: "writeAttribute"
+      attribute: "TemperatureUnit"
+      arguments:
+          value: 2
 
-  - label: "TH reads TemperatureUnit attribute"
-    PICS: LUNIT.C.A0000
-    command: "readAttribute"
-    attribute: "TemperatureUnit"
-    response:
-      value: 2
+    - label: "TH reads TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000
+      command: "readAttribute"
+      attribute: "TemperatureUnit"
+      response:
+          value: 2
 
-  - label: "TH writes 5 to TemperatureUnit attribute"
-    PICS: LUNIT.C.A0000
-    cluster: "Unit Localization"
-    command: "writeAttribute"
-    attribute: "TemperatureUnit"
-    arguments:
-      # Per spec, if [TEMP] feature is enabled, then this attribute can be
-      # one of 0 (Farenheit), 1 (Celsius) or 2 (Kelvin)
-      value: 5 # INVALID
-    response:
-      error: CONSTRAINT_ERROR
+    - label: "TH writes 5 to TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000
+      cluster: "Unit Localization"
+      command: "writeAttribute"
+      attribute: "TemperatureUnit"
+      arguments:
+          # Per spec, if [TEMP] feature is enabled, then this attribute can be
+          # one of 0 (Farenheit), 1 (Celsius) or 2 (Kelvin)
+          value: 5 # INVALID
+      response:
+          error: CONSTRAINT_ERROR
