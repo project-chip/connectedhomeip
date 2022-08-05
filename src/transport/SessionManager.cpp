@@ -445,6 +445,22 @@ void SessionManager::ExpireAllPASESessions()
     });
 }
 
+bool SessionManager::MarkSessionsAsDefunct(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type)
+{
+    bool found = false;
+    mSecureSessions.ForEachSession([&node, &type, &found](auto session) {
+        if (session->IsActiveSession() && session->GetPeer() == node &&
+            (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
+        {
+            session->AsSecureSession()->MarkAsDefunct();
+            found = true;
+        }
+        return Loop::Continue;
+    });
+
+    return found;
+}
+
 Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,
                                                         const ScopedNodeId & sessionEvictionHint)
 {

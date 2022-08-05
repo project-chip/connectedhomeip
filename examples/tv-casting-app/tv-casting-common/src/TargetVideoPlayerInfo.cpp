@@ -36,12 +36,12 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
     server->GetCASESessionManager()->FindOrEstablishSession(ScopedNodeId(nodeId, fabricIndex), &mOnConnectedCallback,
                                                             &mOnConnectionFailureCallback);
 
-    if (mOperationalDeviceProxy == nullptr)
+    if (!mDeviceProxy.ConnectionReady())
     {
         ChipLogError(AppServer, "Failed to find an existing instance of OperationalDeviceProxy to the peer");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    ChipLogProgress(AppServer, "Created an instance of OperationalDeviceProxy");
+    ChipLogProgress(AppServer, "Created an instance of DeviceProxy");
 
     mInitialized = true;
     return CHIP_NO_ERROR;

@@ -56,7 +56,7 @@ enum LogModule
     kLogModule_Discovery,
     kLogModule_InteractionModel,
     kLogModule_Test,
-    kLogModule_OperationalDeviceProxy,
+    kLogModule_OperationalSessionSetup,
     kLogModule_Automation,
     kLogModule_CASESessionManager,
 

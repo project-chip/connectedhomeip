@@ -351,6 +351,19 @@ public:
 
     /**
      * @brief
+     *   Marks all active sessions that match provided arguments as defunct.
+     *
+     * @param node    Scoped node ID of the active sessions we should mark as defunct.
+     * @param type    Type of session we are looking to mark as defunct. If matching
+     *                against all types of sessions is desired, NullOptional should
+     *                be passed into type.
+     * @return        True, if at least one session was marked as defunct, otherwise
+     *                return is False.
+     */
+    bool MarkSessionsAsDefunct(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type);
+
+    /**
+     * @brief
      *   Return the System Layer pointer used by current SessionManager.
      */
     System::Layer * SystemLayer() { return mSystemLayer; }
