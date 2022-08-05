@@ -15,6 +15,9 @@
 
 name: 3.4.8. [TC-WNCV-7.1] GoToPercentage Commands Verification [DUT as Client]
 
+PICS:
+    - WNCV.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

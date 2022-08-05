@@ -17,6 +17,9 @@ name:
     3.7.2. [TC-SU-3.2] Handling different QueryImageResponse scenarios on
     Provider
 
+PICS:
+    - MCORE.OTA.Provider
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

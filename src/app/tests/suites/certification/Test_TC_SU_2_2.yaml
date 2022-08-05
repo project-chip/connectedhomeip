@@ -17,6 +17,9 @@ name:
     3.2.2. [TC-SU-2.2] Handling different QueryImageResponse scenarios on
     Requestor
 
+PICS:
+    - MCORE.OTA.Requestor
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -15,6 +15,9 @@
 
 name: 123.1.1. [TC-S-1.1] Global attributes with server as DUT
 
+PICS:
+    - S.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

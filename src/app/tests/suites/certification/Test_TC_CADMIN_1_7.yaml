@@ -17,6 +17,9 @@ name:
     4.1.7. [TC-CADMIN-1.7] Commissioning window handling timeout and revocation
     using ECM [DUT - Commissioner]
 
+PICS:
+    - CADMIN.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -16,6 +16,9 @@ name:
     24.1.9. [TC-CADMIN-1.9] Device exit commissioning mode after 20 failed
     commission attempts [ECM] [DUT - Commissionee]
 
+PICS:
+    - CADMIN.S
+
 config:
     nodeId: 0x12344321
     timeout: 700

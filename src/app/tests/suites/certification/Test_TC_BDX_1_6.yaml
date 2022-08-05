@@ -17,6 +17,10 @@ name:
     29.1.6. [TC-BDX-1.6] Response to Receiver Initiated BDX Transfer session -
     Negative scenario
 
+PICS:
+    - MCORE.BDX.Sender
+    - MCORE.BDX.Responder
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -14,6 +14,9 @@
 
 name: 27.2.19. [TC-CC-8.1] StopMoveStep functionality with server as DUT
 
+PICS:
+    - CC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Color Control"

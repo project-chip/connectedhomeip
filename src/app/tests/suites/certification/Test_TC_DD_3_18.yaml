@@ -17,6 +17,10 @@ name:
     3.3.18. [TC-DD-3.18] Commissioning Flow - Commissioning Multiple Devices
     [DUT - Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.QR_COMMISSIONING
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

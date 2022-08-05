@@ -15,6 +15,10 @@
 
 name: 28.1.4. [TC-BDX-1.4] Response to Receiver Initiated BDX Transfer session
 
+PICS:
+    - MCORE.BDX.Sender
+    - MCORE.BDX.Responder
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

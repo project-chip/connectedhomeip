@@ -17,6 +17,9 @@ name:
     92.5. [TC-ULABEL-2.4] User Label cluster empty entry verification
     [DUT-server]
 
+PICS:
+    - ULABEL.S
+
 config:
     nodeId: 0x12344321
     cluster: "User Label"

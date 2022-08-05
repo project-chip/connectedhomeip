@@ -15,6 +15,9 @@
 
 name: 3.10.1. [TC-SU-4.1] Verifying Cluster Attributes on OTA-R(DUT)
 
+PICS:
+    - MCORE.OTA.Requestor
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

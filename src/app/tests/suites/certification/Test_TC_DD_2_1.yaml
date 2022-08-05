@@ -16,6 +16,9 @@
 name:
     3.2.1. [TC-DD-2.1] Announcement by Device Verification [DUT - Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

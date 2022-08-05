@@ -15,6 +15,9 @@
 
 name: 22.6.3. [TC-LVL-8.1] Verification of commands (DUT as Client)
 
+PICS:
+    - LVL.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

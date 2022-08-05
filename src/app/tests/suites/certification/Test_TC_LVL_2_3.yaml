@@ -15,6 +15,13 @@
 
 name: 22.2.3. [TC-LVL-2.3] Attributes with DUT as client
 
+PICS:
+    - LVL.C
+    - LVL.C.AM-READ
+    - LVL.C.AO-READ
+    - LVL.C.AM-WRITE
+    - LVL.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

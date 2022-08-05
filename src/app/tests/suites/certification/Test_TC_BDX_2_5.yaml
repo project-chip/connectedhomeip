@@ -15,6 +15,9 @@
 
 name: 29.2.5. [TC-BDX-2.5] Asynchronous file receiving
 
+PICS:
+    - MCORE.BDX.AsynchronousReceiver
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

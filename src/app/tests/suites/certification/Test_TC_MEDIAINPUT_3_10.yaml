@@ -14,6 +14,9 @@
 
 name: 19.5.1. [TC-MEDIAINPUT-3.10] Input List Verification
 
+PICS:
+    - MEDIAINPUT.S
+
 config:
     nodeId: 0x12344321
     cluster: "Media Input"

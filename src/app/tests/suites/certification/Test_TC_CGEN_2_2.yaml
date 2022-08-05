@@ -15,6 +15,9 @@
 
 name: 92.2.2. [TC-CGEN-2.2] ArmFailSafe command verification [DUT - Server]
 
+PICS:
+    - CGEN.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -16,6 +16,9 @@ name:
     19.1.11. [TC-CONTENTLAUNCHER-1.11] Global attributes - Content Launcher
     Cluster (DUT as Server)
 
+PICS:
+    - CONTENTLAUNCHER.S
+
 config:
     nodeId: 0x12344321
     cluster: "Content Launcher"

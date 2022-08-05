@@ -16,6 +16,9 @@ name:
     19.1.8. [TC-AUDIOOUTPUT-1.8] Global attributes - Audio Output Cluster(DUT as
     Server)
 
+PICS:
+    - AUDIOOUTPUT.S
+
 config:
     nodeId: 0x12344321
     cluster: "Audio Output"

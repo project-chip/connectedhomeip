@@ -15,6 +15,9 @@
 
 name: 3.3.1. [TC-DGGEN-3.1] Attributes observed at client side as DUT
 
+PICS:
+    - DGGEN.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -14,6 +14,9 @@
 
 name: 60.2.1. [TC-PS-2.1] Attributes with server as DUT
 
+PICS:
+    - PS.S
+
 config:
     nodeId: 0x12344321
     cluster: "Power Source"

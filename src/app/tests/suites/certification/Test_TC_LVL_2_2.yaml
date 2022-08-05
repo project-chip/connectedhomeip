@@ -14,6 +14,9 @@
 
 name: 24.2.2. [TC-LVL-2.2] Write cluster attributes (DUT as Server)
 
+PICS:
+    - LVL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Level Control"
