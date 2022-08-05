@@ -443,7 +443,7 @@ void CHIPCommand::StopWaiting()
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP
 }
 
-void CHIPCommand::ExecuteDeferredCleanups()
+void CHIPCommand::ExecuteDeferredCleanups(intptr_t ignored)
 {
     for (auto * cmd : sDeferredCleanups)
     {
