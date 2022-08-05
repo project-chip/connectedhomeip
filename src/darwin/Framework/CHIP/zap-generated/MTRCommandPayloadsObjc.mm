@@ -2952,7 +2952,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _granularity = @(0);
 
-        _timeSource = @(0);
+        _timeSource = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;

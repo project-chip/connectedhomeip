@@ -2200,7 +2200,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSNumber * _Nonnull granularity;
 
-@property (nonatomic, copy) NSNumber * _Nonnull timeSource;
+@property (nonatomic, copy) NSNumber * _Nullable timeSource;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

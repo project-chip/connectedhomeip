@@ -9990,7 +9990,7 @@ public:
 
     uint64_t utcTime            = static_cast<uint64_t>(0);
     GranularityEnum granularity = static_cast<GranularityEnum>(0);
-    TimeSourceEnum timeSource   = static_cast<TimeSourceEnum>(0);
+    Optional<TimeSourceEnum> timeSource;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -10007,7 +10007,7 @@ public:
 
     uint64_t utcTime            = static_cast<uint64_t>(0);
     GranularityEnum granularity = static_cast<GranularityEnum>(0);
-    TimeSourceEnum timeSource   = static_cast<TimeSourceEnum>(0);
+    Optional<TimeSourceEnum> timeSource;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetUtcTime
@@ -10107,9 +10107,9 @@ struct TypeInfo
 namespace LocalTime {
 struct TypeInfo
 {
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalTime::Id; }
@@ -10188,7 +10188,7 @@ struct TypeInfo
         Attributes::DefaultNtp::TypeInfo::DecodableType defaultNtp;
         Attributes::TimeZone::TypeInfo::DecodableType timeZone;
         Attributes::DstOffset::TypeInfo::DecodableType dstOffset;
-        Attributes::LocalTime::TypeInfo::DecodableType localTime               = static_cast<uint64_t>(0);
+        Attributes::LocalTime::TypeInfo::DecodableType localTime;
         Attributes::TimeZoneDatabase::TypeInfo::DecodableType timeZoneDatabase = static_cast<bool>(0);
         Attributes::NtpServerPort::TypeInfo::DecodableType ntpServerPort;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;

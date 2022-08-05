@@ -1615,8 +1615,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace DefaultNtp
 
 namespace LocalTime {
-EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // epoch_us
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value); // epoch_us
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value);
 } // namespace LocalTime
 
 namespace TimeZoneDatabase {
