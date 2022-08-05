@@ -92,6 +92,8 @@ if [ "$#" == "0" ]; then
             Use to build the example with pigweed RPC
         OTA_periodic_query_timeout
             Periodic query timeout variable for OTA in seconds
+        rs91x_wpa3_only
+            Support for WPA3 only mode on RS91x
         Presets
         --sed
             enable sleepy end device, set thread mtd
@@ -141,22 +143,6 @@ else
                 ;;
             --chip_enable_wifi_ipv4)
                 optArgs+="chip_enable_wifi_ipv4=true "
-                shift
-                ;;
-            --rs91x_setSecurityType)
-                if [ -z "$2" ]; then
-                    echo "--rs911x_setSecurityType requires WPA_WPA2 or WPA3_ONLY"
-                    exit 1
-                fi
-                if [ "$2" = "WPA_WPA2" ]; then
-                    optArgs+="wifi_enable_security_wpa3=false "
-                elif [ "$2" = "WPA3_ONLY" ]; then
-                    optArgs+="wifi_enable_security_wpa3=true "
-                else
-                    echo "Set security usage: --rs911x_setSecurityType WPA_WPA2|WPA3_ONLY"
-                    exit 1
-                fi
-                shift
                 shift
                 ;;
             --additional_data_advertising)

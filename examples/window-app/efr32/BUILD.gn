@@ -58,7 +58,7 @@ declare_args() {
   chip_enable_wifi_ipv4 = false
 
   # Argument to force enable WPA3 security
-  wifi_enable_security_wpa3 = false
+  rs91x_wpa3_only = false
 }
 
 declare_args() {
@@ -241,7 +241,8 @@ efr32_executable("window_app") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
     }
 
-    if (wifi_enable_security_wpa3) {
+    if (rs91x_wpa3_only) {
+      # TODO: Change this macro once WF200 support is provided
       defines += [ "WIFI_ENABLE_SECURITY_WPA3=1" ]
     }
   }
