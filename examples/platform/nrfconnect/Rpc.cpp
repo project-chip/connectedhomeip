@@ -117,7 +117,7 @@ public:
 
 namespace {
 
-constexpr size_t kRpcTaskSize = 4096;
+constexpr size_t kRpcTaskSize = 5120;
 constexpr int kRpcPriority    = 5;
 
 K_THREAD_STACK_DEFINE(rpc_stack_area, kRpcTaskSize);
