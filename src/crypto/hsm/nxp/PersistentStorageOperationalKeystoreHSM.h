@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "CHIPCryptoPALHsm_SE05X_utils.h"
 #include <crypto/OperationalKeystore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
