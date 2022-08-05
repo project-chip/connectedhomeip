@@ -41,7 +41,7 @@ constexpr chip::FabricId kIdentityAlphaFabricId = 1;
 constexpr chip::FabricId kIdentityBetaFabricId  = 2;
 constexpr chip::FabricId kIdentityGammaFabricId = 3;
 constexpr chip::FabricId kIdentityOtherFabricId = 4;
-constexpr const char *kTrustStorePathVariable = "CHIPTOOL_PAA_TRUST_STORE_PATH";
+constexpr const char * kTrustStorePathVariable  = "CHIPTOOL_PAA_TRUST_STORE_PATH";
 
 namespace {
 const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStore(const char * paaTrustStorePath)
@@ -100,11 +100,13 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.listenPort = port;
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
-    if (!mPaaTrustStorePath.HasValue()) {
-      char * const trust_store_path = getenv(kTrustStorePathVariable);
-      if (trust_store_path != nullptr) {
-        mPaaTrustStorePath.SetValue(trust_store_path);
-      }
+    if (!mPaaTrustStorePath.HasValue())
+    {
+        char * const trust_store_path = getenv(kTrustStorePathVariable);
+        if (trust_store_path != nullptr)
+        {
+            mPaaTrustStorePath.SetValue(trust_store_path);
+        }
     }
     const chip::Credentials::AttestationTrustStore * trustStore = mPaaTrustStorePath.HasValue()
         ? GetTestFileAttestationTrustStore(mPaaTrustStorePath.Value())
@@ -116,7 +118,8 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
         ChipLogError(chipTool,
                      "Please specify a valid path containing trusted PAA certificates using"
                      "the argument [--paa-trust-store-path paa/file/path]"
-                     "or environment variable [%s=paa/file/path]", kTrustStorePathVariable);
+                     "or environment variable [%s=paa/file/path]",
+                     kTrustStorePathVariable);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
