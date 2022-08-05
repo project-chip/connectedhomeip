@@ -1443,43 +1443,59 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace Rssi
 
 namespace BeaconLostCount {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
 } // namespace BeaconLostCount
 
 namespace BeaconRxCount {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
 } // namespace BeaconRxCount
 
 namespace PacketMulticastRxCount {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
 } // namespace PacketMulticastRxCount
 
 namespace PacketMulticastTxCount {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
 } // namespace PacketMulticastTxCount
 
 namespace PacketUnicastRxCount {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
 } // namespace PacketUnicastRxCount
 
 namespace PacketUnicastTxCount {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
 } // namespace PacketUnicastTxCount
 
 namespace CurrentMaxRate {
-EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // int64u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value); // int64u
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value);
 } // namespace CurrentMaxRate
 
 namespace OverrunCount {
-EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // int64u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value); // int64u
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value);
 } // namespace OverrunCount
 
 namespace FeatureMap {

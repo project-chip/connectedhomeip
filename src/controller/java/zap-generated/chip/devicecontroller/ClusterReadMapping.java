@@ -4466,7 +4466,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
-                  .readBeaconLostCountAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readBeaconLostCountAttribute(
+                      (ChipClusters.WiFiNetworkDiagnosticsCluster.BeaconLostCountAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readWiFiNetworkDiagnosticsBeaconLostCountCommandParams);
@@ -4479,7 +4481,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
-                  .readBeaconRxCountAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readBeaconRxCountAttribute(
+                      (ChipClusters.WiFiNetworkDiagnosticsCluster.BeaconRxCountAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readWiFiNetworkDiagnosticsBeaconRxCountCommandParams);
@@ -4494,7 +4498,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
                   .readPacketMulticastRxCountAttribute(
-                      (ChipClusters.LongAttributeCallback) callback);
+                      (ChipClusters.WiFiNetworkDiagnosticsCluster
+                              .PacketMulticastRxCountAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readWiFiNetworkDiagnosticsPacketMulticastRxCountCommandParams);
@@ -4509,7 +4515,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
                   .readPacketMulticastTxCountAttribute(
-                      (ChipClusters.LongAttributeCallback) callback);
+                      (ChipClusters.WiFiNetworkDiagnosticsCluster
+                              .PacketMulticastTxCountAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readWiFiNetworkDiagnosticsPacketMulticastTxCountCommandParams);
@@ -4522,7 +4530,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
-                  .readPacketUnicastRxCountAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readPacketUnicastRxCountAttribute(
+                      (ChipClusters.WiFiNetworkDiagnosticsCluster
+                              .PacketUnicastRxCountAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readWiFiNetworkDiagnosticsPacketUnicastRxCountCommandParams);
@@ -4535,7 +4546,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
-                  .readPacketUnicastTxCountAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readPacketUnicastTxCountAttribute(
+                      (ChipClusters.WiFiNetworkDiagnosticsCluster
+                              .PacketUnicastTxCountAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readWiFiNetworkDiagnosticsPacketUnicastTxCountCommandParams);
@@ -4548,7 +4562,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
-                  .readCurrentMaxRateAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readCurrentMaxRateAttribute(
+                      (ChipClusters.WiFiNetworkDiagnosticsCluster.CurrentMaxRateAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readWiFiNetworkDiagnosticsCurrentMaxRateCommandParams);
@@ -4561,7 +4577,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
-                  .readOverrunCountAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readOverrunCountAttribute(
+                      (ChipClusters.WiFiNetworkDiagnosticsCluster.OverrunCountAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readWiFiNetworkDiagnosticsOverrunCountCommandParams);
