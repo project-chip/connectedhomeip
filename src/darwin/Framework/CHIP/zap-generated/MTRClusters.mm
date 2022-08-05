@@ -6233,11 +6233,11 @@ using chip::SessionHandle;
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeChannelMaskWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeChannelPage0MaskWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointId:@(_endpoint)
                                           clusterId:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeId:@(MTRClusterThreadNetworkDiagnosticsAttributeChannelMaskID)
+                                        attributeId:@(MTRClusterThreadNetworkDiagnosticsAttributeChannelPage0MaskID)
                                              params:params];
 }
 

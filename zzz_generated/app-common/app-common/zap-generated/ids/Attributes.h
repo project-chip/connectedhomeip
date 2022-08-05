@@ -1504,9 +1504,9 @@ namespace SecurityPolicy {
 static constexpr AttributeId Id = 0x0000003B;
 } // namespace SecurityPolicy
 
-namespace ChannelMask {
+namespace ChannelPage0Mask {
 static constexpr AttributeId Id = 0x0000003C;
-} // namespace ChannelMask
+} // namespace ChannelPage0Mask
 
 namespace OperationalDatasetComponents {
 static constexpr AttributeId Id = 0x0000003D;

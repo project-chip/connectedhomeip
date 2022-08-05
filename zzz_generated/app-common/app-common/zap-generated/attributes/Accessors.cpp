@@ -7843,7 +7843,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 } // namespace Delay
 
-namespace ChannelMask {
+namespace ChannelPage0Mask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value)
 {
@@ -7892,7 +7892,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
     return Set(endpoint, value.Value());
 }
 
-} // namespace ChannelMask
+} // namespace ChannelPage0Mask
 
 namespace FeatureMap {
 

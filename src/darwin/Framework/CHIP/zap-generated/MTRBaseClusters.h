@@ -6422,21 +6422,23 @@ NS_ASSUME_NONNULL_BEGIN
                                     completionHandler:(void (^)(MTRThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable value,
                                                           NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeChannelMaskWithCompletionHandler:(void (^)(
-                                                          NSData * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeChannelPage0MaskWithCompletionHandler:(void (^)(NSData * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributeChannelMaskWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                         maxInterval:(NSNumber * _Nonnull)maxInterval
-                                              params:(MTRSubscribeParams * _Nullable)params
-                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                       reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeChannelMaskWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                          endpoint:(NSNumber *)endpoint
-                                             queue:(dispatch_queue_t)queue
-                                 completionHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeChannelPage0MaskWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(MTRSubscribeParams * _Nullable)params
+                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                            reportHandler:
+                                                (void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeChannelPage0MaskWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                               endpoint:(NSNumber *)endpoint
+                                                  queue:(dispatch_queue_t)queue
+                                      completionHandler:
+                                          (void (^)(NSData * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeOperationalDatasetComponentsWithCompletionHandler:
     (void (^)(MTRThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable value,

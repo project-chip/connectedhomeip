@@ -7277,7 +7277,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface ChannelMaskAttributeCallback {
+    public interface ChannelPage0MaskAttributeCallback {
       void onSuccess(@Nullable byte[] value);
 
       void onError(Exception ex);
@@ -7853,13 +7853,13 @@ public class ChipClusters {
       subscribeDelayAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readChannelMaskAttribute(ChannelMaskAttributeCallback callback) {
-      readChannelMaskAttribute(chipClusterPtr, callback);
+    public void readChannelPage0MaskAttribute(ChannelPage0MaskAttributeCallback callback) {
+      readChannelPage0MaskAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeChannelMaskAttribute(
-        ChannelMaskAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeChannelMaskAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeChannelPage0MaskAttribute(
+        ChannelPage0MaskAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeChannelPage0MaskAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readActiveNetworkFaultsListAttribute(
@@ -8305,12 +8305,12 @@ public class ChipClusters {
     private native void subscribeDelayAttribute(
         long chipClusterPtr, DelayAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readChannelMaskAttribute(
-        long chipClusterPtr, ChannelMaskAttributeCallback callback);
+    private native void readChannelPage0MaskAttribute(
+        long chipClusterPtr, ChannelPage0MaskAttributeCallback callback);
 
-    private native void subscribeChannelMaskAttribute(
+    private native void subscribeChannelPage0MaskAttribute(
         long chipClusterPtr,
-        ChannelMaskAttributeCallback callback,
+        ChannelPage0MaskAttributeCallback callback,
         int minInterval,
         int maxInterval);
 

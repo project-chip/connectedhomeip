@@ -2743,7 +2743,7 @@ private:
 | * PendingTimestamp                                                  | 0x0039 |
 | * Delay                                                             | 0x003A |
 | * SecurityPolicy                                                    | 0x003B |
-| * ChannelMask                                                       | 0x003C |
+| * ChannelPage0Mask                                                  | 0x003C |
 | * OperationalDatasetComponents                                      | 0x003D |
 | * ActiveNetworkFaultsList                                           | 0x003E |
 | * GeneratedCommandList                                              | 0xFFF8 |
@@ -9540,7 +9540,7 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "pending-timestamp", Attributes::PendingTimestamp::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "delay", Attributes::Delay::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "security-policy", Attributes::SecurityPolicy::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "channel-mask", Attributes::ChannelMask::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "channel-page0mask", Attributes::ChannelPage0Mask::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "operational-dataset-components", Attributes::OperationalDatasetComponents::Id,
                                    credsIssuerConfig),                                                                            //
         make_unique<ReadAttribute>(Id, "active-network-faults-list", Attributes::ActiveNetworkFaultsList::Id, credsIssuerConfig), //
@@ -9621,7 +9621,7 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "pending-timestamp", Attributes::PendingTimestamp::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "delay", Attributes::Delay::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "security-policy", Attributes::SecurityPolicy::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "channel-mask", Attributes::ChannelMask::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "channel-page0mask", Attributes::ChannelPage0Mask::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "operational-dataset-components", Attributes::OperationalDatasetComponents::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "active-network-faults-list", Attributes::ActiveNetworkFaultsList::Id,

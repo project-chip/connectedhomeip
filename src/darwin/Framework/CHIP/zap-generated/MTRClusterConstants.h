@@ -481,7 +481,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterThreadNetworkDiagnosticsAttributePendingTimestampID = 0x00000039,
     MTRClusterThreadNetworkDiagnosticsAttributeDelayID = 0x0000003A,
     MTRClusterThreadNetworkDiagnosticsAttributeSecurityPolicyID = 0x0000003B,
-    MTRClusterThreadNetworkDiagnosticsAttributeChannelMaskID = 0x0000003C,
+    MTRClusterThreadNetworkDiagnosticsAttributeChannelPage0MaskID = 0x0000003C,
     MTRClusterThreadNetworkDiagnosticsAttributeOperationalDatasetComponentsID = 0x0000003D,
     MTRClusterThreadNetworkDiagnosticsAttributeActiveNetworkFaultsListID = 0x0000003E,
     MTRClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,

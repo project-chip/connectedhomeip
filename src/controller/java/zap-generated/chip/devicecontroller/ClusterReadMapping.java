@@ -4275,21 +4275,22 @@ public class ClusterReadMapping {
             readThreadNetworkDiagnosticsDelayCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readDelayAttribute", readThreadNetworkDiagnosticsDelayAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readThreadNetworkDiagnosticsChannelMaskCommandParams =
+    Map<String, CommandParameterInfo> readThreadNetworkDiagnosticsChannelPage0MaskCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readThreadNetworkDiagnosticsChannelMaskAttributeInteractionInfo =
+    InteractionInfo readThreadNetworkDiagnosticsChannelPage0MaskAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readChannelMaskAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.ChannelMaskAttributeCallback)
+                  .readChannelPage0MaskAttribute(
+                      (ChipClusters.ThreadNetworkDiagnosticsCluster
+                              .ChannelPage0MaskAttributeCallback)
                           callback);
             },
             () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
-            readThreadNetworkDiagnosticsChannelMaskCommandParams);
+            readThreadNetworkDiagnosticsChannelPage0MaskCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
-        "readChannelMaskAttribute",
-        readThreadNetworkDiagnosticsChannelMaskAttributeInteractionInfo);
+        "readChannelPage0MaskAttribute",
+        readThreadNetworkDiagnosticsChannelPage0MaskAttributeInteractionInfo);
     Map<String, CommandParameterInfo>
         readThreadNetworkDiagnosticsActiveNetworkFaultsListCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();
