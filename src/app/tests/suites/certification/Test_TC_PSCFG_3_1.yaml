@@ -24,7 +24,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Power Source Configuration"
     endpoint: 0
 
 tests:
