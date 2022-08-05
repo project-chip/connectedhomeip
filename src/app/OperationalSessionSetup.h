@@ -74,7 +74,7 @@ struct DeviceProxyInitParams
  * @brief Delegate provided when creating OperationalSessionSetup.
  *
  * Once OperationalSessionSetup establishes a connection (or errors out) and has notified all
- * registered application callback via OnDeviceConnected/OnDeviceConnectionFailure, this delegate
+ * registered application callbacks via OnDeviceConnected/OnDeviceConnectionFailure, this delegate
  * is used to deallocate the OperationalSessionSetup.
  */
 class OperationalSessionReleaseDelegate

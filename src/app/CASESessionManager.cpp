@@ -61,7 +61,7 @@ void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)
 
 void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
 {
-    mConfig.sessionSetupPool->ReleaseSessionSetupForFabric(fabricIndex);
+    mConfig.sessionSetupPool->ReleaseAllSessionSetupsForFabric(fabricIndex);
 }
 
 void CASESessionManager::ReleaseAllSessions()
