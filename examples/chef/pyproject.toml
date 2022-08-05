@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,19 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import("//build_overrides/build.gni")
-
-# The location of the build configuration file.
-buildconfig = "${build_root}/config/BUILDCONFIG.gn"
-
-default_args = {
-  chip_enable_pw_rpc = true
-
-  pw_build_PIP_CONSTRAINTS =
-      [ "//third_party/connectedhomeip/scripts/constraints.txt" ]
-  pw_build_PIP_REQUIREMENTS =
-      [ "//third_party/connectedhomeip/scripts/requirements.txt" ]
-
-  pw_build_USE_NEW_PYTHON_BUILD = true
-}
+[build-system]
+requires = ['setuptools', 'wheel']
+build-backend = 'setuptools.build_meta'
