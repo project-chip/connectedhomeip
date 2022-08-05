@@ -874,7 +874,7 @@ function getTests() {
         "Test_TC_DRLK_2_4",
         "Test_TC_DRLK_2_5",
         "Test_TC_DRLK_2_7",
-        //"Test_TC_DRLK_2_9", TODO: This test is not aligned with spec
+        "Test_TC_DRLK_2_9",
     ];
 
     const Groups = [
