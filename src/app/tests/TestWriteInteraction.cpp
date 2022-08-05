@@ -551,8 +551,8 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     engine->Shutdown();
 }
 
-// This test is to create Chunked write requests, we drop the message since the 3rd message, then write hanlder received unknown
-// report message and sends out the status report with invalid action.
+// This test creates a chunked write request, we drop the second write chunk message, then write handler receives unknown
+// report message and sends out a status report with invalid action.
 void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
