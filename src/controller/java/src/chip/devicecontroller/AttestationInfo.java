@@ -1,6 +1,5 @@
 package chip.devicecontroller;
 
-import java.util.Locale;
 
 /** Represents information relating to product attestation. */
 public final class AttestationInfo {

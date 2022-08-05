@@ -1,6 +1,5 @@
 package chip.devicecontroller;
 
-import java.util.Locale;
 
 /** Represents information relating to NOC CSR. */
 public final class CSRInfo {
@@ -10,11 +9,7 @@ public final class CSRInfo {
   private byte[] elementsSignature;
   private byte[] csr;
 
-  public CSRInfo(
-      byte[] nonce,
-      byte[] elements,
-      byte[] elementsSignature,
-      byte[] csr) {
+  public CSRInfo(byte[] nonce, byte[] elements, byte[] elementsSignature, byte[] csr) {
     this.nonce = nonce;
     this.elements = elements;
     this.elementsSignature = elementsSignature;
