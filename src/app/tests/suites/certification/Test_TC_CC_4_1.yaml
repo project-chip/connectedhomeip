@@ -15,98 +15,97 @@
 name: 27.2.5. [TC-CC-4.1] Saturation MoveTo functionality with server as DUT
 
 PICS:
-    - CC.S
+  - CC.S
 
 config:
-    nodeId: 0x12344321
-    cluster: "Color Control"
-    endpoint: 1
-    SaturationConfigValue:
-        type: int8u
-        defaultValue: 90
+  nodeId: 0x12344321
+  cluster: "Color Control"
+  endpoint: 1
+  SaturationConfigValue:
+    type: int8u
+    defaultValue: 90
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+  - label: "Wait for the commissioned device to be retrieved"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+    arguments:
+      values:
+        - name: "nodeId"
+          value: nodeId
 
-    - label: "Turn on light for color control tests"
-      PICS: OO.S.C01.Rsp
-      cluster: "On/Off"
-      command: "on"
+  - label: "Turn on light for color control tests"
+    PICS: OO.S.C01.Rsp
+    cluster: "On/Off"
+    command: "on"
 
-    - label: "Check on/off attribute value is true after on command"
-      cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      PICS: OO.S.A0000
-      response:
-          value: 1
+  - label: "Check on/off attribute value is true after on command"
+    cluster: "On/Off"
+    command: "readAttribute"
+    attribute: "OnOff"
+    PICS: OO.S.A0000
+    response:
+      value: 1
 
-    - label: "TH writes 0 to the Options attribute"
-      PICS: CC.S.F00 && CC.S.A000f
-      command: "writeAttribute"
-      attribute: "Options"
-      arguments:
-          value: 0
+  - label: "TH writes 0 to the Options attribute"
+    PICS: CC.S.F00 && CC.S.A000f
+    command: "writeAttribute"
+    attribute: "Options"
+    arguments:
+      value: 0
 
-    - label: "TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0001
-      command: "readAttribute"
-      attribute: "CurrentSaturation"
-      response:
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
+  - label: "TH reads CurrentSaturation attribute from DUT"
+    PICS: CC.S.F00 && CC.S.A0001
+    command: "readAttribute"
+    attribute: "CurrentSaturation"
+    response:
+      constraints:
+        type: int8u
+        minValue: 0
+        maxValue: 254
 
-    - label: "TH sends MoveToSaturation command to DUT"
-      PICS: CC.S.F00 && CC.S.C03.Rsp
-      command: "MoveToSaturation"
-      arguments:
-          values:
-              - name: "Saturation"
-                value: SaturationConfigValue
-              - name: "TransitionTime"
-                value: 10
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
-
-    - label: "Wait 1500ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 1500
-
-    - label:
-          "Over TransitionTime, TH reads CurrentSaturation attribute from DUT."
-      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C03.Rsp
-      command: "readAttribute"
-      attribute: "CurrentSaturation"
-      response:
+  - label: "TH sends MoveToSaturation command to DUT"
+    PICS: CC.S.F00 && CC.S.C03.Rsp
+    command: "MoveToSaturation"
+    arguments:
+      values:
+        - name: "Saturation"
           value: SaturationConfigValue
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
-
-    - label: "Turn off light that we turned on"
-      PICS: OO.S.C00.Rsp
-      cluster: "On/Off"
-      command: "off"
-
-    - label: "Check on/off attribute value is false after off command"
-      cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      PICS: OO.S.A0000
-      response:
+        - name: "TransitionTime"
+          value: 10
+        - name: "OptionsMask"
           value: 0
+        - name: "OptionsOverride"
+          value: 0
+
+  - label: "Wait 1500ms"
+    cluster: "DelayCommands"
+    command: "WaitForMs"
+    arguments:
+      values:
+        - name: "ms"
+          value: 1500
+
+  - label: "Over TransitionTime, TH reads CurrentSaturation attribute from DUT."
+    PICS: CC.S.F00 && CC.S.A0001 && CC.S.C03.Rsp
+    command: "readAttribute"
+    attribute: "CurrentSaturation"
+    response:
+      value: SaturationConfigValue
+      constraints:
+        type: int8u
+        minValue: 0
+        maxValue: 254
+
+  - label: "Turn off light that we turned on"
+    PICS: OO.S.C00.Rsp
+    cluster: "On/Off"
+    command: "off"
+
+  - label: "Check on/off attribute value is false after off command"
+    cluster: "On/Off"
+    command: "readAttribute"
+    attribute: "OnOff"
+    PICS: OO.S.A0000
+    response:
+      value: 0

@@ -16,55 +16,55 @@
 name: 123.1.1. [TC-S-1.1] Global attributes with server as DUT
 
 PICS:
-    - S.S
+  - S.S
 
 config:
-    nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+  nodeId: 0x12344321
+  cluster: "Basic"
+  endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
-      verification: |
-          DUT and TH are on same fabric
-      disabled: true
+  - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
+    verification: |
+      DUT and TH are on same fabric
+    disabled: true
 
-    - label: "Read ClusterRevision (global attribute 65533)"
-      verification: |
-          value SHALL be 4
-      disabled: true
+  - label: "Read ClusterRevision (global attribute 65533)"
+    verification: |
+      value SHALL be 4
+    disabled: true
 
-    - label: "Read FeatureMap (global attribute 65532)"
-      verification: |
-          value SHALL be 0
-      disabled: true
+  - label: "Read FeatureMap (global attribute 65532)"
+    verification: |
+      value SHALL be 0
+    disabled: true
 
-    - label: "Read FeatureMap (global attribute 65532)"
-      verification: |
-          value SHALL be 1
-      disabled: true
+  - label: "Read FeatureMap (global attribute 65532)"
+    verification: |
+      value SHALL be 1
+    disabled: true
 
-    - label: "Read AttributeList (global attribute 65531)"
-      verification: |
-          list SHALL be [0,1,2,3,4]
-      disabled: true
+  - label: "Read AttributeList (global attribute 65531)"
+    verification: |
+      list SHALL be [0,1,2,3,4]
+    disabled: true
 
-    - label: "Read AttributeList (global attribute 65531)"
-      verification: |
-          list SHALL be [0,1,2,3,4,5]
-      disabled: true
+  - label: "Read AttributeList (global attribute 65531)"
+    verification: |
+      list SHALL be [0,1,2,3,4,5]
+    disabled: true
 
-    - label: "Read EventList (global attribute 65530)"
-      verification: |
-          list SHALL be empty
-      disabled: true
+  - label: "Read EventList (global attribute 65530)"
+    verification: |
+      list SHALL be empty
+    disabled: true
 
-    - label: "Read AcceptedCommandList (global attribute 65529)"
-      verification: |
-          list SHALL contain at least [0,1,2,3,4,5,6] if S.S.C40.Rsp(EnhancedAddScene) then list SHALL also contain [40] else it SHALL NOT contain [40] if S.S.C41.Rsp(EnhancedViewScene) then list SHALL also contain [41] else it SHALL NOT contain [41] if S.S.C42.Rsp(CopyScene) then list SHALL also contain [42] else it SHALL NOT contain [42]
-      disabled: true
+  - label: "Read AcceptedCommandList (global attribute 65529)"
+    verification: |
+      list SHALL contain at least [0,1,2,3,4,5,6] if S.S.C40.Rsp(EnhancedAddScene) then list SHALL also contain [40] else it SHALL NOT contain [40] if S.S.C41.Rsp(EnhancedViewScene) then list SHALL also contain [41] else it SHALL NOT contain [41] if S.S.C42.Rsp(CopyScene) then list SHALL also contain [42] else it SHALL NOT contain [42]
+    disabled: true
 
-    - label: "Read GeneratedCommandList (global attribute 65528)"
-      verification: |
-          list SHALL contain at least [0,1,2,3,4,5,6] if S.S.C40.Rsp(EnhancedAddScene) then list SHALL also contain [40] else it SHALL NOT contain [40] if S.S.C41.Rsp(EnhancedViewScene) then list SHALL also contain [41] else it SHALL NOT contain [41] if S.S.C42.Rsp(CopyScene) then list SHALL also contain [42] else it SHALL NOT contain [42]
-      disabled: true
+  - label: "Read GeneratedCommandList (global attribute 65528)"
+    verification: |
+      list SHALL contain at least [0,1,2,3,4,5,6] if S.S.C40.Rsp(EnhancedAddScene) then list SHALL also contain [40] else it SHALL NOT contain [40] if S.S.C41.Rsp(EnhancedViewScene) then list SHALL also contain [41] else it SHALL NOT contain [41] if S.S.C42.Rsp(CopyScene) then list SHALL also contain [42] else it SHALL NOT contain [42]
+    disabled: true

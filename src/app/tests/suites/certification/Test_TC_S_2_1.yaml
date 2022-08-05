@@ -16,51 +16,51 @@
 name: 123.2.1. [TC-S-2.1] Attributes with server as DUT
 
 PICS:
-    - S.S
-    - S.S.AM
-    - S.S.AO
+  - S.S
+  - S.S.AM
+  - S.S.AO
 
 config:
-    nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+  nodeId: 0x12344321
+  cluster: "Basic"
+  endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
+  - label: "Commission DUT to TH"
+    verification: |
 
-      disabled: true
+    disabled: true
 
-    - label: "TH reads all mandatory attributes from DUT one at a time."
-      verification: |
-          The data type in each command must match the value listed in the specification(s). The data value in each command for the attribute must fall within the valid range described in the specification(s).
-      disabled: true
+  - label: "TH reads all mandatory attributes from DUT one at a time."
+    verification: |
+      The data type in each command must match the value listed in the specification(s). The data value in each command for the attribute must fall within the valid range described in the specification(s).
+    disabled: true
 
-    - label:
-          "TH writes the respective default value to all mandatory attributes to
-          DUT one at a time."
-      verification: |
-          If the access control of DUT is set to READ, the DUT response will indicate that the attribute write command was not a SUCCESS. If the access control of DUT is set to READ/WRITE, the DUT response will indicate that the write command was a SUCCESS.
-      disabled: true
+  - label:
+      "TH writes the respective default value to all mandatory attributes to
+      DUT one at a time."
+    verification: |
+      If the access control of DUT is set to READ, the DUT response will indicate that the attribute write command was not a SUCCESS. If the access control of DUT is set to READ/WRITE, the DUT response will indicate that the write command was a SUCCESS.
+    disabled: true
 
-    - label: "TH reads back all attributes written in step 3a."
-      verification: |
-          If the Status field of the write attributes response command frame was equal to SUCCESS, the updated value is read back. If the Status field of the write attributes response command frame was not equal to SUCCESS the value is not updated when read back.
-      disabled: true
+  - label: "TH reads back all attributes written in step 3a."
+    verification: |
+      If the Status field of the write attributes response command frame was equal to SUCCESS, the updated value is read back. If the Status field of the write attributes response command frame was not equal to SUCCESS the value is not updated when read back.
+    disabled: true
 
-    - label: "TH reads each optional attributes from DUT one at a time."
-      verification: |
-          If the DUT implements the attribute, the Status field will be equal to SUCCESS and the command will contain the requested attribute. If the DUT does not implement the attribute, the Status field will not be equal to SUCCESS. The data type in each command must match the value listed in the specification(s). The data value in each command for the attribute must fall within the valid range described in the specification(s).
-      disabled: true
+  - label: "TH reads each optional attributes from DUT one at a time."
+    verification: |
+      If the DUT implements the attribute, the Status field will be equal to SUCCESS and the command will contain the requested attribute. If the DUT does not implement the attribute, the Status field will not be equal to SUCCESS. The data type in each command must match the value listed in the specification(s). The data value in each command for the attribute must fall within the valid range described in the specification(s).
+    disabled: true
 
-    - label:
-          "TH writes the respective default value to each optional attributes to
-          DUT one at a time."
-      verification: |
-          If the attribute is not implemented or the access control of DUT is set to READ, the DUT response will indicate that the attribute write command was not a SUCCESS. If the attribute is implemented and the access control of DUT is set to READ/WRITE, the DUT response will indicate that the write command was a SUCCESS.
-      disabled: true
+  - label:
+      "TH writes the respective default value to each optional attributes to
+      DUT one at a time."
+    verification: |
+      If the attribute is not implemented or the access control of DUT is set to READ, the DUT response will indicate that the attribute write command was not a SUCCESS. If the attribute is implemented and the access control of DUT is set to READ/WRITE, the DUT response will indicate that the write command was a SUCCESS.
+    disabled: true
 
-    - label: "TH reads back all attributes written in step 5a."
-      verification: |
-          If the Status field of the write attributes response command frame was equal to SUCCESS, the updated value is read back. If the Status field of the write attributes response command frame was not equal to SUCCESS the value is not updated when read back.
-      disabled: true
+  - label: "TH reads back all attributes written in step 5a."
+    verification: |
+      If the Status field of the write attributes response command frame was equal to SUCCESS, the updated value is read back. If the Status field of the write attributes response command frame was not equal to SUCCESS the value is not updated when read back.
+    disabled: true

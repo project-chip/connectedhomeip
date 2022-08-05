@@ -16,126 +16,124 @@
 name: 58.2.2. [TC-I-2.2] Primary functionality with server as DUT
 
 PICS:
-    - I.S
+  - I.S
 
 config:
-    nodeId: 0x12344321
-    cluster: "Identify"
-    endpoint: 1
+  nodeId: 0x12344321
+  cluster: "Identify"
+  endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+  - label: "Wait for the commissioned device to be retrieved"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+    arguments:
+      values:
+        - name: "nodeId"
+          value: nodeId
 
-    - label:
-          "TH sends Identify command to DUT, with the identify time field set to
-          0x003c (60s)."
-      PICS: I.S.C00.Rsp
-      command: "Identify"
-      arguments:
-          values:
-              - name: "IdentifyTime"
-                value: 60
+  - label:
+      "TH sends Identify command to DUT, with the identify time field set to
+      0x003c (60s)."
+    PICS: I.S.C00.Rsp
+    command: "Identify"
+    arguments:
+      values:
+        - name: "IdentifyTime"
+          value: 60
 
-    - label: "TH reads immediately IdentifyTime attribute from DUT"
-      PICS: I.S.A0000
-      command: "readAttribute"
-      attribute: "identify time"
-      response:
-          constraints:
-              minValue: 51
-              maxValue: 69
+  - label: "TH reads immediately IdentifyTime attribute from DUT"
+    PICS: I.S.A0000
+    command: "readAttribute"
+    attribute: "identify time"
+    response:
+      constraints:
+        minValue: 51
+        maxValue: 69
 
-    - label: "Wait 10000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 10000
+  - label: "Wait 10000ms"
+    cluster: "DelayCommands"
+    command: "WaitForMs"
+    arguments:
+      values:
+        - name: "ms"
+          value: 10000
 
-    - label: "After 10 seconds, the TH reads IdentifyTime attribute from DUT"
-      PICS: I.S.A0000
-      command: "readAttribute"
-      attribute: "identify time"
-      response:
-          constraints:
-              minValue: 43
-              maxValue: 57
+  - label: "After 10 seconds, the TH reads IdentifyTime attribute from DUT"
+    PICS: I.S.A0000
+    command: "readAttribute"
+    attribute: "identify time"
+    response:
+      constraints:
+        minValue: 43
+        maxValue: 57
 
-    - label:
-          "TH sends IdentifyQuery command to DUT and Verify
-          IdentifyQueryResponse command to TH,with the Timeout field set to a
-          value in the range 0x0000 to 0x0032"
-      verification: |
-          IdentifyQuery is not supported by Matter
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && I.S.C01.Rsp && I.S.C00.Tx
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+  - label: "TH sends IdentifyQuery command to DUT and Verify
+      IdentifyQueryResponse command to TH,with the Timeout field set to a
+      value in the range 0x0000 to 0x0032"
+    verification: |
+      IdentifyQuery is not supported by Matter
+    cluster: "LogCommands"
+    command: "UserPrompt"
+    PICS: PICS_USER_PROMPT && I.S.C01.Rsp && I.S.C00.Tx
+    arguments:
+      values:
+        - name: "message"
+          value: "Please enter 'y' for success"
+        - name: "expectedValue"
+          value: "y"
 
-    - label:
-          "TH sends Identify command to DUT, with the identify time field set to
-          0x0000 (stop identifying)."
-      PICS: I.S.C00.Rsp
-      command: "Identify"
-      arguments:
-          values:
-              - name: "IdentifyTime"
-                value: 0
-
-    - label: "TH reads immediately IdentifyTime attribute from DUT"
-      PICS: I.S.A0000
-      command: "readAttribute"
-      attribute: "identify time"
-      response:
+  - label:
+      "TH sends Identify command to DUT, with the identify time field set to
+      0x0000 (stop identifying)."
+    PICS: I.S.C00.Rsp
+    command: "Identify"
+    arguments:
+      values:
+        - name: "IdentifyTime"
           value: 0
 
-    # disabled due to IdentifyQuery not supported
-    - label: "TH sends IdentifyQuery command to DUT "
-      verification: |
-          IdentifyQuery is not supported by Matter
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && I.S.C01.Rsp && I.S.C00.Tx
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+  - label: "TH reads immediately IdentifyTime attribute from DUT"
+    PICS: I.S.A0000
+    command: "readAttribute"
+    attribute: "identify time"
+    response:
+      value: 0
 
-    - label:
-          "TH writes a value of 0x000f (15s) to IdentifyTime attribute of DUT"
-      PICS: I.S.A0000
-      command: "writeAttribute"
-      attribute: "identify time"
-      arguments:
-          value: 15
+  # disabled due to IdentifyQuery not supported
+  - label: "TH sends IdentifyQuery command to DUT "
+    verification: |
+      IdentifyQuery is not supported by Matter
+    cluster: "LogCommands"
+    command: "UserPrompt"
+    PICS: PICS_USER_PROMPT && I.S.C01.Rsp && I.S.C00.Tx
+    arguments:
+      values:
+        - name: "message"
+          value: "Please enter 'y' for success"
+        - name: "expectedValue"
+          value: "y"
 
-    - label: "Wait 5000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
+  - label: "TH writes a value of 0x000f (15s) to IdentifyTime attribute of DUT"
+    PICS: I.S.A0000
+    command: "writeAttribute"
+    attribute: "identify time"
+    arguments:
+      value: 15
 
-    - label: "After 5 seconds, the TH reads IdentifyTime attribute from DUT"
-      PICS: I.S.A0000
-      command: "readAttribute"
-      attribute: "identify time"
-      response:
-          constraints:
-              minValue: 5
-              maxValue: 15
+  - label: "Wait 5000ms"
+    cluster: "DelayCommands"
+    command: "WaitForMs"
+    arguments:
+      values:
+        - name: "ms"
+          value: 5000
+
+  - label: "After 5 seconds, the TH reads IdentifyTime attribute from DUT"
+    PICS: I.S.A0000
+    command: "readAttribute"
+    attribute: "identify time"
+    response:
+      constraints:
+        minValue: 5
+        maxValue: 15

@@ -15,98 +15,98 @@
 name: 11.2.3. [TC-BINFO-2.3] Attributes [DUT-Client]
 
 PICS:
-    - BINFO.C
+  - BINFO.C
 
 config:
-    nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+  nodeId: 0x12344321
+  cluster: "Basic"
+  endpoint: 0
 
 tests:
-    - label: "Wait for the device to be commissioned"
-      cluster: "DelayCommands"
-      command: "WaitForCommissioning"
+  - label: "Wait for the device to be commissioned"
+    cluster: "DelayCommands"
+    command: "WaitForCommissioning"
 
-    - label: "Log OnOff Test Startup"
-      cluster: "LogCommands"
-      command: "Log"
-      arguments:
-          values:
-              - name: "message"
-                value: "*** Basic Cluster Tests Ready"
+  - label: "Log OnOff Test Startup"
+    cluster: "LogCommands"
+    command: "Log"
+    arguments:
+      values:
+        - name: "message"
+          value: "*** Basic Cluster Tests Ready"
 
-    - label: "Query Data Model Revision"
-      wait: "readAttribute"
-      attribute: "DataModelRevision"
+  - label: "Query Data Model Revision"
+    wait: "readAttribute"
+    attribute: "DataModelRevision"
 
-    - label: "Query Vendor Name"
-      wait: "readAttribute"
-      attribute: "VendorName"
+  - label: "Query Vendor Name"
+    wait: "readAttribute"
+    attribute: "VendorName"
 
-    - label: "Query VendorID"
-      wait: "readAttribute"
-      attribute: "VendorID"
+  - label: "Query VendorID"
+    wait: "readAttribute"
+    attribute: "VendorID"
 
-    - label: "Query Product Name"
-      wait: "readAttribute"
-      attribute: "ProductName"
+  - label: "Query Product Name"
+    wait: "readAttribute"
+    attribute: "ProductName"
 
-    - label: "Query ProductID"
-      wait: "readAttribute"
-      attribute: "ProductID"
+  - label: "Query ProductID"
+    wait: "readAttribute"
+    attribute: "ProductID"
 
-    - label: "Query Node Label"
-      wait: "readAttribute"
-      attribute: "NodeLabel"
+  - label: "Query Node Label"
+    wait: "readAttribute"
+    attribute: "NodeLabel"
 
-    - label: "Query User Location"
-      wait: "readAttribute"
-      attribute: "Location"
+  - label: "Query User Location"
+    wait: "readAttribute"
+    attribute: "Location"
 
-    - label: "Query HardwareVersion"
-      wait: "readAttribute"
-      attribute: "HardwareVersion"
+  - label: "Query HardwareVersion"
+    wait: "readAttribute"
+    attribute: "HardwareVersion"
 
-    - label: "Query HardwareVersionString"
-      wait: "readAttribute"
-      attribute: "HardwareVersionString"
+  - label: "Query HardwareVersionString"
+    wait: "readAttribute"
+    attribute: "HardwareVersionString"
 
-    - label: "Query SoftwareVersion"
-      wait: "readAttribute"
-      attribute: "SoftwareVersion"
+  - label: "Query SoftwareVersion"
+    wait: "readAttribute"
+    attribute: "SoftwareVersion"
 
-    - label: "Query SoftwareVersionString"
-      wait: "readAttribute"
-      attribute: "SoftwareVersionString"
+  - label: "Query SoftwareVersionString"
+    wait: "readAttribute"
+    attribute: "SoftwareVersionString"
 
-    - label: "Query ManufacturingDate"
-      wait: "readAttribute"
-      attribute: "ManufacturingDate"
+  - label: "Query ManufacturingDate"
+    wait: "readAttribute"
+    attribute: "ManufacturingDate"
 
-    - label: "Query PartNumber"
-      wait: "readAttribute"
-      attribute: "PartNumber"
+  - label: "Query PartNumber"
+    wait: "readAttribute"
+    attribute: "PartNumber"
 
-    - label: "Query ProductURL"
-      wait: "readAttribute"
-      attribute: "ProductURL"
+  - label: "Query ProductURL"
+    wait: "readAttribute"
+    attribute: "ProductURL"
 
-    - label: "Query ProductLabel"
-      wait: "readAttribute"
-      attribute: "ProductLabel"
+  - label: "Query ProductLabel"
+    wait: "readAttribute"
+    attribute: "ProductLabel"
 
-    - label: "Query SerialNumber"
-      wait: "readAttribute"
-      attribute: "SerialNumber"
+  - label: "Query SerialNumber"
+    wait: "readAttribute"
+    attribute: "SerialNumber"
 
-    - label: "Query LocalConfigDisabled"
-      wait: "readAttribute"
-      attribute: "LocalConfigDisabled"
+  - label: "Query LocalConfigDisabled"
+    wait: "readAttribute"
+    attribute: "LocalConfigDisabled"
 
-    - label: "Query Reachable"
-      wait: "readAttribute"
-      attribute: "Reachable"
+  - label: "Query Reachable"
+    wait: "readAttribute"
+    attribute: "Reachable"
 
-    - label: "Query UniqueID"
-      wait: "readAttribute"
-      attribute: "UniqueID"
+  - label: "Query UniqueID"
+    wait: "readAttribute"
+    attribute: "UniqueID"

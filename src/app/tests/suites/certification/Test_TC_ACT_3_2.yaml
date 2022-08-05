@@ -16,82 +16,82 @@
 name: 3.2.4. [TC-ACT-3.2] Functionality with client as DUT
 
 PICS:
-    - ACT.C
+  - ACT.C
 
 config:
-    nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+  nodeId: 0x12344321
+  cluster: "Basic"
+  endpoint: 0
 
 tests:
-    - label: "DUT issues an InstantAction command to TH"
-      PICS: ACT.C.C00.Tx
-      verification: |
-          Optional command, needs an SDK implementation
-      disabled: true
+  - label: "DUT issues an InstantAction command to TH"
+    PICS: ACT.C.C00.Tx
+    verification: |
+      Optional command, needs an SDK implementation
+    disabled: true
 
-    - label: "DUT issues an StartAction command to TH"
-      PICS: ACT.C.C02.Tx
-      verification: |
-          Optional command, needs an SDK implementation
-      disabled: true
+  - label: "DUT issues an StartAction command to TH"
+    PICS: ACT.C.C02.Tx
+    verification: |
+      Optional command, needs an SDK implementation
+    disabled: true
 
-    - label: "DUT issues an StopAction command to TH"
-      PICS: ACT.C.C04.Tx
-      verification: |
-          Optional command, needs an SDK implementation
-      disabled: true
+  - label: "DUT issues an StopAction command to TH"
+    PICS: ACT.C.C04.Tx
+    verification: |
+      Optional command, needs an SDK implementation
+    disabled: true
 
-    - label: "DUT issues an PauseAction command to TH"
-      PICS: ACT.C.C05.Tx
-      verification: |
-          Optional command, needs an SDK implementation
-      disabled: true
+  - label: "DUT issues an PauseAction command to TH"
+    PICS: ACT.C.C05.Tx
+    verification: |
+      Optional command, needs an SDK implementation
+    disabled: true
 
-    - label: "DUT issues an ResumeAction command to TH"
-      PICS: ACT.C.C07.Tx
-      verification: |
-          Optional command, needs an SDK implementation
-      disabled: true
+  - label: "DUT issues an ResumeAction command to TH"
+    PICS: ACT.C.C07.Tx
+    verification: |
+      Optional command, needs an SDK implementation
+    disabled: true
 
-    - label: "DUT issues an EnableAction command to TH"
-      PICS: ACT.C.C08.Tx
-      verification: |
-          Optional command, needs an SDK implementation
-      disabled: true
+  - label: "DUT issues an EnableAction command to TH"
+    PICS: ACT.C.C08.Tx
+    verification: |
+      Optional command, needs an SDK implementation
+    disabled: true
 
-    - label: "DUT issues an DisableAction command to TH"
-      PICS: ACT.C.C0a.Tx
-      verification: |
-          Optional command, needs an SDK implementation
-      disabled: true
+  - label: "DUT issues an DisableAction command to TH"
+    PICS: ACT.C.C0a.Tx
+    verification: |
+      Optional command, needs an SDK implementation
+    disabled: true
 
-    - label: "DUT issues an StartActionWithDuration command to TH"
-      PICS: ACT.C.C03.Tx
-      verification: |
-          Optional command, needs an SDK implementation
-      disabled: true
+  - label: "DUT issues an StartActionWithDuration command to TH"
+    PICS: ACT.C.C03.Tx
+    verification: |
+      Optional command, needs an SDK implementation
+    disabled: true
 
-    - label: "DUT issues an PauseActionWithDuration command to TH"
-      PICS: ACT.C.C06.Tx
-      verification: |
-          Optional command, needs an SDK implementation
-      disabled: true
+  - label: "DUT issues an PauseActionWithDuration command to TH"
+    PICS: ACT.C.C06.Tx
+    verification: |
+      Optional command, needs an SDK implementation
+    disabled: true
 
-    - label: "DUT issues an EnableActionWithDuration command to TH"
-      PICS: ACT.C.C09.Tx
-      verification: |
-          Optional command, needs an SDK implementation
-      disabled: true
+  - label: "DUT issues an EnableActionWithDuration command to TH"
+    PICS: ACT.C.C09.Tx
+    verification: |
+      Optional command, needs an SDK implementation
+    disabled: true
 
-    - label: "DUT issues an DisableActionWithDuration command to TH"
-      PICS: ACT.C.C0b.Tx
-      verification: |
-          Optional command, needs an SDK implementation
-      disabled: true
+  - label: "DUT issues an DisableActionWithDuration command to TH"
+    PICS: ACT.C.C0b.Tx
+    verification: |
+      Optional command, needs an SDK implementation
+    disabled: true
 
-    - label: "DUT issues an InstantActionWithTransition command to TH"
-      PICS: ACT.C.C01.Tx
-      verification: |
-          Optional command, needs an SDK implementation
-      disabled: true
+  - label: "DUT issues an InstantActionWithTransition command to TH"
+    PICS: ACT.C.C01.Tx
+    verification: |
+      Optional command, needs an SDK implementation
+    disabled: true

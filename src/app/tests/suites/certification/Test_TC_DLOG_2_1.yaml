@@ -13,78 +13,73 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    55.2.1. [TC-DLOG-2.1] Diagnostic Logs Cluster Commands Checks with BDX
-    [DUT-Server]
+name: 55.2.1. [TC-DLOG-2.1] Diagnostic Logs Cluster Commands Checks with BDX
+  [DUT-Server]
 
 PICS:
-    - DLOG.S
+  - DLOG.S
 
 config:
-    nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+  nodeId: 0x12344321
+  cluster: "Basic"
+  endpoint: 0
 
 tests:
-    - label: "Reboot DUT"
-      verification: |
+  - label: "Reboot DUT"
+    verification: |
 
-      disabled: true
+    disabled: true
 
-    - label: "Commission DUT to TH"
-      verification: |
+  - label: "Commission DUT to TH"
+    verification: |
 
-      disabled: true
+    disabled: true
 
-    - label:
-          "TH sends RetrieveLogsRequest Command (Intent =
-          EndUserSupport,TransferFileDesignator = 'test.txt', RequestedProtocol=
-          BDX) to DUT"
-      verification: |
-          sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 1 "test.txt" 1 0
+  - label: "TH sends RetrieveLogsRequest Command (Intent =
+      EndUserSupport,TransferFileDesignator = 'test.txt', RequestedProtocol=
+      BDX) to DUT"
+    verification: |
+      sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 1 "test.txt" 1 0
 
 
-          [1651207333.385887][2441:2446] CHIP:DMG:                                StatusIB =
-          [1651207333.385937][2441:2446] CHIP:DMG:                                {
-          [1651207333.385985][2441:2446] CHIP:DMG:                                        status = 0x00 (SUCCESS),
-          [1651207333.386037][2441:2446] CHIP:DMG:                                },
-      disabled: true
+      [1651207333.385887][2441:2446] CHIP:DMG:                                StatusIB =
+      [1651207333.385937][2441:2446] CHIP:DMG:                                {
+      [1651207333.385985][2441:2446] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+      [1651207333.386037][2441:2446] CHIP:DMG:                                },
+    disabled: true
 
-    - label: "TH Sends BDX SendAccept message"
-      PICS: DLOG.S.C01.Tx
-      verification: |
-          Not Verifiable
-      disabled: true
+  - label: "TH Sends BDX SendAccept message"
+    PICS: DLOG.S.C01.Tx
+    verification: |
+      Not Verifiable
+    disabled: true
 
-    - label:
-          "TH sends RetrieveLogsRequest Command (Intent =
-          EndUserSupport,TransferFileDesignator = 'test.txt', RequestedProtocol=
-          BDX) to DUT"
-      verification: |
-          sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 1 "test.txt" 1 0
+  - label: "TH sends RetrieveLogsRequest Command (Intent =
+      EndUserSupport,TransferFileDesignator = 'test.txt', RequestedProtocol=
+      BDX) to DUT"
+    verification: |
+      sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 1 "test.txt" 1 0
 
-          [1651207386.883337][2457:2462] CHIP:DMG:
-          [1651207386.883383][2457:2462] CHIP:DMG:                                StatusIB =
-          [1651207386.883443][2457:2462] CHIP:DMG:                                {
-          [1651207386.883498][2457:2462] CHIP:DMG:                                        status = 0x00 (SUCCESS),
-          [1651207386.883563][2457:2462] CHIP:DMG:                                },
-      disabled: true
+      [1651207386.883337][2457:2462] CHIP:DMG:
+      [1651207386.883383][2457:2462] CHIP:DMG:                                StatusIB =
+      [1651207386.883443][2457:2462] CHIP:DMG:                                {
+      [1651207386.883498][2457:2462] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+      [1651207386.883563][2457:2462] CHIP:DMG:                                },
+    disabled: true
 
-    - label:
-          "TH Sends StatusReport(GeneralCode: FAILURE, ProtocolId: BDX,
-          ProtocolCode: TRANSFER_METHOD_NOT_SUPPORTED)"
-      verification: |
-          Not Verifiable
-      disabled: true
+  - label: "TH Sends StatusReport(GeneralCode: FAILURE, ProtocolId: BDX,
+      ProtocolCode: TRANSFER_METHOD_NOT_SUPPORTED)"
+    verification: |
+      Not Verifiable
+    disabled: true
 
-    - label:
-          "TH sends RetrieveLogsRequest Command (Intent = EndUserSupport,
-          RequestedProtocol = ResponsePayload) to DUT"
-      verification: |
-          sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 0 "test.txt" 1 0
+  - label: "TH sends RetrieveLogsRequest Command (Intent = EndUserSupport,
+      RequestedProtocol = ResponsePayload) to DUT"
+    verification: |
+      sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 0 "test.txt" 1 0
 
-          [1651207416.783607][2465:2470] CHIP:DMG:                                StatusIB =
-          [1651207416.783676][2465:2470] CHIP:DMG:                                {
-          [1651207416.783722][2465:2470] CHIP:DMG:                                        status = 0x00 (SUCCESS),
-          [1651207416.783766][2465:2470] CHIP:DMG:                                },
-      disabled: true
+      [1651207416.783607][2465:2470] CHIP:DMG:                                StatusIB =
+      [1651207416.783676][2465:2470] CHIP:DMG:                                {
+      [1651207416.783722][2465:2470] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+      [1651207416.783766][2465:2470] CHIP:DMG:                                },
+    disabled: true

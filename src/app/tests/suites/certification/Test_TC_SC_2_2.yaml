@@ -13,40 +13,39 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    14.2.2. [TC-SC-2.2] Bidirectional Communication - Passcode Authenticated
-    Session Establishment (PASE)
+name: 14.2.2. [TC-SC-2.2] Bidirectional Communication - Passcode Authenticated
+  Session Establishment (PASE)
 
 PICS:
-    - MCORE.ROLE.COMMISSIONEE
+  - MCORE.ROLE.COMMISSIONEE
 
 config:
-    nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+  nodeId: 0x12344321
+  cluster: "Basic"
+  endpoint: 0
 
 tests:
-    - label: "Initiator uses I2RKey to encrypt and send a message"
-      verification: |
-          Responder receives the encrypted message
-      disabled: true
+  - label: "Initiator uses I2RKey to encrypt and send a message"
+    verification: |
+      Responder receives the encrypted message
+    disabled: true
 
-    - label: "Responder uses I2RKey to decrypt the message"
-      verification: |
-          Responder is able to decrypt the message
-      disabled: true
+  - label: "Responder uses I2RKey to decrypt the message"
+    verification: |
+      Responder is able to decrypt the message
+    disabled: true
 
-    - label: "Responder uses R2IKey to encrypt and send a message"
-      verification: |
-          Initiator receives the encrypted message
-      disabled: true
+  - label: "Responder uses R2IKey to encrypt and send a message"
+    verification: |
+      Initiator receives the encrypted message
+    disabled: true
 
-    - label: "Initiator uses R2IKey to decrypt the message"
-      verification: |
-          Initiator is able to decrypt the message
-      disabled: true
+  - label: "Initiator uses R2IKey to decrypt the message"
+    verification: |
+      Initiator is able to decrypt the message
+    disabled: true
 
-    - label: "An error is encountered in initiator or responder decryption"
-      verification: |
-          Session is terminated and keys are cleared from memory
-      disabled: true
+  - label: "An error is encountered in initiator or responder decryption"
+    verification: |
+      Session is terminated and keys are cleared from memory
+    disabled: true

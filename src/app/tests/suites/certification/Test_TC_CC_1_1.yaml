@@ -15,76 +15,75 @@
 name: 27.1.1. [TC-CC-1.1] Global attributes with server as DUT
 
 PICS:
-    - CC.S
+  - CC.S
 
 config:
-    nodeId: 0x12344321
-    cluster: "Color Control"
-    endpoint: 1
+  nodeId: 0x12344321
+  cluster: "Color Control"
+  endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+  - label: "Wait for the commissioned device to be retrieved"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+    arguments:
+      values:
+        - name: "nodeId"
+          value: nodeId
 
-    - label: "read the global attribute: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          value: 5
-          constraints:
-              type: int16u
+  - label: "read the global attribute: ClusterRevision"
+    command: "readAttribute"
+    attribute: "ClusterRevision"
+    response:
+      value: 5
+      constraints:
+        type: int16u
 
-    - label: "Read the global attribute: FeatureMap"
-      PICS: (CC.S.F00 || CC.S.F01 || CC.S.F02 || CC.S.F03)
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              minValue: 0
-              maxValue: 31
+  - label: "Read the global attribute: FeatureMap"
+    PICS: (CC.S.F00 || CC.S.F01 || CC.S.F02 || CC.S.F03)
+    command: "readAttribute"
+    attribute: "FeatureMap"
+    response:
+      constraints:
+        type: bitmap32
+        minValue: 0
+        maxValue: 31
 
-    - label: "Read the global attribute: AttributeList"
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [8, 15, 16385, 16394, 65528, 65529, 65531, 65532, 65533]
+  - label: "Read the global attribute: AttributeList"
+    command: "readAttribute"
+    attribute: "AttributeList"
+    response:
+      constraints:
+        type: list
+        contains: [8, 15, 16385, 16394, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Read the global attribute: AcceptedCommandList"
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          constraints:
-              type: list
-              contains: []
+  - label: "Read the global attribute: AcceptedCommandList"
+    command: "readAttribute"
+    attribute: "AcceptedCommandList"
+    response:
+      constraints:
+        type: list
+        contains: []
 
-    - label: "Read the global attribute: GeneratedCommandList"
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          value: []
-          constraints:
-              type: list
+  - label: "Read the global attribute: GeneratedCommandList"
+    command: "readAttribute"
+    attribute: "GeneratedCommandList"
+    response:
+      value: []
+      constraints:
+        type: list
 
-    #issue #15011
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+  #issue #15011
+  - label: "Read EventList attribute from the DUT and Verify that the DUT
+      response provides a list of supported events."
+    verification: |
+      Not implemented in chip-tool
+    cluster: "LogCommands"
+    command: "UserPrompt"
+    PICS: PICS_USER_PROMPT
+    arguments:
+      values:
+        - name: "message"
+          value: "Please enter 'y' for success"
+        - name: "expectedValue"
+          value: "y"

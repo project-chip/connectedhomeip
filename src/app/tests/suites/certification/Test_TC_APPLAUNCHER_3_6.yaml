@@ -15,29 +15,28 @@
 name: 19.4.2. [TC-APPLAUNCHER-3.6] Current App Verification
 
 PICS:
-    - APPLAUNCHER.S
+  - APPLAUNCHER.S
 
 config:
-    nodeId: 0x12344321
-    cluster: "Application Launcher"
-    endpoint: 1
+  nodeId: 0x12344321
+  cluster: "Application Launcher"
+  endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+  - label: "Wait for the commissioned device to be retrieved"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+    arguments:
+      values:
+        - name: "nodeId"
+          value: nodeId
 
-    # Issue 13029
-    #this step implicitly validating the attribute(CurrentApp)constraints, as long as the payload is being parsed successfully
-    - label:
-          "TH reads CurrentApp attribute from the DUT and Verify the in-focus
-          application attributes, which should include the display Application
-          ID(type:uint16) Catalog Vendor ID(type:string) or Null if there is no
-          current in-focus application"
-      PICS: APPLAUNCHER.S.A0001
-      command: "readAttribute"
-      attribute: "CurrentApp"
+  # Issue 13029
+  #this step implicitly validating the attribute(CurrentApp)constraints, as long as the payload is being parsed successfully
+  - label: "TH reads CurrentApp attribute from the DUT and Verify the in-focus
+      application attributes, which should include the display Application
+      ID(type:uint16) Catalog Vendor ID(type:string) or Null if there is no
+      current in-focus application"
+    PICS: APPLAUNCHER.S.A0001
+    command: "readAttribute"
+    attribute: "CurrentApp"

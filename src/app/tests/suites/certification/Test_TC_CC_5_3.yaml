@@ -15,123 +15,123 @@
 name: 27.2.11. [TC-CC-5.3] Color Step functionality with server as DUT
 
 PICS:
-    - CC.S
+  - CC.S
 
 config:
-    nodeId: 0x12344321
-    cluster: "Color Control"
-    endpoint: 1
-    StepXConfigValue:
-        type: int16s
-        defaultValue: 100
-    StepYConfigValue:
-        type: int16s
-        defaultValue: 100
+  nodeId: 0x12344321
+  cluster: "Color Control"
+  endpoint: 1
+  StepXConfigValue:
+    type: int16s
+    defaultValue: 100
+  StepYConfigValue:
+    type: int16s
+    defaultValue: 100
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+  - label: "Wait for the commissioned device to be retrieved"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+    arguments:
+      values:
+        - name: "nodeId"
+          value: nodeId
 
-    - label: "Turn on light for color control tests"
-      PICS: OO.S.C01.Rsp
-      cluster: "On/Off"
-      command: "on"
+  - label: "Turn on light for color control tests"
+    PICS: OO.S.C01.Rsp
+    cluster: "On/Off"
+    command: "on"
 
-    - label: "Check on/off attribute value is true after on command"
-      cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      PICS: OO.S.A0000
-      response:
-          value: 1
+  - label: "Check on/off attribute value is true after on command"
+    cluster: "On/Off"
+    command: "readAttribute"
+    attribute: "OnOff"
+    PICS: OO.S.A0000
+    response:
+      value: 1
 
-    - label: "TH writes 0 to the Options attribute"
-      PICS: CC.S.F03 && CC.S.A000f
-      command: "writeAttribute"
-      attribute: "Options"
-      arguments:
+  - label: "TH writes 0 to the Options attribute"
+    PICS: CC.S.F03 && CC.S.A000f
+    command: "writeAttribute"
+    attribute: "Options"
+    arguments:
+      value: 0
+
+  - label: "TH reads CurrentX attribute from DUT"
+    command: "readAttribute"
+    PICS: CC.S.F03 && CC.S.A0003
+    attribute: "CurrentX"
+    response:
+      saveAs: CurrentXValue
+      constraints:
+        type: int16u
+        minValue: 0
+        maxValue: 65279
+
+  - label: "TH reads CurrentY attribute from DUT"
+    command: "readAttribute"
+    PICS: CC.S.F03 && CC.S.A0004
+    attribute: "CurrentY"
+    response:
+      saveAs: CurrentYValue
+      constraints:
+        type: int16u
+        minValue: 0
+        maxValue: 65279
+
+  - label: "TH sends StepColor command to DUT"
+    command: "StepColor"
+    PICS: CC.S.F03 && CC.S.C09.Rsp
+    arguments:
+      values:
+        - name: "stepX"
+          value: StepXConfigValue
+        - name: "stepY"
+          value: StepYConfigValue
+        - name: "TransitionTime"
+          value: 10
+        - name: "OptionsMask"
+          value: 0
+        - name: "OptionsOverride"
           value: 0
 
-    - label: "TH reads CurrentX attribute from DUT"
-      command: "readAttribute"
-      PICS: CC.S.F03 && CC.S.A0003
-      attribute: "CurrentX"
-      response:
-          saveAs: CurrentXValue
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65279
+  - label: "Wait 1500ms"
+    cluster: "DelayCommands"
+    command: "WaitForMs"
+    arguments:
+      values:
+        - name: "ms"
+          value: 1500
 
-    - label: "TH reads CurrentY attribute from DUT"
-      command: "readAttribute"
-      PICS: CC.S.F03 && CC.S.A0004
-      attribute: "CurrentY"
-      response:
-          saveAs: CurrentYValue
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65279
+  - label: "Over TransitionTime, TH reads CurrentX attribute from DUT"
+    PICS: CC.S.F03 && CC.S.A0003 && CC.S.C09.Rsp
+    command: "readAttribute"
+    attribute: "CurrentX"
+    response:
+      constraints:
+        type: int16u
+        minValue: CurrentXValue
+        maxValue: 65279
 
-    - label: "TH sends StepColor command to DUT"
-      command: "StepColor"
-      PICS: CC.S.F03 && CC.S.C09.Rsp
-      arguments:
-          values:
-              - name: "stepX"
-                value: StepXConfigValue
-              - name: "stepY"
-                value: StepYConfigValue
-              - name: "TransitionTime"
-                value: 10
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
+  - label: "Over TransitionTime, TH reads CurrentY attribute from DUT"
+    PICS: CC.S.F03 && CC.S.A0004 && CC.S.C09.Rsp
+    command: "readAttribute"
+    attribute: "CurrentY"
+    response:
+      constraints:
+        type: int16u
+        minValue: CurrentYValue
+        maxValue: 65279
 
-    - label: "Wait 1500ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 1500
+  - label: "Turn off light that we turned on"
+    PICS: OO.S.C00.Rsp
+    cluster: "On/Off"
+    command: "off"
 
-    - label: "Over TransitionTime, TH reads CurrentX attribute from DUT"
-      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C09.Rsp
-      command: "readAttribute"
-      attribute: "CurrentX"
-      response:
-          constraints:
-              type: int16u
-              minValue: CurrentXValue
-              maxValue: 65279
-
-    - label: "Over TransitionTime, TH reads CurrentY attribute from DUT"
-      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C09.Rsp
-      command: "readAttribute"
-      attribute: "CurrentY"
-      response:
-          constraints:
-              type: int16u
-              minValue: CurrentYValue
-              maxValue: 65279
-
-    - label: "Turn off light that we turned on"
-      PICS: OO.S.C00.Rsp
-      cluster: "On/Off"
-      command: "off"
-
-    - label: "Check on/off attribute value is false after off command"
-      cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      PICS: OO.S.A0000
-      response:
-          value: 0
+  - label: "Check on/off attribute value is false after off command"
+    cluster: "On/Off"
+    command: "readAttribute"
+    attribute: "OnOff"
+    PICS: OO.S.A0000
+    response:
+      value: 0

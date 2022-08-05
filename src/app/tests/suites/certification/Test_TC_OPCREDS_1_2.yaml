@@ -14,80 +14,80 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.1.2. [TC-OPCREDS-1.2] Global Attributes for Node Operational Credentials
-    Cluster [DUT-Server]
+  11.1.2. [TC-OPCREDS-1.2] Global Attributes for Node Operational Credentials
+  Cluster [DUT-Server]
 
 PICS:
-    - OPCREDS.S
+  - OPCREDS.S
 
 config:
-    nodeId: 0x12344321
-    cluster: "Operational Credentials"
-    endpoint: 0
+  nodeId: 0x12344321
+  cluster: "Operational Credentials"
+  endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+  - label: "Wait for the commissioned device to be retrieved"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+    arguments:
+      values:
+        - name: "nodeId"
+          value: nodeId
 
-    - label: "TH reads the ClusterRevision from DUT"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          value: 1
-          constraints:
-              type: int16u
+  - label: "TH reads the ClusterRevision from DUT"
+    command: "readAttribute"
+    attribute: "ClusterRevision"
+    response:
+      value: 1
+      constraints:
+        type: int16u
 
-    - label: "TH reads the FeatureMap from DUT"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 0
-          constraints:
-              type: bitmap32
+  - label: "TH reads the FeatureMap from DUT"
+    command: "readAttribute"
+    attribute: "FeatureMap"
+    response:
+      value: 0
+      constraints:
+        type: bitmap32
 
-    - label: "TH reads AttributeList from DUT"
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains:
-                  [
-                      0xFFFD,
-                      0xFFFC,
-                      0xFFFB,
-                      0xFFF9,
-                      0xFFF8,
-                      0x00,
-                      0x01,
-                      0x02,
-                      0x03,
-                      0x04,
-                      0x05,
-                  ]
+  - label: "TH reads AttributeList from DUT"
+    command: "readAttribute"
+    attribute: "AttributeList"
+    response:
+      constraints:
+        type: list
+        contains:
+          [
+            0xFFFD,
+            0xFFFC,
+            0xFFFB,
+            0xFFF9,
+            0xFFF8,
+            0x00,
+            0x01,
+            0x02,
+            0x03,
+            0x04,
+            0x05,
+          ]
 
-    - label: "TH reads EventList from DUT"
-      verification: |
-          out of scope for V1.0
-      disabled: true
+  - label: "TH reads EventList from DUT"
+    verification: |
+      out of scope for V1.0
+    disabled: true
 
-    - label: "TH reads AcceptedCommandList from DUT"
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          constraints:
-              type: list
-              contains: [0x00, 0x02, 0x04, 0x06, 0x07, 0x09, 0x0a, 0x0b]
+  - label: "TH reads AcceptedCommandList from DUT"
+    command: "readAttribute"
+    attribute: "AcceptedCommandList"
+    response:
+      constraints:
+        type: list
+        contains: [0x00, 0x02, 0x04, 0x06, 0x07, 0x09, 0x0a, 0x0b]
 
-    - label: "TH reads GeneratedCommandList from DUT"
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          constraints:
-              type: list
-              contains: [0x01, 0x03, 0x05, 0x08]
+  - label: "TH reads GeneratedCommandList from DUT"
+    command: "readAttribute"
+    attribute: "GeneratedCommandList"
+    response:
+      constraints:
+        type: list
+        contains: [0x01, 0x03, 0x05, 0x08]

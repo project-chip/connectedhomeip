@@ -15,47 +15,47 @@
 name: 74.2.1. [TC-SWTCH-2.1] Attributes with server as DUT
 
 PICS:
-    - SWTCH.S
+  - SWTCH.S
 
 config:
-    nodeId: 0x12344321
-    cluster: "Switch"
-    endpoint: 1
+  nodeId: 0x12344321
+  cluster: "Switch"
+  endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+  - label: "Wait for the commissioned device to be retrieved"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+    arguments:
+      values:
+        - name: "nodeId"
+          value: nodeId
 
-    - label: "Read NumberOfPositions attribute"
-      command: "readAttribute"
-      attribute: "number of positions"
-      response:
-          saveAs: NumberOfPositionsValue
-          constraints:
-              type: int8u
-              minValue: 2
-              maxValue: 255
+  - label: "Read NumberOfPositions attribute"
+    command: "readAttribute"
+    attribute: "number of positions"
+    response:
+      saveAs: NumberOfPositionsValue
+      constraints:
+        type: int8u
+        minValue: 2
+        maxValue: 255
 
-    - label: "Read CurrentPosition attribute"
-      command: "readAttribute"
-      attribute: "current position"
-      response:
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: NumberOfPositionsValue - 1
+  - label: "Read CurrentPosition attribute"
+    command: "readAttribute"
+    attribute: "current position"
+    response:
+      constraints:
+        type: int8u
+        minValue: 0
+        maxValue: NumberOfPositionsValue - 1
 
-    - label: "Read MultiPressMax attribute"
-      PICS: SWTCH.S.F04
-      command: "readAttribute"
-      attribute: "multi press max"
-      response:
-          constraints:
-              type: int8u
-              minValue: 2
-              maxValue: 255
+  - label: "Read MultiPressMax attribute"
+    PICS: SWTCH.S.F04
+    command: "readAttribute"
+    attribute: "multi press max"
+    response:
+      constraints:
+        type: int8u
+        minValue: 2
+        maxValue: 255

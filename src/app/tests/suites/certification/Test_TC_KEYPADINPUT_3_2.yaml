@@ -15,42 +15,42 @@
 name: 19.3.2. [TC-KEYPADINPUT-3.2] Location Keys Verification
 
 PICS:
-    - KEYPADINPUT.S.LK
+  - KEYPADINPUT.S.LK
 
 config:
-    nodeId: 0x12344321
-    cluster: "Keypad Input"
-    endpoint: 1
+  nodeId: 0x12344321
+  cluster: "Keypad Input"
+  endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+  - label: "Wait for the commissioned device to be retrieved"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+    arguments:
+      values:
+        - name: "nodeId"
+          value: nodeId
 
-    - label: "TH sends CEC Settings Keys(0x0A) to DUT"
-      PICS: KEYPADINPUT.S.LK
-      command: "SendKey"
-      arguments:
-          values:
-              - name: "keyCode"
-                value: 0x0A
-      response:
-          values:
-              - name: "status"
-                value: 0
+  - label: "TH sends CEC Settings Keys(0x0A) to DUT"
+    PICS: KEYPADINPUT.S.LK
+    command: "SendKey"
+    arguments:
+      values:
+        - name: "keyCode"
+          value: 0x0A
+    response:
+      values:
+        - name: "status"
+          value: 0
 
-    - label: "TH sends CEC Home Keys(0x09) to DUT"
-      PICS: KEYPADINPUT.S.LK
-      command: "SendKey"
-      arguments:
-          values:
-              - name: "keyCode"
-                value: 0x09
-      response:
-          values:
-              - name: "status"
-                value: 0
+  - label: "TH sends CEC Home Keys(0x09) to DUT"
+    PICS: KEYPADINPUT.S.LK
+    command: "SendKey"
+    arguments:
+      values:
+        - name: "keyCode"
+          value: 0x09
+    response:
+      values:
+        - name: "status"
+          value: 0

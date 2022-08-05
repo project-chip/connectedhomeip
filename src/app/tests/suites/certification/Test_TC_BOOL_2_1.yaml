@@ -15,26 +15,26 @@
 name: 68.2.1. [TC-BOOL-2.1] Attributes with server as DUT
 
 PICS:
-    - BOOL.S
+  - BOOL.S
 
 config:
-    nodeId: 0x12344321
-    cluster: "Boolean State"
-    endpoint: 1
+  nodeId: 0x12344321
+  cluster: "Boolean State"
+  endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+  - label: "Wait for the commissioned device to be retrieved"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+    arguments:
+      values:
+        - name: "nodeId"
+          value: nodeId
 
-    - label: "Read mandatory non-global attribute: StateValue"
-      PICS: BOOL.S.A0000
-      command: "readAttribute"
-      attribute: "StateValue"
-      response:
-          constraints:
-              type: boolean
+  - label: "Read mandatory non-global attribute: StateValue"
+    PICS: BOOL.S.A0000
+    command: "readAttribute"
+    attribute: "StateValue"
+    response:
+      constraints:
+        type: boolean

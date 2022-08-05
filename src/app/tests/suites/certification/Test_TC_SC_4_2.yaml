@@ -13,491 +13,489 @@
 # limitations under the License.
 
 name:
-    13.4.2. [TC-SC-4.2] Commissionable Node Discovery - Commissioner Case [DUT -
-    Commissioner]
+  13.4.2. [TC-SC-4.2] Commissionable Node Discovery - Commissioner Case [DUT -
+  Commissioner]
 
 PICS:
-    - MCORE.ROLE.COMMISSIONER
+  - MCORE.ROLE.COMMISSIONER
 
 config:
-    nodeId: 0x12344321
-    cluster: "Secure Channel"
-    endpoint: 0
-    discriminator:
-        type: int16u
-        defaultValue: 3840
-    vendorId:
-        type: int16u
-        defaultValue: 65521
-    productId:
-        type: int16u
-        defaultValue: 32769
-    deviceType:
-        type: int16u
-        defaultValue: 5
+  nodeId: 0x12344321
+  cluster: "Secure Channel"
+  endpoint: 0
+  discriminator:
+    type: int16u
+    defaultValue: 3840
+  vendorId:
+    type: int16u
+    defaultValue: 65521
+  productId:
+    type: int16u
+    defaultValue: 32769
+  deviceType:
+    type: int16u
+    defaultValue: 5
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+  - label: "Wait for the commissioned device to be retrieved"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+    arguments:
+      values:
+        - name: "nodeId"
+          value: nodeId
 
-    - label:
-          "TH is put in Commissioning Mode using Open Basic Commissioning Window
-          command and starts advertising Commissionable Node Discovery service
-          using DNS-SD"
-      cluster: "AdministratorCommissioning"
-      command: "OpenBasicCommissioningWindow"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "CommissioningTimeout"
-                value: 180
+  - label:
+      "TH is put in Commissioning Mode using Open Basic Commissioning Window
+      command and starts advertising Commissionable Node Discovery service
+      using DNS-SD"
+    cluster: "AdministratorCommissioning"
+    command: "OpenBasicCommissioningWindow"
+    timedInteractionTimeoutMs: 10000
+    arguments:
+      values:
+        - name: "CommissioningTimeout"
+          value: 180
 
-    - label: "Check Instance Name"
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "instanceName"
-                saveAs: deviceInstanceNameBeforeReboot1
-                constraints:
-                    minLength: 16
-                    maxLength: 16
-                    isUpperCase: true
-                    isHexString: true
+  - label: "Check Instance Name"
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "instanceName"
+          saveAs: deviceInstanceNameBeforeReboot1
+          constraints:
+            minLength: 16
+            maxLength: 16
+            isUpperCase: true
+            isHexString: true
 
-    #validate the service type and the service domain not implemented in CI
+  #validate the service type and the service domain not implemented in CI
 
-    - label: "Check Hostname"
-      PICS: "( MCORE.SC.WIFI || MCORE.SC.ETH ) && !MCORE.SC.THR"
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "hostName"
-                constraints:
-                    minLength: 12
-                    maxLength: 12
-                    isUpperCase: true
-                    isHexString: true
+  - label: "Check Hostname"
+    PICS: "( MCORE.SC.WIFI || MCORE.SC.ETH ) && !MCORE.SC.THR"
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "hostName"
+          constraints:
+            minLength: 12
+            maxLength: 12
+            isUpperCase: true
+            isHexString: true
 
-    - label: "Check Hostname"
-      PICS: "( !MCORE.SC.WIFI && !MCORE.SC.ETH ) && MCORE.SC.THR "
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "hostName"
-                constraints:
-                    minLength: 16
-                    maxLength: 16
-                    isUpperCase: true
-                    isHexString: true
+  - label: "Check Hostname"
+    PICS: "( !MCORE.SC.WIFI && !MCORE.SC.ETH ) && MCORE.SC.THR "
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "hostName"
+          constraints:
+            minLength: 16
+            maxLength: 16
+            isUpperCase: true
+            isHexString: true
 
-    #subtype
-    - label: "Check Long Discriminator _L"
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionableByLongDiscriminator"
-      arguments:
-          values:
-              - name: "value"
-                value: discriminator
+  #subtype
+  - label: "Check Long Discriminator _L"
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionableByLongDiscriminator"
+    arguments:
+      values:
+        - name: "value"
+          value: discriminator
 
-    - label: "Check Short Discriminator (_S)"
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionableByShortDiscriminator"
-      arguments:
-          values:
-              - name: "value"
-                value: discriminator
+  - label: "Check Short Discriminator (_S)"
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionableByShortDiscriminator"
+    arguments:
+      values:
+        - name: "value"
+          value: discriminator
 
-    - label: "Check Vendor ID (_V)"
-      PICS: MCORE.SC.VENDOR_SUBTYPE
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionableByVendorId"
-      arguments:
-          values:
-              - name: "value"
-                value: vendorId
+  - label: "Check Vendor ID (_V)"
+    PICS: MCORE.SC.VENDOR_SUBTYPE
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionableByVendorId"
+    arguments:
+      values:
+        - name: "value"
+          value: vendorId
 
-    - label: "Check Device Type ID (_T)"
-      PICS: PICS_SKIP_SAMPLE_APP && MCORE.SC.DEVTYPE_SUBTYPE
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionableByDeviceType"
-      arguments:
-          values:
-              - name: "value"
-                value: deviceType
+  - label: "Check Device Type ID (_T)"
+    PICS: PICS_SKIP_SAMPLE_APP && MCORE.SC.DEVTYPE_SUBTYPE
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionableByDeviceType"
+    arguments:
+      values:
+        - name: "value"
+          value: deviceType
 
-    - label: "Check Commissioning Mode (_CM)"
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionableByCommissioningMode"
+  - label: "Check Commissioning Mode (_CM)"
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionableByCommissioningMode"
 
-    - label: "TXT key for Vendor ID and Product ID (VP)"
-      PICS: MCORE.SC.VP_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "vendorId"
-                value: vendorId
+  - label: "TXT key for Vendor ID and Product ID (VP)"
+    PICS: MCORE.SC.VP_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "vendorId"
+          value: vendorId
 
-    - label: "TXT key for Vendor ID and Product ID (VP)"
-      PICS: MCORE.SC.VP_KEY
-      optional: true
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "productId"
-                value: productId
+  - label: "TXT key for Vendor ID and Product ID (VP)"
+    PICS: MCORE.SC.VP_KEY
+    optional: true
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "productId"
+          value: productId
 
-    - label: "Optional TXT key for MRP Retry Interval Idle (CRI)"
-      PICS: MCORE.SC.SII_OP_DISCOVERY_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "mrpRetryIntervalIdle"
-                constraints:
-                    maxValue: 3600000
+  - label: "Optional TXT key for MRP Retry Interval Idle (CRI)"
+    PICS: MCORE.SC.SII_OP_DISCOVERY_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "mrpRetryIntervalIdle"
+          constraints:
+            maxValue: 3600000
 
-    - label: "Optional TXT key for MRP Retry Interval Active (CRA)"
-      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "mrpRetryIntervalActive"
-                constraints:
-                    maxValue: 3600000
+  - label: "Optional TXT key for MRP Retry Interval Active (CRA)"
+    PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "mrpRetryIntervalActive"
+          constraints:
+            maxValue: 3600000
 
-    - label: "TXT key for commissioning mode (CM)"
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "commissioningMode"
-                value: 1
+  - label: "TXT key for commissioning mode (CM)"
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "commissioningMode"
+          value: 1
 
-    - label: "Optional TXT key for device type (DT)"
-      PICS: PICS_SKIP_SAMPLE_APP && MCORE.SC.DT_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "deviceType"
-                value: deviceType
-                constraints:
-                    maxValue: 999
+  - label: "Optional TXT key for device type (DT)"
+    PICS: PICS_SKIP_SAMPLE_APP && MCORE.SC.DT_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "deviceType"
+          value: deviceType
+          constraints:
+            maxValue: 999
 
-    - label: "Optional TXT key for device name (DN)"
-      PICS: MCORE.SC.DN_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "deviceName"
-                constraints:
-                    maxLength: 32
+  - label: "Optional TXT key for device name (DN)"
+    PICS: MCORE.SC.DN_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "deviceName"
+          constraints:
+            maxLength: 32
 
-    - label: "Optional TXT key for rotating device identifier (RI)"
-      PICS: MCORE.SC.RI_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "rotatingIdLen"
-                constraints:
-                    maxValue: 100
+  - label: "Optional TXT key for rotating device identifier (RI)"
+    PICS: MCORE.SC.RI_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "rotatingIdLen"
+          constraints:
+            maxValue: 100
 
-    - label: "Optional TXT key for pairing hint (PH)"
-      PICS: MCORE.SC.PH_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "pairingHint"
-                constraints:
-                    notValue: 0
+  - label: "Optional TXT key for pairing hint (PH)"
+    PICS: MCORE.SC.PH_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "pairingHint"
+          constraints:
+            notValue: 0
 
-    - label: "Optional TXT key for pairing instructions (PI)"
-      PICS: MCORE.SC.PI_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "pairingInstruction"
-                constraints:
-                    maxLength: 128
+  - label: "Optional TXT key for pairing instructions (PI)"
+    PICS: MCORE.SC.PI_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "pairingInstruction"
+          constraints:
+            maxLength: 128
 
-    - label: "Check IPs"
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "numIPs"
-                constraints:
-                    minValue: 1
+  - label: "Check IPs"
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "numIPs"
+          constraints:
+            minValue: 1
 
-    - label: "Stop target device"
-      PICS: PICS_SDK_CI_ONLY
-      cluster: "SystemCommands"
-      command: "Stop"
+  - label: "Stop target device"
+    PICS: PICS_SDK_CI_ONLY
+    cluster: "SystemCommands"
+    command: "Stop"
 
-    - label:
-          "Start target device with the provided discriminator for basic
-          commissioning advertisement"
-      cluster: "SystemCommands"
-      PICS: PICS_SDK_CI_ONLY
-      command: "Start"
-      arguments:
-          values:
-              - name: "discriminator"
-                value: discriminator
+  - label: "Start target device with the provided discriminator for basic
+      commissioning advertisement"
+    cluster: "SystemCommands"
+    PICS: PICS_SDK_CI_ONLY
+    command: "Start"
+    arguments:
+      values:
+        - name: "discriminator"
+          value: discriminator
 
-    - label: "TH is rebooted"
-      verification: |
-          Not implemented in YAML
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
-          values:
-              - name: "message"
-                value: "Please reboot the TH and enter 'y' after TH starts"
-              - name: "expectedValue"
-                value: "y"
+  - label: "TH is rebooted"
+    verification: |
+      Not implemented in YAML
+    cluster: "LogCommands"
+    command: "UserPrompt"
+    PICS: PICS_SKIP_SAMPLE_APP
+    arguments:
+      values:
+        - name: "message"
+          value: "Please reboot the TH and enter 'y' after TH starts"
+        - name: "expectedValue"
+          value: "y"
 
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+  - label: "Wait for the commissioned device to be retrieved"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+    arguments:
+      values:
+        - name: "nodeId"
+          value: nodeId
 
-    - label: "Open Commissioning Window"
-      cluster: "AdministratorCommissioning"
-      command: "OpenBasicCommissioningWindow"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "CommissioningTimeout"
-                value: 180
+  - label: "Open Commissioning Window"
+    cluster: "AdministratorCommissioning"
+    command: "OpenBasicCommissioningWindow"
+    timedInteractionTimeoutMs: 10000
+    arguments:
+      values:
+        - name: "CommissioningTimeout"
+          value: 180
 
-    - label: "Check Instance Name"
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "instanceName"
-                constraints:
-                    minLength: 16
-                    maxLength: 16
-                    isUpperCase: true
-                    isHexString: true
-                    notValue: deviceInstanceNameBeforeReboot1
+  - label: "Check Instance Name"
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "instanceName"
+          constraints:
+            minLength: 16
+            maxLength: 16
+            isUpperCase: true
+            isHexString: true
+            notValue: deviceInstanceNameBeforeReboot1
 
-    #validate the service type and the service domain not implemented in CI
+  #validate the service type and the service domain not implemented in CI
 
-    - label: "Check Hostname"
-      PICS: "( MCORE.SC.WIFI || MCORE.SC.ETH ) && !MCORE.SC.THR "
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "hostName"
-                constraints:
-                    minLength: 12
-                    maxLength: 12
-                    isUpperCase: true
-                    isHexString: true
+  - label: "Check Hostname"
+    PICS: "( MCORE.SC.WIFI || MCORE.SC.ETH ) && !MCORE.SC.THR "
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "hostName"
+          constraints:
+            minLength: 12
+            maxLength: 12
+            isUpperCase: true
+            isHexString: true
 
-    - label: "Check Hostname"
-      PICS: "( !MCORE.SC.WIFI && !MCORE.SC.ETH ) && MCORE.SC.THR"
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "hostName"
-                constraints:
-                    minLength: 16
-                    maxLength: 16
-                    isUpperCase: true
-                    isHexString: true
+  - label: "Check Hostname"
+    PICS: "( !MCORE.SC.WIFI && !MCORE.SC.ETH ) && MCORE.SC.THR"
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "hostName"
+          constraints:
+            minLength: 16
+            maxLength: 16
+            isUpperCase: true
+            isHexString: true
 
-    - label: "Check Long Discriminator _L"
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionableByLongDiscriminator"
-      arguments:
-          values:
-              - name: "value"
-                value: discriminator
+  - label: "Check Long Discriminator _L"
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionableByLongDiscriminator"
+    arguments:
+      values:
+        - name: "value"
+          value: discriminator
 
-    - label: "Check Short Discriminator (_S)"
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionableByShortDiscriminator"
-      arguments:
-          values:
-              - name: "value"
-                value: discriminator
+  - label: "Check Short Discriminator (_S)"
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionableByShortDiscriminator"
+    arguments:
+      values:
+        - name: "value"
+          value: discriminator
 
-    - label: "Check Vendor ID (_V)"
-      PICS: MCORE.SC.VENDOR_SUBTYPE
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionableByVendorId"
-      arguments:
-          values:
-              - name: "value"
-                value: vendorId
+  - label: "Check Vendor ID (_V)"
+    PICS: MCORE.SC.VENDOR_SUBTYPE
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionableByVendorId"
+    arguments:
+      values:
+        - name: "value"
+          value: vendorId
 
-    - label: "Check Device Type ID (_T)"
-      PICS: PICS_SKIP_SAMPLE_APP && MCORE.SC.DEVTYPE_SUBTYPE
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionableByDeviceType"
-      arguments:
-          values:
-              - name: "value"
-                value: deviceType
+  - label: "Check Device Type ID (_T)"
+    PICS: PICS_SKIP_SAMPLE_APP && MCORE.SC.DEVTYPE_SUBTYPE
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionableByDeviceType"
+    arguments:
+      values:
+        - name: "value"
+          value: deviceType
 
-    - label: "Check Commissioning Mode (_CM)"
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionableByCommissioningMode"
+  - label: "Check Commissioning Mode (_CM)"
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionableByCommissioningMode"
 
-    - label: "TXT key for Vendor ID and Product ID (VP)"
-      PICS: MCORE.SC.VP_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "vendorId"
-                value: vendorId
+  - label: "TXT key for Vendor ID and Product ID (VP)"
+    PICS: MCORE.SC.VP_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "vendorId"
+          value: vendorId
 
-    - label: "TXT key for Vendor ID and Product ID (VP)"
-      PICS: MCORE.SC.VP_KEY
-      optional: true
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "productId"
-                value: productId
+  - label: "TXT key for Vendor ID and Product ID (VP)"
+    PICS: MCORE.SC.VP_KEY
+    optional: true
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "productId"
+          value: productId
 
-    - label: "Optional TXT key for MRP Retry Interval Idle (CRI)"
-      PICS: MCORE.SC.SII_OP_DISCOVERY_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "mrpRetryIntervalIdle"
-                constraints:
-                    maxValue: 3600000
+  - label: "Optional TXT key for MRP Retry Interval Idle (CRI)"
+    PICS: MCORE.SC.SII_OP_DISCOVERY_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "mrpRetryIntervalIdle"
+          constraints:
+            maxValue: 3600000
 
-    - label: "Optional TXT key for MRP Retry Interval Active (CRA)"
-      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "mrpRetryIntervalActive"
-                constraints:
-                    maxValue: 3600000
+  - label: "Optional TXT key for MRP Retry Interval Active (CRA)"
+    PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "mrpRetryIntervalActive"
+          constraints:
+            maxValue: 3600000
 
-    - label: "TXT key for commissioning mode (CM)"
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "commissioningMode"
-                value: 1
+  - label: "TXT key for commissioning mode (CM)"
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "commissioningMode"
+          value: 1
 
-    - label: "Optional TXT key for device type (DT)"
-      PICS: PICS_SKIP_SAMPLE_APP && MCORE.SC.DT_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "deviceType"
-                value: deviceType
-                constraints:
-                    maxValue: 999
+  - label: "Optional TXT key for device type (DT)"
+    PICS: PICS_SKIP_SAMPLE_APP && MCORE.SC.DT_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "deviceType"
+          value: deviceType
+          constraints:
+            maxValue: 999
 
-    - label: "Optional TXT key for device name (DN)"
-      PICS: MCORE.SC.DN_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "deviceName"
-                constraints:
-                    maxLength: 32
+  - label: "Optional TXT key for device name (DN)"
+    PICS: MCORE.SC.DN_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "deviceName"
+          constraints:
+            maxLength: 32
 
-    - label: "Optional TXT key for rotating device identifier (RI)"
-      PICS: MCORE.SC.RI_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "rotatingIdLen"
-                constraints:
-                    maxValue: 100
+  - label: "Optional TXT key for rotating device identifier (RI)"
+    PICS: MCORE.SC.RI_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "rotatingIdLen"
+          constraints:
+            maxValue: 100
 
-    - label: "Optional TXT key for pairing hint (PH)"
-      PICS: MCORE.SC.PH_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "pairingHint"
-                constraints:
-                    notValue: 0
+  - label: "Optional TXT key for pairing hint (PH)"
+    PICS: MCORE.SC.PH_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "pairingHint"
+          constraints:
+            notValue: 0
 
-    - label: "Optional TXT key for pairing instructions (PI)"
-      PICS: MCORE.SC.PI_KEY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "pairingInstruction"
-                constraints:
-                    maxLength: 128
+  - label: "Optional TXT key for pairing instructions (PI)"
+    PICS: MCORE.SC.PI_KEY
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "pairingInstruction"
+          constraints:
+            maxLength: 128
 
-    - label: "Check IPs"
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionable"
-      response:
-          values:
-              - name: "numIPs"
-                constraints:
-                    minValue: 1
+  - label: "Check IPs"
+    cluster: "DiscoveryCommands"
+    command: "FindCommissionable"
+    response:
+      values:
+        - name: "numIPs"
+          constraints:
+            minValue: 1
 
-    #Negative scenarios not implemented in CI
-    - label: "TH adds an unknown key/value pair in the advertised data"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value:
-                    "Please enter 'y' if TH adds an unknown key/value pair in
-                    the advertised data"
-              - name: "expectedValue"
-                value: "y"
+  #Negative scenarios not implemented in CI
+  - label: "TH adds an unknown key/value pair in the advertised data"
+    cluster: "LogCommands"
+    command: "UserPrompt"
+    PICS: PICS_USER_PROMPT
+    arguments:
+      values:
+        - name: "message"
+          value: "Please enter 'y' if TH adds an unknown key/value pair in
+            the advertised data"
+        - name: "expectedValue"
+          value: "y"
 
-    #Negative scenarios not implemented in CI
-    - label: "Scan for DNS-SD commissioner advertisements from TH"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+  #Negative scenarios not implemented in CI
+  - label: "Scan for DNS-SD commissioner advertisements from TH"
+    cluster: "LogCommands"
+    command: "UserPrompt"
+    PICS: PICS_USER_PROMPT
+    arguments:
+      values:
+        - name: "message"
+          value: "Please enter 'y' for success"
+        - name: "expectedValue"
+          value: "y"
