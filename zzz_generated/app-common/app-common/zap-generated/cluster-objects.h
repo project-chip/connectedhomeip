@@ -9440,9 +9440,9 @@ struct TypeInfo
 namespace BeaconLostCount {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BeaconLostCount::Id; }
@@ -9452,9 +9452,9 @@ struct TypeInfo
 namespace BeaconRxCount {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BeaconRxCount::Id; }
@@ -9464,9 +9464,9 @@ struct TypeInfo
 namespace PacketMulticastRxCount {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketMulticastRxCount::Id; }
@@ -9476,9 +9476,9 @@ struct TypeInfo
 namespace PacketMulticastTxCount {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketMulticastTxCount::Id; }
@@ -9488,9 +9488,9 @@ struct TypeInfo
 namespace PacketUnicastRxCount {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketUnicastRxCount::Id; }
@@ -9500,9 +9500,9 @@ struct TypeInfo
 namespace PacketUnicastTxCount {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketUnicastTxCount::Id; }
@@ -9512,9 +9512,9 @@ struct TypeInfo
 namespace CurrentMaxRate {
 struct TypeInfo
 {
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMaxRate::Id; }
@@ -9524,9 +9524,9 @@ struct TypeInfo
 namespace OverrunCount {
 struct TypeInfo
 {
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverrunCount::Id; }
@@ -9577,14 +9577,14 @@ struct TypeInfo
         Attributes::WiFiVersion::TypeInfo::DecodableType wiFiVersion;
         Attributes::ChannelNumber::TypeInfo::DecodableType channelNumber;
         Attributes::Rssi::TypeInfo::DecodableType rssi;
-        Attributes::BeaconLostCount::TypeInfo::DecodableType beaconLostCount               = static_cast<uint32_t>(0);
-        Attributes::BeaconRxCount::TypeInfo::DecodableType beaconRxCount                   = static_cast<uint32_t>(0);
-        Attributes::PacketMulticastRxCount::TypeInfo::DecodableType packetMulticastRxCount = static_cast<uint32_t>(0);
-        Attributes::PacketMulticastTxCount::TypeInfo::DecodableType packetMulticastTxCount = static_cast<uint32_t>(0);
-        Attributes::PacketUnicastRxCount::TypeInfo::DecodableType packetUnicastRxCount     = static_cast<uint32_t>(0);
-        Attributes::PacketUnicastTxCount::TypeInfo::DecodableType packetUnicastTxCount     = static_cast<uint32_t>(0);
-        Attributes::CurrentMaxRate::TypeInfo::DecodableType currentMaxRate                 = static_cast<uint64_t>(0);
-        Attributes::OverrunCount::TypeInfo::DecodableType overrunCount                     = static_cast<uint64_t>(0);
+        Attributes::BeaconLostCount::TypeInfo::DecodableType beaconLostCount;
+        Attributes::BeaconRxCount::TypeInfo::DecodableType beaconRxCount;
+        Attributes::PacketMulticastRxCount::TypeInfo::DecodableType packetMulticastRxCount;
+        Attributes::PacketMulticastTxCount::TypeInfo::DecodableType packetMulticastTxCount;
+        Attributes::PacketUnicastRxCount::TypeInfo::DecodableType packetUnicastRxCount;
+        Attributes::PacketUnicastTxCount::TypeInfo::DecodableType packetUnicastTxCount;
+        Attributes::CurrentMaxRate::TypeInfo::DecodableType currentMaxRate;
+        Attributes::OverrunCount::TypeInfo::DecodableType overrunCount;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

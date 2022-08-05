@@ -57,14 +57,14 @@ limitations under the License.
     <attribute side="server" code="0x02" define="WIFI_VERSION" type="WiFiVersionType" writable="false" isNullable="true" optional="false">WiFiVersion</attribute>
     <attribute side="server" code="0x03" define="CHANNEL_NUMBER" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" isNullable="true" optional="false">ChannelNumber</attribute>
     <attribute side="server" code="0x04" define="RSSI" type="INT8S" min="-120" max="0" writable="false" isNullable="true" optional="false">Rssi</attribute>
-    <attribute side="server" code="0x05" define="BEACON_LOST_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" optional="true">BeaconLostCount</attribute>
-    <attribute side="server" code="0x06" define="BEACON_RX_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" optional="true">BeaconRxCount</attribute>
-    <attribute side="server" code="0x07" define="PACKET_MULTICAST_RX_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" optional="true">PacketMulticastRxCount</attribute>
-    <attribute side="server" code="0x08" define="PACKET_MULTICAST_TX_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" optional="true">PacketMulticastTxCount</attribute>
-    <attribute side="server" code="0x09" define="PACKET_UNICAST_RX_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" optional="true">PacketUnicastRxCount</attribute>
-    <attribute side="server" code="0x0A" define="PACKET_UNICAST_TX_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" optional="true">PacketUnicastTxCount</attribute>
-    <attribute side="server" code="0x0B" define="CURRENT_MAX_RATE" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentMaxRate</attribute>
-    <attribute side="server" code="0x0C" define="OVERRUN_COUNT" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">OverrunCount</attribute>
+    <attribute side="server" code="0x05" define="BEACON_LOST_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" isNullable="true" optional="true">BeaconLostCount</attribute>
+    <attribute side="server" code="0x06" define="BEACON_RX_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" isNullable="true" optional="true">BeaconRxCount</attribute>
+    <attribute side="server" code="0x07" define="PACKET_MULTICAST_RX_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" isNullable="true" optional="true">PacketMulticastRxCount</attribute>
+    <attribute side="server" code="0x08" define="PACKET_MULTICAST_TX_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" isNullable="true" optional="true">PacketMulticastTxCount</attribute>
+    <attribute side="server" code="0x09" define="PACKET_UNICAST_RX_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" isNullable="true" optional="true">PacketUnicastRxCount</attribute>
+    <attribute side="server" code="0x0A" define="PACKET_UNICAST_TX_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" isNullable="true" optional="true">PacketUnicastTxCount</attribute>
+    <attribute side="server" code="0x0B" define="CURRENT_MAX_RATE" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" isNullable="true" optional="true">CurrentMaxRate</attribute>
+    <attribute side="server" code="0x0C" define="OVERRUN_COUNT" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" isNullable="true" optional="true">OverrunCount</attribute>
     <command source="client" code="0x00" name="ResetCounts" optional="true" cli="chip wifi_network_diagnostics resetcounts">
       <description>Reception of this command SHALL reset the Breacon and Packet related count attributes to 0</description>
     </command>
