@@ -1187,9 +1187,6 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
 
 namespace {
 
-using namespace chip;
-using namespace chip::app::TestGroups;
-
 static chip::TestPersistentStorageDelegate sDelegate;
 static GroupDataProviderImpl sProvider(chip::app::TestGroups::kMaxGroupsPerFabric, chip::app::TestGroups::kMaxGroupKeysPerFabric);
 
@@ -1213,63 +1210,6 @@ static EpochKey kEpochKeys3[] = {
     { 0xeeeeeeeeeeeeeeee, { 0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xef } },
     { 0xffffffffffffffff, { 0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff } },
 };
-
-static GroupOperationalCredentials kGroupKeys0[] = {
-    { .start_time     = 0x0000000000000000,
-      .hash           = 0x479e,
-      .encryption_key = { 0xc5, 0xf2, 0x69, 0x01, 0x87, 0x11, 0x51, 0x50, 0xc3, 0x56, 0xad, 0x93, 0xb3, 0x85, 0xbb, 0x0f },
-      .privacy_key    = { 0xf5, 0xce, 0x81, 0x88, 0x1d, 0x11, 0x18, 0xc5, 0xc8, 0x91, 0xc9, 0x06, 0x0b, 0xc7, 0x70, 0x09 } },
-    { .start_time     = 0x1111111111111111,
-      .hash           = 0xa512,
-      .encryption_key = { 0xae, 0xd9, 0x56, 0x95, 0xf3, 0x75, 0xd2, 0xce, 0x78, 0x55, 0x6a, 0x41, 0x73, 0x0c, 0x3f, 0x43 },
-      .privacy_key    = { 0xdc, 0x90, 0xdb, 0x2e, 0x61, 0x76, 0x5a, 0x42, 0x60, 0x7f, 0xaf, 0xaf, 0x16, 0x37, 0x40, 0x0a } },
-    { .start_time     = 0x2222222222222222,
-      .hash           = 0xd800,
-      .encryption_key = { 0x35, 0xca, 0x34, 0x6e, 0x5e, 0x24, 0xbb, 0xbe, 0x88, 0x9c, 0xf4, 0xd3, 0x5c, 0x5e, 0x82, 0x0a },
-      .privacy_key    = { 0xb1, 0xfb, 0x3e, 0x79, 0xa2, 0xff, 0x27, 0xf3, 0x70, 0x4d, 0x2b, 0xe9, 0x19, 0x2d, 0xb6, 0x07 } },
-};
-
-struct GroupKeySetTestEntry
-{
-    EpochKey * epochKey;                     ///< Struct with the epoch key and activation start time
-    GroupOperationalCredentials * groupKeys; ///< Struct of encryption key, privacy key, and group key hash (sessionId)
-};
-
-struct GroupKeySetTestEntry theGroupKeySetTestVector[] = {
-    {
-        .epochKey  = &kEpochKeys0[0],
-        .groupKeys = &kGroupKeys0[0],
-    },
-    {
-        .epochKey  = &kEpochKeys0[1],
-        .groupKeys = &kGroupKeys0[1],
-    },
-    {
-        .epochKey  = &kEpochKeys0[2],
-        .groupKeys = &kGroupKeys0[2],
-    },
-};
-
-const uint16_t theGroupKeySetTestVectorLength = sizeof(theGroupKeySetTestVector) / sizeof(theGroupKeySetTestVector[0]);
-
-void TestKeySetPrivacy(nlTestSuite * apSuite, void * apContext)
-{
-    GroupOperationalCredentials opCreds;
-
-    for (unsigned i = 0; i < theGroupKeySetTestVectorLength; i++)
-    {
-        const ByteSpan epochKey(theGroupKeySetTestVector[i].epochKey->key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-        NL_TEST_ASSERT(apSuite,
-                       CHIP_NO_ERROR == Crypto::DeriveGroupOperationalCredentials(epochKey, kCompressedFabricId1, opCreds));
-
-        NL_TEST_ASSERT(apSuite, opCreds.hash == theGroupKeySetTestVector[i].groupKeys->hash);
-        NL_TEST_ASSERT(
-            apSuite,
-            0 == memcmp(opCreds.encryption_key, theGroupKeySetTestVector[i].groupKeys->encryption_key, EpochKey::kLengthBytes));
-        NL_TEST_ASSERT(
-            apSuite, 0 == memcmp(opCreds.privacy_key, theGroupKeySetTestVector[i].groupKeys->privacy_key, EpochKey::kLengthBytes));
-    }
-}
 
 /**
  *  Set up the test suite.
@@ -1318,7 +1258,6 @@ const nlTest sTests[] = { NL_TEST_DEF("TestStorageDelegate", chip::app::TestGrou
                           NL_TEST_DEF("TestIpk", chip::app::TestGroups::TestIpk),
                           NL_TEST_DEF("TestPerFabricData", chip::app::TestGroups::TestPerFabricData),
                           NL_TEST_DEF("TestGroupDecryption", chip::app::TestGroups::TestGroupDecryption),
-                          NL_TEST_DEF("TestKeySetPrivacy", TestKeySetPrivacy),
                           NL_TEST_SENTINEL() };
 } // namespace
 

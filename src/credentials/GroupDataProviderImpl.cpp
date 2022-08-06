@@ -715,7 +715,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
     uint16_t keyset_id                       = 0;
     GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kCacheAndSync;
     uint8_t keys_count                       = 0;
-    GroupOperationalCredentials operational_keys[KeySet::kEpochKeysMax];
+    Crypto::GroupOperationalCredentials operational_keys[KeySet::kEpochKeysMax];
 
     KeySetData() = default;
     KeySetData(chip::FabricIndex fabric, chip::KeysetId id) : fabric_index(fabric) { keyset_id = id; }
@@ -739,7 +739,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
         next = kInvalidKeysetId;
     }
 
-    GroupOperationalCredentials * GetCurrentGroupCredentials()
+    Crypto::GroupOperationalCredentials * GetCurrentGroupCredentials()
     {
         // An epoch key update SHALL order the keys from oldest to newest,
         // the current epoch key having the second newest time if time
@@ -1790,7 +1790,7 @@ Crypto::SymmetricKeyContext * GroupDataProviderImpl::GetKeyContext(FabricIndex f
             // Group found, get the keyset
             KeySetData keyset;
             VerifyOrReturnError(keyset.Find(mStorage, fabric, mapping.keyset_id), nullptr);
-            GroupOperationalCredentials * creds = keyset.GetCurrentGroupCredentials();
+            Crypto::GroupOperationalCredentials * creds = keyset.GetCurrentGroupCredentials();
             if (nullptr != creds)
             {
                 return mGroupKeyContexPool.CreateObject(
@@ -1973,7 +1973,7 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
             continue;
         }
 
-        GroupOperationalCredentials & creds = keyset.operational_keys[mKeyIndex++];
+        Crypto::GroupOperationalCredentials & creds = keyset.operational_keys[mKeyIndex++];
         if (creds.hash == mSessionId)
         {
             mGroupKeyContext.SetKey(ByteSpan(creds.encryption_key, sizeof(creds.encryption_key)), mSessionId);
