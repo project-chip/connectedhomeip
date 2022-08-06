@@ -826,6 +826,9 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
                 ReturnErrorOnFailure(reader.Get(encryption_key));
                 VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == encryption_key.size(), CHIP_ERROR_INTERNAL);
                 memcpy(key.encryption_key, encryption_key.data(), encryption_key.size());
+                // Re-derive privacy key from encryption key when loading from storage to save on storage size.
+                MutableByteSpan privacy_key(key.privacy_key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+                ReturnErrorOnFailure(Crypto::DeriveGroupPrivacyKey(encryption_key, privacy_key));
                 ReturnErrorOnFailure(reader.ExitContainer(item));
             }
             ReturnErrorOnFailure(reader.ExitContainer(array));
@@ -1628,14 +1631,6 @@ CHIP_ERROR GroupDataProviderImpl::GetKeySet(chip::FabricIndex fabric_index, uint
     out_keyset.epoch_keys[0].start_time = keyset.operational_keys[0].start_time;
     out_keyset.epoch_keys[1].start_time = keyset.operational_keys[1].start_time;
     out_keyset.epoch_keys[2].start_time = keyset.operational_keys[2].start_time;
-
-    // Re-derive privacy keys to minimize storage
-    for (size_t i = 0; i < keyset.keys_count; ++i)
-    {
-        ByteSpan encryption_key(keyset.operational_keys[i].encryption_key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-        MutableByteSpan privacy_key(keyset.operational_keys[i].privacy_key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-        ReturnErrorOnFailure(Crypto::DeriveGroupPrivacyKey(encryption_key, privacy_key));
-    }
 
     return CHIP_NO_ERROR;
 }
