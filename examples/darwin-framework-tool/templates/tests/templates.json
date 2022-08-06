@@ -10,8 +10,7 @@
         "templates/chip/helper.js",
         "common/ClusterTestGeneration.js",
         "darwin/Framework/CHIP/templates/helper.js",
-        "darwin-framework-tool/templates/helper.js",
-        "darwin-framework-tool/templates/tests/tests.js"
+        "darwin-framework-tool/templates/helper.js"
     ],
     "resources": {
         "pics-metafile": "../../../../src/app/tests/suites/certification/PICS.yaml",

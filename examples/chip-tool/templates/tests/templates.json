@@ -8,8 +8,7 @@
         "templates/chip/helper.js",
         "common/ClusterTestGeneration.js",
         "chip-tool/templates/helper.js",
-        "chip-tool/templates/tests/helper.js",
-        "chip-tool/templates/tests/tests.js"
+        "chip-tool/templates/tests/helper.js"
     ],
     "resources": {
         "pics-metafile": "../../../../src/app/tests/suites/certification/PICS.yaml",

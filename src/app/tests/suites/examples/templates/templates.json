@@ -2,8 +2,7 @@
     "name": "CHIP README Templates",
     "version": "chip-v1",
     "helpers": [
-        "common/ClusterTestGeneration.js",
-        "app/tests/suites/examples/templates/tests.js"
+        "common/ClusterTestGeneration.js"
     ],
     "resources": {
         "pics-metafile": "../../../../app/tests/suites/certification/PICS.yaml",
