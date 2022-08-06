@@ -3102,7 +3102,7 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedInvalidReportMess
 
         // The server sends a data report.
         // The client receives the data report data and sends out status report with invalid action.
-        // the client would ack the server's status report).
+        // The server acks the status report.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 3);
     }
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
