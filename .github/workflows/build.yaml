@@ -81,6 +81,11 @@ jobs:
             - name: Run Tests
               timeout-minutes: 30
               run: scripts/tests/gn_tests.sh
+            - name: Setup Build without schema check
+              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=true chip_enable_schema_check=false"
+            - name: Run Tests without schema check
+              timeout-minutes: 20
+              run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
             # - name: Run Code Coverage
