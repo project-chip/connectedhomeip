@@ -202,24 +202,6 @@ ReadHandler * InteractionModelEngine::ActiveHandlerAt(unsigned int aIndex)
     return ret;
 }
 
-WriteHandler * InteractionModelEngine::ActiveWriteHandlerAt(unsigned int aIndex)
-{
-    unsigned int i = 0;
-
-    for (auto & writeHandler : mWriteHandlers)
-    {
-        if (!writeHandler.IsFree())
-        {
-            if (i == aIndex)
-            {
-                return &writeHandler;
-            }
-            i++;
-        }
-    }
-    return nullptr;
-}
-
 uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
 {
     uint32_t numActive = 0;

@@ -114,7 +114,6 @@ public:
     }
 
 private:
-    friend class TestWriteInteraction;
     enum class State
     {
         Uninitialized = 0, // The handler has not been initialized
@@ -122,10 +121,9 @@ private:
         AddStatus,         // The handler has added status code
         Sending,           // The handler has sent out the write response
     };
-    using Status = Protocols::InteractionModel::Status;
-    Status ProcessWriteRequest(System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
-    Status HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
-                                     bool aIsTimedWrite);
+    Protocols::InteractionModel::Status ProcessWriteRequest(System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
+    Protocols::InteractionModel::Status HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
+                                                                  System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
 
     CHIP_ERROR FinalizeMessage(System::PacketBufferTLVWriter && aMessageWriter, System::PacketBufferHandle & packet);
     CHIP_ERROR SendWriteResponse(System::PacketBufferTLVWriter && aMessageWriter);
