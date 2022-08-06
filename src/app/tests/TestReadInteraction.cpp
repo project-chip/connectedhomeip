@@ -2934,7 +2934,6 @@ void TestReadInteraction::TestSubscribeClientReceiveWellFormedStatusResponse(nlT
         // The ReadHandler's exchange is still open when we synthesize the StatusResponse.
         // Since we synthesized the StatusResponse to the ReadClient, instead of sending it from the ReadHandler,
         // the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP ack.
-        // The ReadHandler should have sent a StatusResponse too.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_ERROR_INVALID_MESSAGE_TYPE);
