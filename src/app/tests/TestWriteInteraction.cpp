@@ -32,9 +32,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 
-#include <memory>
 #include <nlunit-test.h>
-#include <utility>
 
 using TestContext = chip::Test::AppContext;
 
@@ -63,7 +61,6 @@ public:
     static void TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtripWithClusterObjectsVersionMatch(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtripWithClusterObjectsVersionMismatch(nlTestSuite * apSuite, void * apContext);
-    static void TestWriteHandlerReceiveInvalidMessage(nlTestSuite * apSuite, void * apContext);
 
 private:
     static void AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient);
@@ -93,18 +90,13 @@ public:
         mStatus = status;
         mOnSuccessCalled++;
     }
-    void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override
-    {
-        mOnErrorCalled++;
-        mLastErrorReason = app::StatusIB(chipError);
-    }
+    void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override { mOnErrorCalled++; }
     void OnDone(WriteClient * apWriteClient) override { mOnDoneCalled++; }
 
     int mOnSuccessCalled = 0;
     int mOnErrorCalled   = 0;
     int mOnDoneCalled    = 0;
     StatusIB mStatus;
-    StatusIB mLastErrorReason;
 };
 
 void TestWriteInteraction::AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient)
@@ -551,74 +543,6 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     engine->Shutdown();
 }
 
-// This test creates a chunked write request, we drop the second write chunk message, then write handler receives unknown
-// report message and sends out a status report with invalid action.
-void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * apSuite, void * apContext)
-{
-    TestContext & ctx  = *static_cast<TestContext *>(apContext);
-    auto sessionHandle = ctx.GetSessionBobToAlice();
-
-    app::AttributePathParams attributePath(2, 3, 4);
-
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-    // Shouldn't have anything in the retransmit table when starting the test.
-    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
-
-    TestWriteClientCallback writeCallback;
-    auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-                                 static_cast<uint16_t>(900) /* reserved buffer size */);
-
-    ByteSpan list[5];
-
-    err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 5));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    ctx.GetLoopback().mSentMessageCount                 = 0;
-    ctx.GetLoopback().mNumMessagesToDrop                = 1;
-    ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 2;
-    err                                                 = writeClient.SendWriteRequest(sessionHandle);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    ctx.DrainAndServiceIO();
-
-    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 1);
-    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 3);
-    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
-
-    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-    NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
-    System::PacketBufferTLVWriter writer;
-    writer.Init(std::move(msgBuf));
-
-    ReportDataMessage::Builder response;
-    response.Init(&writer);
-    NL_TEST_ASSERT(apSuite, writer.Finalize(&msgBuf) == CHIP_NO_ERROR);
-
-    PayloadHeader payloadHeader;
-    payloadHeader.SetExchangeID(0);
-    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
-
-    auto * writeHandler = InteractionModelEngine::GetInstance()->ActiveWriteHandlerAt(0);
-    rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
-    rm->ClearRetransTable(writeHandler->mExchangeCtx.Get());
-    ctx.GetLoopback().mSentMessageCount  = 0;
-    ctx.GetLoopback().mNumMessagesToDrop = 0;
-    writeHandler->OnMessageReceived(writeHandler->mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
-    ctx.DrainAndServiceIO();
-
-    NL_TEST_ASSERT(apSuite, writeCallback.mLastErrorReason.mStatus == Protocols::InteractionModel::Status::InvalidAction);
-    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
-    engine->Shutdown();
-    ctx.ExpireSessionAliceToBob();
-    ctx.ExpireSessionBobToAlice();
-    ctx.CreateSessionAliceToBob();
-    ctx.CreateSessionBobToAlice();
-}
-
 } // namespace app
 } // namespace chip
 
@@ -638,7 +562,6 @@ const nlTest sTests[] =
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjects", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjects),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjectsVersionMatch", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMatch),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjectsVersionMismatch", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMismatch),
-        NL_TEST_DEF("TestWriteHandlerReceiveInvalidMessage", chip::app::TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage),
         NL_TEST_SENTINEL()
 };
 // clang-format on
