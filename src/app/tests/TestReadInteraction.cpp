@@ -3022,7 +3022,6 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidReportMessage(nlTestS
         // The ReadHandler's exchange is still open when we synthesize the ReportData.
         // Since we synthesized the ReportData to the ReadClient, instead of sending it from the ReadHandler,
         // the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP ack.
-        // The ReadHandler should have sent a StatusResponse too.
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_ERROR_END_OF_TLV);
