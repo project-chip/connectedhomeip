@@ -1,4 +1,4 @@
 {
-  "ExampleManualCataCategory": ["examples/Test_Example"],
-  "collection": ["ExampleManualCataCategory"]
+    "ExampleManualCataCategory": ["examples/Test_Example"],
+    "collection": ["ExampleManualCataCategory"]
 }
