@@ -1401,20 +1401,20 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
                                     CertificateChainValidationResult & result);
 
 /**
- * @brief Validate timestamp of a certificate (toBeEvaluatedCertificate) in comparison with other certificate's
- *        (referenceCertificate) issuing timestamp.
+ * @brief Validate notBefore timestamp of a certificate (candidateCertificate) against validity period of the
+ *        issuer certificate (issuerCertificate).
  *
  * Errors are:
- *   - CHIP_ERROR_CERT_EXPIRED if the certificate timestamp does not satisfy the reference certificate's issuing timestamp.
+ *   - CHIP_ERROR_CERT_EXPIRED if the candidateCertificate timestamp does not satisfy the issuerCertificate's timestamp.
  *   - CHIP_ERROR_INVALID_ARGUMENT when passing an invalid argument.
  *   - CHIP_ERROR_INTERNAL on any unexpected crypto or data conversion errors.
  *
- *  @param referenceCertificate     A DER Certificate ByteSpan used as the issuing timestamp reference.
- *  @param toBeEvaluatedCertificate A DER Certificate ByteSpan used to evaluate issuance against the referenceCertificate.
+ *  @param candidateCertificate     A DER Certificate ByteSpan those notBefore timestamp to be evaluated.
+ *  @param issuerCertificate        A DER Certificate ByteSpan used to evaluate validity timestamp of the candidateCertificate.
  *
  *  @returns a CHIP_ERROR (see above) on failure or CHIP_NO_ERROR otherwise.
  **/
-CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, const ByteSpan & toBeEvaluatedCertificate);
+CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & candidateCertificate, const ByteSpan & issuerCertificate);
 
 /**
  * @brief Validate a certificate's validity date against current time.
