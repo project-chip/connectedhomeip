@@ -48,151 +48,159 @@ tests:
       arguments:
           value: 0
 
-    - label: "Reads the MinLevel attribute"
-      PICS: LVL.S.A0002
-      command: "readAttribute"
-      attribute: "MinLevel"
-      response:
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 255
+    - label: "TH sends Off command to DUT"
+      cluster: "On/Off"
+      PICS: LVL.S.C04.Rsp && OO.S.C00.Rsp
+      command: "Off"
 
-    - label: "Reads the MaxLevel attribute"
-      PICS: LVL.S.A0003
-      command: "readAttribute"
-      attribute: "MaxLevel"
-      response:
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 255
-
-    - label: "sends a MoveToLevelWithOnOff command"
-      PICS: LVL.S.C00.Rsp
+    - label:
+          "TH sends a MoveToLevelWithOnOff command to DUT, with Level =50 and
+          TransitionTime =0 (immediate)"
+      PICS: LVL.S.C04.Rsp
       command: "MoveToLevelWithOnOff"
       arguments:
           values:
-              - name: "level"
-                value: 64
-              - name: "transitionTime"
+              - name: "Level"
+                value: 50
+              - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 100ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
+    - label: "TH reads OnOff attribute (On/Off cluster) from DUT"
+      cluster: "On/Off"
+      PICS: OO.S.A0000 && LVL.S.C04.Rsp
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
 
-    - label: "Reads CurrentLevel attribute from DUT"
+    - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C04.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
-          value: 64
+          value: 50
 
-    - label: "sends a Move to level command"
+    - label: "TH sends On command to DUT"
+      cluster: "On/Off"
+      PICS: LVL.S.C04.Rsp && OO.S.C01.Rsp
+      command: "On"
+
+    - label:
+          "TH sends a MoveToLevel command to DUT, with Level =50 and
+          TransitionTime =0 (immediate)"
       PICS: LVL.S.C00.Rsp
       command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
-                value: 100
-              - name: "transitionTime"
+              - name: "Level"
+                value: 50
+              - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 100 ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
-    - label: "Reads CurrentLevel attribute from DUT"
+    - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
-          value: 100
+          value: 50
 
-    - label: "sends a Move to level command"
+    - label:
+          "TH sends a MoveToLevel command to the DUT with Level = 200 and
+          TransitionTime = 300 (30 s). This means the level should increase by
+          150 units in 30s, so 5 units/s"
       PICS: LVL.S.C00.Rsp && LVL.S.M.VarRate
       command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
-                value: 128
-              - name: "transitionTime"
-                value: 100
+              - name: "Level"
+                value: 200
+              - name: "TransitionTime"
+                value: 300
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 11000ms"
+    - label: "Wait 10000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 11000
+                value: 10000
 
-    - label: "Reads CurrentLevel attribute from DUT"
+    - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
-          value: 128
-
-    - label: "Reads the OnOffTransitionTime attribute from the DUT"
-      PICS: LVL.S.A0010
-      command: "readAttribute"
-      attribute: "OnOffTransitionTime"
-      response:
           constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65535
+              minValue: 85
+              maxValue: 115
 
-    - label: "sends a Move to level command"
-      PICS: LVL.S.C00.Rsp && LVL.S.A0010
-      command: "MoveToLevel"
-      arguments:
-          values:
-              - name: "level"
-                value: 64
-              - name: "transitionTime"
-                value: null
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
-
-    - label: "Wait 1000ms"
+    - label: "Wait 10000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 1000
+                value: 10000
 
-    - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000
+    - label: "TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
-          value: 64
+          constraints:
+              minValue: 127
+              maxValue: 173
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          constraints:
+              minValue: 170
+              maxValue: 200
+
+    - label: "Wait 5000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          value: 200
+
+    - label: "TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && !LVL.S.M.VarRate
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          value: 200
 
     - label: "TH writes 0 to the Options attribute"
       PICS: LVL.S.A000f
@@ -227,15 +235,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 100 ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
-    - label: "Reads CurrentLevel attribute from DUT"
+    - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -261,15 +261,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 100 ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
-    - label: "Reads CurrentLevel attribute from DUT"
+    - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -290,15 +282,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 100 ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
-    - label: "Reads CurrentLevel attribute from DUT"
+    - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -319,15 +303,7 @@ tests:
               - name: "OptionsOverride"
                 value: 1
 
-    - label: "Wait 100 ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
-    - label: "Reads CurrentLevel attribute from DUT"
+    - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -367,15 +343,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 100 ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
-    - label: "Reads CurrentLevel attribute from DUT"
+    - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -401,15 +369,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 100 ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
-    - label: "Reads CurrentLevel attribute from DUT"
+    - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -430,15 +390,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 100 ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
-    - label: "Reads CurrentLevel attribute from DUT"
+    - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -459,15 +411,7 @@ tests:
               - name: "OptionsOverride"
                 value: 1
 
-    - label: "Wait 100 ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
-    - label: "Reads CurrentLevel attribute from DUT"
+    - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"

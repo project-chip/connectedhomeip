@@ -83,7 +83,7 @@ tests:
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "writes the OnLevel attribute on the DUT"
       PICS: LVL.S.A0011
