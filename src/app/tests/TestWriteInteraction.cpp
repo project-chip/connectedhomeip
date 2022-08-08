@@ -575,7 +575,7 @@ void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * a
 
     ByteSpan list[5];
 
-    err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 5));
+    err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 100));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     ctx.GetLoopback().mSentMessageCount                 = 0;
