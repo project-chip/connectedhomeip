@@ -37,7 +37,7 @@ tests:
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "Reads the RemainingTime attribute"
       PICS: LVL.S.A0001
@@ -68,7 +68,7 @@ tests:
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "Reads the MaxLevel attribute"
       PICS: LVL.S.A0003 && LVL.S.F01
