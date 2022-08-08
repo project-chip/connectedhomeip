@@ -1,6 +1,5 @@
 package chip.devicecontroller;
 
-
 /** Represents information relating to NOC CSR. */
 public final class CSRInfo {
 

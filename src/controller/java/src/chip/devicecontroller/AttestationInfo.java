@@ -1,6 +1,5 @@
 package chip.devicecontroller;
 
-
 /** Represents information relating to product attestation. */
 public final class AttestationInfo {
 
