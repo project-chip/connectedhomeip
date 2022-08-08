@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTROnboardingPayloadParser.h>
+#import <Matter/NOCChainIssuer.h>
 
 @class MTRBaseDevice;
 
@@ -118,6 +119,14 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * @param[in] queue The queue on which the callbacks will be delivered
  */
 - (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
+
+- (void)setNocChainIssuer:(id<NOCChainIssuer>)nocChainIssuer;
+
+- (uint32_t)onNOCChainGeneration:(NSData *)operationalCertificate
+         intermediateCertificate:(NSData *)intermediateCertificate
+                 rootCertificate:(NSData *)rootCertificate
+                             ipk:(NSData *)ipk
+                    adminSubject:(uint64_t)adminSubject;
 
 /**
  * Shutdown the controller. Calls to shutdown after the first one are NO-OPs.

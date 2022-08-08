@@ -44,3 +44,4 @@
 #import <Matter/MTRSetupPayload.h>
 #import <Matter/MTRStructsObjc.h>
 #import <Matter/MTRThreadOperationalDataset.h>
+#import <Matter/NOCChainIssuer.h>

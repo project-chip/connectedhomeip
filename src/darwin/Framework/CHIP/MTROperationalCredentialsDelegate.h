@@ -24,7 +24,9 @@
 #import "MTRKeypair.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
+#import "NOCChainIssuer.h"
 
+#include <controller/AutoCommissioner.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CASEAuthTag.h>
@@ -44,6 +46,14 @@ public:
         const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
         const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
 
+    CHIP_ERROR CallbackGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
+        const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
+        const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion);
+
+    CHIP_ERROR LocalGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
+        const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
+        const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion);
+
     void SetNodeIdForNextNOCRequest(chip::NodeId nodeId) override
     {
         mNextRequestedNodeId = nodeId;
@@ -54,6 +64,13 @@ public:
 
     void SetDeviceID(chip::NodeId deviceId) { mDeviceBeingPaired = deviceId; }
     void ResetDeviceID() { mDeviceBeingPaired = chip::kUndefinedNodeId; }
+
+    void SetAutoCommissioner(chip::Controller::AutoCommissioner * autoCommissioner) { mAutoCommissioner = autoCommissioner; }
+
+    void SetNocChainIssuer(id<NOCChainIssuer> nocChainIssuer) { mNocChainIssuer = nocChainIssuer; }
+
+    CHIP_ERROR NOCChainGenerated(CHIP_ERROR status, const chip::ByteSpan & noc, const chip::ByteSpan & icac,
+        const chip::ByteSpan & rcac, chip::Optional<chip::Crypto::AesCcm128KeySpan> ipk, chip::Optional<chip::NodeId> adminSubject);
 
     CHIP_ERROR GenerateNOC(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
         const chip::Crypto::P256PublicKey & pubkey, chip::MutableByteSpan & noc);
@@ -115,6 +132,10 @@ private:
     // have a root cert, and at that point it gets initialized to nil.
     NSData * _Nullable mRootCert;
     NSData * _Nullable mIntermediateCert;
+
+    chip::Controller::AutoCommissioner * mAutoCommissioner = nullptr;
+    id<NOCChainIssuer> _Nullable mNocChainIssuer;
+    chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * mOnNOCCompletionCallback = nullptr;
 };
 
 NS_ASSUME_NONNULL_END

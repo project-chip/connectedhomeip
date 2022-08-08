@@ -27,7 +27,10 @@
 #import "MTRLogging.h"
 #import "NSDataSpanConversion.h"
 
+#include <controller/CommissioningDelegate.h>
 #include <credentials/CHIPCert.h>
+#include <credentials/DeviceAttestationConstructor.h>
+#include <credentials/DeviceAttestationVendorReserved.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
@@ -112,9 +115,87 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateNOC(P256Keypair & signingK
     return NewNodeOperationalX509Cert(noc_request, pubkey, signingKeypair, noc);
 }
 
+CHIP_ERROR MTROperationalCredentialsDelegate::NOCChainGenerated(CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
+    const ByteSpan & rcac, Optional<Crypto::AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject)
+{
+    ReturnErrorCodeIf(mOnNOCCompletionCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion = mOnNOCCompletionCallback;
+    mOnNOCCompletionCallback = nullptr;
+
+    // Call-back into commissioner with the generated data.
+    onCompletion->mCall(onCompletion->mContext, status, noc, icac, rcac, ipk, adminSubject);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR MTROperationalCredentialsDelegate::GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
     const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
     const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
+{
+    if (mNocChainIssuer != nil) {
+        return CallbackGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC, PAI, onCompletion);
+    } else {
+        return LocalGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC, PAI, onCompletion);
+    }
+}
+
+CHIP_ERROR MTROperationalCredentialsDelegate::CallbackGenerateNOCChain(const chip::ByteSpan & csrElements,
+    const chip::ByteSpan & csrNonce, const chip::ByteSpan & csrElementsSignature, const chip::ByteSpan & attestationChallenge,
+    const chip::ByteSpan & DAC, const chip::ByteSpan & PAI,
+    chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
+{
+    mOnNOCCompletionCallback = onCompletion;
+
+    TLVReader reader;
+    reader.Init(csrElements);
+
+    if (reader.GetType() == kTLVType_NotSpecified) {
+        ReturnErrorOnFailure(reader.Next());
+    }
+
+    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(reader.GetTag() == AnonymousTag(), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+
+    TLVType containerType;
+    ReturnErrorOnFailure(reader.EnterContainer(containerType));
+    ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, TLV::ContextTag(1)));
+
+    chip::ByteSpan csr(reader.GetReadPoint(), reader.GetLength());
+    reader.ExitContainer(containerType);
+
+    CSRInfo * csrInfo = [[CSRInfo alloc] initWithNonce:AsData(csrNonce)
+                                              elements:AsData(csrElements)
+                                     elementsSignature:AsData(csrElementsSignature)
+                                                   csr:AsData(csr)];
+
+    chip::ByteSpan certificationDeclarationSpan;
+    chip::ByteSpan attestationNonceSpan;
+    uint32_t timestampDeconstructed;
+    chip::ByteSpan firmwareInfoSpan;
+    chip::Credentials::DeviceAttestationVendorReservedDeconstructor vendorReserved;
+
+    chip::Controller::CommissioningParameters commissioningParameters = mAutoCommissioner->GetCommissioningParameters();
+    ReturnErrorOnFailure(chip::Credentials::DeconstructAttestationElements(commissioningParameters.GetAttestationElements().Value(),
+        certificationDeclarationSpan, attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan, vendorReserved));
+
+    AttestationInfo * attestationInfo =
+        [[AttestationInfo alloc] initWithChallenge:AsData(attestationChallenge)
+                                             nonce:AsData(commissioningParameters.GetAttestationNonce().Value())
+                                          elements:AsData(commissioningParameters.GetAttestationElements().Value())
+                                 elementsSignature:AsData(commissioningParameters.GetAttestationSignature().Value())
+                                               dac:AsData(DAC)
+                                               pai:AsData(PAI)
+                          certificationDeclaration:AsData(certificationDeclarationSpan)
+                                      firmwareInfo:AsData(firmwareInfoSpan)];
+
+    [mNocChainIssuer onNOCChainGenerationNeeded:csrInfo attestationInfo:attestationInfo];
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MTROperationalCredentialsDelegate::LocalGenerateNOCChain(const chip::ByteSpan & csrElements,
+    const chip::ByteSpan & csrNonce, const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge,
+    const chip::ByteSpan & DAC, const chip::ByteSpan & PAI,
+    chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
 {
     chip::NodeId assignedId;
     if (mNodeIdRequested) {
