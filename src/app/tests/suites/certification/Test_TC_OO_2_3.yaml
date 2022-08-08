@@ -854,6 +854,14 @@ tests:
               minValue: 255
               maxValue: 345
 
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
     - label: "21a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
       PICS: OO.S.C42.Rsp
