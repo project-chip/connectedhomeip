@@ -63,8 +63,9 @@ public:
     static void TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtripWithClusterObjectsVersionMatch(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtripWithClusterObjectsVersionMismatch(nlTestSuite * apSuite, void * apContext);
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     static void TestWriteHandlerReceiveInvalidMessage(nlTestSuite * apSuite, void * apContext);
-
+#endif
 private:
     static void AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient);
     static void AddAttributeStatus(nlTestSuite * apSuite, void * apContext, WriteHandler & aWriteHandler);
@@ -553,6 +554,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
 // This test creates a chunked write request, we drop the second write chunk message, then write handler receives unknown
 // report message and sends out a status report with invalid action.
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
@@ -618,7 +620,7 @@ void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * a
     ctx.CreateSessionAliceToBob();
     ctx.CreateSessionBobToAlice();
 }
-
+#endif
 } // namespace app
 } // namespace chip
 
@@ -638,7 +640,9 @@ const nlTest sTests[] =
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjects", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjects),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjectsVersionMatch", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMatch),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjectsVersionMismatch", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMismatch),
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         NL_TEST_DEF("TestWriteHandlerReceiveInvalidMessage", chip::app::TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage),
+#endif
         NL_TEST_SENTINEL()
 };
 // clang-format on
