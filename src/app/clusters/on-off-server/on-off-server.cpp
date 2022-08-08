@@ -472,8 +472,6 @@ uint32_t OnOffServer::calculateNextWaitTimeMS(void)
         }
     }
 
-    emberAfOnOffClusterPrintln("startTimeMS:%lld currentTimeMS:%lld elapsed:%lld latency:%lld desiredWaitTimeMS:%d waitTimeMS:%lld", onWithTimedOffStartTimestamp.count(), currentTime.count(), elapsed.count(), latency.count(), UPDATE_TIME_MS.count(), waitTime.count());
-
     onWithTimedOffStartTimestamp = currentTime;
 
     return (uint32_t)waitTime.count();
