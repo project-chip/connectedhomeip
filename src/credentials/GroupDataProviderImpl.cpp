@@ -827,7 +827,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
                 VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == encryption_key.size(), CHIP_ERROR_INTERNAL);
                 memcpy(key.encryption_key, encryption_key.data(), encryption_key.size());
                 // Re-derive privacy key from encryption key when loading from storage to save on storage size.
-                MutableByteSpan privacy_key(key.privacy_key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+                MutableByteSpan privacy_key(key.privacy_key);
                 ReturnErrorOnFailure(Crypto::DeriveGroupPrivacyKey(encryption_key, privacy_key));
                 ReturnErrorOnFailure(reader.ExitContainer(item));
             }
