@@ -262,8 +262,8 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CryptoContext::PrivacyObfuscate(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                                           MessageAuthenticationCode & mac) const
+CHIP_ERROR CryptoContext::PrivacyEncrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                                         MessageAuthenticationCode & mac) const
 {
     VerifyOrReturnError(input != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(input_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -277,11 +277,11 @@ CHIP_ERROR CryptoContext::PrivacyObfuscate(const uint8_t * input, size_t input_l
     CryptoContext::NonceStorage privacyNonce;
     CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac);
 
-    return mKeyContext->PrivacyObfuscate(plaintext, privacyNonce, privacytext);
+    return mKeyContext->PrivacyEncrypt(plaintext, privacyNonce, privacytext);
 }
 
-CHIP_ERROR CryptoContext::PrivacyDeobfuscate(const uint8_t * input, size_t input_length, uint8_t * output,
-                                             const PacketHeader & header, const MessageAuthenticationCode & mac) const
+CHIP_ERROR CryptoContext::PrivacyDecrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+                                         const MessageAuthenticationCode & mac) const
 {
     VerifyOrReturnError(input != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(input_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -295,7 +295,7 @@ CHIP_ERROR CryptoContext::PrivacyDeobfuscate(const uint8_t * input, size_t input
     CryptoContext::NonceStorage privacyNonce;
     CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac);
 
-    return mKeyContext->PrivacyDeobfuscate(privacytext, privacyNonce, plaintext);
+    return mKeyContext->PrivacyDecrypt(privacytext, privacyNonce, plaintext);
 }
 
 } // namespace chip

@@ -129,11 +129,11 @@ public:
     CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, ConstNonceView nonce,
                        const PacketHeader & header, const MessageAuthenticationCode & mac) const;
 
-    CHIP_ERROR PrivacyObfuscate(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                                MessageAuthenticationCode & mac) const;
+    CHIP_ERROR PrivacyEncrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                              MessageAuthenticationCode & mac) const;
 
-    CHIP_ERROR PrivacyDeobfuscate(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                                  const MessageAuthenticationCode & mac) const;
+    CHIP_ERROR PrivacyDecrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+                              const MessageAuthenticationCode & mac) const;
 
     ByteSpan GetAttestationChallenge() const { return ByteSpan(mKeys[kAttestationChallengeKey], Crypto::kAES_CCM128_Key_Length); }
 
