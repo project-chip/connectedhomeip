@@ -2557,7 +2557,7 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x0000003C: {
-                    "attributeName": "ChannelMask",
+                    "attributeName": "ChannelPage0Mask",
                     "attributeId": 0x0000003C,
                     "type": "bytes",
                     "reportable": True,

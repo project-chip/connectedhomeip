@@ -5586,8 +5586,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             }
             return value;
         }
-        case Attributes::ChannelMask::Id: {
-            using TypeInfo = Attributes::ChannelMask::TypeInfo;
+        case Attributes::ChannelPage0Mask::Id: {
+            using TypeInfo = Attributes::ChannelPage0Mask::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {

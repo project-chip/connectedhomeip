@@ -6686,8 +6686,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ChannelMask::Id: {
-            using TypeInfo = Attributes::ChannelMask::TypeInfo;
+        case Attributes::ChannelPage0Mask::Id: {
+            using TypeInfo = Attributes::ChannelPage0Mask::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

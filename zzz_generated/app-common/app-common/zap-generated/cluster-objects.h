@@ -9107,7 +9107,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SecurityPolicy
-namespace ChannelMask {
+namespace ChannelPage0Mask {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<chip::ByteSpan>;
@@ -9115,11 +9115,11 @@ struct TypeInfo
     using DecodableArgType = const chip::app::DataModel::Nullable<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ChannelMask::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChannelPage0Mask::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
     static constexpr size_t MaxLength() { return 4; }
 };
-} // namespace ChannelMask
+} // namespace ChannelPage0Mask
 namespace OperationalDatasetComponents {
 struct TypeInfo
 {
@@ -9248,7 +9248,7 @@ struct TypeInfo
         Attributes::PendingTimestamp::TypeInfo::DecodableType pendingTimestamp;
         Attributes::Delay::TypeInfo::DecodableType delay;
         Attributes::SecurityPolicy::TypeInfo::DecodableType securityPolicy;
-        Attributes::ChannelMask::TypeInfo::DecodableType channelMask;
+        Attributes::ChannelPage0Mask::TypeInfo::DecodableType channelPage0Mask;
         Attributes::OperationalDatasetComponents::TypeInfo::DecodableType operationalDatasetComponents;
         Attributes::ActiveNetworkFaultsList::TypeInfo::DecodableType activeNetworkFaultsList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;

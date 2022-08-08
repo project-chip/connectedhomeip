@@ -9933,9 +9933,9 @@ void CHIPThreadNetworkDiagnosticsDelayAttributeCallback::CallbackFn(void * conte
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback::CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback(
+CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback::CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback(
     jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterChannelMaskAttributeCallbackType>(CallbackFn, this),
+    chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterChannelPage0MaskAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -9952,7 +9952,7 @@ CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback::CHIPThreadNetworkDiagn
     }
 }
 
-CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback::~CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback()
+CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback::~CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -9963,7 +9963,7 @@ CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback::~CHIPThreadNetworkDiag
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback::CallbackFn(
+void CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -9972,8 +9972,8 @@ void CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback::CallbackFn(
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;

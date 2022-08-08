@@ -7399,8 +7399,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::SecurityPolicy::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, securityPolicy));
         break;
-    case Attributes::ChannelMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, channelMask));
+    case Attributes::ChannelPage0Mask::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, channelPage0Mask));
         break;
     case Attributes::OperationalDatasetComponents::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, operationalDatasetComponents));
