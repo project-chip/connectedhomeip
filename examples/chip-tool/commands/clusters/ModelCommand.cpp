@@ -46,12 +46,14 @@ CHIP_ERROR ModelCommand::RunCommand()
                                                     &mOnDeviceConnectionFailureCallback);
 }
 
-void ModelCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
+void ModelCommand::OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                       chip::SessionHandle & sessionHandle)
 {
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
 
-    CHIP_ERROR err = command->SendCommand(device, command->mEndPointId);
+    chip::OperationalDeviceProxy device(&exchangeMgr, sessionHandle);
+    CHIP_ERROR err = command->SendCommand(&device, command->mEndPointId);
     VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
 }
 

@@ -19,10 +19,11 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRError_Internal.h"
 
-void MTRDeviceConnectionBridge::OnConnected(void * context, chip::OperationalDeviceProxy * device)
+void MTRDeviceConnectionBridge::OnConnected(
+    void * context, chip::Messaging::ExchangeManager & exchangeMgr, chip::SessionHandle & sessionHandle)
 {
     auto * object = static_cast<MTRDeviceConnectionBridge *>(context);
-    object->mCompletionHandler(device->GetExchangeManager(), device->GetSecureSession(), nil);
+    object->mCompletionHandler(&exchangeMgr, chip::MakeOptional<chip::SessionHandle>(*sessionHandle->AsSecureSession()), nil);
     object->Release();
 }
 

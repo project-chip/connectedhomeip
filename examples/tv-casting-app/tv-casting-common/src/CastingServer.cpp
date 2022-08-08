@@ -134,15 +134,16 @@ void CastingServer::ReadServerClustersForNode(NodeId nodeId)
 
 void CastingServer::ReadServerClusters(EndpointId endpointId)
 {
-    OperationalDeviceProxy * operationalDeviceProxy = mTargetVideoPlayerInfo.GetOperationalDeviceProxy();
-    if (operationalDeviceProxy == nullptr)
+    const OperationalDeviceProxy * deviceProxy = mTargetVideoPlayerInfo.GetOperationalDeviceProxy();
+    if (deviceProxy == nullptr)
     {
-        ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy");
+        ChipLogError(AppServer, "Failed in getting an instance of DeviceProxy");
         return;
     }
 
-    chip::Controller::DescriptorCluster cluster(*operationalDeviceProxy->GetExchangeManager(),
-                                                operationalDeviceProxy->GetSecureSession().Value(), endpointId);
+    // GetOperationalDeviceProxy only passes us a deviceProxy if we can get a SessionHandle.
+    chip::Controller::DescriptorCluster cluster(*deviceProxy->GetExchangeManager(), deviceProxy->GetSecureSession().Value(),
+                                                endpointId);
 
     TargetEndpointInfo * endpointInfo = mTargetVideoPlayerInfo.GetOrAddEndpoint(endpointId);
 

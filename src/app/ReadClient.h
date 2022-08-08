@@ -33,7 +33,7 @@
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
-#include <app/OperationalDeviceProxy.h>
+#include <app/OperationalSessionSetup.h>
 #include <app/ReadPrepareParams.h>
 #include <app/data-model/Decode.h>
 #include <lib/core/CHIPCallback.h>
@@ -488,7 +488,7 @@ private:
     void StopResubscription();
     void ClearActiveSubscriptionState();
 
-    static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device);
+    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     CHIP_ERROR GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin);
