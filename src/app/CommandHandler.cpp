@@ -35,6 +35,7 @@
 #include <lib/core/CHIPTLVData.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/TypeTraits.h>
+#include <platform/LockTracker.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
@@ -580,6 +581,9 @@ FabricIndex CommandHandler::GetAccessingFabricIndex() const
 
 CommandHandler * CommandHandler::Handle::Get()
 {
+    // Not safe to work with CommandHandler in parallel with other Matter work.
+    assertChipStackLockedByCurrentThread();
+
     return (mMagic == InteractionModelEngine::GetInstance()->GetMagicNumber()) ? mpHandler : nullptr;
 }
 
