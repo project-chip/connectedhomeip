@@ -92,6 +92,7 @@ Status AmebaWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, 
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
     VerifyOrReturnError(ssid.size() <= sizeof(mStagingNetwork.ssid), Status::kOutOfRange);
 
+    memset(&mStagingNetwork, 0, sizeof(mStagingNetwork))
     memcpy(mStagingNetwork.credentials, credentials.data(), credentials.size());
     mStagingNetwork.credentialsLen = static_cast<decltype(mStagingNetwork.credentialsLen)>(credentials.size());
 
