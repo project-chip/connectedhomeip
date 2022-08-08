@@ -91,10 +91,18 @@ to be On or Off.
 ## Running RPC Console
 
 -   Connect a USB-TTL adapter as shown below
+-   For AmebaD
 
             Ameba         USB-TTL
             A19           TX
             A18           RX
+            GND           GND
+            
+-   For AmebaZ2
+
+            Ameba         USB-TTL
+            A13           TX
+            A14           RX
             GND           GND
 
 *   Build the
