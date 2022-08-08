@@ -90,9 +90,8 @@ tests:
           saveAs: NumberOfTotalUsersSupported
           constraints:
               minValue: 0
-              maxValue: 255
+              maxValue: 65534
 
-    #Issues 20930
     - label: "TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
@@ -439,7 +438,6 @@ tests:
               - name: "credential"
                 value: { CredentialType: 1, CredentialIndex: 65534 }
 
-    #Issue 20991 expected NULL values but got INVALID_COMMAND response fix script once the issue is fixed.
     - label: "TH sends Get Credential Status Command"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
@@ -448,40 +446,17 @@ tests:
               - name: "credential"
                 value: { CredentialType: 1, CredentialIndex: 65534 }
       response:
-          error: INVALID_COMMAND
-
-    #Issue 20991 expected NULL values but got INVALID_COMMAND response fix script once the issue is fixed.
-    - label:
-          "TH sends Get Credential command to DUT and Verify that the
-          CredentialType for the provided value is cleared Verify that the
-          CredentialIndex is cleared"
-      verification: |
-          ./chip-tool doorlock get-credential-status '{ "credentialType" : 1 , "credentialIndex" : 65534 }'  1 1 --timedInteractionTimeoutMs 1000
-          Verify on the TH Log:
-
-          [1654698175.243889][5478:5483] CHIP:DMG:
-          [1654698175.243965][5478:5483] CHIP:DMG:                                StatusIB =
-          [1654698175.244054][5478:5483] CHIP:DMG:                                {
-          [1654698175.244136][5478:5483] CHIP:DMG:                                        status = 0x85 (INVALID_COMMAND),
-          [1654698175.244218][5478:5483] CHIP:DMG:                                },
-          [1654698175.244307][5478:5483] CHIP:DMG:
-          [1654698175.244388][5478:5483] CHIP:DMG:                        },
-          [1654698175.244473][5478:5483] CHIP:DMG:
-          [1654698175.244541][5478:5483] CHIP:DMG:                },
-          [1654698175.244621][5478:5483] CHIP:DMG:
-          [1654698175.244681][5478:5483] CHIP:DMG:        ],
-          [1654698175.244755][5478:5483] CHIP:DMG:
-          [1654698175.244814][5478:5483] CHIP:DMG:        InteractionModelRevision = 1
-          [1654698175.244872][5478:5483] CHIP:DMG: }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
-      arguments:
           values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+              - name: "credentialExists"
+                value: false
+              - name: "userIndex"
+                value: null
+              - name: "creatorFabricIndex"
+                value: null
+              - name: "lastModifiedFabricIndex"
+                value: null
+              - name: "nextCredentialIndex"
+                value: null
 
     - label: "TH sends Get Credential Status Command"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
@@ -514,10 +489,18 @@ tests:
       response:
           error: INVALID_COMMAND
 
-    - label: "Cleanup the created user"
+    - label: "Cleanup the first created user"
       command: "ClearUser"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "userIndex"
                 value: 1
+
+    - label: "Cleanup the second created user"
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 2
