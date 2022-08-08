@@ -15,6 +15,10 @@
 
 name: 3.2.2. [TC-DGGEN-2.2] Event functionality test with server as DUT
 
+PICS:
+    - DGGEN.S
+    - DGGEN.S.E
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

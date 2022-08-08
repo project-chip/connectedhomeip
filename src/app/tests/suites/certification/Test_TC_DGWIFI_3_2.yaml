@@ -15,6 +15,9 @@
 
 name: 3.2.2. [TC-DGWIFI-3.2]Command Generated [DUT as Client]
 
+PICS:
+    - DGWIFI.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

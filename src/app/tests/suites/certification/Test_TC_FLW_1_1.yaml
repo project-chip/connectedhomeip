@@ -14,6 +14,9 @@
 
 name: 33.1.1. [TC-FLW-1.1] Global attributes with server as DUT
 
+PICS:
+    - FLW.S
+
 config:
     nodeId: 0x12344321
     cluster: "Flow Measurement"

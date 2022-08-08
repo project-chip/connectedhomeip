@@ -15,6 +15,9 @@
 
 name: 73.3.3. [TC-SWTCH-3.2] Primary functionality with client as DUT
 
+PICS:
+    - SWTCH.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

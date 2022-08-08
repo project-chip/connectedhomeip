@@ -15,6 +15,10 @@
 
 name: 3.3.1. [TC-DGWIFI-3.1]Attributes [DUT as Client]
 
+PICS:
+    - DGWIFI.C.A
+    - DGWIFI.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

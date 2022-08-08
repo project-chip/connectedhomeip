@@ -14,6 +14,9 @@
 
 name: 57.1.1. [TC-I-1.1] Global attributes with server as DUT
 
+PICS:
+    - I.S
+
 config:
     nodeId: 0x12344321
     cluster: "Identify"

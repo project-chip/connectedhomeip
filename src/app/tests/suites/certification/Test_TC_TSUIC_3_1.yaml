@@ -15,6 +15,13 @@
 
 name: 13.3.1. [TC-TSUIC-3.1] Attributes with client as DUT
 
+PICS:
+    - TSUIC.C
+    - TSUIC.C.AM-READ
+    - TSUIC.C.AO-READ
+    - TSUIC.C.AM-WRITE
+    - TSUIC.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

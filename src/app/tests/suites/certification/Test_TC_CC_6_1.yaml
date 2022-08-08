@@ -16,6 +16,9 @@ name:
     27.2.12. [TC-CC-6.1] Color Temperature MoveTo functionality with server as
     DUT
 
+PICS:
+    - CC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Color Control"

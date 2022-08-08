@@ -15,6 +15,10 @@
 
 name: 3.1.7. [TC-DD-1.7] Setup Code Format and Label [DUT - Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.MANUAL_PC
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

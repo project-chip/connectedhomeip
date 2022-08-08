@@ -165,7 +165,6 @@ function getManualTests() {
         "Test_TC_DGGEN_2_2",
         "Test_TC_DGGEN_2_3",
         "Test_TC_DGGEN_3_1",
-        "Test_TC_DGGEN_3_2",
     ];
 
     const Identify = [

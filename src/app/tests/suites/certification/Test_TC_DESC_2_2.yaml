@@ -15,6 +15,9 @@
 
 name: 84.2.2. [TC-DESC-2.2] Descriptor Cluster Attributes [DUT-Client]
 
+PICS:
+    - DESC.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

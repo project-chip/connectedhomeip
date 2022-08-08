@@ -14,6 +14,11 @@
 
 name: 7.2.1. [TC-TMP-2.1] Attributes with server as DUT
 
+PICS:
+    - TMP.S
+    - TMP.S.Am
+    - TMP.S.Ao
+
 config:
     nodeId: 0x12344321
     cluster: "Temperature Measurement"

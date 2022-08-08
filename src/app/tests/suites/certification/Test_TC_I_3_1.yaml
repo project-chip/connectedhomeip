@@ -15,6 +15,13 @@
 
 name: 59.3.1. [TC-I-3.1] Attributes with Client as DUT
 
+PICS:
+    - I.C
+    - I.C.AM-READ
+    - I.C.AO-READ
+    - I.C.AM-WRITE
+    - I.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

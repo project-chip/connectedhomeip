@@ -16,7 +16,7 @@ name: 3.2.3. [TC-OO-2.3] Secondary functionality with server as DUT
 
 PICS:
     - OO.S
-    - OO.S.F00(LT)
+    - OO.S.F00
 
 config:
     nodeId: 0x12344321

@@ -14,6 +14,9 @@
 
 name: 63.1.1. [TC-PSCFG-1.1] Global attributes with server as DUT
 
+PICS:
+    - PSCFG.S
+
 config:
     nodeId: 0x12344321
     cluster: "Power Source Configuration"

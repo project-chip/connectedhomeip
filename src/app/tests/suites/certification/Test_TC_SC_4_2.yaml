@@ -16,6 +16,9 @@ name:
     13.4.2. [TC-SC-4.2] Commissionable Node Discovery - Commissioner Case [DUT -
     Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
 config:
     nodeId: 0x12344321
     cluster: "Secure Channel"

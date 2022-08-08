@@ -14,6 +14,9 @@
 
 name: 27.2.4. [TC-CC-3.3] Hue Step functionality with server as DUT
 
+PICS:
+    - CC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Color Control"
