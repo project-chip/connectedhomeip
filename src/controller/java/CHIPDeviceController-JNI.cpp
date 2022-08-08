@@ -541,6 +541,12 @@ JNI_METHOD(void, setUseJavaCallbackForNOCRequest)
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     wrapper->GetAndroidOperationalCredentialsIssuer()->SetUseJavaCallbackForNOCRequest(useCallback);
+
+    // disable the local PAA Root store since we will be performing validation in the callback
+    wrapper->GetDACVerifier()->SetUseLocalPAARootStore(!useCallback);
+
+    // disable the local CSA store since we will be performing validation in the callback
+    wrapper->GetDACVerifier()->SetUseLocalCSAStore(!useCallback);
 }
 
 JNI_METHOD(void, updateCommissioningNetworkCredentials)

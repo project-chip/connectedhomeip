@@ -151,7 +151,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
 }
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
-                                                                         const ByteSpan & csrSignature,
+                                                                         const ByteSpan & csrElementsSignature,
                                                                          const ByteSpan & attestationChallenge,
                                                                          const ByteSpan & DAC, const ByteSpan & PAI,
                                                                          Callback::Callback<OnNOCChainGeneration> * onCompletion)
@@ -177,8 +177,9 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     jbyteArray javaCsrNonce;
     JniReferences::GetInstance().N2J_ByteArray(env, csrNonce.data(), csrNonce.size(), javaCsrNonce);
 
-    jbyteArray javaCsrSignature;
-    JniReferences::GetInstance().N2J_ByteArray(env, csrSignature.data(), csrSignature.size(), javaCsrSignature);
+    jbyteArray javaCsrElementsSignature;
+    JniReferences::GetInstance().N2J_ByteArray(env, csrElementsSignature.data(), csrElementsSignature.size(),
+                                               javaCsrElementsSignature);
 
     ChipLogProgress(Controller, "Parsing Certificate Signing Request");
     TLVReader reader;
@@ -202,8 +203,13 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     jbyteArray javaCsr;
     JniReferences::GetInstance().N2J_ByteArray(env, csr.data(), csr.size(), javaCsr);
 
+    P256PublicKey pubkey;
+    ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
+    // TODO: verify signed by DAC creds?
+    ChipLogProgress(chipTool, "VerifyCertificateSigningRequest");
+
     jobject csrInfo;
-    err = N2J_CSRInfo(env, javaCsrNonce, javaCsrElements, javaCsrSignature, javaCsr, csrInfo);
+    err = N2J_CSRInfo(env, javaCsrNonce, javaCsrElements, javaCsrElementsSignature, javaCsr, csrInfo);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to create CSRInfo");
