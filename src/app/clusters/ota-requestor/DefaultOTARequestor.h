@@ -111,6 +111,41 @@ public:
      */
     CHIP_ERROR Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver, BDXDownloader & downloader);
 
+    /**
+     * Called to override the default device config vendor ID value
+     */
+    void SetQueryImageVendorId(VendorId vendorId)
+    {
+        // Vendor ID 0x0000 is a reserved value
+        if (vendorId != 0)
+        {
+            mVendorId.SetValue(vendorId);
+        }
+    }
+
+    /**
+     * Called to override the default device config product ID value
+     */
+    void SetQueryImageProductId(uint16_t productId)
+    {
+        // Product ID 0x0000 is a reserved value
+        if (productId != 0)
+        {
+            mProductId.SetValue(productId);
+        }
+    }
+
+    /**
+     * Called to override the default device config hardware version value
+     */
+    void SetQueryImageHardwareVersion(uint16_t hwVersion)
+    {
+        if (hwVersion != 0)
+        {
+            mHardwareVersion.SetValue(hwVersion);
+        }
+    }
+
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
@@ -331,6 +366,12 @@ private:
     // persistent storage (if available), used for sending the NotifyApplied message, and then cleared. This will ensure determinism
     // in the OTARequestorDriver on reboot.
     Optional<ProviderLocationType> mProviderLocation;
+    // Contains the vendor ID to use for the QueryImage command
+    Optional<VendorId> mVendorId;
+    // Contains the product ID to use for the QueryImage command
+    Optional<uint16_t> mProductId;
+    // Contains the hardwre version to use for the QueryImage command
+    Optional<uint16_t> mHardwareVersion;
 };
 
 } // namespace chip

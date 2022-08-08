@@ -74,10 +74,16 @@ constexpr uint16_t kOptionOtaDownloadPath      = 'f';
 constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
 constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionWatchdogTimeout      = 'w';
+constexpr uint16_t kOptionVendorId             = 'x';
+constexpr uint16_t kOptionProductId            = 'y';
+constexpr uint16_t kOptionHardwareVersion      = 'z';
 constexpr size_t kMaxFilePathSize              = 256;
 
 uint32_t gPeriodicQueryTimeoutSec = 0;
 uint32_t gWatchdogTimeoutSec      = 0;
+uint16_t gQueryImageVendorId      = 0;
+uint16_t gQueryImageProductId     = 0;
+uint16_t gQueryImageHwVersion     = 0;
 chip::Optional<bool> gRequestorCanConsent;
 static char gOtaDownloadPath[kMaxFilePathSize] = "/tmp/test.bin";
 bool gAutoApplyImage                           = false;
@@ -89,6 +95,9 @@ OptionDef cmdLineOptionsDef[] = {
     { "periodicQueryTimeout", chip::ArgParser::kArgumentRequired, kOptionPeriodicQueryTimeout },
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "watchdogTimeout", chip::ArgParser::kArgumentRequired, kOptionWatchdogTimeout },
+    { "vendorId", chip::ArgParser::kArgumentRequired, kOptionVendorId },
+    { "productId", chip::ArgParser::kArgumentRequired, kOptionProductId },
+    { "hwVersion", chip::ArgParser::kArgumentRequired, kOptionHardwareVersion },
     {},
 };
 
@@ -117,6 +126,15 @@ OptionSet cmdLineOptions = {
     "  -w, --watchdogTimeout <time in seconds>\n"
     "       Maximum amount of time allowed for an OTA download before the process is cancelled and state reset to idle.\n"
     "       If none or zero is supplied, the timeout is determined by the driver.\n"
+    "  -x, --vendorId <16-bit number>\n"
+    "       Value for the VendorID field in the QueryImage command.\n"
+    "       If none or zero is supplied, the default device config value is used.\n"
+    "  -y, --productId <16-bit number>\n"
+    "       Value for the ProductID field in the QueryImage command.\n"
+    "       If none or zero is supplied, the default device config value is used.\n"
+    "  -z, --hwVersion <16-bit number>\n"
+    "       Value for the HardwareVersion field in the QueryImage command.\n"
+    "       If none or zero is supplied, the default device config value is used.\n"
 };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
@@ -181,6 +199,11 @@ static void InitOTARequestor(void)
 
     // Watchdog timeout can be set any time before a query image is sent
     gRequestorUser.SetWatchdogTimeout(gWatchdogTimeoutSec);
+
+    // Query Image fields must be set prior to the core being initialized
+    gRequestorCore.SetQueryImageVendorId(static_cast<VendorId>(gQueryImageVendorId));
+    gRequestorCore.SetQueryImageProductId(gQueryImageProductId);
+    gRequestorCore.SetQueryImageHardwareVersion(gQueryImageHwVersion);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
@@ -312,6 +335,15 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         break;
     case kOptionWatchdogTimeout:
         gWatchdogTimeoutSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        break;
+    case kOptionVendorId:
+        gQueryImageVendorId = static_cast<uint16_t>(strtoul(aValue, NULL, 0));
+        break;
+    case kOptionProductId:
+        gQueryImageProductId = static_cast<uint16_t>(strtoul(aValue, NULL, 0));
+        break;
+    case kOptionHardwareVersion:
+        gQueryImageHwVersion = static_cast<uint16_t>(strtoul(aValue, NULL, 0));
         break;
     default:
         ChipLogError(SoftwareUpdate, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);

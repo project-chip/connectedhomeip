@@ -111,6 +111,30 @@ void DefaultOTARequestor::InitState(intptr_t context)
     DefaultOTARequestor * requestorCore = reinterpret_cast<DefaultOTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
+    // Only fetch factory data if vendor ID has not been explicitly set
+    if (!requestorCore->mVendorId.HasValue())
+    {
+        uint16_t vendorId;
+        ReturnOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(vendorId));
+        requestorCore->mVendorId.SetValue(static_cast<VendorId>(vendorId));
+    }
+
+    // Only fetch factory data if product ID has not been explicitly set
+    if (!requestorCore->mProductId.HasValue())
+    {
+        uint16_t productId;
+        ReturnOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(productId));
+        requestorCore->mProductId.SetValue(productId);
+    }
+
+    // Only fetch factory data if hardware version has not been explicitly set
+    if (!requestorCore->mHardwareVersion.HasValue())
+    {
+        uint16_t hardwareVersion;
+        ReturnOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetHardwareVersion(hardwareVersion));
+        requestorCore->mHardwareVersion.SetValue(hardwareVersion);
+    }
+
     // This initialization may occur due to the following:
     //   1) Regular boot up - the states should already be correct
     //   2) Reboot from applying an image - once the image has been confirmed, the provider will be notified of the new version and
@@ -729,21 +753,20 @@ CHIP_ERROR DefaultOTARequestor::SendQueryImageRequest(Messaging::ExchangeManager
     constexpr OTADownloadProtocol kProtocolsSupported[] = { OTADownloadProtocol::kBDXSynchronous };
     QueryImage::Type args;
 
-    uint16_t vendorId;
-    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(vendorId));
-    args.vendorId = static_cast<VendorId>(vendorId);
+    VerifyOrReturnError(mVendorId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    args.vendorId = mVendorId.Value();
 
-    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(args.productId));
+    VerifyOrReturnError(mProductId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    args.productId = mProductId.Value();
 
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(args.softwareVersion));
 
     args.protocolsSupported = kProtocolsSupported;
     args.requestorCanConsent.SetValue(!Basic::IsLocalConfigDisabled() && mOtaRequestorDriver->CanConsent());
 
-    uint16_t hardwareVersion;
-    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)
+    if (mHardwareVersion.HasValue())
     {
-        args.hardwareVersion.SetValue(hardwareVersion);
+        args.hardwareVersion.SetValue(mHardwareVersion.Value());
     }
 
     char location[DeviceLayer::ConfigurationManager::kMaxLocationLength];
