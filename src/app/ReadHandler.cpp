@@ -36,6 +36,7 @@
 
 namespace chip {
 namespace app {
+using Status = Protocols::InteractionModel::Status;
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType) :
@@ -87,7 +88,7 @@ void ReadHandler::Close()
     mManagementCallback.OnDone(*this);
 }
 
-CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
+void ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
@@ -103,6 +104,12 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
 
     if (err != CHIP_NO_ERROR)
     {
+        Status status = Status::InvalidAction;
+        if (err.IsIMStatus())
+        {
+            status = StatusIB(err).mStatus;
+        }
+        StatusResponse::Send(status, mExchangeCtx.Get(), /* aExpectResponse = */ false);
         Close();
     }
     else
@@ -110,15 +117,17 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
         // Force us to be in a dirty state so we get processed by the reporting
         mFlags.Set(ReadHandlerFlags::ForceDirty);
     }
-
-    return err;
 }
 
-CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
+                                         bool & aSendStatusResponse)
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
+    aSendStatusResponse    = true;
     CHIP_ERROR statusError = CHIP_NO_ERROR;
     SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
+    // Since this is a valid Status Response message, we don't have to send a Status Response in reply to it.
+    aSendStatusResponse = false;
     SuccessOrExit(err = statusError);
     switch (mState)
     {
@@ -162,11 +171,6 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
     }
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        Close();
-    }
-
     return err;
 }
 
@@ -249,15 +253,26 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                           System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    bool sendStatusResponse = true;
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
-        err = OnStatusResponse(apExchangeContext, std::move(aPayload));
+        err = OnStatusResponse(apExchangeContext, std::move(aPayload), sendStatusResponse);
     }
     else
     {
-        err = OnUnknownMsgType(apExchangeContext, aPayloadHeader, std::move(aPayload));
+        ChipLogDetail(DataManagement, "ReadHandler:: Msg type %d not supported", aPayloadHeader.GetMessageType());
+        err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
+    }
+
+    if (sendStatusResponse)
+    {
+        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        Close();
     }
     return err;
 }
@@ -267,14 +282,6 @@ bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContex
     return (IsType(InteractionType::Subscribe) &&
             GetInitiatorNodeId() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
             GetAccessingFabricIndex() == apExchangeContext.GetSessionHandle()->GetFabricIndex());
-}
-
-CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                         System::PacketBufferHandle && aPayload)
-{
-    ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
-    Close();
-    return CHIP_ERROR_INVALID_MESSAGE_TYPE;
 }
 
 void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
@@ -298,14 +305,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
 
     ReturnErrorOnFailure(readRequestParser.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = readRequestParser.CheckSchemaValidity();
-    if (err != CHIP_NO_ERROR)
-    {
-        // The actual error we want to return to our consumer is an IM "invalid
-        // action" error, not whatever internal error CheckSchemaValidity
-        // happens to come up with.
-        return CHIP_IM_GLOBAL_STATUS(InvalidAction);
-    }
+    ReturnErrorOnFailure(readRequestParser.CheckSchemaValidity());
 #endif
 
     err = readRequestParser.GetAttributeRequests(&attributePathListParser);
