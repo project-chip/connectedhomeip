@@ -294,7 +294,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             .groupDataProvider = mGroupsProvider,
             .mrpLocalConfig    = GetLocalMRPConfig(),
         },
-        .devicePool        = &mDevicePool,
+        .sessionSetupPool        = &mSessionSetupPool,
     };
 
     err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);

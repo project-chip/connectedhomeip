@@ -48,11 +48,11 @@ tests:
     - label: "DUT parses QR code."
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          1. Follow the steps given in the TH's URL to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
+          1. Follow the steps given in the TH"s URL to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
 
           On DUT=chip-tool:
           ./chip-tool pairing code 1 MT:-24J0YXE00KA0648G00
-          [1657235087918] [31502:16832693] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657235087918] [31502:16832693] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657235087918] [31502:16832693] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
@@ -69,7 +69,7 @@ tests:
           [1657235088.040371][370941:370941] CHIP:DIS: Updating services using commissioning mode 0
 
           DUT chip-tool: $ ./chip-tool pairing code 1  MT:-24J0YXE00KA0648G00
-          [1657235087918] [31502:16832693] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657235087918] [31502:16832693] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657235087918] [31502:16832693] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
@@ -99,11 +99,11 @@ tests:
     - label: "DUT parses QR code."
       PICS: MCORE.DD.DISCOVERY_IP
       verification: |
-          1. Follow the steps given in the TH's URL to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
+          1. Follow the steps given in the TH"s URL to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
 
           On DUT=chip-tool:
           ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
-          [1657235198856] [31506:16834043] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657235198856] [31506:16834043] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657235198856] [31506:16834043] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
@@ -122,7 +122,7 @@ tests:
 
           DUT chip-tool:
           $ ./chip-tool pairing code 1  MT:-24J029Q00KA0648G00
-          [1657235198856] [31506:16834043] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657235198856] [31506:16834043] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657235198856] [31506:16834043] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 

@@ -20,6 +20,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
 
@@ -358,8 +359,14 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     wifi_config_t wifiConfig;
 
     memset(&wifiConfig.ap, 0, sizeof(wifi_config_ap_t));
+
+    uint16_t vendorId;
+    uint16_t productId;
+    ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetVendorId(vendorId));
+    ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetProductId(productId));
+
     snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s-%04X-%04X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
-             CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+             vendorId, productId);
     memcpy(wifiConfig.ap.password, CHIP_DEVICE_CONFIG_WIFI_AP_PASSWORD, strlen(CHIP_DEVICE_CONFIG_WIFI_AP_PASSWORD));
     wifiConfig.ap.channel                = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
     wifiConfig.ap.security               = CHIP_DEVICE_CONFIG_WIFI_AP_SECURITY;

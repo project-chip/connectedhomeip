@@ -45,9 +45,9 @@ tests:
     - label:
           "Version String: Using the QR code from Step 1, generate a new QR code
           but substituting out the current Version String with an invalid
-          Version String (i.e. '010' or any non-zero 3-bit value)"
+          Version String (i.e. 010 or any non-zero 3-bit value)"
       verification: |
-          1. Use chip-tool's "payload generate-qrcode" command to help generate the new, invalid QR code
+          1. Use chip-tool"s "payload generate-qrcode" command to help generate the new, invalid QR code
           $ ./chip-tool payload generate-qrcode --existing-payload MT:-24J029Q00KA0648G00 --allow-invalid-payload 1  --version 2
           [1657235626568] [31698:16839018] CHIP: [TOO] QR Code: MT:034J029Q00KA0648G00
       disabled: true
@@ -56,13 +56,7 @@ tests:
           "Scan/read the QR code, generated in the previous step, using the DUT"
       verification: |
           TH all-clusters-app:
-          [1657235198.977848][370963:370963] CHIP:SVR: Commissioning completed successfully
-          [1657235198.977943][370963:370963] CHIP:DIS: Updating services using commissioning mode 0
-
-          DUT chip-tool:
-          $ ./chip-tool pairing code 1  MT:034J029Q00KA0648G00
-          [1657235198856] [31506:16834043] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
-          [1657235198856] [31506:16834043] CHIP: [TOO] Device commissioning completed with success
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
       disabled: true
 
     - label:
@@ -71,7 +65,7 @@ tests:
           discovery capability)"
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          1. Use chip-tool's "payload generate-qrcode" command to help generate the new, invalid QR code
+          1. Use chip-tool"s "payload generate-qrcode" command to help generate the new, invalid QR code
           $ ./chip-tool payload generate-qrcode --existing-payload MT:-24J029Q00KA0648G00 --allow-invalid-payload 1  --rendezvous 4
           [1657235754393] [31702:16840391] CHIP: [TOO] QR Code: MT:-24J029Q00KA0648G00
       disabled: true
@@ -169,7 +163,7 @@ tests:
     - label:
           "Prefix: Using the QR code from Step 1, generate a new QR code but
           substituting out the current Prefix with an invalid Prefix that is not
-          'MT:' (i.e. Prefix='AB:')"
+          MT: (i.e. Prefix=AB:)"
       verification: |
           AB:-24J029Q00KA0648G00
       disabled: true

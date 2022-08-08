@@ -28,7 +28,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Sends a MoveToLevel command to set current level to min value"
+    - label: "Sends a MoveToLevel command to set CurrentLevel to min value"
       command: "MoveToLevel"
       arguments:
           values:
@@ -51,13 +51,13 @@ tests:
 
     - label: "Reads CurrentLevel attribute from DUT"
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 1
 
     - label: "Write OnOffTransitionTime attribute"
       command: "writeAttribute"
-      attribute: "on off transition time"
+      attribute: "OnOffTransitionTime"
       arguments:
           value: 0
 
@@ -71,13 +71,13 @@ tests:
 
     - label: "Read OnOffTransitionTime attribute"
       command: "readAttribute"
-      attribute: "on off transition time"
+      attribute: "OnOffTransitionTime"
       response:
           value: 0
 
     - label: "Write OnLevel attribute"
       command: "writeAttribute"
-      attribute: "on level"
+      attribute: "OnLevel"
       arguments:
           value: 254
 
@@ -91,13 +91,13 @@ tests:
 
     - label: "Read OnLevel attribute"
       command: "readAttribute"
-      attribute: "on level"
+      attribute: "OnLevel"
       response:
           value: 254
 
     - label: "Read MinValue attribute"
       command: "readAttribute"
-      attribute: "min level"
+      attribute: "MinLevel"
       response:
           value: 1
 
@@ -122,7 +122,7 @@ tests:
 
     - label: "If OnLevel is defined, check CurrentLevel is OnLevel value"
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 254
 
@@ -147,11 +147,11 @@ tests:
 
     - label: "If OnLevel is defined, check CurrentLevel is min value"
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 1
 
-    - label: "Sends a MoveToLevel command to set current level to a mid value"
+    - label: "Sends a MoveToLevel command to set CurrentLevel to a mid value"
       command: "MoveToLevel"
       arguments:
           values:
@@ -174,13 +174,13 @@ tests:
 
     - label: "Reads CurrentLevel attribute from DUT"
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 127
 
     - label: "Set OnLevel attribute to null"
       command: "writeAttribute"
-      attribute: "on level"
+      attribute: "OnLevel"
       arguments:
           value: null
 
@@ -194,7 +194,7 @@ tests:
 
     - label: "Read OnLevel attribute"
       command: "readAttribute"
-      attribute: "on level"
+      attribute: "OnLevel"
       response:
           value: null
 
@@ -219,7 +219,7 @@ tests:
 
     - label: "If OnLevel is not defined, check CurrentLevel is restored"
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 127
 
@@ -244,6 +244,6 @@ tests:
 
     - label: "If OnLevel is not defined, check CurrentLevel is restored"
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           value: 127

@@ -240,27 +240,26 @@ exit:
 
 bool SetCertTimeField(ASN1_TIME * asn1Time, const struct tm & value)
 {
-    char timeStr[16];
+    char timeStr[ASN1UniversalTime::kASN1TimeStringMaxLength + 1];
+    MutableCharSpan timeSpan(timeStr);
+    ASN1UniversalTime val = { .Year   = static_cast<uint16_t>((value.tm_year == kX509NoWellDefinedExpirationDateYear)
+                                                                ? kX509NoWellDefinedExpirationDateYear
+                                                                : (value.tm_year + 1900)),
+                              .Month  = static_cast<uint8_t>(value.tm_mon + 1),
+                              .Day    = static_cast<uint8_t>(value.tm_mday),
+                              .Hour   = static_cast<uint8_t>(value.tm_hour),
+                              .Minute = static_cast<uint8_t>(value.tm_min),
+                              .Second = static_cast<uint8_t>(value.tm_sec) };
 
-    // Encode the time as a string in the form YYYYMMDDHHMMSSZ.
-    snprintf(timeStr, sizeof(timeStr), "%04d%02d%02d%02d%02d%02dZ",
-             (value.tm_year == kX509NoWellDefinedExpirationDateYear) ? kX509NoWellDefinedExpirationDateYear
-                                                                     : (static_cast<uint16_t>(value.tm_year + 1900) % 9999),
-             static_cast<uint8_t>(value.tm_mon) % kMonthsPerYear + 1, static_cast<uint8_t>(value.tm_mday) % (kMaxDaysPerMonth + 1),
-             static_cast<uint8_t>(value.tm_hour) % kHoursPerDay, static_cast<uint8_t>(value.tm_min) % kMinutesPerHour,
-             static_cast<uint8_t>(value.tm_sec) % kSecondsPerMinute);
+    if (val.ExportTo_ASN1_TIME_string(timeSpan) != CHIP_NO_ERROR)
+    {
+        fprintf(stderr, "ExportTo_ASN1_TIME_string() failed\n");
+        return false;
+    }
 
-    // X.509/RFC-5280 mandates that times before 2050 UTC must be encoded as ASN.1 UTCTime values, while
-    // times equal or greater than 2050 must be encoded as GeneralizedTime values.  The only difference
-    // between the two is the number of digits in the year -- 4 for GeneralizedTime, 2 for UTCTime.
-    //
-    // The OpenSSL ASN1_TIME_set_string() function DOES NOT handle picking the correct format based
-    // on the given year.  Thus the caller MUST pass a correctly formatted string or the resultant
-    // certificate will be malformed.
+    timeSpan.data()[timeSpan.size()] = '\0';
 
-    bool useUTCTime = ((value.tm_year + 1900) < 2050);
-
-    if (!ASN1_TIME_set_string(asn1Time, timeStr + (useUTCTime ? 2 : 0)))
+    if (!ASN1_TIME_set_string(asn1Time, timeStr))
     {
         fprintf(stderr, "OpenSSL ASN1_TIME_set_string() failed\n");
         return false;

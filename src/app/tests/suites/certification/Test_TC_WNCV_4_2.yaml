@@ -16,6 +16,9 @@ name:
     Window Covering [TC-WNCV-4.2] GoToTiltPercentage Long-Run Verification with
     server as DUT
 
+PICS:
+    - WNCV.S
+
 config:
     nodeId: 0x12344321
     cluster: "Window Covering"
@@ -57,7 +60,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000f
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           constraints:
               notValue: 0

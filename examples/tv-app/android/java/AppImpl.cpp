@@ -60,11 +60,12 @@ MyPincodeService gMyPincodeService;
 
 class MyPostCommissioningListener : public PostCommissioningListener
 {
-    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, OperationalDeviceProxy * device) override
+    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
+                                SessionHandle & sessionHandle) override
     {
 
-        ContentAppPlatform::GetInstance().ManageClientAccess(device, vendorId, GetDeviceCommissioner()->GetNodeId(),
-                                                             OnSuccessResponse, OnFailureResponse);
+        ContentAppPlatform::GetInstance().ManageClientAccess(
+            exchangeMgr, sessionHandle, vendorId, GetDeviceCommissioner()->GetNodeId(), OnSuccessResponse, OnFailureResponse);
     }
 
     /* Callback when command results in success */
@@ -476,7 +477,6 @@ CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter, jobject con
     // supported clusters so that ZAP will generated the requisite code.
     ChipLogDetail(DeviceLayer, "TV App: Disabling Fixed Content App Endpoints");
     emberAfEndpointEnableDisable(3, false);
-
     return CHIP_NO_ERROR;
 }
 

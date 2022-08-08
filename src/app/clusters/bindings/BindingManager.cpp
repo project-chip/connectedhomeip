@@ -121,13 +121,13 @@ CHIP_ERROR BindingManager::EstablishConnection(const ScopedNodeId & nodeId)
     return mLastSessionEstablishmentError;
 }
 
-void BindingManager::HandleDeviceConnected(void * context, OperationalDeviceProxy * device)
+void BindingManager::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
 {
     BindingManager * manager = static_cast<BindingManager *>(context);
-    manager->HandleDeviceConnected(device);
+    manager->HandleDeviceConnected(exchangeMgr, sessionHandle);
 }
 
-void BindingManager::HandleDeviceConnected(OperationalDeviceProxy * device)
+void BindingManager::HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
 {
     FabricIndex fabricToRemove = kUndefinedFabricIndex;
     NodeId nodeToRemove        = kUndefinedNodeId;
@@ -138,11 +138,12 @@ void BindingManager::HandleDeviceConnected(OperationalDeviceProxy * device)
     {
         EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(pendingNotification.mBindingEntryId);
 
-        if (device->GetPeerId() == ScopedNodeId(entry.nodeId, entry.fabricIndex))
+        if (sessionHandle->GetPeer() == ScopedNodeId(entry.nodeId, entry.fabricIndex))
         {
             fabricToRemove = entry.fabricIndex;
             nodeToRemove   = entry.nodeId;
-            mBoundDeviceChangedHandler(entry, device, pendingNotification.mContext->GetContext());
+            OperationalDeviceProxy device(&exchangeMgr, sessionHandle);
+            mBoundDeviceChangedHandler(entry, &device, pendingNotification.mContext->GetContext());
         }
     }
 
@@ -189,19 +190,9 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
         {
             if (iter->type == EMBER_UNICAST_BINDING)
             {
-                OperationalDeviceProxy * peerDevice =
-                    mInitParams.mCASESessionManager->FindExistingSession(ScopedNodeId(iter->nodeId, iter->fabricIndex));
-                if (peerDevice != nullptr && peerDevice->IsConnected())
-                {
-                    // We already have an active connection
-                    mBoundDeviceChangedHandler(*iter, peerDevice, bindingContext->GetContext());
-                }
-                else
-                {
-                    mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
-                    error = EstablishConnection(ScopedNodeId(iter->nodeId, iter->fabricIndex));
-                    SuccessOrExit(error == CHIP_NO_ERROR);
-                }
+                mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
+                error = EstablishConnection(ScopedNodeId(iter->nodeId, iter->fabricIndex));
+                SuccessOrExit(error == CHIP_NO_ERROR);
             }
             else if (iter->type == EMBER_MULTICAST_BINDING)
             {

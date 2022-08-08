@@ -27,7 +27,7 @@ public:
     MTROTAProviderDelegateBridge(id<MTROTAProviderDelegate> delegate);
     ~MTROTAProviderDelegateBridge();
 
-    void Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager);
+    CHIP_ERROR Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager);
     void Shutdown();
 
     void HandleQueryImage(

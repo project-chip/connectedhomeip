@@ -186,12 +186,19 @@ void CommandHandler::DecrementHoldOff()
         return;
     }
 
-    if (!mExchangeCtx->IsGroupExchangeContext() && !mSentStatusResponse)
+    if (!mSentStatusResponse)
     {
-        CHIP_ERROR err = SendCommandResponse();
-        if (err != CHIP_NO_ERROR)
+        if (!mExchangeCtx)
         {
-            ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogProgress(DataManagement, "Skipping command response: exchange context is null");
+        }
+        else if (!mExchangeCtx->IsGroupExchangeContext())
+        {
+            CHIP_ERROR err = SendCommandResponse();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
+            }
         }
     }
 

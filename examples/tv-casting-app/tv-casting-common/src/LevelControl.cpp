@@ -21,8 +21,8 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 
-CHIP_ERROR StepCommand::Invoke(LevelControl::StepMode stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask,
-                               uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback)
+CHIP_ERROR StepCommand::Invoke(LevelControl::StepMode stepMode, uint8_t stepSize, app::DataModel::Nullable<uint16_t> transitionTime,
+                               uint8_t optionMask, uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback)
 {
     LevelControl::Commands::Step::Type request;
     request.stepMode        = stepMode;
@@ -33,8 +33,8 @@ CHIP_ERROR StepCommand::Invoke(LevelControl::StepMode stepMode, uint8_t stepSize
     return MediaCommandBase::Invoke(request, responseCallback);
 }
 
-CHIP_ERROR MoveToLevelCommand::Invoke(uint8_t level, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
-                                      std::function<void(CHIP_ERROR)> responseCallback)
+CHIP_ERROR MoveToLevelCommand::Invoke(uint8_t level, app::DataModel::Nullable<uint16_t> transitionTime, uint8_t optionMask,
+                                      uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback)
 {
     LevelControl::Commands::MoveToLevel::Type request;
     request.level           = level;

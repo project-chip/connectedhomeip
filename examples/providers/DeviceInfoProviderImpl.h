@@ -97,6 +97,7 @@ protected:
     CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override;
     CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override;
     CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override;
+    CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override;
 
 private:
     static constexpr size_t UserLabelTLVMaxSize() { return TLV::EstimateStructOverhead(kMaxLabelNameLength, kMaxLabelValueLength); }

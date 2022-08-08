@@ -15,6 +15,9 @@
 
 name: 19.9.3. [TC-AUDIOOUTPUT-7.3] Select Output Verification (DUT as Client)
 
+PICS:
+    - AUDIOOUTPUT.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -22,7 +25,7 @@ config:
 
 tests:
     - label: "DUT sends SelectOutput command to TH"
-      PICS: AUDIOOUTPUT.S.C0000
+      PICS: AUDIOOUTPUT.C.C00.Tx
       verification: |
           If the DUT knows the Index value, then those can be sent as the argument.
           Else User needs to execute the following command to know the index InputList

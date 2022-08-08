@@ -14,6 +14,9 @@
 
 name: 19.4.5. [TC-APPLAUNCHER-3.8] Stop Application Verification
 
+PICS:
+    - APPLAUNCHER.S
+
 config:
     nodeId: 0x12344321
     cluster: "Application Launcher"
@@ -35,7 +38,7 @@ tests:
                 value: nodeId
 
     - label: "Stop an app with the provided application ID"
-      PICS: APPLAUNCHER.S.C0001
+      PICS: APPLAUNCHER.S.C01.Rsp
       command: "StopApp"
       arguments:
           values:

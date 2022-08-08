@@ -92,6 +92,8 @@ if [ "$#" == "0" ]; then
             Use to build the example with pigweed RPC
         OTA_periodic_query_timeout
             Periodic query timeout variable for OTA in seconds
+        rs91x_wpa3_only
+            Support for WPA3 only mode on RS91x
         Presets
         --sed
             enable sleepy end device, set thread mtd

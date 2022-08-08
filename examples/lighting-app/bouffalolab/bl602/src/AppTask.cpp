@@ -527,19 +527,6 @@ void AppTask::UpdateClusterState(void)
     }
 }
 
-void AppTask::OtaTask(void)
-{
-    int ret;
-    const char * const task_name = "ota task";
-
-    ret = xTaskCreate(ota_tcp_server, task_name, 512, NULL, 6, &OTA_TASK_HANDLE);
-    if (ret != pdPASS)
-    {
-        printf("unable to start task client task");
-        return;
-    }
-}
-
 void AppTask::FactoryResetButtonEventHandler(void)
 {
     AppEvent button_event           = {};

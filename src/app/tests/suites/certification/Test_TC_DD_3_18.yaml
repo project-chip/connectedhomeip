@@ -72,7 +72,7 @@ tests:
           DUT Commissioner:
           $ ./chip-tool pairing code 1 MT:-24J0IRV01KA0648G00
 
-          [1657240914764] [32262:16895870] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657240914764] [32262:16895870] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657240914764] [32262:16895870] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
@@ -95,7 +95,7 @@ tests:
           DUT Commissioner:
           $ ./chip-tool pairing code 2 MT:-24J04QI14KA0648G00
 
-          [1657240985682] [32264:16896797] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657240985682] [32264:16896797] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
           [1657240985682] [32264:16896797] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
@@ -104,6 +104,9 @@ tests:
           clusters attribute from TH1)"
       verification: |
           $ ./chip-tool basic read reachable 1 0
+
+          Verify in DUT as client side
+
           [1657241043430] [32266:16897416] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0011 DataVersion: 131004400
           [1657241043432] [32266:16897416] CHIP: [TOO]   Reachable: TRUE
       disabled: true
@@ -113,6 +116,9 @@ tests:
           clusters attribute from TH2)"
       verification: |
           $ ./chip-tool basic read reachable 2 0
+
+          Verify in DUT as client side
+
           [1657241066927] [32267:16897671] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0011 DataVersion: 2450774961
           [1657241066927] [32267:16897671] CHIP: [TOO]   Reachable: TRUE
       disabled: true

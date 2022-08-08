@@ -17,6 +17,9 @@ name:
     3.6.2. [TC-IDM-6.2] Events Subscribe Interaction from TH to DUT.
     [{DUT_Server}]
 
+PICS:
+    - MCORE.IDM.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -575,15 +578,6 @@ tests:
       disabled: true
 
     - label:
-          "TH sends Subscribe Request Message to DUT with EventRequests set to
-          all events from all clusters on all endpoints on a specific node that
-          is, [Node = Specific, Endpoint = Wildcard, Cluster = Wildcard, Event =
-          Wildcard]."
-      verification: |
-          test step repeated, needs to be removed from test plan, https://github.com/CHIP-Specifications/chip-test-plans/issues/1888
-      disabled: true
-
-    - label:
           "Activate Event subscription from TH to DUT and trigger the subscribed
           event on the DUT before minimum interval."
       verification: |
@@ -638,8 +632,8 @@ tests:
 
     - label:
           "Activate Event subscription from TH to DUT and and trigger the
-          subscribed event on the DUT before minimum interval. 'IsUrgent' flag
-          is set to True for a particular event path in the EventPathIB in the
+          subscribed event on the DUT before minimum interval. IsUrgent flag is
+          set to True for a particular event path in the EventPathIB in the
           SubscribeRequestMessage."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
@@ -885,7 +879,7 @@ tests:
           To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
 
-           accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
+           accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]" 1 0
 
 
           basic subscribe-event-by-id 0x000 100 1000 1 0
@@ -938,7 +932,7 @@ tests:
 
           To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
 
-          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
+          accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]" 1 0
 
           any subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 100 1000 1 0xFFFF
 
@@ -1190,8 +1184,8 @@ tests:
       disabled: true
 
     - label:
-          "With an active Event subscription from TH to DUT, change attribute
-          values on DUT to create events multiple times."
+          "With an active Event subscription from TH to DUT, trigger events on
+          DUT multiple times."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
@@ -1222,7 +1216,7 @@ tests:
 
           By sending the command mentioned below, change attribute values on DUT to create events multiple times.
 
-          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 1, "authMode": 3, "subjects": [111,222,333,444], "targets": [{"cluster":11 , "endpoint":22, "deviceType": null}]}, {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects": [555,666,777,888], "targets": [{"cluster": 55, "endpoint": 66, "deviceType":null }]}]' 1 0
+          accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 1, "authMode": 3, "subjects": [111,222,333,444], "targets": [{"cluster":11 , "endpoint":22, "deviceType": null}]}, {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects": [555,666,777,888], "targets": [{"cluster": 55, "endpoint": 66, "deviceType":null }]}]" 1 0
 
           On TH Verify that each event record is assigned a number that is exactly 1 greater than the last created event record on that Node.
 
@@ -1355,7 +1349,7 @@ tests:
 
           By sending the command mentioned below, change attribute values on DUT to create events multiple times.
 
-          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 1, "authMode": 3, "subjects": [111,222,333,444], "targets": [{"cluster":11 , "endpoint":22, "deviceType": null}]}, {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects": [555,666,777,888], "targets": [{"cluster": 55, "endpoint": 66, "deviceType":null }]}]' 1 0
+          accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 1, "authMode": 3, "subjects": [111,222,333,444], "targets": [{"cluster":11 , "endpoint":22, "deviceType": null}]}, {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects": [555,666,777,888], "targets": [{"cluster": 55, "endpoint": 66, "deviceType":null }]}]" 1 0
 
           On TH Verify that each event record is assigned a number that is exactly 1 greater than the last created event record on that Node.
 

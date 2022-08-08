@@ -1240,7 +1240,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _level = @(0);
 
-        _transitionTime = @(0);
+        _transitionTime = nil;
 
         _optionsMask = @(0);
 
@@ -1279,7 +1279,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _moveMode = @(0);
 
-        _rate = @(0);
+        _rate = nil;
 
         _optionsMask = @(0);
 
@@ -1319,7 +1319,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _stepSize = @(0);
 
-        _transitionTime = @(0);
+        _transitionTime = nil;
 
         _optionsMask = @(0);
 
@@ -1391,7 +1391,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _level = @(0);
 
-        _transitionTime = @(0);
+        _transitionTime = nil;
 
         _optionsMask = @(0);
 
@@ -1430,7 +1430,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _moveMode = @(0);
 
-        _rate = @(0);
+        _rate = nil;
 
         _optionsMask = @(0);
 
@@ -1470,7 +1470,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _stepSize = @(0);
 
-        _transitionTime = @(0);
+        _transitionTime = nil;
 
         _optionsMask = @(0);
 

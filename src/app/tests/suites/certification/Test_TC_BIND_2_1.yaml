@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 117.2.1. [TC-BIND-2.1] Binding Cluster Attributes-Node [DUT-Controller]
+name: 119.2.1. [TC-BIND-2.1] Binding Cluster Attributes-Node [DUT-Controller]
 
 config:
     nodeId: 0x12344321
@@ -29,94 +29,17 @@ tests:
 
     - label: "Commission DUT to TH1s fabric"
       verification: |
-          ./chip-tool pairing ble-wifi 1 chipsetup4 matter123 20202021 3840
-
-
-
-          ./chip-tool pairing open-commissioning-window 1 1 400 1000 3840
-
-
-          MessageCounter:141758774 from RetransTable on exchange 63698i
-          [1657796688.322878][3738:3743] CHIP:DMG: ICR moving to [ResponseRe]
-          [1657796688.322964][3738:3743] CHIP:DMG: InvokeResponseMessage =
-          [1657796688.323016][3738:3743] CHIP:DMG: {
-          [1657796688.323066][3738:3743] CHIP:DMG:         suppressResponse = false,
-          [1657796688.323118][3738:3743] CHIP:DMG:         InvokeResponseIBs =
-          [1657796688.323180][3738:3743] CHIP:DMG:         [
-          [1657796688.323231][3738:3743] CHIP:DMG:                 InvokeResponseIB =
-          [1657796688.323299][3738:3743] CHIP:DMG:                 {
-          [1657796688.323353][3738:3743] CHIP:DMG:                         CommandStatusIB =
-          [1657796688.323418][3738:3743] CHIP:DMG:                         {
-          [1657796688.323480][3738:3743] CHIP:DMG:                                 CommandPathIB =
-          [1657796688.323549][3738:3743] CHIP:DMG:                                 {
-          [1657796688.323627][3738:3743] CHIP:DMG:                                         EndpointId = 0x0,
-          [1657796688.323704][3738:3743] CHIP:DMG:                                         ClusterId = 0x3c,
-          [1657796688.323776][3738:3743] CHIP:DMG:                                         CommandId = 0x0,
-          [1657796688.323845][3738:3743] CHIP:DMG:                                 },
-          [1657796688.323920][3738:3743] CHIP:DMG:
-          [1657796688.323982][3738:3743] CHIP:DMG:                                 StatusIB =
-          [1657796688.324052][3738:3743] CHIP:DMG:                                 {
-          [1657796688.324174][3738:3743] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657796688.324246][3738:3743] CHIP:DMG:                                 },
-          [1657796688.324314][3738:3743] CHIP:DMG:
-          [1657796688.324375][3738:3743] CHIP:DMG:                         },
-          [1657796688.324451][3738:3743] CHIP:DMG:
-          [1657796688.324509][3738:3743] CHIP:DMG:                 },
-          [1657796688.324572][3738:3743] CHIP:DMG:
-          [1657796688.324623][3738:3743] CHIP:DMG:         ],
-          [1657796688.324684][3738:3743] CHIP:DMG:
-          [1657796688.324734][3738:3743] CHIP:DMG:         InteractionModelRevision = 1
-          [1657796688.324783][3738:3743] CHIP:DMG: },
-          [1657796688.324897][3738:3743] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
-          [1657796688.324956][3738:3743] CHIP:CTL: Successfully opened pairing window on the device
-          [1657796688.325135][3738:3743] CHIP:CTL: Manual pairing code: [35297957587]
-          [1657796688.325206][3738:3743] CHIP:CTL: SetupQRCode: [MT:-24J0AFN00GARZ0T.10]
-          [1657796688.325289][3738:3743] CHIP:DMG: ICR moving to [AwaitingDe]
+          ./chip-tool pairing onnetwork 1 20202021
       disabled: true
 
     - label: "Commission TH2 to TH1s fabric (Node ID = 2)"
       verification: |
-          ./chip-tool pairing code 2  35297957587
-
-          [1657796711.261433][1364:1369] CHIP:DMG: {
-          [1657796711.261488][1364:1369] CHIP:DMG:         suppressResponse = false,
-          [1657796711.261549][1364:1369] CHIP:DMG:         InvokeResponseIBs =
-          [1657796711.261623][1364:1369] CHIP:DMG:         [
-          [1657796711.261683][1364:1369] CHIP:DMG:                 InvokeResponseIB =
-          [1657796711.261760][1364:1369] CHIP:DMG:                 {
-          [1657796711.261823][1364:1369] CHIP:DMG:                         CommandDataIB =
-          [1657796711.261899][1364:1369] CHIP:DMG:                         {
-          [1657796711.261969][1364:1369] CHIP:DMG:                                 CommandPathIB =
-          [1657796711.262051][1364:1369] CHIP:DMG:                                 {
-          [1657796711.262133][1364:1369] CHIP:DMG:                                         EndpointId = 0x0,
-          [1657796711.262217][1364:1369] CHIP:DMG:                                         ClusterId = 0x3e,
-          [1657796711.262308][1364:1369] CHIP:DMG:                                         CommandId = 0x8,
-          [1657796711.262387][1364:1369] CHIP:DMG:                                 },
-          [1657796711.262469][1364:1369] CHIP:DMG:
-          [1657796711.262535][1364:1369] CHIP:DMG:                                 CommandFields =
-          [1657796711.262609][1364:1369] CHIP:DMG:                                 {
-          [1657796711.262689][1364:1369] CHIP:DMG:                                         0x0 = 0,
-          [1657796711.262761][1364:1369] CHIP:DMG:                                         0x1 = 2,
-          [1657796711.262869][1364:1369] CHIP:DMG:                                 },
-          [1657796711.262935][1364:1369] CHIP:DMG:                         },
-          [1657796711.263003][1364:1369] CHIP:DMG:
-          [1657796711.263060][1364:1369] CHIP:DMG:                 },
-          [1657796711.263124][1364:1369] CHIP:DMG:
-          [1657796711.263173][1364:1369] CHIP:DMG:         ],
-          [1657796711.263236][1364:1369] CHIP:DMG:
-          [1657796711.263287][1364:1369] CHIP:DMG:         InteractionModelRevision = 1
-          [1657796711.263336][1364:1369] CHIP:DMG: },
-          [1657796711.263456][1364:1369] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1657796711.263527][1364:1369] CHIP:CTL: Device returned status 0 on receiving the NOC
-          [1657796711.263576][1364:1369] CHIP:CTL: Operational credentials provisioned on device 0xffff7400ceb0
-          [1657796711.263624][1364:1369] CHIP:TOO: Secure Pairing Success
-          [1657796711.263665][1364:1369] CHIP:TOO: CASE establishment successful
-          [1657796711.263716][1364:1369] CHIP:CTL: Successfully finished commissioning step 'SendNOC'
+          ./chip-tool pairing ble-wifi 2 chipsetup4 matter123 20202021 3840
       disabled: true
 
     - label: "Commission TH3 to TH1s fabric (Node ID = 3)"
       verification: |
-          ./chip-tool pairing code 3 35468051682
+          ./chip-tool pairing ble-wifi 3 chipsetup4 matter123 20202021 3841
       disabled: true
 
     - label:
@@ -125,7 +48,7 @@ tests:
           Entry 2: Node = 3 Cluster = 0x0006(onoff) Endpoint = 2 Note: Node 2
           corresponds to TH2s Node ID Node 3 corresponds to TH3s Node ID"
       verification: |
-          ./chip-tool binding write binding '[{"node" : 2 , "cluster" : "0x0006" , "endpoint" : 1 }, { "node" : 3 , "cluster" : "0x0006" , "endpoint" : 2  }]' 1 0
+          ./chip-tool binding write binding "[{"node" : 2 , "cluster" : "0x0006" , "endpoint" : 1 }, { "node" : 3 , "cluster" : "0x0006" , "endpoint" : 2  }]" 1 1
 
 
 
@@ -147,35 +70,134 @@ tests:
 
     - label: "TH1 enables DUT as Controller"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT is triggered to send On command to its binding node entries"
       PICS: OO.C.C01.Tx
       verification: |
-          ./chip-tool onoff on 1 1
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}]}]" 2 0
 
-          [1657798258.634672][1444:1449] CHIP:DMG:                                 {
-          [1657798258.634719][1444:1449] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657798258.634771][1444:1449] CHIP:DMG:                                 },
+          [1652330385.328196][3240:3245] CHIP:DMG:                        StatusIB =
+          [1652330385.328229][3240:3245] CHIP:DMG:                        {
+          [1652330385.328264][3240:3245] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1652330385.328298][3240:3245] CHIP:DMG:                        },
 
-          [1657798258.635250][1444:1449] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
 
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}]}]" 3 0
 
-           ./chip-tool onoff on 1 2
+          [1650610345.847274][2626:2631] CHIP:DMG:                                StatusIB =
+          [1650610345.847317][2626:2631] CHIP:DMG:                                {
+          [1650610345.847383][2626:2631] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1650610345.847429][2626:2631] CHIP:DMG:                                },
 
-          [1657798258.634719][1444:1449] CHIP:DMG:    status = 0x00 (SUCCESS),
+          DUT sends on command in the shell
+
+          > switch on
+          [1658837711.917557][4764:4764] CHIP:DMG: ICR moving to [AddingComm]
+          [1658837711.917653][4764:4764] CHIP:DMG: ICR moving to [AddedComma]
+          [1658837711.917869][4764:4764] CHIP:IN: Prepared secure message 0xaaaaf8a908f8 to 0x0000000000000046 (1)  of type 0x8 and protocolId (0, 1) on exchange 5086i with MessageCounter:188042572.
+          [1658837711.917966][4764:4764] CHIP:IN: Sending encrypted msg 0xaaaaf8a908f8 with MessageCounter:188042572 to 0x0000000000000046 (1) at monotonic time: 0000000001828F3D msec
+          [1658837711.918320][4764:4764] CHIP:DMG: ICR moving to [CommandSen]
+          [1658837711.918428][4764:4764] CHIP:DMG: ICR moving to [AddingComm]
+          [1658837711.918496][4764:4764] CHIP:DMG: ICR moving to [AddedComma]
+          [1658837711.918633][4764:4764] CHIP:IN: Prepared secure message 0xaaaaf8a733a8 to 0x0000000000000258 (1)  of type 0x8 and protocolId (0, 1) on exchange 5087i with MessageCounter:70524918.
+          [1658837711.918720][4764:4764] CHIP:IN: Sending encrypted msg 0xaaaaf8a733a8 with MessageCounter:70524918 to 0x0000000000000258 (1) at monotonic time: 0000000001828F3E msec
+          [1658837711.919011][4764:4764] CHIP:DMG: ICR moving to [CommandSen]
+          Done
+          > [1658837711.920333][4764:4764] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:225570715 on exchange 5086i
+          [1658837711.920409][4764:4764] CHIP:EM: Found matching exchange: 5086i, Delegate: 0xaaaaf8a90220
+          [1658837711.920490][4764:4764] CHIP:EM: Rxd Ack; Removing MessageCounter:188042572 from Retrans Table on exchange 5086i
+          [1658837711.920598][4764:4764] CHIP:EM: Removed CHIP MessageCounter:188042572 from RetransTable on exchange 5086i
+          [1658837711.920673][4764:4764] CHIP:DMG: ICR moving to [ResponseRe]
+          [1658837711.920777][4764:4764] CHIP:DMG: InvokeResponseMessage =
+          [1658837711.920837][4764:4764] CHIP:DMG: {
+          [1658837711.920894][4764:4764] CHIP:DMG:        suppressResponse = false,
+          [1658837711.920954][4764:4764] CHIP:DMG:        InvokeResponseIBs =
+          [1658837711.921030][4764:4764] CHIP:DMG:        [
+          [1658837711.921089][4764:4764] CHIP:DMG:                InvokeResponseIB =
+          [1658837711.921166][4764:4764] CHIP:DMG:                {
+          [1658837711.921229][4764:4764] CHIP:DMG:                        CommandStatusIB =
+          [1658837711.921309][4764:4764] CHIP:DMG:                        {
+          [1658837711.921380][4764:4764] CHIP:DMG:                                CommandPathIB =
+          [1658837711.921462][4764:4764] CHIP:DMG:                                {
+          [1658837711.921543][4764:4764] CHIP:DMG:                                        EndpointId = 0x1,
+          [1658837711.921630][4764:4764] CHIP:DMG:                                        ClusterId = 0x6,
+          [1658837711.921714][4764:4764] CHIP:DMG:                                        CommandId = 0x1,
+          [1658837711.921801][4764:4764] CHIP:DMG:                                },
+          [1658837711.921889][4764:4764] CHIP:DMG:
+          [1658837711.921961][4764:4764] CHIP:DMG:                                StatusIB =
+          [1658837711.922050][4764:4764] CHIP:DMG:                                {
+          [1658837711.922139][4764:4764] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1658837711.922222][4764:4764] CHIP:DMG:                                },
+          [1658837711.922301][4764:4764] CHIP:DMG:
+          [1658837711.922374][4764:4764] CHIP:DMG:                        },
+          [1658837711.922456][4764:4764] CHIP:DMG:
+          [1658837711.922522][4764:4764] CHIP:DMG:                },
+          [1658837711.922596][4764:4764] CHIP:DMG:
+          [1658837711.922654][4764:4764] CHIP:DMG:        ],
+          [1658837711.922726][4764:4764] CHIP:DMG:
+          [1658837711.922786][4764:4764] CHIP:DMG:        InteractionModelRevision = 1
+          [1658837711.922844][4764:4764] CHIP:DMG: },
+          [1658837711.922978][4764:4764] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
+          [1658837711.923042][4764:4764] CHIP:-: OnOff command succeeds
+          [1658837711.923125][4764:4764] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658837711.923188][4764:4764] CHIP:EM: Sending Standalone Ack for MessageCounter:225570715 on exchange 5086i
+          [1658837711.923300][4764:4764] CHIP:IN: Prepared secure message 0xffffc33c53d8 to 0x0000000000000046 (1)  of type 0x10 and protocolId (0, 0) on exchange 5086i with MessageCounter:188042573.
+          [1658837711.923385][4764:4764] CHIP:IN: Sending encrypted msg 0xffffc33c53d8 with MessageCounter:188042573 to 0x0000000000000046 (1) at monotonic time: 0000000001828F42 msec
+          [1658837711.923572][4764:4764] CHIP:EM: Flushed pending ack for MessageCounter:225570715 on exchange 5086i
+          [1658837711.926330][4764:4764] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:32223638 on exchange 5087i
+          [1658837711.926404][4764:4764] CHIP:EM: Found matching exchange: 5087i, Delegate: 0xaaaaf8a8bb70
+          [1658837711.926475][4764:4764] CHIP:EM: Rxd Ack; Removing MessageCounter:70524918 from Retrans Table on exchange 5087i
+          [1658837711.926534][4764:4764] CHIP:EM: Removed CHIP MessageCounter:70524918 from RetransTable on exchange 5087i
+          [1658837711.926599][4764:4764] CHIP:DMG: ICR moving to [ResponseRe]
+          [1658837711.926687][4764:4764] CHIP:DMG: InvokeResponseMessage =
+          [1658837711.926744][4764:4764] CHIP:DMG: {
+          [1658837711.926800][4764:4764] CHIP:DMG:        suppressResponse = false,
+          [1658837711.926859][4764:4764] CHIP:DMG:        InvokeResponseIBs =
+          [1658837711.926932][4764:4764] CHIP:DMG:        [
+          [1658837711.926991][4764:4764] CHIP:DMG:                InvokeResponseIB =
+          [1658837711.927066][4764:4764] CHIP:DMG:                {
+          [1658837711.927128][4764:4764] CHIP:DMG:                        CommandStatusIB =
+          [1658837711.927310][4764:4764] CHIP:DMG:                        {
+          [1658837711.927388][4764:4764] CHIP:DMG:                                CommandPathIB =
+          [1658837711.927469][4764:4764] CHIP:DMG:                                {
+          [1658837711.927551][4764:4764] CHIP:DMG:                                        EndpointId = 0x1,
+          [1658837711.927638][4764:4764] CHIP:DMG:                                        ClusterId = 0x6,
+          [1658837711.927722][4764:4764] CHIP:DMG:                                        CommandId = 0x1,
+          [1658837711.927802][4764:4764] CHIP:DMG:                                },
+          [1658837711.927897][4764:4764] CHIP:DMG:
+          [1658837711.927970][4764:4764] CHIP:DMG:                                StatusIB =
+          [1658837711.928057][4764:4764] CHIP:DMG:                                {
+          [1658837711.928145][4764:4764] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1658837711.928222][4764:4764] CHIP:DMG:                                },
+          [1658837711.928303][4764:4764] CHIP:DMG:
+          [1658837711.928373][4764:4764] CHIP:DMG:                        },
+          [1658837711.928453][4764:4764] CHIP:DMG:
+          [1658837711.928515][4764:4764] CHIP:DMG:                },
+          [1658837711.928625][4764:4764] CHIP:DMG:
+          [1658837711.928686][4764:4764] CHIP:DMG:        ],
+          [1658837711.928757][4764:4764] CHIP:DMG:
+          [1658837711.928816][4764:4764] CHIP:DMG:        InteractionModelRevision = 1
+          [1658837711.928873][4764:4764] CHIP:DMG: },
+          [1658837711.928983][4764:4764] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
+          [1658837711.929015][4764:4764] CHIP:-: OnOff command succeeds
+          [1658837711.929055][4764:4764] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658837711.929134][4764:4764] CHIP:EM: Sending Standalone Ack for MessageCounter:32223638 on exchange 5087i
+          [1658837711.929198][4764:4764] CHIP:IN: Prepared secure message 0xffffc33c53d8 to 0x0000000000000258 (1)  of type 0x10 and protocolId (0, 0) on exchange 5087i with MessageCounter:70524919.
+          [1658837711.929241][4764:4764] CHIP:IN: Sending encrypted msg 0xffffc33c53d8 with MessageCounter:70524919 to 0x0000000000000258 (1) at monotonic time: 0000000001828F48 msec
+          [1658837711.929336][4764:4764] CHIP:EM: Flushed pending ack for MessageCounter:32223638 on exchange 5087i
       disabled: true
 
     - label: "TH1 reads OnOff attribute from TH2 (Endpoint 1)"
       PICS: OO.C.C01.Tx
       verification: |
-          ./chip-tool onoff read on-off 1 1
+          ./chip-tool onoff read on-off 2 1
 
           [1657798291.396477][3835:3841] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 4260513117
           [1657798291.396514][3835:3841] CHIP:TOO:   OnOff: TRUE
 
-          ./chip-tool onoff read on-off 1 2
+          ./chip-tool onoff read on-off 3 2
 
           [1657798691.194894][3869:3874] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 470320746
           [1657798691.194948][3869:3874] CHIP:TOO:   OnOff: TRUE
@@ -183,7 +205,7 @@ tests:
 
     - label: "TH1 removes second binding entry corresponding to TH3 from DUT"
       verification: |
-          ./chip-tool binding write binding '[{"node" : 2 , "cluster" : "0x0006" , "endpoint" : 1 }]' 1 0
+          ./chip-tool binding write binding "[{"node" : 2 , "cluster" : "0x0006" , "endpoint" : 1 }]" 1 1
 
           [1657800844.739833][4000:4006] CHIP:EM: Removed CHIP MessageCounter:244702117 from RetransTable on exchange 12653i
           [1657800844.739867][4000:4006] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -235,21 +257,57 @@ tests:
     - label: "DUT is triggered to send off command to its binding entries"
       PICS: OO.C.C00.Tx
       verification: |
-          ./chip-tool onoff off 1 1
+          DUT sends off command in the shell
 
-          [1657800932.012989][1497:1502] CHIP:DMG:                                 StatusIB =
-          [1657800932.013027][1497:1502] CHIP:DMG:                                 {
-          [1657800932.013063][1497:1502] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657800932.013102][1497:1502] CHIP:DMG:                                 },
-
-
-          ./chip-tool onoff off 1 2
+          > switch off
+          [1658838896.810567][4764:4764] CHIP:DMG: ICR moving to [AddingComm]
+          [1658838896.810692][4764:4764] CHIP:DMG: ICR moving to [AddedComma]
+          [1658838896.810911][4764:4764] CHIP:IN: Prepared secure message 0xaaaaf8a8c0e8 to 0x0000000000000046 (1)  of type 0x8 and protocolId (0, 1) on exchange 5088i with MessageCounter:188042574.
+          [1658838896.811035][4764:4764] CHIP:IN: Sending encrypted msg 0xaaaaf8a8c0e8 with MessageCounter:188042574 to 0x0000000000000046 (1) at monotonic time: 000000000194A3BA msec
+          [1658838896.811427][4764:4764] CHIP:DMG: ICR moving to [CommandSen]
+          Done
+          > [1658838896.817922][4764:4764] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:225570716 on exchange 5088i
+          [1658838896.817984][4764:4764] CHIP:EM: Found matching exchange: 5088i, Delegate: 0xaaaaf8a90220
+          [1658838896.818042][4764:4764] CHIP:EM: Rxd Ack; Removing MessageCounter:188042574 from Retrans Table on exchange 5088i
+          [1658838896.818087][4764:4764] CHIP:EM: Removed CHIP MessageCounter:188042574 from RetransTable on exchange 5088i
+          [1658838896.818140][4764:4764] CHIP:DMG: ICR moving to [ResponseRe]
+          [1658838896.818241][4764:4764] CHIP:DMG: InvokeResponseMessage =
+          [1658838896.818287][4764:4764] CHIP:DMG: {
+          [1658838896.818344][4764:4764] CHIP:DMG:        suppressResponse = false,
+          [1658838896.818391][4764:4764] CHIP:DMG:        InvokeResponseIBs =
+          [1658838896.818463][4764:4764] CHIP:DMG:        [
+          [1658838896.818508][4764:4764] CHIP:DMG:                InvokeResponseIB =
+          [1658838896.818581][4764:4764] CHIP:DMG:                {
+          [1658838896.818629][4764:4764] CHIP:DMG:                        CommandStatusIB =
+          [1658838896.818699][4764:4764] CHIP:DMG:                        {
+          [1658838896.818759][4764:4764] CHIP:DMG:                                CommandPathIB =
+          [1658838896.818836][4764:4764] CHIP:DMG:                                {
+          [1658838896.818915][4764:4764] CHIP:DMG:                                        EndpointId = 0x1,
+          [1658838896.819001][4764:4764] CHIP:DMG:                                        ClusterId = 0x6,
+          [1658838896.819068][4764:4764] CHIP:DMG:                                        CommandId = 0x0,
+          [1658838896.819144][4764:4764] CHIP:DMG:                                },
+          [1658838896.819227][4764:4764] CHIP:DMG:
+          [1658838896.819285][4764:4764] CHIP:DMG:                                StatusIB =
+          [1658838896.819347][4764:4764] CHIP:DMG:                                {
+          [1658838896.819408][4764:4764] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1658838896.819474][4764:4764] CHIP:DMG:                                },
+          [1658838896.819535][4764:4764] CHIP:DMG:
+          [1658838896.819588][4764:4764] CHIP:DMG:                        },
+          [1658838896.819650][4764:4764] CHIP:DMG:
+          [1658838896.819700][4764:4764] CHIP:DMG:                },
+          [1658838896.819759][4764:4764] CHIP:DMG:
+          [1658838896.819803][4764:4764] CHIP:DMG:        ],
+          [1658838896.819856][4764:4764] CHIP:DMG:
+          [1658838896.819900][4764:4764] CHIP:DMG:        InteractionModelRevision = 1
+          [1658838896.819943][4764:4764] CHIP:DMG: },
+          [1658838896.820047][4764:4764] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0000 Status=0x0
+          [1658838896.820095][4764:4764] CHIP:-: OnOff command succeeds
       disabled: true
 
     - label: "TH1 reads OnOff attribute from TH2 (Endpoint 1)"
       PICS: OO.C.C00.Tx
       verification: |
-          ./chip-tool onoff read on-off 1 1
+          ./chip-tool onoff read on-off  2 1
 
 
           [1657803168.769564][4272:4277] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 1968648540
@@ -260,7 +318,7 @@ tests:
     - label: "TH1 reads OnOff attribute from TH3 (Endpoint 2)"
       PICS: OO.C.C01.Tx
       verification: |
-          ./chip-tool onoff read on-off 1 2
+          ./chip-tool onoff read on-off 3 2
 
           [1657803609.731464][4333:4339] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3914456390
 

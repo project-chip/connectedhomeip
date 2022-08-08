@@ -146,6 +146,11 @@ public:
                 uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi,
                 bool attemptNetworkScanThread, CHIP_ERROR * errInfoOnFailure);
 
+    chip::Controller::AndroidOperationalCredentialsIssuer * GetAndroidOperationalCredentialsIssuer()
+    {
+        return mOpCredsIssuer.get();
+    }
+
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 

@@ -57,7 +57,7 @@ CHIP_ERROR InteractionModel::ReadEvent(const char * identity, EndpointId endpoin
 CHIP_ERROR InteractionModel::SubscribeAttribute(const char * identity, EndpointId endpointId, ClusterId clusterId,
                                                 AttributeId attributeId, uint16_t minInterval, uint16_t maxInterval,
                                                 bool fabricFiltered, const Optional<DataVersion> & dataVersion,
-                                                const Optional<bool> & keepSubscriptions)
+                                                const Optional<bool> & keepSubscriptions, const Optional<bool> & autoResubscribe)
 {
     DeviceProxy * device = GetDevice(identity);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -73,12 +73,14 @@ CHIP_ERROR InteractionModel::SubscribeAttribute(const char * identity, EndpointI
     }
 
     return InteractionModelReports::SubscribeAttribute(device, endpointIds, clusterIds, attributeIds, minInterval, maxInterval,
-                                                       Optional<bool>(fabricFiltered), dataVersions, keepSubscriptions);
+                                                       Optional<bool>(fabricFiltered), dataVersions, keepSubscriptions,
+                                                       autoResubscribe);
 }
 
 CHIP_ERROR InteractionModel::SubscribeEvent(const char * identity, EndpointId endpointId, ClusterId clusterId, EventId eventId,
                                             uint16_t minInterval, uint16_t maxInterval, bool fabricFiltered,
-                                            const Optional<EventNumber> & eventNumber, const Optional<bool> & keepSubscriptions)
+                                            const Optional<EventNumber> & eventNumber, const Optional<bool> & keepSubscriptions,
+                                            const Optional<bool> & autoResubscribe)
 {
     DeviceProxy * device = GetDevice(identity);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -87,7 +89,8 @@ CHIP_ERROR InteractionModel::SubscribeEvent(const char * identity, EndpointId en
     std::vector<ClusterId> clusterIds   = { clusterId };
     std::vector<EventId> eventIds       = { eventId };
     return InteractionModelReports::SubscribeEvent(device, endpointIds, clusterIds, eventIds, minInterval, maxInterval,
-                                                   Optional<bool>(fabricFiltered), eventNumber, keepSubscriptions);
+                                                   Optional<bool>(fabricFiltered), eventNumber, keepSubscriptions, NullOptional,
+                                                   autoResubscribe);
 }
 
 void InteractionModel::Shutdown()
@@ -118,6 +121,11 @@ void InteractionModel::OnDone(ReadClient * aReadClient)
 {
     InteractionModelReports::CleanupReadClient(aReadClient);
     ContinueOnChipMainThread(CHIP_NO_ERROR);
+}
+
+void InteractionModel::OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams)
+{
+    InteractionModelReports::OnDeallocatePaths(std::move(aReadPrepareParams));
 }
 
 void InteractionModel::OnSubscriptionEstablished(SubscriptionId subscriptionId)
@@ -231,7 +239,9 @@ CHIP_ERROR InteractionModelConfig::GetAttributePaths(std::vector<EndpointId> end
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    pathsConfig.count = pathsCount;
+    pathsConfig.count               = pathsCount;
+    pathsConfig.attributePathParams = std::make_unique<AttributePathParams[]>(pathsCount);
+    pathsConfig.dataVersionFilter   = std::make_unique<DataVersionFilter[]>(pathsCount);
 
     for (size_t i = 0; i < pathsCount; i++)
     {
@@ -274,7 +284,8 @@ CHIP_ERROR InteractionModelReports::ReportAttribute(DeviceProxy * device, std::v
                                                     ReadClient::InteractionType interactionType, uint16_t minInterval,
                                                     uint16_t maxInterval, const Optional<bool> & fabricFiltered,
                                                     const Optional<std::vector<DataVersion>> & dataVersions,
-                                                    const Optional<bool> & keepSubscriptions)
+                                                    const Optional<bool> & keepSubscriptions,
+                                                    const Optional<bool> & autoResubscribe)
 {
     InteractionModelConfig::AttributePathsConfig pathsConfig;
     ReturnErrorOnFailure(
@@ -286,7 +297,7 @@ CHIP_ERROR InteractionModelReports::ReportAttribute(DeviceProxy * device, std::v
     ReadPrepareParams params(device->GetSecureSession().Value());
     params.mpEventPathParamsList        = nullptr;
     params.mEventPathParamsListSize     = 0;
-    params.mpAttributePathParamsList    = pathsConfig.attributePathParams;
+    params.mpAttributePathParamsList    = pathsConfig.attributePathParams.get();
     params.mAttributePathParamsListSize = pathsConfig.count;
 
     if (fabricFiltered.HasValue())
@@ -296,7 +307,7 @@ CHIP_ERROR InteractionModelReports::ReportAttribute(DeviceProxy * device, std::v
 
     if (dataVersions.HasValue())
     {
-        params.mpDataVersionFilterList    = pathsConfig.dataVersionFilter;
+        params.mpDataVersionFilterList    = pathsConfig.dataVersionFilter.get();
         params.mDataVersionFilterListSize = pathsConfig.count;
     }
 
@@ -316,6 +327,15 @@ CHIP_ERROR InteractionModelReports::ReportAttribute(DeviceProxy * device, std::v
     {
         ReturnErrorOnFailure(client->SendRequest(params));
     }
+    else if (autoResubscribe.ValueOr(false))
+    {
+        pathsConfig.attributePathParams.release();
+        if (dataVersions.HasValue())
+        {
+            pathsConfig.dataVersionFilter.release();
+        }
+        ReturnErrorOnFailure(client->SendAutoResubscribeRequest(std::move(params)));
+    }
     else
     {
         // We want to allow certain kinds of spec-invalid subscriptions so we
@@ -331,7 +351,8 @@ CHIP_ERROR InteractionModelReports::ReportEvent(DeviceProxy * device, std::vecto
                                                 ReadClient::InteractionType interactionType, uint16_t minInterval,
                                                 uint16_t maxInterval, const Optional<bool> & fabricFiltered,
                                                 const Optional<EventNumber> & eventNumber, const Optional<bool> & keepSubscriptions,
-                                                const Optional<std::vector<bool>> & isUrgents)
+                                                const Optional<std::vector<bool>> & isUrgents,
+                                                const Optional<bool> & autoResubscribe)
 {
     const size_t clusterCount  = clusterIds.size();
     const size_t eventCount    = eventIds.size();
@@ -378,7 +399,7 @@ CHIP_ERROR InteractionModelReports::ReportEvent(DeviceProxy * device, std::vecto
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    EventPathParams eventPathParams[kMaxAllowedPaths];
+    auto eventPathParams = std::make_unique<EventPathParams[]>(pathsCount);
 
     ChipLogProgress(chipTool,
                     "Sending %sEvent to:", interactionType == ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read");
@@ -412,7 +433,7 @@ CHIP_ERROR InteractionModelReports::ReportEvent(DeviceProxy * device, std::vecto
     }
 
     ReadPrepareParams params(device->GetSecureSession().Value());
-    params.mpEventPathParamsList        = eventPathParams;
+    params.mpEventPathParamsList        = eventPathParams.get();
     params.mEventPathParamsListSize     = pathsCount;
     params.mEventNumber                 = eventNumber;
     params.mpAttributePathParamsList    = nullptr;
@@ -435,7 +456,15 @@ CHIP_ERROR InteractionModelReports::ReportEvent(DeviceProxy * device, std::vecto
 
     auto client = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
                                                mBufferedReadAdapter, interactionType);
-    ReturnErrorOnFailure(client->SendRequest(params));
+    if (autoResubscribe.ValueOr(false))
+    {
+        eventPathParams.release();
+        ReturnErrorOnFailure(client->SendAutoResubscribeRequest(std::move(params)));
+    }
+    else
+    {
+        ReturnErrorOnFailure(client->SendRequest(params));
+    }
     mReadClients.push_back(std::move(client));
     return CHIP_NO_ERROR;
 }
@@ -573,4 +602,22 @@ CHIP_ERROR InteractionModelReports::ReportAll(chip::DeviceProxy * device, std::v
     ReturnErrorOnFailure(client->SendRequest(params));
     mReadClients.push_back(std::move(client));
     return CHIP_NO_ERROR;
+}
+
+void InteractionModelReports::OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams)
+{
+    if (aReadPrepareParams.mpAttributePathParamsList != nullptr)
+    {
+        delete[] aReadPrepareParams.mpAttributePathParamsList;
+    }
+
+    if (aReadPrepareParams.mpDataVersionFilterList != nullptr)
+    {
+        delete[] aReadPrepareParams.mpDataVersionFilterList;
+    }
+
+    if (aReadPrepareParams.mpEventPathParamsList != nullptr)
+    {
+        delete[] aReadPrepareParams.mpEventPathParamsList;
+    }
 }

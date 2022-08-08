@@ -50,9 +50,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <platform/P6/OTAImageProcessorImpl.h>
-extern "C" {
-#include "cy_smif_psoc6.h"
-}
+
 using chip::BDXDownloader;
 using chip::CharSpan;
 using chip::DefaultOTARequestor;
@@ -60,7 +58,7 @@ using chip::FabricIndex;
 using chip::GetRequestorInstance;
 using chip::NodeId;
 using chip::OTADownloader;
-using chip::OTAImageProcessorImpl;
+using chip::DeviceLayer::OTAImageProcessorImpl;
 using chip::System::Layer;
 
 using namespace ::chip;
@@ -314,35 +312,16 @@ bool lowPowerClusterSleep()
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 void AppTask::InitOTARequestor()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     SetRequestorInstance(&gRequestorCore);
+    ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    uint32_t savedSoftwareVersion;
-    err = ConfigurationMgr().GetSoftwareVersion(savedSoftwareVersion);
-    if (err != CHIP_NO_ERROR)
-    {
-        P6_LOG("Can't get saved software version");
-        appError(err);
-    }
-
-    if (savedSoftwareVersion != CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION)
-    {
-        ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
-
-        P6_LOG("Confirming update to version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
-        chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
-        if (requestor != nullptr)
-        {
-            requestor->NotifyUpdateApplied();
-        }
-    }
-
     P6_LOG("Current Software Version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
-    P6_LOG("Current Firmware Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+    P6_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 }
 #endif

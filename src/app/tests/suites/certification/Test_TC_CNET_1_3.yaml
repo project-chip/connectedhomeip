@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.1.3. [TC-CNET-1.3] Global Attributes for Networking commissioning cluster
+    12.1.3. [TC-CNET-1.3] Global Attributes for Networking commissioning cluster
     [DUT-Server]
+
+PICS:
+    - CNET.S
 
 config:
     nodeId: 0x12344321
@@ -25,14 +28,14 @@ config:
 tests:
     - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "TH reads the ClusterRevision from DUT"
       verification: |
           ./chip-tool networkcommissioning read cluster-revision  1 0
 
-          Verify on the TH Log:
+          Verify  ClusterRevision: 1 on the TH Log:
 
           [1649244866.275684][30440:30446] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFD DataVersion: 2702518944
           [1649244866.277721][30440:30446] CHIP:TOO:   ClusterRevision: 1
@@ -43,8 +46,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read feature-map 1 0
 
-
-          Verify on the TH Log:
+          Verify FeatureMap on the TH Log:
 
           [1651215443.195852][3285:3290] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 2584224280
           [1651215443.195939][3285:3290] CHIP:TOO:   FeatureMap: 4
@@ -54,8 +56,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read attribute-list 1 0
 
-
-          Verify on the TH Log:
+          Verify AttributeList on the TH Log:
 
           [1651215479.539148][3293:3298] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFB DataVersion: 2584224280
           [1651215479.539230][3293:3298] CHIP:TOO:   AttributeList: 13 entries
@@ -81,12 +82,9 @@ tests:
 
     - label: "TH reads AcceptedCommandList from DUT"
       verification: |
-          In case of chip tool, here is an example command to use
-
           ./chip-tool networkcommissioning read accepted-command-list 1 0
 
-
-          Verify on the TH Log:
+          Verify AcceptedCommandList on the TH Log:
 
           [1653909914.972854][3424:3429] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFF9 DataVersion: 880539056
           [1653909914.973027][3424:3429] CHIP:TOO:   AcceptedCommandList: 5 entries
@@ -100,10 +98,10 @@ tests:
 
     - label: "TH reads GeneratedCommandList from DUT"
       verification: |
-          ( WiFi) ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read generated-command-list 1 0
+          ( WiFi) ./chip-tool networkcommissioning read generated-command-list 1 0
 
 
-          Verify on the TH Log:
+          Verify GeneratedCommandList on the TH Log:
 
           [1650370123.417759][42418:42423] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFF8 DataVersion: 3182776035
           [1650370123.417866][42418:42423] CHIP:TOO:   GeneratedCommandList: 3 entries
@@ -115,7 +113,7 @@ tests:
            ( Thread ) ./chip-tool networkcommissioning read generated-command-list 51 0
 
 
-          Verify on the TH Log:
+          Verify GeneratedCommandList on the TH Log:
 
           [1650370342.693373][7450:7455] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFF8 DataVersion: 1032683896
           [1650370342.693536][7450:7455] CHIP:TOO:   GeneratedCommandList: 2 entries
@@ -129,5 +127,5 @@ tests:
           "NOTE: Repeat the test case by Commission DUT to TH on the Thread and
           Ethernet setups"
       verification: |
-
+          verification step to be updated.
       disabled: true

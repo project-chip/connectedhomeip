@@ -812,7 +812,7 @@ bool Cmd_GenCert(int argc, char * argv[])
 
     if (gInKeyFileName != nullptr)
     {
-        res = ReadKey(gInKeyFileName, newKey.get());
+        res = ReadKey(gInKeyFileName, newKey);
         VerifyTrueOrExit(res);
     }
     else
@@ -839,7 +839,7 @@ bool Cmd_GenCert(int argc, char * argv[])
         res = ReadCert(gCACertFileName, caCert.get());
         VerifyTrueOrExit(res);
 
-        res = ReadKey(gCAKeyFileName, caKey.get());
+        res = ReadKey(gCAKeyFileName, caKey);
         VerifyTrueOrExit(res);
 
         caCertPtr = caCert.get();

@@ -502,14 +502,6 @@ menu "CHIP Device Layer"
 
                 When set, WoBLE advertisements will stop while a WoBLE connection is active.
 
-        config CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-            bool "Disable Advertising when Provisioned"
-            default n
-            depends on ENABLE_CHIPOBLE
-            help
-                Automatically disable CHIP-over-BLE (WoBLE) advertising when the device transitions
-                to a fully provisioned state.
-
         config DEINIT_BLE_ON_COMMISSIONING_COMPLETE
 	    bool "Disable and DeInit BLE on commissioning complete"
 	    default y

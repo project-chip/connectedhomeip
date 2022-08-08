@@ -29,12 +29,14 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/config.h>
 
 #ifndef DOOR_LOCK_SERVER_ENDPOINT
 #define DOOR_LOCK_SERVER_ENDPOINT 1
 #endif
 
 using chip::Optional;
+using chip::app::Clusters::DoorLock::DlAlarmCode;
 using chip::app::Clusters::DoorLock::DlCredentialRule;
 using chip::app::Clusters::DoorLock::DlCredentialType;
 using chip::app::Clusters::DoorLock::DlDataOperationType;
@@ -63,6 +65,12 @@ static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
 
 struct EmberAfPluginDoorLockCredentialInfo;
 struct EmberAfPluginDoorLockUserInfo;
+
+struct EmberAfDoorLockEndpointContext
+{
+    chip::System::Clock::Timestamp lockoutEndTimestamp;
+    int wrongCodeEntryAttempts;
+};
 
 /**
  * @brief Door Lock Server Plugin class.
@@ -108,6 +116,8 @@ public:
     bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
     bool SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled);
 
+    bool TrackWrongCodeEntry(chip::EndpointId endpointId);
+
     bool GetAutoRelockTime(chip::EndpointId endpointId, uint32_t & autoRelockTime);
     bool GetNumberOfUserSupported(chip::EndpointId endpointId, uint16_t & numberOfUsersSupported);
     bool GetNumberOfPINCredentialsSupported(chip::EndpointId endpointId, uint16_t & numberOfPINCredentials);
@@ -116,6 +126,8 @@ public:
     bool GetNumberOfYearDaySchedulesPerUserSupported(chip::EndpointId endpointId, uint8_t & numberOfYearDaySchedulesPerUser);
     bool GetNumberOfCredentialsSupportedPerUser(chip::EndpointId endpointId, uint8_t & numberOfCredentialsSupportedPerUser);
     bool GetNumberOfHolidaySchedulesSupported(chip::EndpointId endpointId, uint8_t & numberOfHolidaySchedules);
+
+    bool SendLockAlarmEvent(chip::EndpointId endpointId, DlAlarmCode alarmCode);
 
     chip::BitFlags<DoorLockFeature> GetFeatures(chip::EndpointId endpointId);
 
@@ -193,7 +205,7 @@ private:
                                    uint16_t & userIndex);
 
     bool findUserIndexByCredential(chip::EndpointId endpointId, DlCredentialType credentialType, chip::ByteSpan credentialData,
-                                   uint16_t & userIndex, uint16_t & credentialIndex);
+                                   uint16_t & userIndex, uint16_t & credentialIndex, EmberAfPluginDoorLockUserInfo & userInfo);
 
     EmberAfStatus createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
                              uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
@@ -289,6 +301,8 @@ private:
 
     DlLockDataType credentialTypeToLockDataType(DlCredentialType credentialType);
 
+    bool isUserScheduleRestricted(chip::EndpointId endpointId, const EmberAfPluginDoorLockUserInfo & user);
+
     void setUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData);
 
@@ -304,6 +318,10 @@ private:
     void getCredentialStatusCommandHandler(chip::app::CommandHandler * commandObj,
                                            const chip::app::ConcreteCommandPath & commandPath, DlCredentialType credentialType,
                                            uint16_t credentialIndex);
+
+    void sendGetCredentialResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                   DlCredentialType credentialType, uint16_t credentialIndex, uint16_t userIndexWithCredential,
+                                   EmberAfPluginDoorLockCredentialInfo * credentialInfo, bool credentialExists);
 
     void clearCredentialCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                        const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData);
@@ -342,6 +360,13 @@ private:
                                             const chip::app::ConcreteCommandPath & commandPath, uint8_t holidayIndex);
 
     bool RemoteOperationEnabled(chip::EndpointId endpointId) const;
+
+    EmberAfDoorLockEndpointContext * getContext(chip::EndpointId endpointId);
+
+    bool engageLockout(chip::EndpointId endpointId);
+
+    static CHIP_ERROR sendClusterResponse(chip::app::CommandHandler * commandObj,
+                                          const chip::app::ConcreteCommandPath & commandPath, EmberAfStatus status);
 
     /**
      * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands
@@ -504,6 +529,8 @@ private:
         const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData);
 
     EmberEventControl AutolockEvent; /**< for automatic relock scheduling */
+
+    std::array<EmberAfDoorLockEndpointContext, EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT> mEndpointCtx;
 
     static DoorLockServer instance;
 };
@@ -946,3 +973,11 @@ bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cr
 bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
                                         chip::FabricIndex modifier, DlCredentialStatus credentialStatus,
                                         DlCredentialType credentialType, const chip::ByteSpan & credentialData);
+
+/**
+ * @brief This callback is called when the Door Lock server starts the lockout so the app could be notified about it.
+ *
+ * @param endpointId ID of the endpoint that contains the door lock to be locked out.
+ * @param lockoutEndTime Monotonic time of when lockout ends.
+ */
+void emberAfPluginDoorLockLockoutStarted(chip::EndpointId endpointId, chip::System::Clock::Timestamp lockoutEndTime);

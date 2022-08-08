@@ -15,7 +15,7 @@
 
 name:
     3.2.4. [TC-OCC-2.4] OccupancySensorTypeBitmap and OccupancySensorType
-    interdependency with client as DUT
+    interdependency with client    as DUT
 
 config:
     nodeId: 0x12344321
@@ -25,32 +25,57 @@ config:
 tests:
     - label: "Commission DUT to TH"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT reads OccupancySensorType attribute from TH"
       PICS: OCC.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool occupancysensing read occupancy-sensor-type 1 1
 
-          Verify in TH all-clusters-app log
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
 
-          [1648461912.765825][9300:9306] CHIP:DMG: }
-          [1648461912.766013][9300:9306] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 3082917122
-          [1648461912.766089][9300:9306] CHIP:TOO:   occupancy sensor type: 0
-          [1648461912.766203][9300:9306] CHIP:EM: Sending Standalone Ack for MessageCounter:12865747 on exchange 64494i
+          [1657906852.014556][2361:2361] CHIP:IM: Received Read request
+          [1657906852.014724][2361:2361] CHIP:DMG: ReadRequestMessage =
+          [1657906852.014775][2361:2361] CHIP:DMG: {
+          [1657906852.014817][2361:2361] CHIP:DMG:        AttributePathIBs =
+          [1657906852.014865][2361:2361] CHIP:DMG:        [
+          [1657906852.014910][2361:2361] CHIP:DMG:                AttributePathIB =
+          [1657906852.014965][2361:2361] CHIP:DMG:                {
+          [1657906852.015017][2361:2361] CHIP:DMG:                        Endpoint = 0x1,
+          [1657906852.015075][2361:2361] CHIP:DMG:                        Cluster = 0x406,
+          [1657906852.015134][2361:2361] CHIP:DMG:                        Attribute = 0x0000_0001,
+          [1657906852.015189][2361:2361] CHIP:DMG:                }
+          [1657906852.015241][2361:2361] CHIP:DMG:
+          [1657906852.015290][2361:2361] CHIP:DMG:        ],
+          [1657906852.015336][2361:2361] CHIP:DMG:
+          [1657906852.015385][2361:2361] CHIP:DMG:        isFabricFiltered = true,
+          [1657906852.015431][2361:2361] CHIP:DMG:        InteractionModelRevision = 1
+          [1657906852.015474][2361:2361] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads OccupancySensorTypeBitmap attribute from TH"
       PICS: OCC.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool occupancysensing read occupancy-sensor-type-bitmap 1 1
 
-          Verify in TH all-clusters-app log
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
 
-          [1648461918.499009][9307:9312] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0002 DataVersion: 3082917122
-          [1648461918.499082][9307:9312] CHIP:TOO:   occupancy sensor type bitmap: 1
-          [1648461918.499192][9307:9312] CHIP:EM: Sending Standalone Ack for MessageCounter:14798084 on exchange 49320i
+          [1657906867.937264][2361:2361] CHIP:IM: Received Read request
+          [1657906867.937390][2361:2361] CHIP:DMG: ReadRequestMessage =
+          [1657906867.937440][2361:2361] CHIP:DMG: {
+          [1657906867.937498][2361:2361] CHIP:DMG:        AttributePathIBs =
+          [1657906867.937546][2361:2361] CHIP:DMG:        [
+          [1657906867.937591][2361:2361] CHIP:DMG:                AttributePathIB =
+          [1657906867.937663][2361:2361] CHIP:DMG:                {
+          [1657906867.937715][2361:2361] CHIP:DMG:                        Endpoint = 0x1,
+          [1657906867.937771][2361:2361] CHIP:DMG:                        Cluster = 0x406,
+          [1657906867.937853][2361:2361] CHIP:DMG:                        Attribute = 0x0000_0002,
+          [1657906867.937915][2361:2361] CHIP:DMG:                }
+          [1657906867.937986][2361:2361] CHIP:DMG:
+          [1657906867.938034][2361:2361] CHIP:DMG:        ],
+          [1657906867.938085][2361:2361] CHIP:DMG:
+          [1657906867.938148][2361:2361] CHIP:DMG:        isFabricFiltered = true,
+          [1657906867.938187][2361:2361] CHIP:DMG:        InteractionModelRevision = 1
+          [1657906867.938213][2361:2361] CHIP:DMG: },
       disabled: true

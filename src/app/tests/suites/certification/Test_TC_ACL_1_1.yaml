@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 129.1. [TC-ACL-1.1] Global attributes
+name: 132.1.1. [TC-ACL-1.1] Global attributes
 
 config:
     nodeId: 0x12344321
@@ -23,7 +23,7 @@ config:
 tests:
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:

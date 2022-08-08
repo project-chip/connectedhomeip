@@ -65,11 +65,11 @@ private:
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
 
-#if 0
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+#if 0
     CHIP_ERROR GetBootReason(uint32_t & bootReasons) override;
     CHIP_ERROR StoreBootReason(uint32_t bootReasons) override;
 #endif
@@ -97,12 +97,6 @@ private:
 
     static void DoFactoryReset(intptr_t arg);
 };
-
-inline CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
-{
-    log_error("ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress() is not supported now.\r\n");
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
 
 /**
  * Returns the platform-specific implementation of the ConfigurationManager object.

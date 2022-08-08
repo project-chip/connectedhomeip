@@ -51,6 +51,12 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         mParams.SetFailsafeTimerSeconds(params.GetFailsafeTimerSeconds().Value());
     }
 
+    if (params.GetAdminSubject().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting adminSubject from parameters");
+        mParams.SetAdminSubject(params.GetAdminSubject().Value());
+    }
+
     if (params.GetThreadOperationalDataset().HasValue())
     {
         ByteSpan dataset = params.GetThreadOperationalDataset().Value();
@@ -507,7 +513,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             ReleasePAI();
             ReleaseDAC();
             mCommissioneeDeviceProxy = nullptr;
-            mOperationalDeviceProxy  = nullptr;
+            mOperationalDeviceProxy  = OperationalDeviceProxy();
             mDeviceCommissioningInfo = ReadCommissioningInfo();
             return CHIP_NO_ERROR;
         default:
@@ -547,9 +553,9 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 DeviceProxy * AutoCommissioner::GetDeviceProxyForStep(CommissioningStage nextStage)
 {
     if (nextStage == CommissioningStage::kSendComplete ||
-        (nextStage == CommissioningStage::kCleanup && mOperationalDeviceProxy != nullptr))
+        (nextStage == CommissioningStage::kCleanup && mOperationalDeviceProxy.ConnectionReady()))
     {
-        return mOperationalDeviceProxy;
+        return &mOperationalDeviceProxy;
     }
     return mCommissioneeDeviceProxy;
 }

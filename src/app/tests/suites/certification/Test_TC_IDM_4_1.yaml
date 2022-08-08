@@ -17,6 +17,9 @@ name:
     3.4.1. [TC-IDM-4.1] SubscriptionRequestMessage from DUT test cases.
     [{DUT_Client}]
 
+PICS:
+    - MCORE.IDM.C.SubscribeRequest
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -455,6 +458,15 @@ tests:
       disabled: true
 
     - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type list. Modify that attribute on the TH. TH
+          should send the modified data to the DUT. Modify the attribute
+          multiple times (3 times)"
+      verification: |
+          DUT implementation required to verify subscribe and list an attribute of data type list
+      disabled: true
+
+    - label:
           "Activate the subscription between the DUT and the TH for an
           attribute. Force the TH to not send any report data for the duration
           of the maximum interval. After the maximum interval, TH sends a report
@@ -550,146 +562,4 @@ tests:
           [1657884990.170120][2938:2943] CHIP:DMG:         InteractionModelRevision = 1
           [1657884990.170169][2938:2943] CHIP:DMG: }
           [1657884990.170223][2938:2943] CHIP:DMG: Subscription established with SubscriptionID = 0x496bb4cf MinInterval = 10s MaxInterval = 100s Peer = 01:0000000000000001
-      disabled: true
-
-    - label:
-          "[OPTIONAL] Activate the subscription between the DUT and the TH for
-          an attribute of data type list. Modify that attribute on the TH. TH
-          should send the modified data to the DUT. Modify the attribute
-          multiple times (3 times)"
-      verification: |
-          DUT implementation required to verify subscribe and list an attribute of data type floating point
-      disabled: true
-
-    - label:
-          "DUT sends a subscription request action for an attribute with an
-          empty DataVersionFilters field.+ TH sends a report data action with
-          the data of the attribute along with the data version. Tear down the
-          subscription for that attribute. Start another subscription with the
-          DataVersionFilter field set to the data version received above."
-      verification: |
-          In the case of chip tool as a client, here is an example command the client can subscribe to the TH
-
-           onoff  subscribe on-off   10 80  1 1
-
-           On TH(Reference app) verify the report data action with the data of the attribute along with the data version
-          [1657885412.662766][2748:2748] CHIP:DMG: SubscribeRequestMessage =
-          [1657885412.662793][2748:2748] CHIP:DMG: {
-          [1657885412.662816][2748:2748] CHIP:DMG:         KeepSubscriptions = false,
-          [1657885412.662842][2748:2748] CHIP:DMG:         MinIntervalFloorSeconds = 0xa,
-          [1657885412.662868][2748:2748] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x50,
-          [1657885412.662892][2748:2748] CHIP:DMG:         AttributePathIBs =
-          [1657885412.662917][2748:2748] CHIP:DMG:         [
-          [1657885412.662941][2748:2748] CHIP:DMG:                 AttributePathIB =
-          [1657885412.662967][2748:2748] CHIP:DMG:                 {
-          [1657885412.662995][2748:2748] CHIP:DMG:                         Endpoint = 0x1,
-          [1657885412.663030][2748:2748] CHIP:DMG:                         Cluster = 0x6,
-          [1657885412.663061][2748:2748] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1657885412.663089][2748:2748] CHIP:DMG:                 }
-          [1657885412.663119][2748:2748] CHIP:DMG:
-          [1657885412.663145][2748:2748] CHIP:DMG:         ],
-          [1657885412.663172][2748:2748] CHIP:DMG:
-          [1657885412.663199][2748:2748] CHIP:DMG:         isFabricFiltered = true,
-          [1657885412.663223][2748:2748] CHIP:DMG:         InteractionModelRevision = 1
-          [1657885412.663245][2748:2748] CHIP:DMG: },
-          [1657885412.663314][2748:2748] CHIP:DMG: Final negotiated min/max parameters: Min = 10s, Max = 80s
-
-
-          On DUT as a client side, verify that TH all-clusters-app sent Subscription report with unic subscriptionID
-          [1657885412.620231][2979:2984] CHIP:DMG: ReportDataMessage =
-          [1657885412.620274][2979:2984] CHIP:DMG: {
-          [1657885412.620300][2979:2984] CHIP:DMG:         SubscriptionId = 0x5ccc5161,
-          [1657885412.620326][2979:2984] CHIP:DMG:         AttributeReportIBs =
-          [1657885412.620368][2979:2984] CHIP:DMG:         [
-          [1657885412.620393][2979:2984] CHIP:DMG:                 AttributeReportIB =
-          [1657885412.620442][2979:2984] CHIP:DMG:                 {
-          [1657885412.620480][2979:2984] CHIP:DMG:                         AttributeDataIB =
-          [1657885412.620510][2979:2984] CHIP:DMG:                         {
-          [1657885412.620551][2979:2984] CHIP:DMG:                                 DataVersion = 0x42da0cab,
-          [1657885412.620581][2979:2984] CHIP:DMG:                                 AttributePathIB =
-          [1657885412.620622][2979:2984] CHIP:DMG:                                 {
-          [1657885412.620655][2979:2984] CHIP:DMG:                                         Endpoint = 0x1,
-          [1657885412.620699][2979:2984] CHIP:DMG:                                         Cluster = 0x6,
-          [1657885412.620742][2979:2984] CHIP:DMG:                                         Attribute = 0x0000_0000,
-          [1657885412.620773][2979:2984] CHIP:DMG:                                 }
-          [1657885412.620816][2979:2984] CHIP:DMG:
-          [1657885412.620859][2979:2984] CHIP:DMG:                                 Data = false,
-          [1657885412.620889][2979:2984] CHIP:DMG:                         },
-          [1657885412.620929][2979:2984] CHIP:DMG:
-          [1657885412.620955][2979:2984] CHIP:DMG:                 },
-          [1657885412.620996][2979:2984] CHIP:DMG:
-          [1657885412.621021][2979:2984] CHIP:DMG:         ],
-          [1657885412.621063][2979:2984] CHIP:DMG:
-          [1657885412.621087][2979:2984] CHIP:DMG:         InteractionModelRevision = 1
-          [1657885412.621120][2979:2984] CHIP:DMG: }
-          [1657885412.621284][2979:2984] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 1121586347
-          [1657885412.621346][2979:2984] CHIP:TOO:   OnOff: FALSE
-          [1657885412.621399][2979:2984] CHIP:DMG: MoveToState ReadClient[0xffffa40091f0]: Moving to [AwaitingSu]
-
-
-           On TH(Reference app) verify  Attribute data is not sent for the second subscription,  when Start another subscription with the DataVersionFilter field set to the data version received above
-
-          onoff  subscribe on-off   10 50  1 1 --data-version 0x42da0cab
-
-
-          On TH (On the reference app) Verify if DUT is responding with the below status response for the above command
-          [1657885449.497461][2748:2748] CHIP:DMG: SubscribeRequestMessage =
-          [1657885449.497490][2748:2748] CHIP:DMG: {
-          [1657885449.497514][2748:2748] CHIP:DMG:         KeepSubscriptions = false,
-          [1657885449.497540][2748:2748] CHIP:DMG:         MinIntervalFloorSeconds = 0xa,
-          [1657885449.497567][2748:2748] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x32,
-          [1657885449.497592][2748:2748] CHIP:DMG:         AttributePathIBs =
-          [1657885449.497617][2748:2748] CHIP:DMG:         [
-          [1657885449.497641][2748:2748] CHIP:DMG:                 AttributePathIB =
-          [1657885449.497668][2748:2748] CHIP:DMG:                 {
-          [1657885449.497696][2748:2748] CHIP:DMG:                         Endpoint = 0x1,
-          [1657885449.497742][2748:2748] CHIP:DMG:                         Cluster = 0x6,
-          [1657885449.497772][2748:2748] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1657885449.497799][2748:2748] CHIP:DMG:                 }
-          [1657885449.497827][2748:2748] CHIP:DMG:
-          [1657885449.497853][2748:2748] CHIP:DMG:         ],
-          [1657885449.497880][2748:2748] CHIP:DMG:
-          [1657885449.497906][2748:2748] CHIP:DMG:         isFabricFiltered = true,
-          [1657885449.497930][2748:2748] CHIP:DMG:         DataVersionFilterIBs =
-          [1657885449.497960][2748:2748] CHIP:DMG:         [
-          [1657885449.497984][2748:2748] CHIP:DMG:                 DataVersionFilterIB =
-          [1657885449.498011][2748:2748] CHIP:DMG:                 {
-          [1657885449.498036][2748:2748] CHIP:DMG:                         ClusterPathIB =
-          [1657885449.498064][2748:2748] CHIP:DMG:                         {
-          [1657885449.498093][2748:2748] CHIP:DMG:                                 Endpoint = 0x1,
-          [1657885449.498122][2748:2748] CHIP:DMG:                                 Cluster = 0x6,
-          [1657885449.498150][2748:2748] CHIP:DMG:                         }
-          [1657885449.498180][2748:2748] CHIP:DMG:
-          [1657885449.498209][2748:2748] CHIP:DMG:                         DataVersion = 0x42da0cab,
-          [1657885449.498236][2748:2748] CHIP:DMG:                 },
-          [1657885449.498263][2748:2748] CHIP:DMG:
-          [1657885449.498287][2748:2748] CHIP:DMG:         ],
-          [1657885449.498315][2748:2748] CHIP:DMG:
-          [1657885449.498339][2748:2748] CHIP:DMG:         InteractionModelRevision = 1
-          [1657885449.498362][2748:2748] CHIP:DMG: },
-          [1657885449.498459][2748:2748] CHIP:DMG: Final negotiated min/max parameters: Min = 10s, Max = 50s
-
-
-          On DUT as a client side, verify that TH all-clusters-app sent Subscription report with unic subscriptionID
-          [1657885449.455150][2979:2984] CHIP:EM: Removed CHIP MessageCounter:157900434 from RetransTable on exchange 50588i
-          [1657885449.455222][2979:2984] CHIP:DMG: ReportDataMessage =
-          [1657885449.455284][2979:2984] CHIP:DMG: {
-          [1657885449.455321][2979:2984] CHIP:DMG:         SubscriptionId = 0xd9b77c33,
-          [1657885449.455375][2979:2984] CHIP:DMG:         InteractionModelRevision = 1
-          [1657885449.455410][2979:2984] CHIP:DMG: }
-          [1657885449.455480][2979:2984] CHIP:DMG: MoveToState ReadClient[0xffffa40092e0]: Moving to [AwaitingSu]
-          [1657885449.455561][2979:2984] CHIP:EM: Piggybacking Ack for MessageCounter:260146719 on exchange: 50588i
-          [1657885449.455651][2979:2984] CHIP:IN: Prepared secure message 0xffffa4000d48 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 50588i with MessageCounter:157900435.
-          [1657885449.455704][2979:2984] CHIP:IN: Sending encrypted msg 0xffffa4000d48 with MessageCounter:157900435 to 0x0000000000000001 (1) at monotonic time: 00000000007C69C7 msec
-          [1657885449.456845][2979:2984] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:260146720 on exchange 50588i
-          [1657885449.456892][2979:2984] CHIP:EM: Found matching exchange: 50588i, Delegate: 0xffffa40092e0
-          [1657885449.456937][2979:2984] CHIP:EM: Rxd Ack; Removing MessageCounter:157900435 from Retrans Table on exchange 50588i
-          [1657885449.456973][2979:2984] CHIP:EM: Removed CHIP MessageCounter:157900435 from RetransTable on exchange 50588i
-          [1657885449.457029][2979:2984] CHIP:DMG: SubscribeResponseMessage =
-          [1657885449.457068][2979:2984] CHIP:DMG: {
-          [1657885449.457106][2979:2984] CHIP:DMG:         SubscriptionId = 0xd9b77c33,
-          [1657885449.457148][2979:2984] CHIP:DMG:         MaxInterval = 0x32,
-          [1657885449.457186][2979:2984] CHIP:DMG:         InteractionModelRevision = 1
-          [1657885449.457221][2979:2984] CHIP:DMG: }
-          [1657885449.457260][2979:2984] CHIP:DMG: Subscription established with SubscriptionID = 0xd9b77c33 MinInterval = 10s MaxInterval = 50s Peer = 01:0000000000000001
       disabled: true

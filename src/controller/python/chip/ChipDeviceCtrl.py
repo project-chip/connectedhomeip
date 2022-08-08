@@ -117,10 +117,47 @@ class DCState(enum.IntEnum):
     COMMISSIONING = 5
 
 
+class DeviceProxyWrapper():
+    ''' Encapsulates a pointer to OperationalDeviceProxy on the c++ side that needs to be
+        freed when DeviceProxyWrapper goes out of scope. There is a potential issue where
+        if this is copied around that a double free will occure, but how this is used today
+        that is not an issue that needs to be accounted for and it will become very apparent
+        if that happens.
+    '''
+
+    def __init__(self, deviceProxy: ctypes.c_void_p, dmLib=None):
+        self._deviceProxy = deviceProxy
+        self._dmLib = dmLib
+
+    def __del__(self):
+        if (self._dmLib is not None and builtins.chipStack is not None):
+            # This destructor is called from any threading context, including on the Matter threading context.
+            # So, we cannot call chipStack.Call or chipStack.CallAsync which waits for the posted work to
+            # actually be executed. Instead, we just post/schedule the work and move on.
+            builtins.chipStack.PostTaskOnChipThread(lambda: self._dmLib.pychip_FreeOperationalDeviceProxy(self._deviceProxy))
+
+    @property
+    def deviceProxy(self) -> ctypes.c_void_p:
+        return self._deviceProxy
+
+
+class DiscoveryFilterType(enum.IntEnum):
+    # These must match chip::Dnssd::DiscoveryFilterType values (barring the naming convention)
+    NONE = 0
+    SHORT_DISCRIMINATOR = 1
+    LONG_DISCRIMINATOR = 2
+    VENDOR_ID = 3
+    DEVICE_TYPE = 4
+    COMMISSIONING_MODE = 5
+    INSTANCE_NAME = 6
+    COMMISSIONER = 7
+    COMPRESSED_FABRIC_ID = 8
+
+
 class ChipDeviceController():
     activeList = set()
 
-    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, fabricIndex: int, nodeId: int, adminVendorId: int, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
+    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         self._ChipStack = builtins.chipStack
@@ -134,8 +171,10 @@ class ChipDeviceController():
 
         res = self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateController(ctypes.c_void_p(
-                opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId, adminVendorId, ctypes.c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
+                opCredsContext), pointer(devCtrl), fabricId, nodeId, adminVendorId, ctypes.c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
         )
+
+        self.nodeId = nodeId
 
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
@@ -145,19 +184,8 @@ class ChipDeviceController():
         self._Cluster = ChipClusters(builtins.chipStack)
         self._Cluster.InitLib(self._dmLib)
 
-        def HandleKeyExchangeComplete(err):
-            if err != 0:
-                print("Failed to establish secure session to device: {}".format(err))
-                self._ChipStack.callbackRes = self._ChipStack.ErrorToException(
-                    err)
-            else:
-                print("Established secure session with Device")
-            if self.state != DCState.COMMISSIONING:
-                # During Commissioning, HandleKeyExchangeComplete will also be called,
-                # in this case the async operation should be marked as finished by
-                # HandleCommissioningComplete instead this function.
-                self.state = DCState.IDLE
-                self._ChipStack.completeEvent.set()
+        def GetNodeId(self):
+            return self.nodeId
 
         def HandleCommissioningComplete(nodeid, err):
             if err != 0:
@@ -169,6 +197,26 @@ class ChipDeviceController():
             self._ChipStack.commissioningEventRes = err
             self._ChipStack.commissioningCompleteEvent.set()
             self._ChipStack.completeEvent.set()
+
+        def HandleKeyExchangeComplete(err):
+            if err != 0:
+                print("Failed to establish secure session to device: {}".format(err))
+                self._ChipStack.callbackRes = self._ChipStack.ErrorToException(
+                    err)
+            else:
+                print("Established secure session with Device")
+
+            if self.state != DCState.COMMISSIONING:
+                # During Commissioning, HandleKeyExchangeComplete will also be called,
+                # in this case the async operation should be marked as finished by
+                # HandleCommissioningComplete instead this function.
+                self.state = DCState.IDLE
+                self._ChipStack.completeEvent.set()
+            else:
+                # When commissioning, getting an error during key exhange
+                # needs to unblock the entire commissioning flow.
+                if err != 0:
+                    HandleCommissioningComplete(0, err)
 
         self.cbHandleKeyExchangeCompleteFunct = _DevicePairingDelegate_OnPairingCompleteFunct(
             HandleKeyExchangeComplete)
@@ -339,6 +387,44 @@ class ChipDeviceController():
 
     def CheckTestCommissionerPaseConnection(self, nodeid):
         return self._dmLib.pychip_TestPaseConnection(nodeid)
+
+    def CommissionOnNetwork(self, nodeId: int, setupPinCode: int, filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None):
+        '''
+        Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
+        Supported filters are:
+
+            DiscoveryFilterType.NONE
+            DiscoveryFilterType.SHORT_DISCRIMINATOR
+            DiscoveryFilterType.LONG_DISCRIMINATOR
+            DiscoveryFilterType.VENDOR_ID
+            DiscoveryFilterType.DEVICE_TYPE
+            DiscoveryFilterType.COMMISSIONING_MODE
+            DiscoveryFilterType.INSTANCE_NAME
+            DiscoveryFilterType.COMMISSIONER
+            DiscoveryFilterType.COMPRESSED_FABRIC_ID
+
+        The filter can be an integer, a string or None depending on the actual type of selected filter.
+        '''
+        self.CheckIsActive()
+
+        # IP connection will run through full commissioning, so we need to wait
+        # for the commissioning complete event, not just any callback.
+        self.state = DCState.COMMISSIONING
+
+        # Convert numerical filters to string for passing down to binding.
+        if isinstance(filter, int):
+            filter = str(filter)
+
+        self._ChipStack.commissioningCompleteEvent.clear()
+
+        self._ChipStack.CallAsync(
+            lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
+                self.devCtrl, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") + b"\x00" if filter is not None else None)
+        )
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            # Error 50 is a timeout
+            return False
+        return self._ChipStack.commissioningEventRes == 0
 
     def CommissionWithCode(self, setupPayload: str, nodeid: int):
         self.CheckIsActive()
@@ -564,6 +650,7 @@ class ChipDeviceController():
         return self._Cluster
 
     def GetConnectedDeviceSync(self, nodeid, allowPASE=True, timeoutMs: int = None):
+        ''' Returns DeviceProxyWrapper upon success.'''
         self.CheckIsActive()
 
         returnDevice = c_void_p(None)
@@ -585,7 +672,7 @@ class ChipDeviceController():
                 self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
             if res == 0:
                 print('Using PASE connection')
-                return returnDevice
+                return DeviceProxyWrapper(returnDevice)
 
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
             self.devCtrl, nodeid, DeviceAvailableCallback), timeoutMs)
@@ -606,7 +693,8 @@ class ChipDeviceController():
 
         if returnDevice.value is None:
             raise self._ChipStack.ErrorToException(returnErr)
-        return returnDevice
+
+        return DeviceProxyWrapper(returnDevice, self._dmLib)
 
     def ComputeRoundTripTimeout(self, nodeid, upperLayerProcessingTimeoutMs: int = 0):
         ''' Returns a computed timeout value based on the round-trip time it takes for the peer at the other end of the session to
@@ -618,7 +706,7 @@ class ChipDeviceController():
         '''
         device = self.GetConnectedDeviceSync(nodeid)
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_ComputeRoundTripTimeout(
-            device, upperLayerProcessingTimeoutMs))
+            device.deviceProxy, upperLayerProcessingTimeoutMs))
         return res
 
     async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None, timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None):
@@ -638,7 +726,7 @@ class ChipDeviceController():
 
         device = self.GetConnectedDeviceSync(nodeid, timeoutMs=interactionTimeoutMs)
         res = ClusterCommand.SendCommand(
-            future, eventLoop, responseType, device, ClusterCommand.CommandPath(
+            future, eventLoop, responseType, device.deviceProxy, ClusterCommand.CommandPath(
                 EndpointId=endpoint,
                 ClusterId=payload.cluster_id,
                 CommandId=payload.command_id,
@@ -677,7 +765,7 @@ class ChipDeviceController():
                     v[0], v[1], v[2], 1, v[1].value))
 
         res = ClusterAttribute.WriteAttributes(
-            future, eventLoop, device, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs)
+            future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         return await future
@@ -858,7 +946,7 @@ class ChipDeviceController():
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
-        res = ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device, devCtrl=self, attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths, returnClusterObject=returnClusterObject,
+        res = ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device.deviceProxy, devCtrl=self, attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths, returnClusterObject=returnClusterObject,
                                     subscriptionParameters=ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered, keepSubscriptions=keepSubscriptions)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
@@ -1071,6 +1159,9 @@ class ChipDeviceController():
                 c_void_p, c_uint64]
             self._dmLib.pychip_DeviceController_Commission.restype = c_uint32
 
+            self._dmLib.pychip_DeviceController_OnNetworkCommission.argtypes = [c_void_p, c_uint64, c_uint32, c_uint8, c_char_p]
+            self._dmLib.pychip_DeviceController_OnNetworkCommission.restype = c_uint32
+
             self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.argtypes = [
                 c_void_p]
             self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.restype = c_uint32
@@ -1139,6 +1230,10 @@ class ChipDeviceController():
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
                 c_void_p, c_uint64, _DeviceAvailableFunct]
             self._dmLib.pychip_GetConnectedDeviceByNodeId.restype = c_uint32
+
+            self._dmLib.pychip_FreeOperationalDeviceProxy.argtypes = [
+                c_void_p]
+            self._dmLib.pychip_FreeOperationalDeviceProxy.restype = c_uint32
 
             self._dmLib.pychip_GetDeviceBeingCommissioned.argtypes = [
                 c_void_p, c_uint64, c_void_p]

@@ -136,7 +136,7 @@ int main(void)
 #endif
 
     P6_LOG("==================================================\r\n");
-    P6_LOG("chip-p6-lock-example starting\r\n");
+    P6_LOG("chip-p6-lock-example starting Version %d\r\n", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     P6_LOG("==================================================\r\n");
 
     /* Start the FreeRTOS scheduler */

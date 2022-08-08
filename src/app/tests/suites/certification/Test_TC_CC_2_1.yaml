@@ -14,6 +14,9 @@
 
 name: 27.2.1. [TC-CC-2.1] Attributes with server as DUT
 
+PICS:
+    - CC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Color Control"
@@ -36,7 +39,7 @@ tests:
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.A0001
@@ -46,7 +49,7 @@ tests:
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "TH reads RemainingTime attribute from DUT"
       PICS: CC.S.A0002
@@ -56,7 +59,7 @@ tests:
           constraints:
               type: int16u
               minValue: 0
-              maxValue: 65535
+              maxValue: 65534
 
     - label: "TH reads CurrentX attribute from DUT"
       PICS: CC.S.A0003
@@ -155,7 +158,7 @@ tests:
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "TH reads ColorLoopDirection attribute from DUT"
       PICS: CC.S.A4003
@@ -165,7 +168,7 @@ tests:
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "TH reads ColorLoopTime attribute from DUT"
       PICS: CC.S.A4004
@@ -175,7 +178,7 @@ tests:
           constraints:
               type: int16u
               minValue: 0
-              maxValue: 65535
+              maxValue: 65534
 
     - label: "TH reads ColorLoopStartEnhancedHue attribute from DUT"
       PICS: CC.S.A4005

@@ -19,8 +19,8 @@
 #pragma once
 
 #include <app/CASEClientPool.h>
-#include <app/OperationalDeviceProxy.h>
-#include <app/OperationalDeviceProxyPool.h>
+#include <app/OperationalSessionSetup.h>
+#include <app/OperationalSessionSetupPool.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Pool.h>
@@ -34,7 +34,7 @@ namespace chip {
 struct CASESessionManagerConfig
 {
     DeviceProxyInitParams sessionInitParams;
-    OperationalDeviceProxyPoolDelegate * devicePool = nullptr;
+    OperationalSessionSetupPoolDelegate * sessionSetupPool = nullptr;
 };
 
 /**
@@ -45,7 +45,7 @@ struct CASESessionManagerConfig
  * 4. During session establishment, trigger node ID resolution (if needed), and update the DNS-SD cache (if resolution is
  * successful)
  */
-class CASESessionManager
+class CASESessionManager : public OperationalSessionReleaseDelegate
 {
 public:
     CASESessionManager() = default;
@@ -71,9 +71,9 @@ public:
     void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    OperationalDeviceProxy * FindExistingSession(const ScopedNodeId & peerId) const;
+    OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId) const;
 
-    void ReleaseSession(const ScopedNodeId & peerId);
+    void ReleaseSession(const ScopedNodeId & peerId) override;
 
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
@@ -90,7 +90,9 @@ public:
     CHIP_ERROR GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr);
 
 private:
-    void ReleaseSession(OperationalDeviceProxy * device) const;
+    Optional<SessionHandle> FindExistingSession(const ScopedNodeId & peerId) const;
+
+    void ReleaseSession(OperationalSessionSetup * device) const;
 
     CASESessionManagerConfig mConfig;
 };

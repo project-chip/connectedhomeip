@@ -63,6 +63,9 @@ declare_args() {
 
   # Argument to Disable IPv4 for wifi(rs911)
   chip_enable_wifi_ipv4 = false
+
+  # Argument to force enable WPA3 security on rs91x
+  rs91x_wpa3_only = false
 }
 
 declare_args() {
@@ -89,6 +92,11 @@ if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
 
 # WiFi settings
 if (chip_enable_wifi) {
+  # disabling LCD for MG24 for wifi
+  if (efr32_board == "BRD4186A" || efr32_board == "BRD4187A") {
+    show_qr_code = false
+    disable_lcd = true
+  }
   wifi_sdk_dir = "${chip_root}/third_party/silabs/matter_support/matter/wifi"
   efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
   efr32_lwip_defs += [
@@ -169,6 +177,7 @@ efr32_executable("lighting_app") {
   defines = []
 
   sources = [
+    "${examples_plat_dir}/BaseApplication.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/efr32_utils.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
@@ -217,10 +226,6 @@ efr32_executable("lighting_app") {
     sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
   }
 
-  if (chip_enable_wifi_ipv4) {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
-  }
-
   # WiFi Settings
   if (chip_enable_wifi) {
     if (use_rs911x) {
@@ -247,6 +252,15 @@ efr32_executable("lighting_app") {
     } else if (use_wf200) {
       sources += wf200_plat_src
       include_dirs += wf200_plat_incs
+    }
+
+    if (chip_enable_wifi_ipv4) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
+    }
+
+    if (rs91x_wpa3_only) {
+      # TODO: Change this macro once WF200 support is provided
+      defines += [ "WIFI_ENABLE_SECURITY_WPA3=1" ]
     }
   }
 

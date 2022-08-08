@@ -14,7 +14,10 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    114.2.10. [TC-DRLK-2.10] Verification for the Door Lock Events [DUT-Server]
+    116.2.10. [TC-DRLK-2.10] Verification for the Door Lock Events [DUT-Server]
+
+PICS:
+    - DRLK.S
 
 config:
     nodeId: 0x12344321
@@ -25,7 +28,7 @@ tests:
     - label:
           "Trigger the DUT to generate DoorLockAlarm Event (by LockJammed
           scenario)"
-      PICS: DRLK.S.E00
+      PICS: DRLK.S.E00 && DRLK.S.DetectLockJammed
       verification: |
           ./chip-tool doorlock read-event door-lock-alarm 1 1
       disabled: true
@@ -44,7 +47,7 @@ tests:
           [1658139762.662272][2506:2511] CHIP:DMG: }
       disabled: true
 
-    - label: "TH sends the Lock Door command to the DUT with valid PINCode"
+    - label: "TH sends the Lock Door command to the DUT"
       PICS: DRLK.S.C00.Rsp
       verification: |
           ./chip-tool doorlock set-user 0 1 xxx 6452 1 0 0 1 1  --timedInteractionTimeoutMs 1000
@@ -53,7 +56,7 @@ tests:
 
           [1656497453.684077][25847:25853] CHIP:DMG:        status = 0x00 (SUCCESS),
 
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 "{ "credentialType" : 1 , "credentialIndex" : 1 }" 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
           On TH, verify DUT responds with status code as (SUCCESS)
 
@@ -87,7 +90,7 @@ tests:
     - label: "TH reads the DoorStateChange event from DUT"
       PICS: DRLK.S.F05 && DRLK.S.E01
       verification: |
-          out of scope
+          There is no way to change the door state over Matter.
       disabled: true
 
     - label: "TH sends the Unlock Door command to the DUT with valid PINCode"
@@ -117,7 +120,7 @@ tests:
     - label: "TH reads the DoorStateChange event from DUT"
       PICS: DRLK.S.F05 && DRLK.S.E01
       verification: |
-          out of scope
+          There is no way to change the door state over Matter.
       disabled: true
 
     - label:
@@ -290,36 +293,57 @@ tests:
       disabled: true
 
     - label:
-          "TH sends the Unlock Door command (using remote) to the DUT with
-          invalid PINCode"
+          "TH sends a Set User Command with User Status set to OccupiedDisabled
+          and UserIndex set to a number say N to the DUT."
+      PICS: DRLK.S.C1a.Rsp
+      verification: |
+          ./chip-tool doorlock set-user 0 4 xxx 6452 3 0 0 1 1  --timedInteractionTimeoutMs 1000
+
+          [1658994912.123831][4290:4295] CHIP:DMG:                                StatusIB =
+          [1658994912.123871][4290:4295] CHIP:DMG:                                {
+          [1658994912.123915][4290:4295] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1658994912.123959][4290:4295] CHIP:DMG:                                },
+          [1658994912.124003][4290:4295] CHIP:DMG:
+          [1658994912.124039][4290:4295] CHIP:DMG:                        },
+          [1658994912.124079][4290:4295] CHIP:DMG:
+          [1658994912.124110][4290:4295] CHIP:DMG:                },
+          [1658994912.124147][4290:4295] CHIP:DMG:
+          [1658994912.124176][4290:4295] CHIP:DMG:        ],
+          [1658994912.124212][4290:4295] CHIP:DMG:
+          [1658994912.124241][4290:4295] CHIP:DMG:        InteractionModelRevision = 1
+          [1658994912.124270][4290:4295] CHIP:DMG: },
+          [1658994912.124341][4290:4295] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001A Status=0x0
+      disabled: true
+
+    - label:
+          "TH sends a unlock command with the UserIndex set to the number
+          N(Created in step 4c) to the DUT."
       PICS: DRLK.S.C01.Rsp
       verification: |
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 12345678
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
 
-          On TH, verify DUT responds with status code as (FAILURE)
+          On TH, verify DUT responds with status code as (SUCCESS)
 
-          [1658141754.166112][2844:2850] CHIP:DMG:
-          [1658141754.166152][2844:2850] CHIP:DMG:                                StatusIB =
-          [1658141754.166200][2844:2850] CHIP:DMG:                                {
-          [1658141754.166249][2844:2850] CHIP:DMG:                                        status = 0x01 (FAILURE),
-          [1658141754.166337][2844:2850] CHIP:DMG:                                },
-          [1658141754.166387][2844:2850] CHIP:DMG:
-          [1658141754.166426][2844:2850] CHIP:DMG:                        },
-          [1658141754.166472][2844:2850] CHIP:DMG:
-          [1658141754.166508][2844:2850] CHIP:DMG:                },
-          [1658141754.166551][2844:2850] CHIP:DMG:
-          [1658141754.166582][2844:2850] CHIP:DMG:        ],
-          [1658141754.166622][2844:2850] CHIP:DMG:
-          [1658141754.166654][2844:2850] CHIP:DMG:        InteractionModelRevision = 1
-          [1658141754.166685][2844:2850] CHIP:DMG: },
-          [1658141754.166762][2844:2850] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0001 Status=0x1
-          [1658141754.166806][2844:2850] CHIP:TOO: Error: IM Error 0x00000501: General error: 0x01 (FAILURE)
+          [1658141312.730591][2781:2786] CHIP:DMG:                                {
+          [1658141312.730635][2781:2786] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1658141312.730679][2781:2786] CHIP:DMG:                                },
+          [1658141312.730719][2781:2786] CHIP:DMG:
+          [1658141312.730757][2781:2786] CHIP:DMG:                        },
+          [1658141312.730802][2781:2786] CHIP:DMG:
+          [1658141312.730839][2781:2786] CHIP:DMG:                },
+          [1658141312.730882][2781:2786] CHIP:DMG:
+          [1658141312.730913][2781:2786] CHIP:DMG:        ],
+          [1658141312.730953][2781:2786] CHIP:DMG:
+          [1658141312.730985][2781:2786] CHIP:DMG:        InteractionModelRevision = 1
+          [1658141312.731016][2781:2786] CHIP:DMG: },
+          [1658141312.731092][2781:2786] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0001 Status=0x0
+          [1658141312.731146][2781:2786] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label: "TH reads the LockOperationError event from DUT"
       PICS: DRLK.S.E03
       verification: |
-          ./chip-tool doorlock read-event  lock-operation-error 1 1
+          "./chip-tool doorlock read-event  lock-operation-error 1 1
 
           On TH verify that LockOperationError event has priority set as INFO and LockOperationType is set to UnLock
 
@@ -359,7 +383,7 @@ tests:
           [1658213977.362831][3321:3326] CHIP:TOO:         CredentialType: 1
           [1658213977.362874][3321:3326] CHIP:TOO:         CredentialIndex: 0
           [1658213977.362904][3321:3326] CHIP:TOO:        }
-          [1658213977.362948][3321:3326] CHIP:TOO:    }
+          [1658213977.362948][3321:3326] CHIP:TOO:    }"
       disabled: true
 
     - label:
@@ -491,7 +515,14 @@ tests:
           123456 UserIndex as 1 UserStatus as 0 UserType as 0"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       verification: |
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock clear-credential  "{ "credentialType" : 1 , "credentialIndex" : 1 }"  1 1 --timedInteractionTimeoutMs 1000
+
+          [1658995364.177998][4383:4388] CHIP:DMG:                                StatusIB =
+          [1658995364.178088][4383:4388] CHIP:DMG:                                {
+          [1658995364.178137][4383:4388] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1658995364.178185][4383:4388] CHIP:DMG:                                },
+
+          ./chip-tool doorlock set-credential 0 "{ "credentialType" : 1 , "credentialIndex" : 1 }" 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
           On TH, verify DUT responds with status code as (SUCCESS)
 
@@ -543,7 +574,7 @@ tests:
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.C26.Rsp
       verification: |
-          ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }'  1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock clear-credential  "{ "credentialType" : 1 , "credentialIndex" : 1 }"  1 1 --timedInteractionTimeoutMs 1000
 
           On TH, verify DUT responds with status code as (SUCCESS)
 

@@ -13,7 +13,12 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 14.4.10. [TC-SC-4.10] Operational Discovery - Sleepy Node
+name:
+    15.4.10. [TC-SC-4.10] Operational Discovery - Sleepy Node [DUT as
+    Commissionee]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
 
 config:
     nodeId: 0x12344321
@@ -23,7 +28,7 @@ config:
 tests:
     - label: "DUT is instructed to advertise its service"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "TH scans for DNS-SD advertising"

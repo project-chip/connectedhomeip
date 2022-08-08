@@ -17,6 +17,9 @@ name:
     3.4.6. [TC-SC-4.6] Commissioner Discovery - Commissioner [DUT -
     Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -27,7 +30,7 @@ tests:
           "DUT is instructed to start advertising its presence as a commissioner
           in the network"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "Check DNS-SD subtypes used by DUT"

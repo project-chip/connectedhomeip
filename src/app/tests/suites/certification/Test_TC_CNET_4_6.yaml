@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.6. [TC-CNET-4.6] [Thread] FAILSAFE_REQUIRED message Validation
+    12.4.6. [TC-CNET-4.6] [Thread] FAILSAFE_REQUIRED message Validation
     [DUT-Server]
+
+PICS:
+    - CNET.S.F01
 
 config:
     nodeId: 0x12344321
@@ -25,13 +28,17 @@ config:
 tests:
     - label:
           "TH sends the AddOrUpdateThreadNetwork command to the DUT with the
-          following argument: OperationalDataset argument value as 'Userth_op'
+          following argument: OperationalDataset argument value as Userth_op
           Breadcrumb argument value as 1"
       PICS: CNET.S.C03.Rsp
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning add-or-update-thread-network 1232034768527434274  51 0
+          ./chip-tool networkcommissioning add-or-update-thread-network-network hex:<your network id in hex> 1 0
 
-          Verify on the TH Log:
+          Below is an example:
+
+          ./chip-tool networkcommissioning add-or-update-thread-network 1232034768527434274  51 0
+
+          Verify  "FAILSAFE_REQUIRED status code"  on the TH(chip-tool) Log:
 
           [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
           [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
@@ -40,12 +47,16 @@ tests:
 
     - label:
           "TH sends RemoveNetwork command to the DUT with NetworkID argument
-          value as 'Userth_op' and Breadcrumb argument value as 1"
+          value as Userth_op and Breadcrumb argument value as 1"
       PICS: CNET.S.C04.Rsp
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning remove-network 1232034768527434274 51 0
+          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
 
-          Verify on the TH Log:
+          Below is an example:
+
+          /chip-tool networkcommissioning remove-network 1232034768527434274 51 0
+
+          Verify  "FAILSAFE_REQUIRED status code"  on the TH(chip-tool) Log:
 
           [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
           [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
@@ -54,12 +65,16 @@ tests:
 
     - label:
           "TH sends ConnectNetwork command to the DUT with NetworkID argument
-          value as 'Userth_op' and Breadcrumb argument value as 1"
+          value as Userth_op and Breadcrumb argument value as 1"
       PICS: CNET.S.C06.Rsp
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning connect-network 1232034768527434274 51 0
+          ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
 
-          Verify on the TH Log:
+          Below is an example:
+
+          ./chip-tool networkcommissioning connect-network 1232034768527434274 51 0
+
+          Verify  "FAILSAFE_REQUIRED status code"  on the TH(chip-tool) Log:
 
           [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
           [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)

@@ -936,7 +936,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSNumber * _Nonnull level;
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
 
 @property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
@@ -964,7 +964,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSNumber * _Nonnull moveMode;
 
-@property (nonatomic, copy) NSNumber * _Nonnull rate;
+@property (nonatomic, copy) NSNumber * _Nullable rate;
 
 @property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
@@ -994,7 +994,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSNumber * _Nonnull stepSize;
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
 
 @property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
@@ -1046,7 +1046,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSNumber * _Nonnull level;
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
 
 @property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
@@ -1074,7 +1074,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSNumber * _Nonnull moveMode;
 
-@property (nonatomic, copy) NSNumber * _Nonnull rate;
+@property (nonatomic, copy) NSNumber * _Nullable rate;
 
 @property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
@@ -1104,7 +1104,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSNumber * _Nonnull stepSize;
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
 
 @property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
 
