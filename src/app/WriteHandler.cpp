@@ -121,7 +121,7 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
         if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
         {
             CHIP_ERROR statusError = CHIP_NO_ERROR;
-            // Logging purpose to print the status error code
+            // Parse the status response so we can log it properly.
             StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
         }
         ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
