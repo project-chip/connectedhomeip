@@ -49,19 +49,16 @@ public:
     CHIP_ERROR Init(PersistentStorageDelegate * storage)
     {
         IgnoreUnusedVariable(storage);
-        mPendingFabricIndex       = kUndefinedFabricIndex;
-        mPendingKeypair           = nullptr;
-        mIsPendingKeypairActive   = false;
+        mPendingFabricIndex     = kUndefinedFabricIndex;
+        mPendingKeypair         = nullptr;
+        mIsPendingKeypairActive = false;
         return CHIP_NO_ERROR;
     }
 
     /**
      * @brief Finalize the keystore, so that subsequent operations fail
      */
-    void Finish()
-    {
-        ResetPendingKey();
-    }
+    void Finish() { ResetPendingKey(); }
 
     bool HasPendingOpKeypair() const override { return (mPendingKeypair != nullptr); }
 
@@ -83,9 +80,9 @@ protected:
         {
             Platform::Delete(mPendingKeypair);
         }
-        mPendingKeypair           = nullptr;
-        mIsPendingKeypairActive   = false;
-        mPendingFabricIndex       = kUndefinedFabricIndex;
+        mPendingKeypair         = nullptr;
+        mIsPendingKeypairActive = false;
+        mPendingFabricIndex     = kUndefinedFabricIndex;
     }
 
     // This pending fabric index is `kUndefinedFabricIndex` if there isn't a pending keypair override for a given fabric.
