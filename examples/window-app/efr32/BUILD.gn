@@ -78,7 +78,7 @@ if (chip_enable_wifi) {
 }
 
 # ThunderBoards  (No LCD)
-if (efr32_board == "BRD4166A" || efr32_board == "BRD2106B") {
+if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B") {
   show_qr_code = false
   disable_lcd = true
 }
