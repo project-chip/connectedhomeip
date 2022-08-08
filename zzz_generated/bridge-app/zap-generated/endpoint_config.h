@@ -39,9 +39,9 @@
             /* 6 - Breadcrumb, */                                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Bridged Actions (server), big-endian */                                                       \
+            /* Endpoint: 1, Cluster: Actions (server), big-endian */                                                               \
                                                                                                                                    \
-            /* 14 - setup url, */                                                                                                  \
+            /* 14 - SetupURL, */                                                                                                   \
             19, 0, 'h', 't', 't', 'p', 's', ':', '/', '/', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm',                  \
     }
 
@@ -59,9 +59,9 @@
             /* 6 - Breadcrumb, */                                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Bridged Actions (server), little-endian */                                                    \
+            /* Endpoint: 1, Cluster: Actions (server), little-endian */                                                            \
                                                                                                                                    \
-            /* 14 - setup url, */                                                                                                  \
+            /* 14 - SetupURL, */                                                                                                   \
             19, 0, 'h', 't', 't', 'p', 's', ':', '/', '/', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm',                  \
     }
 
@@ -455,10 +455,10 @@
             { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },                               /* FeatureMap */        \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */   \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Bridged Actions (server) */                                                                   \
-            { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* action list */       \
-            { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* endpoint list */     \
-            { 0x00000002, ZAP_TYPE(LONG_CHAR_STRING), 514, 0, ZAP_LONG_DEFAULTS_INDEX(14) },               /* setup url */         \
+            /* Endpoint: 1, Cluster: Actions (server) */                                                                           \
+            { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ActionList */        \
+            { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* EndpointLists */     \
+            { 0x00000002, ZAP_TYPE(LONG_CHAR_STRING), 514, 0, ZAP_LONG_DEFAULTS_INDEX(14) },               /* SetupURL */          \
             { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },                               /* FeatureMap */        \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */   \
                                                                                                                                    \
@@ -631,7 +631,7 @@
   0x00000000 /* Identify */, \
   0x00000040 /* TriggerEffect */, \
   chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 1, Cluster: Bridged Actions (server) */\
+  /* Endpoint: 1, Cluster: Actions (server) */\
   /*   AcceptedCommandList (index=57) */ \
   0x00000000 /* InstantAction */, \
   chip::kInvalidCommandId /* end of list */, \
@@ -904,7 +904,7 @@
       .generatedCommandList = nullptr ,\
     },\
   { \
-      /* Endpoint: 1, Cluster: Bridged Actions (server) */ \
+      /* Endpoint: 1, Cluster: Actions (server) */ \
       .clusterId = 0x00000025,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(206), \
       .attributeCount = 5, \

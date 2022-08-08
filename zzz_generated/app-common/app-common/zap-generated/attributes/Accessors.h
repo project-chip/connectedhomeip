@@ -437,13 +437,13 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace AccessControl
 
-namespace BridgedActions {
+namespace Actions {
 namespace Attributes {
 
-namespace SetupUrl {
+namespace SetupURL {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // long_char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
-} // namespace SetupUrl
+} // namespace SetupURL
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -456,7 +456,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace BridgedActions
+} // namespace Actions
 
 namespace Basic {
 namespace Attributes {

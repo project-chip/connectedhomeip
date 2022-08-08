@@ -70,7 +70,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType & value)
+                                     const chip::app::Clusters::Actions::Structs::ActionStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -114,10 +114,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("Status", indent + 1, value.status);
+        CHIP_ERROR err = LogValue("State", indent + 1, value.state);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Status'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'State'");
             return err;
         }
     }
@@ -562,7 +562,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType & value)
+                                     const chip::app::Clusters::Actions::Structs::EndpointListStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2441,8 +2441,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const BridgedActions::Events::StateChanged::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Actions::Events::StateChanged::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2473,8 +2472,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const BridgedActions::Events::ActionFailed::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Actions::Events::ActionFailed::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -4655,46 +4653,45 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case BridgedActions::Id: {
+    case Actions::Id: {
         switch (path.mAttributeId)
         {
-        case BridgedActions::Attributes::ActionList::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> value;
+        case Actions::Attributes::ActionList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::ActionStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("action list", 1, value);
+            return DataModelLogger::LogValue("ActionList", 1, value);
         }
-        case BridgedActions::Attributes::EndpointList::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType>
-                value;
+        case Actions::Attributes::EndpointLists::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::EndpointListStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("endpoint list", 1, value);
+            return DataModelLogger::LogValue("EndpointLists", 1, value);
         }
-        case BridgedActions::Attributes::SetupUrl::Id: {
+        case Actions::Attributes::SetupURL::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("setup url", 1, value);
+            return DataModelLogger::LogValue("SetupURL", 1, value);
         }
-        case BridgedActions::Attributes::GeneratedCommandList::Id: {
+        case Actions::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case BridgedActions::Attributes::AcceptedCommandList::Id: {
+        case Actions::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case BridgedActions::Attributes::AttributeList::Id: {
+        case Actions::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case BridgedActions::Attributes::FeatureMap::Id: {
+        case Actions::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case BridgedActions::Attributes::ClusterRevision::Id: {
+        case Actions::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -10400,16 +10397,16 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         }
         break;
     }
-    case BridgedActions::Id: {
+    case Actions::Id: {
         switch (header.mPath.mEventId)
         {
-        case BridgedActions::Events::StateChanged::Id: {
-            chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType value;
+        case Actions::Events::StateChanged::Id: {
+            chip::app::Clusters::Actions::Events::StateChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StateChanged", 1, value);
         }
-        case BridgedActions::Events::ActionFailed::Id: {
-            chip::app::Clusters::BridgedActions::Events::ActionFailed::DecodableType value;
+        case Actions::Events::ActionFailed::Id: {
+            chip::app::Clusters::Actions::Events::ActionFailed::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActionFailed", 1, value);
         }

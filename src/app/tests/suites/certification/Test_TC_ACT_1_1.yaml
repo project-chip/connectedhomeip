@@ -19,7 +19,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Bridged Actions"
+    cluster: "Actions"
     endpoint: 1
 
 tests:

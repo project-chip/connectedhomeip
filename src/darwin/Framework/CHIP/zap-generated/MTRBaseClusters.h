@@ -2099,38 +2099,33 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Bridged Actions
+ * Cluster Actions
  *
  */
-@interface MTRBaseClusterBridgedActions : MTRCluster
+@interface MTRBaseClusterActions : MTRCluster
 
 - (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
                                endpoint:(uint16_t)endpoint
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)instantActionWithParams:(MTRBridgedActionsClusterInstantActionParams *)params
+- (void)instantActionWithParams:(MTRActionsClusterInstantActionParams *)params
               completionHandler:(StatusCompletion)completionHandler;
-- (void)instantActionWithTransitionWithParams:(MTRBridgedActionsClusterInstantActionWithTransitionParams *)params
+- (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params
                             completionHandler:(StatusCompletion)completionHandler;
-- (void)startActionWithParams:(MTRBridgedActionsClusterStartActionParams *)params
-            completionHandler:(StatusCompletion)completionHandler;
-- (void)startActionWithDurationWithParams:(MTRBridgedActionsClusterStartActionWithDurationParams *)params
+- (void)startActionWithParams:(MTRActionsClusterStartActionParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)startActionWithDurationWithParams:(MTRActionsClusterStartActionWithDurationParams *)params
                         completionHandler:(StatusCompletion)completionHandler;
-- (void)stopActionWithParams:(MTRBridgedActionsClusterStopActionParams *)params
-           completionHandler:(StatusCompletion)completionHandler;
-- (void)pauseActionWithParams:(MTRBridgedActionsClusterPauseActionParams *)params
-            completionHandler:(StatusCompletion)completionHandler;
-- (void)pauseActionWithDurationWithParams:(MTRBridgedActionsClusterPauseActionWithDurationParams *)params
+- (void)stopActionWithParams:(MTRActionsClusterStopActionParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)pauseActionWithParams:(MTRActionsClusterPauseActionParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)pauseActionWithDurationWithParams:(MTRActionsClusterPauseActionWithDurationParams *)params
                         completionHandler:(StatusCompletion)completionHandler;
-- (void)resumeActionWithParams:(MTRBridgedActionsClusterResumeActionParams *)params
-             completionHandler:(StatusCompletion)completionHandler;
-- (void)enableActionWithParams:(MTRBridgedActionsClusterEnableActionParams *)params
-             completionHandler:(StatusCompletion)completionHandler;
-- (void)enableActionWithDurationWithParams:(MTRBridgedActionsClusterEnableActionWithDurationParams *)params
+- (void)resumeActionWithParams:(MTRActionsClusterResumeActionParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)enableActionWithParams:(MTRActionsClusterEnableActionParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)enableActionWithDurationWithParams:(MTRActionsClusterEnableActionWithDurationParams *)params
                          completionHandler:(StatusCompletion)completionHandler;
-- (void)disableActionWithParams:(MTRBridgedActionsClusterDisableActionParams *)params
+- (void)disableActionWithParams:(MTRActionsClusterDisableActionParams *)params
               completionHandler:(StatusCompletion)completionHandler;
-- (void)disableActionWithDurationWithParams:(MTRBridgedActionsClusterDisableActionWithDurationParams *)params
+- (void)disableActionWithDurationWithParams:(MTRActionsClusterDisableActionWithDurationParams *)params
                           completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeActionListWithCompletionHandler:(void (^)(
@@ -2149,35 +2144,36 @@ NS_ASSUME_NONNULL_BEGIN
                                             queue:(dispatch_queue_t)queue
                                 completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeEndpointListWithCompletionHandler:(void (^)(
-                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeEndpointListsWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributeEndpointListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                          maxInterval:(NSNumber * _Nonnull)maxInterval
-                                               params:(MTRSubscribeParams * _Nullable)params
-                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeEndpointListWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                           endpoint:(NSNumber *)endpoint
-                                              queue:(dispatch_queue_t)queue
-                                  completionHandler:
-                                      (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeEndpointListsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(MTRSubscribeParams * _Nullable)params
+                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                         reportHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeEndpointListsWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                            endpoint:(NSNumber *)endpoint
+                                               queue:(dispatch_queue_t)queue
+                                   completionHandler:
+                                       (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeSetupUrlWithCompletionHandler:(void (^)(
+- (void)readAttributeSetupURLWithCompletionHandler:(void (^)(
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributeSetupUrlWithMinInterval:(NSNumber * _Nonnull)minInterval
+- (void)subscribeAttributeSetupURLWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            params:(MTRSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeSetupUrlWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
++ (void)readAttributeSetupURLWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                        endpoint:(NSNumber *)endpoint
                                           queue:(dispatch_queue_t)queue
                               completionHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -22089,47 +22085,47 @@ typedef NS_ENUM(uint8_t, MTRAccessControlPrivilege) {
     MTRAccessControlPrivilegeAdminister = 0x05,
 };
 
-typedef NS_ENUM(uint8_t, MTRBridgedActionsActionError) {
-    MTRBridgedActionsActionErrorUnknown = 0x00,
-    MTRBridgedActionsActionErrorInterrupted = 0x01,
+typedef NS_ENUM(uint8_t, MTRActionsActionError) {
+    MTRActionsActionErrorUnknown = 0x00,
+    MTRActionsActionErrorInterrupted = 0x01,
 };
 
-typedef NS_ENUM(uint8_t, MTRBridgedActionsActionState) {
-    MTRBridgedActionsActionStateInactive = 0x00,
-    MTRBridgedActionsActionStateActive = 0x01,
-    MTRBridgedActionsActionStatePaused = 0x02,
-    MTRBridgedActionsActionStateDisabled = 0x03,
+typedef NS_ENUM(uint8_t, MTRActionsActionState) {
+    MTRActionsActionStateInactive = 0x00,
+    MTRActionsActionStateActive = 0x01,
+    MTRActionsActionStatePaused = 0x02,
+    MTRActionsActionStateDisabled = 0x03,
 };
 
-typedef NS_ENUM(uint8_t, MTRBridgedActionsActionType) {
-    MTRBridgedActionsActionTypeOther = 0x00,
-    MTRBridgedActionsActionTypeScene = 0x01,
-    MTRBridgedActionsActionTypeSequence = 0x02,
-    MTRBridgedActionsActionTypeAutomation = 0x03,
-    MTRBridgedActionsActionTypeException = 0x04,
-    MTRBridgedActionsActionTypeNotification = 0x05,
-    MTRBridgedActionsActionTypeAlarm = 0x06,
+typedef NS_ENUM(uint8_t, MTRActionsActionType) {
+    MTRActionsActionTypeOther = 0x00,
+    MTRActionsActionTypeScene = 0x01,
+    MTRActionsActionTypeSequence = 0x02,
+    MTRActionsActionTypeAutomation = 0x03,
+    MTRActionsActionTypeException = 0x04,
+    MTRActionsActionTypeNotification = 0x05,
+    MTRActionsActionTypeAlarm = 0x06,
 };
 
-typedef NS_ENUM(uint8_t, MTRBridgedActionsEndpointListType) {
-    MTRBridgedActionsEndpointListTypeOther = 0x00,
-    MTRBridgedActionsEndpointListTypeRoom = 0x01,
-    MTRBridgedActionsEndpointListTypeZone = 0x02,
+typedef NS_ENUM(uint8_t, MTRActionsEndpointListType) {
+    MTRActionsEndpointListTypeOther = 0x00,
+    MTRActionsEndpointListTypeRoom = 0x01,
+    MTRActionsEndpointListTypeZone = 0x02,
 };
 
-typedef NS_OPTIONS(uint16_t, MTRBridgedActionsCommandBits) {
-    MTRBridgedActionsCommandBitsInstantAction = 0x1,
-    MTRBridgedActionsCommandBitsInstantActionWithTransition = 0x2,
-    MTRBridgedActionsCommandBitsStartAction = 0x4,
-    MTRBridgedActionsCommandBitsStartActionWithDuration = 0x8,
-    MTRBridgedActionsCommandBitsStopAction = 0x10,
-    MTRBridgedActionsCommandBitsPauseAction = 0x20,
-    MTRBridgedActionsCommandBitsPauseActionWithDuration = 0x40,
-    MTRBridgedActionsCommandBitsResumeAction = 0x80,
-    MTRBridgedActionsCommandBitsEnableAction = 0x100,
-    MTRBridgedActionsCommandBitsEnableActionWithDuration = 0x200,
-    MTRBridgedActionsCommandBitsDisableAction = 0x400,
-    MTRBridgedActionsCommandBitsDisableActionWithDuration = 0x800,
+typedef NS_OPTIONS(uint16_t, MTRActionsCommandBits) {
+    MTRActionsCommandBitsInstantAction = 0x1,
+    MTRActionsCommandBitsInstantActionWithTransition = 0x2,
+    MTRActionsCommandBitsStartAction = 0x4,
+    MTRActionsCommandBitsStartActionWithDuration = 0x8,
+    MTRActionsCommandBitsStopAction = 0x10,
+    MTRActionsCommandBitsPauseAction = 0x20,
+    MTRActionsCommandBitsPauseActionWithDuration = 0x40,
+    MTRActionsCommandBitsResumeAction = 0x80,
+    MTRActionsCommandBitsEnableAction = 0x100,
+    MTRActionsCommandBitsEnableActionWithDuration = 0x200,
+    MTRActionsCommandBitsDisableAction = 0x400,
+    MTRActionsCommandBitsDisableActionWithDuration = 0x800,
 };
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTAApplyUpdateAction) {

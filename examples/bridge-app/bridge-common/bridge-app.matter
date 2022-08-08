@@ -356,7 +356,7 @@ server cluster AccessControl = 31 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster BridgedActions = 37 {
+server cluster Actions = 37 {
   enum ActionErrorEnum : ENUM8 {
     kUnknown = 0;
     kInterrupted = 1;
@@ -405,8 +405,8 @@ server cluster BridgedActions = 37 {
     char_string<32> name = 1;
     ActionTypeEnum type = 2;
     int16u endpointListID = 3;
-    int16u supportedCommands = 4;
-    ActionStateEnum status = 5;
+    CommandBits supportedCommands = 4;
+    ActionStateEnum state = 5;
   }
 
   struct EndpointListStruct {
@@ -430,8 +430,8 @@ server cluster BridgedActions = 37 {
   }
 
   readonly attribute ActionStruct actionList[] = 0;
-  readonly attribute EndpointListStruct endpointList[] = 1;
-  readonly attribute long_char_string<512> setupUrl = 2;
+  readonly attribute EndpointListStruct endpointLists[] = 1;
+  readonly attribute long_char_string<512> setupURL = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1755,10 +1755,10 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster BridgedActions {
+  server cluster Actions {
     callback attribute actionList;
-    callback attribute endpointList;
-    ram      attribute setupUrl default = "https://example.com";
+    callback attribute endpointLists;
+    ram      attribute setupURL default = "https://example.com";
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

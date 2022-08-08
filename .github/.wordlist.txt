@@ -151,7 +151,6 @@ bouffalolab
 BRD
 breakpoint
 bredr
-BridgedActions
 BridgedDeviceBasic
 bridgedLightEndpoint
 bringup

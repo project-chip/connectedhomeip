@@ -1289,122 +1289,114 @@ public class ClusterReadMapping {
     readAccessControlInteractionInfo.put(
         "readClusterRevisionAttribute", readAccessControlClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("accessControl", readAccessControlInteractionInfo);
-    Map<String, InteractionInfo> readBridgedActionsInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> readBridgedActionsActionListCommandParams =
+    Map<String, InteractionInfo> readActionsInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readActionsActionListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedActionsActionListAttributeInteractionInfo =
+    InteractionInfo readActionsActionListAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .readActionListAttribute(
-                      (ChipClusters.BridgedActionsCluster.ActionListAttributeCallback) callback);
+                      (ChipClusters.ActionsCluster.ActionListAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedBridgedActionsClusterActionListAttributeCallback(),
-            readBridgedActionsActionListCommandParams);
-    readBridgedActionsInteractionInfo.put(
-        "readActionListAttribute", readBridgedActionsActionListAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedActionsEndpointListCommandParams =
+            () -> new ClusterInfoMapping.DelegatedActionsClusterActionListAttributeCallback(),
+            readActionsActionListCommandParams);
+    readActionsInteractionInfo.put(
+        "readActionListAttribute", readActionsActionListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readActionsEndpointListsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedActionsEndpointListAttributeInteractionInfo =
+    InteractionInfo readActionsEndpointListsAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
-                  .readEndpointListAttribute(
-                      (ChipClusters.BridgedActionsCluster.EndpointListAttributeCallback) callback);
+              ((ChipClusters.ActionsCluster) cluster)
+                  .readEndpointListsAttribute(
+                      (ChipClusters.ActionsCluster.EndpointListsAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedActionsClusterEndpointListAttributeCallback(),
-            readBridgedActionsEndpointListCommandParams);
-    readBridgedActionsInteractionInfo.put(
-        "readEndpointListAttribute", readBridgedActionsEndpointListAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedActionsSetupUrlCommandParams =
+            () -> new ClusterInfoMapping.DelegatedActionsClusterEndpointListsAttributeCallback(),
+            readActionsEndpointListsCommandParams);
+    readActionsInteractionInfo.put(
+        "readEndpointListsAttribute", readActionsEndpointListsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readActionsSetupURLCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedActionsSetupUrlAttributeInteractionInfo =
+    InteractionInfo readActionsSetupURLAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
-                  .readSetupUrlAttribute((ChipClusters.CharStringAttributeCallback) callback);
+              ((ChipClusters.ActionsCluster) cluster)
+                  .readSetupURLAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBridgedActionsSetupUrlCommandParams);
-    readBridgedActionsInteractionInfo.put(
-        "readSetupUrlAttribute", readBridgedActionsSetupUrlAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedActionsGeneratedCommandListCommandParams =
+            readActionsSetupURLCommandParams);
+    readActionsInteractionInfo.put(
+        "readSetupURLAttribute", readActionsSetupURLAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readActionsGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedActionsGeneratedCommandListAttributeInteractionInfo =
+    InteractionInfo readActionsGeneratedCommandListAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .readGeneratedCommandListAttribute(
-                      (ChipClusters.BridgedActionsCluster.GeneratedCommandListAttributeCallback)
-                          callback);
+                      (ChipClusters.ActionsCluster.GeneratedCommandListAttributeCallback) callback);
             },
             () ->
                 new ClusterInfoMapping
-                    .DelegatedBridgedActionsClusterGeneratedCommandListAttributeCallback(),
-            readBridgedActionsGeneratedCommandListCommandParams);
-    readBridgedActionsInteractionInfo.put(
+                    .DelegatedActionsClusterGeneratedCommandListAttributeCallback(),
+            readActionsGeneratedCommandListCommandParams);
+    readActionsInteractionInfo.put(
         "readGeneratedCommandListAttribute",
-        readBridgedActionsGeneratedCommandListAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedActionsAcceptedCommandListCommandParams =
+        readActionsGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readActionsAcceptedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedActionsAcceptedCommandListAttributeInteractionInfo =
+    InteractionInfo readActionsAcceptedCommandListAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .readAcceptedCommandListAttribute(
-                      (ChipClusters.BridgedActionsCluster.AcceptedCommandListAttributeCallback)
-                          callback);
+                      (ChipClusters.ActionsCluster.AcceptedCommandListAttributeCallback) callback);
             },
             () ->
                 new ClusterInfoMapping
-                    .DelegatedBridgedActionsClusterAcceptedCommandListAttributeCallback(),
-            readBridgedActionsAcceptedCommandListCommandParams);
-    readBridgedActionsInteractionInfo.put(
-        "readAcceptedCommandListAttribute",
-        readBridgedActionsAcceptedCommandListAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedActionsAttributeListCommandParams =
+                    .DelegatedActionsClusterAcceptedCommandListAttributeCallback(),
+            readActionsAcceptedCommandListCommandParams);
+    readActionsInteractionInfo.put(
+        "readAcceptedCommandListAttribute", readActionsAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readActionsAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedActionsAttributeListAttributeInteractionInfo =
+    InteractionInfo readActionsAttributeListAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .readAttributeListAttribute(
-                      (ChipClusters.BridgedActionsCluster.AttributeListAttributeCallback) callback);
+                      (ChipClusters.ActionsCluster.AttributeListAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedActionsClusterAttributeListAttributeCallback(),
-            readBridgedActionsAttributeListCommandParams);
-    readBridgedActionsInteractionInfo.put(
-        "readAttributeListAttribute", readBridgedActionsAttributeListAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedActionsFeatureMapCommandParams =
+            () -> new ClusterInfoMapping.DelegatedActionsClusterAttributeListAttributeCallback(),
+            readActionsAttributeListCommandParams);
+    readActionsInteractionInfo.put(
+        "readAttributeListAttribute", readActionsAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readActionsFeatureMapCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedActionsFeatureMapAttributeInteractionInfo =
+    InteractionInfo readActionsFeatureMapAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-            readBridgedActionsFeatureMapCommandParams);
-    readBridgedActionsInteractionInfo.put(
-        "readFeatureMapAttribute", readBridgedActionsFeatureMapAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedActionsClusterRevisionCommandParams =
+            readActionsFeatureMapCommandParams);
+    readActionsInteractionInfo.put(
+        "readFeatureMapAttribute", readActionsFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readActionsClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedActionsClusterRevisionAttributeInteractionInfo =
+    InteractionInfo readActionsClusterRevisionAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readBridgedActionsClusterRevisionCommandParams);
-    readBridgedActionsInteractionInfo.put(
-        "readClusterRevisionAttribute", readBridgedActionsClusterRevisionAttributeInteractionInfo);
-    readAttributeMap.put("bridgedActions", readBridgedActionsInteractionInfo);
+            readActionsClusterRevisionCommandParams);
+    readActionsInteractionInfo.put(
+        "readClusterRevisionAttribute", readActionsClusterRevisionAttributeInteractionInfo);
+    readAttributeMap.put("actions", readActionsInteractionInfo);
     Map<String, InteractionInfo> readBasicInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readBasicDataModelRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

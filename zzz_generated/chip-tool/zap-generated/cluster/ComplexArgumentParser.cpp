@@ -64,8 +64,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::AccessControl::Structs
     ComplexArgumentParser::Finalize(request.targets);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::BridgedActions::Structs::ActionStruct::Type & request,
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Actions::Structs::ActionStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -77,7 +76,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("endpointListID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ActionStruct.supportedCommands", "supportedCommands",
                                                                   value.isMember("supportedCommands")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ActionStruct.status", "status", value.isMember("status")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ActionStruct.state", "state", value.isMember("state")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "actionID");
@@ -95,20 +94,20 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "supportedCommands");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.supportedCommands, value["supportedCommands"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "status");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.status, value["status"]));
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "state");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.state, value["state"]));
 
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::BridgedActions::Structs::ActionStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Actions::Structs::ActionStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.actionID);
     ComplexArgumentParser::Finalize(request.name);
     ComplexArgumentParser::Finalize(request.type);
     ComplexArgumentParser::Finalize(request.endpointListID);
     ComplexArgumentParser::Finalize(request.supportedCommands);
-    ComplexArgumentParser::Finalize(request.status);
+    ComplexArgumentParser::Finalize(request.state);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::Type & request,
@@ -568,7 +567,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::
     ComplexArgumentParser::Finalize(request.a);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::Type & request,
+                                        chip::app::Clusters::Actions::Structs::EndpointListStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -596,7 +595,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Actions::Structs::EndpointListStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.endpointListID);
     ComplexArgumentParser::Finalize(request.name);

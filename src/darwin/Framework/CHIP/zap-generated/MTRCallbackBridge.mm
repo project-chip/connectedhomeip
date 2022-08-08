@@ -2262,8 +2262,8 @@ void MTRAccessControlAttributeListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & value)
+void MTRActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::ActionStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2271,16 +2271,16 @@ void MTRBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * 
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRBridgedActionsClusterActionStruct * newElement_0;
-            newElement_0 = [MTRBridgedActionsClusterActionStruct new];
+            MTRActionsClusterActionStruct * newElement_0;
+            newElement_0 = [MTRActionsClusterActionStruct new];
             newElement_0.actionID = [NSNumber numberWithUnsignedShort:entry_0.actionID];
             newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                          length:entry_0.name.size()
                                                        encoding:NSUTF8StringEncoding];
             newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
             newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
-            newElement_0.supportedCommands = [NSNumber numberWithUnsignedShort:entry_0.supportedCommands];
-            newElement_0.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.status)];
+            newElement_0.supportedCommands = [NSNumber numberWithUnsignedShort:entry_0.supportedCommands.Raw()];
+            newElement_0.state = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.state)];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -2293,9 +2293,9 @@ void MTRBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * 
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedActionsActionListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsActionListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRBridgedActionsActionListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRActionsActionListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2309,9 +2309,8 @@ void MTRBridgedActionsActionListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
-        value)
+void MTRActionsEndpointListsListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::EndpointListStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2319,8 +2318,8 @@ void MTRBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void 
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRBridgedActionsClusterEndpointListStruct * newElement_0;
-            newElement_0 = [MTRBridgedActionsClusterEndpointListStruct new];
+            MTRActionsClusterEndpointListStruct * newElement_0;
+            newElement_0 = [MTRActionsClusterEndpointListStruct new];
             newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
             newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                          length:entry_0.name.size()
@@ -2354,9 +2353,9 @@ void MTRBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void 
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedActionsEndpointListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsEndpointListsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRBridgedActionsEndpointListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRActionsEndpointListsListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2370,7 +2369,7 @@ void MTRBridgedActionsEndpointListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRBridgedActionsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRActionsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2393,9 +2392,9 @@ void MTRBridgedActionsGeneratedCommandListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRBridgedActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2409,7 +2408,7 @@ void MTRBridgedActionsGeneratedCommandListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRBridgedActionsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRActionsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2432,9 +2431,9 @@ void MTRBridgedActionsAcceptedCommandListListAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRBridgedActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2448,7 +2447,7 @@ void MTRBridgedActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRBridgedActionsAttributeListListAttributeCallbackBridge::OnSuccessFn(
+void MTRActionsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2471,9 +2470,9 @@ void MTRBridgedActionsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedActionsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRBridgedActionsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRActionsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -13993,17 +13992,17 @@ void MTRNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRBridgedActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BridgedActions::ActionErrorEnum value)
+void MTRActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Actions::ActionErrorEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14017,8 +14016,8 @@ void MTRBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionErrorEnum> & value)
+void MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionErrorEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14029,9 +14028,9 @@ void MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14045,17 +14044,17 @@ void MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptio
     }
 }
 
-void MTRBridgedActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BridgedActions::ActionStateEnum value)
+void MTRActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Actions::ActionStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14069,8 +14068,8 @@ void MTRBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionStateEnum> & value)
+void MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14081,9 +14080,9 @@ void MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14097,17 +14096,17 @@ void MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptio
     }
 }
 
-void MTRBridgedActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BridgedActions::ActionTypeEnum value)
+void MTRActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Actions::ActionTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14121,8 +14120,8 @@ void MTRBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionTypeEnum> & value)
+void MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14133,9 +14132,9 @@ void MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14149,17 +14148,17 @@ void MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackSubscription
     }
 }
 
-void MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BridgedActions::EndpointListTypeEnum value)
+void MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Actions::EndpointListTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14173,8 +14172,8 @@ void MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::EndpointListTypeEnum> & value)
+void MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::EndpointListTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14185,10 +14184,9 @@ void MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

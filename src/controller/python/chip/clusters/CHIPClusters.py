@@ -912,8 +912,8 @@ class ChipClusters:
                 },
             },
     }
-    _BRIDGED_ACTIONS_CLUSTER_INFO = {
-            "clusterName": "BridgedActions",
+    _ACTIONS_CLUSTER_INFO = {
+            "clusterName": "Actions",
             "clusterId": 0x00000025,
             "commands": {
             0x00000000: {
@@ -1026,13 +1026,13 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "EndpointList",
+                    "attributeName": "EndpointLists",
                     "attributeId": 0x00000001,
                     "type": "",
                     "reportable": True,
                 },
                 0x00000002: {
-                    "attributeName": "SetupUrl",
+                    "attributeName": "SetupURL",
                     "attributeId": 0x00000002,
                     "type": "str",
                     "reportable": True,
@@ -7514,7 +7514,7 @@ class ChipClusters:
     0x0000001D: _DESCRIPTOR_CLUSTER_INFO,
     0x0000001E: _BINDING_CLUSTER_INFO,
     0x0000001F: _ACCESS_CONTROL_CLUSTER_INFO,
-    0x00000025: _BRIDGED_ACTIONS_CLUSTER_INFO,
+    0x00000025: _ACTIONS_CLUSTER_INFO,
     0x00000028: _BASIC_CLUSTER_INFO,
     0x00000029: _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
     0x0000002A: _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
@@ -7582,7 +7582,7 @@ class ChipClusters:
         "Descriptor": _DESCRIPTOR_CLUSTER_INFO,
         "Binding": _BINDING_CLUSTER_INFO,
         "AccessControl": _ACCESS_CONTROL_CLUSTER_INFO,
-        "BridgedActions": _BRIDGED_ACTIONS_CLUSTER_INFO,
+        "Actions": _ACTIONS_CLUSTER_INFO,
         "Basic": _BASIC_CLUSTER_INFO,
         "OtaSoftwareUpdateProvider": _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
         "OtaSoftwareUpdateRequestor": _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,

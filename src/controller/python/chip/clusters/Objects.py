@@ -3160,16 +3160,16 @@ class AccessControl(Cluster):
 
 
 @dataclass
-class BridgedActions(Cluster):
+class Actions(Cluster):
     id: typing.ClassVar[int] = 0x0025
 
     @ChipUtility.classproperty
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="actionList", Tag=0x00000000, Type=typing.List[BridgedActions.Structs.ActionStruct]),
-                ClusterObjectFieldDescriptor(Label="endpointList", Tag=0x00000001, Type=typing.List[BridgedActions.Structs.EndpointListStruct]),
-                ClusterObjectFieldDescriptor(Label="setupUrl", Tag=0x00000002, Type=typing.Optional[str]),
+                ClusterObjectFieldDescriptor(Label="actionList", Tag=0x00000000, Type=typing.List[Actions.Structs.ActionStruct]),
+                ClusterObjectFieldDescriptor(Label="endpointLists", Tag=0x00000001, Type=typing.List[Actions.Structs.EndpointListStruct]),
+                ClusterObjectFieldDescriptor(Label="setupURL", Tag=0x00000002, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -3177,9 +3177,9 @@ class BridgedActions(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    actionList: 'typing.List[BridgedActions.Structs.ActionStruct]' = None
-    endpointList: 'typing.List[BridgedActions.Structs.EndpointListStruct]' = None
-    setupUrl: 'typing.Optional[str]' = None
+    actionList: 'typing.List[Actions.Structs.ActionStruct]' = None
+    endpointLists: 'typing.List[Actions.Structs.EndpointListStruct]' = None
+    setupURL: 'typing.Optional[str]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -3221,18 +3221,18 @@ class BridgedActions(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="actionID", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
-                            ClusterObjectFieldDescriptor(Label="type", Tag=2, Type=BridgedActions.Enums.ActionTypeEnum),
+                            ClusterObjectFieldDescriptor(Label="type", Tag=2, Type=Actions.Enums.ActionTypeEnum),
                             ClusterObjectFieldDescriptor(Label="endpointListID", Tag=3, Type=uint),
                             ClusterObjectFieldDescriptor(Label="supportedCommands", Tag=4, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="status", Tag=5, Type=BridgedActions.Enums.ActionStateEnum),
+                            ClusterObjectFieldDescriptor(Label="state", Tag=5, Type=Actions.Enums.ActionStateEnum),
                     ])
 
             actionID: 'uint' = 0
             name: 'str' = ""
-            type: 'BridgedActions.Enums.ActionTypeEnum' = 0
+            type: 'Actions.Enums.ActionTypeEnum' = 0
             endpointListID: 'uint' = 0
             supportedCommands: 'uint' = 0
-            status: 'BridgedActions.Enums.ActionStateEnum' = 0
+            state: 'Actions.Enums.ActionStateEnum' = 0
 
         @dataclass
         class EndpointListStruct(ClusterObject):
@@ -3242,13 +3242,13 @@ class BridgedActions(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="endpointListID", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
-                            ClusterObjectFieldDescriptor(Label="type", Tag=2, Type=BridgedActions.Enums.EndpointListTypeEnum),
+                            ClusterObjectFieldDescriptor(Label="type", Tag=2, Type=Actions.Enums.EndpointListTypeEnum),
                             ClusterObjectFieldDescriptor(Label="endpoints", Tag=3, Type=typing.List[uint]),
                     ])
 
             endpointListID: 'uint' = 0
             name: 'str' = ""
-            type: 'BridgedActions.Enums.EndpointListTypeEnum' = 0
+            type: 'Actions.Enums.EndpointListTypeEnum' = 0
             endpoints: 'typing.List[uint]' = field(default_factory=lambda: [])
 
 
@@ -3482,12 +3482,12 @@ class BridgedActions(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[BridgedActions.Structs.ActionStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.List[Actions.Structs.ActionStruct])
 
-            value: 'typing.List[BridgedActions.Structs.ActionStruct]' = field(default_factory=lambda: [])
+            value: 'typing.List[Actions.Structs.ActionStruct]' = field(default_factory=lambda: [])
 
         @dataclass
-        class EndpointList(ClusterAttributeDescriptor):
+        class EndpointLists(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0025
@@ -3498,12 +3498,12 @@ class BridgedActions(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[BridgedActions.Structs.EndpointListStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.List[Actions.Structs.EndpointListStruct])
 
-            value: 'typing.List[BridgedActions.Structs.EndpointListStruct]' = field(default_factory=lambda: [])
+            value: 'typing.List[Actions.Structs.EndpointListStruct]' = field(default_factory=lambda: [])
 
         @dataclass
-        class SetupUrl(ClusterAttributeDescriptor):
+        class SetupURL(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0025
@@ -3616,12 +3616,12 @@ class BridgedActions(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="actionID", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="invokeID", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="newState", Tag=2, Type=BridgedActions.Enums.ActionStateEnum),
+                            ClusterObjectFieldDescriptor(Label="newState", Tag=2, Type=Actions.Enums.ActionStateEnum),
                     ])
 
             actionID: 'uint' = 0
             invokeID: 'uint' = 0
-            newState: 'BridgedActions.Enums.ActionStateEnum' = 0
+            newState: 'Actions.Enums.ActionStateEnum' = 0
 
         @dataclass
         class ActionFailed(ClusterEvent):
@@ -3639,14 +3639,14 @@ class BridgedActions(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="actionID", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="invokeID", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="newState", Tag=2, Type=BridgedActions.Enums.ActionStateEnum),
-                            ClusterObjectFieldDescriptor(Label="error", Tag=3, Type=BridgedActions.Enums.ActionErrorEnum),
+                            ClusterObjectFieldDescriptor(Label="newState", Tag=2, Type=Actions.Enums.ActionStateEnum),
+                            ClusterObjectFieldDescriptor(Label="error", Tag=3, Type=Actions.Enums.ActionErrorEnum),
                     ])
 
             actionID: 'uint' = 0
             invokeID: 'uint' = 0
-            newState: 'BridgedActions.Enums.ActionStateEnum' = 0
-            error: 'BridgedActions.Enums.ActionErrorEnum' = 0
+            newState: 'Actions.Enums.ActionStateEnum' = 0
+            error: 'Actions.Enums.ActionErrorEnum' = 0
 
 
 @dataclass
