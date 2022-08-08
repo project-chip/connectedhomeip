@@ -458,15 +458,11 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         return Status::ResourceExhausted;
     }
 
-    CHIP_ERROR err = handler->OnInitialRequest(std::move(aPayload));
-    if (err == CHIP_ERROR_NO_MEMORY)
-    {
-        return Status::ResourceExhausted;
-    }
+    handler->OnInitialRequest(std::move(aPayload));
 
     // TODO: Should probably map various TLV errors into InvalidAction, here
     // or inside the read handler.
-    return StatusIB(err).mStatus;
+    return Status::Success;
 }
 
 Protocols::InteractionModel::Status InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext,

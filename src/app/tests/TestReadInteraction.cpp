@@ -521,7 +521,7 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
         err = writer.Finalize(&readRequestbuf);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        err = readHandler.OnInitialRequest(std::move(readRequestbuf));
+        err = readHandler.ProcessReadRequest(std::move(readRequestbuf));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
 
@@ -648,22 +648,27 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).ListIndex(5).EndOfAttributePathIB();
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).EndOfAttributePathIB();
         err = attributePathBuilder.GetError();
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         attributePathListBuilder.EndOfAttributePathIBs();
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-        readRequestBuilder.IsFabricFiltered(false).EndOfReadRequestMessage();
+        readRequestBuilder.EndOfReadRequestMessage();
         NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
         err = writer.Finalize(&readRequestbuf);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        err = readHandler.OnInitialRequest(std::move(readRequestbuf));
-        NL_TEST_ASSERT(apSuite, err == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+        err = readHandler.ProcessReadRequest(std::move(readRequestbuf));
+        ChipLogError(DataManagement, "The error is %s", ErrorStr(err));
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+        NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE);
+#else
+        NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_END_OF_TLV);
+#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
         //
-        // In the call above to OnInitialRequest, the handler will not actually close out the EC since
+        // In the call above to ProcessReadRequest, the handler will not actually close out the EC since
         // it expects the ExchangeManager to do so automatically given it's not calling WillSend() on the EC,
         // and is not sending a response back.
         //
@@ -3449,6 +3454,7 @@ void TestReadInteraction::TestReadHandlerMalformedReadRequest2(nlTestSuite * apS
                                                 Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
+        ChipLogError(DataManagement, "The error is %s", ErrorStr(delegate.mError));
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
     }
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);

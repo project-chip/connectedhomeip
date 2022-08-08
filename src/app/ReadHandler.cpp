@@ -88,7 +88,7 @@ void ReadHandler::Close()
     mManagementCallback.OnDone(*this);
 }
 
-CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
+void ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
@@ -104,6 +104,12 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
 
     if (err != CHIP_NO_ERROR)
     {
+        Status status = Status::InvalidAction;
+        if (err == CHIP_IM_GLOBAL_STATUS(PathsExhausted))
+        {
+            status = Status::PathsExhausted;
+        }
+        StatusResponse::Send(status, mExchangeCtx.Get(), /* aExpectResponse = */ false);
         Close();
     }
     else
@@ -111,8 +117,6 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
         // Force us to be in a dirty state so we get processed by the reporting
         mFlags.Set(ReadHandlerFlags::ForceDirty);
     }
-
-    return err;
 }
 
 CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
@@ -301,14 +305,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
 
     ReturnErrorOnFailure(readRequestParser.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = readRequestParser.CheckSchemaValidity();
-    if (err != CHIP_NO_ERROR)
-    {
-        // The actual error we want to return to our consumer is an IM "invalid
-        // action" error, not whatever internal error CheckSchemaValidity
-        // happens to come up with.
-        return CHIP_IM_GLOBAL_STATUS(InvalidAction);
-    }
+    ReturnErrorOnFailure(readRequestParser.CheckSchemaValidity());
 #endif
 
     err = readRequestParser.GetAttributeRequests(&attributePathListParser);
