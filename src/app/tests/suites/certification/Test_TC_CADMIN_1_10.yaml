@@ -35,12 +35,12 @@ config:
     discriminator:
         type: int16u
         defaultValue: 3840
-    payload:
+    correctPayload:
         type: char_string
-        defaultValue: "MT:0000000000I31506010"
-    payload2:
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+    incorrectSetupCodePayload:
         type: char_string
-        defaultValue: "MT:0000000000I.0648G00"
+        defaultValue: "MT:-24J0AFN00I.0648G00"
 
 tests:
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
@@ -51,6 +51,63 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label:
+          "Open commissioning window exactly like we plan to later to verify
+          that `correctPayload` can in fact commision the device."
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      PICS: CADMIN.S.C01.Rsp
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 900
+
+    - label:
+          "Temporarily commission device with `correctPayload` just like we will
+          try to later"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      # Only run this if we ran the previous step.
+      PICS: CADMIN.S && CADMIN.S.C01.Rsp
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: correctPayload
+
+    - label: "Wait for a CASE session"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+
+    - label: "Read FabricIndex of beta so we can delete the temp fabric"
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      # Only run this if we commissioned the device.
+      PICS: CADMIN.S.C01.Rsp
+      response:
+          saveAs: tempFabricIndex
+
+    - label: "Remove the temp fabric"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      # Only run this if we commissioned the device.
+      PICS: CADMIN.S.C01.Rsp
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: tempFabricIndex
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
@@ -74,7 +131,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -90,7 +147,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -106,7 +163,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -122,7 +179,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -138,7 +195,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -154,7 +211,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -170,7 +227,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -186,7 +243,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -202,7 +259,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -217,23 +274,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
-      response:
-          error: FAILURE
-
-    - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
-      identity: "beta"
-      cluster: "CommissionerCommands"
-      command: "PairWithCode"
-      PICS: CADMIN.S
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId2
-              - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -249,7 +290,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -265,7 +306,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -281,7 +322,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -297,7 +338,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -313,7 +354,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -329,7 +370,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -345,7 +386,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -361,7 +402,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -377,10 +418,27 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    # This step must match the verification step above where we checked `correctPayload`
     - label:
           "TH_CR2 attempts to do PASE to DUT_CE using the correct onboarding
           payload"
@@ -393,6 +451,6 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload
+                value: correctPayload
       response:
           error: FAILURE
