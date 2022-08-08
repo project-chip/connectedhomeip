@@ -1,0 +1,66 @@
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+mDNSResponder_remove_configs =
+    [ "${build_root}/config/compiler:warnings_default" ]
+mDNSResponder_add_configs =
+    [ "${build_root}/config/compiler:warnings_third_party" ]
+
+config("mDNSResponder_base_config") {
+  include_dirs = [
+    "Clients",
+    "mDNSCore",
+    "mDNSPosix",
+    "mDNSShared",
+  ]
+}
+
+source_set("mDNSResponder") {
+  sources = [
+    "Clients/ClientCommon.c",
+    "Clients/bct.c",
+    "Clients/mdns_cli.c",
+    "mDNSCore/CryptoAlg.c",
+    "mDNSCore/DNSCommon.c",
+    "mDNSCore/DNSDigest.c",
+    "mDNSCore/anonymous.c",
+    "mDNSCore/mDNS.c",
+    "mDNSCore/mDNSDebug.h",
+    "mDNSCore/uDNS.c",
+    "mDNSPosix/PosixDaemon.c",
+    "mDNSPosix/mDNSPosix.c",
+    "mDNSPosix/mDNSUNP.c",
+    "mDNSShared/GenLinkedList.c",
+    "mDNSShared/PlatformCommon.c",
+    "mDNSShared/dnssd_clientlib.c",
+    "mDNSShared/dnssd_clientstub.c",
+    "mDNSShared/dnssd_ipc.c",
+    "mDNSShared/mDNSDebug.c",
+    "mDNSShared/uds_daemon.c",
+  ]
+
+  defines = [
+    "MTK_MDNS_ENABLE",
+    "USE_TCP_LOOPBACK",
+    "HAVE_IPV6",
+    "LIMITED_RESOURCES_TARGET",
+    "DEBUG_MDNS",
+  ]
+
+  public_deps = [ "${chip_root}/src/lwip" ]
+
+  deps = [ "${chip_root}/third_party/mt793x_sdk" ]
+
+  if (defined(mDNSResponder_remove_configs)) {
+    configs -= mDNSResponder_remove_configs
+  }
+  if (defined(mDNSResponder_add_configs)) {
+    configs += mDNSResponder_add_configs
+  }
+  cflags = [
+    "-Wno-address-of-packed-member",
+    "-Wno-char-subscripts",
+  ]
+
+  public_configs = [ ":mDNSResponder_base_config" ]
+}

@@ -103,7 +103,11 @@ static_library("inet") {
   ]
 
   if (chip_system_config_use_lwip) {
-    public_deps += [ "${chip_root}/src/lwip" ]
+    if (lwip_platform == "mt793x") {
+      public_deps += [ "${chip_root}/src/platform/mt793x/lwip" ]
+    } else {
+      public_deps += [ "${chip_root}/src/lwip" ]
+    }
   }
 
   if (chip_system_config_use_open_thread_inet_endpoints) {

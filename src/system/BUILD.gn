@@ -159,6 +159,9 @@ source_set("system_config_header") {
       if (chip_device_platform == "cyw30739") {
         public_deps += [ "${cyw30739_sdk_build_root}:cyw30739_sdk" ]
       }
+      if (lwip_platform == "mt793x") {
+        public_deps += [ "${chip_root}/src/platform/mt793x/lwip" ]
+      }
 
       # Add platform here as needed.
     }

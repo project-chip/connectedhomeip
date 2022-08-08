@@ -1,0 +1,545 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+import("//build_overrides/chip.gni")
+import("//build_overrides/mbedtls.gni")
+import("//build_overrides/mt793x_sdk.gni")
+import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/mt793x/args.gni")
+import("${chip_root}/src/platform/mt793x/lwip/lwip.gni")
+
+#
+# Manually specify the path of the Filogic SDK.
+#
+declare_args() {
+  _sdk_root = getenv("MTK_MT793X_SDK_ROOT")
+  mt793x_project_name = "matter_sdk"
+}
+
+#
+# Determine the final path of the Filogic SDK.
+#
+declare_args() {
+  if (_sdk_root == "") {
+    mt793x_sdk_root =
+        "//third_party/connectedhomeip/third_party/mt793x_sdk/filogic"
+  } else {
+    mt793x_sdk_root = _sdk_root
+  }
+}
+
+#
+# Defines an mt793x SDK build target.
+#
+# Parameters:
+#   sources - Extra source files to build.
+#
+template("mt793x_sdk") {
+  assert(mt793x_sdk_root != "", "mt793x_sdk_root must be specified")
+
+  sdk_target_name = target_name
+
+  config("${sdk_target_name}_config") {
+    include_dirs = []
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+
+print(include_dirs)
+
+    # We want to treat SDK headers as system headers, so that warnings in those
+    # headers are not fatal.  Therefore don't add them directly to include_dirs;
+    # we will add them to cflags below instead.
+    mt793x_sdk_include_dirs = [
+      "${mt793x_sdk_root}/kernel/rtos/FreeRTOS/SourceV10/include",
+      "${mt793x_sdk_root}/kernel/rtos/FreeRTOS/SourceV10/portable/GCC/ARM_CM33_NTZ/non_secure",
+      "${mt793x_sdk_root}/kernel/service/inc",
+
+      "${mt793x_sdk_root}/driver/board/mt7933_hdk/util/inc",
+      "${mt793x_sdk_root}/driver/chip/inc",
+      "${mt793x_sdk_root}/driver/chip/mt7933/inc",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/common/inc",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/psramc/inc",
+      "${mt793x_sdk_root}/driver/CMSIS/Device/MTK/mt7933/Include",
+      "${mt793x_sdk_root}/driver/CMSIS/Include",
+
+      "${mt793x_sdk_root}/middleware/MTK/minicli/inc",
+      "${mt793x_sdk_root}/middleware/MTK/nvdm/inc",
+      "${mt793x_sdk_root}/middleware/MTK/connsys/inc",
+      "${mt793x_sdk_root}/middleware/MTK/dhcpd/inc",
+
+      "${lwip_root}/repo/lwip/ports/include",
+      "${lwip_root}/repo/lwip/src/include",
+
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/include",
+
+      "${mt793x_sdk_root}/prebuilt/middleware/MTK/connectivity/wlan/os",
+      "${mt793x_sdk_root}/prebuilt/middleware/MTK/connectivity/wlan/os/freertos/include",
+      "${mt793x_sdk_root}/prebuilt/middleware/MTK/connectivity/wlan/os/freertos/hif/axi/include",
+      "${mt793x_sdk_root}/prebuilt/middleware/MTK/connectivity/wlan/os/freertos/hif/common/include",
+      "${mt793x_sdk_root}/prebuilt/middleware/MTK/connectivity/wlan/include",
+      "${mt793x_sdk_root}/prebuilt/middleware/MTK/connectivity/wlan/include/chips",
+      "${mt793x_sdk_root}/prebuilt/middleware/MTK/connectivity/wlan/include/mgmt",
+      "${mt793x_sdk_root}/prebuilt/middleware/MTK/connectivity/wlan/include/nic",
+      "${mt793x_sdk_root}/prebuilt/middleware/MTK/connectivity/wlan/prealloc/include",
+      "${mt793x_sdk_root}/prebuilt/middleware/MTK/connectivity/wlan/os/freertos/include/fw_header",
+
+      "${mt793x_sdk_root}/prebuilt/middleware/MTK/minisupp/inc/inc",
+      "${mt793x_sdk_root}/prebuilt/middleware/MTK/minisupp/inc/src",
+      "${mt793x_sdk_root}/prebuilt/middleware/MTK/minisupp/inc/wpa_supplicant",
+
+      "${mt793x_sdk_root}/middleware/MTK/connectivity/wlan_service/include",
+      "${mt793x_sdk_root}/middleware/MTK/connectivity/wlan_service/service/include",
+      "${mt793x_sdk_root}/middleware/MTK/connectivity/wlan_service/glue/osal/include",
+      "${mt793x_sdk_root}/middleware/MTK/connectivity/wlan_service/glue/hal/include",
+
+      "${mt793x_sdk_root}/project/mt7933_hdk/apps/matter_sdk/inc",
+
+      "${mt793x_sdk_root}/",
+    ]
+
+    libs = [
+      #      "${mt793x_sdk_root}/middleware/wireless/framework/XCVR/lib/libRadio.a",
+    ]
+
+    defines = [
+      "gEnableBleInactivityTimeNotify=1",
+      "DUAL_MODE_APP=1",
+      "gMainThreadStackSize_c=5096",
+      "HEAP_SIZE=0xF000",
+      "gLoggingActive_d=0",
+      "gLogRingPlacementOffset_c=0xF000",
+      "MBEDTLS_CONFIG_FILE=\"mt793x-mbedtls-config.h\"",
+      "MTK_MINICLI_ENABLE",
+      "MTK_MDNS_ENABLE",
+      #"MTK_HAL_NO_LOG_ENABLE",
+      "MTK_DEBUG_LEVEL_ERROR",
+      "MTK_DEBUG_LEVEL_WARNING",
+      #"MTK_DEBUG_LEVEL_INFO",
+      #"MTK_DEBUG_LEVEL_DEBUG",
+    ]
+
+    # Wi-Fi
+    defines += [
+      "_HIF_AXI",
+      "MT7933",
+      "FREERTOS",
+      "CFG_SUPPORT_CONNAC2X",
+      "CFG_MTK_ANDROID_WMT",
+      "CFG_THIN_DRV",
+      "CFG_REMOVE_NO_CALLER=1",
+      "CFG_SUPPORT_LINK_QUALITY_MONITOR=0",
+      "CFG_SUPPORT_QA_TOOL=0",
+      "__LITTLE_ENDIAN=1",
+      "CFG_TC10_FEATURE=0",
+      "CFG_TC1_FEATURE=0",
+      "ARP_MONITER_ENABLE=0",
+      "CFG_SUPPORT_MANUAL_OWN_CTRL=1",
+      "CFG_SUPPORT_PRIV_SUSPEND_MODE=1",
+      "CFG_SUPPORT_PRIV_CHIP_CONFIG=1",
+      "CFG_SUPPORT_PRIV_RUN_HQA=1",
+      "CFG_SUPPORT_PRIV_GET_MIB_INFO=1",
+      "CFG_SUPPORT_PRIV_SET_PM=1",
+      "CFG_SUPPORT_PRIV_GET_DRV_VER=1",
+      "CFG_SUPPORT_PRIV_FIXED_RATE=1",
+      "CFG_SUPPORT_PRIV_STA_STAT=1",
+      "CFG_SUPPORT_PRIV_WTBL_INFO=1",
+      "CFG_SUPPORT_PRIV_SW_CTRL=1",
+      "CFG_SUPPORT_PRIV_DBGLVL=1",
+      "CFG_SUPPORT_PWR_LIMIT_COUNTRY=1",
+      "CFG_SUPPORT_ARP_OFFLOAD_CMD=1",
+      "CFG_SUPPORT_802_11W=1",
+      "CFG_SUPPORT_WPA3=1",
+      "CFG_SUPPORT_DEBUG_SOP=1",
+      "CFG_NUM_DIFFERENT_CHANNELS_STA=2",
+      "CFG_NUM_DIFFERENT_CHANNELS_P2P=2",
+      "CFG_DRIVER_INITIAL_RUNNING_MODE=3",
+      "CFG_ENABLE_WAKE_LOCK=0",
+      "CFG_DEFAULT_DBG_LEVEL=DBG_CLASS_ERROR",
+      "CFG_SUPPORT_ROAMING=1",
+      "CFG_ENABLE_EFUSE_MAC_ADDR=0",
+      "CFG_SUPPORT_SINGLE_SKU_LOCAL_DB=1",
+      "CFG_P2P_SCAN_REPORT_ALL_BSS=0",
+      "CFG_SCAN_CHANNEL_SPECIFIED=1",
+      "CFG_CHIP_RESET_SUPPORT=0",
+      "CFG_SUPPORT_FREERTOS_NVRAM=0",
+      "CFG_DIRECT_PBUF_WO_DMA=0",
+      "CFG_SUPPORT_NO_SUPPLICANT_OPS=0",
+      "CFG_NO_SCANINFO_IN_DRV=1",
+      "CFG_SUPPORT_NO_SUPPLICANT_OPS_P2P=0",
+      "CFG_ENABLE_WIFI_DIRECT=1",
+      "CFG_SUPPORT_DFS_MASTER=0",
+      "CFG_SUPPORT_DFS=1",
+      "CFG_SUPPORT_SAP_DFS_CHANNEL=0",
+      "CFG_AUTO_CHANNEL_SEL_SUPPORT=0",
+      "CFG_SUPPORT_WFD=0",
+      "CFG_SUPPORT_WFD_COMPOSE_IE=0",
+      "CFG_ENABLE_WIFI_DIRECT_CFG_80211=1",
+      "CFG_DUAL_P2PLIKE_INTERFACE=0",
+      "CFG_SUPPORT_P2P_GC=0",
+      "CFG_SUPPORT_P2P_SCAN=0",
+      "CFG_OPEN_GO_AS_AP_ONLY=0",
+      "CFG_SUPPORT_HOTSPOT_WPS_MANAGER=0",
+      "CFG_PROFILE_PBUF=0",
+      "CONFIG_WIFI_SUPPORT_MODULATION=1",
+      "CFG_SUPPORT_DEBUG_FS=0",
+      "CFG_SUPPORT_TSF_USING_BOOTTIME=1",
+      "CFG_SUPPORT_CHNL_CONFLICT_REVISE=1",
+      "CFG_SUPPORT_AEE=0",
+      "CFG_AMAZON_METRICS_LOG=0",
+      "BUILD_QA_DBG=0",
+      "CFG_BUILT_IN_DRIVER=0",
+      "CFG_SUPPORT_PWR_LIMIT_FILE_LOAD=0",
+      "CFG_ENABLE_DEWEIGHTING_CTRL=0",
+      "CFG_IPI_2CHAIN_SUPPORT=1",
+      "CFG_ENABLE_PS_INTV_CTRL=0",
+      "CFG_ENABLE_1RPD_MMPS_CTRL=0",
+      "CFG_SUPPORT_TWT=1",
+      "CFG_SUPPORT_802_11AX=1",
+      "CFG_WOW_SUPPORT=1",
+      "CFG_SUPPORT_PASSPOINT=0",
+      "CFG_HS20_DEBUG=0",
+      "CFG_ENABLE_GTK_FRAME_FILTER=0",
+      "CFG_MET_PACKET_TRACE_SUPPORT=0",
+      "CFG_MET_TAG_SUPPORT=0",
+
+      #"DBG=0",
+      "CFG_SUPPORT_NVDM=1",
+      "CONFIG_WLAN_SERVICE=1",
+      "CONFIG_TEST_ENGINE_OFFLOAD=1",
+      "CONFIG_WIFI_TEST_TOOL=1",
+      "CFG_BUFFER_BIN_FROM_FLASH=1",
+      "MTK_MT7933_CONSYS_WIFI_ENABLE",
+      "MTK_WLAN_SERVICE_ENABLE",
+      "MTK_MT7933_CONSYS_WIFI_ENABLE",
+      "MTK_WIFI_EMI_IN_PSRAM",
+      "CONFIG_WIFI_SINGLE_FW",
+      "CFG_PSRAM_ENABLE=0",
+      "CFG_SUPPORT_HE_ER=1",
+      "CFG_SUPPORT_FAST_CONNECT=1",
+      "MTK_MINISUPP_ENABLE",
+      "AP_DEFAULT_IPADDR=\"192.168.2.1\"",
+      "PRIMARY_DNS=\"192.168.2.1\"",
+      "SECONDARY_DNS=\"192.168.2.1\"",
+    ]
+
+    if (chip_mdns == "platform") {
+      defines += [
+        "OPENTHREAD_CONFIG_SRP_CLIENT_ENABLE=1",
+        "OPENTHREAD_CONFIG_ECDSA_ENABLE=1",
+        "OPENTHREAD_CONFIG_DNS_CLIENT_SERVICE_DISCOVERY_ENABLE=1",
+        "OPENTHREAD_CONFIG_DNS_CLIENT_ENABLE=1",
+      ]
+    }
+
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+
+    cflags = [
+      "-Wno-error=absolute-value",
+      "-Wno-unused-but-set-variable",
+      "-Wno-unused-variable",
+      "-Wno-unused-function",
+      "-Wno-conversion",
+      "-Wno-sign-compare",
+      "-Wno-clobbered",
+      "-Wno-implicit-fallthrough",
+      "-fno-optimize-strlen",
+      "-mthumb",
+      "-MMD",
+      "-MP",
+    ]
+
+    cflags += [ "-DPRODUCT_VERSION=7933" ]
+
+    defines += [
+      # HAL
+      "HAL_ASIC_MPU_MODULE_ENABLED",
+      "HAL_CACHE_MODULE_ENABLED",
+      "HAL_CLOCK_MODULE_ENABLED",
+      "HAL_DWT_MODULE_ENABLED",
+      "HAL_EINT_MODULE_ENABLED",
+      "HAL_FLASH_MODULE_ENABLED",
+      "HAL_GPIO_MODULE_ENABLED",
+      "HAL_GPT_MODULE_ENABLED",
+      #"MTK_HAL_PLAIN_LOG_ENABLE",
+      "HAL_PMU_MODULE_ENABLED",
+      "HAL_TOP_THERMAL_MODULE_ENABLED",
+      "HAL_MPU_MODULE_ENABLED",
+      "HAL_NVIC_MODULE_ENABLED",
+      "HAL_PSRAM_MODULE_ENABLED",
+      "HAL_PSRAM_NON_UHS_ENABLED",
+      "HAL_SLEEP_MANAGER_ENABLED",
+      "HAL_SPI_MASTER_MODULE_ENABLED",
+      "HAL_TRNG_MODULE_ENABLED",
+      "HAL_UART_MODULE_ENABLED",
+      "HAL_WDT_MODULE_ENABLED",
+      "HAL_TOP_THERMAL_MODULE_ENABLED",
+      # others
+      "MTK_NVDM_ENABLE",
+    ]
+
+    libs = [
+      "${mt793x_sdk_root}/prebuilt/middleware/MTK/nvdm/lib/libnvdm_CM4_GCC.a",
+    ]
+
+    # Now add our "system-header" include dirs
+    foreach(include_dir, mt793x_sdk_include_dirs) {
+      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
+    }
+  }
+
+  # TODO - Break up this monolith and make it configurable.
+  source_set(sdk_target_name) {
+    forward_variables_from(invoker, "*")
+
+    if (!defined(sources)) {
+      sources = []
+    }
+
+    sources += [
+      "${mt793x_sdk_root}/driver/board/mt7933_hdk/util/inc/io_def.h",
+      "${mt793x_sdk_root}/driver/board/mt7933_hdk/util/src/io_def.c",
+    ]
+
+    sources += [
+      "${mt793x_sdk_root}/kernel/rtos/FreeRTOS/SourceV10/croutine.c",
+      "${mt793x_sdk_root}/kernel/rtos/FreeRTOS/SourceV10/event_groups.c",
+      "${mt793x_sdk_root}/kernel/rtos/FreeRTOS/SourceV10/list.c",
+
+      #"${mt793x_sdk_root}/kernel/rtos/FreeRTOS/SourceV10/portable/MemMang/heap_ext.c",
+      "${mt793x_sdk_root}/kernel/rtos/FreeRTOS/SourceV10/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
+      "${mt793x_sdk_root}/kernel/rtos/FreeRTOS/SourceV10/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
+      "${mt793x_sdk_root}/kernel/rtos/FreeRTOS/SourceV10/portable/GCC/mt7933/port_tick.c",
+      "${mt793x_sdk_root}/kernel/rtos/FreeRTOS/SourceV10/portable/MemMang/heap_4.c",
+      "${mt793x_sdk_root}/kernel/rtos/FreeRTOS/SourceV10/queue.c",
+      "${mt793x_sdk_root}/kernel/rtos/FreeRTOS/SourceV10/stream_buffer.c",
+      "${mt793x_sdk_root}/kernel/rtos/FreeRTOS/SourceV10/tasks.c",
+      "${mt793x_sdk_root}/kernel/rtos/FreeRTOS/SourceV10/timers.c",
+    ]
+
+    sources += [
+      "${mt793x_sdk_root}/kernel/service/src/exception_handler.c",
+      "${mt793x_sdk_root}/kernel/service/src/os_port_callback.c",
+      "${mt793x_sdk_root}/kernel/service/src/os_utils.c",
+    ]
+
+    sources += [
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/eint/hal_eint.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/eint/hdl_eint.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/eint/mhal_eint.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_asic_mpu.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_cache.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_cache_internal.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_clk.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_dwt.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_dwt_internal.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_flash.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_gpio.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_gpt.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_gpt_internal.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_log.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_mpu_internal.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_nvic.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_nvic_internal.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_psram.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_pmu.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_pmu_wrap_interface.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_sys.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_spi_master.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_spi_master_internal.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_top_thermal.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_trng.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_trng_internal.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_uart.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_wdt.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/hal_wdt_internal.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/common/mhal_osai.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/psramc/Hal_io.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/psramc/non_uhs_psram.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/psramc/pemi.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/psramc/psramc_pi_basic_api.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/psramc/psramc_pi_calibration_api.c",
+      "${mt793x_sdk_root}/driver/chip/mt7933/src/psramc/psramc_pi_main.c",
+    ]
+
+    sources += [
+      "${mt793x_sdk_root}/kernel/service/inc/swla.h",
+      "${mt793x_sdk_root}/kernel/service/inc/syslog.h",
+      "${mt793x_sdk_root}/kernel/service/src/swla.c",
+      "${mt793x_sdk_root}/kernel/service/src/syslog.c",
+      "${mt793x_sdk_root}/kernel/service/src/toi.c",
+    ]
+    
+    sources += [ "${mt793x_sdk_root}/middleware/MTK/dhcpd/src/dhcpd.c" ]
+
+    sources += [
+      "${mt793x_sdk_root}/middleware/MTK/connectivity/wlan/flash_addr.c",
+      "${mt793x_sdk_root}/middleware/MTK/connectivity/wlan/mgmt/reg_rule.c",
+      "${mt793x_sdk_root}/middleware/MTK/connectivity/wlan/os/freertos/gl_init.c",
+      "${mt793x_sdk_root}/middleware/MTK/connectivity/wlan/os/freertos/gl_kal.c",
+      "${mt793x_sdk_root}/middleware/MTK/connectivity/wlan/os/freertos/gl_p2p.c",
+      "${mt793x_sdk_root}/middleware/MTK/connectivity/wlan/os/freertos/gl_upperlayer.c",
+      "${mt793x_sdk_root}/middleware/MTK/connectivity/wlan/os/freertos/gl_wifi_cli.c",
+      "${mt793x_sdk_root}/middleware/MTK/connectivity/wlan/os/freertos/netif/wifi_netif.c",
+      "${mt793x_sdk_root}/middleware/MTK/connectivity/wlan/os/freertos/wifi_api.c",
+    ]
+
+    sources += [ "${mt793x_sdk_root}/middleware/MTK/connsys/src/mt7933_pos.c" ]
+
+    sources += [
+      "${mt793x_sdk_root}/middleware/MTK/nvdm/src/nvdm_ctrl.c",
+      "${mt793x_sdk_root}/middleware/MTK/nvdm/src/nvdm_port.c",
+    ]
+
+    sources += [
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/aes.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/aes_alt.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/aesni.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/arc4.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/aria.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/asn1parse.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/asn1write.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/base64.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/bignum.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/blowfish.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/camellia.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ccm.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/certs.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/chacha20.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/chachapoly.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/cipher.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/cipher_wrap.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/cmac.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ctr_drbg.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/debug.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/des.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/des_alt.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/dhm.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ecdh.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ecdsa.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ecjpake.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ecp.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ecp_curves.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/entropy.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/entropy_hardware_poll.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/entropy_poll.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/error.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/gcm.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/havege.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/hkdf.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/hmac_drbg.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/md.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/md2.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/md4.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/md5.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/md5_alt.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/memory_buffer_alloc.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/net_sockets.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/nist_kw.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/oid.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/padlock.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/pem.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/pk.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/pk_wrap.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/pkcs11.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/pkcs12.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/pkcs5.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/pkparse.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/pkwrite.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/platform.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/platform_util.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/poly1305.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/psa_crypto.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/psa_crypto_driver_wrappers.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/psa_crypto_se.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/psa_crypto_slot_management.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/psa_crypto_storage.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/psa_its_file.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ripemd160.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/rsa.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/rsa_internal.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/sha1.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/sha1_alt.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/sha256.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/sha256_alt.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/sha512.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/sha512_alt.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ssl_cache.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ssl_ciphersuites.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ssl_cli.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ssl_cookie.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ssl_msg.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ssl_srv.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ssl_ticket.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ssl_tls.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/ssl_tls13_keys.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/threading.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/threading_alt.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/timing.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/version.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/version_features.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/x509.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/x509_create.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/x509_crl.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/x509_crt.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/x509_csr.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/x509write_crt.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/x509write_csr.c",
+      "${mt793x_sdk_root}/middleware/third_party/mbedtls/library/xtea.c",
+    ]
+
+    sources += [
+      "${mt793x_sdk_root}/project/mt7933_hdk/apps/matter_sdk/GCC/startup_mt7933.s",
+      "${mt793x_sdk_root}/project/mt7933_hdk/apps/matter_sdk/GCC/syscalls.c",
+      "${mt793x_sdk_root}/project/mt7933_hdk/apps/matter_sdk/src/filogic.c",
+      "${mt793x_sdk_root}/project/mt7933_hdk/apps/matter_sdk/src/filogic_button.c",
+      "${mt793x_sdk_root}/project/mt7933_hdk/apps/matter_sdk/src/filogic_led.c",
+      "${mt793x_sdk_root}/project/mt7933_hdk/apps/matter_sdk/src/network_default_config.c",
+      "${mt793x_sdk_root}/project/mt7933_hdk/apps/matter_sdk/src/nvdm_config.c",
+      "${mt793x_sdk_root}/project/mt7933_hdk/apps/matter_sdk/src/platform_default_config.c",
+      "${mt793x_sdk_root}/project/mt7933_hdk/apps/matter_sdk/src/regions_init.c",
+      "${mt793x_sdk_root}/project/mt7933_hdk/apps/matter_sdk/src/sys_init.c",
+      "${mt793x_sdk_root}/project/mt7933_hdk/apps/matter_sdk/src/system_mt7933.c",
+      "${mt793x_sdk_root}/project/mt7933_hdk/apps/matter_sdk/src/wifi_cfg_default_config.c",
+    ]
+
+    libs = []
+
+    libs += [
+      "${mt793x_sdk_root}/prebuilt/driver/chip/mt7933/lib/lib_gcpu.a",
+      "${mt793x_sdk_root}/prebuilt/driver/chip/mt7933/lib/libefuse.a",
+      "${mt793x_sdk_root}/prebuilt/driver/chip/mt7933/lib/libhal_core_CM33_GCC.a",
+    ]
+
+    # Wi-Fi
+    libs += [
+      "${mt793x_sdk_root}/out/mt7933_hdk/qfn_sdk_demo/lib/libwifi.a",
+      #"${mt793x_sdk_root}/prebuilt/middleware/MTK/connectivity/wlan/lib/libwifi.a",
+      #"${mt793x_sdk_root}/prebuilt/middleware/MTK/minisupp/lib/libminisupp.a",
+      "${mt793x_sdk_root}/out/mt7933_hdk/qfn_sdk_demo/lib/libminisupp.a",
+    ]
+
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+
+    if (!defined(public_configs)) {
+      public_configs = []
+    }
+
+    public_configs += [ ":${sdk_target_name}_config" ]
+  }
+}

@@ -63,6 +63,11 @@ static_library("shell") {
       "MainLoopCYW30739.cpp",
       "streamer_cyw30739.cpp",
     ]
+  } else if (chip_device_platform == "mt793x") {
+    sources += [
+      "MainLoopDefault.cpp",
+      "streamer_mt793x.cpp",
+    ]
   } else if (current_os == "zephyr") {
     sources += [
       "MainLoopZephyr.cpp",

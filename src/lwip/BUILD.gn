@@ -34,6 +34,7 @@ assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "qpg" || lwip_platform == "mbed" ||
            lwip_platform == "psoc6" || lwip_platform == "cyw30739" ||
            lwip_platform == "bl602" || lwip_platform == "mw320",
+           lwip_platform == "mt793x",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -62,6 +63,8 @@ if (lwip_platform == "cc13x2_26x2") {
   import("//build_overrides/bl602_sdk.gni")
 } else if (lwip_platform == "mw320") {
   import("//build_overrides/mw320_sdk.gni")
+} else if (lwip_platform == "mt793x") {
+  import("//build_overrides/mt793x_sdk.gni")
 }
 
 buildconfig_header("lwip_buildconfig") {
@@ -158,6 +161,8 @@ if (current_os == "zephyr" || current_os == "mbed") {
       public += [ "standalone/arch/sys_arch.h" ]
       sources += [ "standalone/sys_arch.c" ]
     } else if (lwip_platform == "cyw30739") {
+    } else if (lwip_platform == "mt793x") {
+      sources += [ "mt793x/sys_arch.c" ]
     } else {
       public += [
         "${lwip_platform}/lwippools.h",
@@ -183,6 +188,8 @@ if (current_os == "zephyr" || current_os == "mbed") {
       public_deps += [ "${cyw30739_sdk_build_root}:cyw30739_sdk" ]
     } else if (lwip_platform == "bl602") {
       public_deps += [ "${bl602_sdk_build_root}:bl602_sdk" ]
+    } else if (lwip_platform == "mt793x") {
+      public_deps += [ "${mt793x_sdk_build_root}:mt793x_sdk" ]
     }
 
     public_configs = [

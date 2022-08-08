@@ -285,6 +285,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Set this to true to enable mw320 builds by default.
     enable_mw320_builds = false
+
+    # Set this to true to enable mt793x builds by default.
+    enable_mt793x_builds = false
   }
 
   declare_args() {
@@ -390,6 +393,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Build the mw320 shell app example.
     enable_mw320_shell_build = enable_mw320_builds
+
+    # Build the mt793x shell app example.
+    enable_mt793x_shell_app_build = enable_mt793x_builds
 
     enable_fake_tests = enable_default_builds && host_os == "linux"
 
@@ -680,6 +686,12 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     extra_build_deps += [ ":mw320_shell" ]
+  }
+
+  if (enable_mt793x_shell_app_build) {
+    group("mt793x_shell_app") {
+      deps = [ "${chip_root}/examples/shell/k32w(${chip_root}/config/mt793x/toolchain:mt793x_shell_app)" ]
+    }
   }
 
   group("default") {
