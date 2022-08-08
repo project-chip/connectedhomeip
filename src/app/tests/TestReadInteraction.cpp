@@ -521,6 +521,8 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
         err = writer.Finalize(&readRequestbuf);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+        // Call ProcessReadRequest directly, because OnInitialRequest sends status
+        // messages on the wire instead of returning an error.
         err = readHandler.ProcessReadRequest(std::move(readRequestbuf));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }

@@ -105,9 +105,9 @@ void ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
     if (err != CHIP_NO_ERROR)
     {
         Status status = Status::InvalidAction;
-        if (err == CHIP_IM_GLOBAL_STATUS(PathsExhausted))
+        if (err.IsIMStatus())
         {
-            status = Status::PathsExhausted;
+            status = StatusIB(err).mStatus;
         }
         StatusResponse::Send(status, mExchangeCtx.Get(), /* aExpectResponse = */ false);
         Close();

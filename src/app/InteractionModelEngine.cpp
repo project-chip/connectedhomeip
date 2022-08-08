@@ -460,8 +460,6 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
 
     handler->OnInitialRequest(std::move(aPayload));
 
-    // TODO: Should probably map various TLV errors into InvalidAction, here
-    // or inside the read handler.
     return Status::Success;
 }
 
