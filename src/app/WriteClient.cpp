@@ -185,17 +185,18 @@ CHIP_ERROR WriteClient::StartNewMessage()
     {
         reservedSize = static_cast<uint16_t>(packet->AvailableDataLength() - kMaxSecureSduLengthBytes);
     }
-
+    ChipLogError(DataManagement, "1available size is %u, reserve size is %u ! ", packet->AvailableDataLength(), reservedSize);
     // ... and we need to reserve some extra space for the MIC field.
     reservedSize = static_cast<uint16_t>(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
-
+    ChipLogError(DataManagement, "2available size is %u, reserve size is %u !", packet->AvailableDataLength(), reservedSize);
     // ... and the overhead for end of AttributeDataIBs (end of container), more chunks flag, end of WriteRequestMessage (another
     // end of container).
     reservedSize = static_cast<uint16_t>(reservedSize + kReservedSizeForTLVEncodingOverhead);
-
+    ChipLogError(DataManagement, "3available size is %u, reserve size is %u ! ", packet->AvailableDataLength(), reservedSize);
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // ... and for unit tests.
     reservedSize = static_cast<uint16_t>(reservedSize + mReservedSize);
+        ChipLogError(DataManagement, "4available size is %u, reserve size is %u ", packet->AvailableDataLength(), reservedSize);
 #endif
 
     mMessageWriter.Init(std::move(packet));
