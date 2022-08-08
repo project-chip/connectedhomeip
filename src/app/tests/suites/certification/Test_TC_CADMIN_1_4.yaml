@@ -14,6 +14,9 @@
 
 name: 24.1.4. [TC-CADMIN-1.4] Node Behavior using BCM [DUT - Commissionee]
 
+PICS:
+    - CADMIN.S
+
 config:
     nodeId: 0x12344321
     timeout: 300

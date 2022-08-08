@@ -15,6 +15,9 @@
 
 name: 132.2.1. [TC-ACL-2.1] Simple attributes
 
+PICS:
+    - ACL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

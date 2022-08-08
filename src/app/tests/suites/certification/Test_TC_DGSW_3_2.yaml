@@ -15,6 +15,9 @@
 
 name: 3.3.2. [TC-DGSW-3.2] Commands Generated [{DUT_Client}]
 
+PICS:
+    - DGSW.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

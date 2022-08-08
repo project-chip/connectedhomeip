@@ -17,6 +17,9 @@ name:
     Credential , Set Credential Response, Get Credential Status, Get Credential
     Status Response, Clear Credential [DUT-Server]
 
+PICS:
+    - DRLK.S
+
 config:
     nodeId: 0x12344321
     cluster: "Door Lock"

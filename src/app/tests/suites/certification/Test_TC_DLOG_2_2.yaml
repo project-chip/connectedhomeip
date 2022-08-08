@@ -17,6 +17,9 @@ name:
     55.2.2. [TC-DLOG-2.2] Diagnostic Logs Cluster Commands Checks without BDX
     [DUT-Server]
 
+PICS:
+    - DLOG.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

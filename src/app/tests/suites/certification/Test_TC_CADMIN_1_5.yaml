@@ -16,6 +16,9 @@ name:
     24.1.5. [TC-CADMIN-1.5] Commissioning window handling timeout and revocation
     using ECM [DUT_CE - Commissionee]
 
+PICS:
+    - CADMIN.S
+
 config:
     nodeId: 0x12344321
     timeout: 300

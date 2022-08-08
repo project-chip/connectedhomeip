@@ -16,6 +16,9 @@
 name:
     3.3.1.[TC-SU-2.3]Transfer of Software Update images between DUT and TH/OTA-P
 
+PICS:
+    - MCORE.OTA.Requestor
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

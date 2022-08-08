@@ -15,6 +15,9 @@
 
 name: 3.1.1. [TC-DGWIFI-1.1] Global Attributes [DUT as Server]
 
+PICS:
+    - DGWIFI.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

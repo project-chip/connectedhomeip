@@ -15,6 +15,9 @@
 
 name: 4.3.2. [TC-OO-3.2] Functionality with client as DUT
 
+PICS:
+    - OO.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

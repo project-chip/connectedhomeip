@@ -16,6 +16,9 @@ name:
     19.1.4. [TC-MEDIAINPUT-1.4] Global attributes - Media Input Cluster (DUT as
     Server)
 
+PICS:
+    - MEDIAINPUT.S
+
 config:
     nodeId: 0x12344321
     cluster: "Media Input"

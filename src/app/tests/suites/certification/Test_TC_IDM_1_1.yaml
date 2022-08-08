@@ -15,6 +15,9 @@
 
 name: 3.1.1. [TC-IDM-1.1] Invoke Request Action from DUT to TH - [{DUT_Client}]
 
+PICS:
+    - MCORE.IDM.C.InvokeRequest
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
