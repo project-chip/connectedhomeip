@@ -213,7 +213,6 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     virtual CHIP_ERROR InitializeStaticResourcesBeforeServerInit()
     {
         static chip::KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
-        static chip::PersistentStorageOperationalKeystoreHSM sPersistentStorageOperationalKeystore;
         static chip::PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
         static chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
         static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
