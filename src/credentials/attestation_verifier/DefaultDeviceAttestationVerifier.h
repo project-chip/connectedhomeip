@@ -41,10 +41,18 @@ public:
                                                    const ByteSpan & attestationSignatureBuffer,
                                                    const Crypto::P256PublicKey & dacPublicKey, const ByteSpan & csrNonce) override;
 
-protected:
+    bool GetUseLocalPAARootStore() { return mUseLocalPAARootStore; }
+    void SetUseLocalPAARootStore(bool useLocalPAARootStore) { mUseLocalPAARootStore = useLocalPAARootStore; }
+
+    bool GetUseLocalCSAStore() { return mUseLocalCSAStore; }
+    void SetUseLocalCSAStore(bool useLocalCSAStore) { mUseLocalCSAStore = useLocalCSAStore; }
+
     DefaultDACVerifier() {}
 
+protected:
     const AttestationTrustStore * mAttestationTrustStore;
+    bool mUseLocalPAARootStore = true;
+    bool mUseLocalCSAStore     = true;
 };
 
 /**
