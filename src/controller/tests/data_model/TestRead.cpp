@@ -1646,6 +1646,8 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         //
         ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1500), [&]() { return callback.mOnError >= 1; });
 
+        ctx.GetLoopback().mNumMessagesToDrop = 0;
+
         NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
         NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_ERROR_TIMEOUT);
         NL_TEST_ASSERT(apSuite, callback.mOnDone == 1);
