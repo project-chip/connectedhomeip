@@ -48,10 +48,8 @@ public:
      */
     CHIP_ERROR Init(PersistentStorageDelegate * storage)
     {
-        VerifyOrReturnError(mStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        IgnoreUnusedVariable(storage);
         mPendingFabricIndex       = kUndefinedFabricIndex;
-        mIsExternallyOwnedKeypair = false;
-        mStorage                  = storage;
         mPendingKeypair           = nullptr;
         mIsPendingKeypairActive   = false;
         return CHIP_NO_ERROR;
@@ -62,10 +60,7 @@ public:
      */
     void Finish()
     {
-        VerifyOrReturn(mStorage != nullptr);
-
         ResetPendingKey();
-        mStorage = nullptr;
     }
 
     bool HasPendingOpKeypair() const override { return (mPendingKeypair != nullptr); }
@@ -84,26 +79,19 @@ public:
 protected:
     void ResetPendingKey()
     {
-        if (!mIsExternallyOwnedKeypair && (mPendingKeypair != nullptr))
+        if (mPendingKeypair != nullptr)
         {
             Platform::Delete(mPendingKeypair);
         }
         mPendingKeypair           = nullptr;
-        mIsExternallyOwnedKeypair = false;
         mIsPendingKeypairActive   = false;
         mPendingFabricIndex       = kUndefinedFabricIndex;
     }
-
-    PersistentStorageDelegate * mStorage = nullptr;
 
     // This pending fabric index is `kUndefinedFabricIndex` if there isn't a pending keypair override for a given fabric.
     FabricIndex mPendingFabricIndex          = kUndefinedFabricIndex;
     Crypto::P256KeypairHSM * mPendingKeypair = nullptr;
     bool mIsPendingKeypairActive             = false;
-
-    // If overridding NewOpKeypairForFabric method in a subclass, set this to true in
-    // `NewOpKeypairForFabric` if the mPendingKeypair should not be deleted when no longer in use.
-    bool mIsExternallyOwnedKeypair = false;
 };
 
 } // namespace chip
