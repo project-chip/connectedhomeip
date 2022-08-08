@@ -419,7 +419,7 @@ tests:
 
           CHIP:CTL: Performing next commissioning step "FindOperational"
           CHIP:CSM: FindOrEstablishSession: PeerId = BFCBED670D527591:000000000001B669
-          CHIP:CSM: FindOrEstablishSession: No existing OperationalDeviceProxy instance found
+          CHIP:CSM: FindOrEstablishSession: No existing OperationalSessionSetup instance found
       disabled: true
 
     - label: "Reboot TH"
@@ -446,7 +446,7 @@ tests:
 
           CHIP:CTL: Performing next commissioning step "FindOperational"
           CHIP:CSM: FindOrEstablishSession: PeerId = BFCBED670D527591:000000000001B669
-          CHIP:CSM: FindOrEstablishSession: No existing OperationalDeviceProxy instance found
+          CHIP:CSM: FindOrEstablishSession: No existing OperationalSessionSetup instance found
       disabled: true
 
     - label: "Commissioner starts discovery of TH using Operational Discovery"

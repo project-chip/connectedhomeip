@@ -67,10 +67,11 @@ protected:
     void OnWaitForMs() override { NextTest(); };
 
     /////////// Interaction Model Interface /////////
-    chip::DeviceProxy * GetDevice(const char * identity) override { return mDevices[identity]; }
+    chip::DeviceProxy * GetDevice(const char * identity) override { return mDevices[identity].get(); }
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override{};
 
-    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
+    static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                    chip::SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override;
@@ -94,7 +95,7 @@ protected:
 
     chip::Optional<char *> mPICSFilePath;
     chip::Optional<uint16_t> mTimeout;
-    std::map<std::string, chip::DeviceProxy *> mDevices;
+    std::map<std::string, std::unique_ptr<chip::OperationalDeviceProxy>> mDevices;
 
     // When set to false, prevents interaction model events from affecting the current test status.
     // This flag exists because if an error happens while processing a response the allocated

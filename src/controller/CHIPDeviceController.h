@@ -31,8 +31,8 @@
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/ClusterStateCache.h>
-#include <app/OperationalDeviceProxy.h>
-#include <app/OperationalDeviceProxyPool.h>
+#include <app/OperationalSessionSetup.h>
+#include <app/OperationalSessionSetupPool.h>
 #include <controller/AbstractDnssdDiscoveryController.h>
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPCluster.h>
@@ -371,12 +371,12 @@ protected:
 
     /// Fetches the session to use for the current device. Allows overriding
     /// in case subclasses want to create the session if it does not yet exist
-    virtual OperationalDeviceProxy * GetDeviceSession(const ScopedNodeId & peerId);
+    virtual OperationalSessionSetup * GetDeviceSession(const ScopedNodeId & peerId);
 
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 
 private:
-    void ReleaseOperationalDevice(OperationalDeviceProxy * device);
+    void ReleaseOperationalDevice(OperationalSessionSetup * device);
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
@@ -661,7 +661,7 @@ public:
     void OnDone(app::ReadClient *) override;
 
     // Commissioner will establish new device connections after PASE.
-    OperationalDeviceProxy * GetDeviceSession(const ScopedNodeId & peerId) override;
+    OperationalSessionSetup * GetDeviceSession(const ScopedNodeId & peerId) override;
 
     // Issue an NOC chain using the associated OperationalCredentialsDelegate. The NOC chain will
     // be provided in X509 DER format.
@@ -760,7 +760,7 @@ private:
     /* Callback called when adding root cert to device results in failure */
     static void OnRootCertFailureResponse(void * context, CHIP_ERROR error);
 
-    static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
+    static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     static void OnDeviceAttestationInformationVerification(void * context, Credentials::AttestationVerificationResult result);
