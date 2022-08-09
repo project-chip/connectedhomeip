@@ -17,6 +17,9 @@ name:
     105.2.1. [TC-LUNIT-2.1] Read and Write Unit Localization Cluster Attributes
     [DUT as Client]
 
+PICS:
+    - LUNIT.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

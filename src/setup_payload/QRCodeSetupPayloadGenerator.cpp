@@ -168,8 +168,9 @@ static CHIP_ERROR generateBitSet(PayloadContents & payload, MutableByteSpan & bi
         populateBits(bits.data(), offset, payload.productID, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, static_cast<uint64_t>(payload.commissioningFlow),
                                       kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits));
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.rendezvousInformation.Raw(), kRendezvousInfoFieldLengthInBits,
-                                      kTotalPayloadDataSizeInBits));
+    VerifyOrReturnError(payload.rendezvousInformation.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.rendezvousInformation.Value().Raw(),
+                                      kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.discriminator.GetLongValue(),
                                       kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(

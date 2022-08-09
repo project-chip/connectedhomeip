@@ -17,6 +17,9 @@ name:
     50.2.5. [TC-DGTHREAD-2.5] Thread Network Diagnostics Cluster
     Events[DUT-Server]
 
+PICS:
+    - DGTHREAD.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

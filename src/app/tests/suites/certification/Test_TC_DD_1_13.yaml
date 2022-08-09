@@ -17,6 +17,11 @@ name:
     3.1.13. [TC-DD-1.13] Onboarding Payload Verification - Custom Flow = 1 [DUT
     - Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.QR
+    - MCORE.DD.USER_INTENT_COMM_FLOW
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

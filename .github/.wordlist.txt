@@ -151,7 +151,6 @@ bouffalolab
 BRD
 breakpoint
 bredr
-BridgedActions
 BridgedDeviceBasic
 bridgedLightEndpoint
 bringup
@@ -560,6 +559,7 @@ GenericThreadStackManagerImpl
 GenericWiFiConfigurationManagerImpl
 GetDeviceId
 GetDeviceInfo
+DeviceInstanceInfoProvider
 GetDns
 GetIP
 getManualTests

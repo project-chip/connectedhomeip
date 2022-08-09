@@ -17,6 +17,9 @@ name:
     3.4.2. [TC-SU-2.5] Handling different ApplyUpdateResponse scenarios on
     Requestor
 
+PICS:
+    - MCORE.OTA.Requestor
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

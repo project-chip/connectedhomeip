@@ -19,6 +19,7 @@
 #include "AndroidOperationalCredentialsIssuer.h"
 #include <algorithm>
 #include <credentials/CHIPCert.h>
+#include <credentials/DeviceAttestationConstructor.h>
 #include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMem.h>
@@ -30,6 +31,7 @@
 
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 
 namespace chip {
 namespace Controller {
@@ -39,6 +41,13 @@ constexpr const char kOperationalCredentialsRootCertificateStorage[] = "AndroidC
 using namespace Credentials;
 using namespace Crypto;
 using namespace TLV;
+
+static CHIP_ERROR N2J_CSRInfo(JNIEnv * env, jbyteArray nonce, jbyteArray elements, jbyteArray elementsSignature, jbyteArray csr,
+                              jobject & outCSRInfo);
+
+static CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, jbyteArray challenge, jbyteArray nonce, jbyteArray elements,
+                                      jbyteArray elementsSignature, jbyteArray dac, jbyteArray pai, jbyteArray cd,
+                                      jbyteArray firmwareInfo, jobject & outAttestationInfo);
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::Initialize(PersistentStorageDelegate & storage, AutoCommissioner * autoCommissioner,
                                                            jobject javaObjectRef)
@@ -149,8 +158,9 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
 {
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = JniReferences::GetInstance().FindMethod(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef,
-                                                  "onNOCChainGenerationNeeded", "([B[B[B[B[B[B[B[B[B)V", &method);
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onNOCChainGenerationNeeded", "([B[B[B[B[B[B[B[B[B)V",
+                                                  &method);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Error invoking onNOCChainGenerationNeeded: %" CHIP_ERROR_FORMAT, err.Format());
@@ -159,52 +169,103 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
 
     mOnNOCCompletionCallback = onCompletion;
 
-    JniReferences::GetInstance().GetEnvForCurrentThread()->ExceptionClear();
+    env->ExceptionClear();
 
-    jbyteArray javaCsr;
-    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csrElements.data(),
-                                               csrElements.size(), javaCsr);
+    jbyteArray javaCsrElements;
+    JniReferences::GetInstance().N2J_ByteArray(env, csrElements.data(), csrElements.size(), javaCsrElements);
 
     jbyteArray javaCsrNonce;
-    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csrNonce.data(),
-                                               csrNonce.size(), javaCsrNonce);
+    JniReferences::GetInstance().N2J_ByteArray(env, csrNonce.data(), csrNonce.size(), javaCsrNonce);
 
     jbyteArray javaCsrSignature;
-    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csrSignature.data(),
-                                               csrSignature.size(), javaCsrSignature);
+    JniReferences::GetInstance().N2J_ByteArray(env, csrSignature.data(), csrSignature.size(), javaCsrSignature);
+
+    ChipLogProgress(Controller, "Parsing Certificate Signing Request");
+    TLVReader reader;
+    reader.Init(csrElements);
+
+    if (reader.GetType() == kTLVType_NotSpecified)
+    {
+        ReturnErrorOnFailure(reader.Next());
+    }
+
+    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(reader.GetTag() == AnonymousTag(), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+
+    TLVType containerType;
+    ReturnErrorOnFailure(reader.EnterContainer(containerType));
+    ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, TLV::ContextTag(1)));
+
+    ByteSpan csr(reader.GetReadPoint(), reader.GetLength());
+    reader.ExitContainer(containerType);
+
+    jbyteArray javaCsr;
+    JniReferences::GetInstance().N2J_ByteArray(env, csr.data(), csr.size(), javaCsr);
+
+    jobject csrInfo;
+    err = N2J_CSRInfo(env, javaCsrNonce, javaCsrElements, javaCsrSignature, javaCsr, csrInfo);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to create CSRInfo");
+        return err;
+    }
 
     jbyteArray javaAttestationChallenge;
-    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), attestationChallenge.data(),
-                                               attestationChallenge.size(), javaAttestationChallenge);
+    JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), attestationChallenge.size(),
+                                               javaAttestationChallenge);
 
     const ByteSpan & attestationElements = mAutoCommissioner->GetCommissioningParameters().GetAttestationElements().Value();
     jbyteArray javaAttestationElements;
-    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), attestationElements.data(),
-                                               attestationElements.size(), javaAttestationElements);
+    JniReferences::GetInstance().N2J_ByteArray(env, attestationElements.data(), attestationElements.size(),
+                                               javaAttestationElements);
 
     const ByteSpan & attestationNonce = mAutoCommissioner->GetCommissioningParameters().GetAttestationNonce().Value();
     jbyteArray javaAttestationNonce;
-    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), attestationNonce.data(),
-                                               attestationNonce.size(), javaAttestationNonce);
+    JniReferences::GetInstance().N2J_ByteArray(env, attestationNonce.data(), attestationNonce.size(), javaAttestationNonce);
 
     const ByteSpan & attestationElementsSignature =
         mAutoCommissioner->GetCommissioningParameters().GetAttestationSignature().Value();
     jbyteArray javaAttestationElementsSignature;
-    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(),
-                                               attestationElementsSignature.data(), attestationElementsSignature.size(),
+    JniReferences::GetInstance().N2J_ByteArray(env, attestationElementsSignature.data(), attestationElementsSignature.size(),
                                                javaAttestationElementsSignature);
 
     jbyteArray javaDAC;
-    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), DAC.data(), DAC.size(),
-                                               javaDAC);
+    JniReferences::GetInstance().N2J_ByteArray(env, DAC.data(), DAC.size(), javaDAC);
 
     jbyteArray javaPAI;
-    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), PAI.data(), PAI.size(),
-                                               javaPAI);
+    JniReferences::GetInstance().N2J_ByteArray(env, PAI.data(), PAI.size(), javaPAI);
 
-    JniReferences::GetInstance().GetEnvForCurrentThread()->CallVoidMethod(
-        mJavaObjectRef, method, javaCsr, javaCsrNonce, javaCsrSignature, javaAttestationChallenge, javaAttestationElements,
-        javaAttestationNonce, javaAttestationElementsSignature, javaDAC, javaPAI);
+    ByteSpan certificationDeclarationSpan;
+    ByteSpan attestationNonceSpan;
+    uint32_t timestampDeconstructed;
+    ByteSpan firmwareInfoSpan;
+    DeviceAttestationVendorReservedDeconstructor vendorReserved;
+
+    err = DeconstructAttestationElements(attestationElements, certificationDeclarationSpan, attestationNonceSpan,
+                                         timestampDeconstructed, firmwareInfoSpan, vendorReserved);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to create parse attestation elements");
+        return err;
+    }
+
+    jbyteArray javaCD;
+    JniReferences::GetInstance().N2J_ByteArray(env, certificationDeclarationSpan.data(), certificationDeclarationSpan.size(),
+                                               javaCD);
+
+    jbyteArray javaFirmwareInfo;
+    JniReferences::GetInstance().N2J_ByteArray(env, firmwareInfoSpan.data(), firmwareInfoSpan.size(), javaFirmwareInfo);
+
+    jobject attestationInfo;
+    err = N2J_AttestationInfo(env, javaAttestationChallenge, javaAttestationNonce, javaAttestationElements,
+                              javaAttestationElementsSignature, javaDAC, javaPAI, javaCD, javaFirmwareInfo, attestationInfo);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to create AttestationInfo");
+        return err;
+    }
+
+    env->CallVoidMethod(mJavaObjectRef, method, csrInfo, attestationInfo);
     return CHIP_NO_ERROR;
 }
 
@@ -310,6 +371,52 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const Byte
                                                csrElements.size(), javaCsr);
     JniReferences::GetInstance().GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, javaCsr);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR N2J_CSRInfo(JNIEnv * env, jbyteArray nonce, jbyteArray elements, jbyteArray elementsSignature, jbyteArray csr,
+                       jobject & outCSRInfo)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    jmethodID constructor;
+    jclass infoClass;
+
+    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/CSRInfo", infoClass);
+    JniClass attestationInfoClass(infoClass);
+    SuccessOrExit(err);
+
+    env->ExceptionClear();
+    constructor = env->GetMethodID(infoClass, "<init>", "([B[B[B[B)V");
+    VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+
+    outCSRInfo = (jobject) env->NewObject(infoClass, constructor, nonce, elements, elementsSignature, csr);
+
+    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+exit:
+    return err;
+}
+
+CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, jbyteArray challenge, jbyteArray nonce, jbyteArray elements,
+                               jbyteArray elementsSignature, jbyteArray dac, jbyteArray pai, jbyteArray cd, jbyteArray firmwareInfo,
+                               jobject & outAttestationInfo)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    jmethodID constructor;
+    jclass infoClass;
+
+    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/AttestationInfo", infoClass);
+    JniClass attestationInfoClass(infoClass);
+    SuccessOrExit(err);
+
+    env->ExceptionClear();
+    constructor = env->GetMethodID(infoClass, "<init>", "([B[B[B[B[B[B[B[B)V");
+    VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+
+    outAttestationInfo =
+        (jobject) env->NewObject(infoClass, constructor, challenge, nonce, elements, elementsSignature, dac, pai, cd, firmwareInfo);
+
+    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+exit:
+    return err;
 }
 
 } // namespace Controller

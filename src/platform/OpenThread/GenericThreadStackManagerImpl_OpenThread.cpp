@@ -1587,7 +1587,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::ChannelMask::Id: {
+    case ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::Id: {
         err = CHIP_ERROR_INCORRECT_STATE;
         if (otDatasetIsCommissioned(mOTInst))
         {

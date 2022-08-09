@@ -14,6 +14,9 @@
 
 name: 18.1.1. [TC-LVL-1.1] Global attributes with server as DUT
 
+PICS:
+    - LVL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Level Control"

@@ -16,6 +16,9 @@ name:
     24.1.6. [TC-CADMIN-1.6] Commissioning window handling timeout and revocation
     using BCM [DUT - Commissionee]
 
+PICS:
+    - CADMIN.S
+
 config:
     nodeId: 0x12344321
     timeout: 300

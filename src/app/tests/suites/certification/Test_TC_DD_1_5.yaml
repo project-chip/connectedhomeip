@@ -17,6 +17,10 @@ name:
     3.1.5. [TC-DD-1.5] NFC Rules of Advertisement and Onboarding [DUT -
     Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.NFC
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -14,6 +14,10 @@
 
 name: 45.2.1. [TC-DGETH-2.1] Attributes with server as DUT
 
+PICS:
+    - DGETH.S
+    - DGETH.S.A
+
 config:
     nodeId: 0x12344321
     cluster: "Ethernet Network Diagnostics"

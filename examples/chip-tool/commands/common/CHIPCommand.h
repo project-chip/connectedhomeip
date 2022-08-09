@@ -115,7 +115,7 @@ protected:
     virtual bool DeferInteractiveCleanup() { return false; }
 
     // Execute any deferred cleanups.  Used when exiting interactive mode.
-    void ExecuteDeferredCleanups();
+    static void ExecuteDeferredCleanups(intptr_t ignored);
 
 #ifdef CONFIG_USE_LOCAL_STORAGE
     PersistentStorage mDefaultStorage;

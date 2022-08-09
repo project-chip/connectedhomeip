@@ -15,6 +15,9 @@
 
 name: 71.2.2. [TC-ILL-2.2] Primary Functionality with Server as DUT
 
+PICS:
+    - ILL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

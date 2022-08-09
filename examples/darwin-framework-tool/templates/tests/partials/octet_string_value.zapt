@@ -1,0 +1,5 @@
+{{~#if (isHexString value)}}
+[[NSData alloc] initWithBytes:"{{octetStringFromHexString value}}" length:{{octetStringLengthFromHexString value}}]
+{{else}}
+[[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral value}}" length:{{value.length}}]
+{{/if}}

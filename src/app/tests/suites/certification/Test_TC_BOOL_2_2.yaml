@@ -15,6 +15,9 @@
 
 name: 68.2.2. [TC-BOOL-2.2] Primary Functionality with Server as DUT
 
+PICS:
+    - BOOL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

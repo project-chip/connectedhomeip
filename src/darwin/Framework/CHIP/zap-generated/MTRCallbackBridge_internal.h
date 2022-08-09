@@ -179,19 +179,18 @@ typedef void (*NullableAccessControlClusterChangeTypeEnumAttributeCallback)(
 typedef void (*AccessControlClusterPrivilegeAttributeCallback)(void *, chip::app::Clusters::AccessControl::Privilege);
 typedef void (*NullableAccessControlClusterPrivilegeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::Privilege> &);
-typedef void (*BridgedActionsClusterActionErrorEnumAttributeCallback)(void *, chip::app::Clusters::BridgedActions::ActionErrorEnum);
-typedef void (*NullableBridgedActionsClusterActionErrorEnumAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionErrorEnum> &);
-typedef void (*BridgedActionsClusterActionStateEnumAttributeCallback)(void *, chip::app::Clusters::BridgedActions::ActionStateEnum);
-typedef void (*NullableBridgedActionsClusterActionStateEnumAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionStateEnum> &);
-typedef void (*BridgedActionsClusterActionTypeEnumAttributeCallback)(void *, chip::app::Clusters::BridgedActions::ActionTypeEnum);
-typedef void (*NullableBridgedActionsClusterActionTypeEnumAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionTypeEnum> &);
-typedef void (*BridgedActionsClusterEndpointListTypeEnumAttributeCallback)(
-    void *, chip::app::Clusters::BridgedActions::EndpointListTypeEnum);
-typedef void (*NullableBridgedActionsClusterEndpointListTypeEnumAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::EndpointListTypeEnum> &);
+typedef void (*ActionsClusterActionErrorEnumAttributeCallback)(void *, chip::app::Clusters::Actions::ActionErrorEnum);
+typedef void (*NullableActionsClusterActionErrorEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionErrorEnum> &);
+typedef void (*ActionsClusterActionStateEnumAttributeCallback)(void *, chip::app::Clusters::Actions::ActionStateEnum);
+typedef void (*NullableActionsClusterActionStateEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionStateEnum> &);
+typedef void (*ActionsClusterActionTypeEnumAttributeCallback)(void *, chip::app::Clusters::Actions::ActionTypeEnum);
+typedef void (*NullableActionsClusterActionTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionTypeEnum> &);
+typedef void (*ActionsClusterEndpointListTypeEnumAttributeCallback)(void *, chip::app::Clusters::Actions::EndpointListTypeEnum);
+typedef void (*NullableActionsClusterEndpointListTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::EndpointListTypeEnum> &);
 typedef void (*OtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback)(
     void *, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction);
 typedef void (*NullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback)(
@@ -605,19 +604,18 @@ typedef void (*AccessControlAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*AccessControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BridgedActionsActionListListAttributeCallback)(
+typedef void (*ActionsActionListListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & data);
-typedef void (*BridgedActionsEndpointListListAttributeCallback)(
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::ActionStruct::DecodableType> & data);
+typedef void (*ActionsEndpointListsListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
-        data);
-typedef void (*BridgedActionsGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BridgedActionsAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BridgedActionsAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::EndpointListStruct::DecodableType> & data);
+typedef void (*ActionsGeneratedCommandListListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ActionsAcceptedCommandListListAttributeCallback)(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ActionsAttributeListListAttributeCallback)(void * context,
+                                                          const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*BasicCapabilityMinimaStructAttributeCallback)(
     void *, const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType &);
 typedef void (*BasicGeneratedCommandListListAttributeCallback)(void * context,
@@ -3992,46 +3990,42 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBridgedActionsActionListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsActionListListAttributeCallback>
+class MTRActionsActionListListAttributeCallbackBridge : public MTRCallbackBridge<ActionsActionListListAttributeCallback>
 {
 public:
-    MTRBridgedActionsActionListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                           MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsActionListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRActionsActionListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
+                                                    bool keepAlive = false) :
+        MTRCallbackBridge<ActionsActionListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRBridgedActionsActionListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                           MTRDeviceController * controller, ResponseHandler handler,
-                                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsActionListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                         keepAlive){};
+    MTRActionsActionListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
+                                                    ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsActionListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                  keepAlive){};
 
-    MTRBridgedActionsActionListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsActionListListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+    MTRActionsActionListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                    MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsActionListListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> &
-            value);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::ActionStruct::DecodableType> & value);
 };
 
-class MTRBridgedActionsActionListListAttributeCallbackSubscriptionBridge
-    : public MTRBridgedActionsActionListListAttributeCallbackBridge
+class MTRActionsActionListListAttributeCallbackSubscriptionBridge : public MTRActionsActionListListAttributeCallbackBridge
 {
 public:
-    MTRBridgedActionsActionListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                       MTRDeviceController * controller, ResponseHandler handler,
-                                                                       MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsActionListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+    MTRActionsActionListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                MTRDeviceController * controller, ResponseHandler handler,
+                                                                MTRActionBlock action,
+                                                                SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsActionListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRBridgedActionsActionListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsActionListListAttributeCallbackBridge(queue, device, handler, action, true),
+    MTRActionsActionListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                ResponseHandler handler, MTRActionBlock action,
+                                                                SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsActionListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -4041,48 +4035,140 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBridgedActionsEndpointListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsEndpointListListAttributeCallback>
+class MTRActionsEndpointListsListAttributeCallbackBridge : public MTRCallbackBridge<ActionsEndpointListsListAttributeCallback>
 {
 public:
-    MTRBridgedActionsEndpointListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsEndpointListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRActionsEndpointListsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
+                                                       bool keepAlive = false) :
+        MTRCallbackBridge<ActionsEndpointListsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRBridgedActionsEndpointListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                             MTRDeviceController * controller, ResponseHandler handler,
-                                                             MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsEndpointListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                           keepAlive){};
+    MTRActionsEndpointListsListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                       MTRDeviceController * controller, ResponseHandler handler,
+                                                       MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsEndpointListsListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                     keepAlive){};
 
-    MTRBridgedActionsEndpointListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                             ResponseHandler handler, MTRActionBlock action,
-                                                             bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsEndpointListListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
-                                                                           keepAlive){};
+    MTRActionsEndpointListsListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                       MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsEndpointListsListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::EndpointListStruct::DecodableType> &
             value);
 };
 
-class MTRBridgedActionsEndpointListListAttributeCallbackSubscriptionBridge
-    : public MTRBridgedActionsEndpointListListAttributeCallbackBridge
+class MTRActionsEndpointListsListAttributeCallbackSubscriptionBridge : public MTRActionsEndpointListsListAttributeCallbackBridge
 {
 public:
-    MTRBridgedActionsEndpointListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+    MTRActionsEndpointListsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                   MTRDeviceController * controller, ResponseHandler handler,
+                                                                   MTRActionBlock action,
+                                                                   SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsEndpointListsListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRActionsEndpointListsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                   ResponseHandler handler, MTRActionBlock action,
+                                                                   SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsEndpointListsListAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRActionsGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ActionsGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRActionsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRActionsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                              MTRDeviceController * controller, ResponseHandler handler,
+                                                              MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsGeneratedCommandListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                            keepAlive){};
+
+    MTRActionsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                              ResponseHandler handler, MTRActionBlock action,
+                                                              bool keepAlive = false) :
+        MTRCallbackBridge<ActionsGeneratedCommandListListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                            keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRActionsGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                          MTRDeviceController * controller, ResponseHandler handler,
+                                                                          MTRActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                          ResponseHandler handler, MTRActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRActionsAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ActionsAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRActionsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRActionsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                             MTRDeviceController * controller, ResponseHandler handler,
+                                                             MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsAcceptedCommandListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                           keepAlive){};
+
+    MTRActionsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                             ResponseHandler handler, MTRActionBlock action,
+                                                             bool keepAlive = false) :
+        MTRCallbackBridge<ActionsAcceptedCommandListListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                           keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRActionsAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsEndpointListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        MTRActionsAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRBridgedActionsEndpointListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+    MTRActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsEndpointListListAttributeCallbackBridge(queue, device, handler, action, true),
+        MTRActionsAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -4092,141 +4178,41 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBridgedActionsGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsGeneratedCommandListListAttributeCallback>
+class MTRActionsAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<ActionsAttributeListListAttributeCallback>
 {
 public:
-    MTRBridgedActionsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
+    MTRActionsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
+                                                       bool keepAlive = false) :
+        MTRCallbackBridge<ActionsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRBridgedActionsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                     MTRDeviceController * controller, ResponseHandler handler,
-                                                                     MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsGeneratedCommandListListAttributeCallback>(queue, nodeID, controller, handler, action,
-                                                                                   OnSuccessFn, keepAlive){};
+    MTRActionsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                       MTRDeviceController * controller, ResponseHandler handler,
+                                                       MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsAttributeListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                     keepAlive){};
 
-    MTRBridgedActionsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                     ResponseHandler handler, MTRActionBlock action,
-                                                                     bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsGeneratedCommandListListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class MTRBridgedActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRBridgedActionsGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    MTRBridgedActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRBridgedActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRBridgedActionsAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsAcceptedCommandListListAttributeCallback>
-{
-public:
-    MTRBridgedActionsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRBridgedActionsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                    MTRDeviceController * controller, ResponseHandler handler,
-                                                                    MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsAcceptedCommandListListAttributeCallback>(queue, nodeID, controller, handler, action,
-                                                                                  OnSuccessFn, keepAlive){};
-
-    MTRBridgedActionsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                    ResponseHandler handler, MTRActionBlock action,
-                                                                    bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsAcceptedCommandListListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
-                                                                                  keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class MTRBridgedActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRBridgedActionsAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    MTRBridgedActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRBridgedActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRBridgedActionsAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsAttributeListListAttributeCallback>
-{
-public:
-    MTRBridgedActionsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRBridgedActionsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                              MTRDeviceController * controller, ResponseHandler handler,
-                                                              MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsAttributeListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                            keepAlive){};
-
-    MTRBridgedActionsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                              ResponseHandler handler, MTRActionBlock action,
-                                                              bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsAttributeListListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
-                                                                            keepAlive){};
+    MTRActionsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                       MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsAttributeListListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class MTRBridgedActionsAttributeListListAttributeCallbackSubscriptionBridge
-    : public MTRBridgedActionsAttributeListListAttributeCallbackBridge
+class MTRActionsAttributeListListAttributeCallbackSubscriptionBridge : public MTRActionsAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRBridgedActionsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                          MTRDeviceController * controller, ResponseHandler handler,
-                                                                          MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+    MTRActionsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                   MTRDeviceController * controller, ResponseHandler handler,
+                                                                   MTRActionBlock action,
+                                                                   SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRBridgedActionsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
+    MTRActionsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                   ResponseHandler handler, MTRActionBlock action,
+                                                                   SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -17578,338 +17564,43 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBridgedActionsClusterActionErrorEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsClusterActionErrorEnumAttributeCallback>
+class MTRActionsClusterActionErrorEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<ActionsClusterActionErrorEnumAttributeCallback>
 {
 public:
-    MTRBridgedActionsClusterActionErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsClusterActionErrorEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRActionsClusterActionErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                            MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsClusterActionErrorEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRBridgedActionsClusterActionErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                   MTRDeviceController * controller, ResponseHandler handler,
-                                                                   MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsClusterActionErrorEnumAttributeCallback>(queue, nodeID, controller, handler, action,
-                                                                                 OnSuccessFn, keepAlive){};
+    MTRActionsClusterActionErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                            MTRDeviceController * controller, ResponseHandler handler,
+                                                            MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsClusterActionErrorEnumAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                          keepAlive){};
 
-    MTRBridgedActionsClusterActionErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                   ResponseHandler handler, MTRActionBlock action,
-                                                                   bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsClusterActionErrorEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
-                                                                                 keepAlive){};
+    MTRActionsClusterActionErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                            MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsClusterActionErrorEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::BridgedActions::ActionErrorEnum value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::Actions::ActionErrorEnum value);
 };
 
-class MTRBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge
-    : public MTRBridgedActionsClusterActionErrorEnumAttributeCallbackBridge
+class MTRActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge
+    : public MTRActionsClusterActionErrorEnumAttributeCallbackBridge
 {
 public:
-    MTRBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsClusterActionErrorEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsClusterActionErrorEnumAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableBridgedActionsClusterActionErrorEnumAttributeCallback>
-{
-public:
-    MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<NullableBridgedActionsClusterActionErrorEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
-
-    MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                           MTRDeviceController * controller,
-                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                           bool keepAlive = false) :
-        MTRCallbackBridge<NullableBridgedActionsClusterActionErrorEnumAttributeCallback>(queue, nodeID, controller, handler, action,
-                                                                                         OnSuccessFn, keepAlive){};
-
-    MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                           bool keepAlive = false) :
-        MTRCallbackBridge<NullableBridgedActionsClusterActionErrorEnumAttributeCallback>(queue, device, handler, action,
-                                                                                         OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionErrorEnum> & value);
-};
-
-class MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge
-    : public MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackBridge
-{
-public:
-    MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRBridgedActionsClusterActionStateEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsClusterActionStateEnumAttributeCallback>
-{
-public:
-    MTRBridgedActionsClusterActionStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsClusterActionStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRBridgedActionsClusterActionStateEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                   MTRDeviceController * controller, ResponseHandler handler,
-                                                                   MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsClusterActionStateEnumAttributeCallback>(queue, nodeID, controller, handler, action,
-                                                                                 OnSuccessFn, keepAlive){};
-
-    MTRBridgedActionsClusterActionStateEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                   ResponseHandler handler, MTRActionBlock action,
-                                                                   bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsClusterActionStateEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
-                                                                                 keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::BridgedActions::ActionStateEnum value);
-};
-
-class MTRBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge
-    : public MTRBridgedActionsClusterActionStateEnumAttributeCallbackBridge
-{
-public:
-    MTRBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsClusterActionStateEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsClusterActionStateEnumAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableBridgedActionsClusterActionStateEnumAttributeCallback>
-{
-public:
-    MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<NullableBridgedActionsClusterActionStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
-
-    MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                           MTRDeviceController * controller,
-                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                           bool keepAlive = false) :
-        MTRCallbackBridge<NullableBridgedActionsClusterActionStateEnumAttributeCallback>(queue, nodeID, controller, handler, action,
-                                                                                         OnSuccessFn, keepAlive){};
-
-    MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                           bool keepAlive = false) :
-        MTRCallbackBridge<NullableBridgedActionsClusterActionStateEnumAttributeCallback>(queue, device, handler, action,
-                                                                                         OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionStateEnum> & value);
-};
-
-class MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge
-    : public MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackBridge
-{
-public:
-    MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRBridgedActionsClusterActionTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsClusterActionTypeEnumAttributeCallback>
-{
-public:
-    MTRBridgedActionsClusterActionTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsClusterActionTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRBridgedActionsClusterActionTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                  MTRDeviceController * controller, ResponseHandler handler,
-                                                                  MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsClusterActionTypeEnumAttributeCallback>(queue, nodeID, controller, handler, action,
-                                                                                OnSuccessFn, keepAlive){};
-
-    MTRBridgedActionsClusterActionTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                  ResponseHandler handler, MTRActionBlock action,
-                                                                  bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsClusterActionTypeEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
-                                                                                keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::BridgedActions::ActionTypeEnum value);
-};
-
-class MTRBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge
-    : public MTRBridgedActionsClusterActionTypeEnumAttributeCallbackBridge
-{
-public:
-    MTRBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsClusterActionTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsClusterActionTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableBridgedActionsClusterActionTypeEnumAttributeCallback>
-{
-public:
-    MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<NullableBridgedActionsClusterActionTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                          MTRDeviceController * controller, ResponseHandler handler,
-                                                                          MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<NullableBridgedActionsClusterActionTypeEnumAttributeCallback>(queue, nodeID, controller, handler, action,
-                                                                                        OnSuccessFn, keepAlive){};
-
-    MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                          bool keepAlive = false) :
-        MTRCallbackBridge<NullableBridgedActionsClusterActionTypeEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionTypeEnum> & value);
-};
-
-class MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge
-    : public MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackBridge
-{
-public:
-    MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsClusterEndpointListTypeEnumAttributeCallback>
-{
-public:
-    MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsClusterEndpointListTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
-
-    MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+    MTRActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
-                                                                        MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsClusterEndpointListTypeEnumAttributeCallback>(queue, nodeID, controller, handler, action,
-                                                                                      OnSuccessFn, keepAlive){};
-
-    MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                        bool keepAlive = false) :
-        MTRCallbackBridge<BridgedActionsClusterEndpointListTypeEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::BridgedActions::EndpointListTypeEnum value);
-};
-
-class MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge
-    : public MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge
-{
-public:
-    MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+                                                                        MTRActionBlock action,
+                                                                        SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsClusterActionErrorEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
+    MTRActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                        ResponseHandler handler, MTRActionBlock action,
+                                                                        SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsClusterActionErrorEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -17919,50 +17610,333 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableBridgedActionsClusterEndpointListTypeEnumAttributeCallback>
+class MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableActionsClusterActionErrorEnumAttributeCallback>
 {
 public:
-    MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                MTRLocalActionBlock action,
-                                                                                bool keepAlive = false) :
-        MTRCallbackBridge<NullableBridgedActionsClusterEndpointListTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
+    MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableActionsClusterActionErrorEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+    MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                    MTRDeviceController * controller, ResponseHandler handler,
+                                                                    MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableActionsClusterActionErrorEnumAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                                  OnSuccessFn, keepAlive){};
+
+    MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                    ResponseHandler handler, MTRActionBlock action,
+                                                                    bool keepAlive = false) :
+        MTRCallbackBridge<NullableActionsClusterActionErrorEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                                  keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionErrorEnum> & value);
+};
+
+class MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                                 MTRDeviceController * controller,
                                                                                 ResponseHandler handler, MTRActionBlock action,
-                                                                                bool keepAlive = false) :
-        MTRCallbackBridge<NullableBridgedActionsClusterEndpointListTypeEnumAttributeCallback>(queue, nodeID, controller, handler,
-                                                                                              action, OnSuccessFn, keepAlive){};
-
-    MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                bool keepAlive = false) :
-        MTRCallbackBridge<NullableBridgedActionsClusterEndpointListTypeEnumAttributeCallback>(queue, device, handler, action,
-                                                                                              OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::EndpointListTypeEnum> & value);
-};
-
-class MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge
-    : public MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge
-{
-public:
-    MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action,
-                                                                                    true),
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge(
+    MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                                ResponseHandler handler, MTRActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRActionsClusterActionStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<ActionsClusterActionStateEnumAttributeCallback>
+{
+public:
+    MTRActionsClusterActionStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                            MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsClusterActionStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRActionsClusterActionStateEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                            MTRDeviceController * controller, ResponseHandler handler,
+                                                            MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsClusterActionStateEnumAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                          keepAlive){};
+
+    MTRActionsClusterActionStateEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                            MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsClusterActionStateEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Actions::ActionStateEnum value);
+};
+
+class MTRActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRActionsClusterActionStateEnumAttributeCallbackBridge
+{
+public:
+    MTRActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                        MTRDeviceController * controller, ResponseHandler handler,
+                                                                        MTRActionBlock action,
+                                                                        SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsClusterActionStateEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                        ResponseHandler handler, MTRActionBlock action,
+                                                                        SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsClusterActionStateEnumAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableActionsClusterActionStateEnumAttributeCallback>
+{
+public:
+    MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableActionsClusterActionStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                    MTRDeviceController * controller, ResponseHandler handler,
+                                                                    MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableActionsClusterActionStateEnumAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                                  OnSuccessFn, keepAlive){};
+
+    MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                    ResponseHandler handler, MTRActionBlock action,
+                                                                    bool keepAlive = false) :
+        MTRCallbackBridge<NullableActionsClusterActionStateEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                                  keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionStateEnum> & value);
+};
+
+class MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                                MTRDeviceController * controller,
+                                                                                ResponseHandler handler, MTRActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                                ResponseHandler handler, MTRActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRActionsClusterActionTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<ActionsClusterActionTypeEnumAttributeCallback>
+{
+public:
+    MTRActionsClusterActionTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                           MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsClusterActionTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRActionsClusterActionTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                           MTRDeviceController * controller, ResponseHandler handler,
+                                                           MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsClusterActionTypeEnumAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                         keepAlive){};
+
+    MTRActionsClusterActionTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                           MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsClusterActionTypeEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Actions::ActionTypeEnum value);
+};
+
+class MTRActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRActionsClusterActionTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                       MTRDeviceController * controller, ResponseHandler handler,
+                                                                       MTRActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsClusterActionTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                       ResponseHandler handler, MTRActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsClusterActionTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableActionsClusterActionTypeEnumAttributeCallback>
+{
+public:
+    MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableActionsClusterActionTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                   MTRDeviceController * controller, ResponseHandler handler,
+                                                                   MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableActionsClusterActionTypeEnumAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                                 OnSuccessFn, keepAlive){};
+
+    MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                   ResponseHandler handler, MTRActionBlock action,
+                                                                   bool keepAlive = false) :
+        MTRCallbackBridge<NullableActionsClusterActionTypeEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                                 keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionTypeEnum> & value);
+};
+
+class MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                               MTRDeviceController * controller,
+                                                                               ResponseHandler handler, MTRActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                               ResponseHandler handler, MTRActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<ActionsClusterEndpointListTypeEnumAttributeCallback>
+{
+public:
+    MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsClusterEndpointListTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                 MTRDeviceController * controller, ResponseHandler handler,
+                                                                 MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ActionsClusterEndpointListTypeEnumAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                               OnSuccessFn, keepAlive){};
+
+    MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                 ResponseHandler handler, MTRActionBlock action,
+                                                                 bool keepAlive = false) :
+        MTRCallbackBridge<ActionsClusterEndpointListTypeEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                               keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Actions::EndpointListTypeEnum value);
+};
+
+class MTRActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                             MTRDeviceController * controller,
+                                                                             ResponseHandler handler, MTRActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                             ResponseHandler handler, MTRActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableActionsClusterEndpointListTypeEnumAttributeCallback>
+{
+public:
+    MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableActionsClusterEndpointListTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                         MTRDeviceController * controller, ResponseHandler handler,
+                                                                         MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableActionsClusterEndpointListTypeEnumAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                                       OnSuccessFn, keepAlive){};
+
+    MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                         ResponseHandler handler, MTRActionBlock action,
+                                                                         bool keepAlive = false) :
+        MTRCallbackBridge<NullableActionsClusterEndpointListTypeEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::EndpointListTypeEnum> & value);
+};
+
+class MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
+        MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

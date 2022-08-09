@@ -56,6 +56,10 @@
         {
             "name": "valueEquals",
             "path": "partials/value_equals.zapt"
+        },
+        {
+            "name": "octetStringValue",
+            "path": "partials/octet_string_value.zapt"
         }
     ],
     "templates": [

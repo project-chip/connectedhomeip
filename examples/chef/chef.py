@@ -239,7 +239,8 @@ def bundle_esp32(device_name: str) -> None:
             shutil.copy(src_item, dest_item)
 
 
-def main(argv: Sequence[str]) -> None:
+def main() -> int:
+
     check_python_version()
     config = load_config()
     cicd_config = load_cicd_config()
@@ -340,7 +341,7 @@ def main(argv: Sequence[str]) -> None:
     parser.add_option(
         "", "--cpu_type", help="CPU type to compile for. Linux only.", choices=["arm64", "arm", "x64"])
 
-    options, _ = parser.parse_args(argv)
+    options, _ = parser.parse_args(sys.argv[1:])
 
     splash()
 
@@ -795,7 +796,8 @@ def main(argv: Sequence[str]) -> None:
                 shell.run_cmd(f"python3 -m chip_rpc.console --device {config['silabs-thread']['CU']} -b 115200")
 
     flush_print("Done")
+    return 0
 
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv[1:]))
+    sys.exit(main())

@@ -14,6 +14,9 @@
 
 name: 33.2.2. [TC-FLW-2.2] Primary functionality with server as DUT
 
+PICS:
+    - FLW.S
+
 config:
     nodeId: 0x12344321
     cluster: "Flow Measurement"

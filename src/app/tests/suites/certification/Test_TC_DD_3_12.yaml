@@ -17,6 +17,11 @@ name:
     3.3.12. [TC-DD-3.12] Commissioning Flow = 1 (User-Intent Flow) - QR Code
     [DUT - Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.QR_COMMISSIONING
+    - MCORE.DD.USER_INTENT_COMM_FLOW
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

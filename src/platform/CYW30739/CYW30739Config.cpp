@@ -23,6 +23,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <hal/wiced_hal_eflash.h>
 #include <platform/CYW30739/CYW30739Config.h>
 #include <platform_nvram.h>
 
@@ -78,12 +79,7 @@ template CHIP_ERROR CYW30739Config::ReadConfigValue(Key key, uint64_t & val);
 template <typename T>
 CHIP_ERROR CYW30739Config::WriteConfigValue(Key key, T val)
 {
-    wiced_result_t result;
-    uint16_t write_count = wiced_hal_write_nvram(PLATFORM_NVRAM_VSID_MATTER_BASE + key, sizeof(val), (uint8_t *) &val, &result);
-    if (result == WICED_SUCCESS && write_count == sizeof(val))
-        return CHIP_NO_ERROR;
-    else
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    return WriteConfigValueBin(key, &val, sizeof(val));
 }
 
 template CHIP_ERROR CYW30739Config::WriteConfigValue(Key key, bool val);
@@ -110,6 +106,22 @@ CHIP_ERROR CYW30739Config::WriteConfigValueBin(Key key, const void * data, size_
     /* Skip writing because the write API reports error result for zero length data. */
     if (dataLen == 0)
         return CHIP_NO_ERROR;
+
+    if (IsDataFromFlash(data))
+    {
+        /*
+         * Copy data to RAM before calling the platform API
+         * which doesn't support writing data from the flash.
+         */
+        using namespace chip::Platform;
+        std::unique_ptr<void, decltype(&MemoryFree)> buffer(MemoryAlloc(dataLen), &MemoryFree);
+        if (!buffer)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        memcpy(buffer.get(), data, dataLen);
+        return WriteConfigValueBin(key, buffer.get(), dataLen);
+    }
 
     wiced_result_t result;
     const uint16_t write_count = wiced_hal_write_nvram(PLATFORM_NVRAM_VSID_MATTER_BASE + key, dataLen, (uint8_t *) data, &result);
@@ -146,6 +158,11 @@ CHIP_ERROR CYW30739Config::FactoryResetConfig(void)
 }
 
 void CYW30739Config::RunConfigUnitTest(void) {}
+
+bool CYW30739Config::IsDataFromFlash(const void * data)
+{
+    return reinterpret_cast<void *>(FLASH_BASE_ADDRESS) <= data && data < reinterpret_cast<void *>(FLASH_BASE_ADDRESS + FLASH_SIZE);
+}
 
 } // namespace Internal
 } // namespace DeviceLayer

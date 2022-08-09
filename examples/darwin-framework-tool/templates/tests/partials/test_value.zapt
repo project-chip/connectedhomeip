@@ -37,7 +37,7 @@
       {{#if (isCharString type)}}
         m{{asUpperCamelCase definedValue}}.Value() : @"{{chip_tests_config_get_default_value definedValue}}";
       {{else if (isOctetString type)}}
-        {{!-- TODO Extract the length of the default value for ByteSpan--}}
+        {{> octetStringValue value=(chip_tests_config_get_default_value definedValue)}};
       {{else}}
         [NSNumber numberWith{{asObjectiveCNumberType definedValue type false}}:m{{asUpperCamelCase definedValue}}.Value()] :
         [NSNumber numberWith{{asObjectiveCNumberType definedValue type false}}:{{asTypedExpressionFromObjectiveC (chip_tests_config_get_default_value definedValue) type}}];
@@ -46,11 +46,7 @@
       {{#if (isCharString type)}}
         @"{{definedValue}}";
       {{else if (isOctetString type)}}
-        {{~#if (isHexString definedValue)}}
-        [[NSData alloc] initWithBytes:"{{octetStringFromHexString definedValue}}" length:{{octetStringLengthFromHexString definedValue}}];
-        {{else}}
-        [[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral definedValue}}" length:{{definedValue.length}}];
-        {{/if}}
+        {{> octetStringValue value=definedValue}};
       {{else}}
         [NSNumber numberWith{{asObjectiveCNumberType definedValue type false}}:{{asTypedExpressionFromObjectiveC definedValue type}}];
       {{/if}}

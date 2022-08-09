@@ -15,6 +15,10 @@
 
 name: 85.2.1. [TC-DGGEN-2.1] Attributes with server as DUT
 
+PICS:
+    - DGGEN.S
+    - DGGEN.S.A
+
 config:
     nodeId: 0x12344321
     cluster: "General Diagnostics"

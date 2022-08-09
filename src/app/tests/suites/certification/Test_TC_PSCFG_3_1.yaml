@@ -15,6 +15,13 @@
 
 name: 65.3.1. [TC-PSCFG-3.1] Attributes with client as DUT
 
+PICS:
+    - PSCFG.C
+    - PSCFG.C.AM-READ
+    - PSCFG.C.AO-READ
+    - PSCFG.C.AM-WRITE
+    - PSCFG.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

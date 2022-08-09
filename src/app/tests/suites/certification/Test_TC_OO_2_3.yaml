@@ -16,7 +16,7 @@ name: 3.2.3. [TC-OO-2.3] Secondary functionality with server as DUT
 
 PICS:
     - OO.S
-    - OO.S.F00(LT)
+    - OO.S.F00
 
 config:
     nodeId: 0x12344321
@@ -865,6 +865,14 @@ tests:
                 value: 300
               - name: "OffWaitTime"
                 value: 300
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
 
     - label: "21b:Reads OnOff attribute from DUT"
       command: "readAttribute"

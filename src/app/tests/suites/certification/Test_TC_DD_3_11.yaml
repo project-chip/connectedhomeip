@@ -17,6 +17,11 @@ name:
     3.3.11. [TC-DD-3.11] Commissioning Flow = 0 (Standard Flow) - QR Code [DUT -
     Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.QR_COMMISSIONING
+    - MCORE.DD.STANDARD_COMM_FLOW
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

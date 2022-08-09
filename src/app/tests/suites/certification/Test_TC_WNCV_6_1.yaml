@@ -15,6 +15,9 @@
 
 name: 3.4.7. [TC-WNCV-6.1] Basic Commands Verification [DUT as Client]
 
+PICS:
+    - WNCV.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
