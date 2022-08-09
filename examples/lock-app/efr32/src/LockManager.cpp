@@ -652,7 +652,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
                           endpointId);
 
             DoorLockServer::Instance().SetLockState(endpointId, lockState);
-            
+
             return true;
         }
 
