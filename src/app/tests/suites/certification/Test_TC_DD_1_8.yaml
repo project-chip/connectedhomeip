@@ -17,6 +17,10 @@ name:
     3.1.8. [TC-DD-1.8] QR Code Onboarding Payload Verification [DUT -
     Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.QR_COMMISSIONING
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

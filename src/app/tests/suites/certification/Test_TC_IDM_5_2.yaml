@@ -17,6 +17,9 @@ name:
     3.5.2. [TC-IDM-5.2] Status Response from DUT in response to a Timed Request
     Action from TH.
 
+PICS:
+    - MCORE.IDM.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

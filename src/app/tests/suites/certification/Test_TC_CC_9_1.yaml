@@ -14,6 +14,9 @@
 
 name: 27.2.20. [TC-CC-9.1] ColorLoopSet Validation
 
+PICS:
+    - CC.S
+
 config:
     nodeId: 0x12344321
     timeout: 400

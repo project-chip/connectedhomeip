@@ -17,6 +17,9 @@ name:
     99.3.1. [TC-LCFG-3.1] Localization Configuration Cluster
     Attributes[DUT-Client]
 
+PICS:
+    - LCFG.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -14,6 +14,9 @@
 
 name: 24.3.1. [TC-LVL-3.1] MoveToLevel Verification (DUT as Server)
 
+PICS:
+    - LVL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Level Control"

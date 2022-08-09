@@ -15,6 +15,9 @@
 
 name: 105.1.2. [TC-LUNIT-1.2] Global Attributes [DUT as Server]
 
+PICS:
+    - LUNIT.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

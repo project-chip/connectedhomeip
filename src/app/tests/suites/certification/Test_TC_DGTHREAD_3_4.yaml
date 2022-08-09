@@ -15,6 +15,9 @@
 
 name: 50.3.4. [TC-DGTHREAD-3.4] ResetCounts Command[DUT-Client]
 
+PICS:
+    - DGTHREAD.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

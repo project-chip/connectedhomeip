@@ -15,6 +15,13 @@
 
 name: 68.3.1. [TC-BOOL-3.1] Attributes with Client as DUT
 
+PICS:
+    - BOOL.C
+    - BOOL.C.AM-READ
+    - BOOL.C.AO-READ
+    - BOOL.C.AM-WRITE
+    - BOOL.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

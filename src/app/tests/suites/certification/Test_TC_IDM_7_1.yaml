@@ -15,6 +15,9 @@
 
 name: 3.6.5. [TC-IDM-7.1] Multi Fabric Subscription Test Cases. [{DUT_Server}]
 
+PICS:
+    - MCORE.IDM.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

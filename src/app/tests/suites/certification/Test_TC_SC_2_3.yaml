@@ -15,6 +15,9 @@
 
 name: 14.2.3. [TC-SC-2.3] PASE Error Handling [DUT - Responder/Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

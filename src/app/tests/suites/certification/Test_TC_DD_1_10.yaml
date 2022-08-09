@@ -17,6 +17,10 @@ name:
     3.1.10. [TC-DD-1.10] NFC Onboarding Payload Verification [DUT -
     Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.SCAN_NFC
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

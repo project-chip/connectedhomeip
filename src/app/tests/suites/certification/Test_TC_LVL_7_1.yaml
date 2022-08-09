@@ -17,6 +17,10 @@ name:
     22.6.2. [TC-LVL-7.1] Verification of MoveToClosestFrequency command (DUT as
     Server)
 
+PICS:
+    - LVL.S
+    - LVL.S.F02
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

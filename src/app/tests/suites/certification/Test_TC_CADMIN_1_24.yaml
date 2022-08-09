@@ -17,6 +17,9 @@ name:
     24.1.24. [TC-CADMIN-1.24] Open commissioning window - durations max and
     max+1 [ECM] [DUT - Commissionee]
 
+PICS:
+    - CADMIN.S
+
 config:
     nodeId: 0x12344321
     timeout: 330

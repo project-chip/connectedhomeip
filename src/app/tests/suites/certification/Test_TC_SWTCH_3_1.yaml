@@ -15,6 +15,13 @@
 
 name: 74.3.1. [TC-SWTCH-3.1] Global attributes with client as DUT
 
+PICS:
+    - SWTCH.C
+    - SWTCH.C.AM-READ
+    - SWTCH.C.AO-READ
+    - SWTCH.C.AM-WRITE
+    - SWTCH.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

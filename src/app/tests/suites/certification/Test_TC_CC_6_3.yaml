@@ -15,6 +15,9 @@
 name:
     27.2.14. [TC-CC-6.3] Color Temperature Step functionality with server as DUT
 
+PICS:
+    - CC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Color Control"

@@ -15,6 +15,13 @@
 
 name: 34.3.1. [TC-PRS-3.1] Attributes with Client as DUT
 
+PICS:
+    - PRS.C
+    - PRS.C.AM-READ
+    - PRS.C.AO-READ
+    - PRS.C.AM-WRITE
+    - PRS.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
