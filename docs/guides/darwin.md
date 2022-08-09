@@ -39,8 +39,6 @@ Note: These steps are supported on:
 Each developer preview release is compatible with a certain SHA from this
 repository.
 
--   iOS/iPadOS/tvOS 15.6 Developer Preview:
-    [`aa9457e6b94b735076dff6297176183bf9780177`](https://github.com/project-chip/connectedhomeip/commits/aa9457e6b94b735076dff6297176183bf9780177)
 -   iOS/iPadOS/tvOS 16.0 Developer Preview:
     [`aa9457e6b94b735076dff6297176183bf9780177`](https://github.com/project-chip/connectedhomeip/commits/aa9457e6b94b735076dff6297176183bf9780177)
 
