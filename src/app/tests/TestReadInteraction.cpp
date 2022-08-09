@@ -434,14 +434,12 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     // We don't actually want to deliver that message, because we want to
     // synthesize the read response.  But we don't want it hanging around
     // forever either.
-    ctx.GetLoopback().mNumMessagesToDrop = Test::LoopbackTransport::kUnlimitedMessageCount;
+    ctx.GetLoopback().mNumMessagesToDrop = 1;
     ctx.DrainAndServiceIO();
 
     GenerateReportData(apSuite, apContext, buf, false /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
     err = readClient.ProcessReportData(std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    ctx.GetLoopback().mNumMessagesToDrop = 0;
 }
 
 void TestReadInteraction::TestReadUnexpectedSubscriptionId(nlTestSuite * apSuite, void * apContext)
@@ -460,9 +458,8 @@ void TestReadInteraction::TestReadUnexpectedSubscriptionId(nlTestSuite * apSuite
     // We don't actually want to deliver that message, because we want to
     // synthesize the read response.  But we don't want it hanging around
     // forever either.
-    ctx.GetLoopback().mNumMessagesToDrop = Test::LoopbackTransport::kUnlimitedMessageCount;
+    ctx.GetLoopback().mNumMessagesToDrop = 1;
     ctx.DrainAndServiceIO();
-    ctx.GetLoopback().mNumMessagesToDrop = 0;
 
     // For read, we don't expect there is subscription id in report data.
     GenerateReportData(apSuite, apContext, buf, false /*aNeedInvalidReport*/, true /* aSuppressResponse*/,
@@ -603,9 +600,8 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     // We don't actually want to deliver that message, because we want to
     // synthesize the read response.  But we don't want it hanging around
     // forever either.
-    ctx.GetLoopback().mNumMessagesToDrop = Test::LoopbackTransport::kUnlimitedMessageCount;
+    ctx.GetLoopback().mNumMessagesToDrop = 1;
     ctx.DrainAndServiceIO();
-    ctx.GetLoopback().mNumMessagesToDrop = 0;
 
     GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
 
@@ -2722,7 +2718,7 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage(nlTestSuite * apSu
                                    chip::app::ReadClient::InteractionType::Read);
 
         ctx.GetLoopback().mSentMessageCount                 = 0;
-        ctx.GetLoopback().mNumMessagesToDrop                = Test::LoopbackTransport::kUnlimitedMessageCount;
+        ctx.GetLoopback().mNumMessagesToDrop                = 1;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
         ctx.GetLoopback().mDroppedMessageCount              = 0;
         err                                                 = readClient.SendRequest(readPrepareParams);
@@ -2742,8 +2738,8 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage(nlTestSuite * apSu
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
         rm->ClearRetransTable(readClient.mExchange.Get());
-
-        printf("JJ: MSentMessage = %d\n", ctx.GetLoopback().mSentMessageCount);
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
         ctx.GetLoopback().mSentMessageCount                 = 0;
         ctx.GetLoopback().mNumMessagesToDrop                = 0;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
@@ -2751,6 +2747,11 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage(nlTestSuite * apSu
         readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
         ctx.DrainAndServiceIO();
 
+        // TODO: Need to validate what status is being sent to the ReadHandler
+        // The ReadHandler closed its exchange when it sent the Report Data (which we dropped).
+        // Since we synthesized the StatusResponse to the ReadClient, instead of sending it from the ReadHandler,
+        // the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP ack.
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_IM_GLOBAL_STATUS(Busy));
     }
 
@@ -2799,7 +2800,7 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse(nlTest
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         ctx.GetLoopback().mSentMessageCount                 = 0;
-        ctx.GetLoopback().mNumMessagesToDrop                = Test::LoopbackTransport::kUnlimitedMessageCount;
+        ctx.GetLoopback().mNumMessagesToDrop                = 1;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
         ctx.GetLoopback().mDroppedMessageCount              = 0;
         err                                                 = readClient.SendRequest(readPrepareParams);
@@ -2819,6 +2820,8 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse(nlTest
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
         rm->ClearRetransTable(readClient.mExchange.Get());
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
 
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
@@ -2830,6 +2833,13 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse(nlTest
 
         readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
         ctx.DrainAndServiceIO();
+
+        // TODO: Need to validate what status is being sent to the ReadHandler
+        // The ReadHandler's exchange is closed when we synthesize the subscribe response, since it sent the
+        // Subscribe Response as the last message in the transaction.
+        // Since we synthesized the subscribe response to the ReadClient, instead of sending it from the ReadHandler,
+        // the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP ack.
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_IM_GLOBAL_STATUS(Busy));
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 0);
@@ -2880,7 +2890,7 @@ void TestReadInteraction::TestSubscribeClientReceiveWellFormedStatusResponse(nlT
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         ctx.GetLoopback().mSentMessageCount                 = 0;
-        ctx.GetLoopback().mNumMessagesToDrop                = Test::LoopbackTransport::kUnlimitedMessageCount;
+        ctx.GetLoopback().mNumMessagesToDrop                = 1;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
         ctx.GetLoopback().mDroppedMessageCount              = 0;
         err                                                 = readClient.SendRequest(readPrepareParams);
@@ -2900,6 +2910,8 @@ void TestReadInteraction::TestSubscribeClientReceiveWellFormedStatusResponse(nlT
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
         rm->ClearRetransTable(readClient.mExchange.Get());
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
 
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
@@ -2911,6 +2923,13 @@ void TestReadInteraction::TestSubscribeClientReceiveWellFormedStatusResponse(nlT
 
         readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
         ctx.DrainAndServiceIO();
+
+        // TODO: Need to validate what status is being sent to the ReadHandler
+        // The ReadHandler's exchange is still open when we synthesize the StatusResponse.
+        // Since we synthesized the StatusResponse to the ReadClient, instead of sending it from the ReadHandler,
+        // the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP ack.
+        // The ReadHandler should have sent a StatusResponse too, but it's buggy and does not do that.
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_ERROR_INVALID_MESSAGE_TYPE);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 0);
@@ -2961,7 +2980,7 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidReportMessage(nlTestS
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         ctx.GetLoopback().mSentMessageCount                 = 0;
-        ctx.GetLoopback().mNumMessagesToDrop                = Test::LoopbackTransport::kUnlimitedMessageCount;
+        ctx.GetLoopback().mNumMessagesToDrop                = 1;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
         ctx.GetLoopback().mDroppedMessageCount              = 0;
         err                                                 = readClient.SendRequest(readPrepareParams);
@@ -2980,6 +2999,8 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidReportMessage(nlTestS
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
 
         rm->ClearRetransTable(readClient.mExchange.Get());
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mExchangeCtx.Get());
@@ -2991,6 +3012,13 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidReportMessage(nlTestS
 
         readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
         ctx.DrainAndServiceIO();
+
+        // TODO: Need to validate what status is being sent to the ReadHandler
+        // The ReadHandler's exchange is still open when we synthesize the ReportData.
+        // Since we synthesized the ReportData to the ReadClient, instead of sending it from the ReadHandler,
+        // the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP ack.
+        // The ReadHandler should have sent a StatusResponse too, but it's buggy and does not do that.
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_ERROR_END_OF_TLV);
 
@@ -3045,6 +3073,7 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedInvalidReportMess
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 5);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
@@ -3065,8 +3094,13 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedInvalidReportMess
                                                                 Messaging::SendMessageFlags::kExpectResponse);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
-    }
 
+        // The server sends a data report.
+        // The client receives the data report data and sends out status report with invalid action.
+        // The server should respond with a status report of its own, leading to 4 messages (because
+        // the client would ack the server's status report), but it's buggy and just sends an ack to the status report it got.
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 3);
+    }
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
     engine->Shutdown();
 }
@@ -3109,7 +3143,7 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidSubscribeResponseMess
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         ctx.GetLoopback().mSentMessageCount                 = 0;
-        ctx.GetLoopback().mNumMessagesToDrop                = Test::LoopbackTransport::kUnlimitedMessageCount;
+        ctx.GetLoopback().mNumMessagesToDrop                = 1;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 3;
         ctx.GetLoopback().mDroppedMessageCount              = 0;
         err                                                 = readClient.SendRequest(readPrepareParams);
@@ -3131,6 +3165,8 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidSubscribeResponseMess
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::SubscribeResponse);
 
         rm->ClearRetransTable(readClient.mExchange.Get());
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 4);
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mExchangeCtx.Get());
@@ -3142,6 +3178,12 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidSubscribeResponseMess
 
         readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
         ctx.DrainAndServiceIO();
+
+        // TODO: Need to validate what status is being sent to the ReadHandler
+        // The ReadHandler's exchange is still open when we synthesize the subscribe response.
+        // Since we synthesized the subscribe response to the ReadClient, instead of sending it from the ReadHandler,
+        // the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP ack.
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_ERROR_INVALID_SUBSCRIPTION);
     }
@@ -3195,6 +3237,7 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedReportMessageWith
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 5);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
@@ -3218,8 +3261,13 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedReportMessageWith
                                                                 Messaging::SendMessageFlags::kExpectResponse);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
-    }
 
+        // The server sends a data report.
+        // The client receives the data report data and sends out status report with invalid subsciption.
+        // The server should respond with a status report of its own, leading to 4 messages (because
+        // the client would ack the server's status report), just sends an ack to the status report it got.
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 3);
+    }
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
     engine->Shutdown();
 }
@@ -3261,7 +3309,7 @@ void TestReadInteraction::TestReadChunkingInvalidSubscriptionId(nlTestSuite * ap
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         ctx.GetLoopback().mSentMessageCount                 = 0;
-        ctx.GetLoopback().mNumMessagesToDrop                = Test::LoopbackTransport::kUnlimitedMessageCount;
+        ctx.GetLoopback().mNumMessagesToDrop                = 1;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 3;
         ctx.GetLoopback().mDroppedMessageCount              = 0;
         err                                                 = readClient.SendRequest(readPrepareParams);
@@ -3284,6 +3332,8 @@ void TestReadInteraction::TestReadChunkingInvalidSubscriptionId(nlTestSuite * ap
         NL_TEST_ASSERT(apSuite, writer.Finalize(&msgBuf) == CHIP_NO_ERROR);
 
         rm->ClearRetransTable(readClient.mExchange.Get());
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 4);
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
 
@@ -3294,6 +3344,13 @@ void TestReadInteraction::TestReadChunkingInvalidSubscriptionId(nlTestSuite * ap
 
         readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
         ctx.DrainAndServiceIO();
+
+        // TODO: Need to validate what status is being sent to the ReadHandler
+        // The ReadHandler's exchange is still open when we synthesize the report data message.
+        // Since we synthesized the second report data message to the ReadClient with invalid subscription id, instead of sending it
+        // from the ReadHandler, the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP
+        // ack.
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_ERROR_INVALID_SUBSCRIPTION);
     }

@@ -1530,6 +1530,8 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kResponsive);
+
     {
         TestResubscriptionCallback callback;
         app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), callback,
@@ -1590,6 +1592,8 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
         NL_TEST_ASSERT(apSuite, callback.mOnDone == 0);
     }
 
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kDefault);
+
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
@@ -1602,6 +1606,8 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
 {
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
     auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kResponsive);
 
     {
         TestResubscriptionCallback callback;
@@ -1646,13 +1652,13 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         //
         ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1500), [&]() { return callback.mOnError >= 1; });
 
-        ctx.GetLoopback().mNumMessagesToDrop = 0;
-
         NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
         NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_ERROR_TIMEOUT);
         NL_TEST_ASSERT(apSuite, callback.mOnDone == 1);
         NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 0);
     }
+
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kDefault);
 
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -1722,6 +1728,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kDefault);
     app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
 }
 
