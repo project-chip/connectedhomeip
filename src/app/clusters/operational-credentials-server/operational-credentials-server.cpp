@@ -350,7 +350,6 @@ public:
     // Gets called when a fabric is about to be deleted
     void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        ChipLogError(Zcl, "\n\nLeave event for fabric index: %u\n", fabricIndex);
         // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
         for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
         {
