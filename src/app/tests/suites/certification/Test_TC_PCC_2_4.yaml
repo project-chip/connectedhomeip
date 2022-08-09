@@ -14,6 +14,9 @@
 
 name: 15.2.4. [TC-PCC-2.4] Primary functionality with server as DUT
 
+PICS:
+    - PCC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Pump Configuration and Control"

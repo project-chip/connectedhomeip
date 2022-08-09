@@ -15,6 +15,9 @@
 
 name: 65.2.2. [TC-PSCFG-2.2] Primary functionality with server as DUT
 
+PICS:
+    - PSCFG.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

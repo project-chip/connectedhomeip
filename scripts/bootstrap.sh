@@ -35,20 +35,8 @@ _bootstrap_or_activate() {
         git submodule update --init
     fi
 
-    local _MATTER_BANNER="$(
-        cat <<-EOF
-
-        █
-        █
-    ▄   █   ▄                                 █     ▌
-    ▀▀█████▀▀     ▄▓▀▀▀▄,▄▀▀▀▀▄   ╓▄▀▀▀▀▄█  ▀▀█▀▀▀▀▀█▀▀  ,▄▀▀▀▀▄    ▄▀▀
-  ▀█▄       ▄█▀   █     █     █  ▐▌      █    █     █   .█▄▄▄▄▄▄█⌐ ▐▌
-    ▀█▄   ▄█▀     █     █     █  ▐▌      █    █     █    █         ▐▌
- ▄██▀▀█   █▀▀██▄  █     █     █   ╙▀▄▄▄Φ▀█    ▀▄▄   ▀▄▄   ▀▄▄▄▄▀^  ▐▌
-▀▀    █   █    ▀▀
-
-EOF
-    )"
+    PW_BRANDING_BANNER="$_CHIP_ROOT/scripts/matter_banner.txt"
+    export PW_BRANDING_BANNER
 
     PW_PROJECT_ROOT="$_CHIP_ROOT"
     export PW_PROJECT_ROOT
@@ -60,7 +48,8 @@ EOF
 
     _chip_bootstrap_banner() {
         if [ -z "$PW_ENVSETUP_QUIET" ] && [ -z "$PW_ENVSETUP_NO_BANNER" ]; then
-            pw_bold_white "$_MATTER_BANNER\n"
+            cat "$PW_BRANDING_BANNER"
+            echo
         fi
     }
 

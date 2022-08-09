@@ -106,19 +106,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(nullable NSZone *)zone;
 @end
 
-@interface MTRBridgedActionsClusterActionStruct : NSObject <NSCopying>
+@interface MTRActionsClusterActionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull actionID;
 @property (nonatomic, copy) NSString * _Nonnull name;
 @property (nonatomic, copy) NSNumber * _Nonnull type;
 @property (nonatomic, copy) NSNumber * _Nonnull endpointListID;
 @property (nonatomic, copy) NSNumber * _Nonnull supportedCommands;
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull state;
 
 - (instancetype)init;
 - (id)copyWithZone:(nullable NSZone *)zone;
 @end
 
-@interface MTRBridgedActionsClusterEndpointListStruct : NSObject <NSCopying>
+@interface MTRActionsClusterEndpointListStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull endpointListID;
 @property (nonatomic, copy) NSString * _Nonnull name;
 @property (nonatomic, copy) NSNumber * _Nonnull type;
@@ -128,7 +128,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(nullable NSZone *)zone;
 @end
 
-@interface MTRBridgedActionsClusterStateChangedEvent : NSObject <NSCopying>
+@interface MTRActionsClusterStateChangedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull actionID;
 @property (nonatomic, copy) NSNumber * _Nonnull invokeID;
 @property (nonatomic, copy, getter=getNewState) NSNumber * _Nonnull newState;
@@ -137,7 +137,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(nullable NSZone *)zone;
 @end
 
-@interface MTRBridgedActionsClusterActionFailedEvent : NSObject <NSCopying>
+@interface MTRActionsClusterActionFailedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull actionID;
 @property (nonatomic, copy) NSNumber * _Nonnull invokeID;
 @property (nonatomic, copy, getter=getNewState) NSNumber * _Nonnull newState;

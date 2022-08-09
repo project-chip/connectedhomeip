@@ -15,6 +15,9 @@
 
 name: 98.3.1. [TC-FLABEL-3.1] Fixed Label cluster [DUT-client]
 
+PICS:
+    - FLABEL.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

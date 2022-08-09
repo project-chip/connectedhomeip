@@ -17,6 +17,10 @@ name:
     3.3.19. [TC-DD-3.19] Commissioning Flow - Commission, Unpair and
     Re-commission Device [DUT - Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.QR
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

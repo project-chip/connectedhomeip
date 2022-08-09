@@ -533,20 +533,20 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace AccessControl
 
-namespace BridgedActions {
+namespace Actions {
 namespace Attributes {
 
 namespace ActionList {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace ActionList
 
-namespace EndpointList {
+namespace EndpointLists {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace EndpointList
+} // namespace EndpointLists
 
-namespace SetupUrl {
+namespace SetupURL {
 static constexpr AttributeId Id = 0x00000002;
-} // namespace SetupUrl
+} // namespace SetupURL
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -569,7 +569,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace BridgedActions
+} // namespace Actions
 
 namespace Basic {
 namespace Attributes {
@@ -1504,9 +1504,9 @@ namespace SecurityPolicy {
 static constexpr AttributeId Id = 0x0000003B;
 } // namespace SecurityPolicy
 
-namespace ChannelMask {
+namespace ChannelPage0Mask {
 static constexpr AttributeId Id = 0x0000003C;
-} // namespace ChannelMask
+} // namespace ChannelPage0Mask
 
 namespace OperationalDatasetComponents {
 static constexpr AttributeId Id = 0x0000003D;

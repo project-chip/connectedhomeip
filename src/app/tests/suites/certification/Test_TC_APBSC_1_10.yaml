@@ -16,6 +16,9 @@ name:
     19.1.10. [TC-APBSC-1.10] Global attributes - Application Basic Cluster (DUT
     as Server)
 
+PICS:
+    - APBSC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Application Basic"

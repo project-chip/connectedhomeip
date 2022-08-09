@@ -216,7 +216,7 @@ typedef struct _ActionStruct
     uint8_t Type;
     uint16_t EndpointListID;
     uint16_t SupportedCommands;
-    uint8_t Status;
+    uint8_t State;
 } ActionStruct;
 
 // Struct for ApplicationBasicApplication

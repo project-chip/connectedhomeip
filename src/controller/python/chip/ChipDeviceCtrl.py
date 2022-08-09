@@ -117,6 +117,30 @@ class DCState(enum.IntEnum):
     COMMISSIONING = 5
 
 
+class DeviceProxyWrapper():
+    ''' Encapsulates a pointer to OperationalDeviceProxy on the c++ side that needs to be
+        freed when DeviceProxyWrapper goes out of scope. There is a potential issue where
+        if this is copied around that a double free will occure, but how this is used today
+        that is not an issue that needs to be accounted for and it will become very apparent
+        if that happens.
+    '''
+
+    def __init__(self, deviceProxy: ctypes.c_void_p, dmLib=None):
+        self._deviceProxy = deviceProxy
+        self._dmLib = dmLib
+
+    def __del__(self):
+        if (self._dmLib is not None and builtins.chipStack is not None):
+            # This destructor is called from any threading context, including on the Matter threading context.
+            # So, we cannot call chipStack.Call or chipStack.CallAsync which waits for the posted work to
+            # actually be executed. Instead, we just post/schedule the work and move on.
+            builtins.chipStack.PostTaskOnChipThread(lambda: self._dmLib.pychip_FreeOperationalDeviceProxy(self._deviceProxy))
+
+    @property
+    def deviceProxy(self) -> ctypes.c_void_p:
+        return self._deviceProxy
+
+
 class DiscoveryFilterType(enum.IntEnum):
     # These must match chip::Dnssd::DiscoveryFilterType values (barring the naming convention)
     NONE = 0
@@ -626,6 +650,7 @@ class ChipDeviceController():
         return self._Cluster
 
     def GetConnectedDeviceSync(self, nodeid, allowPASE=True, timeoutMs: int = None):
+        ''' Returns DeviceProxyWrapper upon success.'''
         self.CheckIsActive()
 
         returnDevice = c_void_p(None)
@@ -647,7 +672,7 @@ class ChipDeviceController():
                 self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
             if res == 0:
                 print('Using PASE connection')
-                return returnDevice
+                return DeviceProxyWrapper(returnDevice)
 
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
             self.devCtrl, nodeid, DeviceAvailableCallback), timeoutMs)
@@ -668,7 +693,8 @@ class ChipDeviceController():
 
         if returnDevice.value is None:
             raise self._ChipStack.ErrorToException(returnErr)
-        return returnDevice
+
+        return DeviceProxyWrapper(returnDevice, self._dmLib)
 
     def ComputeRoundTripTimeout(self, nodeid, upperLayerProcessingTimeoutMs: int = 0):
         ''' Returns a computed timeout value based on the round-trip time it takes for the peer at the other end of the session to
@@ -680,7 +706,7 @@ class ChipDeviceController():
         '''
         device = self.GetConnectedDeviceSync(nodeid)
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_ComputeRoundTripTimeout(
-            device, upperLayerProcessingTimeoutMs))
+            device.deviceProxy, upperLayerProcessingTimeoutMs))
         return res
 
     async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None, timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None):
@@ -700,7 +726,7 @@ class ChipDeviceController():
 
         device = self.GetConnectedDeviceSync(nodeid, timeoutMs=interactionTimeoutMs)
         res = ClusterCommand.SendCommand(
-            future, eventLoop, responseType, device, ClusterCommand.CommandPath(
+            future, eventLoop, responseType, device.deviceProxy, ClusterCommand.CommandPath(
                 EndpointId=endpoint,
                 ClusterId=payload.cluster_id,
                 CommandId=payload.command_id,
@@ -739,7 +765,7 @@ class ChipDeviceController():
                     v[0], v[1], v[2], 1, v[1].value))
 
         res = ClusterAttribute.WriteAttributes(
-            future, eventLoop, device, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs)
+            future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         return await future
@@ -920,7 +946,7 @@ class ChipDeviceController():
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
-        res = ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device, devCtrl=self, attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths, returnClusterObject=returnClusterObject,
+        res = ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device.deviceProxy, devCtrl=self, attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths, returnClusterObject=returnClusterObject,
                                     subscriptionParameters=ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered, keepSubscriptions=keepSubscriptions)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
@@ -1204,6 +1230,10 @@ class ChipDeviceController():
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
                 c_void_p, c_uint64, _DeviceAvailableFunct]
             self._dmLib.pychip_GetConnectedDeviceByNodeId.restype = c_uint32
+
+            self._dmLib.pychip_FreeOperationalDeviceProxy.argtypes = [
+                c_void_p]
+            self._dmLib.pychip_FreeOperationalDeviceProxy.restype = c_uint32
 
             self._dmLib.pychip_GetDeviceBeingCommissioned.argtypes = [
                 c_void_p, c_uint64, c_void_p]

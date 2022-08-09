@@ -17,6 +17,10 @@ name:
     3.3.21. [TC-DD-3.21] Commissioning Flow - Commission Multiple-Endpoint
     Device [DUT - Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.QR_COMMISSIONING
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

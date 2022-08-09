@@ -16,6 +16,9 @@ name:
     19.1.9. [TC-TGTNAV-1.9] Global attributes - Target Navigator Cluster (DUT as
     Server)
 
+PICS:
+    - TGTNAV.S
+
 config:
     nodeId: 0x12344321
     cluster: "Target Navigator"

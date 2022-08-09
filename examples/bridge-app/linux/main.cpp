@@ -172,16 +172,15 @@ DeviceOnOff ActionLight2("Action Light 2", "Room 1");
 DeviceOnOff ActionLight3("Action Light 3", "Room 2");
 DeviceOnOff ActionLight4("Action Light 4", "Room 2");
 
-Room room1("Room 1", 0xE001, BridgedActions::EndpointListTypeEnum::kRoom, true);
-Room room2("Room 2", 0xE002, BridgedActions::EndpointListTypeEnum::kRoom, true);
-Room room3("Zone 3", 0xE003, BridgedActions::EndpointListTypeEnum::kZone, false);
+Room room1("Room 1", 0xE001, Actions::EndpointListTypeEnum::kRoom, true);
+Room room2("Room 2", 0xE002, Actions::EndpointListTypeEnum::kRoom, true);
+Room room3("Zone 3", 0xE003, Actions::EndpointListTypeEnum::kZone, false);
 
-Action action1(0x1001, "Room 1 On", BridgedActions::ActionTypeEnum::kAutomation, 0xE001, 0x1,
-               BridgedActions::ActionStateEnum::kInactive, true);
-Action action2(0x1002, "Turn On Room 2", BridgedActions::ActionTypeEnum::kAutomation, 0xE002, 0x01,
-               BridgedActions::ActionStateEnum::kInactive, true);
-Action action3(0x1003, "Turn Off Room 1", BridgedActions::ActionTypeEnum::kAutomation, 0xE003, 0x01,
-               BridgedActions::ActionStateEnum::kInactive, false);
+Action action1(0x1001, "Room 1 On", Actions::ActionTypeEnum::kAutomation, 0xE001, 0x1, Actions::ActionStateEnum::kInactive, true);
+Action action2(0x1002, "Turn On Room 2", Actions::ActionTypeEnum::kAutomation, 0xE002, 0x01, Actions::ActionStateEnum::kInactive,
+               true);
+Action action3(0x1003, "Turn Off Room 1", Actions::ActionTypeEnum::kAutomation, 0xE003, 0x01, Actions::ActionStateEnum::kInactive,
+               false);
 
 // ---------------------------------------------------------------------------
 //
@@ -339,7 +338,7 @@ std::vector<EndpointListInfo> GetEndpointListInfo(chip::EndpointId parentId)
                 if ((gDevices[index] != nullptr) && (gDevices[index]->GetParentEndpointId() == parentId))
                 {
                     std::string location;
-                    if (room->getType() == BridgedActions::EndpointListTypeEnum::kZone)
+                    if (room->getType() == Actions::EndpointListTypeEnum::kZone)
                     {
                         location = gDevices[index]->GetZone();
                     }
@@ -654,7 +653,7 @@ void runOnOffRoomAction(Room * room, bool actionOn, EndpointId endpointId, uint1
 {
     if (hasInvokeID)
     {
-        BridgedActions::Events::StateChanged::Type event{ actionID, invokeID, BridgedActions::ActionStateEnum::kActive };
+        Actions::Events::StateChanged::Type event{ actionID, invokeID, Actions::ActionStateEnum::kActive };
         EventNumber eventNumber;
         chip::app::LogEvent(event, endpointId, eventNumber);
     }
@@ -679,15 +678,14 @@ void runOnOffRoomAction(Room * room, bool actionOn, EndpointId endpointId, uint1
 
     if (hasInvokeID)
     {
-        BridgedActions::Events::StateChanged::Type event{ actionID, invokeID, BridgedActions::ActionStateEnum::kInactive };
+        Actions::Events::StateChanged::Type event{ actionID, invokeID, Actions::ActionStateEnum::kInactive };
         EventNumber eventNumber;
         chip::app::LogEvent(event, endpointId, eventNumber);
     }
 }
 
-bool emberAfBridgedActionsClusterInstantActionCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const BridgedActions::Commands::InstantAction::DecodableType & commandData)
+bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                const Actions::Commands::InstantAction::DecodableType & commandData)
 {
     bool hasInvokeID      = false;
     uint32_t invokeID     = 0;

@@ -268,7 +268,7 @@ enum class Privilege : uint8_t
 };
 } // namespace AccessControl
 
-namespace BridgedActions {
+namespace Actions {
 
 // Enum for ActionErrorEnum
 enum class ActionErrorEnum : uint8_t
@@ -326,7 +326,7 @@ enum class CommandBits : uint16_t
     kDisableAction               = 0x400,
     kDisableActionWithDuration   = 0x800,
 };
-} // namespace BridgedActions
+} // namespace Actions
 
 namespace Basic {
 } // namespace Basic

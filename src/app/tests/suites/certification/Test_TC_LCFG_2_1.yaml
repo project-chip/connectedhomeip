@@ -17,6 +17,9 @@ name:
     99.2.1. [TC-LCFG-2.1] Localization Configuration Cluster
     Attributes[DUT-Server]
 
+PICS:
+    - LCFG.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -15,6 +15,9 @@
 
 name: 36.2.3. [TC-WNCV-2.3] Mode Attribute with server as DUT
 
+PICS:
+    - WNCV.S
+
 config:
     nodeId: 0x12344321
     cluster: "Window Covering"

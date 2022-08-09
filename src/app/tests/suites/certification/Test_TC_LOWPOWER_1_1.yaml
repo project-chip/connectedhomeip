@@ -16,6 +16,9 @@ name:
     19.1.1. [TC-LOWPOWER-1.1] Global attributes - Low Power Cluster (DUT as
     Server)
 
+PICS:
+    - LOWPOWER.S
+
 config:
     nodeId: 0x12344321
     cluster: "Low Power"

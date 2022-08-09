@@ -15,6 +15,13 @@
 
 name: 22.2.3. [TC-LVL-2.3] Attributes with DUT as client
 
+PICS:
+    - LVL.C
+    - LVL.C.AM-READ
+    - LVL.C.AO-READ
+    - LVL.C.AM-WRITE
+    - LVL.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -38,10 +45,10 @@ tests:
           [1657279115.433703][4417:4417] CHIP:DMG:                         Cluster = 0x8,
           [1657279115.433781][4417:4417] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1657279115.433851][4417:4417] CHIP:DMG:                 }
-          [1657279115.433920][4417:4417] CHIP:DMG:                         
+          [1657279115.433920][4417:4417] CHIP:DMG:
           [1657279115.433980][4417:4417] CHIP:DMG:         ],
-          [1657279115.434047][4417:4417] CHIP:DMG:                 
-          [1657279115.434109][4417:4417] CHIP:DMG:         isFabricFiltered = true, 
+          [1657279115.434047][4417:4417] CHIP:DMG:
+          [1657279115.434109][4417:4417] CHIP:DMG:         isFabricFiltered = true,
           [1657279115.434169][4417:4417] CHIP:DMG:         InteractionModelRevision = 1
           [1657279115.434226][4417:4417] CHIP:DMG: },
 
@@ -59,10 +66,10 @@ tests:
           [1657279142.247028][4417:4417] CHIP:DMG:                         Cluster = 0x8,
           [1657279142.247100][4417:4417] CHIP:DMG:                         Attribute = 0x0000_0011,
           [1657279142.247164][4417:4417] CHIP:DMG:                 }
-          [1657279142.247245][4417:4417] CHIP:DMG:                         
+          [1657279142.247245][4417:4417] CHIP:DMG:
           [1657279142.247310][4417:4417] CHIP:DMG:         ],
-          [1657279142.247375][4417:4417] CHIP:DMG:                 
-          [1657279142.247439][4417:4417] CHIP:DMG:         isFabricFiltered = true, 
+          [1657279142.247375][4417:4417] CHIP:DMG:
+          [1657279142.247439][4417:4417] CHIP:DMG:         isFabricFiltered = true,
           [1657279142.247500][4417:4417] CHIP:DMG:         InteractionModelRevision = 1
           [1657279142.247552][4417:4417] CHIP:DMG: },
 
@@ -80,10 +87,10 @@ tests:
           [1657279166.426245][4417:4417] CHIP:DMG:                         Cluster = 0x8,
           [1657279166.426310][4417:4417] CHIP:DMG:                         Attribute = 0x0000_000F,
           [1657279166.426389][4417:4417] CHIP:DMG:                 }
-          [1657279166.426465][4417:4417] CHIP:DMG:                         
+          [1657279166.426465][4417:4417] CHIP:DMG:
           [1657279166.426528][4417:4417] CHIP:DMG:         ],
-          [1657279166.426597][4417:4417] CHIP:DMG:                 
-          [1657279166.426660][4417:4417] CHIP:DMG:         isFabricFiltered = true, 
+          [1657279166.426597][4417:4417] CHIP:DMG:
+          [1657279166.426660][4417:4417] CHIP:DMG:         isFabricFiltered = true,
           [1657279166.426721][4417:4417] CHIP:DMG:         InteractionModelRevision = 1
           [1657279166.426777][4417:4417] CHIP:DMG: },
       disabled: true
@@ -540,7 +547,7 @@ tests:
           [1657913877.851251][3126:3126] CHIP:DMG:        isFabricFiltered = true,
           [1657913877.851297][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
           [1657913877.851343][3126:3126] CHIP:DMG: },
-          [1657913877.851471][3126:3126] CHIP:DMG: IM 
+          [1657913877.851471][3126:3126] CHIP:DMG: IM
 
 
           ./chip-tool levelcontrol read options 1 1
@@ -590,7 +597,7 @@ tests:
           a manufacturer specific order"
       verification: |
           ./chip-tool levelcontrol read remaining-time 1 1
-          Verify in TH all-clusters-app 
+          Verify in TH all-clusters-app
 
           [1657913955.033202][3126:3126] CHIP:IM: Received Read request
           [1657913955.033289][3126:3126] CHIP:DMG: ReadRequestMessage =
@@ -611,9 +618,9 @@ tests:
           [1657913955.033764][3126:3126] CHIP:DMG: },
 
 
-           ./chip-tool levelcontrol read min-level 1 1   
-          Verify in TH all-clusters-app 
-            
+           ./chip-tool levelcontrol read min-level 1 1
+          Verify in TH all-clusters-app
+
           [1657914034.938109][3245:3245] CHIP:DMG: ReadRequestMessage =
           [1657914034.938157][3245:3245] CHIP:DMG: {
           [1657914034.938197][3245:3245] CHIP:DMG:        AttributePathIBs =
@@ -632,8 +639,8 @@ tests:
           [1657914034.939024][3245:3245] CHIP:DMG: },
 
 
-           ./chip-tool levelcontrol read max-level 1 1  
-          Verify in TH all-clusters-app 
+           ./chip-tool levelcontrol read max-level 1 1
+          Verify in TH all-clusters-app
 
           [1657914049.937379][3245:3245] CHIP:IM: Received Read request
           [1657914049.937458][3245:3245] CHIP:DMG: ReadRequestMessage =
@@ -655,7 +662,7 @@ tests:
 
 
           ./chip-tool levelcontrol read current-frequency 1 1
-          Verify in TH all-clusters-app 
+          Verify in TH all-clusters-app
           [1657914066.583478][3245:3245] CHIP:DMG: ReadRequestMessage =
           [1657914066.583530][3245:3245] CHIP:DMG: {
           [1657914066.583568][3245:3245] CHIP:DMG:        AttributePathIBs =
@@ -675,7 +682,7 @@ tests:
 
 
           ./chip-tool levelcontrol read min-frequency 1 1
-          Verify in TH all-clusters-app 
+          Verify in TH all-clusters-app
           [1657914086.207991][3245:3245] CHIP:IM: Received Read request
           [1657914086.208155][3245:3245] CHIP:DMG: ReadRequestMessage =
           [1657914086.208207][3245:3245] CHIP:DMG: {
@@ -696,7 +703,7 @@ tests:
 
 
            ./chip-tool levelcontrol read max-frequency 1 1
-          Verify in TH all-clusters-app 
+          Verify in TH all-clusters-app
           [1657914105.798625][3245:3245] CHIP:IM: Received Read request
           [1657914105.798770][3245:3245] CHIP:DMG: ReadRequestMessage =
           [1657914105.798846][3245:3245] CHIP:DMG: {
@@ -716,7 +723,7 @@ tests:
           [1657914105.799842][3245:3245] CHIP:DMG: },
 
           ./chip-tool levelcontrol read on-off-transition-time 1 1
-          Verify in TH all-clusters-app 
+          Verify in TH all-clusters-app
           [1657914125.515789][3245:3245] CHIP:IM: Received Read request
           [1657914125.515917][3245:3245] CHIP:DMG: ReadRequestMessage =
           [1657914125.515964][3245:3245] CHIP:DMG: {
@@ -741,7 +748,7 @@ tests:
           the TH one at a time in a manufacturer specific order"
       verification: |
           ./chip-tool levelcontrol write on-off-transition-time 5 1 1
-          Verify in TH all-clusters-app 
+          Verify in TH all-clusters-app
 
           [1657914163.137445][3245:3245] CHIP:DMG: WriteRequestMessage =
           [1657914163.137491][3245:3245] CHIP:DMG: {
@@ -769,7 +776,7 @@ tests:
 
 
            ./chip-tool levelcontrol write on-transition-time 5 1 1
-          Verify in TH all-clusters-app 
+          Verify in TH all-clusters-app
 
           [1657914187.402168][3245:3245] CHIP:DMG: WriteRequestMessage =
           [1657914187.402215][3245:3245] CHIP:DMG: {
@@ -822,7 +829,7 @@ tests:
           [1657914206.149489][3245:3245] CHIP:DMG: },
 
            ./chip-tool levelcontrol write default-move-rate 5 1 1
-          Verify in TH all-clusters-app 
+          Verify in TH all-clusters-app
 
           [1657914228.843788][3245:3245] CHIP:DMG: WriteRequestMessage =
           [1657914228.843839][3245:3245] CHIP:DMG: {

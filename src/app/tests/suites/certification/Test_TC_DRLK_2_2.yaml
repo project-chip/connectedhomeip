@@ -91,9 +91,9 @@ tests:
               - name: "userIndex"
                 value: 1
               - name: "userStatus"
-                value: 0
+                value: null
               - name: "userType"
-                value: 0
+                value: null
       response:
           values:
               - name: "status"

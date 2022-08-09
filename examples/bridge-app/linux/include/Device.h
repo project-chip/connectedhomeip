@@ -209,51 +209,50 @@ private:
 class EndpointListInfo
 {
 public:
-    EndpointListInfo(uint16_t endpointListId, std::string name, chip::app::Clusters::BridgedActions::EndpointListTypeEnum type);
-    EndpointListInfo(uint16_t endpointListId, std::string name, chip::app::Clusters::BridgedActions::EndpointListTypeEnum type,
+    EndpointListInfo(uint16_t endpointListId, std::string name, chip::app::Clusters::Actions::EndpointListTypeEnum type);
+    EndpointListInfo(uint16_t endpointListId, std::string name, chip::app::Clusters::Actions::EndpointListTypeEnum type,
                      chip::EndpointId endpointId);
     void AddEndpointId(chip::EndpointId endpointId);
     inline uint16_t GetEndpointListId() { return mEndpointListId; };
     std::string GetName() { return mName; };
-    inline chip::app::Clusters::BridgedActions::EndpointListTypeEnum GetType() { return mType; };
+    inline chip::app::Clusters::Actions::EndpointListTypeEnum GetType() { return mType; };
     inline chip::EndpointId * GetEndpointListData() { return mEndpoints.data(); };
     inline size_t GetEndpointListSize() { return mEndpoints.size(); };
 
 private:
     uint16_t mEndpointListId = static_cast<uint16_t>(0);
     std::string mName;
-    chip::app::Clusters::BridgedActions::EndpointListTypeEnum mType =
-        static_cast<chip::app::Clusters::BridgedActions::EndpointListTypeEnum>(0);
+    chip::app::Clusters::Actions::EndpointListTypeEnum mType = static_cast<chip::app::Clusters::Actions::EndpointListTypeEnum>(0);
     std::vector<chip::EndpointId> mEndpoints;
 };
 
 class Room
 {
 public:
-    Room(std::string name, uint16_t endpointListId, chip::app::Clusters::BridgedActions::EndpointListTypeEnum type, bool isVisible);
+    Room(std::string name, uint16_t endpointListId, chip::app::Clusters::Actions::EndpointListTypeEnum type, bool isVisible);
     inline void setIsVisible(bool isVisible) { mIsVisible = isVisible; };
     inline bool getIsVisible() { return mIsVisible; };
     inline void setName(std::string name) { mName = name; };
     inline std::string getName() { return mName; };
-    inline chip::app::Clusters::BridgedActions::EndpointListTypeEnum getType() { return mType; };
+    inline chip::app::Clusters::Actions::EndpointListTypeEnum getType() { return mType; };
     inline uint16_t getEndpointListId() { return mEndpointListId; };
 
 private:
     bool mIsVisible;
     std::string mName;
     uint16_t mEndpointListId;
-    chip::app::Clusters::BridgedActions::EndpointListTypeEnum mType;
+    chip::app::Clusters::Actions::EndpointListTypeEnum mType;
 };
 
 class Action
 {
 public:
-    Action(uint16_t actionId, std::string name, chip::app::Clusters::BridgedActions::ActionTypeEnum type, uint16_t endpointListId,
-           uint16_t supportedCommands, chip::app::Clusters::BridgedActions::ActionStateEnum status, bool isVisible);
+    Action(uint16_t actionId, std::string name, chip::app::Clusters::Actions::ActionTypeEnum type, uint16_t endpointListId,
+           uint16_t supportedCommands, chip::app::Clusters::Actions::ActionStateEnum status, bool isVisible);
     inline void setName(std::string name) { mName = name; };
     inline std::string getName() { return mName; };
-    inline chip::app::Clusters::BridgedActions::ActionTypeEnum getType() { return mType; };
-    inline chip::app::Clusters::BridgedActions::ActionStateEnum getStatus() { return mStatus; };
+    inline chip::app::Clusters::Actions::ActionTypeEnum getType() { return mType; };
+    inline chip::app::Clusters::Actions::ActionStateEnum getStatus() { return mStatus; };
     inline uint16_t getActionId() { return mActionId; };
     inline uint16_t getEndpointListId() { return mEndpointListId; };
     inline uint16_t getSupportedCommands() { return mSupportedCommands; };
@@ -262,8 +261,8 @@ public:
 
 private:
     std::string mName;
-    chip::app::Clusters::BridgedActions::ActionTypeEnum mType;
-    chip::app::Clusters::BridgedActions::ActionStateEnum mStatus;
+    chip::app::Clusters::Actions::ActionTypeEnum mType;
+    chip::app::Clusters::Actions::ActionStateEnum mStatus;
     uint16_t mActionId;
     uint16_t mEndpointListId;
     uint16_t mSupportedCommands;

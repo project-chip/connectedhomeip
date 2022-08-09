@@ -15,6 +15,9 @@
 
 name: 28.2.1. [TC-BDX-2.1] Synchronous file sending
 
+PICS:
+    - MCORE.BDX.SynchronousSender
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

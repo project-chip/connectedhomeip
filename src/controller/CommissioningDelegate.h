@@ -17,7 +17,7 @@
  */
 
 #pragma once
-#include <app/OperationalDeviceProxy.h>
+#include <app/OperationalSessionSetup.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -444,8 +444,8 @@ struct NocChain
 
 struct OperationalNodeFoundData
 {
-    OperationalNodeFoundData(OperationalDeviceProxy * proxy) : operationalProxy(proxy) {}
-    OperationalDeviceProxy * operationalProxy;
+    OperationalNodeFoundData(OperationalDeviceProxy proxy) : operationalProxy(proxy) {}
+    OperationalDeviceProxy operationalProxy;
 };
 
 struct NetworkClusterInfo

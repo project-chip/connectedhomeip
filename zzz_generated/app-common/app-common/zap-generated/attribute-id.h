@@ -144,7 +144,7 @@
 #define ZCL_TARGETS_PER_ACCESS_CONTROL_ENTRY_ATTRIBUTE_ID (0x0003)
 #define ZCL_ACCESS_CONTROL_ENTRIES_PER_FABRIC_ATTRIBUTE_ID (0x0004)
 
-// Attribute ids for cluster: Bridged Actions
+// Attribute ids for cluster: Actions
 
 // Client attributes
 

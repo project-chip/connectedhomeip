@@ -248,9 +248,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::Privileg
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedActions::ActionErrorEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Actions::ActionErrorEnum val)
 {
-    using EnumType = BridgedActions::ActionErrorEnum;
+    using EnumType = Actions::ActionErrorEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -260,9 +260,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedActions::ActionE
         return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedActions::ActionStateEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Actions::ActionStateEnum val)
 {
-    using EnumType = BridgedActions::ActionStateEnum;
+    using EnumType = Actions::ActionStateEnum;
     switch (val)
     {
     case EnumType::kInactive:
@@ -274,9 +274,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedActions::ActionS
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedActions::ActionTypeEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Actions::ActionTypeEnum val)
 {
-    using EnumType = BridgedActions::ActionTypeEnum;
+    using EnumType = Actions::ActionTypeEnum;
     switch (val)
     {
     case EnumType::kOther:
@@ -291,9 +291,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedActions::ActionT
         return static_cast<EnumType>(7);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedActions::EndpointListTypeEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Actions::EndpointListTypeEnum val)
 {
-    using EnumType = BridgedActions::EndpointListTypeEnum;
+    using EnumType = Actions::EndpointListTypeEnum;
     switch (val)
     {
     case EnumType::kOther:

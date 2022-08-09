@@ -61,6 +61,10 @@ object ChipClient {
    * Wrapper around [ChipDeviceController.getConnectedDevicePointer] to return the value directly.
    */
   suspend fun getConnectedDevicePointer(context: Context, nodeId: Long): Long {
+    // TODO (#21539) This is a memory leak because we currently never call releaseConnectedDevicePointer
+    // once we are done with the returned device pointer. Memory leak was introduced since the refactor
+    // that introduced it was very large in order to fix a use after free, which was considered to be
+    // worse than the memory leak that was introduced.
     return suspendCoroutine { continuation ->
       getDeviceController(context).getConnectedDevicePointer(
         nodeId,

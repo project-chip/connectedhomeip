@@ -17,6 +17,9 @@ name:
     Day Schedule, Get Week Day Schedule , Get Week Day Schedule Response, Clear
     Week Day Schedule [DUT-Server]
 
+PICS:
+    - DRLK.S
+
 config:
     nodeId: 0x12344321
     cluster: "Door Lock"
