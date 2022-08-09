@@ -26,6 +26,12 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+      disabled: true
+
     - label:
           "DUT and TH activate the subscription. Change the value of the
           attribute which has been subscribed on the DUT by manually changing
@@ -33,6 +39,9 @@ tests:
           the value of the room temperature. Turning on/off on a light bulb."
       verification: |
           DUT dependency
+          test step is execpting to Change the value of the attribute which has been subscribed on the DUT by manually changing some settings on the device.
+           Example: Temperature sensor may update the value of the room temperature.
+           Turning on/off on a light bulb.
       disabled: true
 
     - label:
@@ -40,10 +49,13 @@ tests:
           attribute which has been subscribed on the DUT by sending an IMWrite
           or Invoke message to the DUT from the TH. +"
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          The cluster used in the below command is an example, User can use any supported chip cluster. 
+
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           onoff  subscribe start-up-on-off  30 100 1 1
-          on TH, verify that DUT is responds right attribute value for above command
+          on TH, verify that DUT is responds right attribute value for above command 
 
           [1657451357.177831][11635:11640] CHIP:DMG: {
           [1657451357.177894][11635:11640] CHIP:DMG:      SubscriptionId = 0xf3aa49ef,
@@ -117,8 +129,11 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+
            onoff  subscribe on-off 10 200  1 1
-           on TH  verify Verify that DUT is responds right attribute value for above command
+           on TH  verify Verify that DUT is responds right attribute value for above command 
 
           [1657451491.078934][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657451491.079004][11635:11640] CHIP:DMG: {
@@ -152,7 +167,7 @@ tests:
 
 
            onoff  subscribe on-off 10 200  1 1  --data-version  0x1979c38
-          On TH,  Verify that there is an empty report data message sent from the DUT to the TH
+          On TH,  Verify that there is an empty report data message sent from the DUT to the TH 
           [1657451619.059013][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657451619.059083][11635:11640] CHIP:DMG: {
           [1657451619.059145][11635:11640] CHIP:DMG:      SubscriptionId = 0x28f3dd7,
@@ -181,10 +196,12 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
 
-           on TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
            basic subscribe local-config-disabled 100 200 1 0
+           on TH verify that DUT is responds right attribute value for above command and then send write command to change the attribute value, verify the attribute value is modified or not.
           [1657451690.259096][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733078 from RetransTable on exchange 33639i
           [1657451690.259223][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657451690.259295][11635:11640] CHIP:DMG: {
@@ -267,8 +284,12 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
-          basic subscribe node-label 10 100 1 0
 
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+
+
+          basic subscribe node-label 10 100 1 0
 
           on TH  verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
@@ -337,7 +358,7 @@ tests:
           [1657452091.180436][11635:11640] CHIP:DMG: Refresh LivenessCheckTime for 125000 milliseconds with SubscriptionId = 0xd9323ff2 Peer = 01:0000000000000001
 
 
-
+            
           Verify the above command multiple times(3 times)
       disabled: true
 
@@ -351,7 +372,11 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
-          any subscribe-by-id 0x0008 0x0010 10 100  1 1
+
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+
+          any subscribe-by-id 0x0008 0x0010 10 100  1 1 
 
            on TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
@@ -458,6 +483,9 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+
 
            userlabel subscribe label-list 100 500 1 0
            On TH verify that  DUT is responds right attribute value for above  command
@@ -494,6 +522,9 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
+
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           basic subscribe local-config-disabled 10 100  1 0 --keepSubscriptions 0
           on TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
@@ -604,11 +635,13 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+
+
            levelcontrol subscribe  on-level 10 80 1 1
 
-
           On TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
-
 
           [1657453503.538054][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733149 from RetransTable on exchange 33661i
           [1657453503.538172][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -683,8 +716,12 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+
+
+          onoff subscribe on-time 100 1000 1 1 
           On TH Verify that the DUT sends a Report Data action and  There are no attribute value changes before MaxInterval elapses.
-          onoff subscribe on-time 100 1000 1 1
           [1657453718.436970][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657453718.437043][11635:11640] CHIP:DMG: {
           [1657453718.437108][11635:11640] CHIP:DMG:      SubscriptionId = 0xce00f651,
@@ -728,6 +765,10 @@ tests:
           to True. Change both the attribute values on the DUT."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
+
+
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           >>>  onoff subscribe off-wait-time 10 500 1 1 --keepSubscriptions 1
 
@@ -872,10 +913,12 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           onoff subscribe on-time 10 100 1 1 --keepSubscriptions 1
 
-          After sending above command verify that the subscription is activated between DUT and TH
+          After sending above command verify that the subscription is activated between DUT and TH 
           1657454443.310644][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657454443.310712][11635:11640] CHIP:DMG: {
           [1657454443.310773][11635:11640] CHIP:DMG:      SubscriptionId = 0xae2db075,
@@ -960,7 +1003,7 @@ tests:
 
 
           onoff write on-time 1 1 1
-           on TH Verify that  subscription is terminated after the MaxInterval of the first subscription is reached.
+           on TH Verify that  subscription is terminated after the MaxInterval of the first subscription is reached. 
           [1657455187.367198][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657455187.367281][11635:11640] CHIP:DMG: {
           [1657455187.367324][11635:11640] CHIP:DMG:      SubscriptionId = 0x50a6822b,
@@ -981,11 +1024,11 @@ tests:
           [1657455187.788687][11635:11640] CHIP:DMG:                         {
           [1657455253.788687][11635:11640] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657455187.788687][11635:11640] CHIP:DMG:                         },
-          [1657455187.788687][11635:11640] CHIP:DMG:
+          [1657455187.788687][11635:11640] CHIP:DMG:                        
           [1657455187.788687][11635:11640] CHIP:DMG:               },
 
           here is an example command the TH can write an attribute in the onoff cluster in the DUT to change the value that the TH subscribed in the above command.
-           onoff write off-wait-time 1 1 1
+           onoff write off-wait-time 1 1 1 
 
           On TH verify that, TH  received a report data from DUT
 
@@ -1032,7 +1075,8 @@ tests:
           the value of the attribute and trigger an action on the DUT to trigger
           any event."
       verification: |
-          https://github.com/project-chip/connectedhomeip/issues/20479
+          Out of Scope for V1.0
+          https://github.com/project-chip/connectedhomeip/issues/15999
       disabled: true
 
     - label:
@@ -1042,6 +1086,7 @@ tests:
           of the attributes on the DUT"
       verification: |
           Out of Scope for V1.0
+          https://github.com/project-chip/connectedhomeip/issues/15999
       disabled: true
 
     - label:
@@ -1050,8 +1095,11 @@ tests:
           Attribute, Cluster = ClusterID ]]. Set the MinIntervalFloor to some
           value say N(seconds). Change the attribute on the DUT"
       verification: |
+          Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start 
+
           onoff subscribe-by-id 0x4001 200 700  1 0xFFFF
-           on TH, verify that DUT is responds right attribute value for  command and then send write command to change the attribute value,
+           on TH, verify that DUT is responds right attribute value for  command and then send write command to change the attribute value, 
           [1658322253.825601][4866:4871] CHIP:DMG: ReportDataMessage =
           [1658322253.825662][4866:4871] CHIP:DMG: {
           [1658322253.825714][4866:4871] CHIP:DMG:        SubscriptionId = 0x42baa1,
@@ -1142,6 +1190,7 @@ tests:
           the attributes on the DUT"
       verification: |
           Out of Scope for V1.0
+          https://github.com/project-chip/connectedhomeip/issues/15999
       disabled: true
 
     - label:
@@ -1151,6 +1200,7 @@ tests:
           Change all or few of the attributes on the DUT"
       verification: |
           Out of Scope for V1.0
+          https://github.com/project-chip/connectedhomeip/issues/15999
       disabled: true
 
     - label:
@@ -1160,4 +1210,5 @@ tests:
           Change all or few of the attributes on the DUT"
       verification: |
           Out of Scope for V1.0
+          https://github.com/project-chip/connectedhomeip/issues/15999
       disabled: true

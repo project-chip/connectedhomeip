@@ -60,7 +60,7 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
-           ./chip-tool any command-by-id 0x0003 3 1 1 0
+           ./chip-tool any command-by-id 0x0003 3 1 1 0 
 
           On TH, verify DUT responsds as unsuppported command  for the data sent in the above command
 
@@ -77,7 +77,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
-          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command 
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except identify cluster command if try to send any other command will get status as unsupported access.
 
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]" 1 0
@@ -93,14 +93,14 @@ tests:
           [1659419722.669953][1915:1920] CHIP:DMG:                                 Cluster = 0x1f,
           [1659419722.669993][1915:1920] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1659419722.670034][1915:1920] CHIP:DMG:                         }
-          [1659419722.670077][1915:1920] CHIP:DMG:
+          [1659419722.670077][1915:1920] CHIP:DMG:                                 
           [1659419722.670114][1915:1920] CHIP:DMG:                         StatusIB =
           [1659419722.670153][1915:1920] CHIP:DMG:                         {
           [1659419722.670191][1915:1920] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1659419722.670229][1915:1920] CHIP:DMG:                         },
-          [1659419722.670266][1915:1920] CHIP:DMG:
+          [1659419722.670266][1915:1920] CHIP:DMG:                         
           [1659419722.670300][1915:1920] CHIP:DMG:                 },
-          [1659419722.670343][1915:1920] CHIP:DMG:
+          [1659419722.670343][1915:1920] CHIP:DMG:                 
           [1659419722.670373][1915:1920] CHIP:DMG:                 AttributeStatusIB =
           [1659419722.670405][1915:1920] CHIP:DMG:                 {
           [1659419722.670436][1915:1920] CHIP:DMG:                         AttributePathIB =
@@ -110,20 +110,20 @@ tests:
           [1659419722.670590][1915:1920] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1659419722.670661][1915:1920] CHIP:DMG:                                 ListIndex = Null,
           [1659419722.670700][1915:1920] CHIP:DMG:                         }
-          [1659419722.670740][1915:1920] CHIP:DMG:
+          [1659419722.670740][1915:1920] CHIP:DMG:                                 
           [1659419722.670776][1915:1920] CHIP:DMG:                         StatusIB =
           [1659419722.670813][1915:1920] CHIP:DMG:                         {
           [1659419722.670851][1915:1920] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1659419722.670888][1915:1920] CHIP:DMG:                         },
-          [1659419722.670925][1915:1920] CHIP:DMG:
+          [1659419722.670925][1915:1920] CHIP:DMG:                         
           [1659419722.670958][1915:1920] CHIP:DMG:                 },
-          [1659419722.670994][1915:1920] CHIP:DMG:
+          [1659419722.670994][1915:1920] CHIP:DMG:                 
           [1659419722.671022][1915:1920] CHIP:DMG:         ],
-          [1659419722.671062][1915:1920] CHIP:DMG:
+          [1659419722.671062][1915:1920] CHIP:DMG:         
           [1659419722.671092][1915:1920] CHIP:DMG:         InteractionModelRevision = 1
           [1659419722.671120][1915:1920] CHIP:DMG: }
           [1659419722.671244][1915:1920] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1659419722.671314][1915:1920] CHIP:EM: Sending Standalone Ack for MessageCounter:153124628 on
+          [1659419722.671314][1915:1920] CHIP:EM: Sending Standalone Ack for MessageCounter:153124628 on 
 
 
 
@@ -147,7 +147,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
-          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command 
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except identify cluster command if try to send any other command will get status as unsupported access.
 
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]" 1 0
@@ -163,14 +163,14 @@ tests:
           [1659419722.669953][1915:1920] CHIP:DMG:                                 Cluster = 0x1f,
           [1659419722.669993][1915:1920] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1659419722.670034][1915:1920] CHIP:DMG:                         }
-          [1659419722.670077][1915:1920] CHIP:DMG:
+          [1659419722.670077][1915:1920] CHIP:DMG:                                 
           [1659419722.670114][1915:1920] CHIP:DMG:                         StatusIB =
           [1659419722.670153][1915:1920] CHIP:DMG:                         {
           [1659419722.670191][1915:1920] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1659419722.670229][1915:1920] CHIP:DMG:                         },
-          [1659419722.670266][1915:1920] CHIP:DMG:
+          [1659419722.670266][1915:1920] CHIP:DMG:                         
           [1659419722.670300][1915:1920] CHIP:DMG:                 },
-          [1659419722.670343][1915:1920] CHIP:DMG:
+          [1659419722.670343][1915:1920] CHIP:DMG:                 
           [1659419722.670373][1915:1920] CHIP:DMG:                 AttributeStatusIB =
           [1659419722.670405][1915:1920] CHIP:DMG:                 {
           [1659419722.670436][1915:1920] CHIP:DMG:                         AttributePathIB =
@@ -180,20 +180,20 @@ tests:
           [1659419722.670590][1915:1920] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1659419722.670661][1915:1920] CHIP:DMG:                                 ListIndex = Null,
           [1659419722.670700][1915:1920] CHIP:DMG:                         }
-          [1659419722.670740][1915:1920] CHIP:DMG:
+          [1659419722.670740][1915:1920] CHIP:DMG:                                 
           [1659419722.670776][1915:1920] CHIP:DMG:                         StatusIB =
           [1659419722.670813][1915:1920] CHIP:DMG:                         {
           [1659419722.670851][1915:1920] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1659419722.670888][1915:1920] CHIP:DMG:                         },
-          [1659419722.670925][1915:1920] CHIP:DMG:
+          [1659419722.670925][1915:1920] CHIP:DMG:                         
           [1659419722.670958][1915:1920] CHIP:DMG:                 },
-          [1659419722.670994][1915:1920] CHIP:DMG:
+          [1659419722.670994][1915:1920] CHIP:DMG:                 
           [1659419722.671022][1915:1920] CHIP:DMG:         ],
-          [1659419722.671062][1915:1920] CHIP:DMG:
+          [1659419722.671062][1915:1920] CHIP:DMG:         
           [1659419722.671092][1915:1920] CHIP:DMG:         InteractionModelRevision = 1
           [1659419722.671120][1915:1920] CHIP:DMG: }
           [1659419722.671244][1915:1920] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1659419722.671314][1915:1920] CHIP:EM: Sending Standalone Ack for MessageCounter:153124628 on
+          [1659419722.671314][1915:1920] CHIP:EM: Sending Standalone Ack for MessageCounter:153124628 on 
 
 
            ./chip-tool  generalcommissioning commissioning-complete  1 0
@@ -217,12 +217,12 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
           sudo ./chip-tool generalcommissioning arm-fail-safe  1000 1  1 0
 
-          On TH,  Verify  DUT generates an InvokeResponseIB with a valid CommandDataIB and
+          On TH,  Verify  DUT generates an InvokeResponseIB with a valid CommandDataIB and 
           sends it to the TH for the data sent in the above command
 
           [1657091692.258118][5248:5253] CHIP:DMG: InvokeResponseMessage =
           [1657091692.258154][5248:5253] CHIP:DMG: {
-          [1657091692.258189][5248:5253] CHIP:DMG:         suppressResponse = false,
+          [1657091692.258189][5248:5253] CHIP:DMG:         suppressResponse = false, 
           [1657091692.258233][5248:5253] CHIP:DMG:         InvokeResponseIBs =
           [1657091692.258280][5248:5253] CHIP:DMG:         [
           [1657091692.258315][5248:5253] CHIP:DMG:                 InvokeResponseIB =
@@ -235,25 +235,25 @@ tests:
           [1657091692.258641][5248:5253] CHIP:DMG:                                         ClusterId = 0x30,
           [1657091692.258692][5248:5253] CHIP:DMG:                                         CommandId = 0x1,
           [1657091692.258739][5248:5253] CHIP:DMG:                                 },
-          [1657091692.258790][5248:5253] CHIP:DMG:
-          [1657091692.258834][5248:5253] CHIP:DMG:                                 CommandFields =
+          [1657091692.258790][5248:5253] CHIP:DMG:                                 
+          [1657091692.258834][5248:5253] CHIP:DMG:                                 CommandFields = 
           [1657091692.258886][5248:5253] CHIP:DMG:                                 {
-          [1657091692.258958][5248:5253] CHIP:DMG:                                         0x0 = 0,
-          [1657091692.259011][5248:5253] CHIP:DMG:                                         0x1 = "",
+          [1657091692.258958][5248:5253] CHIP:DMG:                                         0x0 = 0, 
+          [1657091692.259011][5248:5253] CHIP:DMG:                                         0x1 = "", 
           [1657091692.259061][5248:5253] CHIP:DMG:                                 },
           [1657091692.259107][5248:5253] CHIP:DMG:                         },
-          [1657091692.259162][5248:5253] CHIP:DMG:
+          [1657091692.259162][5248:5253] CHIP:DMG:                         
           [1657091692.259202][5248:5253] CHIP:DMG:                 },
-          [1657091692.259246][5248:5253] CHIP:DMG:
+          [1657091692.259246][5248:5253] CHIP:DMG:                 
           [1657091692.259280][5248:5253] CHIP:DMG:         ],
-          [1657091692.259323][5248:5253] CHIP:DMG:
+          [1657091692.259323][5248:5253] CHIP:DMG:         
           [1657091692.259358][5248:5253] CHIP:DMG:         InteractionModelRevision = 1
           [1657091692.259392][5248:5253] CHIP:DMG: },
           [1657091692.259477][5248:5253] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657091692.259539][5248:5253] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1657091692.259610][5248:5253] CHIP:TOO:   ArmFailSafeResponse: {
           [1657091692.259656][5248:5253] CHIP:TOO:     errorCode: 0
-          [1657091692.259690][5248:5253] CHIP:TOO:     debugText:
+          [1657091692.259690][5248:5253] CHIP:TOO:     debugText: 
           [1657091692.259722][5248:5253] CHIP:TOO:    }
           [1657091692.259775][5248:5253] CHIP:DMG: ICR moving to [AwaitingDe]
           [1657091692.259841][5248:5253] CHIP:EM: Sending Standalone Ack for MessageCounter:215437814 on exchange 22331i
@@ -274,7 +274,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
-          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command 
           Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
 
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]" 1 0
@@ -290,14 +290,14 @@ tests:
           [1659419722.669953][1915:1920] CHIP:DMG:                                 Cluster = 0x1f,
           [1659419722.669993][1915:1920] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1659419722.670034][1915:1920] CHIP:DMG:                         }
-          [1659419722.670077][1915:1920] CHIP:DMG:
+          [1659419722.670077][1915:1920] CHIP:DMG:                                 
           [1659419722.670114][1915:1920] CHIP:DMG:                         StatusIB =
           [1659419722.670153][1915:1920] CHIP:DMG:                         {
           [1659419722.670191][1915:1920] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1659419722.670229][1915:1920] CHIP:DMG:                         },
-          [1659419722.670266][1915:1920] CHIP:DMG:
+          [1659419722.670266][1915:1920] CHIP:DMG:                         
           [1659419722.670300][1915:1920] CHIP:DMG:                 },
-          [1659419722.670343][1915:1920] CHIP:DMG:
+          [1659419722.670343][1915:1920] CHIP:DMG:                 
           [1659419722.670373][1915:1920] CHIP:DMG:                 AttributeStatusIB =
           [1659419722.670405][1915:1920] CHIP:DMG:                 {
           [1659419722.670436][1915:1920] CHIP:DMG:                         AttributePathIB =
@@ -307,26 +307,26 @@ tests:
           [1659419722.670590][1915:1920] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1659419722.670661][1915:1920] CHIP:DMG:                                 ListIndex = Null,
           [1659419722.670700][1915:1920] CHIP:DMG:                         }
-          [1659419722.670740][1915:1920] CHIP:DMG:
+          [1659419722.670740][1915:1920] CHIP:DMG:                                 
           [1659419722.670776][1915:1920] CHIP:DMG:                         StatusIB =
           [1659419722.670813][1915:1920] CHIP:DMG:                         {
           [1659419722.670851][1915:1920] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1659419722.670888][1915:1920] CHIP:DMG:                         },
-          [1659419722.670925][1915:1920] CHIP:DMG:
+          [1659419722.670925][1915:1920] CHIP:DMG:                         
           [1659419722.670958][1915:1920] CHIP:DMG:                 },
-          [1659419722.670994][1915:1920] CHIP:DMG:
+          [1659419722.670994][1915:1920] CHIP:DMG:                 
           [1659419722.671022][1915:1920] CHIP:DMG:         ],
-          [1659419722.671062][1915:1920] CHIP:DMG:
+          [1659419722.671062][1915:1920] CHIP:DMG:         
           [1659419722.671092][1915:1920] CHIP:DMG:         InteractionModelRevision = 1
           [1659419722.671120][1915:1920] CHIP:DMG: }
           [1659419722.671244][1915:1920] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1659419722.671314][1915:1920] CHIP:EM: Sending Standalone Ack for MessageCounter:153124628 on
+          [1659419722.671314][1915:1920] CHIP:EM: Sending Standalone Ack for MessageCounter:153124628 on 
 
 
            ./chip-tool onoff on 1 1 --timedInteractionTimeoutMs 100
           On TH, verify DUT  responsds as UNSUPPORTED_ACCESS  for the data sent in the above command
-          [1659422136.353455][2014:2019] CHIP:DMG:
-          [1659422136.353482][2014:2019] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659422136.353455][2014:2019] CHIP:DMG:         
+          [1659422136.353482][2014:2019] CHIP:DMG:         InteractionModelRevision = 1
           [1659422136.353510][2014:2019] CHIP:DMG: },
           [1659422136.353575][2014:2019] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x7e
           [1659422136.353612][2014:2019] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
@@ -345,7 +345,7 @@ tests:
           path that requires a Timed Invoke transaction to invoke and this
           action is not part of a Timed Invoke transaction"
       verification: |
-          As in the previous step, we enabled accesscontrol to a specific cluster, we need to remove the accesscontrol using below command.
+          As in the previous step, we enabled accesscontrol to a specific cluster, we need to remove the accesscontrol using below command. 
           As the EP used here is an example, user needs to provide the endpoint id, which they use.
 
 

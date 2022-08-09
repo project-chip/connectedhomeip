@@ -29,7 +29,7 @@ tests:
           string"
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):  
           ./chip-tool contentlauncher launch-url "exampleUrl"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
           ./chip-tv-casting-app contentlauncher launch-url "exampleUrl"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
 
@@ -51,7 +51,7 @@ tests:
           string and a display string"
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):  
           ./chip-tool contentlauncher launch-url "https://csa-iot.org/"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1 --DisplayString "Custom Display String"
           ./chip-tv-casting-app contentlauncher launch-url "https://csa-iot.org/"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1 --DisplayString "Custom Display String"
 
@@ -72,7 +72,7 @@ tests:
           string and a brand information object."
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):  
           ./chip-tool contentlauncher launch-url "https://csa-iot.org/"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
           ./chip-tv-casting-app contentlauncher launch-url "https://csa-iot.org/"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
 
@@ -93,7 +93,7 @@ tests:
           content URL string."
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):  
           ./chip-tool contentlauncher launch-url "https://badurl"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
           ./chip-tv-casting-app contentlauncher launch-url "https://badurl"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
 
@@ -105,7 +105,7 @@ tests:
           [1652429829.721395][29660:29665] CHIP:TOO:    }
 
           [1654584050.322782][2478:2478] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_050A Command=0x0000_0001
-          [1654584050.322837][2478:2478] CHIP:DL: GetContentAppByEndpointId() - endpoint 1 not found
+          [1654584050.322837][2478:2478] CHIP:DL: GetContentAppByEndpointId() - endpoint 1 not found 
           [1654584050.322860][2478:2478] CHIP:ZCL: Content Launcher NOT returning ContentApp delegate for endpoint:1
           [1654584050.322891][2478:2478] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl
           [1654584050.322915][2478:2478] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://badurl DisplayString= BrandingInformation.ProviderName=exampleName
@@ -117,7 +117,7 @@ tests:
           content URL string."
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):  
           ./chip-tool contentlauncher launch-url "https://csa-iot.org/badauth"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
           ./chip-tv-casting-app contentlauncher launch-url "https://csa-iot.org/badauth"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
 
@@ -129,7 +129,7 @@ tests:
           [1652429857.018103][29666:29671] CHIP:TOO:    }
 
           [1654584216.621632][2478:2478] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_050A Command=0x0000_0001
-          [1654584216.621692][2478:2478] CHIP:DL: GetContentAppByEndpointId() - endpoint 1 not found
+          [1654584216.621692][2478:2478] CHIP:DL: GetContentAppByEndpointId() - endpoint 1 not found 
           [1654584216.621718][2478:2478] CHIP:ZCL: Content Launcher NOT returning ContentApp delegate for endpoint:1
           [1654584216.621752][2478:2478] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl
           [1654584216.621804][2478:2478] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://csa-iot.org/badauth DisplayString= BrandingInformation.ProviderName=exampleName

@@ -28,7 +28,7 @@ config:
 tests:
     - label:
           "TH sends a Timed Request Message with the timeout value set. (Example
-          - 200 milliseconds)."
+          - 200 milliseconds). +"
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
           ./chip-tool onoff on 1 1 --timedInteractionTimeoutMs 200
@@ -67,23 +67,23 @@ tests:
           [1655798786.132439][7065:7070] CHIP:DMG:                                 Cluster = 0x8,
           [1655798786.132512][7065:7070] CHIP:DMG:                                 Attribute = 0x0000_0011,
           [1655798786.132578][7065:7070] CHIP:DMG:                         }
-          [1655798786.132635][7065:7070] CHIP:DMG:
+          [1655798786.132635][7065:7070] CHIP:DMG:                                 
           [1655798786.132704][7065:7070] CHIP:DMG:                         StatusIB =
           [1655798786.132770][7065:7070] CHIP:DMG:                         {
           [1655798786.132822][7065:7070] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1655798786.132892][7065:7070] CHIP:DMG:                         },
-          [1655798786.132960][7065:7070] CHIP:DMG:
+          [1655798786.132960][7065:7070] CHIP:DMG:                         
           [1655798786.133006][7065:7070] CHIP:DMG:                 },
-          [1655798786.133070][7065:7070] CHIP:DMG:
+          [1655798786.133070][7065:7070] CHIP:DMG:                 
           [1655798786.133109][7065:7070] CHIP:DMG:         ],
-          [1655798786.133173][7065:7070] CHIP:DMG:
+          [1655798786.133173][7065:7070] CHIP:DMG:         
           [1655798786.133213][7065:7070] CHIP:DMG:         InteractionModelRevision = 1
           [1655798786.133269][7065:7070] CHIP:DMG: }
           [1655798786.133385][7065:7070] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
 
            By sending a ReadRequest that the Write action was performed correctly.
-          ./chip-tool levelcontrol read on-level 1 1
+          ./chip-tool levelcontrol read on-level 1 1 
           [1655799013.466144][7075:7080] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 737039642
           [1655799013.466237][7075:7080] CHIP:TOO:   on level: 1
           [1655799013.466336][7075:7080] CHIP:EM: Sending Standalone Ack for MessageCounter:202402347 on exchange 58038i
@@ -132,7 +132,7 @@ tests:
           and then send the Write Request Message to the DUT."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
-
+           
           ./chip-tool modeselect write on-mode 0 1 1 --repeat-delay-ms 1000 --timedInteractionTimeoutMs 500
 
           On TH, Verify we are getting status response and UNSUPPORTED_ACCESS  from DUT to TH for above command

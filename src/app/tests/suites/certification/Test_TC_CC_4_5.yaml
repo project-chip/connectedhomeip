@@ -24,14 +24,17 @@ config:
     endpoint: 0
 
 tests:
-    - label:
-          "DUT sends MoveToSaturation command to TH a Saturation with
-          TransitionTime 300."
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "DUT sends MoveToSaturation command to TH"
       PICS: CC.C.C03.Rsp
       verification: |
           ./chip-tool colorcontrol move-to-saturation 200 300 0 0 1 1
 
-          Verify in DUT as client side log:
+          Verify in TH(all-clusters-app) Log:
 
           [1657911500.672151][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657911500.672204][2977:2977] CHIP:DMG: {
@@ -67,12 +70,13 @@ tests:
       disabled: true
 
     - label:
-          "Over TransitionTime, DUT reads CurrentSaturation attribute from TH."
-      PICS: CC.C.A0001
+          "DUT reads CurrentSaturation attribute from TH (potentially multiple
+          times)"
+      PICS: CC.C.C03.Rsp && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
 
-          Verify in DUT as client side log:
+          Verify in TH(all-clusters-app) Log:
 
           [1657911521.672771][2977:2977] CHIP:IM: Received Read request
           [1657911521.672849][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -104,7 +108,8 @@ tests:
       PICS: CC.C.C04.Rsp
       verification: |
           ./chip-tool colorcontrol move-saturation 1 10 0 0 1 1
-          Verify in DUT as client side log:
+
+          Verify in TH(all-clusters-app) Log:
 
 
           [1657911543.960120][2977:2977] CHIP:DMG: InvokeRequestMessage =
@@ -140,12 +145,13 @@ tests:
           [1657911543.961152][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0004
       disabled: true
 
-    - label: "DUT reads CurrentSaturation attribute from TH several times."
-      PICS: CC.C.A0001
+    - label:
+          "DUT reads CurrentSaturation attribute (potentially multiple times)"
+      PICS: CC.C.C04.Rsp && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
 
-          Verify in DUT as client side log:
+          Verify in TH(all-clusters-app) Log:
 
           [1657911563.694872][2977:2977] CHIP:IM: Received Read request
           [1657911563.694955][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -178,7 +184,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol step-saturation 1 10 200 0 0 1 1
 
-          Verify in DUT as client side log:
+          Verify in TH(all-clusters-app) Log:
 
           [1657911581.077515][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657911581.077553][2977:2977] CHIP:DMG: {
@@ -215,12 +221,13 @@ tests:
       disabled: true
 
     - label:
-          "Over TransitionTime, DUT reads CurrentSaturation attribute from TH."
-      PICS: CC.C.A0001
+          "DUT reads CurrentSaturation attribute from TH (potentially multiple
+          times)"
+      PICS: CC.C.C05.Rsp && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
 
-          Verify in DUT as client side log:
+          Verify in TH(all-clusters-app) Log:
           [1657911602.223413][2977:2977] CHIP:IM: Received Read request
           [1657911602.223554][2977:2977] CHIP:DMG: ReadRequestMessage =
           [1657911602.223609][2977:2977] CHIP:DMG: {
@@ -247,12 +254,12 @@ tests:
           [1657911602.224608][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
-    - label: "DUT sends MoveToHueAndSaturation command to TH."
+    - label: "DUT sends MoveToHueAndSaturation command to TH"
       PICS: CC.C.C06.Rsp
       verification: |
           ./chip-tool colorcontrol move-to-hue-and-saturation 100 200 200 0 0 1 1
 
-          Verify in DUT as client side log:
+          Verify in TH(all-clusters-app) Log:
 
           [1657911631.586168][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657911631.586198][2977:2977] CHIP:DMG: {
@@ -289,12 +296,12 @@ tests:
       disabled: true
 
     - label:
-          "Over TransitionTime, DUT reads CurrentHue and CurrentSaturation
-          attributes from TH."
-      PICS: CC.C.A0000 && CC.C.A0001
+          "DUT reads CurrentHue and CurrentSaturation attributes from TH
+          (potentially multiple times)"
+      PICS: CC.C.C06.Rsp && CC.C.A0000 && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-hue 1 1
-          Verify in DUT as client side log:
+          Verify in TH(all-clusters-app) Log:
 
           [1657911655.180421][2977:2977] CHIP:IM: Received Read request
           [1657911655.180507][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -324,7 +331,7 @@ tests:
 
           "./chip-tool colorcontrol read current-saturation 1 1
 
-          Verify in DUT as client side log:
+          Verify in TH(all-clusters-app) Log:
 
           [1657911674.594218][2977:2977] CHIP:IM: Received Read request
           [1657911674.594301][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -359,7 +366,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol stop-move-step 0 0 1 1
 
-          Verify in DUT as client side log:
+          Verify in TH(all-clusters-app) Log:
           [1657911698.270231][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657911698.270280][2977:2977] CHIP:DMG: {
           [1657911698.270321][2977:2977] CHIP:DMG:        suppressResponse = false,
@@ -389,4 +396,37 @@ tests:
           [1657911698.271270][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=o
           [1657911698.271337][2977:2977] CHIP:DMG: AccessControl: allowed
           [1657911698.271365][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0047
+      disabled: true
+
+    - label:
+          "Over TransitionTime, DUT reads CurrentSaturation attribute from TH."
+      PICS: CC.C.C47.Rsp && CC.C.A0001
+      verification: |
+          ./chip-tool colorcontrol read current-saturation 1 1
+
+          Verify in TH(all-clusters-app) Log:
+          [1657911602.223413][2977:2977] CHIP:IM: Received Read request
+          [1657911602.223554][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657911602.223609][2977:2977] CHIP:DMG: {
+          [1657911602.223655][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657911602.223708][2977:2977] CHIP:DMG:        [
+          [1657911602.223758][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657911602.223828][2977:2977] CHIP:DMG:                {
+          [1657911602.223884][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657911602.223949][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657911602.224000][2977:2977] CHIP:DMG:                        Attribute = 0x0000_0001,
+          [1657911602.224027][2977:2977] CHIP:DMG:                }
+          [1657911602.224078][2977:2977] CHIP:DMG:
+          [1657911602.224162][2977:2977] CHIP:DMG:        ],
+          [1657911602.224193][2977:2977] CHIP:DMG:
+          [1657911602.224219][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657911602.224244][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657911602.224267][2977:2977] CHIP:DMG: },
+          [1657911602.224346][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657911602.224442][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657911602.224471][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 1 is dirty
+          [1657911602.224492][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0001 (expanded=0)
+          [1657911602.224520][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657911602.224553][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657911602.224608][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true

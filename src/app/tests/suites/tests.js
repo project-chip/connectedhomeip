@@ -210,6 +210,7 @@ function getManualTests() {
         "Test_TC_CHANNEL_5_4",
         "Test_TC_CHANNEL_5_5",
         "Test_TC_CHANNEL_5_6",
+        "Test_TC_KEYPADINPUT_3_1",
         "Test_TC_MEDIAPLAYBACK_6_5",
         "Test_TC_MEDIAPLAYBACK_6_7",
         "Test_TC_AUDIOOUTPUT_7_3",

@@ -28,13 +28,18 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
           ./chip-tool flowmeasurement read measured-value 1 1
 
-          Verify read command is received in DUT as client side log
+          Verify read command is received on TH(all-clusters-app) log
 
           [1658853801.750840][29347:29347] CHIP:IM: Received Read request
           [1658853801.750918][29347:29347] CHIP:DMG: ReadRequestMessage =
@@ -47,10 +52,10 @@ tests:
           [1658853801.751105][29347:29347] CHIP:DMG:                         Cluster = 0x404,
           [1658853801.751137][29347:29347] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1658853801.751167][29347:29347] CHIP:DMG:                 }
-          [1658853801.751195][29347:29347] CHIP:DMG:
+          [1658853801.751195][29347:29347] CHIP:DMG:                         
           [1658853801.751220][29347:29347] CHIP:DMG:         ],
-          [1658853801.751248][29347:29347] CHIP:DMG:
-          [1658853801.751275][29347:29347] CHIP:DMG:         isFabricFiltered = true,
+          [1658853801.751248][29347:29347] CHIP:DMG:                 
+          [1658853801.751275][29347:29347] CHIP:DMG:         isFabricFiltered = true, 
           [1658853801.751300][29347:29347] CHIP:DMG:         InteractionModelRevision = 1
           [1658853801.751323][29347:29347] CHIP:DMG: },
           [1658853801.751396][29347:29347] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -64,7 +69,7 @@ tests:
 
           "./chip-tool flowmeasurement read min-measured-value 1 1
 
-          Verify read command is received in DUT as client side log
+          Verify read command is received on TH(all-clusters-app) log
 
           [1658853849.969073][29347:29347] CHIP:IM: Received Read request
           [1658853849.969151][29347:29347] CHIP:DMG: ReadRequestMessage =
@@ -77,10 +82,10 @@ tests:
           [1658853849.969369][29347:29347] CHIP:DMG:                         Cluster = 0x404,
           [1658853849.969410][29347:29347] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1658853849.969447][29347:29347] CHIP:DMG:                 }
-          [1658853849.969476][29347:29347] CHIP:DMG:
+          [1658853849.969476][29347:29347] CHIP:DMG:                         
           [1658853849.969511][29347:29347] CHIP:DMG:         ],
-          [1658853849.969539][29347:29347] CHIP:DMG:
-          [1658853849.969574][29347:29347] CHIP:DMG:         isFabricFiltered = true,
+          [1658853849.969539][29347:29347] CHIP:DMG:                 
+          [1658853849.969574][29347:29347] CHIP:DMG:         isFabricFiltered = true, 
           [1658853849.969600][29347:29347] CHIP:DMG:         InteractionModelRevision = 1
           [1658853849.969628][29347:29347] CHIP:DMG: },
           [1658853849.969697][29347:29347] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -91,7 +96,7 @@ tests:
 
           "./chip-tool flowmeasurement read max-measured-value 1 1
 
-          Verify read command is received in DUT as client side log
+          Verify read command is received on TH(all-clusters-app) log
 
           [1658853898.416395][29347:29347] CHIP:IM: Received Read request
           [1658853898.416472][29347:29347] CHIP:DMG: ReadRequestMessage =
@@ -104,10 +109,10 @@ tests:
           [1658853898.416703][29347:29347] CHIP:DMG:                         Cluster = 0x404,
           [1658853898.416746][29347:29347] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1658853898.416776][29347:29347] CHIP:DMG:                 }
-          [1658853898.416813][29347:29347] CHIP:DMG:
+          [1658853898.416813][29347:29347] CHIP:DMG:                         
           [1658853898.416839][29347:29347] CHIP:DMG:         ],
-          [1658853898.416876][29347:29347] CHIP:DMG:
-          [1658853898.416903][29347:29347] CHIP:DMG:         isFabricFiltered = true,
+          [1658853898.416876][29347:29347] CHIP:DMG:                 
+          [1658853898.416903][29347:29347] CHIP:DMG:         isFabricFiltered = true, 
           [1658853898.416937][29347:29347] CHIP:DMG:         InteractionModelRevision = 1
           [1658853898.416960][29347:29347] CHIP:DMG: },
           [1658853898.417051][29347:29347] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -121,7 +126,7 @@ tests:
       verification: |
           chip-tool flowmeasurement read tolerance 1 1
 
-          Verify in DUT as client side log
+          Verify read command is received on TH(all-clusters-app) log
 
           [1658853991.266232][29347:29347] CHIP:IM: Received Read request
           [1658853991.266328][29347:29347] CHIP:DMG: ReadRequestMessage =
@@ -134,10 +139,10 @@ tests:
           [1658853991.266640][29347:29347] CHIP:DMG:                         Cluster = 0x404,
           [1658853991.266694][29347:29347] CHIP:DMG:                         Attribute = 0x0000_0003,
           [1658853991.266736][29347:29347] CHIP:DMG:                 }
-          [1658853991.266785][29347:29347] CHIP:DMG:
+          [1658853991.266785][29347:29347] CHIP:DMG:                         
           [1658853991.266820][29347:29347] CHIP:DMG:         ],
-          [1658853991.266869][29347:29347] CHIP:DMG:
-          [1658853991.266905][29347:29347] CHIP:DMG:         isFabricFiltered = true,
+          [1658853991.266869][29347:29347] CHIP:DMG:                 
+          [1658853991.266905][29347:29347] CHIP:DMG:         isFabricFiltered = true, 
           [1658853991.266952][29347:29347] CHIP:DMG:         InteractionModelRevision = 1
           [1658853991.266984][29347:29347] CHIP:DMG: },
           [1658853991.267091][29347:29347] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -167,7 +172,7 @@ tests:
       verification: |
           ./chip-tool flowmeasurement read attribute-list 1 1
 
-          Verify a list of supported attributes which contains mandatory in DUT as client side log
+          Verify a list of supported attributes which contains mandatory on TH(all-clusters-minimal-app) log
 
           [1656478164937] [49517:5732586] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_FFFB DataVersion: 3423686907
           [1656478164937] [49517:5732586] CHIP: [TOO]   AttributeList: 8 entries
@@ -182,7 +187,7 @@ tests:
 
           ./chip-tool flowmeasurement read feature-map 1 1
 
-          Verify featuremap value is 0 in DUT as client side log
+          Verify featuremap value is 0 on TH(all-clusters-minimal-app) log
 
           [1656478242820] [49526:5733040] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_FFFC DataVersion: 3423686907
           [1656478242820] [49526:5733040] CHIP: [TOO]   FeatureMap: 0
@@ -190,7 +195,7 @@ tests:
 
           "./chip-tool flowmeasurement read measured-value 1 1
 
-          Verify read command is received in DUT as client side log
+          Verify read command is received on TH(all-clusters-minimal-app) log
 
           [1658853801.750840][29347:29347] CHIP:IM: Received Read request
           [1658853801.750918][29347:29347] CHIP:DMG: ReadRequestMessage =
@@ -203,10 +208,10 @@ tests:
           [1658853801.751105][29347:29347] CHIP:DMG:                         Cluster = 0x404,
           [1658853801.751137][29347:29347] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1658853801.751167][29347:29347] CHIP:DMG:                 }
-          [1658853801.751195][29347:29347] CHIP:DMG:
+          [1658853801.751195][29347:29347] CHIP:DMG:                         
           [1658853801.751220][29347:29347] CHIP:DMG:         ],
-          [1658853801.751248][29347:29347] CHIP:DMG:
-          [1658853801.751275][29347:29347] CHIP:DMG:         isFabricFiltered = true,
+          [1658853801.751248][29347:29347] CHIP:DMG:                 
+          [1658853801.751275][29347:29347] CHIP:DMG:         isFabricFiltered = true, 
           [1658853801.751300][29347:29347] CHIP:DMG:         InteractionModelRevision = 1
           [1658853801.751323][29347:29347] CHIP:DMG: },
           [1658853801.751396][29347:29347] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -220,7 +225,7 @@ tests:
 
           ""./chip-tool flowmeasurement read min-measured-value 1 1
 
-          Verify read command is received in DUT as client side log
+          Verify read command is received on TH(all-clusters-minimal-app) log
 
           [1658853849.969073][29347:29347] CHIP:IM: Received Read request
           [1658853849.969151][29347:29347] CHIP:DMG: ReadRequestMessage =
@@ -233,10 +238,10 @@ tests:
           [1658853849.969369][29347:29347] CHIP:DMG:                         Cluster = 0x404,
           [1658853849.969410][29347:29347] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1658853849.969447][29347:29347] CHIP:DMG:                 }
-          [1658853849.969476][29347:29347] CHIP:DMG:
+          [1658853849.969476][29347:29347] CHIP:DMG:                         
           [1658853849.969511][29347:29347] CHIP:DMG:         ],
-          [1658853849.969539][29347:29347] CHIP:DMG:
-          [1658853849.969574][29347:29347] CHIP:DMG:         isFabricFiltered = true,
+          [1658853849.969539][29347:29347] CHIP:DMG:                 
+          [1658853849.969574][29347:29347] CHIP:DMG:         isFabricFiltered = true, 
           [1658853849.969600][29347:29347] CHIP:DMG:         InteractionModelRevision = 1
           [1658853849.969628][29347:29347] CHIP:DMG: },
           [1658853849.969697][29347:29347] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -247,7 +252,7 @@ tests:
 
           ""./chip-tool flowmeasurement read max-measured-value 1 1
 
-          Verify read command is received in DUT as client side log
+          Verify read command is received on TH(all-clusters-minimal-app) log
 
           [1658853898.416395][29347:29347] CHIP:IM: Received Read request
           [1658853898.416472][29347:29347] CHIP:DMG: ReadRequestMessage =
@@ -260,10 +265,10 @@ tests:
           [1658853898.416703][29347:29347] CHIP:DMG:                         Cluster = 0x404,
           [1658853898.416746][29347:29347] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1658853898.416776][29347:29347] CHIP:DMG:                 }
-          [1658853898.416813][29347:29347] CHIP:DMG:
+          [1658853898.416813][29347:29347] CHIP:DMG:                         
           [1658853898.416839][29347:29347] CHIP:DMG:         ],
-          [1658853898.416876][29347:29347] CHIP:DMG:
-          [1658853898.416903][29347:29347] CHIP:DMG:         isFabricFiltered = true,
+          [1658853898.416876][29347:29347] CHIP:DMG:                 
+          [1658853898.416903][29347:29347] CHIP:DMG:         isFabricFiltered = true, 
           [1658853898.416937][29347:29347] CHIP:DMG:         InteractionModelRevision = 1
           [1658853898.416960][29347:29347] CHIP:DMG: },
           [1658853898.417051][29347:29347] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -276,7 +281,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Verify in DUT as client side log
+          Verify read command is received on TH(all-clusters-minimal-app) log
 
           ./chip-tool flowmeasurement read tolerance 1 1
 

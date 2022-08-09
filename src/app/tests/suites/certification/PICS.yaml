@@ -506,15 +506,15 @@ PICS:
     - label:
           "Does the device implement receiving the MoveToColorTemperature
           command?"
-      id: CC.C.C0A.Rsp
+      id: CC.C.C0a.Rsp
 
     - label:
           "Does the device implement receiving the MoveColorTemperature command?"
-      id: CC.C.C4B.Rsp
+      id: CC.C.C4b.Rsp
 
     - label:
           "Does the device implement receiving the StepColorTemperature command?"
-      id: CC.C.C4C.Rsp
+      id: CC.C.C4c.Rsp
 
     - label:
           "Does the device implement receiving the EnhancedMoveToHue command?"
@@ -533,6 +533,10 @@ PICS:
 
     - label: "Does the device implement receiving the ColorLoopSet command?"
       id: CC.C.C44.Rsp
+
+    - label:
+          "Does the device implement sending the MoveToColorTemperature command?"
+      id: CC.C.C0a.Rsp
 
       # Relative Humidity cluster
     - label: "Does the device implement the MeasuredValue attribute?"
@@ -1938,6 +1942,11 @@ PICS:
           "Does the DUT support the Keypad Input server cluster, SendKey
           command?"
       id: KEYPADINPUT.S.C00.Rsp
+
+    - label:
+          "Does the DUT support the Keypad Input client cluster, SendKey
+          command?"
+      id: KEYPADINPUT.C.C00.Tx
 
     - label:
           "Does the DUT support the Application Launcher server cluster
