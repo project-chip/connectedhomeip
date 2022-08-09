@@ -33,6 +33,10 @@ Note: These steps are supported on:
     interference with existing homes.
 -   To pair and control Matter Thread devices, you'll need to have a HomePod
     Mini or Apple TV 4K
+-   To pair to devices via BLE, you must either use the Matter Pairing API
+    documented
+    [here](https://developer.apple.com/documentation/homekit/hmmatterhome), or
+    enable [Developer mode](#enable-developer-mode-on-your-apple-device).
 
 ## Source Compatibility
 
