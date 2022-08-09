@@ -36,8 +36,8 @@ public:
     struct AttributePathsConfig
     {
         size_t count = 0;
-        chip::app::AttributePathParams attributePathParams[kMaxAllowedPaths];
-        chip::app::DataVersionFilter dataVersionFilter[kMaxAllowedPaths];
+        std::unique_ptr<chip::app::AttributePathParams[]> attributePathParams;
+        std::unique_ptr<chip::app::DataVersionFilter[]> dataVersionFilter;
     };
 
     static CHIP_ERROR GetAttributePaths(std::vector<chip::EndpointId> endpointIds, std::vector<chip::ClusterId> clusterIds,
@@ -58,26 +58,25 @@ protected:
                              const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional)
     {
         return ReportAttribute(device, endpointIds, clusterIds, attributeIds, chip::app::ReadClient::InteractionType::Read, 0, 0,
-                               fabricFiltered, dataVersions);
+                               fabricFiltered, dataVersions, chip::NullOptional, chip::NullOptional);
     }
 
     CHIP_ERROR SubscribeAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                                   std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
-                                  uint16_t minInterval = 0, uint16_t maxInterval = 0,
-                                  const chip::Optional<bool> & fabricFiltered                         = chip::Optional<bool>(true),
-                                  const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional,
-                                  const chip::Optional<bool> & keepSubscriptions                      = chip::NullOptional)
+                                  uint16_t minInterval, uint16_t maxInterval, const chip::Optional<bool> & fabricFiltered,
+                                  const chip::Optional<std::vector<chip::DataVersion>> & dataVersions,
+                                  const chip::Optional<bool> & keepSubscriptions, const chip::Optional<bool> & autoResubscribe)
     {
         return ReportAttribute(device, endpointIds, clusterIds, attributeIds, chip::app::ReadClient::InteractionType::Subscribe,
-                               minInterval, maxInterval, fabricFiltered, dataVersions, keepSubscriptions);
+                               minInterval, maxInterval, fabricFiltered, dataVersions, keepSubscriptions, autoResubscribe);
     }
 
     CHIP_ERROR ReportAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                                std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
-                               chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval = 0,
-                               uint16_t maxInterval = 0, const chip::Optional<bool> & fabricFiltered = chip::Optional<bool>(true),
-                               const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional,
-                               const chip::Optional<bool> & keepSubscriptions                      = chip::NullOptional);
+                               chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval, uint16_t maxInterval,
+                               const chip::Optional<bool> & fabricFiltered,
+                               const chip::Optional<std::vector<chip::DataVersion>> & dataVersions,
+                               const chip::Optional<bool> & keepSubscriptions, const chip::Optional<bool> & autoResubscribe);
 
     CHIP_ERROR ReadEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                          std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
@@ -85,28 +84,25 @@ protected:
                          const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional)
     {
         return ReportEvent(device, endpointIds, clusterIds, eventIds, chip::app::ReadClient::InteractionType::Read, 0, 0,
-                           fabricFiltered, eventNumber);
+                           fabricFiltered, eventNumber, chip::NullOptional, chip::NullOptional, chip::NullOptional);
     }
 
     CHIP_ERROR SubscribeEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
-                              std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
-                              uint16_t minInterval = 0, uint16_t maxInterval = 0,
-                              const chip::Optional<bool> & fabricFiltered           = chip::Optional<bool>(true),
-                              const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
-                              const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional,
-                              const chip::Optional<std::vector<bool>> & isUrgents   = chip::NullOptional)
+                              std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds, uint16_t minInterval,
+                              uint16_t maxInterval, const chip::Optional<bool> & fabricFiltered,
+                              const chip::Optional<chip::EventNumber> & eventNumber, const chip::Optional<bool> & keepSubscriptions,
+                              const chip::Optional<std::vector<bool>> & isUrgents, const chip::Optional<bool> & autoResubscribe)
     {
         return ReportEvent(device, endpointIds, clusterIds, eventIds, chip::app::ReadClient::InteractionType::Subscribe,
-                           minInterval, maxInterval, fabricFiltered, eventNumber, keepSubscriptions, isUrgents);
+                           minInterval, maxInterval, fabricFiltered, eventNumber, keepSubscriptions, isUrgents, autoResubscribe);
     }
 
     CHIP_ERROR ReportEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                            std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
-                           chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval = 0,
-                           uint16_t maxInterval = 0, const chip::Optional<bool> & fabricFiltered = chip::Optional<bool>(true),
-                           const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
-                           const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional,
-                           const chip::Optional<std::vector<bool>> & isUrgents   = chip::NullOptional);
+                           chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval, uint16_t maxInterval,
+                           const chip::Optional<bool> & fabricFiltered, const chip::Optional<chip::EventNumber> & eventNumber,
+                           const chip::Optional<bool> & keepSubscriptions, const chip::Optional<std::vector<bool>> & isUrgents,
+                           const chip::Optional<bool> & autoResubscribe);
 
     CHIP_ERROR ReadAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                        std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
@@ -138,6 +134,8 @@ protected:
                          const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional,
                          const chip::Optional<chip::EventNumber> & eventNumber               = chip::NullOptional,
                          const chip::Optional<bool> & keepSubscriptions                      = chip::NullOptional);
+
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams);
 
     void Shutdown() { mReadClients.clear(); }
 
@@ -352,18 +350,17 @@ public:
                              const chip::Optional<chip::DataVersion> & dataVersion = chip::NullOptional);
 
     CHIP_ERROR SubscribeAttribute(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                  chip::AttributeId attributeId, uint16_t minInterval, uint16_t maxInterval,
-                                  bool fabricFiltered                                   = true,
-                                  const chip::Optional<chip::DataVersion> & dataVersion = chip::NullOptional,
-                                  const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional);
+                                  chip::AttributeId attributeId, uint16_t minInterval, uint16_t maxInterval, bool fabricFiltered,
+                                  const chip::Optional<chip::DataVersion> & dataVersion,
+                                  const chip::Optional<bool> & keepSubscriptions, const chip::Optional<bool> & autoResubscribe);
 
     CHIP_ERROR ReadEvent(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::EventId eventId,
                          bool fabricFiltered = true, const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional);
 
     CHIP_ERROR SubscribeEvent(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::EventId eventId,
-                              uint16_t minInterval, uint16_t maxInterval, bool fabricFiltered = true,
-                              const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
-                              const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional);
+                              uint16_t minInterval, uint16_t maxInterval, bool fabricFiltered,
+                              const chip::Optional<chip::EventNumber> & eventNumber, const chip::Optional<bool> & keepSubscriptions,
+                              const chip::Optional<bool> & autoResubscribe);
 
     CHIP_ERROR WaitForReport() { return CHIP_NO_ERROR; }
 
@@ -437,6 +434,7 @@ public:
     void OnError(CHIP_ERROR error) override;
     void OnDone(chip::app::ReadClient * aReadClient) override;
     void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId) override;
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override;
     /////////// WriteClient Callback Interface /////////
     void OnResponse(const chip::app::WriteClient * client, const chip::app::ConcreteDataAttributePath & path,
                     chip::app::StatusIB status) override;
