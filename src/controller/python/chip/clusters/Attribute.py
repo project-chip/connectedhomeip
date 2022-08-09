@@ -17,6 +17,7 @@
 
 # Needed to use types in type hints before they are fully defined.
 from __future__ import annotations
+import asyncio
 from asyncio import events
 
 from asyncio.futures import Future
@@ -719,22 +720,32 @@ class AsyncReadTransaction:
             logging.info("Re-subscription succeeded!")
             if self._subscription_handler._onResubscriptionSucceededCb is not None:
                 if (self._subscription_handler._onResubscriptionSucceededCb_isAsync):
-                    self._event_loop.create_task(
-                        self._subscription_handler._onResubscriptionSucceededCb(self._subscription_handler))
+                    if self._event_loop.is_closed():
+                        asyncio.run(
+                            self._subscription_handler._onResubscriptionSucceededCb(self._subscription_handler))
+                    else:
+                        self._event_loop.create_task(
+                            self._subscription_handler._onResubscriptionSucceededCb(self._subscription_handler))
                 else:
                     self._subscription_handler._onResubscriptionSucceededCb(self._subscription_handler)
 
     def handleSubscriptionEstablished(self, subscriptionId):
-        self._event_loop.call_soon_threadsafe(
-            self._handleSubscriptionEstablished, subscriptionId)
+        if self._event_loop.is_closed():
+            self._handleSubscriptionEstablished(subscriptionId)
+        else:
+            self._event_loop.call_soon_threadsafe(
+                self._handleSubscriptionEstablished, subscriptionId)
 
     def handleResubscriptionAttempted(self, terminationCause: int, nextResubscribeIntervalMsec: int):
         if (self._subscription_handler._onResubscriptionAttemptedCb_isAsync):
-            self._event_loop.create_task(self._subscription_handler._onResubscriptionAttemptedCb(
-                self._subscription_handler, terminationCause, nextResubscribeIntervalMsec))
+            if self._event_loop.is_closed():
+                asyncio.run(self._subscription_handler._onresubscriptionattemptedcb(
+                    self._subscription_handler, terminationCause, nextResubscribeIntervalMsec))
+            else:
+                self._event_loop.create_task(self._subscription_handler._onresubscriptionattemptedcb(
+                    self._subscription_handler, terminationCause, nextResubscribeIntervalMsec))
         else:
-            self._event_loop.call_soon_threadsafe(
-                self._subscription_handler._onResubscriptionAttemptedCb, self._subscription_handler, terminationCause, nextResubscribeIntervalMsec)
+            self._subscription_handler._onResubscriptionAttemptedCb(self._subscription_handler, terminationCause, nextResubscribeIntervalMsec)
 
     def _handleReportBegin(self):
         pass
