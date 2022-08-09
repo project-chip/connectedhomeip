@@ -745,7 +745,8 @@ class AsyncReadTransaction:
                 self._event_loop.create_task(self._subscription_handler._onresubscriptionattemptedcb(
                     self._subscription_handler, terminationCause, nextResubscribeIntervalMsec))
         else:
-            self._subscription_handler._onResubscriptionAttemptedCb(self._subscription_handler, terminationCause, nextResubscribeIntervalMsec)
+            self._subscription_handler._onResubscriptionAttemptedCb(
+                self._subscription_handler, terminationCause, nextResubscribeIntervalMsec)
 
     def _handleReportBegin(self):
         pass
