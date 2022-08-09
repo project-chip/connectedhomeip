@@ -314,7 +314,7 @@ tests:
 
            onoff subscribe on-time 500 100 1 1
 
-          On TH Verify that the DUT sends an error message 
+          On TH Verify that the DUT sends an error message
           [1657451028.957761][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733056 from RetransTable on exchange 33632i
           [1657451028.957867][11635:11640] CHIP:DMG: StatusResponseMessage =
           [1657451028.957963][11635:11640] CHIP:DMG: {

@@ -132,14 +132,14 @@ tests:
 
           NOTE the quotes: single-quote/double-quote/string/double-quote/single-quote
 
-          On TH(chip-tool) verify that DUT sends a success response 
+          On TH(chip-tool) verify that DUT sends a success response
           [1656495932.122094][2236:2241] CHIP:DMG:                         }
-          [1656495932.122264][2236:2241] CHIP:DMG:                                 
+          [1656495932.122264][2236:2241] CHIP:DMG:
           [1656495932.122332][2236:2241] CHIP:DMG:                         StatusIB =
           [1656495932.122398][2236:2241] CHIP:DMG:                         {
           [1656495932.122466][2236:2241] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1656495932.122538][2236:2241] CHIP:DMG:                         },
-          [1656495932.122602][2236:2241] CHIP:DMG:                         
+          [1656495932.122602][2236:2241] CHIP:DMG:
           [1656495932.122660][2236:2241] CHIP:DMG:                 },
       disabled: true
 
@@ -249,7 +249,7 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read software-version-string  1 3
 
-          Verify the SoftwareVersionString is of type string and has length of 1 to 64 bytes 
+          Verify the SoftwareVersionString is of type string and has length of 1 to 64 bytes
 
           [1656496498.568951][2362:2367] CHIP:TOO:   SoftwareVersionString: 1.0
       disabled: true

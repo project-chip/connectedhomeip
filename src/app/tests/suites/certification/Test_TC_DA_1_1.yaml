@@ -28,7 +28,7 @@ config:
 tests:
     - label: "Commission DUT to TH1s Fabric"
       verification: |
-          sudo ./chip-all-clusters-app --wifi 
+          sudo ./chip-all-clusters-app --wifi
 
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
 
@@ -53,7 +53,7 @@ tests:
           [1655471672.386378][13377:13382] CHIP:TOO:       VendorId: 65521
           [1655471672.386412][13377:13382] CHIP:TOO:       FabricId: 1
           [1655471672.386445][13377:13382] CHIP:TOO:       NodeId: 1
-          [1655471672.386675][13377:13382] CHIP:TOO:       Label: 
+          [1655471672.386675][13377:13382] CHIP:TOO:       Label:
           [1655471672.386716][13377:13382] CHIP:TOO:       FabricIndex: 1
           [1655471672.386750][13377:13382] CHIP:TOO:      }
       disabled: true
@@ -79,12 +79,12 @@ tests:
           "Factory reset DUT Perform the device discovery flow checks as covered
           in TC-DD-2.2"
       verification: |
-          1. TH starts matter announcement procedure using BLE transport : verify this by sending 
-          "./chip-tool discover commissionables" after launching all-clusters-app on DUT 
+          1. TH starts matter announcement procedure using BLE transport : verify this by sending
+          "./chip-tool discover commissionables" after launching all-clusters-app on DUT
 
-          2. DUT must find TH and provide onboarding data to for validation. 
+          2. DUT must find TH and provide onboarding data to for validation.
           Pass Criteria: DUT is able to report the Onboarding payload as set on TH : Verify this by commissioning DUT with TH
-          1. TH starts matter announcement procedure using BLE transport : verify this by sending "./chip-tool discover commissionables" after launching all-clusters-app on DUT 
+          1. TH starts matter announcement procedure using BLE transport : verify this by sending "./chip-tool discover commissionables" after launching all-clusters-app on DUT
           2. DUT must find TH and provide onboarding data to for validation. Pass Criteria: DUT is able to report the Onboarding payload as set on TH : Verify this by commissioning DUT with TH by passing "./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1"
       disabled: true
 
@@ -104,7 +104,7 @@ tests:
           [1635691999.946983][3822:3827] CHIP:EM: Flushed pending ack for MessageCounter:3234931243 on exchange 35324i
 
 
-          2. Verify TH2 is commissioned  by using "./chip-tool pairing code 2 36199720672" considering 36199720672 as manualcode generated in TH1 
+          2. Verify TH2 is commissioned  by using "./chip-tool pairing code 2 36199720672" considering 36199720672 as manualcode generated in TH1
 
           Verify whether you got below message on TH2 (chip-tool) log
           Device commissioning completed with success
@@ -125,7 +125,7 @@ tests:
           [1655471672.386378][13377:13382] CHIP:TOO:       VendorId: 65521
           [1655471672.386412][13377:13382] CHIP:TOO:       FabricId: 1
           [1655471672.386445][13377:13382] CHIP:TOO:       NodeId: 2
-          [1655471672.386675][13377:13382] CHIP:TOO:       Label: 
+          [1655471672.386675][13377:13382] CHIP:TOO:       Label:
           [1655471672.386716][13377:13382] CHIP:TOO:       FabricIndex: 2
           [1655471672.386750][13377:13382] CHIP:TOO:      }
       disabled: true
@@ -135,7 +135,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read nocs 2 0
 
-          Verify there is single entry on TH2 (chip-tool) log 
+          Verify there is single entry on TH2 (chip-tool) log
 
           [1655471146.098327][13302:13307] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2667297991
           [1655471146.098416][13302:13307] CHIP:TOO:   NOCs: 1 entries

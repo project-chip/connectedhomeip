@@ -32,7 +32,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -43,7 +43,7 @@ tests:
       verification: |
           ./chip-tool network-commissioning read networks 1 0
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -52,7 +52,7 @@ tests:
           as  MaxNetworksVal  ue -  NumNetworks  and saves
           as  RemainingNetwor  kSlots"
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -63,7 +63,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivate092010 1 0 --Breadcrumb 1
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -71,7 +71,7 @@ tests:
           "TH calculates the  midpoint of the  network list
           as  floor((MaxNetwor  ksValue + 1)/2)  and saves as  Midpoint"
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -82,7 +82,7 @@ tests:
           ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
 
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -96,7 +96,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:63686970736574757035 matter123 1 0 --Breadcrumb 1
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -107,7 +107,7 @@ tests:
       verification: |
           ./chip-tool network-commissioning read networks 1 0
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -119,7 +119,7 @@ tests:
       verification: |
           ./chip-tool network-commissioning read networks 1 0
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -128,7 +128,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -139,7 +139,7 @@ tests:
           is  Midpoint  3.  Breadcrum  b is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -148,7 +148,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -160,7 +160,7 @@ tests:
       verification: |
           ./chip-tool  networkcommissioning reorder-network  hex:47524C50726976617465 1 0 --Breadcrumb 1
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -170,7 +170,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -179,7 +179,7 @@ tests:
       verification: |
           ./chip-tool network-commissioning read networks 1 0
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -189,7 +189,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -198,7 +198,7 @@ tests:
       verification: |
           ./chip-tool network-commissioning read networks 1 0
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -209,7 +209,7 @@ tests:
           ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
 
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -221,7 +221,7 @@ tests:
           connectable."
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -232,7 +232,7 @@ tests:
           is  Midpoint  3.  Breadcrum  b is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -240,7 +240,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning CommissioningComplete 1 0
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -250,7 +250,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -259,6 +259,6 @@ tests:
       verification: |
           ./chip-tool network-commissioning read networks 1 0
 
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true

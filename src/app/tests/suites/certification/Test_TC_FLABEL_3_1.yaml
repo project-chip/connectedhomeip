@@ -32,7 +32,7 @@ tests:
     - label: "DUT reads LabelList from the TH"
       PICS: FLABEL.C.A0000
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool fixedlabel read label-list 1 0
           Verify DUT receives LabelList attribute response on the TH(all-clusters-app) Log:
@@ -48,10 +48,10 @@ tests:
           [1659609299.723357][2409:2409] CHIP:DMG:                         Cluster = 0x40,
           [1659609299.723404][2409:2409] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1659609299.723444][2409:2409] CHIP:DMG:                 }
-          [1659609299.723483][2409:2409] CHIP:DMG:                         
+          [1659609299.723483][2409:2409] CHIP:DMG:
           [1659609299.723518][2409:2409] CHIP:DMG:         ],
-          [1659609299.723555][2409:2409] CHIP:DMG:                 
-          [1659609299.723589][2409:2409] CHIP:DMG:         isFabricFiltered = true, 
+          [1659609299.723555][2409:2409] CHIP:DMG:
+          [1659609299.723589][2409:2409] CHIP:DMG:         isFabricFiltered = true,
           [1659609299.723624][2409:2409] CHIP:DMG:         InteractionModelRevision = 1
           [1659609299.723654][2409:2409] CHIP:DMG: },
           [1659609299.723746][2409:2409] CHIP:DMG: IM RH moving to [GeneratingReports]

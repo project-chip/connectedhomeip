@@ -126,7 +126,7 @@ tests:
           GroupKeyManagement cluster from DUT on PIXIT.G.ENDPOINT"
       PICS: GRPKEY.S.A0001
       verification: |
-          ./chip-tool groupkeymanagement read group-table 1 0  
+          ./chip-tool groupkeymanagement read group-table 1 0
 
           Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
@@ -226,7 +226,7 @@ tests:
           : GroupID as 0x0005 GroupName as Gp5"
       PICS: G.S.C00.Rsp && G.S.C00.Tx
       verification: |
-          ./chip-tool groups add-group 0x0005 grp5 1 1 
+          ./chip-tool groups add-group 0x0005 grp5 1 1
 
           Verify the "status is UNSUPPORTED_ACCESS" on the TH(Chip-tool)  Log:
 

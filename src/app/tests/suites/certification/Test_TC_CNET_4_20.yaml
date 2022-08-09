@@ -64,13 +64,13 @@ tests:
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
 
           Verify "AddOrUpdateWiFiNetwork Response" on the TH(All-cluster-app) Log:
 
-          [1659616812.403722][8402:8402] CHIP:DMG:         
+          [1659616812.403722][8402:8402] CHIP:DMG:
           [1659616812.403755][8402:8402] CHIP:DMG:         InteractionModelRevision = 1
           [1659616812.403786][8402:8402] CHIP:DMG: },
           [1659616812.403872][8402:8402] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0031 e=0 p=a
@@ -84,7 +84,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
            ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
 
@@ -104,7 +104,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning reorder-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning reorder-network hex:47524C50726976617465 3 1 0
 
@@ -124,13 +124,13 @@ tests:
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
 
           Verify "RemoveNetworkResponse" on the TH(All-cluster-app) Log:
 
-          [1659617136.123532][8402:8402] CHIP:DMG:         
+          [1659617136.123532][8402:8402] CHIP:DMG:
           [1659617136.123555][8402:8402] CHIP:DMG:         InteractionModelRevision = 1
           [1659617136.123578][8402:8402] CHIP:DMG: },
           [1659617136.123645][8402:8402] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0031 e=0 p=a

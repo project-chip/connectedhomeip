@@ -32,7 +32,7 @@ tests:
     - label: "DUT reads NameSupport attribute from TH"
       PICS: G.C.A0000
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
 
           ./chip-tool groups read name-support 1 1
@@ -52,10 +52,10 @@ tests:
           [1659609024.740659][3355:3355] CHIP:DMG:                         Cluster = 0x4,
           [1659609024.740725][3355:3355] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1659609024.740810][3355:3355] CHIP:DMG:                 }
-          [1659609024.740872][3355:3355] CHIP:DMG:                         
+          [1659609024.740872][3355:3355] CHIP:DMG:
           [1659609024.740925][3355:3355] CHIP:DMG:         ],
-          [1659609024.740983][3355:3355] CHIP:DMG:                 
-          [1659609024.741037][3355:3355] CHIP:DMG:         isFabricFiltered = true, 
+          [1659609024.740983][3355:3355] CHIP:DMG:
+          [1659609024.741037][3355:3355] CHIP:DMG:         isFabricFiltered = true,
           [1659609024.741091][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
           [1659609024.741140][3355:3355] CHIP:DMG: },
           [1659609024.741283][3355:3355] CHIP:DMG: IM RH moving to [GeneratingReports]

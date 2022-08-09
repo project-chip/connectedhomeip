@@ -32,7 +32,7 @@ tests:
     - label: "DUT sends GetGroupMembership command to TH"
       PICS: G.C.C02.Tx
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool groups get-group-membership "[33]" 1 1
 
@@ -82,7 +82,7 @@ tests:
 
           Verify the "AddGroupIfIdentifying command response" on the TH(Allcluster-app)  Log:
 
-          [1659609228.441181][3355:3355] CHIP:DMG:         
+          [1659609228.441181][3355:3355] CHIP:DMG:
           [1659609228.441208][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
           [1659609228.441234][3355:3355] CHIP:DMG: },
           [1659609228.441306][3355:3355] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0004 e=0 p=m

@@ -39,7 +39,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-total-count 54 0
           Verify "RxTotalCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 4079810 [SC]Allocated SecureSession (0x20002e98) - waiting for Sigma1 msg
           I: 4079818 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:21934806 on exchanr
           D: 4079828 [EM]Handling via exchange: 8058r, Delegate: 0x200070ec
@@ -58,7 +58,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-unicast-count 54 0
           Verify "RxUnicastCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 4108122 [SC]Allocated SecureSession (0x20002f50) - waiting for Sigma1 msg
           I: 4108130 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:146842823 on exchar
           D: 4108140 [EM]Handling via exchange: 31466r, Delegate: 0x200070ec
@@ -75,7 +75,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-broadcast-count 54 0
           Verify "RxBroadcastCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 4630447 [SC]Allocated SecureSession (0x20003008) - waiting for Sigma1 msg
           I: 4630454 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:32416455 on exchanr
           D: 4630464 [EM]Handling via exchange: 25526r, Delegate: 0x200070ec
@@ -92,7 +92,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-data-count 54 0
           Verify "RxDataCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 5193071 [SC]Allocated SecureSession (0x200030c0) - waiting for Sigma1 msg
           I: 5193079 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:49592654 on exchanr
           D: 5193089 [EM]Handling via exchange: 37413r, Delegate: 0x200070ec
@@ -128,7 +128,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-beacon-count 54 0
           Verify "RxBeaconCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 5685067 [SC]Allocated SecureSession (0x200032e8) - waiting for Sigma1 msg
           D: 5685074 [EM]Retransmitting MessageCounter:53367944 on exchange 27673r Send Cnt 1
           I: 5685083 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367944 to 0x0000000000000000c
@@ -147,7 +147,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-beacon-request-count 54 0
           Verify "RxBeaconRequestCount response" on the TH(All-cluster-app) Log:
-           
+
           I: 6354933 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367948 to 0x0000000000000000c
           I: 6354947 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:189386222 on exchar
           D: 6354958 [EM]Handling via exchange: 40234r, Delegate: 0x200070ec
@@ -164,7 +164,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-other-count 54 0
           Verify "RxOtherCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 6440317 [SC]Allocated SecureSession (0x20003458) - waiting for Sigma1 msg
           I: 6440325 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:185096786 on exchar
           D: 6440335 [EM]Handling via exchange: 54133r, Delegate: 0x200070ec
@@ -181,7 +181,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-address-filtered-count 54 0
           Verify "RxAddressFilteredCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 6500252 [SC]Allocated SecureSession (0x20003510) - waiting for Sigma1 msg
           I: 6500260 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:17427447 on exchanr
           D: 6500270 [EM]Handling via exchange: 733r, Delegate: 0x200070ec
@@ -198,7 +198,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-dest-addr-filtered-count 54 0
           Verify "RxDestAddrFilteredCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 6546865 [SC]Allocated SecureSession (0x200035c8) - waiting for Sigma1 msg
           I: 6546873 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:74235822 on exchanr
           D: 6546883 [EM]Handling via exchange: 35034r, Delegate: 0x200070ec
@@ -215,7 +215,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-duplicated-count 54 0
           Verify "RxDuplicatedCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 6599281 [SC]Allocated SecureSession (0x20003680) - waiting for Sigma1 msg
           I: 6599288 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:36119403 on exchanr
           D: 6599298 [EM]Handling via exchange: 9572r, Delegate: 0x200070ec
@@ -232,7 +232,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-err-no-frame-count 54 0
           Verify "RxErrNoFrameCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 6634879 [SC]Allocated SecureSession (0x20003738) - waiting for Sigma1 msg
           D: 6634886 [EM]Retransmitting MessageCounter:53367968 on exchange 23023r Send Cnt 1
           I: 6634893 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367968 to 0x0000000000000000c
@@ -251,7 +251,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-err-unknown-neighbor-count 54 0
           Verify "RxErrUnknownNeighborCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 6673331 [SC]Allocated SecureSession (0x200037f0) - waiting for Sigma1 msg
           I: 6673338 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:5756147 on exchangr
           D: 6673348 [EM]Handling via exchange: 27489r, Delegate: 0x200070ec
@@ -287,7 +287,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-err-sec-count 54 0
           Verify "RxErrSecCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 6776643 [SC]Allocated SecureSession (0x20002de0) - waiting for Sigma1 msg
           I: 6776651 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:62796965 on exchanr
           D: 6776661 [EM]Handling via exchange: 37020r, Delegate: 0x200070ec
@@ -321,7 +321,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-err-other-count 54 0
           Verify "RxErrOtherCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 6866596 [SC]Allocated SecureSession (0x20002e98) - waiting for Sigma1 msg
           I: 6866604 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:179617390 on exchar
           D: 6866614 [EM]Handling via exchange: 3843r, Delegate: 0x200070ec

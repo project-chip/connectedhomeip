@@ -32,7 +32,7 @@ tests:
     - label: "DUT sends ColorLoopSet command to TH."
       PICS: CC.C.C44.Rsp
       verification: |
-          ./chip-tool colorcontrol color-loop-set 15 0 0 30 160 0 0 1 1 
+          ./chip-tool colorcontrol color-loop-set 15 0 0 30 160 0 0 1 1
 
           Verify in TH(all-clusters-app) log:
           [1657912387.432732][3126:3126] CHIP:DMG: InvokeRequestMessage =
@@ -217,10 +217,10 @@ tests:
           [1659960576.918206][2718:2718] CHIP:DMG: 			Cluster = 0x300,
           [1659960576.918249][2718:2718] CHIP:DMG: 			Attribute = 0x0000_4000,
           [1659960576.918287][2718:2718] CHIP:DMG: 		}
-          [1659960576.918325][2718:2718] CHIP:DMG: 			
+          [1659960576.918325][2718:2718] CHIP:DMG:
           [1659960576.918359][2718:2718] CHIP:DMG: 	],
-          [1659960576.918397][2718:2718] CHIP:DMG: 		
-          [1659960576.918432][2718:2718] CHIP:DMG: 	isFabricFiltered = true, 
+          [1659960576.918397][2718:2718] CHIP:DMG:
+          [1659960576.918432][2718:2718] CHIP:DMG: 	isFabricFiltered = true,
           [1659960576.918466][2718:2718] CHIP:DMG: 	InteractionModelRevision = 1
           [1659960576.918498][2718:2718] CHIP:DMG: },
           [1659960576.918604][2718:2718] CHIP:DMG: IM RH moving to [GeneratingReports]

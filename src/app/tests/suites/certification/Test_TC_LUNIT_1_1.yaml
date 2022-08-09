@@ -37,7 +37,7 @@ tests:
     - label: "{DUTread} (0xFFFD) ClusterRevision attribute"
       PICS: LUNIT.C.Afffd
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool unitlocalization read  cluster-revision 1 0
           Verify DUT receives  cluster-revision attribute response on the TH(all-clusters-app) Log:
@@ -54,10 +54,10 @@ tests:
           [1659785279.519822][4122:4122] CHIP:DMG: 			Cluster = 0x2d,
           [1659785279.519853][4122:4122] CHIP:DMG: 			Attribute = 0x0000_FFFD,
           [1659785279.519877][4122:4122] CHIP:DMG: 		}
-          [1659785279.519904][4122:4122] CHIP:DMG: 			
+          [1659785279.519904][4122:4122] CHIP:DMG:
           [1659785279.519932][4122:4122] CHIP:DMG: 	],
-          [1659785279.519960][4122:4122] CHIP:DMG: 		
-          [1659785279.519986][4122:4122] CHIP:DMG: 	isFabricFiltered = true, 
+          [1659785279.519960][4122:4122] CHIP:DMG:
+          [1659785279.519986][4122:4122] CHIP:DMG: 	isFabricFiltered = true,
           [1659785279.520011][4122:4122] CHIP:DMG: 	InteractionModelRevision = 1
           [1659785279.520034][4122:4122] CHIP:DMG: },
           [1659785279.520108][4122:4122] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -67,7 +67,7 @@ tests:
     - label: "{DUTread} (0xFFFC) FeatureMap attribute"
       PICS: LUNIT.C.Afffc
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool unitlocalization read  feature-map 1 0
           Verify DUT receives feature-map attribute response on the TH(all-clusters-app) Log:
@@ -83,10 +83,10 @@ tests:
           [1659785328.533894][4122:4122] CHIP:DMG:                         Cluster = 0x2d,
           [1659785328.533958][4122:4122] CHIP:DMG:                         Attribute = 0x0000_FFFC,
           [1659785328.534017][4122:4122] CHIP:DMG:                 }
-          [1659785328.534072][4122:4122] CHIP:DMG:                         
+          [1659785328.534072][4122:4122] CHIP:DMG:
           [1659785328.534124][4122:4122] CHIP:DMG:         ],
-          [1659785328.534176][4122:4122] CHIP:DMG:                 
-          [1659785328.534224][4122:4122] CHIP:DMG:         isFabricFiltered = true, 
+          [1659785328.534176][4122:4122] CHIP:DMG:
+          [1659785328.534224][4122:4122] CHIP:DMG:         isFabricFiltered = true,
           [1659785328.534275][4122:4122] CHIP:DMG:         InteractionModelRevision = 1
           [1659785328.534319][4122:4122] CHIP:DMG: },
           [1659785328.534443][4122:4122] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -97,7 +97,7 @@ tests:
     - label: "{DUTread} (0xFFFB) AttributeList attribute"
       PICS: LUNIT.C.Afffb
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool unitlocalization read attribute-list 1 0
 
@@ -121,7 +121,7 @@ tests:
     - label: "{DUTread} (0xFFF9) AcceptedCommandList attribute"
       PICS: LUNIT.C.Afff9
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool unitlocalization read accepted-command-list 1 0
           Verify DUT receives AcceptedCommandList attribute response on the TH(all-clusters-app) Log:
@@ -137,10 +137,10 @@ tests:
           [1659785385.381650][4122:4122] CHIP:DMG: 			Cluster = 0x2d,
           [1659785385.381717][4122:4122] CHIP:DMG: 			Attribute = 0x0000_FFFB,
           [1659785385.381780][4122:4122] CHIP:DMG: 		}
-          [1659785385.381842][4122:4122] CHIP:DMG: 			
+          [1659785385.381842][4122:4122] CHIP:DMG:
           [1659785385.381900][4122:4122] CHIP:DMG: 	],
-          [1659785385.381959][4122:4122] CHIP:DMG: 		
-          [1659785385.382019][4122:4122] CHIP:DMG: 	isFabricFiltered = true, 
+          [1659785385.381959][4122:4122] CHIP:DMG:
+          [1659785385.382019][4122:4122] CHIP:DMG: 	isFabricFiltered = true,
           [1659785385.382072][4122:4122] CHIP:DMG: 	InteractionModelRevision = 1
           [1659785385.382121][4122:4122] CHIP:DMG: },
           [1659785385.382261][4122:4122] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -149,7 +149,7 @@ tests:
     - label: "{DUTread} (0xFFF8) GeneratedCommandList attribute"
       PICS: LUNIT.C.Afff8
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool unitlocalization read generated-command-list 1 0
           Verify DUT receives GeneratedCommandList attribute response on the TH(all-clusters-app) Log:
@@ -164,10 +164,10 @@ tests:
           [1659785447.481923][4122:4122] CHIP:DMG: 			Cluster = 0x2d,
           [1659785447.481958][4122:4122] CHIP:DMG: 			Attribute = 0x0000_FFF8,
           [1659785447.481985][4122:4122] CHIP:DMG: 		}
-          [1659785447.482014][4122:4122] CHIP:DMG: 			
+          [1659785447.482014][4122:4122] CHIP:DMG:
           [1659785447.482039][4122:4122] CHIP:DMG: 	],
-          [1659785447.482067][4122:4122] CHIP:DMG: 		
-          [1659785447.482093][4122:4122] CHIP:DMG: 	isFabricFiltered = true, 
+          [1659785447.482067][4122:4122] CHIP:DMG:
+          [1659785447.482093][4122:4122] CHIP:DMG: 	isFabricFiltered = true,
           [1659785447.482118][4122:4122] CHIP:DMG: 	InteractionModelRevision = 1
           [1659785447.482142][4122:4122] CHIP:DMG: },
           [1659785447.482215][4122:4122] CHIP:DMG: IM RH moving to [GeneratingReports]

@@ -28,7 +28,7 @@ config:
 tests:
     - label: "TH1 generates 32-byte AttestationNonce"
       verification: |
-          To generate the Attestation Nonce give below command 
+          To generate the Attestation Nonce give below command
 
           echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom)
 
@@ -407,7 +407,7 @@ tests:
       verification: |
           Verify that the attestation_elements_message structure fields satisfy the following conditions on TH(chip-tool) Log
           1. AttestationElements field size should not be greater than RESP_MAX(900 bytes)
-          2. certification_declaration is present and is an octet string 
+          2. certification_declaration is present and is an octet string
 
           [1655374218.453303][35023:35028] CHIP:DMG: Attestation Elements (585 bytes) =
           [1655374218.453366][35023:35028] CHIP:DMG: {
@@ -675,14 +675,14 @@ tests:
           integer in range 0..65535 ,certification_type has a value between 1..2"
       verification: |
           Verify Verify for the following contents of CD (certificate declaration) in TH (chip-tool) log:
-          format_version = 1, 
-          vendor_id matches the basic_info_vendor_id, 
-          product_id_array matches the basic_info_product_id saved earlier, 
-          device_type_id value should between 0 and (2^31 - 1), 
-          certificate_id, 
-          security level = 0, 
-          security_information = 0,  
-          version_number should be in range 0..65535, 
+          format_version = 1,
+          vendor_id matches the basic_info_vendor_id,
+          product_id_array matches the basic_info_product_id saved earlier,
+          device_type_id value should between 0 and (2^31 - 1),
+          certificate_id,
+          security level = 0,
+          security_information = 0,
+          version_number should be in range 0..65535,
           certification_type should be  between 1..2
 
 
@@ -946,7 +946,7 @@ tests:
           MCORE.DA.CERTDECL_ORIGIN_PRODUCTID
       verification: |
           Verify The Vendor ID (VID) in the DAC subject and PAI subject are the same as the vendor_id field in the Certification Declaration.
-          To decode the DAC/PAI subject, refer TC-DA-1.7 - step 6 & then verify the vendorID and ProductID is same from the previous step log output. 
+          To decode the DAC/PAI subject, refer TC-DA-1.7 - step 6 & then verify the vendorID and ProductID is same from the previous step log output.
 
 
 
@@ -989,7 +989,7 @@ tests:
           MCORE.DA.CERTDECL_ORIGIN_PRODUCTID
       verification: |
           Verify The Vendor ID (VID) in the DAC subject and PAI subject are the same as the vendor_id field in the Certification Declaration.
-          To decode the DAC/PAI subject, refer TC-DA-1.7 - step 6 & then verify the vendorID and ProductID is same from the previous step log output. 
+          To decode the DAC/PAI subject, refer TC-DA-1.7 - step 6 & then verify the vendorID and ProductID is same from the previous step log output.
 
 
           Certificate:
@@ -1085,7 +1085,7 @@ tests:
 
           [1655984597.150863][23339:23344] CHIP:DMG: InvokeResponseMessage =
           [1655984597.150923][23339:23344] CHIP:DMG: {
-          [1655984597.150981][23339:23344] CHIP:DMG:         suppressResponse = false, 
+          [1655984597.150981][23339:23344] CHIP:DMG:         suppressResponse = false,
           [1655984597.151042][23339:23344] CHIP:DMG:         InvokeResponseIBs =
           [1655984597.151117][23339:23344] CHIP:DMG:         [
           [1655984597.151177][23339:23344] CHIP:DMG:                 InvokeResponseIB =
@@ -1098,18 +1098,18 @@ tests:
           [1655984597.151729][23339:23344] CHIP:DMG:                                         ClusterId = 0x3e,
           [1655984597.151812][23339:23344] CHIP:DMG:                                         CommandId = 0x0,
           [1655984597.151890][23339:23344] CHIP:DMG:                                 },
-          [1655984597.151978][23339:23344] CHIP:DMG:                                 
+          [1655984597.151978][23339:23344] CHIP:DMG:
           [1655984597.152050][23339:23344] CHIP:DMG:                                 StatusIB =
           [1655984597.152127][23339:23344] CHIP:DMG:                                 {
           [1655984597.152216][23339:23344] CHIP:DMG:                                         status = 0x85 (INVALID_COMMAND),
           [1655984597.152297][23339:23344] CHIP:DMG:                                 },
-          [1655984597.152377][23339:23344] CHIP:DMG:                                 
+          [1655984597.152377][23339:23344] CHIP:DMG:
           [1655984597.152449][23339:23344] CHIP:DMG:                         },
-          [1655984597.152527][23339:23344] CHIP:DMG:                         
+          [1655984597.152527][23339:23344] CHIP:DMG:
           [1655984597.152593][23339:23344] CHIP:DMG:                 },
-          [1655984597.152666][23339:23344] CHIP:DMG:                 
+          [1655984597.152666][23339:23344] CHIP:DMG:
           [1655984597.152723][23339:23344] CHIP:DMG:         ],
-          [1655984597.152794][23339:23344] CHIP:DMG:         
+          [1655984597.152794][23339:23344] CHIP:DMG:
           [1655984597.152852][23339:23344] CHIP:DMG:         InteractionModelRevision = 1
           [1655984597.152908][23339:23344] CHIP:DMG: },
           [1655984597.153037][23339:23344] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_0000 Status=0x85
@@ -1128,7 +1128,7 @@ tests:
 
           [1655984597.150863][23339:23344] CHIP:DMG: InvokeResponseMessage =
           [1655984597.150923][23339:23344] CHIP:DMG: {
-          [1655984597.150981][23339:23344] CHIP:DMG:         suppressResponse = false, 
+          [1655984597.150981][23339:23344] CHIP:DMG:         suppressResponse = false,
           [1655984597.151042][23339:23344] CHIP:DMG:         InvokeResponseIBs =
           [1655984597.151117][23339:23344] CHIP:DMG:         [
           [1655984597.151177][23339:23344] CHIP:DMG:                 InvokeResponseIB =
@@ -1141,18 +1141,18 @@ tests:
           [1655984597.151729][23339:23344] CHIP:DMG:                                         ClusterId = 0x3e,
           [1655984597.151812][23339:23344] CHIP:DMG:                                         CommandId = 0x0,
           [1655984597.151890][23339:23344] CHIP:DMG:                                 },
-          [1655984597.151978][23339:23344] CHIP:DMG:                                 
+          [1655984597.151978][23339:23344] CHIP:DMG:
           [1655984597.152050][23339:23344] CHIP:DMG:                                 StatusIB =
           [1655984597.152127][23339:23344] CHIP:DMG:                                 {
           [1655984597.152216][23339:23344] CHIP:DMG:                                         status = 0x85 (INVALID_COMMAND),
           [1655984597.152297][23339:23344] CHIP:DMG:                                 },
-          [1655984597.152377][23339:23344] CHIP:DMG:                                 
+          [1655984597.152377][23339:23344] CHIP:DMG:
           [1655984597.152449][23339:23344] CHIP:DMG:                         },
-          [1655984597.152527][23339:23344] CHIP:DMG:                         
+          [1655984597.152527][23339:23344] CHIP:DMG:
           [1655984597.152593][23339:23344] CHIP:DMG:                 },
-          [1655984597.152666][23339:23344] CHIP:DMG:                 
+          [1655984597.152666][23339:23344] CHIP:DMG:
           [1655984597.152723][23339:23344] CHIP:DMG:         ],
-          [1655984597.152794][23339:23344] CHIP:DMG:         
+          [1655984597.152794][23339:23344] CHIP:DMG:
           [1655984597.152852][23339:23344] CHIP:DMG:         InteractionModelRevision = 1
           [1655984597.152908][23339:23344] CHIP:DMG: },
           [1655984597.153037][23339:23344] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_0000 Status=0x85

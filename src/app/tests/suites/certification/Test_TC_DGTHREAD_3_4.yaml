@@ -68,7 +68,7 @@ tests:
     - label: "DUT reads OverrunCount attribute from TH"
       PICS: DGTHREAD.C.A0006
       verification: |
-          ./chip-tool threadnetworkdiagnostics read overrun-count 54 0 
+          ./chip-tool threadnetworkdiagnostics read overrun-count 54 0
            Verify "OverrunCount response" on the TH(All-cluster-app) Log:
 
           D: 7011179 [SC]Allocated SecureSession (0x20003008) - waiting for Sigma1 msg

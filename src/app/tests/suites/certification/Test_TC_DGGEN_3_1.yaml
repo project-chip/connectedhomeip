@@ -37,7 +37,7 @@ tests:
     - label: "DUT reads NetworkInterfaces structure attribute from TH."
       PICS: DGGEN.C.A0000
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool generaldiagnostics read network-interfaces 1 0
 
@@ -45,7 +45,7 @@ tests:
 
 
           1659772635.992784][17263:17263] CHIP:DMG: }
-          [1659772635.992786][17263:17263] CHIP:DMG:  
+          [1659772635.992786][17263:17263] CHIP:DMG:
           [1659772635.992848][17263:17263] CHIP:DMG: ReportDataMessage =
           [1659772635.992851][17263:17263] CHIP:DMG: {
           [1659772635.992853][17263:17263] CHIP:DMG:         AttributeReportIBs =
@@ -61,14 +61,14 @@ tests:
           [1659772635.992890][17263:17263] CHIP:DMG:                                         Cluster = 0x33,
           [1659772635.992894][17263:17263] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1659772635.992898][17263:17263] CHIP:DMG:                                 }
-          [1659772635.992902][17263:17263] CHIP:DMG:                                         
+          [1659772635.992902][17263:17263] CHIP:DMG:
           [1659772635.992906][17263:17263] CHIP:DMG:                                 Data = [
-          [1659772635.992910][17263:17263] CHIP:DMG:                                                 
+          [1659772635.992910][17263:17263] CHIP:DMG:
           [1659772635.992914][17263:17263] CHIP:DMG:                                 ],
           [1659772635.992918][17263:17263] CHIP:DMG:                         },
-          [1659772635.992923][17263:17263] CHIP:DMG:                         
+          [1659772635.992923][17263:17263] CHIP:DMG:
           [1659772635.992926][17263:17263] CHIP:DMG:                 },
-          [1659772635.992935][17263:17263] CHIP:DMG:                 
+          [1659772635.992935][17263:17263] CHIP:DMG:
           [1659772635.992939][17263:17263] CHIP:DMG:                 AttributeReportIB =
           [1659772635.992946][17263:17263] CHIP:DMG:                 {
           [1659772635.992949][17263:17263] CHIP:DMG:                         AttributeDataIB =
@@ -81,32 +81,32 @@ tests:
           [1659772635.992977][17263:17263] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1659772635.992981][17263:17263] CHIP:DMG:                                         ListIndex = Null,
           [1659772635.992986][17263:17263] CHIP:DMG:                                 }
-          [1659772635.992990][17263:17263] CHIP:DMG:                                         
-          [1659772635.992994][17263:17263] CHIP:DMG:                                 Data = 
+          [1659772635.992990][17263:17263] CHIP:DMG:
+          [1659772635.992994][17263:17263] CHIP:DMG:                                 Data =
           [1659772635.992998][17263:17263] CHIP:DMG:                                 {
-          [1659772635.993003][17263:17263] CHIP:DMG:                                         0x0 = "docker0" (7 chars), 
-          [1659772635.993007][17263:17263] CHIP:DMG:                                         0x1 = false, 
+          [1659772635.993003][17263:17263] CHIP:DMG:                                         0x0 = "docker0" (7 chars),
+          [1659772635.993007][17263:17263] CHIP:DMG:                                         0x1 = false,
           [1659772635.993012][17263:17263] CHIP:DMG:                                         0x2 = NULL
           [1659772635.993016][17263:17263] CHIP:DMG:                                         0x3 = NULL
           [1659772635.993021][17263:17263] CHIP:DMG:                                         0x4 = [
-          [1659772635.993025][17263:17263] CHIP:DMG:                                                         0x2, 0x42, 0x2d, 0x7f, 0xa5, 0x93, 
+          [1659772635.993025][17263:17263] CHIP:DMG:                                                         0x2, 0x42, 0x2d, 0x7f, 0xa5, 0x93,
           [1659772635.993031][17263:17263] CHIP:DMG:                                         ] (6 bytes)
           [1659772635.993035][17263:17263] CHIP:DMG:                                         0x5 = [
           [1659772635.993041][17263:17263] CHIP:DMG:                                                         [
-          [1659772635.993045][17263:17263] CHIP:DMG:                                                         0xac, 0x11, 0x0, 0x1, 
+          [1659772635.993045][17263:17263] CHIP:DMG:                                                         0xac, 0x11, 0x0, 0x1,
           [1659772635.993051][17263:17263] CHIP:DMG:                                                 ] (4 bytes)
           [1659772635.993057][17263:17263] CHIP:DMG:                                         ],
           [1659772635.993060][17263:17263] CHIP:DMG:                                         0x6 = [
           [1659772635.993064][17263:17263] CHIP:DMG:                                                         [
-          [1659772635.993068][17263:17263] CHIP:DMG:                                                         
+          [1659772635.993068][17263:17263] CHIP:DMG:
           [1659772635.993074][17263:17263] CHIP:DMG:                                                 ] (0 bytes)
           [1659772635.993080][17263:17263] CHIP:DMG:                                         ],
-          [1659772635.993084][17263:17263] CHIP:DMG:                                         0x7 = 0, 
+          [1659772635.993084][17263:17263] CHIP:DMG:                                         0x7 = 0,
           [1659772635.993088][17263:17263] CHIP:DMG:                                 },
           [1659772635.993091][17263:17263] CHIP:DMG:                         },
-          [1659772635.993098][17263:17263] CHIP:DMG:                         
+          [1659772635.993098][17263:17263] CHIP:DMG:
           [1659772635.993101][17263:17263] CHIP:DMG:                 },
-          [1659772635.993113][17263:17263] CHIP:DMG:                 
+          [1659772635.993113][17263:17263] CHIP:DMG:
           [1659772635.993116][17263:17263] CHIP:DMG:                 AttributeReportIB =
           [1659772635.993125][17263:17263] CHIP:DMG:                 {
           [1659772635.993128][17263:17263] CHIP:DMG:                         AttributeDataIB =
@@ -119,32 +119,32 @@ tests:
           [1659772635.993154][17263:17263] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1659772635.993159][17263:17263] CHIP:DMG:                                         ListIndex = Null,
           [1659772635.993163][17263:17263] CHIP:DMG:                                 }
-          [1659772635.993167][17263:17263] CHIP:DMG:                                         
-          [1659772635.993171][17263:17263] CHIP:DMG:                                 Data = 
+          [1659772635.993167][17263:17263] CHIP:DMG:
+          [1659772635.993171][17263:17263] CHIP:DMG:                                 Data =
           [1659772635.993175][17263:17263] CHIP:DMG:                                 {
-          [1659772635.993179][17263:17263] CHIP:DMG:                                         0x0 = "wlp0s20f3" (9 chars), 
-          [1659772635.993183][17263:17263] CHIP:DMG:                                         0x1 = true, 
+          [1659772635.993179][17263:17263] CHIP:DMG:                                         0x0 = "wlp0s20f3" (9 chars),
+          [1659772635.993183][17263:17263] CHIP:DMG:                                         0x1 = true,
           [1659772635.993188][17263:17263] CHIP:DMG:                                         0x2 = NULL
           [1659772635.993193][17263:17263] CHIP:DMG:                                         0x3 = NULL
           [1659772635.993197][17263:17263] CHIP:DMG:                                         0x4 = [
-          [1659772635.993202][17263:17263] CHIP:DMG:                                                         0x8, 0x71, 0x90, 0x45, 0x8b, 0x2f, 
+          [1659772635.993202][17263:17263] CHIP:DMG:                                                         0x8, 0x71, 0x90, 0x45, 0x8b, 0x2f,
           [1659772635.993207][17263:17263] CHIP:DMG:                                         ] (6 bytes)
           [1659772635.993211][17263:17263] CHIP:DMG:                                         0x5 = [
           [1659772635.993216][17263:17263] CHIP:DMG:                                                         [
-          [1659772635.993220][17263:17263] CHIP:DMG:                                                         0xc0, 0xa8, 0x64, 0xa, 
+          [1659772635.993220][17263:17263] CHIP:DMG:                                                         0xc0, 0xa8, 0x64, 0xa,
           [1659772635.993226][17263:17263] CHIP:DMG:                                                 ] (4 bytes)
           [1659772635.993231][17263:17263] CHIP:DMG:                                         ],
           [1659772635.993235][17263:17263] CHIP:DMG:                                         0x6 = [
           [1659772635.993239][17263:17263] CHIP:DMG:                                                         [
-          [1659772635.993246][17263:17263] CHIP:DMG:                                                         0xfe, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4e, 0x4e, 0xd5, 0x79, 0x10, 0xe8, 0x45, 0xb5, 
+          [1659772635.993246][17263:17263] CHIP:DMG:                                                         0xfe, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4e, 0x4e, 0xd5, 0x79, 0x10, 0xe8, 0x45, 0xb5,
           [1659772635.993252][17263:17263] CHIP:DMG:                                                 ] (16 bytes)
           [1659772635.993257][17263:17263] CHIP:DMG:                                         ],
-          [1659772635.993261][17263:17263] CHIP:DMG:                                         0x7 = 1, 
+          [1659772635.993261][17263:17263] CHIP:DMG:                                         0x7 = 1,
           [1659772635.993264][17263:17263] CHIP:DMG:                                 },
           [1659772635.993268][17263:17263] CHIP:DMG:                         },
-          [1659772635.993275][17263:17263] CHIP:DMG:                         
+          [1659772635.993275][17263:17263] CHIP:DMG:
           [1659772635.993278][17263:17263] CHIP:DMG:                 },
-          [1659772635.993289][17263:17263] CHIP:DMG:                 
+          [1659772635.993289][17263:17263] CHIP:DMG:
           [1659772635.993292][17263:17263] CHIP:DMG:                 AttributeReportIB =
           [1659772635.993299][17263:17263] CHIP:DMG:                 {
           [1659772635.993302][17263:17263] CHIP:DMG:                         AttributeDataIB =
@@ -157,32 +157,32 @@ tests:
           [1659772635.993330][17263:17263] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1659772635.993335][17263:17263] CHIP:DMG:                                         ListIndex = Null,
           [1659772635.993338][17263:17263] CHIP:DMG:                                 }
-          [1659772635.993343][17263:17263] CHIP:DMG:                                         
-          [1659772635.993347][17263:17263] CHIP:DMG:                                 Data = 
+          [1659772635.993343][17263:17263] CHIP:DMG:
+          [1659772635.993347][17263:17263] CHIP:DMG:                                 Data =
           [1659772635.993351][17263:17263] CHIP:DMG:                                 {
-          [1659772635.993355][17263:17263] CHIP:DMG:                                         0x0 = "enp3s0" (6 chars), 
-          [1659772635.993359][17263:17263] CHIP:DMG:                                         0x1 = true, 
+          [1659772635.993355][17263:17263] CHIP:DMG:                                         0x0 = "enp3s0" (6 chars),
+          [1659772635.993359][17263:17263] CHIP:DMG:                                         0x1 = true,
           [1659772635.993363][17263:17263] CHIP:DMG:                                         0x2 = NULL
           [1659772635.993367][17263:17263] CHIP:DMG:                                         0x3 = NULL
           [1659772635.993372][17263:17263] CHIP:DMG:                                         0x4 = [
-          [1659772635.993376][17263:17263] CHIP:DMG:                                                         0xe4, 0x54, 0xe8, 0x15, 0x1d, 0xb3, 
+          [1659772635.993376][17263:17263] CHIP:DMG:                                                         0xe4, 0x54, 0xe8, 0x15, 0x1d, 0xb3,
           [1659772635.993382][17263:17263] CHIP:DMG:                                         ] (6 bytes)
           [1659772635.993385][17263:17263] CHIP:DMG:                                         0x5 = [
           [1659772635.993390][17263:17263] CHIP:DMG:                                                         [
-          [1659772635.993394][17263:17263] CHIP:DMG:                                                         0xc0, 0xa8, 0x64, 0xb, 
+          [1659772635.993394][17263:17263] CHIP:DMG:                                                         0xc0, 0xa8, 0x64, 0xb,
           [1659772635.993400][17263:17263] CHIP:DMG:                                                 ] (4 bytes)
           [1659772635.993406][17263:17263] CHIP:DMG:                                         ],
           [1659772635.993410][17263:17263] CHIP:DMG:                                         0x6 = [
           [1659772635.993414][17263:17263] CHIP:DMG:                                                         [
-          [1659772635.993420][17263:17263] CHIP:DMG:                                                         0xfe, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xe6, 0x54, 0xe8, 0xff, 0xfe, 0x15, 0x1d, 0xb3, 
+          [1659772635.993420][17263:17263] CHIP:DMG:                                                         0xfe, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xe6, 0x54, 0xe8, 0xff, 0xfe, 0x15, 0x1d, 0xb3,
           [1659772635.993426][17263:17263] CHIP:DMG:                                                 ] (16 bytes)
           [1659772635.993430][17263:17263] CHIP:DMG:                                         ],
-          [1659772635.993434][17263:17263] CHIP:DMG:                                         0x7 = 2, 
+          [1659772635.993434][17263:17263] CHIP:DMG:                                         0x7 = 2,
           [1659772635.993438][17263:17263] CHIP:DMG:                                 },
           [1659772635.993442][17263:17263] CHIP:DMG:                         },
-          [1659772635.993450][17263:17263] CHIP:DMG:                         
+          [1659772635.993450][17263:17263] CHIP:DMG:
           [1659772635.993453][17263:17263] CHIP:DMG:                 },
-          [1659772635.993463][17263:17263] CHIP:DMG:                 
+          [1659772635.993463][17263:17263] CHIP:DMG:
           [1659772635.993466][17263:17263] CHIP:DMG:                 AttributeReportIB =
           [1659772635.993474][17263:17263] CHIP:DMG:                 {
           [1659772635.993477][17263:17263] CHIP:DMG:                         AttributeDataIB =
@@ -195,35 +195,35 @@ tests:
           [1659772635.993505][17263:17263] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1659772635.993509][17263:17263] CHIP:DMG:                                         ListIndex = Null,
           [1659772635.993513][17263:17263] CHIP:DMG:                                 }
-          [1659772635.993517][17263:17263] CHIP:DMG:                                         
-          [1659772635.993521][17263:17263] CHIP:DMG:                                 Data = 
+          [1659772635.993517][17263:17263] CHIP:DMG:
+          [1659772635.993521][17263:17263] CHIP:DMG:                                 Data =
           [1659772635.993525][17263:17263] CHIP:DMG:                                 {
-          [1659772635.993529][17263:17263] CHIP:DMG:                                         0x0 = "lo" (2 chars), 
-          [1659772635.993534][17263:17263] CHIP:DMG:                                         0x1 = true, 
+          [1659772635.993529][17263:17263] CHIP:DMG:                                         0x0 = "lo" (2 chars),
+          [1659772635.993534][17263:17263] CHIP:DMG:                                         0x1 = true,
           [1659772635.993538][17263:17263] CHIP:DMG:                                         0x2 = NULL
           [1659772635.993542][17263:17263] CHIP:DMG:                                         0x3 = NULL
           [1659772635.993545][17263:17263] CHIP:DMG:                                         0x4 = [
-          [1659772635.993550][17263:17263] CHIP:DMG:                                                         0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+          [1659772635.993550][17263:17263] CHIP:DMG:                                                         0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
           [1659772635.993556][17263:17263] CHIP:DMG:                                         ] (6 bytes)
           [1659772635.993559][17263:17263] CHIP:DMG:                                         0x5 = [
           [1659772635.993565][17263:17263] CHIP:DMG:                                                         [
-          [1659772635.993570][17263:17263] CHIP:DMG:                                                         0x7f, 0x0, 0x0, 0x1, 
+          [1659772635.993570][17263:17263] CHIP:DMG:                                                         0x7f, 0x0, 0x0, 0x1,
           [1659772635.993575][17263:17263] CHIP:DMG:                                                 ] (4 bytes)
           [1659772635.993579][17263:17263] CHIP:DMG:                                         ],
           [1659772635.993583][17263:17263] CHIP:DMG:                                         0x6 = [
           [1659772635.993587][17263:17263] CHIP:DMG:                                                         [
-          [1659772635.993594][17263:17263] CHIP:DMG:                                                         0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 
+          [1659772635.993594][17263:17263] CHIP:DMG:                                                         0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1,
           [1659772635.993600][17263:17263] CHIP:DMG:                                                 ] (16 bytes)
           [1659772635.993605][17263:17263] CHIP:DMG:                                         ],
-          [1659772635.993609][17263:17263] CHIP:DMG:                                         0x7 = 0, 
+          [1659772635.993609][17263:17263] CHIP:DMG:                                         0x7 = 0,
           [1659772635.993613][17263:17263] CHIP:DMG:                                 },
           [1659772635.993617][17263:17263] CHIP:DMG:                         },
-          [1659772635.993623][17263:17263] CHIP:DMG:                         
+          [1659772635.993623][17263:17263] CHIP:DMG:
           [1659772635.993627][17263:17263] CHIP:DMG:                 },
-          [1659772635.993634][17263:17263] CHIP:DMG:                 
+          [1659772635.993634][17263:17263] CHIP:DMG:
           [1659772635.993637][17263:17263] CHIP:DMG:         ],
-          [1659772635.993656][17263:17263] CHIP:DMG:         
-          [1659772635.993659][17263:17263] CHIP:DMG:         SuppressResponse = true, 
+          [1659772635.993656][17263:17263] CHIP:DMG:
+          [1659772635.993659][17263:17263] CHIP:DMG:         SuppressResponse = true,
           [1659772635.993662][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
           [1659772635.993665][17263:17263] CHIP:DMG: }
           [1659772635.993669][17263:17263] CHIP:DMG:
@@ -234,14 +234,14 @@ tests:
           gets rebooted more than 2 times."
       PICS: DGGEN.C.A0001
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool generaldiagnostics read reboot-count 1 0
           Verify in DUT as client side: verify that RebootCount attribute data type must be UINT16 and the count should match with the number of rebooted times.
 
           [1659772809.009830][17263:17263] CHIP:DMG:     buffer_ptr = 94267919976192
           [1659772809.009842][17263:17263] CHIP:DMG: }
-          [1659772809.009854][17263:17263] CHIP:DMG:  
+          [1659772809.009854][17263:17263] CHIP:DMG:
           [1659772809.009924][17263:17263] CHIP:DMG: ReportDataMessage =
           [1659772809.009939][17263:17263] CHIP:DMG: {
           [1659772809.009951][17263:17263] CHIP:DMG:         AttributeReportIBs =
@@ -257,18 +257,18 @@ tests:
           [1659772809.010124][17263:17263] CHIP:DMG:                                         Cluster = 0x33,
           [1659772809.010141][17263:17263] CHIP:DMG:                                         Attribute = 0x0000_0001,
           [1659772809.010156][17263:17263] CHIP:DMG:                                 }
-          [1659772809.010173][17263:17263] CHIP:DMG:                                         
-          [1659772809.010190][17263:17263] CHIP:DMG:                                 Data = 2, 
+          [1659772809.010173][17263:17263] CHIP:DMG:
+          [1659772809.010190][17263:17263] CHIP:DMG:                                 Data = 2,
           [1659772809.010205][17263:17263] CHIP:DMG:                         },
-          [1659772809.010223][17263:17263] CHIP:DMG:                         
+          [1659772809.010223][17263:17263] CHIP:DMG:
           [1659772809.010236][17263:17263] CHIP:DMG:                 },
-          [1659772809.010256][17263:17263] CHIP:DMG:                 
+          [1659772809.010256][17263:17263] CHIP:DMG:
           [1659772809.010269][17263:17263] CHIP:DMG:         ],
-          [1659772809.010289][17263:17263] CHIP:DMG:         
-          [1659772809.010303][17263:17263] CHIP:DMG:         SuppressResponse = true, 
+          [1659772809.010289][17263:17263] CHIP:DMG:
+          [1659772809.010303][17263:17263] CHIP:DMG:         SuppressResponse = true,
           [1659772809.010315][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
           [1659772809.010327][17263:17263] CHIP:DMG: }
-          [1659772809.010340][17263:17263] CHIP:DMG:  
+          [1659772809.010340][17263:17263] CHIP:DMG:
           [1659772809.010472][17263:17263] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1659772809.010651][17263:17263] CHIP:DMG: <RE> ReportsIn
       disabled: true
@@ -278,14 +278,14 @@ tests:
           arbitrary start time of TH rebooting."
       PICS: DGGEN.C.A0002
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool generaldiagnostics read up-time 1 0
 
           Verify in DUT as client side: Verify that UpTime attribute data type must be UINT64 and the time duratoin should be represented in seconds since DUT (node) has been rebooted.
 
           659772924.705797][17263:17263] CHIP:DMG: }
-          [1659772924.705813][17263:17263] CHIP:DMG:  
+          [1659772924.705813][17263:17263] CHIP:DMG:
           [1659772924.705907][17263:17263] CHIP:DMG: ReportDataMessage =
           [1659772924.705928][17263:17263] CHIP:DMG: {
           [1659772924.705943][17263:17263] CHIP:DMG:         AttributeReportIBs =
@@ -301,15 +301,15 @@ tests:
           [1659772924.706173][17263:17263] CHIP:DMG:                                         Cluster = 0x33,
           [1659772924.706195][17263:17263] CHIP:DMG:                                         Attribute = 0x0000_0002,
           [1659772924.706221][17263:17263] CHIP:DMG:                                 }
-          [1659772924.706248][17263:17263] CHIP:DMG:                                         
-          [1659772924.706273][17263:17263] CHIP:DMG:                                 Data = 804, 
+          [1659772924.706248][17263:17263] CHIP:DMG:
+          [1659772924.706273][17263:17263] CHIP:DMG:                                 Data = 804,
           [1659772924.706293][17263:17263] CHIP:DMG:                         },
-          [1659772924.706318][17263:17263] CHIP:DMG:                         
+          [1659772924.706318][17263:17263] CHIP:DMG:
           [1659772924.706335][17263:17263] CHIP:DMG:                 },
-          [1659772924.706361][17263:17263] CHIP:DMG:                 
+          [1659772924.706361][17263:17263] CHIP:DMG:
           [1659772924.706375][17263:17263] CHIP:DMG:         ],
-          [1659772924.706401][17263:17263] CHIP:DMG:         
-          [1659772924.706422][17263:17263] CHIP:DMG:         SuppressResponse = true, 
+          [1659772924.706401][17263:17263] CHIP:DMG:
+          [1659772924.706422][17263:17263] CHIP:DMG:         SuppressResponse = true,
           [1659772924.706441][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
           [1659772924.706461][17263:17263] CHIP:DMG: }
           [1659772924.706480][17263:17263] CHIP:DMG:
@@ -318,7 +318,7 @@ tests:
     - label: "DUT reads a TotalOperationalHours attribute value from TH."
       PICS: DGGEN.C.A0003
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool generaldiagnostics read total-operational-hours 1 0
           Verify in DUT as client side: verify that TotalOperationalHours attribute data type must be UINT32 and the value indicates the number of hours the node has been operational since DUT (node) has been rebooted.
@@ -334,10 +334,10 @@ tests:
           [1659971129.330513][3458:3458] CHIP:DMG: 			Cluster = 0x33,
           [1659971129.330545][3458:3458] CHIP:DMG: 			Attribute = 0x0000_0003,
           [1659971129.330574][3458:3458] CHIP:DMG: 		}
-          [1659971129.330602][3458:3458] CHIP:DMG: 			
+          [1659971129.330602][3458:3458] CHIP:DMG:
           [1659971129.330626][3458:3458] CHIP:DMG: 	],
-          [1659971129.330654][3458:3458] CHIP:DMG: 		
-          [1659971129.330680][3458:3458] CHIP:DMG: 	isFabricFiltered = true, 
+          [1659971129.330654][3458:3458] CHIP:DMG:
+          [1659971129.330680][3458:3458] CHIP:DMG: 	isFabricFiltered = true,
           [1659971129.330705][3458:3458] CHIP:DMG: 	InteractionModelRevision = 1
           [1659971129.330727][3458:3458] CHIP:DMG: },
           [1659971129.330800][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -352,7 +352,7 @@ tests:
           "TH undergoes a reboot process. DUT reads a attribute value from TH."
       PICS: DGGEN.C.A0004
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool generaldiagnostics read boot-reasons 1 0
 
@@ -368,10 +368,10 @@ tests:
           [1659971157.322280][3458:3458] CHIP:DMG: 			Cluster = 0x33,
           [1659971157.322313][3458:3458] CHIP:DMG: 			Attribute = 0x0000_0004,
           [1659971157.322344][3458:3458] CHIP:DMG: 		}
-          [1659971157.322374][3458:3458] CHIP:DMG: 			
+          [1659971157.322374][3458:3458] CHIP:DMG:
           [1659971157.322400][3458:3458] CHIP:DMG: 	],
-          [1659971157.322429][3458:3458] CHIP:DMG: 		
-          [1659971157.322456][3458:3458] CHIP:DMG: 	isFabricFiltered = true, 
+          [1659971157.322429][3458:3458] CHIP:DMG:
+          [1659971157.322456][3458:3458] CHIP:DMG: 	isFabricFiltered = true,
           [1659971157.322483][3458:3458] CHIP:DMG: 	InteractionModelRevision = 1
           [1659971157.322507][3458:3458] CHIP:DMG: },
           [1659971157.322585][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -391,10 +391,10 @@ tests:
           [1659971157.322280][3458:3458] CHIP:DMG: 			Cluster = 0x33,
           [1659971157.322313][3458:3458] CHIP:DMG: 			Attribute = 0x0000_0004,
           [1659971157.322344][3458:3458] CHIP:DMG: 		}
-          [1659971157.322374][3458:3458] CHIP:DMG: 			
+          [1659971157.322374][3458:3458] CHIP:DMG:
           [1659971157.322400][3458:3458] CHIP:DMG: 	],
-          [1659971157.322429][3458:3458] CHIP:DMG: 		
-          [1659971157.322456][3458:3458] CHIP:DMG: 	isFabricFiltered = true, 
+          [1659971157.322429][3458:3458] CHIP:DMG:
+          [1659971157.322456][3458:3458] CHIP:DMG: 	isFabricFiltered = true,
           [1659971157.322483][3458:3458] CHIP:DMG: 	InteractionModelRevision = 1
           [1659971157.322507][3458:3458] CHIP:DMG: },
           [1659971157.322585][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -420,15 +420,15 @@ tests:
           [1659773092.661053][17263:17263] CHIP:DMG:                                         Cluster = 0x33,
           [1659773092.661082][17263:17263] CHIP:DMG:                                         Attribute = 0x0000_0004,
           [1659773092.661104][17263:17263] CHIP:DMG:                                 }
-          [1659773092.661130][17263:17263] CHIP:DMG:                                         
-          [1659773092.661152][17263:17263] CHIP:DMG:                                 Data = 0, 
+          [1659773092.661130][17263:17263] CHIP:DMG:
+          [1659773092.661152][17263:17263] CHIP:DMG:                                 Data = 0,
           [1659773092.661168][17263:17263] CHIP:DMG:                         },
-          [1659773092.661212][17263:17263] CHIP:DMG:                         
+          [1659773092.661212][17263:17263] CHIP:DMG:
           [1659773092.661230][17263:17263] CHIP:DMG:                 },
-          [1659773092.661251][17263:17263] CHIP:DMG:                 
+          [1659773092.661251][17263:17263] CHIP:DMG:
           [1659773092.661263][17263:17263] CHIP:DMG:         ],
-          [1659773092.661284][17263:17263] CHIP:DMG:         
-          [1659773092.661297][17263:17263] CHIP:DMG:         SuppressResponse = true, 
+          [1659773092.661284][17263:17263] CHIP:DMG:
+          [1659773092.661297][17263:17263] CHIP:DMG:         SuppressResponse = true,
           [1659773092.661311][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
           [1659773092.661323][17263:17263] CHIP:DMG: }
           [1659773092.661337][17263:17263] CHIP:DMG:
@@ -439,13 +439,13 @@ tests:
           is possible option for this attribute."
       PICS: DGGEN.C.A0005
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          ./chip-tool generaldiagnostics read active-hardware-faults 1 0 
+          ./chip-tool generaldiagnostics read active-hardware-faults 1 0
 
           Verify in DUT as client side: verify that ActiveHardwareFaults attribute the attribute response should be empty. But when a hardware fault occurs, the return attribute value must match the value listed in the HardwareFault ENUM table 11.11.6.1
 
-          [1659773303.234177][17263:17263] CHIP:DMG:  
+          [1659773303.234177][17263:17263] CHIP:DMG:
           [1659773303.234225][17263:17263] CHIP:DMG: ReportDataMessage =
           [1659773303.234234][17263:17263] CHIP:DMG: {
           [1659773303.234241][17263:17263] CHIP:DMG:         AttributeReportIBs =
@@ -461,17 +461,17 @@ tests:
           [1659773303.234346][17263:17263] CHIP:DMG:                                         Cluster = 0x33,
           [1659773303.234357][17263:17263] CHIP:DMG:                                         Attribute = 0x0000_0005,
           [1659773303.234367][17263:17263] CHIP:DMG:                                 }
-          [1659773303.234378][17263:17263] CHIP:DMG:                                         
+          [1659773303.234378][17263:17263] CHIP:DMG:
           [1659773303.234388][17263:17263] CHIP:DMG:                                 Data = [
-          [1659773303.234401][17263:17263] CHIP:DMG:                                                 
+          [1659773303.234401][17263:17263] CHIP:DMG:
           [1659773303.234417][17263:17263] CHIP:DMG:                                 ],
           [1659773303.234428][17263:17263] CHIP:DMG:                         },
-          [1659773303.234444][17263:17263] CHIP:DMG:                         
+          [1659773303.234444][17263:17263] CHIP:DMG:
           [1659773303.234457][17263:17263] CHIP:DMG:                 },
-          [1659773303.234475][17263:17263] CHIP:DMG:                 
+          [1659773303.234475][17263:17263] CHIP:DMG:
           [1659773303.234485][17263:17263] CHIP:DMG:         ],
-          [1659773303.234503][17263:17263] CHIP:DMG:         
-          [1659773303.234512][17263:17263] CHIP:DMG:         SuppressResponse = true, 
+          [1659773303.234503][17263:17263] CHIP:DMG:
+          [1659773303.234512][17263:17263] CHIP:DMG:         SuppressResponse = true,
           [1659773303.234523][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
           [1659773303.234533][17263:17263] CHIP:DMG: }
           [1659773303.234544][17263:17263] CHIP:DMG:
@@ -482,9 +482,9 @@ tests:
           possible option for this attribute."
       PICS: DGGEN.C.A0006
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          ./chip-tool generaldiagnostics read active-radio-faults 1 0 
+          ./chip-tool generaldiagnostics read active-radio-faults 1 0
           Verify in DUT as client side:verify that  the attribute response should be empty. But when a radio fault occurs, the return attribute value must match the value listed in the RadioFault ENUM table. 11.11.6.2
 
           [1659971190.358722][3458:3458] CHIP:IM: Received Read request
@@ -498,10 +498,10 @@ tests:
           [1659971190.358988][3458:3458] CHIP:DMG: 			Cluster = 0x33,
           [1659971190.359019][3458:3458] CHIP:DMG: 			Attribute = 0x0000_0006,
           [1659971190.359049][3458:3458] CHIP:DMG: 		}
-          [1659971190.359077][3458:3458] CHIP:DMG: 			
+          [1659971190.359077][3458:3458] CHIP:DMG:
           [1659971190.359101][3458:3458] CHIP:DMG: 	],
-          [1659971190.359129][3458:3458] CHIP:DMG: 		
-          [1659971190.359154][3458:3458] CHIP:DMG: 	isFabricFiltered = true, 
+          [1659971190.359129][3458:3458] CHIP:DMG:
+          [1659971190.359154][3458:3458] CHIP:DMG: 	isFabricFiltered = true,
           [1659971190.359178][3458:3458] CHIP:DMG: 	InteractionModelRevision = 1
           [1659971190.359201][3458:3458] CHIP:DMG: },
           [1659971190.359274][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -517,13 +517,13 @@ tests:
           is possible option for this attribute."
       PICS: DGGEN.C.A0007
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          ./chip-tool generaldiagnostics read active-network-faults 1 0 
+          ./chip-tool generaldiagnostics read active-network-faults 1 0
           Verify in DUT as client side: verify that ActiveNetworkFaults attribute value attribute response should be empty. But when a network fault occurs, the return attribute value must match the value listed in the NetworkFault ENUM ta
 
           [1659773398.933596][17263:17263] CHIP:DMG: }
-          [1659773398.933607][17263:17263] CHIP:DMG:  
+          [1659773398.933607][17263:17263] CHIP:DMG:
           [1659773398.933677][17263:17263] CHIP:DMG: ReportDataMessage =
           [1659773398.933692][17263:17263] CHIP:DMG: {
           [1659773398.933703][17263:17263] CHIP:DMG:         AttributeReportIBs =
@@ -539,17 +539,17 @@ tests:
           [1659773398.933867][17263:17263] CHIP:DMG:                                         Cluster = 0x33,
           [1659773398.933883][17263:17263] CHIP:DMG:                                         Attribute = 0x0000_0006,
           [1659773398.933898][17263:17263] CHIP:DMG:                                 }
-          [1659773398.933916][17263:17263] CHIP:DMG:                                         
+          [1659773398.933916][17263:17263] CHIP:DMG:
           [1659773398.933931][17263:17263] CHIP:DMG:                                 Data = [
-          [1659773398.933947][17263:17263] CHIP:DMG:                                                 
+          [1659773398.933947][17263:17263] CHIP:DMG:
           [1659773398.933963][17263:17263] CHIP:DMG:                                 ],
           [1659773398.933977][17263:17263] CHIP:DMG:                         },
-          [1659773398.933996][17263:17263] CHIP:DMG:                         
+          [1659773398.933996][17263:17263] CHIP:DMG:
           [1659773398.934009][17263:17263] CHIP:DMG:                 },
-          [1659773398.934029][17263:17263] CHIP:DMG:                 
+          [1659773398.934029][17263:17263] CHIP:DMG:
           [1659773398.934042][17263:17263] CHIP:DMG:         ],
-          [1659773398.934062][17263:17263] CHIP:DMG:         
-          [1659773398.934076][17263:17263] CHIP:DMG:         SuppressResponse = true, 
+          [1659773398.934062][17263:17263] CHIP:DMG:
+          [1659773398.934076][17263:17263] CHIP:DMG:         SuppressResponse = true,
           [1659773398.934090][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
           [1659773398.934102][17263:17263] CHIP:DMG: }
       disabled: true
@@ -560,7 +560,7 @@ tests:
           according to pre-provisioned client and server test mode."
       PICS: DGGEN.C.A0008
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool generaldiagnostics read   test-event-triggers-enabled  1 0
           Verify in DUT as client side: verify that TestEventTriggersEnabled attribute value should be data type bool
@@ -580,18 +580,18 @@ tests:
           [1659773457.296284][17263:17263] CHIP:DMG:                                         Cluster = 0x33,
           [1659773457.296315][17263:17263] CHIP:DMG:                                         Attribute = 0x0000_0008,
           [1659773457.296339][17263:17263] CHIP:DMG:                                 }
-          [1659773457.296366][17263:17263] CHIP:DMG:                                         
-          [1659773457.296390][17263:17263] CHIP:DMG:                                 Data = false, 
+          [1659773457.296366][17263:17263] CHIP:DMG:
+          [1659773457.296390][17263:17263] CHIP:DMG:                                 Data = false,
           [1659773457.296405][17263:17263] CHIP:DMG:                         },
-          [1659773457.296428][17263:17263] CHIP:DMG:                         
+          [1659773457.296428][17263:17263] CHIP:DMG:
           [1659773457.296446][17263:17263] CHIP:DMG:                 },
-          [1659773457.296468][17263:17263] CHIP:DMG:                 
+          [1659773457.296468][17263:17263] CHIP:DMG:
           [1659773457.296481][17263:17263] CHIP:DMG:         ],
-          [1659773457.296510][17263:17263] CHIP:DMG:         
-          [1659773457.296531][17263:17263] CHIP:DMG:         SuppressResponse = true, 
+          [1659773457.296510][17263:17263] CHIP:DMG:
+          [1659773457.296531][17263:17263] CHIP:DMG:         SuppressResponse = true,
           [1659773457.296549][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
           [1659773457.296566][17263:17263] CHIP:DMG: }
-          [1659773457.296585][17263:17263] CHIP:DMG:  
+          [1659773457.296585][17263:17263] CHIP:DMG:
           [1659773457.296794][17263:17263] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1659773457.296849][17263:17263] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandle
       disabled: true

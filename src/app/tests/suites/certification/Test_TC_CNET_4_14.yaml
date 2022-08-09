@@ -30,7 +30,7 @@ tests:
           "TH sends  ArmFailSafe  command to the  DUT
           with  ExpiryLengthSeco  nds set to 900"
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -39,7 +39,7 @@ tests:
           entries as NumNetworks"
       PICS: CNET.S.A0001
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -48,7 +48,7 @@ tests:
           as  MaxNetworksVal  ue -  NumNetworks  and saves
           as  RemainingNetwor  kSlots"
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -56,7 +56,7 @@ tests:
           "TH calculates the  midpoint of the  network list
           as  floor((MaxNetwor  ksValue + 1)/2)  and saves as  Midpoint"
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -64,7 +64,7 @@ tests:
           "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeco nds
           field set to 900"
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -75,7 +75,7 @@ tests:
           credentials are NOT required to be connectable."
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -84,7 +84,7 @@ tests:
           as  OriginalNetworkL  ist"
       PICS: CNET.S.A0001
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -95,14 +95,14 @@ tests:
           is  MaxNetwo  rksValue  3.  Breadcrum  b is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label:
           "TH reads Breadcumb attribute from the General Commissioning Cluster"
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -113,14 +113,14 @@ tests:
           is  Midpoint  3.  Breadcrum  b is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label:
           "TH reads Breadcumb attribute from the General Commissioning Cluster"
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -131,7 +131,7 @@ tests:
           is  Midpoint  3.  Breadcrum  b is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -139,14 +139,14 @@ tests:
           "TH reads  Breadcumb  attribute from
           the  General  Commissioning  Cluster"
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label: "TH reads  Networks  attribute list from  the DUT"
       PICS: CNET.S.A0001
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -154,14 +154,14 @@ tests:
           "TH sends  ArmFailSafe  command to the  DUT
           with  ExpiryLengthSeco  nds set to 0"
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label: "TH reads  Networks  attribute list from  the DUT"
       PICS: CNET.S.A0001
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -169,7 +169,7 @@ tests:
           "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
           to 900"
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -181,7 +181,7 @@ tests:
           connectable"
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -192,13 +192,13 @@ tests:
           is  Midpoint  3.  Breadcrum  b is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label: "TH sends the CommissioningCo mplete command to the DUT"
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -206,13 +206,13 @@ tests:
           "TH sends  ArmFailSafe  command to the  DUT
           with  ExpiryLengthSeco  nds set to 0"
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label: "TH reads  Networks  attribute list from  the DUT"
       PICS: CNET.S.A0001
       verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true

@@ -31,7 +31,7 @@ tests:
 
     - label: "TH reads the ClusterRevision from DUT"
       verification: |
-          ./chip-tool groups read cluster-revision 1 1 
+          ./chip-tool groups read cluster-revision 1 1
 
           Verify the "clusterrevision value" on the TH(Chip-tool)  Log:
 
@@ -41,7 +41,7 @@ tests:
 
     - label: "TH reads the FeatureMap from DUT"
       verification: |
-          ./chip-tool groups read feature-map 1 1 
+          ./chip-tool groups read feature-map 1 1
 
           Verify the "featuremap value" on the TH(Chip-tool)  Log:
 
@@ -51,7 +51,7 @@ tests:
 
     - label: "TH reads AttributeList from DUT"
       verification: |
-          ./chip-tool groups read attribute-list 1 1 
+          ./chip-tool groups read attribute-list 1 1
 
           Verify the "attibute list contains the mandatory attributes and global attributes" on the TH(Chip-tool)  Log:
 

@@ -59,7 +59,7 @@ tests:
     - label: "DUT reads NodeLabel from the TH"
       PICS: BRBINFO.C.A0005
       verification: |
-          Nodelabel is an optional Attribute - 
+          Nodelabel is an optional Attribute -
 
           ./chip-tool bridgeddevicebasic read node-label 1 3
 

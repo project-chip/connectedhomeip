@@ -58,7 +58,7 @@ tests:
       PICS: DGTHREAD.C.A0017
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-unicast-count 54 0
-           
+
           Verify "TxUnicastCount response" on the TH(All-cluster-app) Log:
 
           D: 3036505 [SC]Allocated SecureSession (0x20002f50) - waiting for Sigma1 msg
@@ -94,7 +94,7 @@ tests:
       PICS: DGTHREAD.C.A0019
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-ack-requested-count 54 0
-           
+
           Verify "TxAckRequestedCount response" on the TH(All-cluster-app) Log:
 
           I: 3120921 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367864 to 0x0000000000000000c
@@ -131,7 +131,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-no-ack-requested-count 54 0
           Verify "TxNoAckRequestedCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 3223768 [SC]Allocated SecureSession (0x20003230) - waiting for Sigma1 msg
           I: 3223776 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:222085508 on exchar
           D: 3223786 [EM]Handling via exchange: 38957r, Delegate: 0x200070ec
@@ -167,7 +167,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-data-poll-count 54 0
           Verify "TxDataPollCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 3325107 [SC]Allocated SecureSession (0x200033a0) - waiting for Sigma1 msg
           I: 3325115 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:39487161 on exchanr
           D: 3325125 [EM]Handling via exchange: 61775r, Delegate: 0x200070ec
@@ -205,7 +205,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-beacon-request-count 54 0
           Verify "TxBeaconRequestCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 3383318 [SC]Allocated SecureSession (0x20003510) - waiting for Sigma1 msg
           I: 3383326 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:29889571 on exchanr
           D: 3383338 [EM]Handling via exchange: 53268r, Delegate: 0x200070ec
@@ -241,7 +241,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-retry-count 54 0
           Verify "TxRetryCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 3579614 [SC]Allocated SecureSession (0x20003680) - waiting for Sigma1 msg
           I: 3579622 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:236977137 on exchar
           D: 3579632 [EM]Handling via exchange: 26757r, Delegate: 0x200070ec
@@ -329,7 +329,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-err-busy-channel-count 54 0
           Verify "TxErrBusyChannelCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 3925250 [SC]Allocated SecureSession (0x20002d28) - waiting for Sigma1 msg
           I: 3925257 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:68236194 on exchanr
           D: 3925267 [EM]Handling via exchange: 58143r, Delegate: 0x200070ec

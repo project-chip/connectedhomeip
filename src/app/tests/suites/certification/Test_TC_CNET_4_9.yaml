@@ -78,7 +78,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
 
@@ -150,9 +150,9 @@ tests:
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
 
-          Below is an example: 
+          Below is an example:
 
-          ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0 --Breadcrumb 2 
+          ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0 --Breadcrumb 2
 
           Verify "ConnectNetworkResponse and its arguments" on the TH(Chip-tool) Log:
 

@@ -37,7 +37,7 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
           ./chip-tool identify read identify-time 1 1
           Verify DUT receives  identify-time attribute response on the TH(all-clusters-app) Log:
 
@@ -52,10 +52,10 @@ tests:
           [1648015371.160047][2506:2506] CHIP:DMG:                         Cluster = 0x3,
           [1648015371.160087][2506:2506] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1648015371.160127][2506:2506] CHIP:DMG:                 }
-          [1648015371.160164][2506:2506] CHIP:DMG:                         
+          [1648015371.160164][2506:2506] CHIP:DMG:
           [1648015371.160201][2506:2506] CHIP:DMG:         ],
-          [1648015371.160238][2506:2506] CHIP:DMG:                 
-          [1648015371.160270][2506:2506] CHIP:DMG:         isFabricFiltered = true, 
+          [1648015371.160238][2506:2506] CHIP:DMG:
+          [1648015371.160270][2506:2506] CHIP:DMG:         isFabricFiltered = true,
           [1648015371.160300][2506:2506] CHIP:DMG:         InteractionModelRevision = 1
           [1648015371.160324][2506:2506] CHIP:DMG: },
 
@@ -74,10 +74,10 @@ tests:
           [1648015519.017673][2506:2506] CHIP:DMG:                         Cluster = 0x3,
           [1648015519.017721][2506:2506] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1648015519.017768][2506:2506] CHIP:DMG:                 }
-          [1648015519.017813][2506:2506] CHIP:DMG:                         
+          [1648015519.017813][2506:2506] CHIP:DMG:
           [1648015519.017853][2506:2506] CHIP:DMG:         ],
-          [1648015519.017894][2506:2506] CHIP:DMG:                 
-          [1648015519.017932][2506:2506] CHIP:DMG:         isFabricFiltered = true, 
+          [1648015519.017894][2506:2506] CHIP:DMG:
+          [1648015519.017932][2506:2506] CHIP:DMG:         isFabricFiltered = true,
           [1648015519.017969][2506:2506] CHIP:DMG:         InteractionModelRevision = 1
           [1648015519.018003][2506:2506] CHIP:DMG: },
       disabled: true
@@ -93,7 +93,7 @@ tests:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool identify  write   identify-time  1 1 1
 
@@ -102,7 +102,7 @@ tests:
           [1646012277.591936][33190:33190] CHIP:DMG: IM WH moving to [Initialized]
           [1646012277.591987][33190:33190] CHIP:DMG: WriteRequestMessage =
           [1646012277.592013][33190:33190] CHIP:DMG: {
-          [1646012277.592036][33190:33190] CHIP:DMG:         timedRequest = false, 
+          [1646012277.592036][33190:33190] CHIP:DMG:         timedRequest = false,
           [1646012277.592064][33190:33190] CHIP:DMG:         AttributeDataIBs =
           [1646012277.592094][33190:33190] CHIP:DMG:         [
           [1646012277.592118][33190:33190] CHIP:DMG:                 AttributeDataIB =
@@ -113,13 +113,13 @@ tests:
           [1646012277.592273][33190:33190] CHIP:DMG:                                 Cluster = 0x3,
           [1646012277.592306][33190:33190] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1646012277.592336][33190:33190] CHIP:DMG:                         }
-          [1646012277.592368][33190:33190] CHIP:DMG:                                 
-          [1646012277.592400][33190:33190] CHIP:DMG:                                 Data = 60, 
+          [1646012277.592368][33190:33190] CHIP:DMG:
+          [1646012277.592400][33190:33190] CHIP:DMG:                                 Data = 60,
           [1646012277.592433][33190:33190] CHIP:DMG:                 },
-          [1646012277.592463][33190:33190] CHIP:DMG:                 
+          [1646012277.592463][33190:33190] CHIP:DMG:
           [1646012277.592488][33190:33190] CHIP:DMG:         ],
-          [1646012277.592516][33190:33190] CHIP:DMG:         
-          [1646012277.592540][33190:33190] CHIP:DMG:         moreChunkedMessages = false, 
+          [1646012277.592516][33190:33190] CHIP:DMG:
+          [1646012277.592540][33190:33190] CHIP:DMG:         moreChunkedMessages = false,
           [1646012277.592566][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
           [1646012277.592589][33190:33190] CHIP:DMG: },
           [1646012277.592669][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=o
@@ -139,10 +139,10 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool identify read identify-time 1 1
-          Verify DUT receives  identify-time attribute response on theTH(all-clusters-minimal-app) 
+          Verify DUT receives  identify-time attribute response on theTH(all-clusters-minimal-app)
 
           [1648015371.159715][2506:2506] CHIP:IM: Received Read request
           [1648015371.159805][2506:2506] CHIP:DMG: ReadRequestMessage =
@@ -155,16 +155,16 @@ tests:
           [1648015371.160047][2506:2506] CHIP:DMG:                         Cluster = 0x3,
           [1648015371.160087][2506:2506] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1648015371.160127][2506:2506] CHIP:DMG:                 }
-          [1648015371.160164][2506:2506] CHIP:DMG:                         
+          [1648015371.160164][2506:2506] CHIP:DMG:
           [1648015371.160201][2506:2506] CHIP:DMG:         ],
-          [1648015371.160238][2506:2506] CHIP:DMG:                 
-          [1648015371.160270][2506:2506] CHIP:DMG:         isFabricFiltered = true, 
+          [1648015371.160238][2506:2506] CHIP:DMG:
+          [1648015371.160270][2506:2506] CHIP:DMG:         isFabricFiltered = true,
           [1648015371.160300][2506:2506] CHIP:DMG:         InteractionModelRevision = 1
           [1648015371.160324][2506:2506] CHIP:DMG: },
 
 
            ./chip-tool identify  read   identify-type 1 1
-          Verify DUT receives  identify-type attribute response on theTH(all-clusters-minimal-app) 
+          Verify DUT receives  identify-type attribute response on theTH(all-clusters-minimal-app)
 
           [1648015519.017225][2506:2506] CHIP:IM: Received Read request
           [1648015519.017293][2506:2506] CHIP:DMG: ReadRequestMessage =
@@ -177,10 +177,10 @@ tests:
           [1648015519.017673][2506:2506] CHIP:DMG:                         Cluster = 0x3,
           [1648015519.017721][2506:2506] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1648015519.017768][2506:2506] CHIP:DMG:                 }
-          [1648015519.017813][2506:2506] CHIP:DMG:                         
+          [1648015519.017813][2506:2506] CHIP:DMG:
           [1648015519.017853][2506:2506] CHIP:DMG:         ],
-          [1648015519.017894][2506:2506] CHIP:DMG:                 
-          [1648015519.017932][2506:2506] CHIP:DMG:         isFabricFiltered = true, 
+          [1648015519.017894][2506:2506] CHIP:DMG:
+          [1648015519.017932][2506:2506] CHIP:DMG:         isFabricFiltered = true,
           [1648015519.017969][2506:2506] CHIP:DMG:         InteractionModelRevision = 1
           [1648015519.018003][2506:2506] CHIP:DMG: },
       disabled: true

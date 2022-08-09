@@ -57,10 +57,10 @@ tests:
     - label: "DUT reads RoutingRole attribute value from TH"
       PICS: DGTHREAD.C.A0001
       verification: |
-          ./chip-tool threadnetworkdiagnostics read routing-role 54 0 
+          ./chip-tool threadnetworkdiagnostics read routing-role 54 0
 
           Verify "RoutingRole response" on the TH(All-cluster-app) Log:
-           
+
           D: 857084 [EM]Handling via exchange: 46068r, Delegate: 0x200070ec
           D: 857090 [IM]Received Read request
           D: 857094 [DMG]IM RH moving to [GeneratingReports]
@@ -76,7 +76,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read network-name 54 0
 
           Verify "NetworkName response" on the TH(All-cluster-app) Log:
-           
+
           D: 906029 [EM]Handling via exchange: 28293r, Delegate: 0x200070ec
           D: 906035 [IM]Received Read request
           D: 906039 [DMG]IM RH moving to [GeneratingReports]
@@ -108,7 +108,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read extended-pan-id 54 0
 
           Verify "ExtendedPanId response" on the TH(All-cluster-app) Log:
-           
+
           D: 992402 [EM]Handling via exchange: 49565r, Delegate: 0x200070ec
           D: 992409 [IM]Received Read request
           D: 992413 [DMG]IM RH moving to [GeneratingReports]
@@ -124,7 +124,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read mesh-local-prefix 54 0
 
           Verify "MeshLocalPrefix response" on the TH(All-cluster-app) Log:
-           
+
           D: 1037614 [EM]Handling via exchange: 42980r, Delegate: 0x200070ec
           D: 1037620 [IM]Received Read request
           D: 1037624 [DMG]IM RH moving to [GeneratingReports]
@@ -137,10 +137,10 @@ tests:
     - label: "DUT reads OverrunCount attribute value from TH."
       PICS: DGTHREAD.C.A0006
       verification: |
-          ./chip-tool threadnetworkdiagnostics read overrun-count 54 0 
+          ./chip-tool threadnetworkdiagnostics read overrun-count 54 0
 
           Verify "OverrunCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 1085229 [SC]Allocated SecureSession (0x20003680) - waiting for Sigma1 msg
           I: 1085236 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:86023668 on exchanr
           D: 1085246 [EM]Handling via exchange: 16079r, Delegate: 0x200070ec
@@ -158,7 +158,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read neighbor-table-list 54 0
 
           Verify "NeighborTableList response" on the TH(All-cluster-app) Log:
-           
+
           D: 1133597 [SC]Allocated SecureSession (0x20003738) - waiting for Sigma1 msg
           I: 1133606 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:213814779 on exchar
           D: 1133616 [EM]Handling via exchange: 57703r, Delegate: 0x200070ec
@@ -194,7 +194,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read partition-id 54 0
 
           Verify "PartitionId response" on the TH(All-cluster-app) Log:
-           
+
           D: 1251223 [SC]Allocated SecureSession (0x20002c70) - waiting for Sigma1 msg
           I: 1251230 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:191202632 on exchar
           D: 1251241 [EM]Handling via exchange: 25875r, Delegate: 0x200070ec
@@ -214,7 +214,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read weighting 54 0
 
           Verify "weighting response" on the TH(All-cluster-app) Log:
-           
+
           D: 1299900 [SC]Allocated SecureSession (0x20002de0) - waiting for Sigma1 msg
           I: 1299907 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:55560128 on exchanr
           D: 1299917 [EM]Handling via exchange: 45722r, Delegate: 0x200070ec
@@ -250,7 +250,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read stable-data-version 54 0
 
           Verify "StableDataVersion response" on the TH(All-cluster-app) Log:
-           
+
 
           I: 1392842 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367784 to 0x0000000000000000c
           I: 1392857 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:43531416 on exchanr
@@ -269,7 +269,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read leader-router-id 54 0
 
           Verify "LeaderRouterId response" on the TH(All-cluster-app) Log:
-           
+
 
           D: 1455932 [SC]Allocated SecureSession (0x20002f50) - waiting for Sigma1 msg
           I: 1455940 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:149451326 on exchar
@@ -290,7 +290,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read detached-role-count 54 0
 
           Verify "DetachedRoleCount response" on the TH(All-cluster-app) Log:
-           
+
           I: 1532319 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367792 to 0x0000000000000000c
           I: 1532333 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:268029320 on exchar
           D: 1532344 [EM]Handling via exchange: 16217r, Delegate: 0x200070ec
@@ -308,7 +308,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read child-role-count 54 0
 
           Verify "ChildRoleCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 1566935 [SC]Allocated SecureSession (0x200030c0) - waiting for Sigma1 msg
           I: 1566943 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:48367315 on exchanr
           D: 1566953 [EM]Handling via exchange: 7022r, Delegate: 0x200070ec
@@ -328,7 +328,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read router-role-count 54 0
 
           Verify "RouterRoleCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 1600012 [SC]Allocated SecureSession (0x20003178) - waiting for Sigma1 msg
           I: 1600020 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:78525212 on exchanr
           D: 1600030 [EM]Handling via exchange: 10230r, Delegate: 0x200070ec
@@ -346,7 +346,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read leader-role-count 54 0
 
           Verify "LeaderRoleCount response" on the TH(All-cluster-app) Log:
-           
+
           I: 1712400 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367804 to 0x0000000000000000c
           I: 1712415 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:173936026 on exchar
           D: 1712425 [EM]Handling via exchange: 56738r, Delegate: 0x200070ec
@@ -364,7 +364,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read attach-attempt-count 54 0
 
           Verify "AttachAttemptCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 1762338 [SC]Allocated SecureSession (0x200032e8) - waiting for Sigma1 msg
           I: 1762346 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:45359373 on exchanr
           D: 1762356 [EM]Handling via exchange: 7899r, Delegate: 0x200070ec
@@ -382,7 +382,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read partition-id-change-count 54 0
 
           Verify "PartitionIdChangeCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 1988080 [SC]Allocated SecureSession (0x200033a0) - waiting for Sigma1 msg
           I: 1988087 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:211482637 on exchar
           D: 1988097 [EM]Handling via exchange: 39932r, Delegate: 0x200070ec
@@ -419,7 +419,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read parent-change-count 54 0
 
           Verify "ParentChangeCount response" on the TH(All-cluster-app) Log:
-           
+
           D: 2167609 [SC]Allocated SecureSession (0x20003510) - waiting for Sigma1 msg
           I: 2167617 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:197446435 on exchar
           D: 2167627 [EM]Handling via exchange: 13205r, Delegate: 0x200070ec
@@ -437,7 +437,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read active-timestamp 54 0
 
           Verify "ActiveTimestamp response" on the TH(All-cluster-app) Log:
-           
+
           I: 2257044 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367824 to 0x0000000000000000c
           I: 2257059 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:197064524 on exchar
           D: 2257070 [EM]Handling via exchange: 61923r, Delegate: 0x200070ec
@@ -455,7 +455,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read pending-timestamp 54 0
 
           Verify "PendingTimestamp response" on the TH(All-cluster-app) Log:
-           
+
           D: 2368307 [SC]Allocated SecureSession (0x20003680) - waiting for Sigma1 msg
           I: 2368315 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:262013622 on exchar
           D: 2368325 [EM]Handling via exchange: 17994r, Delegate: 0x200070ec
@@ -510,7 +510,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read channel-mask 54 0
 
           Verify "ChannelMask response" on the TH(All-cluster-app) Log:
-           
+
           I: 2464057 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367840 to 0x0000000000000000c
           I: 2464071 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:147354356 on exchar
           D: 2464082 [EM]Handling via exchange: 1863r, Delegate: 0x200070ec
@@ -528,7 +528,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read operational-dataset-components 54 0
 
           Verify "OperationalDatasetComponents response" on the TH(All-cluster-app) Log:
-           
+
           D: 2559492 [SC]Allocated SecureSession (0x20002de0) - waiting for Sigma1 msg
           D: 2559499 [EM]Retransmitting MessageCounter:53367844 on exchange 11177r Send Cnt 1
           I: 2559507 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367844 to 0x0000000000000000c

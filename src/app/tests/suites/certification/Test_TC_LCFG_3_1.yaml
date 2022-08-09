@@ -34,7 +34,7 @@ tests:
     - label: "DUT reads SupportedLocales attribute from TH"
       PICS: LCFG.C.A0001
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool localizationconfiguration read supported-locales 1 0
           Verify DUT receives supported-locales attribute  response on the TH(all-clusters-app) Log:
@@ -49,10 +49,10 @@ tests:
           [1659616748.134673][11438:11438] CHIP:DMG:                         Cluster = 0x2b,
           [1659616748.134743][11438:11438] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1659616748.134808][11438:11438] CHIP:DMG:                 }
-          [1659616748.134875][11438:11438] CHIP:DMG:                         
+          [1659616748.134875][11438:11438] CHIP:DMG:
           [1659616748.134936][11438:11438] CHIP:DMG:         ],
-          [1659616748.134996][11438:11438] CHIP:DMG:                 
-          [1659616748.135053][11438:11438] CHIP:DMG:         isFabricFiltered = true, 
+          [1659616748.134996][11438:11438] CHIP:DMG:
+          [1659616748.135053][11438:11438] CHIP:DMG:         isFabricFiltered = true,
           [1659616748.135109][11438:11438] CHIP:DMG:         InteractionModelRevision = 1
           [1659616748.135160][11438:11438] CHIP:DMG: },
           [1659616748.135322][11438:11438] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -61,7 +61,7 @@ tests:
     - label: "DUT reads ActiveLocale attribute from the TH"
       PICS: LCFG.C.A0000
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool localizationconfiguration read active-locale 1 0
           Verify DUT receives active-locale attribute  response on the TH(all-clusters-app) Log:
@@ -76,10 +76,10 @@ tests:
           [1659616904.401819][11438:11438] CHIP:DMG:                         Cluster = 0x2b,
           [1659616904.401851][11438:11438] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1659616904.401880][11438:11438] CHIP:DMG:                 }
-          [1659616904.401906][11438:11438] CHIP:DMG:                         
+          [1659616904.401906][11438:11438] CHIP:DMG:
           [1659616904.401930][11438:11438] CHIP:DMG:         ],
-          [1659616904.401955][11438:11438] CHIP:DMG:                 
-          [1659616904.401978][11438:11438] CHIP:DMG:         isFabricFiltered = true, 
+          [1659616904.401955][11438:11438] CHIP:DMG:
+          [1659616904.401978][11438:11438] CHIP:DMG:         isFabricFiltered = true,
           [1659616904.402000][11438:11438] CHIP:DMG:         InteractionModelRevision = 1
           [1659616904.402020][11438:11438] CHIP:DMG: },
           [1659616904.402087][11438:11438] CHIP:DMG: IM RH moving to [GeneratingReports]

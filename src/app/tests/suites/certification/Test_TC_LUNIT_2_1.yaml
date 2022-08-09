@@ -34,7 +34,7 @@ tests:
     - label: "DUT reads TemperatureUnit attribute from TH"
       PICS: LUNIT.C.A0000
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool unitlocalization read temperature-unit 1 0
           Verify DUT receives TemperatureUnit attribute response on the TH(all-clusters-app) Log:
@@ -50,10 +50,10 @@ tests:
           [1659785506.642484][4122:4122] CHIP:DMG: 			Cluster = 0x2d,
           [1659785506.642512][4122:4122] CHIP:DMG: 			Attribute = 0x0000_0000,
           [1659785506.642535][4122:4122] CHIP:DMG: 		}
-          [1659785506.642565][4122:4122] CHIP:DMG: 			
+          [1659785506.642565][4122:4122] CHIP:DMG:
           [1659785506.642590][4122:4122] CHIP:DMG: 	],
-          [1659785506.642618][4122:4122] CHIP:DMG: 		
-          [1659785506.642645][4122:4122] CHIP:DMG: 	isFabricFiltered = true, 
+          [1659785506.642618][4122:4122] CHIP:DMG:
+          [1659785506.642645][4122:4122] CHIP:DMG: 	isFabricFiltered = true,
           [1659785506.642670][4122:4122] CHIP:DMG: 	InteractionModelRevision = 1
           [1659785506.642693][4122:4122] CHIP:DMG: },
           [1659785506.642766][4122:4122] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -62,15 +62,15 @@ tests:
     - label: "DUT writes 3 to TemperatureUnit attribute on TH"
       PICS: LUNIT.C.A0000
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool unitlocalization write temperature-unit 3 1 0
           Verify DUT receives TemperatureUnit attribute write response on the TH(all-clusters-app) Log:
 
           [1659785555.542655][4122:4122] CHIP:DMG: WriteRequestMessage =
           [1659785555.542689][4122:4122] CHIP:DMG: {
-          [1659785555.542719][4122:4122] CHIP:DMG: 	suppressResponse = false, 
-          [1659785555.542754][4122:4122] CHIP:DMG: 	timedRequest = false, 
+          [1659785555.542719][4122:4122] CHIP:DMG: 	suppressResponse = false,
+          [1659785555.542754][4122:4122] CHIP:DMG: 	timedRequest = false,
           [1659785555.542787][4122:4122] CHIP:DMG: 	AttributeDataIBs =
           [1659785555.542827][4122:4122] CHIP:DMG: 	[
           [1659785555.542859][4122:4122] CHIP:DMG: 		AttributeDataIB =
@@ -81,13 +81,13 @@ tests:
           [1659785555.543062][4122:4122] CHIP:DMG: 				Cluster = 0x2d,
           [1659785555.543107][4122:4122] CHIP:DMG: 				Attribute = 0x0000_0000,
           [1659785555.543172][4122:4122] CHIP:DMG: 			}
-          [1659785555.543218][4122:4122] CHIP:DMG: 				
-          [1659785555.543260][4122:4122] CHIP:DMG: 			Data = 3, 
+          [1659785555.543218][4122:4122] CHIP:DMG:
+          [1659785555.543260][4122:4122] CHIP:DMG: 			Data = 3,
           [1659785555.543321][4122:4122] CHIP:DMG: 		},
-          [1659785555.543362][4122:4122] CHIP:DMG: 		
+          [1659785555.543362][4122:4122] CHIP:DMG:
           [1659785555.543395][4122:4122] CHIP:DMG: 	],
-          [1659785555.543434][4122:4122] CHIP:DMG: 	
-          [1659785555.543468][4122:4122] CHIP:DMG: 	moreChunkedMessages = false, 
+          [1659785555.543434][4122:4122] CHIP:DMG:
+          [1659785555.543468][4122:4122] CHIP:DMG: 	moreChunkedMessages = false,
           [1659785555.543502][4122:4122] CHIP:DMG: 	InteractionModelRevision = 1
           [1659785555.543534][4122:4122] CHIP:DMG: },
           [1659785555.543637][4122:4122] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t=
@@ -96,7 +96,7 @@ tests:
     - label: "DUT reads TemperatureUnit attribute from TH"
       PICS: LUNIT.C.A0000
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool unitlocalization read temperature-unit 1 0
           Verify DUT receives TemperatureUnit attribute response on the TH(all-clusters-app) Log:
@@ -112,10 +112,10 @@ tests:
           [1659785612.134917][4122:4122] CHIP:DMG: 			Cluster = 0x2d,
           [1659785612.134983][4122:4122] CHIP:DMG: 			Attribute = 0x0000_0000,
           [1659785612.135041][4122:4122] CHIP:DMG: 		}
-          [1659785612.135093][4122:4122] CHIP:DMG: 			
+          [1659785612.135093][4122:4122] CHIP:DMG:
           [1659785612.135167][4122:4122] CHIP:DMG: 	],
-          [1659785612.135223][4122:4122] CHIP:DMG: 		
-          [1659785612.135272][4122:4122] CHIP:DMG: 	isFabricFiltered = true, 
+          [1659785612.135223][4122:4122] CHIP:DMG:
+          [1659785612.135272][4122:4122] CHIP:DMG: 	isFabricFiltered = true,
           [1659785612.135320][4122:4122] CHIP:DMG: 	InteractionModelRevision = 1
           [1659785612.135364][4122:4122] CHIP:DMG: },
           [1659785612.135489][4122:4122] CHIP:DMG: IM RH moving to [GeneratingReports]

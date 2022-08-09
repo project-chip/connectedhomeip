@@ -50,7 +50,7 @@ tests:
           PIXIT.DGGEN.ENABLEKEY and EventTrigger field set to 0."
       PICS: DGGEN.S.C00.Rsp
       verification: |
-          Based on Spec, EnableKey value is to be provided by  manufacturer 
+          Based on Spec, EnableKey value is to be provided by  manufacturer
           below mentioned the example command to verify
            ./chip-tool generaldiagnostics  <EnableKey> test-event-trigger   0 1 0
       disabled: true

@@ -182,7 +182,7 @@ tests:
           field  set to 2"
       PICS: CNET.S.C00.Rsp && CNET.S.C01.Tx
       verification: |
-          Below is an example: 
+          Below is an example:
           ./chip-tool networkcommissioning scan-networks 1 0 --Ssid hex:47524C50726976617465 --Breadcrumb 2
 
           Verify "ScanNetworksResponse and its arguments" on the TH(Chip-tool) Log:

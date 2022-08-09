@@ -33,7 +33,7 @@ tests:
           "Start bridge-app on TH. Commission TH to DUT. Monitor traffic between
           DUT and TH."
       verification: |
-          sudo ./chip-bridge-app 
+          sudo ./chip-bridge-app
 
           ./chip-tool pairing ethernet 1 20202021 3840 fe80::e65f:1ff:fe0f:2753  5540
 
