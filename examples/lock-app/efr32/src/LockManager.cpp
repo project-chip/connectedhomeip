@@ -643,7 +643,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     // If a pin code is not given
     if (!pin.HasValue())
     {
-        ChipLogDetail(Zcl, "Door Lock App: PIN code is not specified, but it is required [endpointId=%d]", mEndpointId);
+        ChipLogDetail(Zcl, "Door Lock App: PIN code is not specified [endpointId=%d]", mEndpointId);
 
         // If a pin code is not required
         if (!requirePin)
@@ -655,6 +655,8 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
 
             return true;
         }
+
+        ChipLogError(Zcl, "Door Lock App: PIN code is not specified, but it is required [endpointId=%d]", mEndpointId);
 
         return false;
     }
