@@ -15,6 +15,7 @@
 import argparse
 import os
 from subprocess import PIPE, Popen
+import platform
 
 
 def run_command(command):
@@ -41,7 +42,18 @@ def build_darwin_framework(args):
     if not os.path.exists(abs_path):
         os.mkdir(abs_path)
 
-    command = ['xcodebuild', '-scheme', args.target, '-sdk', 'macosx', '-project', args.project_path, '-derivedDataPath', abs_path]
+    command = [
+        'xcodebuild',
+        '-scheme',
+        args.target,
+        '-sdk',
+        'macosx',
+        '-project',
+        args.project_path,
+        '-derivedDataPath',
+        abs_path,
+        "PLATFORM_PREFERRED_ARCH={}".format(platform.machine())
+    ]
     command_result = run_command(command)
 
     print("Build Framework Result: {}".format(command_result))
