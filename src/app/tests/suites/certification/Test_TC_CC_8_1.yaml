@@ -299,7 +299,7 @@ tests:
               maxValue: 65279
 
     - label: "TH sends MoveColorTemperature command to DUT"
-      PICS: CC.S.C4B.Rsp && CC.S.F04
+      PICS: CC.S.C4b.Rsp && CC.S.F04
       command: "MoveColorTemperature"
       arguments:
           values:
@@ -325,7 +325,7 @@ tests:
                 value: 1000
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT"
-      PICS: CC.S.A0007 && CC.S.C4B.Rsp && CC.S.F04
+      PICS: CC.S.A0007 && CC.S.C4b.Rsp && CC.S.F04
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:

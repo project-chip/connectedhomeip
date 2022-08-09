@@ -32,6 +32,24 @@ config:
         defaultValue: "MT:-24J0AFN00KA0648G00"
 
 tests:
+    - label: "Precondition: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Precondition: Reset Devices to factory defaults"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"

@@ -26,7 +26,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Reset DUT_CE to factory defaults"
+    - label: "Precondition: Reset DUT_CE to factory defaults"
       verification: |
           verification step to be updated.
       disabled: true
