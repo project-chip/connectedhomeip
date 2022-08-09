@@ -3,8 +3,8 @@
 A prototype application that demonstrates OTA provider capabilities.
 
 Refer to
-[setup ESP-IDF and CHIP Environment](../../../docs/guides/esp32/setup_idf_chip.md) guide
-to get started.
+[setup ESP-IDF and CHIP Environment](../../../docs/guides/esp32/setup_idf_chip.md)
+guide to get started.
 
 ---
 
