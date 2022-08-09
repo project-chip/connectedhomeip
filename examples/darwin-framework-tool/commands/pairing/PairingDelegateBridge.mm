@@ -35,6 +35,9 @@
         ChipLogError(chipTool, "Secure Pairing Failed");
         _commandBridge->SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE);
         break;
+    case MTRPairingStatusDiscoveringMoreDevices:
+        ChipLogProgress(chipTool, "Secure Pairing Discovering More Devices");
+        break;
     case MTRPairingStatusUnknown:
         ChipLogError(chipTool, "Uknown Pairing Status");
         break;

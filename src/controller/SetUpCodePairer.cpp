@@ -405,14 +405,14 @@ void SetUpCodePairer::OnStatusUpdate(DevicePairingDelegate::Status status)
         if (!mDiscoveredParameters.empty())
         {
             ChipLogProgress(Controller, "Ignoring SecurePairingFailed status for now; we have more discovered devices to try");
-            return;
+            status = DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices;
         }
 
         if (DiscoveryInProgress())
         {
             ChipLogProgress(Controller,
                             "Ignoring SecurePairingFailed status for now; we are waiting to see if we discover more devices");
-            return;
+            status = DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices;
         }
     }
 
