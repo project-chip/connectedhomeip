@@ -186,9 +186,9 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
                                                    LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
 
-    if (LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.HasAny())
+    if (LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.HasValue())
     {
-        rendezvousFlags = LinuxDeviceOptions::GetInstance().payload.rendezvousInformation;
+        rendezvousFlags = LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.Value();
     }
 
     err = GetPayloadContents(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);

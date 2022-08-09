@@ -24,7 +24,6 @@
 #include "QRCodeSetupPayloadParser.h"
 #include "Base38Decode.h"
 
-#include <math.h>
 #include <memory>
 #include <string.h>
 #include <vector>
@@ -354,7 +353,8 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, kRendezvousInfoFieldLengthInBits));
     static_assert(kRendezvousInfoFieldLengthInBits <= 8 * sizeof(RendezvousInformationFlag),
                   "Won't fit in RendezvousInformationFlags");
-    outPayload.rendezvousInformation = RendezvousInformationFlags(static_cast<RendezvousInformationFlag>(dest));
+    outPayload.rendezvousInformation.SetValue(
+        RendezvousInformationFlags().SetRaw(static_cast<std::underlying_type_t<RendezvousInformationFlag>>(dest)));
 
     ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, kPayloadDiscriminatorFieldLengthInBits));
     static_assert(kPayloadDiscriminatorFieldLengthInBits <= 16, "Won't fit in uint16_t");
