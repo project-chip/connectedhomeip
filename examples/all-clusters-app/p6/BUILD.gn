@@ -121,6 +121,7 @@ p6_executable("clusters_app") {
     ":all_clusters_app_sdk_sources",
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/common/QRCode",
+    "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
