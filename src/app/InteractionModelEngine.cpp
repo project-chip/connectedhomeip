@@ -202,6 +202,24 @@ ReadHandler * InteractionModelEngine::ActiveHandlerAt(unsigned int aIndex)
     return ret;
 }
 
+WriteHandler * InteractionModelEngine::ActiveWriteHandlerAt(unsigned int aIndex)
+{
+    unsigned int i = 0;
+
+    for (auto & writeHandler : mWriteHandlers)
+    {
+        if (!writeHandler.IsFree())
+        {
+            if (i == aIndex)
+            {
+                return &writeHandler;
+            }
+            i++;
+        }
+    }
+    return nullptr;
+}
+
 uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
 {
     uint32_t numActive = 0;
@@ -406,7 +424,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         reader.Init(aPayload.Retain());
 
         ReadRequestMessage::Parser readRequestParser;
-        VerifyOrReturnError(readRequestParser.Init(reader) == CHIP_NO_ERROR, Status::Failure);
+        VerifyOrReturnError(readRequestParser.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
         {
             size_t requestedAttributePathCount = 0;
@@ -458,15 +476,9 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         return Status::ResourceExhausted;
     }
 
-    CHIP_ERROR err = handler->OnInitialRequest(std::move(aPayload));
-    if (err == CHIP_ERROR_NO_MEMORY)
-    {
-        return Status::ResourceExhausted;
-    }
+    handler->OnInitialRequest(std::move(aPayload));
 
-    // TODO: Should probably map various TLV errors into InvalidAction, here
-    // or inside the read handler.
-    return StatusIB(err).mStatus;
+    return Status::Success;
 }
 
 Protocols::InteractionModel::Status InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext,

@@ -15,6 +15,9 @@
 
 name: 3.2.2. [TC-OCC-2.2] Attributes with client as DUT
 
+PICS:
+    - OCC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

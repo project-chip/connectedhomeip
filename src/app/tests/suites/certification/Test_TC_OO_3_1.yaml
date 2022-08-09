@@ -15,6 +15,13 @@
 
 name: 4.3.1. [TC-OO-3.1] Attributes with client as DUT
 
+PICS:
+    - OO.C
+    - OO.C.AM-READ
+    - OO.C.AO-READ
+    - OO.C.AM-WRITE
+    - OO.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

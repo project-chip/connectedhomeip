@@ -1400,9 +1400,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBridgedActionsClusterActionListAttributeCallback
-      implements ChipClusters.BridgedActionsCluster.ActionListAttributeCallback,
-          DelegatedClusterCallback {
+  public static class DelegatedActionsClusterActionListAttributeCallback
+      implements ChipClusters.ActionsCluster.ActionListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
     @Override
@@ -1411,11 +1410,10 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.BridgedActionsClusterActionStruct> valueList) {
+    public void onSuccess(List<ChipStructs.ActionsClusterActionStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo(
-              "valueList", "List<ChipStructs.BridgedActionsClusterActionStruct>");
+          new CommandResponseInfo("valueList", "List<ChipStructs.ActionsClusterActionStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -1426,8 +1424,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBridgedActionsClusterEndpointListAttributeCallback
-      implements ChipClusters.BridgedActionsCluster.EndpointListAttributeCallback,
+  public static class DelegatedActionsClusterEndpointListsAttributeCallback
+      implements ChipClusters.ActionsCluster.EndpointListsAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1437,11 +1435,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.BridgedActionsClusterEndpointListStruct> valueList) {
+    public void onSuccess(List<ChipStructs.ActionsClusterEndpointListStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.BridgedActionsClusterEndpointListStruct>");
+              "valueList", "List<ChipStructs.ActionsClusterEndpointListStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -1452,8 +1450,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBridgedActionsClusterGeneratedCommandListAttributeCallback
-      implements ChipClusters.BridgedActionsCluster.GeneratedCommandListAttributeCallback,
+  public static class DelegatedActionsClusterGeneratedCommandListAttributeCallback
+      implements ChipClusters.ActionsCluster.GeneratedCommandListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1476,8 +1474,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBridgedActionsClusterAcceptedCommandListAttributeCallback
-      implements ChipClusters.BridgedActionsCluster.AcceptedCommandListAttributeCallback,
+  public static class DelegatedActionsClusterAcceptedCommandListAttributeCallback
+      implements ChipClusters.ActionsCluster.AcceptedCommandListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1500,8 +1498,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBridgedActionsClusterAttributeListAttributeCallback
-      implements ChipClusters.BridgedActionsCluster.AttributeListAttributeCallback,
+  public static class DelegatedActionsClusterAttributeListAttributeCallback
+      implements ChipClusters.ActionsCluster.AttributeListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -7194,11 +7192,10 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.AccessControlCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("accessControl", accessControlClusterInfo);
-    ClusterInfo bridgedActionsClusterInfo =
+    ClusterInfo actionsClusterInfo =
         new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.BridgedActionsCluster(ptr, endpointId),
-            new HashMap<>());
-    clusterMap.put("bridgedActions", bridgedActionsClusterInfo);
+            (ptr, endpointId) -> new ChipClusters.ActionsCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("actions", actionsClusterInfo);
     ClusterInfo basicClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.BasicCluster(ptr, endpointId), new HashMap<>());
@@ -7490,7 +7487,7 @@ public class ClusterInfoMapping {
     destination.get("descriptor").combineCommands(source.get("descriptor"));
     destination.get("binding").combineCommands(source.get("binding"));
     destination.get("accessControl").combineCommands(source.get("accessControl"));
-    destination.get("bridgedActions").combineCommands(source.get("bridgedActions"));
+    destination.get("actions").combineCommands(source.get("actions"));
     destination.get("basic").combineCommands(source.get("basic"));
     destination
         .get("otaSoftwareUpdateProvider")
@@ -8281,55 +8278,52 @@ public class ClusterInfoMapping {
     commandMap.put("binding", bindingClusterInteractionInfoMap);
     Map<String, InteractionInfo> accessControlClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("accessControl", accessControlClusterInteractionInfoMap);
-    Map<String, InteractionInfo> bridgedActionsClusterInteractionInfoMap = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> bridgedActionsinstantActionCommandParams =
+    Map<String, InteractionInfo> actionsClusterInteractionInfoMap = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> actionsinstantActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedActionsinstantActionactionIDCommandParameterInfo =
+    CommandParameterInfo actionsinstantActionactionIDCommandParameterInfo =
         new CommandParameterInfo("actionID", Integer.class, Integer.class);
-    bridgedActionsinstantActionCommandParams.put(
-        "actionID", bridgedActionsinstantActionactionIDCommandParameterInfo);
+    actionsinstantActionCommandParams.put(
+        "actionID", actionsinstantActionactionIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionsinstantActioninvokeIDCommandParameterInfo =
+    CommandParameterInfo actionsinstantActioninvokeIDCommandParameterInfo =
         new CommandParameterInfo("invokeID", Optional.class, Long.class);
-    bridgedActionsinstantActionCommandParams.put(
-        "invokeID", bridgedActionsinstantActioninvokeIDCommandParameterInfo);
+    actionsinstantActionCommandParams.put(
+        "invokeID", actionsinstantActioninvokeIDCommandParameterInfo);
 
-    InteractionInfo bridgedActionsinstantActionInteractionInfo =
+    InteractionInfo actionsinstantActionInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .instantAction(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
                       (Optional<Long>) commandArguments.get("invokeID"));
             },
             () -> new DelegatedDefaultClusterCallback(),
-            bridgedActionsinstantActionCommandParams);
-    bridgedActionsClusterInteractionInfoMap.put(
-        "instantAction", bridgedActionsinstantActionInteractionInfo);
-    Map<String, CommandParameterInfo> bridgedActionsinstantActionWithTransitionCommandParams =
+            actionsinstantActionCommandParams);
+    actionsClusterInteractionInfoMap.put("instantAction", actionsinstantActionInteractionInfo);
+    Map<String, CommandParameterInfo> actionsinstantActionWithTransitionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedActionsinstantActionWithTransitionactionIDCommandParameterInfo =
+    CommandParameterInfo actionsinstantActionWithTransitionactionIDCommandParameterInfo =
         new CommandParameterInfo("actionID", Integer.class, Integer.class);
-    bridgedActionsinstantActionWithTransitionCommandParams.put(
-        "actionID", bridgedActionsinstantActionWithTransitionactionIDCommandParameterInfo);
+    actionsinstantActionWithTransitionCommandParams.put(
+        "actionID", actionsinstantActionWithTransitionactionIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionsinstantActionWithTransitioninvokeIDCommandParameterInfo =
+    CommandParameterInfo actionsinstantActionWithTransitioninvokeIDCommandParameterInfo =
         new CommandParameterInfo("invokeID", Optional.class, Long.class);
-    bridgedActionsinstantActionWithTransitionCommandParams.put(
-        "invokeID", bridgedActionsinstantActionWithTransitioninvokeIDCommandParameterInfo);
+    actionsinstantActionWithTransitionCommandParams.put(
+        "invokeID", actionsinstantActionWithTransitioninvokeIDCommandParameterInfo);
 
-    CommandParameterInfo
-        bridgedActionsinstantActionWithTransitiontransitionTimeCommandParameterInfo =
-            new CommandParameterInfo("transitionTime", Integer.class, Integer.class);
-    bridgedActionsinstantActionWithTransitionCommandParams.put(
-        "transitionTime",
-        bridgedActionsinstantActionWithTransitiontransitionTimeCommandParameterInfo);
+    CommandParameterInfo actionsinstantActionWithTransitiontransitionTimeCommandParameterInfo =
+        new CommandParameterInfo("transitionTime", Integer.class, Integer.class);
+    actionsinstantActionWithTransitionCommandParams.put(
+        "transitionTime", actionsinstantActionWithTransitiontransitionTimeCommandParameterInfo);
 
-    InteractionInfo bridgedActionsinstantActionWithTransitionInteractionInfo =
+    InteractionInfo actionsinstantActionWithTransitionInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .instantActionWithTransition(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
@@ -8337,55 +8331,52 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("transitionTime"));
             },
             () -> new DelegatedDefaultClusterCallback(),
-            bridgedActionsinstantActionWithTransitionCommandParams);
-    bridgedActionsClusterInteractionInfoMap.put(
-        "instantActionWithTransition", bridgedActionsinstantActionWithTransitionInteractionInfo);
-    Map<String, CommandParameterInfo> bridgedActionsstartActionCommandParams =
+            actionsinstantActionWithTransitionCommandParams);
+    actionsClusterInteractionInfoMap.put(
+        "instantActionWithTransition", actionsinstantActionWithTransitionInteractionInfo);
+    Map<String, CommandParameterInfo> actionsstartActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedActionsstartActionactionIDCommandParameterInfo =
+    CommandParameterInfo actionsstartActionactionIDCommandParameterInfo =
         new CommandParameterInfo("actionID", Integer.class, Integer.class);
-    bridgedActionsstartActionCommandParams.put(
-        "actionID", bridgedActionsstartActionactionIDCommandParameterInfo);
+    actionsstartActionCommandParams.put("actionID", actionsstartActionactionIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionsstartActioninvokeIDCommandParameterInfo =
+    CommandParameterInfo actionsstartActioninvokeIDCommandParameterInfo =
         new CommandParameterInfo("invokeID", Optional.class, Long.class);
-    bridgedActionsstartActionCommandParams.put(
-        "invokeID", bridgedActionsstartActioninvokeIDCommandParameterInfo);
+    actionsstartActionCommandParams.put("invokeID", actionsstartActioninvokeIDCommandParameterInfo);
 
-    InteractionInfo bridgedActionsstartActionInteractionInfo =
+    InteractionInfo actionsstartActionInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .startAction(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
                       (Optional<Long>) commandArguments.get("invokeID"));
             },
             () -> new DelegatedDefaultClusterCallback(),
-            bridgedActionsstartActionCommandParams);
-    bridgedActionsClusterInteractionInfoMap.put(
-        "startAction", bridgedActionsstartActionInteractionInfo);
-    Map<String, CommandParameterInfo> bridgedActionsstartActionWithDurationCommandParams =
+            actionsstartActionCommandParams);
+    actionsClusterInteractionInfoMap.put("startAction", actionsstartActionInteractionInfo);
+    Map<String, CommandParameterInfo> actionsstartActionWithDurationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedActionsstartActionWithDurationactionIDCommandParameterInfo =
+    CommandParameterInfo actionsstartActionWithDurationactionIDCommandParameterInfo =
         new CommandParameterInfo("actionID", Integer.class, Integer.class);
-    bridgedActionsstartActionWithDurationCommandParams.put(
-        "actionID", bridgedActionsstartActionWithDurationactionIDCommandParameterInfo);
+    actionsstartActionWithDurationCommandParams.put(
+        "actionID", actionsstartActionWithDurationactionIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionsstartActionWithDurationinvokeIDCommandParameterInfo =
+    CommandParameterInfo actionsstartActionWithDurationinvokeIDCommandParameterInfo =
         new CommandParameterInfo("invokeID", Optional.class, Long.class);
-    bridgedActionsstartActionWithDurationCommandParams.put(
-        "invokeID", bridgedActionsstartActionWithDurationinvokeIDCommandParameterInfo);
+    actionsstartActionWithDurationCommandParams.put(
+        "invokeID", actionsstartActionWithDurationinvokeIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionsstartActionWithDurationdurationCommandParameterInfo =
+    CommandParameterInfo actionsstartActionWithDurationdurationCommandParameterInfo =
         new CommandParameterInfo("duration", Long.class, Long.class);
-    bridgedActionsstartActionWithDurationCommandParams.put(
-        "duration", bridgedActionsstartActionWithDurationdurationCommandParameterInfo);
+    actionsstartActionWithDurationCommandParams.put(
+        "duration", actionsstartActionWithDurationdurationCommandParameterInfo);
 
-    InteractionInfo bridgedActionsstartActionWithDurationInteractionInfo =
+    InteractionInfo actionsstartActionWithDurationInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .startActionWithDuration(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
@@ -8393,80 +8384,74 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("duration"));
             },
             () -> new DelegatedDefaultClusterCallback(),
-            bridgedActionsstartActionWithDurationCommandParams);
-    bridgedActionsClusterInteractionInfoMap.put(
-        "startActionWithDuration", bridgedActionsstartActionWithDurationInteractionInfo);
-    Map<String, CommandParameterInfo> bridgedActionsstopActionCommandParams =
+            actionsstartActionWithDurationCommandParams);
+    actionsClusterInteractionInfoMap.put(
+        "startActionWithDuration", actionsstartActionWithDurationInteractionInfo);
+    Map<String, CommandParameterInfo> actionsstopActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedActionsstopActionactionIDCommandParameterInfo =
+    CommandParameterInfo actionsstopActionactionIDCommandParameterInfo =
         new CommandParameterInfo("actionID", Integer.class, Integer.class);
-    bridgedActionsstopActionCommandParams.put(
-        "actionID", bridgedActionsstopActionactionIDCommandParameterInfo);
+    actionsstopActionCommandParams.put("actionID", actionsstopActionactionIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionsstopActioninvokeIDCommandParameterInfo =
+    CommandParameterInfo actionsstopActioninvokeIDCommandParameterInfo =
         new CommandParameterInfo("invokeID", Optional.class, Long.class);
-    bridgedActionsstopActionCommandParams.put(
-        "invokeID", bridgedActionsstopActioninvokeIDCommandParameterInfo);
+    actionsstopActionCommandParams.put("invokeID", actionsstopActioninvokeIDCommandParameterInfo);
 
-    InteractionInfo bridgedActionsstopActionInteractionInfo =
+    InteractionInfo actionsstopActionInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .stopAction(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
                       (Optional<Long>) commandArguments.get("invokeID"));
             },
             () -> new DelegatedDefaultClusterCallback(),
-            bridgedActionsstopActionCommandParams);
-    bridgedActionsClusterInteractionInfoMap.put(
-        "stopAction", bridgedActionsstopActionInteractionInfo);
-    Map<String, CommandParameterInfo> bridgedActionspauseActionCommandParams =
+            actionsstopActionCommandParams);
+    actionsClusterInteractionInfoMap.put("stopAction", actionsstopActionInteractionInfo);
+    Map<String, CommandParameterInfo> actionspauseActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedActionspauseActionactionIDCommandParameterInfo =
+    CommandParameterInfo actionspauseActionactionIDCommandParameterInfo =
         new CommandParameterInfo("actionID", Integer.class, Integer.class);
-    bridgedActionspauseActionCommandParams.put(
-        "actionID", bridgedActionspauseActionactionIDCommandParameterInfo);
+    actionspauseActionCommandParams.put("actionID", actionspauseActionactionIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionspauseActioninvokeIDCommandParameterInfo =
+    CommandParameterInfo actionspauseActioninvokeIDCommandParameterInfo =
         new CommandParameterInfo("invokeID", Optional.class, Long.class);
-    bridgedActionspauseActionCommandParams.put(
-        "invokeID", bridgedActionspauseActioninvokeIDCommandParameterInfo);
+    actionspauseActionCommandParams.put("invokeID", actionspauseActioninvokeIDCommandParameterInfo);
 
-    InteractionInfo bridgedActionspauseActionInteractionInfo =
+    InteractionInfo actionspauseActionInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .pauseAction(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
                       (Optional<Long>) commandArguments.get("invokeID"));
             },
             () -> new DelegatedDefaultClusterCallback(),
-            bridgedActionspauseActionCommandParams);
-    bridgedActionsClusterInteractionInfoMap.put(
-        "pauseAction", bridgedActionspauseActionInteractionInfo);
-    Map<String, CommandParameterInfo> bridgedActionspauseActionWithDurationCommandParams =
+            actionspauseActionCommandParams);
+    actionsClusterInteractionInfoMap.put("pauseAction", actionspauseActionInteractionInfo);
+    Map<String, CommandParameterInfo> actionspauseActionWithDurationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedActionspauseActionWithDurationactionIDCommandParameterInfo =
+    CommandParameterInfo actionspauseActionWithDurationactionIDCommandParameterInfo =
         new CommandParameterInfo("actionID", Integer.class, Integer.class);
-    bridgedActionspauseActionWithDurationCommandParams.put(
-        "actionID", bridgedActionspauseActionWithDurationactionIDCommandParameterInfo);
+    actionspauseActionWithDurationCommandParams.put(
+        "actionID", actionspauseActionWithDurationactionIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionspauseActionWithDurationinvokeIDCommandParameterInfo =
+    CommandParameterInfo actionspauseActionWithDurationinvokeIDCommandParameterInfo =
         new CommandParameterInfo("invokeID", Optional.class, Long.class);
-    bridgedActionspauseActionWithDurationCommandParams.put(
-        "invokeID", bridgedActionspauseActionWithDurationinvokeIDCommandParameterInfo);
+    actionspauseActionWithDurationCommandParams.put(
+        "invokeID", actionspauseActionWithDurationinvokeIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionspauseActionWithDurationdurationCommandParameterInfo =
+    CommandParameterInfo actionspauseActionWithDurationdurationCommandParameterInfo =
         new CommandParameterInfo("duration", Long.class, Long.class);
-    bridgedActionspauseActionWithDurationCommandParams.put(
-        "duration", bridgedActionspauseActionWithDurationdurationCommandParameterInfo);
+    actionspauseActionWithDurationCommandParams.put(
+        "duration", actionspauseActionWithDurationdurationCommandParameterInfo);
 
-    InteractionInfo bridgedActionspauseActionWithDurationInteractionInfo =
+    InteractionInfo actionspauseActionWithDurationInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .pauseActionWithDuration(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
@@ -8474,80 +8459,78 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("duration"));
             },
             () -> new DelegatedDefaultClusterCallback(),
-            bridgedActionspauseActionWithDurationCommandParams);
-    bridgedActionsClusterInteractionInfoMap.put(
-        "pauseActionWithDuration", bridgedActionspauseActionWithDurationInteractionInfo);
-    Map<String, CommandParameterInfo> bridgedActionsresumeActionCommandParams =
+            actionspauseActionWithDurationCommandParams);
+    actionsClusterInteractionInfoMap.put(
+        "pauseActionWithDuration", actionspauseActionWithDurationInteractionInfo);
+    Map<String, CommandParameterInfo> actionsresumeActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedActionsresumeActionactionIDCommandParameterInfo =
+    CommandParameterInfo actionsresumeActionactionIDCommandParameterInfo =
         new CommandParameterInfo("actionID", Integer.class, Integer.class);
-    bridgedActionsresumeActionCommandParams.put(
-        "actionID", bridgedActionsresumeActionactionIDCommandParameterInfo);
+    actionsresumeActionCommandParams.put(
+        "actionID", actionsresumeActionactionIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionsresumeActioninvokeIDCommandParameterInfo =
+    CommandParameterInfo actionsresumeActioninvokeIDCommandParameterInfo =
         new CommandParameterInfo("invokeID", Optional.class, Long.class);
-    bridgedActionsresumeActionCommandParams.put(
-        "invokeID", bridgedActionsresumeActioninvokeIDCommandParameterInfo);
+    actionsresumeActionCommandParams.put(
+        "invokeID", actionsresumeActioninvokeIDCommandParameterInfo);
 
-    InteractionInfo bridgedActionsresumeActionInteractionInfo =
+    InteractionInfo actionsresumeActionInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .resumeAction(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
                       (Optional<Long>) commandArguments.get("invokeID"));
             },
             () -> new DelegatedDefaultClusterCallback(),
-            bridgedActionsresumeActionCommandParams);
-    bridgedActionsClusterInteractionInfoMap.put(
-        "resumeAction", bridgedActionsresumeActionInteractionInfo);
-    Map<String, CommandParameterInfo> bridgedActionsenableActionCommandParams =
+            actionsresumeActionCommandParams);
+    actionsClusterInteractionInfoMap.put("resumeAction", actionsresumeActionInteractionInfo);
+    Map<String, CommandParameterInfo> actionsenableActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedActionsenableActionactionIDCommandParameterInfo =
+    CommandParameterInfo actionsenableActionactionIDCommandParameterInfo =
         new CommandParameterInfo("actionID", Integer.class, Integer.class);
-    bridgedActionsenableActionCommandParams.put(
-        "actionID", bridgedActionsenableActionactionIDCommandParameterInfo);
+    actionsenableActionCommandParams.put(
+        "actionID", actionsenableActionactionIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionsenableActioninvokeIDCommandParameterInfo =
+    CommandParameterInfo actionsenableActioninvokeIDCommandParameterInfo =
         new CommandParameterInfo("invokeID", Optional.class, Long.class);
-    bridgedActionsenableActionCommandParams.put(
-        "invokeID", bridgedActionsenableActioninvokeIDCommandParameterInfo);
+    actionsenableActionCommandParams.put(
+        "invokeID", actionsenableActioninvokeIDCommandParameterInfo);
 
-    InteractionInfo bridgedActionsenableActionInteractionInfo =
+    InteractionInfo actionsenableActionInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .enableAction(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
                       (Optional<Long>) commandArguments.get("invokeID"));
             },
             () -> new DelegatedDefaultClusterCallback(),
-            bridgedActionsenableActionCommandParams);
-    bridgedActionsClusterInteractionInfoMap.put(
-        "enableAction", bridgedActionsenableActionInteractionInfo);
-    Map<String, CommandParameterInfo> bridgedActionsenableActionWithDurationCommandParams =
+            actionsenableActionCommandParams);
+    actionsClusterInteractionInfoMap.put("enableAction", actionsenableActionInteractionInfo);
+    Map<String, CommandParameterInfo> actionsenableActionWithDurationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedActionsenableActionWithDurationactionIDCommandParameterInfo =
+    CommandParameterInfo actionsenableActionWithDurationactionIDCommandParameterInfo =
         new CommandParameterInfo("actionID", Integer.class, Integer.class);
-    bridgedActionsenableActionWithDurationCommandParams.put(
-        "actionID", bridgedActionsenableActionWithDurationactionIDCommandParameterInfo);
+    actionsenableActionWithDurationCommandParams.put(
+        "actionID", actionsenableActionWithDurationactionIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionsenableActionWithDurationinvokeIDCommandParameterInfo =
+    CommandParameterInfo actionsenableActionWithDurationinvokeIDCommandParameterInfo =
         new CommandParameterInfo("invokeID", Optional.class, Long.class);
-    bridgedActionsenableActionWithDurationCommandParams.put(
-        "invokeID", bridgedActionsenableActionWithDurationinvokeIDCommandParameterInfo);
+    actionsenableActionWithDurationCommandParams.put(
+        "invokeID", actionsenableActionWithDurationinvokeIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionsenableActionWithDurationdurationCommandParameterInfo =
+    CommandParameterInfo actionsenableActionWithDurationdurationCommandParameterInfo =
         new CommandParameterInfo("duration", Long.class, Long.class);
-    bridgedActionsenableActionWithDurationCommandParams.put(
-        "duration", bridgedActionsenableActionWithDurationdurationCommandParameterInfo);
+    actionsenableActionWithDurationCommandParams.put(
+        "duration", actionsenableActionWithDurationdurationCommandParameterInfo);
 
-    InteractionInfo bridgedActionsenableActionWithDurationInteractionInfo =
+    InteractionInfo actionsenableActionWithDurationInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .enableActionWithDuration(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
@@ -8555,55 +8538,54 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("duration"));
             },
             () -> new DelegatedDefaultClusterCallback(),
-            bridgedActionsenableActionWithDurationCommandParams);
-    bridgedActionsClusterInteractionInfoMap.put(
-        "enableActionWithDuration", bridgedActionsenableActionWithDurationInteractionInfo);
-    Map<String, CommandParameterInfo> bridgedActionsdisableActionCommandParams =
+            actionsenableActionWithDurationCommandParams);
+    actionsClusterInteractionInfoMap.put(
+        "enableActionWithDuration", actionsenableActionWithDurationInteractionInfo);
+    Map<String, CommandParameterInfo> actionsdisableActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedActionsdisableActionactionIDCommandParameterInfo =
+    CommandParameterInfo actionsdisableActionactionIDCommandParameterInfo =
         new CommandParameterInfo("actionID", Integer.class, Integer.class);
-    bridgedActionsdisableActionCommandParams.put(
-        "actionID", bridgedActionsdisableActionactionIDCommandParameterInfo);
+    actionsdisableActionCommandParams.put(
+        "actionID", actionsdisableActionactionIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionsdisableActioninvokeIDCommandParameterInfo =
+    CommandParameterInfo actionsdisableActioninvokeIDCommandParameterInfo =
         new CommandParameterInfo("invokeID", Optional.class, Long.class);
-    bridgedActionsdisableActionCommandParams.put(
-        "invokeID", bridgedActionsdisableActioninvokeIDCommandParameterInfo);
+    actionsdisableActionCommandParams.put(
+        "invokeID", actionsdisableActioninvokeIDCommandParameterInfo);
 
-    InteractionInfo bridgedActionsdisableActionInteractionInfo =
+    InteractionInfo actionsdisableActionInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .disableAction(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
                       (Optional<Long>) commandArguments.get("invokeID"));
             },
             () -> new DelegatedDefaultClusterCallback(),
-            bridgedActionsdisableActionCommandParams);
-    bridgedActionsClusterInteractionInfoMap.put(
-        "disableAction", bridgedActionsdisableActionInteractionInfo);
-    Map<String, CommandParameterInfo> bridgedActionsdisableActionWithDurationCommandParams =
+            actionsdisableActionCommandParams);
+    actionsClusterInteractionInfoMap.put("disableAction", actionsdisableActionInteractionInfo);
+    Map<String, CommandParameterInfo> actionsdisableActionWithDurationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedActionsdisableActionWithDurationactionIDCommandParameterInfo =
+    CommandParameterInfo actionsdisableActionWithDurationactionIDCommandParameterInfo =
         new CommandParameterInfo("actionID", Integer.class, Integer.class);
-    bridgedActionsdisableActionWithDurationCommandParams.put(
-        "actionID", bridgedActionsdisableActionWithDurationactionIDCommandParameterInfo);
+    actionsdisableActionWithDurationCommandParams.put(
+        "actionID", actionsdisableActionWithDurationactionIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionsdisableActionWithDurationinvokeIDCommandParameterInfo =
+    CommandParameterInfo actionsdisableActionWithDurationinvokeIDCommandParameterInfo =
         new CommandParameterInfo("invokeID", Optional.class, Long.class);
-    bridgedActionsdisableActionWithDurationCommandParams.put(
-        "invokeID", bridgedActionsdisableActionWithDurationinvokeIDCommandParameterInfo);
+    actionsdisableActionWithDurationCommandParams.put(
+        "invokeID", actionsdisableActionWithDurationinvokeIDCommandParameterInfo);
 
-    CommandParameterInfo bridgedActionsdisableActionWithDurationdurationCommandParameterInfo =
+    CommandParameterInfo actionsdisableActionWithDurationdurationCommandParameterInfo =
         new CommandParameterInfo("duration", Long.class, Long.class);
-    bridgedActionsdisableActionWithDurationCommandParams.put(
-        "duration", bridgedActionsdisableActionWithDurationdurationCommandParameterInfo);
+    actionsdisableActionWithDurationCommandParams.put(
+        "duration", actionsdisableActionWithDurationdurationCommandParameterInfo);
 
-    InteractionInfo bridgedActionsdisableActionWithDurationInteractionInfo =
+    InteractionInfo actionsdisableActionWithDurationInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedActionsCluster) cluster)
+              ((ChipClusters.ActionsCluster) cluster)
                   .disableActionWithDuration(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
@@ -8611,10 +8593,10 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("duration"));
             },
             () -> new DelegatedDefaultClusterCallback(),
-            bridgedActionsdisableActionWithDurationCommandParams);
-    bridgedActionsClusterInteractionInfoMap.put(
-        "disableActionWithDuration", bridgedActionsdisableActionWithDurationInteractionInfo);
-    commandMap.put("bridgedActions", bridgedActionsClusterInteractionInfoMap);
+            actionsdisableActionWithDurationCommandParams);
+    actionsClusterInteractionInfoMap.put(
+        "disableActionWithDuration", actionsdisableActionWithDurationInteractionInfo);
+    commandMap.put("actions", actionsClusterInteractionInfoMap);
     Map<String, InteractionInfo> basicClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("basic", basicClusterInteractionInfoMap);
     Map<String, InteractionInfo> otaSoftwareUpdateProviderClusterInteractionInfoMap =

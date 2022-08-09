@@ -16,6 +16,9 @@
 name:
     4.1.2. [TC-CADMIN-1.2] Administrator Behavior using BCM [DUT - Commissioner]
 
+PICS:
+    - CADMIN.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

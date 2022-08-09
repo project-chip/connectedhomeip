@@ -78,35 +78,43 @@ CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
     {
         StringBuilder<128> humanFlags;
 
-        if (payload.rendezvousInformation.HasAny())
+        if (!payload.rendezvousInformation.HasValue())
         {
-            if (payload.rendezvousInformation.Has(RendezvousInformationFlag::kSoftAP))
-            {
-                humanFlags.Add("Soft-AP");
-            }
-            if (payload.rendezvousInformation.Has(RendezvousInformationFlag::kBLE))
-            {
-                if (!humanFlags.Empty())
-                {
-                    humanFlags.Add(", ");
-                }
-                humanFlags.Add("BLE");
-            }
-            if (payload.rendezvousInformation.Has(RendezvousInformationFlag::kOnNetwork))
-            {
-                if (!humanFlags.Empty())
-                {
-                    humanFlags.Add(", ");
-                }
-                humanFlags.Add("On IP network");
-            }
+            ChipLogProgress(SetupPayload, "Discovery Bitmask:   UNKNOWN");
         }
         else
         {
-            humanFlags.Add("NONE");
-        }
+            if (payload.rendezvousInformation.Value().HasAny())
+            {
+                if (payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kSoftAP))
+                {
+                    humanFlags.Add("Soft-AP");
+                }
+                if (payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kBLE))
+                {
+                    if (!humanFlags.Empty())
+                    {
+                        humanFlags.Add(", ");
+                    }
+                    humanFlags.Add("BLE");
+                }
+                if (payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kOnNetwork))
+                {
+                    if (!humanFlags.Empty())
+                    {
+                        humanFlags.Add(", ");
+                    }
+                    humanFlags.Add("On IP network");
+                }
+            }
+            else
+            {
+                humanFlags.Add("NONE");
+            }
 
-        ChipLogProgress(SetupPayload, "Capabilities:        0x%02X (%s)", payload.rendezvousInformation.Raw(), humanFlags.c_str());
+            ChipLogProgress(SetupPayload, "Discovery Bitmask:   0x%02X (%s)", payload.rendezvousInformation.Value().Raw(),
+                            humanFlags.c_str());
+        }
     }
     if (payload.discriminator.IsShortDiscriminator())
     {

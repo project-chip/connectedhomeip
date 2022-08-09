@@ -29,6 +29,7 @@
 #include <vector>
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/SetupDiscriminator.h>
 
@@ -115,11 +116,11 @@ enum class CommissioningFlow : uint8_t
  */
 struct PayloadContents
 {
-    uint8_t version                                  = 0;
-    uint16_t vendorID                                = 0;
-    uint16_t productID                               = 0;
-    CommissioningFlow commissioningFlow              = CommissioningFlow::kStandard;
-    RendezvousInformationFlags rendezvousInformation = RendezvousInformationFlag::kNone;
+    uint8_t version                     = 0;
+    uint16_t vendorID                   = 0;
+    uint16_t productID                  = 0;
+    CommissioningFlow commissioningFlow = CommissioningFlow::kStandard;
+    Optional<RendezvousInformationFlags> rendezvousInformation;
     SetupDiscriminator discriminator;
     uint32_t setUpPINCode = 0;
 

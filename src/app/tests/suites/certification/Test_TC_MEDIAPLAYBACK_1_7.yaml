@@ -16,6 +16,9 @@ name:
     19.1.7. [TC-MEDIAPLAYBACK-1.7] Global attributes - Media Playback Cluster
     (DUT as Server)
 
+PICS:
+    - MEDIAPLAYBACK.S
+
 config:
     nodeId: 0x12344321
     cluster: "Media Playback"

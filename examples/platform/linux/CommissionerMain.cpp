@@ -255,6 +255,9 @@ void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
     case DevicePairingDelegate::Status::SecurePairingFailed:
         ChipLogError(AppServer, "Secure Pairing Failed");
         break;
+    case DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices:
+        ChipLogProgress(AppServer, "Secure Pairing Discovering More Device");
+        break;
     }
 }
 

@@ -16,6 +16,10 @@
 name:
     3.3.9. [TC-DD-3.9] Commissioning Flow - Custom Flow = 2 [DUT - Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.CUSTOM_COMM_FLOW
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -650,6 +650,9 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
         {
             ChipLogDetail(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", lockStateToString(lockState),
                           endpointId);
+
+            DoorLockServer::Instance().SetLockState(endpointId, lockState);
+
             return true;
         }
 
@@ -670,6 +673,8 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
             ChipLogDetail(Zcl,
                           "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
                           lockStateToString(lockState), mEndpointId);
+
+            DoorLockServer::Instance().SetLockState(endpointId, lockState);
 
             return true;
         }

@@ -15,6 +15,9 @@
 
 name: 80.3.3. [TC-MOD-3.3] OTA Mode Verification (DUT as Server)
 
+PICS:
+    - MOD.S.A0004
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

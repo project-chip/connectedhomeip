@@ -15,6 +15,9 @@
 
 name: 105.1.1. [TC-LUNIT-1.1] Global Attributes [DUT as Client]
 
+PICS:
+    - LUNIT.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

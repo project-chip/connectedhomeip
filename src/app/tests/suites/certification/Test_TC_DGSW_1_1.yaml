@@ -15,6 +15,9 @@
 
 name: 3.1.1. [TC-DGSW-1.1] Global Attributes [{DUT_Sever}]
 
+PICS:
+    - DGSW.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

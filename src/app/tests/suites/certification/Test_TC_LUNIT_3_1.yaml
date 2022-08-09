@@ -17,6 +17,9 @@ name:
     105.3.1. [TC-LUNIT-3.1] Read and Write Unit Localization Cluster Attributes
     [DUT as Server]
 
+PICS:
+    - LUNIT.S
+
 config:
     nodeId: 0x12344321
     cluster: "Unit Localization"

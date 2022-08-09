@@ -15,6 +15,9 @@
 
 name: 99.1.1. [TC-LCFG-1.1] Global Attributes [DUT-Server]
 
+PICS:
+    - LCFG.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -56,7 +56,7 @@ public final class ChipIdLookup {
       return "AccessControl";
     }
     if (clusterId == 37L) {
-      return "BridgedActions";
+      return "Actions";
     }
     if (clusterId == 40L) {
       return "Basic";
@@ -539,10 +539,10 @@ public final class ChipIdLookup {
         return "ActionList";
       }
       if (attributeId == 1L) {
-        return "EndpointList";
+        return "EndpointLists";
       }
       if (attributeId == 2L) {
-        return "SetupUrl";
+        return "SetupURL";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -1214,7 +1214,7 @@ public final class ChipIdLookup {
         return "SecurityPolicy";
       }
       if (attributeId == 60L) {
-        return "ChannelMask";
+        return "ChannelPage0Mask";
       }
       if (attributeId == 61L) {
         return "OperationalDatasetComponents";

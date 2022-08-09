@@ -15,6 +15,11 @@
 
 name: 3.3.4. [TC-DD-3.4] User Directed Commissioning [DUT - Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.UI
+    - MCORE.DD.COMM_DISCOVERY
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

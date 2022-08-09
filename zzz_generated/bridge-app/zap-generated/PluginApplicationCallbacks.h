@@ -29,7 +29,7 @@
     MatterBindingPluginClientInitCallback();                                                                                       \
     MatterAccessControlPluginClientInitCallback();                                                                                 \
     MatterAccessControlPluginServerInitCallback();                                                                                 \
-    MatterBridgedActionsPluginServerInitCallback();                                                                                \
+    MatterActionsPluginServerInitCallback();                                                                                       \
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterTimeFormatLocalizationPluginServerInitCallback();                                                                        \

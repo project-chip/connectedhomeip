@@ -237,22 +237,22 @@ typedef void (*CHIPAccessControlClusterFeatureMapAttributeCallbackType)(
 typedef void (*CHIPAccessControlClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::AccessControl::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
-typedef void (*CHIPBridgedActionsClusterActionListAttributeCallbackType)(
-    void *, const chip::app::Clusters::BridgedActions::Attributes::ActionList::TypeInfo::DecodableType &);
-typedef void (*CHIPBridgedActionsClusterEndpointListAttributeCallbackType)(
-    void *, const chip::app::Clusters::BridgedActions::Attributes::EndpointList::TypeInfo::DecodableType &);
-typedef void (*CHIPBridgedActionsClusterSetupUrlAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedActions::Attributes::SetupUrl::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedActionsClusterGeneratedCommandListAttributeCallbackType)(
-    void *, const chip::app::Clusters::BridgedActions::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
-typedef void (*CHIPBridgedActionsClusterAcceptedCommandListAttributeCallbackType)(
-    void *, const chip::app::Clusters::BridgedActions::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
-typedef void (*CHIPBridgedActionsClusterAttributeListAttributeCallbackType)(
-    void *, const chip::app::Clusters::BridgedActions::Attributes::AttributeList::TypeInfo::DecodableType &);
-typedef void (*CHIPBridgedActionsClusterFeatureMapAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedActions::Attributes::FeatureMap::TypeInfo::DecodableArgType);
-typedef void (*CHIPBridgedActionsClusterClusterRevisionAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedActions::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+typedef void (*CHIPActionsClusterActionListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Actions::Attributes::ActionList::TypeInfo::DecodableType &);
+typedef void (*CHIPActionsClusterEndpointListsAttributeCallbackType)(
+    void *, const chip::app::Clusters::Actions::Attributes::EndpointLists::TypeInfo::DecodableType &);
+typedef void (*CHIPActionsClusterSetupURLAttributeCallbackType)(
+    void *, chip::app::Clusters::Actions::Attributes::SetupURL::TypeInfo::DecodableArgType);
+typedef void (*CHIPActionsClusterGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Actions::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPActionsClusterAcceptedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Actions::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPActionsClusterAttributeListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Actions::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPActionsClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::Actions::Attributes::FeatureMap::TypeInfo::DecodableArgType);
+typedef void (*CHIPActionsClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::Actions::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
 typedef void (*CHIPBasicClusterDataModelRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::Basic::Attributes::DataModelRevision::TypeInfo::DecodableArgType);
@@ -694,8 +694,8 @@ typedef void (*CHIPThreadNetworkDiagnosticsClusterDelayAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Delay::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterSecurityPolicyAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::SecurityPolicy::TypeInfo::DecodableArgType);
-typedef void (*CHIPThreadNetworkDiagnosticsClusterChannelMaskAttributeCallbackType)(
-    void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ChannelMask::TypeInfo::DecodableArgType);
+typedef void (*CHIPThreadNetworkDiagnosticsClusterChannelPage0MaskAttributeCallbackType)(
+    void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponentsAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterActiveNetworkFaultsListAttributeCallbackType)(

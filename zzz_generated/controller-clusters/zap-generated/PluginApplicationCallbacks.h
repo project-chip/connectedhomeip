@@ -32,7 +32,7 @@
     MatterDescriptorPluginClientInitCallback();                                                                                    \
     MatterBindingPluginClientInitCallback();                                                                                       \
     MatterAccessControlPluginClientInitCallback();                                                                                 \
-    MatterBridgedActionsPluginClientInitCallback();                                                                                \
+    MatterActionsPluginClientInitCallback();                                                                                       \
     MatterBasicPluginClientInitCallback();                                                                                         \
     MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
     MatterOtaSoftwareUpdateRequestorPluginClientInitCallback();                                                                    \

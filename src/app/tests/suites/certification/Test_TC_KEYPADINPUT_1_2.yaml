@@ -16,6 +16,9 @@ name:
     19.1.2. [TC-KEYPADINPUT-1.2] Global attributes - Keypad Input Cluster (DUT
     as Server)
 
+PICS:
+    - KEYPADINPUT.S
+
 config:
     nodeId: 0x12344321
     cluster: "Keypad Input"

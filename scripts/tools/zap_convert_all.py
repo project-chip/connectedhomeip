@@ -31,14 +31,25 @@ def checkPythonVersion():
         exit(1)
 
 
+zapFilesToSkip = [
+    # examples/chef/sample_app_util/test_files/sample_zap_file.zap is
+    # not a real .zap file; it's input to generating .zap files.  So
+    # the path to zcl.json in it is just wrong, and we should skip it.
+    "examples/chef/sample_app_util/test_files/sample_zap_file.zap",
+]
+
+
 def getTargets():
     targets = []
     targets.extend([[str(filepath)]
-                   for filepath in Path('./examples').rglob('*.zap')])
+                   for filepath in Path('./examples').rglob('*.zap')
+                    if str(filepath) not in zapFilesToSkip])
     targets.extend([[str(filepath)]
-                   for filepath in Path('./src/darwin').rglob('*.zap')])
+                   for filepath in Path('./src/darwin').rglob('*.zap')
+                    if str(filepath) not in zapFilesToSkip])
     targets.extend([[str(filepath)] for filepath in Path(
-        './src/controller/data_model').rglob('*.zap')])
+        './src/controller/data_model').rglob('*.zap')
+        if str(filepath) not in zapFilesToSkip])
     return targets
 
 

@@ -17,6 +17,9 @@ name:
     4.2.1. [TC-LTIME-2.1] Read and Write Time Format Localization Cluster
     Attributes [DUT as Client]
 
+PICS:
+    - LTIME.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
