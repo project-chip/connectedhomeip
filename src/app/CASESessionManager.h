@@ -26,6 +26,7 @@
 #include <lib/support/Pool.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/SessionDelegate.h>
+#include <transport/SessionUpdateDelegate.h>
 
 #include <lib/dnssd/ResolverProxy.h>
 
@@ -45,11 +46,17 @@ struct CASESessionManagerConfig
  * 4. During session establishment, trigger node ID resolution (if needed), and update the DNS-SD cache (if resolution is
  * successful)
  */
-class CASESessionManager : public OperationalSessionReleaseDelegate
+class CASESessionManager : public OperationalSessionReleaseDelegate, public SessionUpdateDelegate
 {
 public:
     CASESessionManager() = default;
-    virtual ~CASESessionManager() {}
+    virtual ~CASESessionManager()
+    {
+        if (mConfig.sessionInitParams.Validate() == CHIP_NO_ERROR)
+        {
+            mConfig.sessionInitParams.exchangeMgr->GetReliableMessageMgr()->RegisterSessionUpdateDelegate(nullptr);
+        }
+    }
 
     CHIP_ERROR Init(chip::System::Layer * systemLayer, const CASESessionManagerConfig & params);
     void Shutdown() {}
@@ -88,6 +95,8 @@ public:
      * `CHIP_ERROR_NOT_CONNECTED` error.
      */
     CHIP_ERROR GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr);
+
+    void UpdatePeerAddress(ScopedNodeId peerId) override;
 
 private:
     Optional<SessionHandle> FindExistingSession(const ScopedNodeId & peerId) const;

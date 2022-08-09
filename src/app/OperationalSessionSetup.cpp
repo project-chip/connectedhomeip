@@ -93,6 +93,13 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
     //
     EnqueueConnectionCallbacks(onConnection, onFailure);
 
+    if (mPerformingLookupOnConnectedSession)
+    {
+        // If there is an ongoing address lookup happening, now that we have enqueued the callbacks
+        // we can exit early. Callbacks will occur once address resolution is complete.
+        return;
+    }
+
     switch (mState)
     {
     case State::Uninitialized:
@@ -198,19 +205,16 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
             // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
             return;
         }
+        return;
     }
-    else
+    // TODO is this check needed?
+    if (mPerformingLookupOnConnectedSession)
     {
-        if (!mSecureSession)
-        {
-            // Nothing needs to be done here.  It's not an error to not have a
-            // secureSession.  For one thing, we could have gotten a different
-            // UpdateAddress already and that caused connections to be torn down and
-            // whatnot.
-            return;
-        }
-
-        mSecureSession.Get().Value()->AsSecureSession()->SetPeerAddress(addr);
+        // TODO Do we want to also provide ReliableMessageProtocolConfig?
+        mInitParams.sessionManager->UpdateAllSessionsPeerAddress(mPeerId, addr);
+        DequeueConnectionCallbacks(CHIP_NO_ERROR);
+        // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
+        return;
     }
 }
 
@@ -361,12 +365,13 @@ void OperationalSessionSetup::CleanupCASEClient()
 
 void OperationalSessionSetup::OnSessionReleased()
 {
+    if (mPerformingLookupOnConnectedSession)
+    {
+        // TODO what should we do here?
+    }
+    // I think overall we should be calling DequeueConnectionCallbacks(reason) here
+    // or we should be calling EstablishConnection() to re-establish a connection.
     MoveToState(State::HasAddress);
-}
-
-void OperationalSessionSetup::OnFirstMessageDeliveryFailed()
-{
-    LookupPeerAddress();
 }
 
 void OperationalSessionSetup::OnSessionHang()
@@ -423,6 +428,53 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
     return Resolver::Instance().LookupNode(request, mAddressLookupHandle);
 }
 
+void OperationalSessionSetup::PerformLookupIfSessionAlreadyEstablished()
+{
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    bool isConnected = false;
+
+    if (mPerformingLookupOnConnectedSession)
+    {
+        // We are already in the middle of a lookup from a previous call to
+        // PerformLookupIfSessionAlreadyEstablished. In that case we will just exit right away as
+        // we are already looking to update the results from the previous lookup.
+        return;
+    }
+
+    switch (mState)
+    {
+    case State::Uninitialized:
+        err = CHIP_ERROR_INCORRECT_STATE;
+        // Thing are very wrong and we are just going to call DequeueConnectionCallbacks which will
+        // release ourself.
+        DequeueConnectionCallbacks(err);
+        // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
+        // While it is odd to have an explicit return here at the end of the function, we do so
+        // as a precaution in case someone later on adds something to the end of this function.
+        return;
+    case State::NeedsAddress:
+        // When mState is State::NeedsAddress this means that OperationalSessionSetup has been
+        // freshly created and we are expecting there to be an already established session
+        // that needs to have LookupPeerAddress.
+        isConnected = AttachToExistingSecureSession();
+        if (!isConnected)
+        {
+            // TODO what should we do here? Clearly the session has expired
+            // We could call Connect() with null callbacks.
+            return;
+        }
+        mPerformingLookupOnConnectedSession = true;
+        MoveToState(State::SecureConnected);
+        LookupPeerAddress();
+        break;
+    default:
+        // When mState is any other valid value, the session is in the middle of being established.
+        // We are not going to do an additional lookup, nor are we going to call
+        // DequeueConnectionCallbacks since we do not want to release ourselves.
+        break;
+    }
+}
+
 void OperationalSessionSetup::OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result)
 {
     UpdateDeviceData(result.address, result.mrpRemoteConfig);
@@ -438,6 +490,7 @@ void OperationalSessionSetup::OnNodeAddressResolutionFailed(const PeerId & peerI
         MoveToState(State::NeedsAddress);
     }
 
+    // No need to set mPerformingLookupOnConnectedSession to false since call below releases `this`.
     DequeueConnectionCallbacks(reason);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }

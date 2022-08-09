@@ -25,6 +25,7 @@ CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CAS
 {
     ReturnErrorOnFailure(params.sessionInitParams.Validate());
     mConfig = params;
+    params.sessionInitParams.exchangeMgr->GetReliableMessageMgr()->RegisterSessionUpdateDelegate(this);
     return AddressResolve::Resolver::Instance().Init(systemLayer);
 }
 
@@ -76,6 +77,24 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Trans
     ReturnErrorCodeIf(!optionalSessionHandle.HasValue(), CHIP_ERROR_NOT_CONNECTED);
     addr = optionalSessionHandle.Value()->AsSecureSession()->GetPeerAddress();
     return CHIP_NO_ERROR;
+}
+
+void CASESessionManager::UpdatePeerAddress(ScopedNodeId peerId)
+{
+    OperationalSessionSetup * session = FindExistingSessionSetup(peerId);
+    if (session == nullptr)
+    {
+        ChipLogDetail(CASESessionManager, "UpdatePeerAddress: No existing OperationalSessionSetup instance found");
+
+        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, peerId, this);
+        if (session == nullptr)
+        {
+            ChipLogDetail(CASESessionManager, "UpdatePeerAddress: Failed to allocate OperationalSessionSetup instance");
+            return;
+        }
+    }
+
+    session->PerformLookupIfSessionAlreadyEstablished();
 }
 
 OperationalSessionSetup * CASESessionManager::FindExistingSessionSetup(const ScopedNodeId & peerId) const

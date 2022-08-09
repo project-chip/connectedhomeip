@@ -33,6 +33,7 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/SessionUpdateDelegate.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -171,6 +172,8 @@ public:
      */
     void StopTimer();
 
+    void RegisterSessionUpdateDelegate(SessionUpdateDelegate * sessionUpdateDelegate);
+
 #if CHIP_CONFIG_TEST
     // Functions for testing
     int TestGetCountRetransTable();
@@ -194,6 +197,8 @@ private:
 
     // ReliableMessageProtocol Global tables for timer context
     ObjectPool<RetransTableEntry, CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE> mRetransTable;
+
+    SessionUpdateDelegate * mSessionUpdateDelegate = nullptr;
 };
 
 } // namespace Messaging
