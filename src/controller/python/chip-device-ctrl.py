@@ -367,7 +367,7 @@ class DeviceMgrCmd(Cmd):
         setup-payload generate [options]
 
         Options:
-          -vr  Version        
+          -vr  Version
           -vi  Vendor ID
           -pi  Product ID
           -cf  Custom Flow [Standard = 0, UserActionRequired = 1, Custom = 2]
@@ -971,7 +971,7 @@ class DeviceMgrCmd(Cmd):
         open-commissioning-window <nodeid> [options]
 
         Options:
-          -t  Timeout (in seconds)     
+          -t  Timeout (in seconds)
           -o  Option  [TokenWithRandomPIN = 1, TokenWithProvidedPIN = 2]
           -d  Discriminator Value
           -i  Iteration
@@ -1024,7 +1024,7 @@ class DeviceMgrCmd(Cmd):
                 return
 
             compressed_fabricid = self.devCtrl.GetCompressedFabricId()
-            raw_fabricid = self.devCtrl.GetFabricId()
+            raw_fabricid = self.devCtrl.fabricId
         except exceptions.ChipStackException as ex:
             print("An exception occurred during reading FabricID:")
             print(str(ex))

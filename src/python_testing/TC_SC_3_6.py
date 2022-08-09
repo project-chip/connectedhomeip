@@ -25,7 +25,6 @@ from mobly import asserts
 from chip.utils import CommissioningBuildingBlocks
 from chip.clusters.Attribute import TypedAttributePath, SubscriptionTransaction
 import asyncio
-import queue
 from threading import Event
 import time
 
@@ -35,7 +34,7 @@ class ResubscriptionCatcher:
         self._name = name
         self._got_resubscription_event = Event()
 
-    async def __call__(self, transaction: SubscriptionTransaction, terminationError, nextResubscribeIntervalMsec):
+    def __call__(self, transaction: SubscriptionTransaction, terminationError, nextResubscribeIntervalMsec):
         self._got_resubscription_event.set()
         logging.info("Got resubscription on client %s" % self.name)
 
@@ -46,37 +45,6 @@ class ResubscriptionCatcher:
     @property
     def caught_resubscription(self) -> bool:
         return self._got_resubscription_event.is_set()
-
-
-class AttributeChangeAccumulator:
-    def __init__(self, name):
-        self._name = name
-        self._all_data = queue.Queue()
-
-    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
-        data = transaction.GetAttribute(path)
-        value = {
-            'sub_name': self._name,
-            'endpoint': path.Path.EndpointId,
-            'attribute': path.AttributeType,
-            'value': data
-        }
-        self._all_data.put(value)
-        logging.info("Got subscription report on client %s: %s" % (self.name, value))
-
-    @property
-    def all_data(self):
-        data = []
-        while True:
-            try:
-                data.append(self._all_data.get(block=False))
-            except queue.Empty:
-                break
-        return data
-
-    @property
-    def name(self) -> str:
-        return self._name
 
 
 class TC_SC_3_6(MatterBaseTest):
@@ -112,7 +80,7 @@ class TC_SC_3_6(MatterBaseTest):
         logging.info("Pre-conditions: use existing fabric to configure new fabrics so that total is %d fabrics" %
                      num_fabrics_to_commission)
 
-        # Generate Node IDs for subsequent for subsequent controllers start at 200, follow 200, 300, ...
+        # Generate Node IDs for subsequent controllers start at 200, follow 200, 300, ...
         node_ids = [200 + (i * 100) for i in range(num_controllers_per_fabric - 1)]
 
         # Prepare clients for first fabric, that includes the default controller
@@ -146,7 +114,7 @@ class TC_SC_3_6(MatterBaseTest):
         asserts.assert_equal(len(client_list), num_fabrics_to_commission *
                              num_controllers_per_fabric, "Must have the right number of clients")
 
-        # Before subscribing, set the NodeBabel to "Before Subscriptions"
+        # Before subscribing, set the NodeLabel to "Before Subscriptions"
         logging.info("Pre-conditions: writing initial value of NodeLabel, so that we can control for change of attribute detection")
         await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.Basic.Attributes.NodeLabel(value=BEFORE_LABEL))])
 
@@ -155,59 +123,39 @@ class TC_SC_3_6(MatterBaseTest):
         sub_handlers = []
         resub_catchers = []
 
-        logging.info("Step 1 (first part): Establish subscription with all 15 clients")
+        logging.info("Step 1 (first part): Establish subscription with all %d clients" % len(client_list))
         for client in client_list:
             logging.info("Establishing subscription from controller node %s" % client.name)
             sub = await client.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.Basic.Attributes.NodeLabel)],
                                              reportInterval=(min_report_interval_sec, max_report_interval_sec), keepSubscriptions=False)
             subscriptions.append(sub)
 
-            attribute_handler = AttributeChangeAccumulator(name=client.name)
-            sub.SetAttributeUpdateCallback(attribute_handler)
-            sub_handlers.append(attribute_handler)
-
             resub_catcher = ResubscriptionCatcher(name=client.name)
-            sub.SetResubscriptionAttemptedCallback(resub_catcher, isAsync=True)
+            sub.SetResubscriptionAttemptedCallback(resub_catcher)
             resub_catchers.append(resub_catcher)
 
             if sub_liveness_override_ms is not None:
                 logging.warning("Overriding subscription liveness to check %dms! NOT FOR CERTIFICATION!" % sub_liveness_override_ms)
                 sub.OverrideLivenessTimeoutMs(sub_liveness_override_ms)
 
-        asserts.assert_equal(len(subscriptions), num_fabrics_to_commission *
-                             num_controllers_per_fabric, "Must have the right number of subscriptions")
+        asserts.assert_equal(len(subscriptions), len(client_list), "Must have the right number of subscriptions")
 
         # Trigger a change on NodeLabel
-        logging.info("Step 1 (second part): Change attribute with one client, and validate all clients observe the change on same session")
+        logging.info(
+            "Step 1 (second part): Change attribute with one client, ensure no resubscriptions are triggered due to CASE session starvation")
         await asyncio.sleep(1)
         await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.Basic.Attributes.NodeLabel(value=AFTER_LABEL))])
 
-        # Await a stabilization delay in increments to let the coroutines run
+        # Await a stabilization delay in increments to let the event loops run
         start_time = time.time()
         while (time.time() - start_time) < stabilization_delay_sec:
             await asyncio.sleep(0.05)
 
-        # After stabilization, validate no resubscriptions and all nodes have seen an update
+        # After stabilization, validate no resubscriptions
 
         logging.info("Validation of results")
-        # First check: all subs seeing update
         failed = False
-        for handler in sub_handlers:
-            data_update_count = 0
-            for item in handler.all_data:
-                if item['value'] == AFTER_LABEL:
-                    data_update_count += 1
 
-            if data_update_count == 0:
-                logging.error("Client %s did not see subscription update" % handler.name)
-                failed = True
-            elif data_update_count > 1:
-                logging.error("Client %s saw %d updates instead of 1" % (handler.name, data_update_count))
-                failed = True
-            else:
-                logging.info("Client %s successfully saw 1 update" % handler.name)
-
-        # Second check: no resubscriptions
         for catcher in resub_catchers:
             if catcher.caught_resubscription:
                 logging.error("Client %s saw a resubscription" % catcher.name)

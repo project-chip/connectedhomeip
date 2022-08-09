@@ -174,14 +174,13 @@ class ChipDeviceController():
                 opCredsContext), pointer(devCtrl), fabricId, nodeId, adminVendorId, ctypes.c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
         )
 
-        self._nodeId = nodeId
-
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
         self.devCtrl = devCtrl
         self._fabricAdmin = fabricAdmin
         self._fabricId = fabricId
+        self._nodeId = nodeId
         self._adminIndex = fabricAdmin.adminIndex
 
         if name is None:
@@ -236,6 +235,12 @@ class ChipDeviceController():
         self.state = DCState.IDLE
         self.isActive = True
 
+        # Validate FabricID/NodeID followed from NOC Chain
+        self._fabricId = self.GetFabricIdInternal()
+        assert self._fabricId == fabricId
+        self._nodeId = self.GetNodeIdInternal()
+        assert self._nodeId == nodeId
+
         ChipDeviceController.activeList.add(self)
 
     @property
@@ -244,10 +249,12 @@ class ChipDeviceController():
 
     @property
     def nodeId(self) -> int:
+        self.CheckIsActive()
         return self._nodeId
 
     @property
     def fabricId(self) -> int:
+        self.CheckIsActive()
         return self._fabricId
 
     @property
@@ -261,9 +268,6 @@ class ChipDeviceController():
     @name.setter
     def name(self, new_name: str):
         self._name = new_name
-
-    def GetNodeId(self) -> int:
-        return self.nodeId
 
     def Shutdown(self):
         ''' Shuts down this controller and reclaims any used resources, including the bound
@@ -647,7 +651,8 @@ class ChipDeviceController():
         else:
             raise self._ChipStack.ErrorToException(res)
 
-    def GetFabricId(self):
+    def GetFabricIdInternal(self):
+        """Get the fabric ID from the object. Only used to validate cached value from property."""
         self.CheckIsActive()
 
         fabricid = c_uint64(0)
@@ -662,7 +667,8 @@ class ChipDeviceController():
         else:
             raise self._ChipStack.ErrorToException(res)
 
-    def GetNodeId(self):
+    def GetNodeIdInternal(self) -> int:
+        """Get the node ID from the object. Only used to validate cached value from property."""
         self.CheckIsActive()
 
         nodeid = c_uint64(0)
