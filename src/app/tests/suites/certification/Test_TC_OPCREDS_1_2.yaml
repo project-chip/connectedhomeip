@@ -17,6 +17,9 @@ name:
     11.1.2. [TC-OPCREDS-1.2] Global Attributes for Node Operational Credentials
     Cluster [DUT-Server]
 
+PICS:
+    - OPCREDS.S
+
 config:
     nodeId: 0x12344321
     cluster: "Operational Credentials"

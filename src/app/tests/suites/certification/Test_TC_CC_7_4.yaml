@@ -16,6 +16,9 @@ name:
     27.2.18. [TC-CC-7.4] MoveToEnhancedHueAndSaturation functionality with
     server as DUT
 
+PICS:
+    - CC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Color Control"

@@ -473,8 +473,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::BridgedActions::Id: {
-        using namespace app::Clusters::BridgedActions;
+    case app::Clusters::Actions::Id: {
+        using namespace app::Clusters::Actions;
         switch (aPath.mEventId)
         {
         case Events::StateChanged::Id: {
@@ -505,17 +505,17 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jclass stateChangedStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$BridgedActionsClusterStateChangedEvent", stateChangedStructClass);
+                env, "chip/devicecontroller/ChipEventStructs$ActionsClusterStateChangedEvent", stateChangedStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedActionsClusterStateChangedEvent");
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ActionsClusterStateChangedEvent");
                 return nullptr;
             }
             jmethodID stateChangedStructCtor =
                 env->GetMethodID(stateChangedStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;)V");
             if (stateChangedStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedActionsClusterStateChangedEvent constructor");
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ActionsClusterStateChangedEvent constructor");
                 return nullptr;
             }
 
@@ -558,17 +558,17 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jclass actionFailedStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$BridgedActionsClusterActionFailedEvent", actionFailedStructClass);
+                env, "chip/devicecontroller/ChipEventStructs$ActionsClusterActionFailedEvent", actionFailedStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedActionsClusterActionFailedEvent");
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ActionsClusterActionFailedEvent");
                 return nullptr;
             }
             jmethodID actionFailedStructCtor = env->GetMethodID(
                 actionFailedStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;)V");
             if (actionFailedStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedActionsClusterActionFailedEvent constructor");
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ActionsClusterActionFailedEvent constructor");
                 return nullptr;
             }
 

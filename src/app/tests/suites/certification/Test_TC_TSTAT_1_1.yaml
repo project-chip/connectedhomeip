@@ -14,6 +14,9 @@
 
 name: 42.1.1. [TC-TSTAT-1.1] Global attributes with server as DUT
 
+PICS:
+    - TSTAT.S
+
 config:
     nodeId: 0x12344321
     cluster: "Thermostat"

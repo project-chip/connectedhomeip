@@ -41,8 +41,8 @@ void __attribute__((weak)) MatterBindingPluginClientInitCallback() {}
 void MatterBindingPluginServerInitCallback();
 void __attribute__((weak)) MatterAccessControlPluginClientInitCallback() {}
 void MatterAccessControlPluginServerInitCallback();
-void __attribute__((weak)) MatterBridgedActionsPluginClientInitCallback() {}
-void MatterBridgedActionsPluginServerInitCallback();
+void __attribute__((weak)) MatterActionsPluginClientInitCallback() {}
+void MatterActionsPluginServerInitCallback();
 void __attribute__((weak)) MatterBasicPluginClientInitCallback() {}
 void MatterBasicPluginServerInitCallback();
 void __attribute__((weak)) MatterOtaSoftwareUpdateProviderPluginClientInitCallback() {}

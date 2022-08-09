@@ -15,6 +15,9 @@
 
 name: 3.2.27. [TC-CC-9.4] ColorLoopSet Validation with client as DUT
 
+PICS:
+    - CC.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

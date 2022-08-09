@@ -14,6 +14,9 @@
 
 name: 24.2.2. [TC-LVL-2.2] Write cluster attributes (DUT as Server)
 
+PICS:
+    - LVL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Level Control"
@@ -83,7 +86,7 @@ tests:
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "writes the OnLevel attribute on the DUT"
       PICS: LVL.S.A0011

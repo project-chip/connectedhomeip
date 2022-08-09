@@ -15,6 +15,9 @@
 
 name: 3.2.2. [TC-DGWIFI-2.2] Event Functionality [DUT as Server]
 
+PICS:
+    - DGWIFI.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

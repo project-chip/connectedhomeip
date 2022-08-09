@@ -17,6 +17,10 @@ name:
     3.1.9. [TC-DD-1.9] Manual Pairing Code Payload Verification [DUT -
     Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.MANUAL_PC_COMMISSIONING
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

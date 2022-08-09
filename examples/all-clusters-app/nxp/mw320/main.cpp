@@ -775,7 +775,7 @@ std::string createSetupPayload()
     payload.version               = 0;
     payload.discriminator         = discriminator;
     payload.setUpPINCode          = setupPINCode;
-    payload.rendezvousInformation = RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE);
+    payload.rendezvousInformation.SetValue(chip::RendezvousInformationFlag::kBLE);
     payload.vendorID              = vendorId;
     payload.productID             = productId;
 

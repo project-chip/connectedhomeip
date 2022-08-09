@@ -15,6 +15,9 @@
 
 name: 80.1.2. [TC-MOD-1.2] Cluster attributes with server as DUT
 
+PICS:
+    - MOD.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

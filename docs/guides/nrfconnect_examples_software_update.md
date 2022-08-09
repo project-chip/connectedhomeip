@@ -229,31 +229,30 @@ Complete the following steps to perform DFU using mcumgr:
         Split status: N/A (0)
         ```
 
-> **_NOTE:_** If you are using the nRF5340DK board, that supports multi-image
-> device firmware upgrade, complete Steps 7-9. If not using one, go straight to
-> the step 10.
+7. If you are using the nRF5340DK board, which supports multi-image device firmware upgrade,
+   complete the following substeps. If you are not using one, go straight to the step 8.
 
-7.  Upload the network core firmware image to the device by running the
-    following command in your example directory:
+   a. Upload the network core firmware image to the device by running the
+      following command in your example directory:
 
         ```
         sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/net_core_app_update.bin -n 1 -w 1
         ```
 
-    The operation can take a few minutes. Wait until the progress bar reaches
-    100%.
+      The operation can take a few minutes. Wait until the progress bar reaches
+      100%.
 
-8.  Obtain the list of images present in the device memory by running following
-    command:
+   b. Obtain the list of images present in the device memory by running following
+      command:
 
         ```
         sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image list
         ```
 
-    The displayed output contains the old application image in slot 0 that is
-    currently active, the new application image in slot 1 in pending state, and
-    the new network image which is in slot 1 and not active yet (flags field
-    empty):
+      The displayed output contains the old application image in slot 0 that is
+      currently active, the new application image in slot 1 in pending state, and
+      the new network image which is in slot 1 and not active yet (flags field
+      empty):
 
         ```
         Images:
@@ -275,16 +274,16 @@ Complete the following steps to perform DFU using mcumgr:
         Split status: N/A (0)
         ```
 
-9.  Swap the firmware images by calling the following method with `image-hash`
-    replaced by the image present in the slot 1 hash (for example,
-    `d9e31e73cb7a959c26411250c2b3028f3510ae88a4549ae3f2f097c3e7530f48`):
+   c. Swap the firmware images by calling the following method with `image-hash`
+      replaced by the image present in the slot 1 hash (for example,
+      `d9e31e73cb7a959c26411250c2b3028f3510ae88a4549ae3f2f097c3e7530f48`):
 
         ```
         sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image test image-hash
         ```
 
-    You can observe that the `flags:` field in the image for slot 1 changes
-    value to `pending`:
+      You can observe that the `flags:` field in the image for slot 1 changes
+      value to `pending`:
 
         ```
         Images:
@@ -306,27 +305,27 @@ Complete the following steps to perform DFU using mcumgr:
         Split status: N/A (0)
         ```
 
-10. Reset the device with the following command to let the bootloader swap
-    images:
+8. Reset the device with the following command to let the bootloader swap
+   images:
 
-        ```
-        sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' reset
-        ```
+       ```
+       sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' reset
+       ```
 
 
-    The device is reset and the following notifications appear in its console:
+   The device is reset and the following notifications appear in its console:
 
-        ```
-        *** Booting Zephyr OS build zephyr-v2.5.0-1101-ga9d3aef65424  ***
-        I: Starting bootloader
-        I: Primary image: magic=good, swap_type=0x2, copy_done=0x1, image_ok=0x1
-        I: Secondary image: magic=good, swap_type=0x2, copy_done=0x3, image_ok=0x3
-        I: Boot source: none
-        I: Swap type: test
-        ```
+       ```
+       *** Booting Zephyr OS build zephyr-v2.5.0-1101-ga9d3aef65424  ***
+       I: Starting bootloader
+       I: Primary image: magic=good, swap_type=0x2, copy_done=0x1, image_ok=0x1
+       I: Secondary image: magic=good, swap_type=0x2, copy_done=0x3, image_ok=0x3
+       I: Boot source: none
+       I: Swap type: test
+       ```
 
-    Swapping operation can take some time, and after it completes, the new
-    firmware is booted.
+   Swapping operation can take some time, and after it completes, the new
+   firmware is booted.
 
 Visit the
 [mcumgr image management](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/indexhtml#image-management)

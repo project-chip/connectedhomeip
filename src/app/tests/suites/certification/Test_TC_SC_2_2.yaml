@@ -17,6 +17,9 @@ name:
     14.2.2. [TC-SC-2.2] Bidirectional Communication - Passcode Authenticated
     Session Establishment (PASE)
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

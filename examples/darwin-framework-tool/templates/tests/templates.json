@@ -40,6 +40,10 @@
             "path": "partials/check_test_value.zapt"
         },
         {
+            "name": "octetStringValue",
+            "path": "partials/octet_string_value.zapt"
+        },
+        {
             "name": "maybeCheckExpectedConstraints",
             "path": "partials/checks/maybeCheckExpectedConstraints.zapt"
         }

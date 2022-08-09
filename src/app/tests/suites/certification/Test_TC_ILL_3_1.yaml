@@ -15,6 +15,13 @@
 
 name: 71.3.1. [TC-ILL-3.1] Attributes with Client as DUT
 
+PICS:
+    - ILL.C
+    - ILL.C.AM-READ
+    - ILL.C.AO-READ
+    - ILL.C.AM-WRITE
+    - ILL.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

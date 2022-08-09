@@ -15,6 +15,9 @@
 name:
     27.2.21. [TC-CC-9.2] ColorLoopSet Validation - change direction without stop
 
+PICS:
+    - CC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Color Control"

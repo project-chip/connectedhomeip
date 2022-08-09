@@ -15,6 +15,9 @@
 
 name: 3.6.1. [TC-IDM-6.1] Events Read Interaction from TH to DUT. [{DUT_Server}]
 
+PICS:
+    - MCORE.IDM.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

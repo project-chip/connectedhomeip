@@ -46,6 +46,9 @@ MTRPairingStatus MTRDevicePairingDelegateBridge::MapStatus(chip::Controller::Dev
     case chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed:
         rv = MTRPairingStatusFailed;
         break;
+    case chip::Controller::DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices:
+        rv = MTRPairingStatusDiscoveringMoreDevices;
+        break;
     }
     return rv;
 }

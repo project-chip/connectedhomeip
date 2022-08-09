@@ -58,11 +58,7 @@
       {{~#if (chip_tests_variables_has expected)}}{{expected}}
       {{else if keepAsExpected}}{{expected}}
       {{else if (isOctetString type)}}
-        {{~#if (isHexString expected)}}
-          chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringFromHexString expected}}"), {{octetStringLengthFromHexString expected}})
-        {{else}}
-          chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringEscapedForCLiteral expected}}"), {{expected.length}})
-        {{/if}}
+        {{> octetStringValue value=expected}}
       {{else if (isCharString type)}}chip::CharSpan("{{expected}}", {{utf8StringLength expected}})
       {{else if (chip_tests_config_has expected)}}m{{asUpperCamelCase expected}}.HasValue() ? m{{asUpperCamelCase expected}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value expected) (chip_tests_config_get_type expected)}}
       {{else}}{{asTypedExpression expected type}}

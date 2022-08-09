@@ -17,6 +17,10 @@ name:
     3.3.15. [TC-DD-3.15] Commissioning Flow - Manual Pairing Code [DUT -
     Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.MANUAL_PC_COMMISSIONING
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

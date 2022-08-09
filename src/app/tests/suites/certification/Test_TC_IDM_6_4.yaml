@@ -17,6 +17,9 @@ name:
     3.6.4. [TC-IDM-6.4] Events Subscribe Interaction from DUT to TH.
     [{DUT_Client}]
 
+PICS:
+    - MCORE.IDM.C.SubscribeRequest
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -15,6 +15,9 @@
 
 name: 80.2.1. [TC-MOD-2.1] ChangeToMode Verification (DUT as Server)
 
+PICS:
+    - MOD.S.C00.Rsp
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

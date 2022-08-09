@@ -26,4 +26,4 @@ dir_cipd_pigweed =
 dir_cipd_python =
     get_path_info("${_bootstrap_root}/${dir_cipd_python}", "abspath")
 dir_virtual_env =
-    get_path_info("${_bootstrap_root}/${dir_virtual_env}", "abspath")
+    get_path_info("${_bootstrap_root}/${pw_env_setup_VIRTUAL_ENV}", "abspath")

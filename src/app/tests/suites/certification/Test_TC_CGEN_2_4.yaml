@@ -17,6 +17,9 @@ name:
     92.2.3. [TC-CGEN-2.4] Verification For CommissioningError on response
     message [DUT - Server]
 
+PICS:
+    - CGEN.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

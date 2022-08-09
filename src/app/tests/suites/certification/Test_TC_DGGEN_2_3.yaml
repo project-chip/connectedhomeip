@@ -15,6 +15,10 @@
 
 name: 3.2.3. [TC-DGGEN-2.3] Command received at server as DUT
 
+PICS:
+    - DGGEN.S
+    - DGGEN.S.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

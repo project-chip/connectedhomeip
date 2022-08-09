@@ -17,6 +17,9 @@ name:
     3.2.4. [TC-OCC-2.4] OccupancySensorTypeBitmap and OccupancySensorType
     interdependency with client    as DUT
 
+PICS:
+    - OCC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

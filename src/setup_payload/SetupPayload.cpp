@@ -74,7 +74,7 @@ bool PayloadContents::isValidQRCodePayload() const
 
     chip::RendezvousInformationFlags allvalid(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork,
                                               RendezvousInformationFlag::kSoftAP);
-    if (!rendezvousInformation.HasOnly(allvalid))
+    if (!rendezvousInformation.HasValue() || !rendezvousInformation.Value().HasOnly(allvalid))
     {
         return false;
     }

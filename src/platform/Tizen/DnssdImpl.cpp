@@ -226,47 +226,37 @@ gboolean BrowseAsync(GMainLoop * mainLoop, gpointer userData)
     return true;
 }
 
-void ConvertTxtRecords(unsigned short txtLen, uint8_t * txtRecord, std::vector<TextEntry> & textEntries)
+void GetTextEntries(unsigned short txtLen, uint8_t * txtRecord, std::vector<TextEntry> & textEntries)
 {
-    if (txtLen <= 1)
+    VerifyOrReturn(txtLen > 1, ChipLogDetail(DeviceLayer, "DNSsd %s: No TXT records", __func__));
+    const uint8_t * txtRecordEnd = txtRecord + txtLen;
+
+    while (txtRecord < txtRecordEnd)
     {
-        ChipLogDetail(DeviceLayer, "DNSsd %s: No TXT records", __func__);
-        return;
-    }
+        uint8_t txtRecordSize = txtRecord[0];
+        txtRecord++;
 
-    const uint8_t * ptr = txtRecord;
-    const uint8_t * max = txtRecord + txtLen;
-    char key[kDnssdKeyMaxSize + 1];
-    char value[kDnssdTextMaxSize + 1];
+        VerifyOrReturn(txtRecord + txtRecordSize <= txtRecordEnd,
+                       ChipLogError(DeviceLayer, "DNSsd %s: Invalid TXT data", __func__));
 
-    while (ptr < max)
-    {
-        const uint8_t * const end = ptr + 1 + ptr[0];
-        if (end > max)
+        for (size_t i = 0; i < txtRecordSize; i++)
         {
-            ChipLogError(DeviceLayer, "DNSsd %s: Invalid TXT data", __func__);
-            return;
-        }
+            if (txtRecord[i] == '=')
+            {
+                // NULL-terminate the key string
+                txtRecord[i] = '\0';
 
-        char * buf = &key[0];
-        while (++ptr < end)
-        {
-            if (*ptr == '=')
-            {
-                *buf = 0;
-                buf  = &value[0];
-            }
-            else
-            {
-                *buf = *ptr;
-                ++buf;
+                char * key      = reinterpret_cast<char *>(txtRecord);
+                uint8_t * data  = txtRecord + i + 1;
+                size_t dataSize = txtRecordSize - i - 1;
+                textEntries.push_back({ key, data, dataSize });
+
+                break;
             }
         }
-        *buf = 0;
 
-        auto valueLen = strlen(value);
-        auto valuePtr = reinterpret_cast<const uint8_t *>(strdup(value));
-        textEntries.push_back(TextEntry{ strdup(key), valuePtr, valueLen });
+        // Move to the next text entry
+        txtRecord += txtRecordSize;
     }
 }
 
@@ -330,13 +320,12 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     ret = dnssd_service_get_port(service, &port);
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_port() failed. ret: %d", ret));
 
+    dnssdService.mPort = static_cast<uint16_t>(port);
+
     ret = dnssd_service_get_all_txt_record(service, &txtLen, reinterpret_cast<void **>(&txtRecord));
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_all_txt_record() failed. ret: %d", ret));
 
-    ConvertTxtRecords(txtLen, txtRecord, textEntries);
-    g_free(txtRecord);
-
-    dnssdService.mPort          = static_cast<uint16_t>(port);
+    GetTextEntries(txtLen, txtRecord, textEntries);
     dnssdService.mTextEntries   = textEntries.empty() ? nullptr : textEntries.data();
     dnssdService.mTextEntrySize = textEntries.size();
 
@@ -345,6 +334,8 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
         chip::DeviceLayer::StackLock lock;
         rCtx->mCallback(rCtx->mCbContext, &dnssdService, chip::Span<chip::Inet::IPAddress>(&ipAddr, 1), CHIP_NO_ERROR);
     }
+
+    g_free(txtRecord);
 
     rCtx->mInstance->RemoveContext(rCtx);
     return;
@@ -710,7 +701,6 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
         return chip::DeviceLayer::ThreadStackMgr().AddSrpService(service->mName, regtype.c_str(), service->mPort, subTypes,
                                                                  textEntries);
     }
-
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     return DnssdTizen::GetInstance().RegisterService(*service, callback, context);

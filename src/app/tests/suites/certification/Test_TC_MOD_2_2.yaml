@@ -15,6 +15,9 @@
 
 name: 80.2.2. [TC-MOD-2.2] ChangeToMode Verification (DUT as Client)
 
+PICS:
+    - MOD.C.C00.Tx
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

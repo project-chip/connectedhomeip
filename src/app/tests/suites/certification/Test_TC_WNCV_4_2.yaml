@@ -136,7 +136,7 @@ tests:
 
     ######## GoToTiltPercentage Long-Run for 60.2 percent #######
     ### Step 4x ->  Check GoToTiltPercentage 60.20% Long-Run effects
-    - label: "4a: TH sends GoToTiltPercentage command with 60.20 percent to DUT"
+    - label: "4a: TH sends GoToTiltPercentage command with 60.05 percent to DUT"
       command: "GoToTiltPercentage"
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.C08.Rsp
       arguments:

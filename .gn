@@ -25,5 +25,13 @@ script_executable = "python3"
 
 default_args = {
   pw_unit_test_AUTOMATIC_RUNNER = "$dir_pigweed/targets/host/run_test"
-  pw_build_PIP_CONSTRAINTS = ["//scripts/constraints.txt"]
+
+  pw_build_PIP_CONSTRAINTS = [ "//scripts/constraints.txt" ]
+  pw_build_PIP_REQUIREMENTS = [ "//scripts/requirements.txt" ]
+
+  # Use the new Python build and merged 'pigweed' Python package.
+  pw_build_USE_NEW_PYTHON_BUILD = true
+
+  # GN target to use for the default Python build venv.
+  pw_build_PYTHON_BUILD_VENV = "//:matter_build_venv"
 }

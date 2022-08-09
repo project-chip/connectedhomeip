@@ -35,6 +35,7 @@
 #include <lib/core/CHIPTLVData.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/TypeTraits.h>
+#include <platform/LockTracker.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
@@ -186,12 +187,19 @@ void CommandHandler::DecrementHoldOff()
         return;
     }
 
-    if (!mExchangeCtx->IsGroupExchangeContext() && !mSentStatusResponse)
+    if (!mSentStatusResponse)
     {
-        CHIP_ERROR err = SendCommandResponse();
-        if (err != CHIP_NO_ERROR)
+        if (!mExchangeCtx)
         {
-            ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogProgress(DataManagement, "Skipping command response: exchange context is null");
+        }
+        else if (!mExchangeCtx->IsGroupExchangeContext())
+        {
+            CHIP_ERROR err = SendCommandResponse();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
+            }
         }
     }
 
@@ -573,6 +581,9 @@ FabricIndex CommandHandler::GetAccessingFabricIndex() const
 
 CommandHandler * CommandHandler::Handle::Get()
 {
+    // Not safe to work with CommandHandler in parallel with other Matter work.
+    assertChipStackLockedByCurrentThread();
+
     return (mMagic == InteractionModelEngine::GetInstance()->GetMagicNumber()) ? mpHandler : nullptr;
 }
 

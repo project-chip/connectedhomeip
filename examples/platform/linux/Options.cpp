@@ -283,7 +283,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
 
     case kDeviceOption_Capabilities:
-        LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.SetRaw(static_cast<uint8_t>(atoi(aValue)));
+        LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.Emplace().SetRaw(static_cast<uint8_t>(atoi(aValue)));
         break;
 
     case kDeviceOption_Discriminator: {

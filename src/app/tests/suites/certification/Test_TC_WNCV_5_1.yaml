@@ -15,6 +15,9 @@
 
 name: 3.4.6. [TC-WNCV-5.1] Mandatory Attributes Verification [DUT as Client]
 
+PICS:
+    - WNCV.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

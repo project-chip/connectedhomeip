@@ -14,6 +14,9 @@
 
 name: 74.2.1. [TC-SWTCH-2.1] Attributes with server as DUT
 
+PICS:
+    - SWTCH.S
+
 config:
     nodeId: 0x12344321
     cluster: "Switch"
