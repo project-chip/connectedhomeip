@@ -163,6 +163,10 @@ void AppTask::AppTaskMain(void * pvParameter)
         appError(err);
     }
 
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+    sAppTask.StartStatusLEDTimer();
+#endif    
+
     EFR32_LOG("App Task started");
 
     while (true)
