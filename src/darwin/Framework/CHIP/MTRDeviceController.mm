@@ -42,7 +42,6 @@
 
 #include <platform/CHIPDeviceBuildConfig.h>
 
-#include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CommissioningWindowOpener.h>
@@ -78,7 +77,6 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
-@property (readonly) chip::Controller::AutoCommissioner * autoCommissioner;
 @property (readonly) MTRDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) MTROperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) MTRP256KeypairBridge signingKeypairBridge;
@@ -231,9 +229,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
         commissionerParams.pairingDelegate = _pairingDelegateBridge;
 
-        _autoCommissioner = new chip::Controller::AutoCommissioner();
-        commissionerParams.defaultCommissioner = _autoCommissioner;
-        _operationalCredentialsDelegate->SetAutoCommissioner(_autoCommissioner);
+        _operationalCredentialsDelegate->SetDeviceCommissioner(_cppCommissioner);
 
         commissionerParams.operationalCredentialsDelegate = _operationalCredentialsDelegate;
 
@@ -660,44 +656,58 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     });
 }
 
-- (void)setNocChainIssuer:(id<NOCChainIssuer>)nocChainIssuer
+- (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer
 {
+    VerifyOrReturn([self checkIsRunning]);
+
     dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning]);
+
         self->_operationalCredentialsDelegate->SetNocChainIssuer(nocChainIssuer);
     });
 }
 
-- (uint32_t)onNOCChainGeneration:(NSData *)operationalCertificate
-         intermediateCertificate:(NSData *)intermediateCertificate
-                 rootCertificate:(NSData *)rootCertificate
-                             ipk:(NSData *)ipk
-                    adminSubject:(uint64_t)adminSubject
+- (NSNumber *)onNOCChainGenerationComplete:(NSData *)operationalCertificate
+                   intermediateCertificate:(NSData *)intermediateCertificate
+                           rootCertificate:(NSData *)rootCertificate
+                                       ipk:(NSData *)ipk
+                              adminSubject:(NSNumber *)adminSubject
+                                     error:(NSError * __autoreleasing *)error
 {
+    VerifyOrReturnValue([self checkIsRunning:error], [NSNumber numberWithUnsignedInt:CHIP_ERROR_INCORRECT_STATE.AsInteger()]);
+    VerifyOrReturnValue(operationalCertificate != nil, [NSNumber numberWithUnsignedInt:CHIP_ERROR_INVALID_ARGUMENT.AsInteger()]);
+    VerifyOrReturnValue(intermediateCertificate != nil, [NSNumber numberWithUnsignedInt:CHIP_ERROR_INVALID_ARGUMENT.AsInteger()]);
+    VerifyOrReturnValue(rootCertificate != nil, [NSNumber numberWithUnsignedInt:CHIP_ERROR_INVALID_ARGUMENT.AsInteger()]);
+
     // use ipk and adminSubject from CommissioningParameters if not passed in
-    chip::Controller::CommissioningParameters commissioningParams = _autoCommissioner->GetCommissioningParameters();
+    chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters
+        = _cppCommissioner->GetCommissioningParameters();
+    VerifyOrReturnValue(
+        commissioningParameters.HasValue(), [NSNumber numberWithUnsignedInt:CHIP_ERROR_INCORRECT_STATE.AsInteger()]);
 
     chip::Optional<chip::Crypto::AesCcm128KeySpan> ipkOptional;
     uint8_t ipkValue[chip::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
     chip::Crypto::AesCcm128KeySpan ipkTempSpan(ipkValue);
-    chip::ByteSpan ipkBytes = AsByteSpan(ipk);
     if (ipk != nil) {
-        VerifyOrReturnValue(ipkBytes.size() == sizeof(ipkValue), CHIP_ERROR_INTERNAL.AsInteger());
-        memcpy(&ipkValue[0], ipkBytes.data(), ipkBytes.size());
+        VerifyOrReturnValue(
+            [ipk length] == sizeof(ipkValue), [NSNumber numberWithUnsignedInt:CHIP_ERROR_INCORRECT_STATE.AsInteger()]);
+        memcpy(&ipkValue[0], [ipk bytes], [ipk length]);
         ipkOptional.SetValue(ipkTempSpan);
-    } else if (commissioningParams.GetIpk().HasValue()) {
-        ipkOptional.SetValue(commissioningParams.GetIpk().Value());
+    } else if (commissioningParameters.Value().GetIpk().HasValue()) {
+        ipkOptional.SetValue(commissioningParameters.Value().GetIpk().Value());
     }
 
     chip::Optional<chip::NodeId> adminSubjectOptional;
-    if (adminSubject == chip::kUndefinedNodeId) {
+    if (adminSubject == nil) {
         // if no value passed in, use value from CommissioningParameters
-        adminSubject = commissioningParams.GetAdminSubject().ValueOr(chip::kUndefinedNodeId);
+        adminSubjectOptional.SetValue(commissioningParameters.Value().GetAdminSubject().ValueOr(chip::kUndefinedNodeId));
     } else {
-        adminSubjectOptional.SetValue(adminSubject);
+        adminSubjectOptional.SetValue(adminSubject.unsignedLongLongValue);
     }
 
     __block CHIP_ERROR err = CHIP_NO_ERROR;
     dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning:error]);
         err = self->_operationalCredentialsDelegate->NOCChainGenerated(CHIP_NO_ERROR, AsByteSpan(operationalCertificate),
             AsByteSpan(intermediateCertificate), AsByteSpan(rootCertificate), ipkOptional, adminSubjectOptional);
     });
@@ -705,7 +715,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     if (err != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Failed to SetNocChain for the device: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    return err.AsInteger();
+    return [NSNumber numberWithUnsignedInt:err.AsInteger()];
 }
 
 - (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg

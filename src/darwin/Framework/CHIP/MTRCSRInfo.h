@@ -25,13 +25,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CSRInfo : NSObject
 
-@property (nonatomic, copy, nullable) NSData * nonce;
+@property (nonatomic, copy) NSData * nonce;
 
-@property (nonatomic, copy, nullable) NSData * elements;
+@property (nonatomic, copy) NSData * elements;
 
-@property (nonatomic, copy, nullable) NSData * elementsSignature;
+@property (nonatomic, copy) NSData * elementsSignature;
 
-@property (nonatomic, copy, nullable) NSData * csr;
+@property (nonatomic, copy) NSData * csr;
 
 - (instancetype)initWithNonce:(NSData *)nonce
                      elements:(NSData *)elements

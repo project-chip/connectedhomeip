@@ -15,21 +15,25 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-
-#import <Matter/AttestationInfo.h>
-#import <Matter/CSRInfo.h>
+#import "MTRCSRInfo.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol NOCChainIssuer <NSObject>
-@required
-/**
- * @brief This allows for custom credentials issuer implementations, for example, when a proprietary cloud API will perform the CSR
- * signing.
- */
-- (void)onNOCChainGenerationNeeded:(CSRInfo *)csrInfo attestationInfo:(AttestationInfo *)attestationInfo;
+@implementation CSRInfo : NSObject
 
+- (instancetype)initWithNonce:(NSData *)nonce
+                     elements:(NSData *)elements
+            elementsSignature:(NSData *)elementsSignature
+                          csr:(NSData *)csr
+{
+    if (self = [super init]) {
+        _nonce = nonce;
+        _elements = elements;
+        _elementsSignature = elementsSignature;
+        _csr = csr;
+    }
+    return self;
+}
 @end
 
 NS_ASSUME_NONNULL_END

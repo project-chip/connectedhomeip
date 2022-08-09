@@ -15,11 +15,31 @@
  *    limitations under the License.
  */
 
-#import "AttestationInfo.h"
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation AttestationInfo : NSObject
+/**
+ * Represents information relating to product attestation.
+ *
+ */
+@interface AttestationInfo : NSObject
+
+@property (nonatomic, copy) NSData * challenge;
+
+@property (nonatomic, copy) NSData * nonce;
+
+@property (nonatomic, copy) NSData * elements;
+
+@property (nonatomic, copy) NSData * elementsSignature;
+
+@property (nonatomic, copy) NSData * dac;
+
+@property (nonatomic, copy) NSData * pai;
+
+@property (nonatomic, copy) NSData * certificationDeclaration;
+
+@property (nonatomic, copy) NSData * firmwareInfo;
 
 - (instancetype)initWithChallenge:(NSData *)challenge
                             nonce:(NSData *)nonce
@@ -28,20 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
                               dac:(NSData *)dac
                               pai:(NSData *)pai
          certificationDeclaration:(NSData *)certificationDeclaration
-                     firmwareInfo:(NSData *)firmwareInfo
-{
-    if (self = [super init]) {
-        _challenge = challenge;
-        _nonce = nonce;
-        _elements = elements;
-        _elementsSignature = elementsSignature;
-        _dac = dac;
-        _pai = pai;
-        _certificationDeclaration = certificationDeclaration;
-        _firmwareInfo = firmwareInfo;
-    }
-    return self;
-}
+                     firmwareInfo:(NSData *)firmwareInfo;
 
 @end
 

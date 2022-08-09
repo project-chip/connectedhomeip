@@ -174,15 +174,19 @@ CHIP_ERROR MTROperationalCredentialsDelegate::CallbackGenerateNOCChain(const chi
     chip::ByteSpan firmwareInfoSpan;
     chip::Credentials::DeviceAttestationVendorReservedDeconstructor vendorReserved;
 
-    chip::Controller::CommissioningParameters commissioningParameters = mAutoCommissioner->GetCommissioningParameters();
-    ReturnErrorOnFailure(chip::Credentials::DeconstructAttestationElements(commissioningParameters.GetAttestationElements().Value(),
-        certificationDeclarationSpan, attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan, vendorReserved));
+    chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters
+        = mCppCommissioner->GetCommissioningParameters();
+    VerifyOrReturnError(commissioningParameters.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(
+        chip::Credentials::DeconstructAttestationElements(commissioningParameters.Value().GetAttestationElements().Value(),
+            certificationDeclarationSpan, attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan, vendorReserved));
 
     AttestationInfo * attestationInfo =
         [[AttestationInfo alloc] initWithChallenge:AsData(attestationChallenge)
-                                             nonce:AsData(commissioningParameters.GetAttestationNonce().Value())
-                                          elements:AsData(commissioningParameters.GetAttestationElements().Value())
-                                 elementsSignature:AsData(commissioningParameters.GetAttestationSignature().Value())
+                                             nonce:AsData(commissioningParameters.Value().GetAttestationNonce().Value())
+                                          elements:AsData(commissioningParameters.Value().GetAttestationElements().Value())
+                                 elementsSignature:AsData(commissioningParameters.Value().GetAttestationSignature().Value())
                                                dac:AsData(DAC)
                                                pai:AsData(PAI)
                           certificationDeclaration:AsData(certificationDeclarationSpan)

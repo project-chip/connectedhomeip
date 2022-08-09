@@ -22,11 +22,11 @@
 
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
+#import "MTRNOCChainIssuer.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
-#import "NOCChainIssuer.h"
 
-#include <controller/AutoCommissioner.h>
+#include <controller/CHIPDeviceController.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CASEAuthTag.h>
@@ -46,14 +46,6 @@ public:
         const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
         const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
 
-    CHIP_ERROR CallbackGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
-        const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
-        const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion);
-
-    CHIP_ERROR LocalGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
-        const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
-        const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion);
-
     void SetNodeIdForNextNOCRequest(chip::NodeId nodeId) override
     {
         mNextRequestedNodeId = nodeId;
@@ -65,9 +57,14 @@ public:
     void SetDeviceID(chip::NodeId deviceId) { mDeviceBeingPaired = deviceId; }
     void ResetDeviceID() { mDeviceBeingPaired = chip::kUndefinedNodeId; }
 
-    void SetAutoCommissioner(chip::Controller::AutoCommissioner * autoCommissioner) { mAutoCommissioner = autoCommissioner; }
+    void SetDeviceCommissioner(chip::Controller::DeviceCommissioner * cppCommissioner) { mCppCommissioner = cppCommissioner; }
 
-    void SetNocChainIssuer(id<NOCChainIssuer> nocChainIssuer) { mNocChainIssuer = nocChainIssuer; }
+    chip::Optional<chip::Controller::CommissioningParameters> GetCommissioningParameters()
+    {
+        return mCppCommissioner == nullptr ? chip::NullOptional : mCppCommissioner->GetCommissioningParameters();
+    }
+
+    void SetNocChainIssuer(id<MTRNOCChainIssuer> nocChainIssuer) { mNocChainIssuer = nocChainIssuer; }
 
     CHIP_ERROR NOCChainGenerated(CHIP_ERROR status, const chip::ByteSpan & noc, const chip::ByteSpan & icac,
         const chip::ByteSpan & rcac, chip::Optional<chip::Crypto::AesCcm128KeySpan> ipk, chip::Optional<chip::NodeId> adminSubject);
@@ -114,6 +111,14 @@ private:
         chip::FabricId fabricId, const chip::CATValues & cats, const chip::Crypto::P256PublicKey & pubkey,
         chip::MutableByteSpan & noc);
 
+    CHIP_ERROR CallbackGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
+        const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
+        const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion);
+
+    CHIP_ERROR LocalGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
+        const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
+        const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion);
+
     ChipP256KeypairPtr mIssuerKey;
 
     chip::Crypto::AesCcm128Key mIPK;
@@ -133,8 +138,8 @@ private:
     NSData * _Nullable mRootCert;
     NSData * _Nullable mIntermediateCert;
 
-    chip::Controller::AutoCommissioner * mAutoCommissioner = nullptr;
-    id<NOCChainIssuer> _Nullable mNocChainIssuer;
+    chip::Controller::DeviceCommissioner * mCppCommissioner = nullptr;
+    id<MTRNOCChainIssuer> _Nullable mNocChainIssuer;
     chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * mOnNOCCompletionCallback = nullptr;
 };
 
