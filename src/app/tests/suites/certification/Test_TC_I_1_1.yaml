@@ -109,6 +109,7 @@ tests:
           value: [0]
           constraints:
               type: list
+
     #Commenting out the step EventList attribute which is out of scope for matter V1.0
     #- label:
     #      "Read EventList attribute from the DUT and Verify that the DUT
