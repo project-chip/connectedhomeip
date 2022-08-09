@@ -26,7 +26,8 @@
 class ShutdownSubscription : public CHIPCommand
 {
 public:
-    ShutdownSubscription(CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand("shutdown-subscription", credsIssuerConfig)
+    ShutdownSubscription(CredentialIssuerCommands * credsIssuerConfig) :
+        CHIPCommand("shutdown-one", credsIssuerConfig, "Shut down a single subscription, identified by its subscription id.")
     {
         AddArgument("subscription-id", 0, UINT64_MAX, &mSubscriptionId);
     }
@@ -44,30 +45,48 @@ private:
     chip::SubscriptionId mSubscriptionId;
 };
 
-class ShutdownSubscriptions : public CHIPCommand
+class ShutdownSubscriptionsForNode : public CHIPCommand
 {
 public:
-    ShutdownSubscriptions(CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand("shutdown-subscriptions", credsIssuerConfig)
+    ShutdownSubscriptionsForNode(CredentialIssuerCommands * credsIssuerConfig) :
+        CHIPCommand("shutdown-all-for-node", credsIssuerConfig, "Shut down all subscriptions targeting a given node.")
     {
-        AddArgument("fabric-index", 0, UINT64_MAX, &mFabricIndex);
-        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument("node-id", 0, UINT64_MAX, &mNodeId,
+                    "The node id, scoped to the commissioner name the command is running under.");
     }
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(CurrentCommissioner().GetFabricIndex(), mNodeId);
 
-        chip::app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricIndex, mNodeId);
-
-        SetCommandExitStatus(err);
+        SetCommandExitStatus(CHIP_NO_ERROR);
         return CHIP_NO_ERROR;
     }
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
 private:
-    chip::FabricIndex mFabricIndex;
     chip::NodeId mNodeId;
+};
+
+class ShutdownAllSubscriptions : public CHIPCommand
+{
+public:
+    ShutdownAllSubscriptions(CredentialIssuerCommands * credsIssuerConfig) :
+        CHIPCommand("shutdown-all", credsIssuerConfig, "Shut down all subscriptions to all nodes.")
+    {}
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override
+    {
+        chip::app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
+
+        SetCommandExitStatus(CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
+    }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
+
+private:
 };
 
 void registerClusterSubscriptions(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
@@ -75,8 +94,9 @@ void registerClusterSubscriptions(Commands & commands, CredentialIssuerCommands 
     const char * clusterName = "Subscriptions";
 
     commands_list clusterCommands = {
-        make_unique<ShutdownSubscription>(credsIssuerConfig),  //
-        make_unique<ShutdownSubscriptions>(credsIssuerConfig), //
+        make_unique<ShutdownSubscription>(credsIssuerConfig),         //
+        make_unique<ShutdownSubscriptionsForNode>(credsIssuerConfig), //
+        make_unique<ShutdownAllSubscriptions>(credsIssuerConfig),     //
     };
 
     commands.Register(clusterName, clusterCommands);
