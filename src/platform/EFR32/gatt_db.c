@@ -55,7 +55,7 @@ GATT_DATA(const sli_bt_gattdb_value_t gattdb_attribute_field_28) = { .len  = 16,
                                                                          0x1d,
                                                                      } };
 GATT_DATA(sli_bt_gattdb_attribute_chrvalue_t
-              gattdb_attribute_field_24)                         = { .properties = 0x3e,
+              gattdb_attribute_field_24)                         = { .properties = 0x2e,
                                              .max_len    = 247,
                                              .len        = 1,
                                              .data       = {
@@ -353,7 +353,7 @@ GATT_DATA(const sli_bt_gattdb_attribute_t gattdb_attributes_map[]) = {
       .caps           = 0xffff,
       .state          = 0x00,
       .datatype       = 0x05,
-      .characteristic = { .properties = 0x3e, .char_uuid = 0x8001 } },
+      .characteristic = { .properties = 0x2e, .char_uuid = 0x8001 } },
     { .handle      = 0x19,
       .uuid        = 0x8001,
       .permissions = 0x807,
@@ -367,7 +367,7 @@ GATT_DATA(const sli_bt_gattdb_attribute_t gattdb_attributes_map[]) = {
       .caps        = 0xffff,
       .state       = 0x00,
       .datatype    = 0x03,
-      .configdata  = { .flags = 0x03, .clientconfig_index = 0x01 } },
+      .configdata  = { .flags = 0x02, .clientconfig_index = 0x01 } },
     { .handle         = 0x1b,
       .uuid           = 0x0002,
       .permissions    = 0x801,
