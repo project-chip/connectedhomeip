@@ -189,7 +189,7 @@ void AppTask::OnIdentifyStart(Identify * identify)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
     sAppTask.StartStatusLEDTimer();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+#endif
 }
 
 void AppTask::OnIdentifyStop(Identify * identify)
@@ -198,7 +198,7 @@ void AppTask::OnIdentifyStop(Identify * identify)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
     sAppTask.StopStatusLEDTimer();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+#endif
 }
 
 void AppTask::ThermostatActionEventHandler(AppEvent * aEvent)
