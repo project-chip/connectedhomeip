@@ -40,7 +40,7 @@ public:
     void operator=(PersistentStorageOperationalKeystoreHSM const &) = delete;
 
     /**
-     * @brief Initialize the Operational Keystore to map to a given storage delegate.
+     * @brief Initialize the Operational Keystore for HSM.
      *
      * @param storage Pointer to persistent storage delegate to use. Must outlive this instance.
      * @retval CHIP_NO_ERROR on success
@@ -74,10 +74,13 @@ public:
     void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) override;
 
 protected:
+    void ResetPendingSlot();
+
     void ResetPendingKey()
     {
         if (mPendingKeypair != nullptr)
         {
+            ResetPendingSlot();
             Platform::Delete(mPendingKeypair);
         }
         mPendingKeypair         = nullptr;
