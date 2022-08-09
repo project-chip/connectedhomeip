@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 #include "LockEndpoint.h"
-#include <cstring>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <cstring>
 
 using chip::to_underlying;
 
