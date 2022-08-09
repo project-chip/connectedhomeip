@@ -15,6 +15,9 @@
 
 name: 3.2.17. [TC-CC-6.4] Color Temperature functionality with client as DUT
 
+PICS:
+    - CC.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -206,74 +209,6 @@ tests:
           [1657911996.201314][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=o
           [1657911996.201367][2977:2977] CHIP:DMG: AccessControl: allowed
           [1657911996.201395][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_004C
-      disabled: true
-
-    - label: "DUT sends StopMoveStep command to TH."
-      PICS: CC.C.C47.Rsp
-      verification: |
-          ./chip-tool colorcontrol read color-temperature 1 1
-
-          Verify in DUT as client side log:
-
-          [1657911929.678926][2977:2977] CHIP:IM: Received Read request
-          [1657911929.679006][2977:2977] CHIP:DMG: ReadRequestMessage =
-          [1657911929.679032][2977:2977] CHIP:DMG: {
-          [1657911929.679066][2977:2977] CHIP:DMG:        AttributePathIBs =
-          [1657911929.679092][2977:2977] CHIP:DMG:        [
-          [1657911929.679116][2977:2977] CHIP:DMG:                AttributePathIB =
-          [1657911929.679154][2977:2977] CHIP:DMG:                {
-          [1657911929.679182][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
-          [1657911929.679213][2977:2977] CHIP:DMG:                        Cluster = 0x300,
-          [1657911929.679252][2977:2977] CHIP:DMG:                        Attribute = 0x0000_0007,
-          [1657911929.679281][2977:2977] CHIP:DMG:                }
-          [1657911929.679308][2977:2977] CHIP:DMG:
-          [1657911929.679333][2977:2977] CHIP:DMG:        ],
-          [1657911929.679370][2977:2977] CHIP:DMG:
-          [1657911929.679397][2977:2977] CHIP:DMG:        isFabricFiltered = true,
-          [1657911929.679422][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
-          [1657911929.679453][2977:2977] CHIP:DMG: },
-          [1657911929.679531][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1657911929.679637][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1657911929.679677][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 7 is dirty
-          [1657911929.679698][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0007 (expanded=0)
-          [1657911929.679726][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
-          [1657911929.679768][2977:2977] CHIP:DMG: AccessControl: allowed
-          [1657911929.679827][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
-      disabled: true
-
-    - label:
-          "Over TransitionTime, DUT reads ColorTemperatureMireds attribute from
-          TH."
-      PICS: CC.C.A0007
-      verification: |
-          ./chip-tool colorcontrol read color-temperature 1 1
-
-          Verify in DUT as client side log:
-
-          [1657911929.678926][2977:2977] CHIP:IM: Received Read request
-          [1657911929.679006][2977:2977] CHIP:DMG: ReadRequestMessage =
-          [1657911929.679032][2977:2977] CHIP:DMG: {
-          [1657911929.679066][2977:2977] CHIP:DMG:        AttributePathIBs =
-          [1657911929.679092][2977:2977] CHIP:DMG:        [
-          [1657911929.679116][2977:2977] CHIP:DMG:                AttributePathIB =
-          [1657911929.679154][2977:2977] CHIP:DMG:                {
-          [1657911929.679182][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
-          [1657911929.679213][2977:2977] CHIP:DMG:                        Cluster = 0x300,
-          [1657911929.679252][2977:2977] CHIP:DMG:                        Attribute = 0x0000_0007,
-          [1657911929.679281][2977:2977] CHIP:DMG:                }
-          [1657911929.679308][2977:2977] CHIP:DMG:
-          [1657911929.679333][2977:2977] CHIP:DMG:        ],
-          [1657911929.679370][2977:2977] CHIP:DMG:
-          [1657911929.679397][2977:2977] CHIP:DMG:        isFabricFiltered = true,
-          [1657911929.679422][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
-          [1657911929.679453][2977:2977] CHIP:DMG: },
-          [1657911929.679531][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1657911929.679637][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1657911929.679677][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 7 is dirty
-          [1657911929.679698][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0007 (expanded=0)
-          [1657911929.679726][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
-          [1657911929.679768][2977:2977] CHIP:DMG: AccessControl: allowed
-          [1657911929.679827][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label: "DUT sends StopMoveStep command to TH."

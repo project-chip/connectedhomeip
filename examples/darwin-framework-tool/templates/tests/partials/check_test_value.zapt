@@ -39,11 +39,7 @@
     VerifyOrReturn(CheckValue{{#if (isString type)}}AsString{{/if}}("{{label}}", {{actual}}, 
       {{~#if (chip_tests_variables_has expected)}}{{expected}}
       {{~else if (isOctetString type)}}
-        {{~#if (isHexString expected)}}
-        [[NSData alloc] initWithBytes:"{{octetStringFromHexString expected}}" length:{{octetStringLengthFromHexString expected}}]
-        {{else}}
-        [[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral expected}}" length:{{expected.length}}]
-        {{/if}}
+        {{> octetStringValue value=expected}}
       {{~else if (isCharString type)}}@"{{expected}}"
       {{else if (chip_tests_config_has expected)}}m{{asUpperCamelCase expected}}.HasValue() ? m{{asUpperCamelCase expected}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value expected) (chip_tests_config_get_type expected)}}
       {{~else}}{{asTypedExpressionFromObjectiveC expected type}}

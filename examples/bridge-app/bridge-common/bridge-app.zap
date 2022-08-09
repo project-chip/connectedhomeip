@@ -4469,7 +4469,7 @@
               "code": 5,
               "mfgCode": null,
               "side": "server",
-              "type": "fabric_idx",
+              "type": "int8u",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -5477,10 +5477,10 @@
           ]
         },
         {
-          "name": "Bridged Actions",
+          "name": "Actions",
           "code": 37,
           "mfgCode": null,
-          "define": "BRIDGED_ACTIONS_CLUSTER",
+          "define": "ACTIONS_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
@@ -5529,15 +5529,15 @@
           ]
         },
         {
-          "name": "Bridged Actions",
+          "name": "Actions",
           "code": 37,
           "mfgCode": null,
-          "define": "BRIDGED_ACTIONS_CLUSTER",
+          "define": "ACTIONS_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [
             {
-              "name": "action list",
+              "name": "ActionList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5553,7 +5553,7 @@
               "reportableChange": 0
             },
             {
-              "name": "endpoint list",
+              "name": "EndpointLists",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -5569,7 +5569,7 @@
               "reportableChange": 0
             },
             {
-              "name": "setup url",
+              "name": "SetupURL",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -6355,7 +6355,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "current level",
+              "name": "CurrentLevel",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -6371,7 +6371,7 @@
               "reportableChange": 0
             },
             {
-              "name": "remaining time",
+              "name": "RemainingTime",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -6387,7 +6387,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min level",
+              "name": "MinLevel",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -6403,7 +6403,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max level",
+              "name": "MaxLevel",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -6419,7 +6419,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current frequency",
+              "name": "CurrentFrequency",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -6435,7 +6435,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min frequency",
+              "name": "MinFrequency",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -6451,7 +6451,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max frequency",
+              "name": "MaxFrequency",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -6467,7 +6467,7 @@
               "reportableChange": 0
             },
             {
-              "name": "options",
+              "name": "Options",
               "code": 15,
               "mfgCode": null,
               "side": "server",
@@ -6483,7 +6483,7 @@
               "reportableChange": 0
             },
             {
-              "name": "on off transition time",
+              "name": "OnOffTransitionTime",
               "code": 16,
               "mfgCode": null,
               "side": "server",
@@ -6499,7 +6499,7 @@
               "reportableChange": 0
             },
             {
-              "name": "on level",
+              "name": "OnLevel",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -6515,7 +6515,7 @@
               "reportableChange": 0
             },
             {
-              "name": "on transition time",
+              "name": "OnTransitionTime",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -6531,7 +6531,7 @@
               "reportableChange": 0
             },
             {
-              "name": "off transition time",
+              "name": "OffTransitionTime",
               "code": 19,
               "mfgCode": null,
               "side": "server",
@@ -6547,7 +6547,7 @@
               "reportableChange": 0
             },
             {
-              "name": "default move rate",
+              "name": "DefaultMoveRate",
               "code": 20,
               "mfgCode": null,
               "side": "server",
@@ -6563,7 +6563,7 @@
               "reportableChange": 0
             },
             {
-              "name": "start up current level",
+              "name": "StartUpCurrentLevel",
               "code": 16384,
               "mfgCode": null,
               "side": "server",
@@ -7543,6 +7543,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 257
     }
-  ],
-  "log": []
+  ]
 }

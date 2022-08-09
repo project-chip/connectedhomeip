@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.13.1. [TC-MC-11.1] Casting Video Player via User-Directed Commissioning
+    19.13.1. [TC-MC-11.1] Casting Video Player via User-Directed Commissioning
     Verification (DUT as Server)
+
+PICS:
+    - MC.S.UDCLOGIN
 
 config:
     nodeId: 0x12344321
@@ -32,8 +35,7 @@ tests:
           The shell should show a discovered commissioner, similar to the following:
 
           [1653089767279] [88361:1149415] CHIP: [SVR] Discovered Commissioner #0
-          [1653089767279] [88361:1149415] CHIP: [DIS]         Hostname: 147dda9ac00a
-          [1653089767279] [88361:1149415] CHIP: [DIS]         IP Address #1: 169.254.81.148
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Hostname: 147dda9ac00a        [1653089767279] [88361:1149415] CHIP: [DIS]         IP Address #1: 169.254.81.148
           [1653089767279] [88361:1149415] CHIP: [DIS]         Port: 5650
           [1653089767279] [88361:1149415] CHIP: [DIS]         Mrp Interval idle: 5000 ms
           [1653089767279] [88361:1149415] CHIP: [DIS]         Mrp Interval active: 2000 ms
@@ -59,7 +61,7 @@ tests:
 
     - label:
           "DUT prompt user for onboarding by giving an option to accept or
-          reject the commissioning of TH"
+          reject the commissioning of TH ."
       verification: |
           UX will vary by product maker. The following is the tv-app shell output:
 

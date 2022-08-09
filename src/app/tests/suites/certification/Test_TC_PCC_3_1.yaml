@@ -15,6 +15,13 @@
 
 name: 3.3.1. [TC-PCC-3.1] Attributes with client as DUT
 
+PICS:
+    - PCC.C
+    - PCC.C.AM-READ
+    - PCC.C.AO-READ
+    - PCC.C.AM-WRITE
+    - PCC.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

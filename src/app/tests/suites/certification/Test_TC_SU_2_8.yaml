@@ -15,6 +15,9 @@
 
 name: 3.6.1. [TC-SU-2.8] OTA functionality in Multi Fabric scenario
 
+PICS:
+    - MCORE.OTA.Requestor
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

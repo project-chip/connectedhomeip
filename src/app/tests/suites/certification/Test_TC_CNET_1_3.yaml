@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.1.3. [TC-CNET-1.3] Global Attributes for Networking commissioning cluster
+    12.1.3. [TC-CNET-1.3] Global Attributes for Networking commissioning cluster
     [DUT-Server]
+
+PICS:
+    - CNET.S
 
 config:
     nodeId: 0x12344321

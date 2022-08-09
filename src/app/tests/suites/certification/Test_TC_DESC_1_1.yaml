@@ -15,6 +15,9 @@
 
 name: 84.1.1. [TC-DESC-1.1] Descriptor Cluster Attributes with DUT as Server
 
+PICS:
+    - DESC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Descriptor"

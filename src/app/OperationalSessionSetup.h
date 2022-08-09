@@ -70,9 +70,79 @@ struct DeviceProxyInitParams
     }
 };
 
-class OperationalDeviceProxy;
+/**
+ * @brief Delegate provided when creating OperationalSessionSetup.
+ *
+ * Once OperationalSessionSetup establishes a connection (or errors out) and has notified all
+ * registered application callbacks via OnDeviceConnected/OnDeviceConnectionFailure, this delegate
+ * is used to deallocate the OperationalSessionSetup.
+ */
+class OperationalSessionReleaseDelegate
+{
+public:
+    virtual ~OperationalSessionReleaseDelegate() = default;
+    // TODO Issue #20452: Once cleanup from #20452 takes place we can provide OperationalSessionSetup *
+    // instead of ScopedNodeId here.
+    virtual void ReleaseSession(const ScopedNodeId & peerId) = 0;
+};
 
-typedef void (*OnDeviceConnected)(void * context, OperationalDeviceProxy * device);
+/**
+ * @brief Minimal implementation of DeviceProxy that encapsulates a SessionHolder to track a CASE session.
+ *
+ * Deprecated - Avoid using this object.
+ *
+ * OperationalDeviceProxy is a minimal implementation of DeviceProxy. It is meant to provide a transition
+ * for existing consumers of OperationalDeviceProxy that were delivered a reference to that object in
+ * their respective OnDeviceConnected callback, but were incorrectly holding onto that object past
+ * the function call. OperationalDeviceProxy can be held on for as long as is desired, while still
+ * minimizing the code changes needed to transition to a more final solution by virtue of
+ * implementing DeviceProxy.
+ */
+class OperationalDeviceProxy : public DeviceProxy
+{
+public:
+    OperationalDeviceProxy(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle) :
+        mExchangeMgr(exchangeMgr), mSecureSession(sessionHandle), mPeerScopedNodeId(sessionHandle->GetPeer())
+    {}
+    OperationalDeviceProxy() {}
+
+    // Recommended to use InteractionModelEngine::ShutdownSubscriptions directly.
+    void ShutdownSubscriptions() override { VerifyOrDie(false); } // Currently not implemented.
+    void Disconnect() override
+    {
+        if (IsSecureConnected())
+        {
+            GetSecureSession().Value()->AsSecureSession()->MarkAsDefunct();
+        }
+        mSecureSession.Release();
+        mExchangeMgr      = nullptr;
+        mPeerScopedNodeId = ScopedNodeId();
+    }
+    Messaging::ExchangeManager * GetExchangeManager() const override { return mExchangeMgr; }
+    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.Get(); }
+    NodeId GetDeviceId() const override { return mPeerScopedNodeId.GetNodeId(); }
+    ScopedNodeId GetPeerScopedNodeId() const { return mPeerScopedNodeId; }
+
+    bool ConnectionReady() const { return (mExchangeMgr != nullptr && IsSecureConnected()); }
+
+private:
+    bool IsSecureConnected() const override { return static_cast<bool>(mSecureSession); }
+
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
+    SessionHolder mSecureSession;
+    ScopedNodeId mPeerScopedNodeId;
+};
+
+/**
+ * @brief Callback prototype when secure session is established.
+ *
+ * Callback implementations are not supposed to store the exchangeMgr or the sessionHandle. Older
+ * application code does incorrectly hold onto this information so do not follow those incorrect
+ * implementations as an example.
+ */
+// TODO: OnDeviceConnected should not return ExchangeManager. Application should have this already. This
+// was provided initially to keep code churn down during a large refactor of OnDeviceConnected.
+typedef void (*OnDeviceConnected)(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
 typedef void (*OnDeviceConnectionFailure)(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
 /**
@@ -84,27 +154,29 @@ typedef void (*OnDeviceConnectionFailure)(void * context, const ScopedNodeId & p
  *    - Establish a secure channel to it via CASE
  *    - Expose to consumers the secure session for talking to the device.
  */
-class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
-                                          public SessionDelegate,
-                                          public SessionEstablishmentDelegate,
-                                          public AddressResolve::NodeListener
+class DLL_EXPORT OperationalSessionSetup : public SessionDelegate,
+                                           public SessionEstablishmentDelegate,
+                                           public AddressResolve::NodeListener
 {
 public:
-    ~OperationalDeviceProxy() override;
+    ~OperationalSessionSetup() override;
 
-    OperationalDeviceProxy(DeviceProxyInitParams & params, ScopedNodeId peerId) : mSecureSession(*this)
+    OperationalSessionSetup(DeviceProxyInitParams & params, ScopedNodeId peerId,
+                            OperationalSessionReleaseDelegate * releaseDelegate) :
+        mSecureSession(*this)
     {
         mInitParams = params;
-        if (params.Validate() != CHIP_NO_ERROR)
+        if (params.Validate() != CHIP_NO_ERROR || releaseDelegate == nullptr)
         {
             mState = State::Uninitialized;
             return;
         }
 
-        mSystemLayer = params.exchangeMgr->GetSessionManager()->SystemLayer();
-        mPeerId      = peerId;
-        mFabricTable = params.fabricTable;
-        mState       = State::NeedsAddress;
+        mSystemLayer     = params.exchangeMgr->GetSessionManager()->SystemLayer();
+        mPeerId          = peerId;
+        mFabricTable     = params.fabricTable;
+        mReleaseDelegate = releaseDelegate;
+        mState           = State::NeedsAddress;
         mAddressLookupHandle.SetListener(this);
     }
 
@@ -156,17 +228,9 @@ public:
     /**
      *  Mark any open session with the device as expired.
      */
-    void Disconnect() override;
-
-    NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
+    void Disconnect();
 
     ScopedNodeId GetPeerId() const { return mPeerId; }
-
-    void ShutdownSubscriptions() override;
-
-    Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
-
-    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.Get(); }
 
     Transport::PeerAddress GetPeerAddress() const { return mDeviceAddress; }
 
@@ -204,7 +268,7 @@ public:
 private:
     enum class State
     {
-        Uninitialized,    // Error state: OperationalDeviceProxy is useless
+        Uninitialized,    // Error state: OperationalSessionSetup is useless
         NeedsAddress,     // No address known, lookup not started yet.
         ResolvingAddress, // Address lookup in progress.
         HasAddress,       // Have an address, CASE handshake not started yet.
@@ -233,8 +297,12 @@ private:
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;
 
+    OperationalSessionReleaseDelegate * mReleaseDelegate;
+
     /// This is used when a node address is required.
     chip::AddressResolve::NodeLookupHandle mAddressLookupHandle;
+
+    ReliableMessageProtocolConfig mRemoteMRPConfig = GetDefaultMRPConfig();
 
     CHIP_ERROR EstablishConnection();
 
@@ -246,8 +314,6 @@ private:
      *
      */
     bool AttachToExistingSecureSession();
-
-    bool IsSecureConnected() const override { return mState == State::SecureConnected; }
 
     void CleanupCASEClient();
 

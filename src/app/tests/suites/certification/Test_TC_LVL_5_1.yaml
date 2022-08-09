@@ -14,6 +14,9 @@
 
 name: 24.5.1. [TC-LVL-5.1] Step Verification (DUT as Server)
 
+PICS:
+    - LVL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Level Control"
@@ -48,193 +51,157 @@ tests:
       arguments:
           value: 0
 
-    - label: "Reads Minlevel attribute from DUT"
-      PICS: LVL.S.A0002
-      command: "readAttribute"
-      attribute: "MinLevel"
-      response:
-          saveAs: MinlevelValue
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
+    - label: "TH sends Off command to DUT"
+      cluster: "On/Off"
+      PICS: OO.S.C00.Rsp && LVL.S.C06.Rsp
+      command: "Off"
 
-    - label: "Sends MoveToLevelWithOnOff command to DUT"
-      PICS: LVL.S.C04.Rsp && LVL.S.A0002
-      command: "MoveToLevelWithOnOff"
+    - label:
+          "TH sends a StepWithOnOff command to DUT, with StepMode =0x00 (up),
+          StepSize =50 and TransitionTime =0 (immediate)"
+      PICS: LVL.S.C06.Rsp
+      command: "StepWithOnOff"
       arguments:
           values:
-              - name: "level"
-                value: MinlevelValue + 1
-              - name: "transitionTime"
+              - name: "StepMode"
+                value: 0
+              - name: "StepSize"
+                value: 50
+              - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Sends MoveToLevelWithOnOff command to DUT"
-      PICS: LVL.S.C04.Rsp && !LVL.S.A0002
-      command: "MoveToLevelWithOnOff"
+    - label: "TH reads OnOff attribute (On/Off cluster) from DUT"
+      cluster: "On/Off"
+      PICS: OO.S.A0000 && LVL.S.C06.Rsp
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "TH sends On command to DUT"
+      cluster: "On/Off"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label:
+          "TH sends a MoveToLevel command to DUT, with Level =50 and
+          TransitionTime =0 (immediate)"
+      PICS: LVL.S.C00.Rsp
+      command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
-                value: 2
-              - name: "transitionTime"
+              - name: "Level"
+                value: 50
+              - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0000 && LVL.S.C04.Rsp
+    - label: "Reads current level attribute from DUT"
+      PICS: LVL.S.A0000 && LVL.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
-          value: MinlevelValue + 1
-          saveAs: CurrentlevelValue
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
+          value: 50
 
-    - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0000 && !LVL.S.A0002 && LVL.S.C04.Rsp
-      command: "readAttribute"
-      attribute: "CurrentLevel"
-      response:
-          value: 2
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
-
-    - label: "Sends step up command to DUT"
+    - label:
+          "TH sends a Step command to the DUT with StepMode =0x00 (up), StepSize
+          =150 and TransitionTime =300"
       PICS: LVL.S.C02.Rsp && LVL.S.M.VarRate
       command: "Step"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "StepMode"
                 value: 0
-              - name: "stepSize"
-                value: 64
-              - name: "transitionTime"
-                value: 20
+              - name: "StepSize"
+                value: 150
+              - name: "TransitionTime"
+                value: 300
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Sends step up command to DUT"
-      PICS: LVL.S.C02.Rsp && !LVL.S.M.VarRate
-      command: "Step"
-      arguments:
-          values:
-              - name: "stepMode"
-                value: 0
-              - name: "stepSize"
-                value: 64
-              - name: "transitionTime"
-                value: 20
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
-
-    - label: "Wait 2500ms"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 2500
+                value: 10000
 
-    - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0000 && LVL.S.C02.Rsp && LVL.S.M.VarRate
+    - label: "TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C02.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
-          value: 66
           constraints:
-              type: int8u
+              minValue: 85
+              maxValue: 115
 
-    - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0000 && LVL.S.C02.Rsp && !LVL.S.M.VarRate
-      command: "readAttribute"
-      attribute: "CurrentLevel"
-      response:
-          value: 66
-          constraints:
-              type: int8u
-
-    - label: "Sends a StepWithOnOff command"
-      PICS: LVL.S.C06.Rsp && LVL.S.M.VarRate
-      command: "StepWithOnOff"
-      arguments:
-          values:
-              - name: "stepMode"
-                value: 1
-              - name: "stepSize"
-                value: 64
-              - name: "transitionTime"
-                value: 20
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
-
-    - label: "Sends a StepWithOnOff command"
-      PICS: LVL.S.C06.Rsp && !LVL.S.M.VarRate
-      command: "StepWithOnOff"
-      arguments:
-          values:
-              - name: "stepMode"
-                value: 1
-              - name: "stepSize"
-                value: 64
-              - name: "transitionTime"
-                value: 20
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
-
-    - label: "Wait 2500ms"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 2500
+                value: 10000
 
-    - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.C06.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
+    - label: "TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C02.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
-          value: CurrentlevelValue
+          constraints:
+              minValue: 127
+              maxValue: 173
 
-    - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.C06.Rsp && LVL.S.A0000 && !LVL.S.M.VarRate
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C02.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
-          value: CurrentlevelValue
+          constraints:
+              minValue: 170
+              maxValue: 200
 
-    - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.C06.Rsp && LVL.S.A0000 && !LVL.S.A0002 && LVL.S.M.VarRate
+    - label: "Wait 5000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C02.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
-          value: 2
+          value: 200
 
-    - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.C06.Rsp && LVL.S.A0000 && !LVL.S.A0002 && !LVL.S.M.VarRate
+    - label:
+          "TH reads CurrentLevel attribute from DUT (after DUT has finished the
+          transition)"
+      PICS: LVL.S.C02.Rsp && LVL.S.A0000 && !LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
-          value: 2
+          value: 200
 
     - label: "Precondition send Off Command"
       cluster: "On/Off"

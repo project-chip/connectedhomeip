@@ -14,6 +14,9 @@
 
 name: 4.1.1. [TC-OO-1.1] Global attributes with server as DUT
 
+PICS:
+    - OO.S
+
 config:
     nodeId: 0x12344321
     cluster: "On/Off"

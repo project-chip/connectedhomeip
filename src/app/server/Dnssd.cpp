@@ -299,9 +299,10 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
-    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u",
+    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u",
                     advertiseParameters.GetVendorId().ValueOr(0), advertiseParameters.GetProductId().ValueOr(0),
-                    advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator());
+                    advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator(),
+                    to_underlying(advertiseParameters.GetCommissioningMode()));
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 

@@ -17,6 +17,9 @@ name:
     3.4.8. [TC-SC-4.8] Compressed Fabric ID remains the same for Nodes
     commissioned to the same fabric [DUT - Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -6,6 +6,168 @@ struct LabelStruct {
     char_string<16> value = 1;
 }
 
+server cluster Identify = 3 {
+  enum IdentifyEffectIdentifier : ENUM8 {
+    kBlink = 0;
+    kBreathe = 1;
+    kOkay = 2;
+    kChannelChange = 11;
+    kFinishEffect = 254;
+    kStopEffect = 255;
+  }
+
+  enum IdentifyEffectVariant : ENUM8 {
+    kDefault = 0;
+  }
+
+  enum IdentifyIdentifyType : ENUM8 {
+    kNone = 0;
+    kVisibleLight = 1;
+    kVisibleLED = 2;
+    kAudibleBeep = 3;
+    kDisplay = 4;
+    kActuator = 5;
+  }
+
+  attribute int16u identifyTime = 0;
+  readonly attribute enum8 identifyType = 1;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct IdentifyRequest {
+    INT16U identifyTime = 0;
+  }
+
+  request struct TriggerEffectRequest {
+    IdentifyEffectIdentifier effectIdentifier = 0;
+    IdentifyEffectVariant effectVariant = 1;
+  }
+
+  command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
+  command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
+}
+
+server cluster Groups = 4 {
+  bitmap GroupClusterFeature : BITMAP32 {
+    kGroupNames = 0x1;
+  }
+
+  readonly attribute bitmap8 nameSupport = 0;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddGroupRequest {
+    group_id groupId = 0;
+    CHAR_STRING groupName = 1;
+  }
+
+  request struct ViewGroupRequest {
+    group_id groupId = 0;
+  }
+
+  request struct GetGroupMembershipRequest {
+    group_id groupList[] = 0;
+  }
+
+  request struct RemoveGroupRequest {
+    group_id groupId = 0;
+  }
+
+  request struct AddGroupIfIdentifyingRequest {
+    group_id groupId = 0;
+    CHAR_STRING groupName = 1;
+  }
+
+  response struct AddGroupResponse = 0 {
+    ENUM8 status = 0;
+    group_id groupId = 1;
+  }
+
+  response struct ViewGroupResponse = 1 {
+    ENUM8 status = 0;
+    group_id groupId = 1;
+    CHAR_STRING groupName = 2;
+  }
+
+  response struct GetGroupMembershipResponse = 2 {
+    nullable INT8U capacity = 0;
+    group_id groupList[] = 1;
+  }
+
+  response struct RemoveGroupResponse = 3 {
+    ENUM8 status = 0;
+    group_id groupId = 1;
+  }
+
+  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
+  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
+  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
+  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
+  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
+  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
+}
+
+server cluster OnOff = 6 {
+  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
+    kFadeToOffIn0p8Seconds = 0;
+    kNoFade = 1;
+    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
+  }
+
+  enum OnOffDyingLightEffectVariant : ENUM8 {
+    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
+  }
+
+  enum OnOffEffectIdentifier : ENUM8 {
+    kDelayedAllOff = 0;
+    kDyingLight = 1;
+  }
+
+  enum OnOffStartUpOnOff : ENUM8 {
+    kOff = 0;
+    kOn = 1;
+    kTogglePreviousOnOff = 2;
+  }
+
+  bitmap OnOffControl : BITMAP8 {
+    kAcceptOnlyWhenOn = 0x1;
+  }
+
+  bitmap OnOffFeature : BITMAP32 {
+    kLighting = 0x1;
+  }
+
+  bitmap SceneFeatures : BITMAP32 {
+    kSceneNames = 0x1;
+  }
+
+  readonly attribute boolean onOff = 0;
+  readonly attribute boolean globalSceneControl = 16384;
+  attribute int16u onTime = 16385;
+  attribute int16u offWaitTime = 16386;
+  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct OffWithEffectRequest {
+    OnOffEffectIdentifier effectId = 0;
+    OnOffDelayedAllOffEffectVariant effectVariant = 1;
+  }
+
+  request struct OnWithTimedOffRequest {
+    OnOffControl onOffControl = 0;
+    int16u onTime = 1;
+    int16u offWaitTime = 2;
+  }
+
+  command Off(): DefaultSuccess = 0;
+  command On(): DefaultSuccess = 1;
+  command Toggle(): DefaultSuccess = 2;
+  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
+  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
+  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
+}
+
 server cluster Descriptor = 29 {
   struct DeviceType {
     devtype_id type = 0;
@@ -16,6 +178,9 @@ server cluster Descriptor = 29 {
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
   readonly attribute ENDPOINT_NO partsList[] = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -961,6 +1126,44 @@ endpoint 0 {
 
   server cluster UserLabel {
     callback attribute labelList;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+}
+endpoint 1 {
+  device type anonymousEndpointType = 259;
+
+  server cluster Identify {
+    ram      attribute identifyTime;
+    ram      attribute identifyType;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Groups {
+    ram      attribute nameSupport;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster OnOff {
+    persist  attribute onOff;
+    ram      attribute globalSceneControl default = 1;
+    ram      attribute onTime;
+    ram      attribute offWaitTime;
+    persist  attribute startUpOnOff default = 0xFF;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }

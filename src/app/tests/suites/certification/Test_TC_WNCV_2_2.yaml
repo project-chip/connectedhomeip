@@ -14,6 +14,9 @@
 
 name: 39.2.2. [TC-WNCV-2.2] ConfigStatus Attribute with server as DUT
 
+PICS:
+    - WNCV.S
+
 config:
     nodeId: 0x12344321
     cluster: "Window Covering"

@@ -15,6 +15,10 @@
 
 name: 3.1.6. [TC-DD-1.6] QR Code Format and Label [DUT - Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.QR
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

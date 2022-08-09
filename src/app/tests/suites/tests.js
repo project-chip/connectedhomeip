@@ -165,7 +165,6 @@ function getManualTests() {
         "Test_TC_DGGEN_2_2",
         "Test_TC_DGGEN_2_3",
         "Test_TC_DGGEN_3_1",
-        "Test_TC_DGGEN_3_2",
     ];
 
     const Identify = [
@@ -605,6 +604,7 @@ function getTests() {
         "Test_TC_BINFO_1_1",
         "Test_TC_CNET_1_3",
         "Test_TC_BINFO_2_1",
+        "Test_TC_CNET_1_3",
     ];
 
     const Descriptor = [
@@ -874,7 +874,7 @@ function getTests() {
         "Test_TC_DRLK_2_4",
         "Test_TC_DRLK_2_5",
         "Test_TC_DRLK_2_7",
-        //"Test_TC_DRLK_2_9", TODO: This test is not aligned with spec
+        "Test_TC_DRLK_2_9",
     ];
 
     const Groups = [

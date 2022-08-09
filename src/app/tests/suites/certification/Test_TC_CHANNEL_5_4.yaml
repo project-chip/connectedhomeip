@@ -15,6 +15,9 @@
 
 name: 3.7.4. [TC-CHANNEL-5.4] Change Channel Verification (DUT as Client)
 
+PICS:
+    - CHANNEL.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -22,49 +25,39 @@ config:
 
 tests:
     - label: "DUT sends ChangeChannel command to TH"
-      PICS: CHANNEL.C.C0000
+      PICS: CHANNEL.C.C00.Tx
       verification: |
-          product maker needs to provide instructions for how to trigger the command:
-          Refer to device or application documentation for special argument values to each command, and/or additional steps required to put device into in correct state to exhibit test behavior.
-
-          If the DUT knows the Index value, then those can be sent as the argument.
-          Else User needs to execute the following command to know the index InputList
-          ./chip-tool channel read channel-list 1 1
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
           ./chip-tool channel change-channel 33 1 1
-
-          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
-          [1653913430.898775][18080:18085] CHIP:DMG: InvokeResponseMessage =
-          [1653913430.898791][18080:18085] CHIP:DMG: {
-          [1653913430.898805][18080:18085] CHIP:DMG:         suppressResponse = false,
-          [1653913430.898823][18080:18085] CHIP:DMG:         InvokeResponseIBs =
-          [1653913430.898849][18080:18085] CHIP:DMG:         [
-          [1653913430.898866][18080:18085] CHIP:DMG:                 InvokeResponseIB =
-          [1653913430.898889][18080:18085] CHIP:DMG:                 {
-          [1653913430.898905][18080:18085] CHIP:DMG:                         CommandStatusIB =
-          [1653913430.898926][18080:18085] CHIP:DMG:                         {
-          [1653913430.898946][18080:18085] CHIP:DMG:                                 CommandPathIB =
-          [1653913430.898970][18080:18085] CHIP:DMG:                                 {
-          [1653913430.898991][18080:18085] CHIP:DMG:                                         EndpointId = 0x1,
-          [1653913430.899012][18080:18085] CHIP:DMG:                                         ClusterId = 0x504,
-          [1653913430.899035][18080:18085] CHIP:DMG:                                         CommandId = 0x2,
-          [1653913430.899052][18080:18085] CHIP:DMG:                                 },
-          [1653913430.899079][18080:18085] CHIP:DMG:
-          [1653913430.899097][18080:18085] CHIP:DMG:                                 StatusIB =
-          [1653913430.899120][18080:18085] CHIP:DMG:                                 {
-          [1653913430.899173][18080:18085] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1653913430.899203][18080:18085] CHIP:DMG:                                 },
-          [1653913430.899227][18080:18085] CHIP:DMG:
-          [1653913430.899244][18080:18085] CHIP:DMG:                         },
-          [1653913430.899268][18080:18085] CHIP:DMG:
-          [1653913430.899286][18080:18085] CHIP:DMG:                 },
-          [1653913430.899311][18080:18085] CHIP:DMG:
-          [1653913430.899328][18080:18085] CHIP:DMG:         ],
-          [1653913430.899354][18080:18085] CHIP:DMG:
-          [1653913430.899373][18080:18085] CHIP:DMG:         InteractionModelRevision = 1
-          [1653913430.899389][18080:18085] CHIP:DMG: },
+          ./chip-tv-casting-app channel change-channel 33 1 1
 
 
-          Enter the below command to read the current input.
-          ./chip-tool channel  read current-channel 1 1
+          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
+
+          [1658530798589] [21924:317544] CHIP: [DMG] InvokeRequestMessage =
+          [1658530798589] [21924:317544] CHIP: [DMG] {
+          [1658530798589] [21924:317544] CHIP: [DMG]         suppressResponse = false,
+          [1658530798589] [21924:317544] CHIP: [DMG]         timedRequest = false,
+          [1658530798589] [21924:317544] CHIP: [DMG]         InvokeRequests =
+          [1658530798589] [21924:317544] CHIP: [DMG]         [
+          [1658530798589] [21924:317544] CHIP: [DMG]                 CommandDataIB =
+          [1658530798589] [21924:317544] CHIP: [DMG]                 {
+          [1658530798589] [21924:317544] CHIP: [DMG]                         CommandPathIB =
+          [1658530798589] [21924:317544] CHIP: [DMG]                         {
+          [1658530798589] [21924:317544] CHIP: [DMG]                                 EndpointId = 0x1,
+          [1658530798589] [21924:317544] CHIP: [DMG]                                 ClusterId = 0x504,
+          [1658530798590] [21924:317544] CHIP: [DMG]                                 CommandId = 0x0,
+          [1658530798590] [21924:317544] CHIP: [DMG]                         },
+          [1658530798590] [21924:317544] CHIP: [DMG]
+          [1658530798590] [21924:317544] CHIP: [DMG]                         CommandFields =
+          [1658530798590] [21924:317544] CHIP: [DMG]                         {
+          [1658530798590] [21924:317544] CHIP: [DMG]                                 0x0 = "33",
+          [1658530798590] [21924:317544] CHIP: [DMG]                         },
+          [1658530798590] [21924:317544] CHIP: [DMG]                 },
+          [1658530798590] [21924:317544] CHIP: [DMG]
+          [1658530798590] [21924:317544] CHIP: [DMG]         ],
+          [1658530798590] [21924:317544] CHIP: [DMG]
+          [1658530798590] [21924:317544] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658530798590] [21924:317544] CHIP: [DMG] },
       disabled: true

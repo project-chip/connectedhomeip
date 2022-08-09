@@ -15,6 +15,9 @@
 
 name: 33.7.1. [TC-SU-3.1] QueryImageResponse from DUT to OTA-R
 
+PICS:
+    - MCORE.OTA.Provider
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

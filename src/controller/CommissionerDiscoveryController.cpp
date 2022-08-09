@@ -178,7 +178,8 @@ void CommissionerDiscoveryController::Cancel()
 }
 
 void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, uint16_t productId, NodeId nodeId,
-                                                             OperationalDeviceProxy * device)
+                                                             Messaging::ExchangeManager & exchangeMgr,
+                                                             SessionHandle & sessionHandle)
 {
     mVendorId  = vendorId;
     mProductId = productId;
@@ -186,7 +187,7 @@ void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, 
     if (mPostCommissioningListener != nullptr)
     {
         ChipLogDetail(Controller, "CommissionerDiscoveryController calling listener");
-        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, device);
+        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
     }
     else
     {

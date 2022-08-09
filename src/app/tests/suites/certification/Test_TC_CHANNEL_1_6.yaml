@@ -15,6 +15,9 @@
 name:
     19.1.6. [TC-CHANNEL-1.6] Global attributes - Channel Cluster (DUT as Server)
 
+PICS:
+    - CHANNEL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Channel"
@@ -112,16 +115,7 @@ tests:
               contains: [3]
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: " !CHANNEL.S.C01.Tx "
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          value: []
-          constraints:
-              type: list
-
-    - label: "Read the global attribute: GeneratedCommandList"
-      PICS: CHANNEL.S.C01.Tx
+      PICS: CHANNEL.S.CL || CHANNEL.S.LI
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

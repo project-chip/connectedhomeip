@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.4. [TC-CNET-4.4] [Wi-Fi] Verification for ScanNetworks command
+    12.4.4. [TC-CNET-4.4] [Wi-Fi] Verification for ScanNetworks command
     [DUT-Server]
+
+PICS:
+    - CNET.S.F00
 
 config:
     nodeId: 0x12344321
@@ -24,13 +27,13 @@ config:
 
 tests:
     - label:
-          "TH sends ScanNetworks command to the DUT with the SSID field set to
-          'null' and Breadcrumb field set to 1"
+          "TH sends  ScanNetworks  command to the  DUT with the SSID  field set
+          to null  and Breadcrumb  field set to 1"
       PICS: CNET.S.C00.Rsp && CNET.S.C01.Tx
       verification: |
           ./chip-tool networkcommissioning scan-networks 1 0 --Ssid null --Breadcrumb 1
 
-          Verify wiFiScanResults entries and its arguments on the TH Log:
+          Verify "wiFiScanResults entries and its arguments" on the TH(chip-tool) Log:
 
           [1653475026.012811][29937:29942] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
           [1653475026.012942][29937:29942] CHIP:TOO:   ScanNetworksResponse: {
@@ -162,26 +165,28 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+          "TH reads  Breadcumb  attribute from
+          the  General  Commissioning  Cluster"
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-          Verify  Breadcrumb: 1 on the TH Log:
+          Verify  "Breadcrumb: 1" on the TH(chip-tool) Log:
 
           [1657190614.753193][5241:5246] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2805642039
           [1657190614.753305][5241:5246] CHIP:TOO:   Breadcrumb: 1
       disabled: true
 
     - label:
-          "TH sends ScanNetworks Command to the DUT with SSID field set to
-          PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and Breadcrumb field set to 2"
+          "TH sends  ScanNetworks  Command to the  DUT with SSID  field set
+          to  PIXIT.CNET.WIFI_  1ST_ACCESSPOINT  _SSID and  Breadcrumb
+          field  set to 2"
       PICS: CNET.S.C00.Rsp && CNET.S.C01.Tx
       verification: |
           ./chip-tool networkcommissioning scan-network hex:<your network id in hex> 1 0
           Below is an example:
           ./chip-tool networkcommissioning scan-networks 1 0 --Ssid 47524C50726976617465 --Breadcrumb 2
 
-          Verify ScanNetworksResponse and its arguments on the TH Log:
+          Verify "ScanNetworksResponse and its arguments" on the TH(chip-tool) Log:
 
           [1653475824.575642][30076:30081] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
           [1653475824.575807][30076:30081] CHIP:TOO:   ScanNetworksResponse: {
@@ -201,11 +206,12 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+          "TH reads  Breadcumb  attribute from
+          the  General  Commissioning  Cluster"
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-          Verify Breadcrumb: 2 on the TH Log:
+          Verify "Breadcrumb: 2" on the TH(chip-tool) Log:
 
           [1657197542.352377][5661:5666] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2805642042
           [1657197542.352450][5661:5666] CHIP:TOO:   Breadcrumb: 2

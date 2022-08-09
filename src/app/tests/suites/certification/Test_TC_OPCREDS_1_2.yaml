@@ -17,59 +17,59 @@ name:
     11.1.2. [TC-OPCREDS-1.2] Global Attributes for Node Operational Credentials
     Cluster [DUT-Server]
 
+PICS:
+    - OPCREDS.S
+
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Operational Credentials"
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
-
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "TH reads the ClusterRevision from DUT"
-      verification: |
-          ./chip-tool operationalcredentials read cluster-revision 1 0
-
-          Verify on the TH Log:
-
-
-          [1651215068.211617][3121:3134] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_FFFD DataVersion: 3662641304
-          [1651215068.211771][3121:3134] CHIP:TOO:   ClusterRevision: 1
-      disabled: true
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
     - label: "TH reads the FeatureMap from DUT"
-      verification: |
-          ./chip-tool operationalcredentials read feature-map 1 0
-
-          Verify on the TH Log:
-
-          [1653459610.168569][29181:29186] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_FFFC DataVersion: 760966542
-          [1653459610.168681][29181:29186] CHIP:TOO:   FeatureMap: 0
-          [1653459610.168856][29181:29186] CHIP:EM: Sending Standalone Ack for MessageCounter:15955740 on exchange 48874i
-      disabled: true
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
 
     - label: "TH reads AttributeList from DUT"
-      verification: |
-          ./chip-tool operationalcredentials read attribute-list 1 0
-
-          Verify on the TH Log:
-
-          [1656324429.812701][17795:17800] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_FFFB DataVersion: 3039700471
-          [1656324429.812917][17795:17800] CHIP:TOO:   AttributeList: 11 entries
-          [1656324429.813076][17795:17800] CHIP:TOO:     [1]: 0
-          [1656324429.813143][17795:17800] CHIP:TOO:     [2]: 1
-          [1656324429.813205][17795:17800] CHIP:TOO:     [3]: 2
-          [1656324429.813266][17795:17800] CHIP:TOO:     [4]: 3
-          [1656324429.813327][17795:17800] CHIP:TOO:     [5]: 4
-          [1656324429.813387][17795:17800] CHIP:TOO:     [6]: 5
-          [1656324429.813450][17795:17800] CHIP:TOO:     [7]: 65528
-          [1656324429.813513][17795:17800] CHIP:TOO:     [8]: 65529
-          [1656324429.813575][17795:17800] CHIP:TOO:     [9]: 65531
-          [1656324429.813636][17795:17800] CHIP:TOO:     [10]: 65532
-          [1656324429.813697][17795:17800] CHIP:TOO:     [11]: 65533
-      disabled: true
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0xFFFD,
+                      0xFFFC,
+                      0xFFFB,
+                      0xFFF9,
+                      0xFFF8,
+                      0x00,
+                      0x01,
+                      0x02,
+                      0x03,
+                      0x04,
+                      0x05,
+                  ]
 
     - label: "TH reads EventList from DUT"
       verification: |
@@ -77,33 +77,17 @@ tests:
       disabled: true
 
     - label: "TH reads AcceptedCommandList from DUT"
-      verification: |
-          ./chip-tool operationalcredentials read  accepted-command-list 1 0
-
-          Verify on the TH Log:
-
-          [1657021609.426857][7131:7136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_FFF9 DataVersion: 364716653
-          [1657021609.426944][7131:7136] CHIP:TOO:   AcceptedCommandList: 8 entries
-          [1657021609.426978][7131:7136] CHIP:TOO:     [1]: 0
-          [1657021609.427005][7131:7136] CHIP:TOO:     [2]: 2
-          [1657021609.427032][7131:7136] CHIP:TOO:     [3]: 4
-          [1657021609.427059][7131:7136] CHIP:TOO:     [4]: 6
-          [1657021609.427085][7131:7136] CHIP:TOO:     [5]: 7
-          [1657021609.427111][7131:7136] CHIP:TOO:     [6]: 9
-          [1657021609.427138][7131:7136] CHIP:TOO:     [7]: 10
-          [1657021609.427165][7131:7136] CHIP:TOO:     [8]: 11
-      disabled: true
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0x00, 0x02, 0x04, 0x06, 0x07, 0x09, 0x0a, 0x0b]
 
     - label: "TH reads GeneratedCommandList from DUT"
-      verification: |
-          ./chip-tool operationalcredentials read generated-command-list 1 0
-
-          Verify on the TH Log:
-
-          [1651215270.028855][3260:3265] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_FFF8 DataVersion: 3662641304
-          [1651215270.028955][3260:3265] CHIP:TOO:   GeneratedCommandList: 4 entries
-          [1651215270.029001][3260:3265] CHIP:TOO:     [1]: 1
-          [1651215270.029039][3260:3265] CHIP:TOO:     [2]: 3
-          [1651215270.029076][3260:3265] CHIP:TOO:     [3]: 5
-          [1651215270.029112][3260:3265] CHIP:TOO:     [4]: 8
-      disabled: true
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0x01, 0x03, 0x05, 0x08]

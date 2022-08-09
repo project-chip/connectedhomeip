@@ -14,6 +14,9 @@
 
 name: 27.2.2. [TC-CC-3.1] Hue MoveTo functionality with server as DUT
 
+PICS:
+    - CC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Color Control"
@@ -89,49 +92,13 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 5000ms"
+    - label: "Wait 30s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 5000
-
-    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 5000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
-
-    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 20s"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 20000
+                value: 30000
 
     - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
@@ -158,49 +125,13 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 5000ms"
+    - label: "Wait 30s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 5000
-
-    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT."
-      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 5000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
-
-    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT."
-      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 20s"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 20000
+                value: 30000
 
     - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT."
       PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
@@ -227,49 +158,13 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 5000ms"
+    - label: "Wait 30s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 5000
-
-    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 5000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
-
-    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 20s"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 20000
+                value: 30000
 
     - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
@@ -296,49 +191,13 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 5000ms"
+    - label: "Wait 30s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 5000
-
-    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 5000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
-
-    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 20s"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 20000
+                value: 30000
 
     - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp

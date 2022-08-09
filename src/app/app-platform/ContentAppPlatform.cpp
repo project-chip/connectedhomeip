@@ -406,11 +406,11 @@ constexpr ClusterId kClusterIdAudioOutput     = 0x050b;
 // constexpr ClusterId kClusterIdApplicationLauncher = 0x050c;
 // constexpr ClusterId kClusterIdAccountLogin        = 0x050e;
 
-CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targetDeviceProxy, uint16_t targetVendorId,
-                                                  NodeId localNodeId, Controller::WriteResponseSuccessCallback successCb,
+CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle,
+                                                  uint16_t targetVendorId, NodeId localNodeId,
+                                                  Controller::WriteResponseSuccessCallback successCb,
                                                   Controller::WriteResponseFailureCallback failureCb)
 {
-    VerifyOrReturnError(targetDeviceProxy != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(successCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(failureCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -419,9 +419,9 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
     Access::AccessControl::Entry entry;
     ReturnErrorOnFailure(GetAccessControl().PrepareEntry(entry));
     ReturnErrorOnFailure(entry.SetAuthMode(Access::AuthMode::kCase));
-    entry.SetFabricIndex(targetDeviceProxy->GetFabricIndex());
+    entry.SetFabricIndex(sessionHandle->GetFabricIndex());
     ReturnErrorOnFailure(entry.SetPrivilege(vendorPrivilege));
-    ReturnErrorOnFailure(entry.AddSubject(nullptr, targetDeviceProxy->GetDeviceId()));
+    ReturnErrorOnFailure(entry.AddSubject(nullptr, sessionHandle->GetPeer().GetNodeId()));
 
     std::vector<Binding::Structs::TargetStruct::Type> bindings;
 
@@ -522,13 +522,12 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
     }
 
     // TODO: add a subject description on the ACL
-    ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, targetDeviceProxy->GetFabricIndex(), nullptr, entry));
+    ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, sessionHandle->GetFabricIndex(), nullptr, entry));
 
     ChipLogProgress(Controller, "Attempting to update Binding list");
     BindingListType bindingList(bindings.data(), bindings.size());
 
-    chip::Controller::BindingCluster cluster(*targetDeviceProxy->GetExchangeManager(),
-                                             targetDeviceProxy->GetSecureSession().Value(), kTargetBindingClusterEndpointId);
+    chip::Controller::BindingCluster cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
 
     ReturnErrorOnFailure(
         cluster.WriteAttribute<Binding::Attributes::Binding::TypeInfo>(bindingList, nullptr, successCb, failureCb));

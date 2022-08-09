@@ -241,7 +241,7 @@ static constexpr CommandId Id = 0x00000008;
 } // namespace Commands
 } // namespace LevelControl
 
-namespace BridgedActions {
+namespace Actions {
 namespace Commands {
 
 namespace InstantAction {
@@ -293,7 +293,7 @@ static constexpr CommandId Id = 0x0000000B;
 } // namespace DisableActionWithDuration
 
 } // namespace Commands
-} // namespace BridgedActions
+} // namespace Actions
 
 namespace Basic {
 namespace Commands {

@@ -16,6 +16,9 @@ name:
     111.2.4. [TC-DRLK-2.4] Verification for Unlock with Timeout command
     [DUT-Server]
 
+PICS:
+    - DRLK.S
+
 config:
     nodeId: 0x12344321
     cluster: "Door Lock"

@@ -16,6 +16,9 @@ name:
     19.1.5. [TC-WAKEONLAN-1.5] Global attributes - Wake on LAN Cluster (DUT as
     Server)
 
+PICS:
+    - WAKEONLAN.S
+
 config:
     nodeId: 0x12344321
     cluster: "Wake on LAN"
@@ -30,7 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -53,6 +56,15 @@ tests:
           constraints:
               type: list
               contains: [65528, 65529, 65531, 65531, 65533]
+
+    - label: "Read the optional attribute(MACAddress) in AttributeList"
+      PICS: WAKEONLAN.S.A0000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"

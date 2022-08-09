@@ -57,12 +57,12 @@ ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeM
 
 void ReadClient::ClearActiveSubscriptionState()
 {
-    mIsReporting             = false;
-    mIsPrimingReports        = true;
-    mPendingMoreChunks       = false;
-    mMinIntervalFloorSeconds = 0;
-    mMaxInterval             = 0;
-    mSubscriptionId          = 0;
+    mIsReporting                  = false;
+    mWaitingForFirstPrimingReport = true;
+    mPendingMoreChunks            = false;
+    mMinIntervalFloorSeconds      = 0;
+    mMaxInterval                  = 0;
+    mSubscriptionId               = 0;
     MoveToState(ClientState::Idle);
 }
 
@@ -504,7 +504,8 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     err = report.GetSubscriptionId(&subscriptionId);
     if (CHIP_NO_ERROR == err)
     {
-        if (mIsPrimingReports)
+        VerifyOrExit(IsSubscriptionType(), err = CHIP_ERROR_INVALID_ARGUMENT);
+        if (mWaitingForFirstPrimingReport)
         {
             mSubscriptionId = subscriptionId;
         }
@@ -592,7 +593,7 @@ exit:
         err                     = StatusResponse::Send(Status::Success, mExchange.Get(), !noResponseExpected);
     }
 
-    mIsPrimingReports = false;
+    mWaitingForFirstPrimingReport = false;
     return err;
 }
 
@@ -990,13 +991,13 @@ CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
     return CHIP_NO_ERROR;
 }
 
-void ReadClient::HandleDeviceConnected(void * context, OperationalDeviceProxy * device)
+void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
 {
     ReadClient * const _this = static_cast<ReadClient *>(context);
     VerifyOrDie(_this != nullptr);
 
-    ChipLogProgress(DataManagement, "HandleDeviceConnected %d\n", device->GetSecureSession().HasValue());
-    _this->mReadPrepareParams.mSessionHolder.Grab(device->GetSecureSession().Value());
+    ChipLogProgress(DataManagement, "HandleDeviceConnected");
+    _this->mReadPrepareParams.mSessionHolder.Grab(sessionHandle);
 
     auto err = _this->SendSubscribeRequest(_this->mReadPrepareParams);
     if (err != CHIP_NO_ERROR)
@@ -1041,17 +1042,6 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
         if (_this->mReadPrepareParams.mSessionHolder)
         {
             _this->mReadPrepareParams.mSessionHolder->AsSecureSession()->MarkAsDefunct();
-        }
-
-        //
-        // TODO: Until #19259 is merged, we cannot actually just get by with the above logic since marking sessions
-        //       defunct has no effect on resident OperationalDeviceProxy instances that are already bound
-        //       to a now-defunct CASE session.
-        //
-        auto proxy = caseSessionManager->FindExistingSession(_this->mPeer);
-        if (proxy != nullptr)
-        {
-            proxy->Disconnect();
         }
 
         caseSessionManager->FindOrEstablishSession(_this->mPeer, &_this->mOnConnectedCallback,

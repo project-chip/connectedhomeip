@@ -17,6 +17,9 @@ name:
     3.9.1. [TC-SU-3.4] Handling different ApplyUpdateResponse scenarios on
     Provider
 
+PICS:
+    - MCORE.OTA.Provider
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

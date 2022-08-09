@@ -17,6 +17,9 @@ name:
     4.1.1. [TC-DA-1.1] The NOC SHALL be wiped on Factory Reset [DUT -
     Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -27,8 +30,9 @@ tests:
       verification: |
           sudo ./chip-all-clusters-app --wifi
 
-          Verify in TH log:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
+
+          Verify in TH log:
 
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
@@ -40,7 +44,8 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read fabrics 1 0
 
-          Verify there is single entry in TH log:
+          Verify that there is a single entry in the list
+
           [1655471672.386120][13377:13382] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2667297992
           [1655471672.386213][13377:13382] CHIP:TOO:   Fabrics: 1 entries
           [1655471672.386291][13377:13382] CHIP:TOO:     [1]: {
@@ -59,7 +64,8 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read nocs 1 0
 
-          Verify there is single entry in TH log:
+          Verify there is single entry and Fabric ID matches FabricID of TH1
+
           [1658392350.745452][3254:3259] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 1660110003
           [1658392350.748972][3254:3259] CHIP:TOO:   NOCs: 1 entries
           [1658392350.749041][3254:3259] CHIP:TOO:     [1]: {
@@ -110,7 +116,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read fabrics 2 0
 
-          Verify there is single entry in TH log:
+          Verify there is single entry and FabricID matches the FabricID of TH2
 
           [1655471672.386120][13377:13382] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2667297992
           [1655471672.386213][13377:13382] CHIP:TOO:   Fabrics: 1 entries
@@ -129,7 +135,7 @@ tests:
       verification: |
           "./chip-tool operationalcredentials read nocs 2 0
 
-          Verify there is single entry in TH log:
+          Verify there is single entry and verify the NOC entry of TH1 and NOC entry of TH2 are different
 
           [1655471146.098327][13302:13307] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2667297991
           [1655471146.098416][13302:13307] CHIP:TOO:   NOCs: 1 entries

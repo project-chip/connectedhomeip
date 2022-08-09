@@ -28,22 +28,25 @@ class MediaCommandBase
 public:
     MediaCommandBase(chip::ClusterId clusterId) { mClusterId = clusterId; }
 
-    CHIP_ERROR SetTarget(TargetVideoPlayerInfo & mTargetVideoPlayerInfo, chip::EndpointId tvEndpoint)
+    CHIP_ERROR SetTarget(TargetVideoPlayerInfo & targetVideoPlayerInfo, chip::EndpointId tvEndpoint)
     {
-        mOperationalDeviceProxy = mTargetVideoPlayerInfo.GetOperationalDeviceProxy();
-        if (mOperationalDeviceProxy == nullptr)
+        auto deviceProxy = targetVideoPlayerInfo.GetOperationalDeviceProxy();
+        if (deviceProxy == nullptr)
         {
             ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy");
             return CHIP_ERROR_PEER_NODE_NOT_FOUND;
         }
-
-        mTvEndpoint = tvEndpoint;
+        mTargetVideoPlayerInfo = &targetVideoPlayerInfo;
+        mTvEndpoint            = tvEndpoint;
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR Invoke(RequestType request, std::function<void(CHIP_ERROR)> responseCallback)
     {
-        VerifyOrDieWithMsg(mOperationalDeviceProxy != nullptr, AppServer, "Target unknown");
+        VerifyOrDieWithMsg(mTargetVideoPlayerInfo != nullptr, AppServer, "Target unknown");
+
+        auto deviceProxy = mTargetVideoPlayerInfo->GetOperationalDeviceProxy();
+        ReturnErrorCodeIf(deviceProxy == nullptr || !deviceProxy->ConnectionReady(), CHIP_ERROR_PEER_NODE_NOT_FOUND);
 
         sResponseCallback = responseCallback;
 
@@ -56,8 +59,8 @@ public:
             {}
         };
 
-        MediaClusterBase cluster(*mOperationalDeviceProxy->GetExchangeManager(),
-                                 mOperationalDeviceProxy->GetSecureSession().Value(), mClusterId, mTvEndpoint);
+        MediaClusterBase cluster(*deviceProxy->GetExchangeManager(), deviceProxy->GetSecureSession().Value(), mClusterId,
+                                 mTvEndpoint);
         return cluster.InvokeCommand(request, nullptr, OnSuccess, OnFailure);
     }
 
@@ -67,7 +70,7 @@ public:
 
 protected:
     chip::ClusterId mClusterId;
-    chip::OperationalDeviceProxy * mOperationalDeviceProxy = nullptr;
+    TargetVideoPlayerInfo * mTargetVideoPlayerInfo = nullptr;
     chip::EndpointId mTvEndpoint;
     static std::function<void(CHIP_ERROR)> sResponseCallback;
 };

@@ -15,6 +15,13 @@
 
 name: 77.2.3. [TC-ACT-3.1] GLobal attributes with client as DUT
 
+PICS:
+    - ACT.C
+    - ACT.C.AM-READ
+    - ACT.C.AO-READ
+    - ACT.C.AM-WRITE
+    - ACT.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

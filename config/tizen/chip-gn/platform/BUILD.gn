@@ -54,11 +54,11 @@ if (chip_enable_ble) {
   pkg_config("capi-network-bluetooth") {
     packages = [ "capi-network-bluetooth" ]
   }
+}
 
-  if (chip_enable_openthread) {
-    pkg_config("capi-network-thread") {
-      packages = [ "capi-network-thread" ]
-    }
+if (chip_enable_openthread) {
+  pkg_config("capi-network-thread") {
+    packages = [ "capi-network-thread" ]
   }
 }
 

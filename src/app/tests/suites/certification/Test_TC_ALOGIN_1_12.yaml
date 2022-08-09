@@ -16,6 +16,9 @@ name:
     19.1.12. [TC-ALOGIN-1.12] Global attributes - Account Login Cluster (DUT as
     Server)
 
+PICS:
+    - ALOGIN.S
+
 config:
     nodeId: 0x12344321
     cluster: "Account Login"
@@ -30,7 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:

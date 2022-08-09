@@ -15,6 +15,9 @@
 
 name: 4.1.5. [TC-DA-1.5] NOCSR Procedure Validation [DUT - Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -23,7 +26,7 @@ config:
 tests:
     - label: "TH1 fully commissions the DUT"
       verification: |
-          sudo ./chip-all-clusters-app --wifi
+          sudo ./chip-all-clusters-app --wifi --trace_decode 1
 
           Verify in TH log:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1

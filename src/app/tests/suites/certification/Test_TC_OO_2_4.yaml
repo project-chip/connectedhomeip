@@ -14,6 +14,10 @@
 
 name: 3.2.4. [TC-OO-2.4] Startup functionality with server as DUT
 
+PICS:
+    - OO.S
+    - OO.S.F00
+
 config:
     nodeId: 0x12344321
     cluster: "On/Off"
