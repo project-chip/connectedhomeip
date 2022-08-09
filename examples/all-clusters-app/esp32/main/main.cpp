@@ -34,7 +34,6 @@
 #include "nvs_flash.h"
 #include "platform/PlatformManager.h"
 #include "shell_extension/launch.h"
-#include <DeviceInfoProviderImpl.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/af.h>
 #include <binding-handler.h>
@@ -58,6 +57,12 @@
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+#include <platform/ESP32/ESP32DeviceInfoProvider.h>
+#else
+#include <DeviceInfoProviderImpl.h>
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 using namespace ::chip;
 using namespace ::chip::Shell;
@@ -94,7 +99,11 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
-DeviceLayer::DeviceInfoProviderImpl sExampleDeviceInfoProvider;
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+chip::DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
+#else
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 } // namespace
 
