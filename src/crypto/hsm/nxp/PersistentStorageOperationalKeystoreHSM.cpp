@@ -97,7 +97,7 @@ CHIP_ERROR PersistentStorageOperationalKeystoreHSM::NewOpKeypairForFabric(Fabric
                                                                           MutableByteSpan & outCertificateSigningRequest)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t slotId = getEmpytSlotId();
+    uint8_t slotId = 0;
 
     VerifyOrReturnError(slotId < MAX_KEYID_SLOTS_FOR_FABRICS, CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -106,6 +106,8 @@ CHIP_ERROR PersistentStorageOperationalKeystoreHSM::NewOpKeypairForFabric(Fabric
 
     // Replace previous pending keypair, if any was previously allocated
     ResetPendingKey();
+
+    slotId = getEmpytSlotId();
 
     mPendingKeypair = Platform::New<Crypto::P256KeypairHSM>();
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_NO_MEMORY);
@@ -124,7 +126,6 @@ CHIP_ERROR PersistentStorageOperationalKeystoreHSM::NewOpKeypairForFabric(Fabric
     err              = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
     if (err != CHIP_NO_ERROR)
     {
-        keyidFabIdMapping[slotId].isPending = false;
         ResetPendingKey();
         return err;
     }
