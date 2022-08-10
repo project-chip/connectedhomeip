@@ -205,6 +205,7 @@ requirements
 ##### Guides
 
 -   [Bouffalo Lab](/examples/lighting-app/bouffalolab/bl602/README.md)
+-   [CYW30739 Lighting](/examples/lighting-app/cyw30739/README.md)
 -   [EFR32 Window Covering](/examples/window-app/efr32/README.md)
 -   [ESP32 All Clusters](/examples/all-clusters-app/esp32/README.md)
 -   [ESP32 Lighting](/examples/lighting-app/esp32/README.md)
