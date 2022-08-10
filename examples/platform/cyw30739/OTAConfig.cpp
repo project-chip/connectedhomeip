@@ -25,7 +25,12 @@
 #include <app/server/Server.h>
 #include <platform/CYW30739/OTAImageProcessorImpl.h>
 
+using namespace ::chip;
+using namespace ::chip::DeviceLayer;
+
 namespace OTAConfig {
+
+constexpr uint32_t kInitOTARequestorDelaySec = 3;
 
 // Global OTA objects
 chip::DefaultOTARequestor gRequestorCore;
@@ -34,8 +39,34 @@ chip::DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
 chip::BDXDownloader gDownloader;
 chip::OTAImageProcessorImpl gImageProcessor;
 
+static void PlatformEventHandler(const ChipDeviceEvent * event, intptr_t arg);
+static void InitRequestor(System::Layer * systemLayer, void * appState);
+
 void Init()
 {
+    PlatformMgrImpl().AddEventHandler(PlatformEventHandler, 0);
+}
+
+void PlatformEventHandler(const ChipDeviceEvent * event, intptr_t arg)
+{
+    switch (event->Type)
+    {
+    case DeviceEventType::kThreadConnectivityChange:
+        if (event->ThreadConnectivityChange.Result == kConnectivity_Established)
+            SystemLayer().StartTimer(System::Clock::Seconds32(kInitOTARequestorDelaySec), InitRequestor, nullptr);
+        break;
+    default:
+        break;
+    }
+}
+
+void InitRequestor(System::Layer * systemLayer, void * appState)
+{
+    if (GetRequestorInstance() != nullptr)
+        return;
+
+    ChipLogProgress(SoftwareUpdate, "Initializing requestor");
+
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 
