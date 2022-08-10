@@ -16,6 +16,7 @@
  */
 
 #include "MessagingContext.h"
+#include "system/SystemClock.h"
 
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <lib/support/CodeUtils.h>
@@ -97,6 +98,28 @@ void MessagingContext::ShutdownAndRestoreExisting(MessagingContext & existing)
     // Point the transport back to the original session manager, since we had
     // pointed it to ours.
     existing.mTransport->SetSessionManager(&existing.GetSecureSessionManager());
+}
+
+void MessagingContext::SetMRPMode(MRPMode mode)
+{
+    if (mode == MRPMode::kDefault)
+    {
+        mSessionBobToAlice->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+        mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+        mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+        mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+    }
+    else
+    {
+        mSessionBobToAlice->AsSecureSession()->SetRemoteMRPConfig(
+            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
+        mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(
+            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
+        mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(
+            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
+        mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(
+            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
+    }
 }
 
 CHIP_ERROR MessagingContext::CreateSessionBobToAlice()

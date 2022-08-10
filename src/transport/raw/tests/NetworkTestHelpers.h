@@ -99,6 +99,8 @@ public:
         }
     }
 
+    static constexpr uint32_t kUnlimitedMessageCount = std::numeric_limits<uint32_t>::max();
+
     CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override
     {
         ReturnErrorOnFailure(mMessageSendError);
@@ -116,6 +118,7 @@ public:
 
         if (dropMessage)
         {
+            ChipLogProgress(Test, "Dropping message...");
             mDroppedMessageCount++;
             if (mDelegate != nullptr)
             {
