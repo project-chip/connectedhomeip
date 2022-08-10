@@ -279,6 +279,17 @@ void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, Nod
     }
 }
 
+void InteractionModelEngine::ShutdownAllSubscriptions()
+{
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    {
+        if (readClient->IsSubscriptionType())
+        {
+            readClient->Close(CHIP_NO_ERROR);
+        }
+    }
+}
+
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
 {
     mCommandHandlerObjs.ReleaseObject(&apCommandObj);
