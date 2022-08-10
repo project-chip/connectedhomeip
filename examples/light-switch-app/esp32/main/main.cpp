@@ -30,6 +30,7 @@
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
 
+#include <DeviceInfoProviderImpl.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -38,15 +39,17 @@
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
-namespace {
-#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
-#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-} // namespace
-
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
+
+namespace {
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
+DeviceLayer::DeviceInfoProviderImpl sExampleDeviceInfoProvider;
+} // namespace
 
 static const char * TAG = "light-switch-app";
 
@@ -80,9 +83,10 @@ extern "C" void app_main()
     chip::LaunchShell();
 #endif // CONFIG_ENABLE_CHIP_SHELL
 
-    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    DeviceLayer::SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
 
-    CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    CHIP_ERROR error              = deviceMgr.Init(&EchoCallbacks);
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));

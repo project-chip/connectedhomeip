@@ -258,6 +258,10 @@ public class ChipDeviceController {
     getConnectedDevicePointer(deviceControllerPtr, nodeId, jniCallback.getCallbackHandle());
   }
 
+  public void releaseConnectedDevicePointer(long devicePtr) {
+    releaseOperationalDevicePointer(devicePtr);
+  }
+
   public boolean disconnectDevice(long deviceId) {
     return disconnectDevice(deviceControllerPtr, deviceId);
   }
@@ -630,7 +634,7 @@ public class ChipDeviceController {
   private native void getConnectedDevicePointer(
       long deviceControllerPtr, long deviceId, long callbackHandle);
 
-  private native void releaseConnectedDevicePointer(long devicePtr);
+  private native void releaseOperationalDevicePointer(long devicePtr);
 
   private native boolean disconnectDevice(long deviceControllerPtr, long deviceId);
 

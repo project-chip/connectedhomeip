@@ -29,3 +29,4 @@ cpp_standard = "gnu++17"
 
 # To fit in flash
 chip_detail_logging = false
+show_qr_code = false

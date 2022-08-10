@@ -59,14 +59,24 @@ if (efr32_board == "BRD4304A") {
 } else if (efr32_board == "BRD4180A") {
   assert(
       false,
-      "The board ${efr32_board} not currentlt supported due to RAM limitation")
+      "The board ${efr32_board} not currently supported due to RAM limitation")
   efr32_family = "efr32mg21"
   efr32_mcu = "EFR32MG21A020F1024IM32"
 } else if (efr32_board == "BRD4186A" || efr32_board == "BRD4187A") {
+  print("RevA is deprecated, We suggest using BRD4186C (rev C)")
   efr32_family = "efr32mg24"
   efr32_mcu = "EFR32MG24A010F1536GM48"
+} else if (efr32_board == "BRD4186C") {
+  efr32_family = "efr32mg24"
+  efr32_mcu = "EFR32MG24B210F1536IM48"
+} else if (efr32_board == "BRD4187C") {
+  efr32_family = "efr32mg24"
+  efr32_mcu = "EFR32MG24B220F1536IM48"
+} else if (efr32_board == "BRD2601B") {
+  efr32_family = "efr32mg24"
+  efr32_mcu = "EFR32MG24B310F1536IM48"
 } else {
   print(
-      "Please provide a valid value for EFR32_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186A, BRD4187A)")
-  assert(false, "The board ${efr32_board} is unsupported as for now.")
+      "Please provide a valid value for EFR32_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186C, BRD4187C, BRD2601B)")
+  assert(false, "The board ${efr32_board} is unsupported")
 }

@@ -53,15 +53,6 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends AddOrUpdateWiFiNetwork command to the DUT with SSID
-          argument value as Userwifi_ssid2, Credentials argument value as
-          Userwifi_Credentials and Breadcrumb argument value as 1"
-      verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
-          ( Pre-Condition)
-      disabled: true
-
-    - label:
           "TH calculates the  midpoint of the  network list
           as  floor((MaxNetwor  ksValue + 1)/2)  and saves as  Midpoint"
       verification: |
@@ -78,11 +69,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends  AddOrUpdateWiFi  Network  command to the  DUT. This
-          step  should be  repeated  RemainingNetwor  kSlots times
-          using  DIFFERENT SSID  and credential  values and the  Breadcrumb
-          field  set to 1. Note that  these credentials  are NOT required  to be
-          connectable."
+          "TH sends AddOrUpdateThre adNetwork command to the DUT. This step
+          should be repeated RemainingNetwor kSlots times using DIFFERENT
+          OperationalDatase t values and Breadcrumb set to 1. Note that these
+          credentials are NOT required to be connectable."
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4

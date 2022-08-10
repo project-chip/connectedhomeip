@@ -26,14 +26,14 @@ config:
 tests:
     - label: "Commission TH to DUT"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
-    - label: "TH reads from the DUT the (0xFFFD) ClusterRevision attribute"
+    - label: "{THread} (0xFFFD) ClusterRevision attribute"
       verification: |
           ./chip-tool localizationconfiguration read cluster-revision 1 0
 
-          On TH, verify that DUT sends ClusterRevision attribute value as 1
+          On TH(chip-tool), verify that DUT sends ClusterRevision attribute value as 1
 
           [1649330698.587235][4440:4445] CHIP:DMG:
           [1649330698.587269][4440:4445] CHIP:DMG:        SuppressResponse = true,
@@ -43,20 +43,20 @@ tests:
           [1649330698.587643][4440:4445] CHIP:TOO:   ClusterRevision: 1
       disabled: true
 
-    - label: "TH reads from the DUT the (0xFFFC) FeatureMap attribute"
+    - label: "{THread} (0xFFFC) FeatureMap attribute"
       verification: |
           ./chip-tool localizationconfiguration read feature-map 1 0
 
-          On TH, verify that DUT sends  FeatureMap attribute value as 0
+          On TH(chip-tool), verify that DUT sends  FeatureMap attribute value as 0
           [1653462414.221894][29485:29490] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_FFFC DataVersion: 2352052086
           [1653462414.222033][29485:29490] CHIP:TOO:   FeatureMap: 0
           [1653462414.222207][29485:29490] CHIP:EM: Sending Standalone Ack for MessageCounter:4940181 on exchange 7821i
       disabled: true
 
-    - label: "TH reads from the DUT the (0xFFFB) AttributeList attribute"
+    - label: "{THread} (0xFFFB) AttributeList attribute"
       verification: |
           ./chip-tool localizationconfiguration read  attribute-list 1 0
-          On TH, verify that DUT  sends a list of supported attributes
+          On TH(chip-tool), verify that DUT  sends a list of supported attributes
 
           [1653462309.061114][29477:29482] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_FFFB DataVersion: 2352052086
           [1653462309.061199][29477:29482] CHIP:TOO:   AttributeList: 7 entries
@@ -70,15 +70,15 @@ tests:
           [1653462309.061492][29477:29482] CHIP:EM: Sending Standalone Ack for MessageCounter:13553423 on exchange 61180i
       disabled: true
 
-    - label: "TH reads from the DUT the (0xFFFA) EventList attribute"
+    - label: "{THread} (0xFFFA) EventList attribute"
       verification: |
           out 0f scope for V1.0
       disabled: true
 
-    - label: "TH reads from the DUT the (0xFFF9) AcceptedCommandList attribute"
+    - label: "{THread} (0xFFF9) AcceptedCommandList attribute"
       verification: |
           ./chip-tool localizationconfiguration read accepted-command-list 1 0
-          On TH, verify that DUT  responsds as list of Accepted Command as 0 entries.
+          On TH(chip-too), verify that DUT  responsds as list of Accepted Command as 0 entries.
 
           [1649331020.031045][4520:4525] CHIP:DMG:
           [1649331020.031081][4520:4525] CHIP:DMG:        SuppressResponse = true,
@@ -88,10 +88,10 @@ tests:
           [1649331020.031470][4520:4525] CHIP:TOO:   AcceptedCommandList: 0 entries
       disabled: true
 
-    - label: "TH reads from the DUT the (0xFFF8) GeneratedCommandList attribute"
+    - label: "{THread} (0xFFF8) GeneratedCommandList attribute"
       verification: |
           ./chip-tool localizationconfiguration read  generated-command-list 1 0
-          On TH, verify that DUT  responsds as list of GeneratedCommandList as 0 entries.
+          On TH(chip-tool), verify that DUT  responsds as list of GeneratedCommandList as 0 entries.
 
           [1649330937.798986][4508:4513] CHIP:DMG:
           [1649330937.799022][4508:4513] CHIP:DMG:        SuppressResponse = true,

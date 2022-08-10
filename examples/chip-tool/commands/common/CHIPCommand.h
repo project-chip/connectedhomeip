@@ -59,15 +59,15 @@ public:
     static constexpr uint16_t kMaxGroupsPerFabric    = 5;
     static constexpr uint16_t kMaxGroupKeysPerFabric = 8;
 
-    CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) :
-        Command(commandName), mCredIssuerCmds(credIssuerCmds)
+    CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds, const char * helpText = nullptr) :
+        Command(commandName, helpText), mCredIssuerCmds(credIssuerCmds)
     {
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
                     "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
                     "directory.");
-        AddArgument(
-            "commissioner-name", &mCommissionerName,
-            "Name of fabric to use. Valid values are \"alpha\", \"beta\", \"gamma\", and integers greater than or equal to 4.");
+        AddArgument("commissioner-name", &mCommissionerName,
+                    "Name of fabric to use. Valid values are \"alpha\", \"beta\", \"gamma\", and integers greater than or equal to "
+                    "4.  The default if not specified is \"alpha\".");
         AddArgument("commissioner-nodeid", 0, UINT64_MAX, &mCommissionerNodeId,
                     "The node id to use for chip-tool.  If not provided, kTestControllerNodeId (112233, 0x1B669) will be used.");
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED

@@ -66,7 +66,7 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
     # Step 1: Wipe the subject from all existing ACLs.
     for acl in currentAcls:
         if (acl.subjects != NullValue):
-            acl.subjects = [subject for subject in acl.subjects if subject != grantedCtrl.GetNodeId()]
+            acl.subjects = [subject for subject in acl.subjects if subject != grantedCtrl.nodeId]
 
     if (privilege):
         addedPrivilege = False
@@ -75,8 +75,8 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
         #         the existing privilege in that entry matches our desired privilege.
         for acl in currentAcls:
             if acl.privilege == privilege:
-                if grantedCtrl.GetNodeId() not in acl.subjects:
-                    acl.subjects.append(grantedCtrl.GetNodeId())
+                if grantedCtrl.nodeId not in acl.subjects:
+                    acl.subjects.append(grantedCtrl.nodeId)
                 addedPrivilege = True
 
         # Step 3: If there isn't an existing entry to add to, make a new one.
@@ -86,7 +86,7 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
                     f"Cannot add another ACL entry to grant privilege to existing count of {currentAcls} ACLs -- will exceed minimas!")
 
             currentAcls.append(Clusters.AccessControl.Structs.AccessControlEntry(privilege=privilege, authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
-                                                                                 subjects=[grantedCtrl.GetNodeId()]))
+                                                                                 subjects=[grantedCtrl.nodeId]))
 
     # Step 4: Prune ACLs which have empty subjects.
     currentAcls = [acl for acl in currentAcls if acl.subjects != NullValue and len(acl.subjects) != 0]
@@ -115,24 +115,21 @@ async def CreateControllersOnFabric(fabricAdmin: FabricAdmin, adminDevCtrl: Chip
 
 
 async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, existingNodeId, newNodeId):
-    ''' Perform sequence to commission new frabric using existing commissioned fabric.
+    ''' Perform sequence to commission new fabric using existing commissioned fabric.
 
     Args:
         commissionerDevCtrl (ChipDeviceController): Already commissioned device controller used
             to commission a new fabric on `newFabricDevCtrl`.
         newFabricDevCtrl (ChipDeviceController): New device controller which is used for the new
             fabric we are establishing.
-        existingNodeId (int): Node ID of the server we are establishing a CASE session on the
-            existing fabric that we will used to perform AddNOC.
-        newNodeId (int): Node ID that we would like to server to used on the new fabric being
-            added.
+        existingNodeId (int): Node ID of the target where an AddNOC needs to be done for a new fabric.
+        newNodeId (int): Node ID to use for the target node on the new fabric.
 
     Return:
         bool: True if successful, False otherwise.
 
     '''
-
-    resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(60), timedRequestTimeoutMs=1000)
+    resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(60))
     if resp.errorCode is not generalCommissioning.Enums.CommissioningError.kOk:
         return False
 
@@ -141,20 +138,20 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
     chainForAddNOC = newFabricDevCtrl.IssueNOCChain(csrForAddNOC, newNodeId)
     if chainForAddNOC.rcacBytes is None or chainForAddNOC.icacBytes is None or chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None:
         # Expiring the failsafe timer in an attempt to clean up.
-        await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 
     await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.AddTrustedRootCertificate(chainForAddNOC.rcacBytes))
-    resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.AddNOC(chainForAddNOC.nocBytes, chainForAddNOC.icacBytes, chainForAddNOC.ipkBytes, newFabricDevCtrl.GetNodeId(), 0xFFF1))
+    resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.AddNOC(chainForAddNOC.nocBytes, chainForAddNOC.icacBytes, chainForAddNOC.ipkBytes, newFabricDevCtrl.nodeId, 0xFFF1))
     if resp.statusCode is not opCreds.Enums.OperationalCertStatus.kSuccess:
         # Expiring the failsafe timer in an attempt to clean up.
-        await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 
     resp = await newFabricDevCtrl.SendCommand(newNodeId, 0, generalCommissioning.Commands.CommissioningComplete())
     if resp.errorCode is not generalCommissioning.Enums.CommissioningError.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
-        await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 
     if not await _IsNodeInFabricList(newFabricDevCtrl, newNodeId):
@@ -179,20 +176,20 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
         bool: True if successful, False otherwise.
 
     """
-    resp = await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(600), timedRequestTimeoutMs=1000)
+    resp = await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(600))
     if resp.errorCode is not generalCommissioning.Enums.CommissioningError.kOk:
         return False
     csrForUpdateNOC = await devCtrl.SendCommand(
         existingNodeId, 0, opCreds.Commands.CSRRequest(CSRNonce=os.urandom(32), isForUpdateNOC=True))
     chainForUpdateNOC = devCtrl.IssueNOCChain(csrForUpdateNOC, newNodeId)
     if chainForUpdateNOC.rcacBytes is None or chainForUpdateNOC.icacBytes is None or chainForUpdateNOC.nocBytes is None or chainForUpdateNOC.ipkBytes is None:
-        await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 
     resp = await devCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.UpdateNOC(chainForUpdateNOC.nocBytes, chainForUpdateNOC.icacBytes))
     if resp.statusCode is not opCreds.Enums.OperationalCertStatus.kSuccess:
         # Expiring the failsafe timer in an attempt to clean up.
-        await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 
     # Forget our session since the peer deleted it
@@ -201,7 +198,7 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
     resp = await devCtrl.SendCommand(newNodeId, 0, generalCommissioning.Commands.CommissioningComplete())
     if resp.errorCode is not generalCommissioning.Enums.CommissioningError.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
-        await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 
     if not await _IsNodeInFabricList(devCtrl, newNodeId):

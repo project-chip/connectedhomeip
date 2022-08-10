@@ -139,6 +139,11 @@ public:
     void ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
 
     /**
+     * Tears down all active subscriptions.
+     */
+    void ShutdownAllSubscriptions();
+
+    /**
      * Expire active transactions and release related objects for the given fabric index.
      * This is used for releasing transactions that won't be closed when a fabric is removed.
      */

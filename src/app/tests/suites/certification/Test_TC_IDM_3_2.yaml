@@ -653,6 +653,7 @@ tests:
           one attribute on a given cluster and endpoint to null. +"
       verification: |
           Out of Scope for V1.0
+          https://github.com/project-chip/connectedhomeip/issues/8043
       disabled: true
 
     - label:
@@ -660,6 +661,7 @@ tests:
           value +"
       verification: |
           Out of Scope for V1.0
+          https://github.com/project-chip/connectedhomeip/issues/8043
       disabled: true
 
     - label:
@@ -667,6 +669,7 @@ tests:
           value +"
       verification: |
           Out of Scope for V1.0
+          https://github.com/project-chip/connectedhomeip/issues/8043
       disabled: true
 
     - label:
@@ -674,6 +677,7 @@ tests:
           one attribute and Set SuppressResponse to True. +"
       verification: |
           Out of Scope for V1.0
+          https://github.com/project-chip/connectedhomeip/issues/8043
       disabled: true
 
     - label:

@@ -418,9 +418,52 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
           To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
-          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
+          Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except identify cluster command if try to send any other command will get status as unsupported access.
 
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]" 1 0
+          [1659419722.669629][1915:1920] CHIP:DMG: WriteResponseMessage =
+          [1659419722.669657][1915:1920] CHIP:DMG: {
+          [1659419722.669687][1915:1920] CHIP:DMG:         AttributeStatusIBs =
+          [1659419722.669727][1915:1920] CHIP:DMG:         [
+          [1659419722.669758][1915:1920] CHIP:DMG:                 AttributeStatusIB =
+          [1659419722.669796][1915:1920] CHIP:DMG:                 {
+          [1659419722.669833][1915:1920] CHIP:DMG:                         AttributePathIB =
+          [1659419722.669871][1915:1920] CHIP:DMG:                         {
+          [1659419722.669912][1915:1920] CHIP:DMG:                                 Endpoint = 0x0,
+          [1659419722.669953][1915:1920] CHIP:DMG:                                 Cluster = 0x1f,
+          [1659419722.669993][1915:1920] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1659419722.670034][1915:1920] CHIP:DMG:                         }
+          [1659419722.670077][1915:1920] CHIP:DMG:
+          [1659419722.670114][1915:1920] CHIP:DMG:                         StatusIB =
+          [1659419722.670153][1915:1920] CHIP:DMG:                         {
+          [1659419722.670191][1915:1920] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1659419722.670229][1915:1920] CHIP:DMG:                         },
+          [1659419722.670266][1915:1920] CHIP:DMG:
+          [1659419722.670300][1915:1920] CHIP:DMG:                 },
+          [1659419722.670343][1915:1920] CHIP:DMG:
+          [1659419722.670373][1915:1920] CHIP:DMG:                 AttributeStatusIB =
+          [1659419722.670405][1915:1920] CHIP:DMG:                 {
+          [1659419722.670436][1915:1920] CHIP:DMG:                         AttributePathIB =
+          [1659419722.670471][1915:1920] CHIP:DMG:                         {
+          [1659419722.670510][1915:1920] CHIP:DMG:                                 Endpoint = 0x0,
+          [1659419722.670550][1915:1920] CHIP:DMG:                                 Cluster = 0x1f,
+          [1659419722.670590][1915:1920] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1659419722.670661][1915:1920] CHIP:DMG:                                 ListIndex = Null,
+          [1659419722.670700][1915:1920] CHIP:DMG:                         }
+          [1659419722.670740][1915:1920] CHIP:DMG:
+          [1659419722.670776][1915:1920] CHIP:DMG:                         StatusIB =
+          [1659419722.670813][1915:1920] CHIP:DMG:                         {
+          [1659419722.670851][1915:1920] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1659419722.670888][1915:1920] CHIP:DMG:                         },
+          [1659419722.670925][1915:1920] CHIP:DMG:
+          [1659419722.670958][1915:1920] CHIP:DMG:                 },
+          [1659419722.670994][1915:1920] CHIP:DMG:
+          [1659419722.671022][1915:1920] CHIP:DMG:         ],
+          [1659419722.671062][1915:1920] CHIP:DMG:
+          [1659419722.671092][1915:1920] CHIP:DMG:         InteractionModelRevision = 1
+          [1659419722.671120][1915:1920] CHIP:DMG: }
+          [1659419722.671244][1915:1920] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1659419722.671314][1915:1920] CHIP:EM: Sending Standalone Ack for MessageCounter:153124628 on
 
            ./chip-tool any read-event-by-id 0x28 0 1 0
 
@@ -456,7 +499,9 @@ tests:
           [1653054249.515090][12265:12270] CHIP:DMG:         InteractionModelRevision = 1
           [1653054249.515102][12265:12270] CHIP:DMG: }
 
-          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
+          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to  send below mentioned command to Grant access to all clusters again.
+
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode":2, "subjects":[112233], "targets":null}]" 1 0
       disabled: true
 
     - label:
@@ -466,7 +511,7 @@ tests:
       verification: |
           To Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
 
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]" 1 0
           ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
           On TH verify DUT sends Report Data Message with no entry for that event in EventReports list.
 

@@ -28,13 +28,18 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
           ./chip-tool booleanstate read state-value 1 1
 
-          Verify read command is received in DUT as client side log
+          Verify read command is received on TH(all-clusters-app) Log successfully
 
           [1658847009.838448][28392:28392] CHIP:IM: Received Read request
           [1658847009.838537][28392:28392] CHIP:DMG: ReadRequestMessage =
@@ -90,7 +95,7 @@ tests:
       verification: |
           ./chip-tool booleanstate read attribute-list 1 1
 
-          Verify none of the optional attributes of the server-side of the cluster is listed  in DUT as client side log
+          Verify none of the optional attributes of the server-side of the cluster is listed  on TH(all-clusters-app) Log
           [1654244313219] [91456:3997555] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_FFFB DataVersion: 2739318439
           [1654244313220] [91456:3997555] CHIP: [TOO]   AttributeList: 6 entries
           [1654244313220] [91456:3997555] CHIP: [TOO]     [1]: 0
@@ -102,7 +107,7 @@ tests:
 
            ./chip-tool booleanstate read state-value 1 1
 
-          Verify read command is received in DUT as client side log
+          Verify read command is received on TH (all-clusters-minimal-app) Log
 
           [1658847009.838448][28392:28392] CHIP:IM: Received Read request
           [1658847009.838537][28392:28392] CHIP:DMG: ReadRequestMessage =

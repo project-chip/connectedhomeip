@@ -27,6 +27,7 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
+#include <DeviceInfoProviderImpl.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -48,15 +49,17 @@
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
-namespace {
-#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
-#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-} // namespace
-
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::Credentials;
+
+namespace {
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
+DeviceLayer::DeviceInfoProviderImpl sExampleDeviceInfoProvider;
+} // namespace
 
 static const char * TAG = "lock-app";
 
@@ -96,9 +99,10 @@ extern "C" void app_main()
     chip::LaunchShell();
 #endif
 
-    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    DeviceLayer::SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
 
-    CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    CHIP_ERROR error              = deviceMgr.Init(&EchoCallbacks);
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));

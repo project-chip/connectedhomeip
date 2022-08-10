@@ -24,21 +24,24 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "Start bridge-app on TH. Commission TH to DUT. Monitor traffic between
           DUT and TH."
       verification: |
-          On TH server side:
           sudo ./chip-bridge-app
 
-          On DUT as client side:
           ./chip-tool pairing ethernet 1 20202021 3840 fe80::e65f:1ff:fe0f:2753  5540
 
           Verify DeviceTypeList for available EP
 
           ./chip-tool  descriptor read device-list 1 1
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002313.871608][3977:3982] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3021853414
           [1657002313.871680][3977:3982] CHIP:TOO:   device list: 1 entries
           [1657002313.871740][3977:3982] CHIP:TOO:     [1]: {
@@ -48,7 +51,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 3
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002329.438065][3983:3988] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2452512872
           [1657002329.438135][3983:3988] CHIP:TOO:   device list: 2 entries
           [1657002329.438193][3983:3988] CHIP:TOO:     [1]: {
@@ -63,7 +66,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 4
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002348.693948][3989:3994] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1398882309
           [1657002348.694013][3989:3994] CHIP:TOO:   device list: 2 entries
           [1657002348.694063][3989:3994] CHIP:TOO:     [1]: {
@@ -79,7 +82,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 5
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002369.589492][3996:4001] CHIP:TOO: Endpoint: 5 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 130458766
           [1657002369.589556][3996:4001] CHIP:TOO:   device list: 2 entries
           [1657002369.589610][3996:4001] CHIP:TOO:     [1]: {
@@ -95,7 +98,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 6
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002386.484093][4002:4007] CHIP:TOO: Endpoint: 6 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 295450100
           [1657002386.484155][4002:4007] CHIP:TOO:   device list: 1 entries
           [1657002386.484255][4002:4007] CHIP:TOO:     [1]: {
@@ -107,7 +110,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 7
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002413.721927][4015:4020] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2117104859
           [1657002413.721981][4015:4020] CHIP:TOO:   device list: 1 entries
           [1657002413.722028][4015:4020] CHIP:TOO:     [1]: {
@@ -119,7 +122,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 8
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002436.415904][4034:4039] CHIP:TOO: Endpoint: 8 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2026786918
           [1657002436.415972][4034:4039] CHIP:TOO:   device list: 1 entries
           [1657002436.416033][4034:4039] CHIP:TOO:     [1]: {
@@ -131,7 +134,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 9
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002455.445818][4040:4045] CHIP:TOO: Endpoint: 9 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 913116116
           [1657002455.445883][4040:4045] CHIP:TOO:   device list: 1 entries
           [1657002455.445944][4040:4045] CHIP:TOO:     [1]: {
@@ -143,7 +146,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 10
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002473.100910][4047:4052] CHIP:TOO: Endpoint: 10 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 259205426
           [1657002473.100967][4047:4052] CHIP:TOO:   device list: 2 entries
           [1657002473.101013][4047:4052] CHIP:TOO:     [1]: {
@@ -158,7 +161,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 11
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002495.856770][4061:4066] CHIP:TOO: Endpoint: 11 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 4248421677
           [1657002495.856836][4061:4066] CHIP:TOO:   device list: 2 entries
           [1657002495.856893][4061:4066] CHIP:TOO:     [1]: {
@@ -174,7 +177,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 12
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002515.862187][4073:4078] CHIP:TOO: Endpoint: 12 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2731599835
           [1657002515.862249][4073:4078] CHIP:TOO:   device list: 2 entries
           [1657002515.862302][4073:4078] CHIP:TOO:     [1]: {
@@ -190,7 +193,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 13
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002538.134605][4097:4102] CHIP:TOO: Endpoint: 13 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3449178249
           [1657002538.134700][4097:4102] CHIP:TOO:   device list: 2 entries
           [1657002538.134784][4097:4102] CHIP:TOO:     [1]: {
@@ -207,6 +210,8 @@ tests:
           Verify PartsList  for available EP
 
           ./chip-tool  descriptor read parts-list 1 0
+
+          Verify in TH(all-clusters-app) Log:
 
           [1657002201.045720][3893:3899] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3573910940
           [1657002201.045841][3893:3899] CHIP:TOO:   parts list: 12 entries
@@ -226,7 +231,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 3
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002843.395988][4135:4140] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2452512872
           [1657002843.396058][4135:4140] CHIP:TOO:   device list: 2 entries
           [1657002843.396112][4135:4140] CHIP:TOO:     [1]: {
@@ -240,7 +245,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 4
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002927.992247][4143:4148] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1398882309
           [1657002927.992309][4143:4148] CHIP:TOO:   device list: 2 entries
           [1657002927.992362][4143:4148] CHIP:TOO:     [1]: {
@@ -254,7 +259,7 @@ tests:
 
            ./chip-tool  descriptor read device-list 1 5
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002949.332151][4156:4161] CHIP:TOO: Endpoint: 5 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 130458766
           [1657002949.332245][4156:4161] CHIP:TOO:   device list: 2 entries
           [1657002949.332294][4156:4161] CHIP:TOO:     [1]: {
@@ -268,7 +273,7 @@ tests:
 
            ./chip-tool  descriptor read device-list 1 6
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002965.947096][4163:4168] CHIP:TOO: Endpoint: 6 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 295450100
           [1657002965.947150][4163:4168] CHIP:TOO:   device list: 1 entries
           [1657002965.947196][4163:4168] CHIP:TOO:     [1]: {
@@ -278,7 +283,7 @@ tests:
 
            ./chip-tool  descriptor read device-list 1 7
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657002981.963307][4176:4181] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2117104859
           [1657002981.963371][4176:4181] CHIP:TOO:   device list: 1 entries
           [1657002981.963429][4176:4181] CHIP:TOO:     [1]: {
@@ -288,7 +293,7 @@ tests:
 
            ./chip-tool  descriptor read device-list 1 8
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657003007.476575][4183:4188] CHIP:TOO: Endpoint: 8 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2026786918
           [1657003007.476635][4183:4188] CHIP:TOO:   device list: 1 entries
           [1657003007.476689][4183:4188] CHIP:TOO:     [1]: {
@@ -298,7 +303,7 @@ tests:
 
            ./chip-tool  descriptor read device-list 1 9
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657003023.263333][4191:4196] CHIP:TOO: Endpoint: 9 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 913116116
           [1657003023.263391][4191:4196] CHIP:TOO:   device list: 1 entries
           [1657003023.263443][4191:4196] CHIP:TOO:     [1]: {
@@ -308,7 +313,7 @@ tests:
 
            ./chip-tool  descriptor read device-list 1 10
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657003044.071972][4204:4209] CHIP:TOO: Endpoint: 10 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 259205426
           [1657003044.072037][4204:4209] CHIP:TOO:   device list: 2 entries
           [1657003044.072085][4204:4209] CHIP:TOO:     [1]: {
@@ -322,7 +327,7 @@ tests:
 
            ./chip-tool  descriptor read device-list 1 11
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657003082.358311][4217:4222] CHIP:TOO: Endpoint: 11 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 4248421677
           [1657003082.358379][4217:4222] CHIP:TOO:   device list: 2 entries
           [1657003082.358432][4217:4222] CHIP:TOO:     [1]: {
@@ -336,7 +341,7 @@ tests:
 
            ./chip-tool  descriptor read device-list 1 12
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657003103.954911][4248:4253] CHIP:TOO: Endpoint: 12 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2731599835
           [1657003103.954986][4248:4253] CHIP:TOO:   device list: 2 entries
           [1657003103.955050][4248:4253] CHIP:TOO:     [1]: {
@@ -350,7 +355,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 13
 
-          On DUT as client side:
+          Verify in TH(all-clusters-app) Log:
           [1657003125.905572][4261:4266] CHIP:TOO: Endpoint: 13 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3449178249
           [1657003125.905638][4261:4266] CHIP:TOO:   device list: 2 entries
           [1657003125.905687][4261:4266] CHIP:TOO:     [1]: {
@@ -368,13 +373,13 @@ tests:
           bridged On/Off lights (use key c in the console to bridge-app)"
       PICS: MCORE.DEVLIST.UseDeviceState
       verification: |
-          Verify in TH as server side
+          Verify on DUT(chip-tool) Log
           c
           [1659089560.774328][12236:12241] CHIP:DL: Device[Light 1b]: ON
           [1659089560.774681][12236:12236] CHIP:DMG: Endpoint 3, Cluster 0x0000_0006 update version to 83dcb371
 
 
-          Verify in DUT as client side
+          Verify on TH(all-clusters-app) Log:
           ./chip-tool onoff read on-off 1 3
 
           [1659089585.162599][8769:8774] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 2212279153
@@ -389,6 +394,8 @@ tests:
       verification: |
           Press a key "tbd" on bridge-app to change the simulated temperature
 
+          Verify on DUT(chip-tool) Log
+
           [1659351537.115828][14237:14242] CHIP:DL: TempSensorDevice[TempSensor 1]: New measurement=""200""
           [1659351537.115987][14237:14242] CHIP:DL: TempSensorDevice[TempSensor 2]: New measurement=""200""
           [1659351537.116097][14237:14242] CHIP:DL: TempSensorDevice[Composed TempSensor 1]: New measurement=""200""
@@ -398,6 +405,8 @@ tests:
           [1659351537.116179][14237:14242] CHIP:DL: TempSensorDevice[Composed TempSensor 2]: New measurement=""200""
           "
           "./chip-tool temperaturemeasurement read measured-value 1 4
+
+          Verify on TH(all-clusters-app) Log:
 
           expect to get a different value than step 7b
           [1659351542.393349][12212:12217] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0402 Attribute 0x0000_0000 DataVersion: 2406690153
@@ -411,6 +420,8 @@ tests:
       verification: |
           ./chip-tool onoff on 1 3
 
+          Verify on DUT(chip-tool) Log
+
           [1658501274.507714][14425:14425] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=3 p=o
           [1658501274.507760][14425:14425] CHIP:DMG: AccessControl: allowed
           [1658501274.507789][14425:14425] CHIP:DMG: Received command for Endpoint=3 Cluster=0x0000_0006 Command=0x0000_0001
@@ -420,6 +431,8 @@ tests:
 
 
           ./chip-tool onoff read on-off 1 3
+
+          Verify on TH(all-clusters-app) Log:
 
           [1658501339.773125][35583:35588] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3868039507
           [1658501339.773139][35583:35588] CHIP:TOO:   OnOff: TRUE
@@ -432,13 +445,19 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic  read node-label 1 3
 
+          Verify on TH(all-clusters-app) Log:
+
           [1659089932.160005][8810:8815] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 3178625724
           [1659089932.160111][8810:8815] CHIP:TOO:   NodeLabel: Light 1
+
+          Verify on DUT(chip-tool) Log
 
           "b
           [1659089470.077297][12236:12241] CHIP:DL: Device[Light 1]: New Name=""Light 1b""
 
           ./chip-tool bridgeddevicebasic  read node-label 1 3
+
+          Verify on TH(all-clusters-app) Log:
 
           [1659352004.560327][12241:12246] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 2321959095
           [1659352004.560365][12241:12246] CHIP:TOO:   NodeLabel: Light 1b
@@ -448,6 +467,8 @@ tests:
           "Use TH/bridge-app to add a bridged light (use key 2 in the console to
           bridge-app to add Light 2)"
       verification: |
+          Verify on DUT(chip-tool) Log
+
           2
           [1659352274.915018][14237:14242] CHIP:DMG: Endpoint 1, Cluster 0x0000_001D update version to 7e918bae
           [1659352274.915107][14237:14242] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to 7561f371
@@ -456,7 +477,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 0
 
-          Verify the endpoints listed in TH Log
+          Verify the endpoints listed in TH(all-clusters-app) Log
 
           [1659352284.821350][12264:12269] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1969353585
           [1659352284.821433][12264:12269] CHIP:TOO:   parts list: 13 entries
@@ -475,8 +496,8 @@ tests:
           [1659352284.821812][12264:12269] CHIP:TOO:     [13]: 14
 
           "
-
-          Verify the list contains 11 entries in TH Log
+          ./chip-tool  descriptor read parts-list 1 1
+          Verify the list contains 11 entries in TH(all-clusters-app) Log
 
           [1659352298.310126][12270:12275] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2123467694
           [1659352298.310213][12270:12275] CHIP:TOO:   parts list: 12 entries
@@ -496,11 +517,16 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 14
 
+          Verify on TH(all-clusters-app) Log
+
+
           [1659352316.442844][12276:12281] CHIP:TOO: Endpoint: 14 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3417142897
           [1659352316.442927][12276:12281] CHIP:TOO:   parts list: 0 entries
           [1659352316.443042][12276:12281] CHIP:EM: Sending Standalone Ack for MessageCounter:85433161 on exchange 30040i
 
           ./chip-tool  descriptor read device-list 1 14
+
+          Verify the list contains 11 entries in TH(all-clusters-app) Log
 
           [1659352346.719522][12283:12288] CHIP:TOO: Endpoint: 14 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3417142897
           [1659352346.719601][12283:12288] CHIP:TOO:   device list: 2 entries
@@ -521,6 +547,8 @@ tests:
       verification: |
           ./chip-tool  descriptor read parts-list 1 0
 
+          Verify on TH(all-clusters-app) Log:
+
           [1659352461.553715][12295:12300] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1969353586
           [1659352461.553848][12295:12300] CHIP:TOO:   parts list: 12 entries
           [1659352461.553882][12295:12300] CHIP:TOO:     [1]: 1
@@ -537,6 +565,8 @@ tests:
           [1659352461.554168][12295:12300] CHIP:TOO:     [12]: 14
 
           ./chip-tool  descriptor read parts-list 1 1
+
+          Verify on TH(all-clusters-app) Log:
 
           [1659352492.227696][12302:12307] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2123467695
           [1659352492.227770][12302:12307] CHIP:TOO:   parts list: 11 entries

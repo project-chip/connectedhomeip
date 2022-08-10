@@ -452,6 +452,26 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
     return true;
 }
 
+uint32_t OnOffServer::calculateNextWaitTimeMS(void)
+{
+    const chip::System::Clock::Timestamp currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
+    chip::System::Clock::Timestamp waitTime          = UPDATE_TIME_MS;
+    chip::System::Clock::Timestamp latency;
+
+    if (currentTime > nextDesiredOnWithTimedOffTimestamp)
+    {
+        latency = currentTime - nextDesiredOnWithTimedOffTimestamp;
+        if (latency >= UPDATE_TIME_MS)
+            waitTime = chip::System::Clock::Milliseconds32(1);
+        else
+            waitTime -= latency;
+    }
+
+    nextDesiredOnWithTimedOffTimestamp += UPDATE_TIME_MS;
+
+    return (uint32_t) waitTime.count();
+}
+
 bool OnOffServer::OnWithTimedOffCommand(const app::ConcreteCommandPath & commandPath,
                                         const Commands::OnWithTimedOff::DecodableType & commandData)
 {
@@ -503,7 +523,8 @@ bool OnOffServer::OnWithTimedOffCommand(const app::ConcreteCommandPath & command
 
     if (currentOnTime < MAX_TIME_VALUE && currentOffWaitTime < MAX_TIME_VALUE)
     {
-        emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
+        nextDesiredOnWithTimedOffTimestamp = chip::System::SystemClock().GetMonotonicTimestamp() + UPDATE_TIME_MS;
+        emberEventControlSetDelayMS(configureEventControl(endpoint), (uint32_t) UPDATE_TIME_MS.count());
     }
 
 exit:
@@ -526,7 +547,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
     if (isOn) // OnOff On case
     {
         // Restart Timer
-        emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
+        emberEventControlSetDelayMS(configureEventControl(endpoint), calculateNextWaitTimeMS());
 
         // Update onTime values
         uint16_t onTime = MIN_TIME_VALUE;
@@ -565,7 +586,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         if (offWaitTime > 0)
         {
             // Restart Timer
-            emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
+            emberEventControlSetDelayMS(configureEventControl(endpoint), calculateNextWaitTimeMS());
         }
         else
         {

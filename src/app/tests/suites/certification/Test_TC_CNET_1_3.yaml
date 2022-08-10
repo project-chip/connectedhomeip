@@ -35,7 +35,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read cluster-revision  1 0
 
-          Verify  ClusterRevision: 1 on the TH Log:
+          Verify  "ClusterRevision: 1" on the TH(Chip-tool)  Log:
 
           [1649244866.275684][30440:30446] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFD DataVersion: 2702518944
           [1649244866.277721][30440:30446] CHIP:TOO:   ClusterRevision: 1
@@ -46,7 +46,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read feature-map 1 0
 
-          Verify FeatureMap on the TH Log:
+          Verify "FeatureMap" on the TH(Chip-tool)  Log:
 
           [1651215443.195852][3285:3290] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 2584224280
           [1651215443.195939][3285:3290] CHIP:TOO:   FeatureMap: 4
@@ -56,7 +56,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read attribute-list 1 0
 
-          Verify AttributeList on the TH Log:
+          Verify "AttributeList" on the TH(Chip-tool)  Log:
 
           [1651215479.539148][3293:3298] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFB DataVersion: 2584224280
           [1651215479.539230][3293:3298] CHIP:TOO:   AttributeList: 13 entries
@@ -84,7 +84,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read accepted-command-list 1 0
 
-          Verify AcceptedCommandList on the TH Log:
+          Verify "AcceptedCommandList" on the TH(Chip-tool)  Log:
 
           [1653909914.972854][3424:3429] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFF9 DataVersion: 880539056
           [1653909914.973027][3424:3429] CHIP:TOO:   AcceptedCommandList: 5 entries
@@ -101,7 +101,7 @@ tests:
           ( WiFi) ./chip-tool networkcommissioning read generated-command-list 1 0
 
 
-          Verify GeneratedCommandList on the TH Log:
+          Verify "GeneratedCommandList" on the TH(Chip-tool)  Log:
 
           [1650370123.417759][42418:42423] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFF8 DataVersion: 3182776035
           [1650370123.417866][42418:42423] CHIP:TOO:   GeneratedCommandList: 3 entries
@@ -113,7 +113,7 @@ tests:
            ( Thread ) ./chip-tool networkcommissioning read generated-command-list 51 0
 
 
-          Verify GeneratedCommandList on the TH Log:
+          Verify "GeneratedCommandList" on the TH(Chip-tool)  Log:
 
           [1650370342.693373][7450:7455] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFF8 DataVersion: 1032683896
           [1650370342.693536][7450:7455] CHIP:TOO:   GeneratedCommandList: 2 entries

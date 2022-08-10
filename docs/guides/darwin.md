@@ -33,16 +33,18 @@ Note: These steps are supported on:
     interference with existing homes.
 -   To pair and control Matter Thread devices, you'll need to have a HomePod
     Mini or Apple TV 4K
+-   To pair to devices via BLE, you must either use the Matter Pairing API
+    documented
+    [here](https://developer.apple.com/documentation/homekit/hmmatterhome), or
+    enable [Developer mode](#enable-developer-mode-on-your-apple-device).
 
 ## Source Compatibility
 
 Each developer preview release is compatible with a certain SHA from this
 repository.
 
--   iOS/iPadOS/tvOS 15.6 Developer Preview:
-    [`cfc35951be66a664a6efdadea56d1b8ea6e63e96`](https://github.com/project-chip/connectedhomeip/commits/cfc35951be66a664a6efdadea56d1b8ea6e63e96)
 -   iOS/iPadOS/tvOS 16.0 Developer Preview:
-    [`cfc35951be66a664a6efdadea56d1b8ea6e63e96`](https://github.com/project-chip/connectedhomeip/commits/cfc35951be66a664a6efdadea56d1b8ea6e63e96)
+    [`aa9457e6b94b735076dff6297176183bf9780177`](https://github.com/project-chip/connectedhomeip/commits/aa9457e6b94b735076dff6297176183bf9780177)
 
 ## Profile Installation
 
@@ -97,8 +99,8 @@ To enable developer mode, please follow the instructions
 1. Clone the [Matter repo](https://github.com/project-chip/connectedhomeip.git)
 2. Checkout the specific commit hash (from [above](#source-compatibility)) for
    maximum compatibility with your installed release:
-    - Example command for SHA `cfc35951be66a664a6efdadea56d1b8ea6e63e96`:
-      `$ git checkout cfc35951be66a664a6efdadea56d1b8ea6e63e96`
+    - Example command for SHA `aa9457e6b94b735076dff6297176183bf9780177`:
+      `$ git checkout aa9457e6b94b735076dff6297176183bf9780177`
 
 In order to work with iOS/iPadOS/tvOS 15.6 or greater, device types as defined
 in the Matter Device Library spec are used to determine accessory categories.
@@ -203,6 +205,7 @@ requirements
 ##### Guides
 
 -   [Bouffalo Lab](/examples/lighting-app/bouffalolab/bl602/README.md)
+-   [CYW30739 Lighting](/examples/lighting-app/cyw30739/README.md)
 -   [EFR32 Window Covering](/examples/window-app/efr32/README.md)
 -   [ESP32 All Clusters](/examples/all-clusters-app/esp32/README.md)
 -   [ESP32 Lighting](/examples/lighting-app/esp32/README.md)

@@ -33,7 +33,7 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read cluster-revision 1 0
 
-          Verify cluster revision value is 1 in TH log:
+          Verify cluster revision value is 1 in TH(chip-tool) log:
 
           [1653911336.371533][3567:3572] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFFD DataVersion: 2944003194
           [1653911336.371751][3567:3572] CHIP:TOO:   ClusterRevision: 1
@@ -44,7 +44,7 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read feature-map 1 0
 
-          Verify featuremap value is 3 in TH log:
+          Verify featuremap value is 3 in TH(chip-tool) log:
 
           [1651786827.582555][240914:240920] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFFC DataVersion: 2811403040
           [1651786827.582608][240914:240920] CHIP:TOO:   FeatureMap: 3
@@ -54,7 +54,7 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read attribute-list 1 0
 
-          Verify  list of supported attributes in TH log:
+          Verify  list of supported attributes in TH(chip-tool) log:
 
           [1651786900.043572][240929:240934] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFFB DataVersion: 2811403040
           [1651786900.043655][240929:240934] CHIP:TOO:   AttributeList: 14 entries
@@ -78,7 +78,7 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read accepted-command-list 1 0
 
-          Verify list of Acccepted Command in TH log:
+          Verify list of Acccepted Command in TH(chip-tool) log:
 
           [1651786971.201258][240944:240949] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFF9 DataVersion: 2811403040
           [1651786971.201322][240944:240949] CHIP:TOO:   AcceptedCommandList: 1 entries
@@ -89,7 +89,7 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read generated-command-list 1 0
 
-          Verify list of Generated Command, this list SHALL have zero entry in TH log:
+          Verify list of Generated Command, this list SHALL have zero entry in TH(chip-tool) log:
 
           [1651787190.403639][240971:240976] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFF8 DataVersion: 2811403040
           [1651787190.403729][240971:240976] CHIP:TOO:   GeneratedCommandList: 0 entries

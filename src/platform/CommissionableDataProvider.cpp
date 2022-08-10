@@ -43,5 +43,5 @@ void SetCommissionableDataProvider(CommissionableDataProvider * provider)
     gCommissionableDataProvider = provider;
 }
 
-} // namespace Credentials
+} // namespace DeviceLayer
 } // namespace chip
