@@ -121,6 +121,7 @@ class MatterTestConfig:
     storage_path: pathlib.Path = None
     logs_path: pathlib.Path = None
     paa_trust_store_path: pathlib.Path = None
+    ble_interface_id: int = None
 
     admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
     global_test_params: dict = field(default_factory=dict)
@@ -130,6 +131,7 @@ class MatterTestConfig:
     commissioning_method: str = None
     discriminator: int = None
     setup_passcode: int = None
+    commissionee_ip_address_just_for_testing: str = None
 
     qr_code_content: str = None
     manual_code: str = None
@@ -158,7 +160,7 @@ class MatterStackState:
         self._fabric_admins = []
 
         if not hasattr(builtins, "chipStack"):
-            chip.native.Init()
+            chip.native.Init(bluetoothAdapter=config.ble_interface_id)
             if config.storage_path is None:
                 raise ValueError("Must have configured a MatterTestConfig.storage_path")
             self._init_stack(already_initialized=False, persistentStoragePath=config.storage_path)
@@ -468,6 +470,11 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
             print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread!")
             return False
         config.thread_operational_dataset = args.thread_dataset_hex
+    elif config.commissioning_method == "on-network-ip":
+        if args.ip_addr is None:
+            print("error: missing --ip-addr <IP_ADDRESS> for --commissioning-method on-network-ip")
+            return False
+        config.commissionee_ip_address_just_for_testing = args.ip_addr
 
     return True
 
@@ -482,6 +489,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.storage_path = pathlib.Path(_DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
     config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
+    config.ble_interface_id = args.ble_interface_id
 
     config.controller_node_id = args.controller_node_id
 
@@ -521,6 +529,8 @@ def parse_matter_test_args(argv: list[str]) -> MatterTestConfig:
     paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
     basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
                              help="PAA trust store path (default: %s)" % str(paa_path_default))
+    basic_group.add_argument('--ble-interface-id', action="store", type=int,
+                             metavar="INTERFACE_ID", help="ID of BLE adapter (from hciconfig)")
     basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
                              metavar='NODE_ID',
                              default=_DEFAULT_CONTROLLER_NODE_ID,
@@ -533,7 +543,7 @@ def parse_matter_test_args(argv: list[str]) -> MatterTestConfig:
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
                                   help='Name of commissioning method to use')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
@@ -541,6 +551,9 @@ def parse_matter_test_args(argv: list[str]) -> MatterTestConfig:
     commission_group.add_argument('-p', '--passcode', type=int_decimal_or_hex,
                                   metavar='PASSCODE',
                                   help='PAKE passcode to use')
+    commission_group.add_argument('-i', '--ip-addr', type=str,
+                                  metavar='RAW_IP_ADDRESS',
+                                  help='IP address to use (only for method "on-network-ip". ONLY FOR LOCAL TESTING!')
 
     commission_group.add_argument('--wifi-ssid', type=str,
                                   metavar='SSID',
@@ -634,6 +647,9 @@ class CommissionDeviceTest(MatterBaseTest):
             return dev_ctrl.CommissionWiFi(conf.discriminator, conf.setup_passcode, conf.dut_node_id, conf.wifi_ssid, conf.wifi_passphrase)
         elif conf.commissioning_method == "ble-thread":
             return dev_ctrl.CommissionThread(conf.discriminator, conf.setup_passcode, conf.dut_node_id, conf.thread_operational_dataset)
+        elif conf.commissioning_method == "on-network-ip":
+            logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
+            return dev_ctrl.CommissionIP(ipaddr=conf.commissionee_ip_address_just_for_testing, setupPinCode=conf.setup_passcode, nodeid=conf.dut_node_id)
         else:
             raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)
 
