@@ -23,6 +23,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
