@@ -1676,6 +1676,11 @@ PICS:
           QueryImageResponse Command?"
       id: OTAP.S.M.UserConsentNeeded
 
+    - label:
+          "Does the DUT support sending the DelayedActionTime field in
+          QueryImageResponse Command?"
+      id: OTAP.S.M.DelayedActionTime
+
     - label: "Does the DUT support sending the AnnounceOTAProvider Command?"
       id: OTAR.C.M.AnnounceOTAProvider
 
@@ -2393,6 +2398,11 @@ PICS:
           "Does the DUT support the Target Navigator server cluster
           NavigateTarget command?"
       id: TGTNAV.S.C00.Rsp
+
+    - label:
+          "Does the DUT support the Target Navigator client cluster,
+          NavigateTarget command?"
+      id: TGTNAV.C.C00.Tx
 
     - label:
           "Does the DUT support the Application Basic server cluster VendorName
@@ -3218,6 +3228,11 @@ PICS:
           Subtype in Commissionable Node Discovery through DNS-SD
           advertisements?"
       id: MCORE.DD.COMMISSIONING_SUBTYPE_T
+
+    - label:
+          "Does the commissioner support fetching DCL data from a device being
+          commissioned?"
+      id: MCORE.DD.FETCH_DCL
 
     #Ethernet Network Diagnostics Cluster
     - label: "Does the device implement the ResetCounts command?"
@@ -5074,6 +5089,9 @@ PICS:
           "Does device support Extended Discovery for Commissionable Node
           Discovery?"
       id: MCORE.SC.SED
+
+    - label: "Does the Controller DUT support Service Advertising?"
+      id: MCORE.SC.ADV
 
     - label: "Does the Controller DUT support Service Advertising?"
       id: MCORE.SC.ADV

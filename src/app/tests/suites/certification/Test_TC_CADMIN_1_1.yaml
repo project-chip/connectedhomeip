@@ -47,7 +47,7 @@ tests:
 
           ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3841
 
-          Controller:
+          On TH1(chip-tool) Log
 
           CHIP:IN: Sending encrypted msg 0xaaaad3464d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 5805157 msec
           [1635691999.946536][3822:3827] CHIP:DMG: ICR moving to [CommandSen]
@@ -58,7 +58,7 @@ tests:
           [1635691999.946895][3822:3827] CHIP:IN: Sending plaintext msg 0xffffaa58a960 with MessageCounter:1726016118 to 0x0000000000000000 at monotonic time: 5805158 msec
           [1635691999.946983][3822:3827] CHIP:EM: Flushed pending ack for MessageCounter:3234931243 on exchange 35324i
 
-          Device:
+          On DUT as server side
 
           CHIP minimal mDNS started advertising.
           [1635687658.683388][3792:3792] CHIP:DIS: Failed to find a valid admin pairing. Node ID unknown
@@ -399,6 +399,7 @@ tests:
           ./chip-tool pairing code 1  34995354639
 
           verify you got the following message in the TH log
+
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
           CHIP:TOO: Secure Pairing Failed
           CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
@@ -446,7 +447,7 @@ tests:
           ./chip-tool basic read node-label 2 0
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
-          [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te8
+          [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te5new
           [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
       disabled: true
 

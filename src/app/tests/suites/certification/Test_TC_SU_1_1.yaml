@@ -31,7 +31,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Requestor logs:
+          Verify on the OTA Requestor logs receives AnnounceOTAProvider:
 
           [1645743053311] [97809:20280821] CHIP: [SWU] OTA Requestor received AnnounceOTAProvider
           [1645743053311] [97809:20280821] CHIP: [SWU]   FabricIndex: 1

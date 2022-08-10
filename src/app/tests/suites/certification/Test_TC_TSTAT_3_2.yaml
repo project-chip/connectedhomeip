@@ -30,11 +30,13 @@ tests:
           reasonable positive value that is supported by the DUT."
       PICS: TSTAT.C.C00.Tx
       verification: |
-          verify on Reference app receives the right Read Request Message for the data sent in the below commands
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool thermostat setpoint-raise-lower 0 10 1 1
 
-          Verify in DUT as client side:Verify that Test Harness(Thermostat app) receives the SetpointRaiseLower command from the DUT
+
+          verify On TH(all-clusters-app) receives the right invoke Request Message for the data sent in the above command
+
 
           [1646064221.719107][33190:33190] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:4540287 on exchange 31012r
           [1646064221.719148][33190:33190] CHIP:EM: Handling via exchange: 31012r, Delegate: 0xaaaace1730c8
@@ -74,9 +76,12 @@ tests:
           reasonable negative value that is supported by the DUT."
       PICS: TSTAT.C.C00.Tx
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool thermostat setpoint-raise-lower 0 -10 1 1
 
-          Verify in DUT as client side: verify that, Test Harness(thermostat-app) receives the SetpointRaiseLower command from the DUT
+          verify On TH(all-clusters-app) receives the right invoke Request Message for the data sent in the above command
+
 
           [1646064525.675075][33190:33190] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:16717414 on exchange 9698r
           [1646064525.675116][33190:33190] CHIP:EM: Handling via exchange: 9698r, Delegate: 0xaaaace1730c8

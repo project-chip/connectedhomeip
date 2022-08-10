@@ -34,39 +34,28 @@ tests:
       verification: |
           ./chip-tool windowcovering up-or-open 1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify the " DUT responds with request response" on TH(all-clusters-app):
 
-          [1657103322.822782][4661:4666] CHIP:DMG: InvokeResponseMessage =
-          [1657103322.822822][4661:4666] CHIP:DMG: {
-          [1657103322.822862][4661:4666] CHIP:DMG:         suppressResponse = false,
-          [1657103322.822911][4661:4666] CHIP:DMG:         InvokeResponseIBs =
-          [1657103322.822962][4661:4666] CHIP:DMG:         [
-          [1657103322.823002][4661:4666] CHIP:DMG:                 InvokeResponseIB =
-          [1657103322.823054][4661:4666] CHIP:DMG:                 {
-          [1657103322.823097][4661:4666] CHIP:DMG:                         CommandStatusIB =
-          [1657103322.823147][4661:4666] CHIP:DMG:                         {
-          [1657103322.823200][4661:4666] CHIP:DMG:                                 CommandPathIB =
-          [1657103322.823256][4661:4666] CHIP:DMG:                                 {
-          [1657103322.823313][4661:4666] CHIP:DMG:                                         EndpointId = 0x1,
-          [1657103322.823370][4661:4666] CHIP:DMG:                                         ClusterId = 0x102,
-          [1657103322.823426][4661:4666] CHIP:DMG:                                         CommandId = 0x0,
-          [1657103322.823479][4661:4666] CHIP:DMG:                                 },
-          [1657103322.823537][4661:4666] CHIP:DMG:
-          [1657103322.823585][4661:4666] CHIP:DMG:                                 StatusIB =
-          [1657103322.823644][4661:4666] CHIP:DMG:                                 {
-          [1657103322.823684][4661:4666] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657103322.823724][4661:4666] CHIP:DMG:                                 },
-          [1657103322.823821][4661:4666] CHIP:DMG:
-          [1657103322.823860][4661:4666] CHIP:DMG:                         },
-          [1657103322.823902][4661:4666] CHIP:DMG:
-          [1657103322.823933][4661:4666] CHIP:DMG:                 },
-          [1657103322.823970][4661:4666] CHIP:DMG:
-          [1657103322.823999][4661:4666] CHIP:DMG:         ],
-          [1657103322.824035][4661:4666] CHIP:DMG:
-          [1657103322.824064][4661:4666] CHIP:DMG:         InteractionModelRevision = 1
-          [1657103322.824093][4661:4666] CHIP:DMG: },
-          [1657103322.824161][4661:4666] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0102 Command=0x0000_0000 Status=0x0
-          [1657103322.824210][4661:4666] CHIP:DMG: ICR moving to [AwaitingDe]
+          1659945239.794637][2742:2742] CHIP:DMG: InvokeRequestMessage =
+          [1659945239.794680][2742:2742] CHIP:DMG: {
+          [1659945239.794718][2742:2742] CHIP:DMG:         suppressResponse = false,
+          [1659945239.794762][2742:2742] CHIP:DMG:         timedRequest = false,
+          [1659945239.794801][2742:2742] CHIP:DMG:         InvokeRequests =
+          [1659945239.794851][2742:2742] CHIP:DMG:         [
+          [1659945239.794891][2742:2742] CHIP:DMG:                 CommandDataIB =
+          [1659945239.794936][2742:2742] CHIP:DMG:                 {
+          [1659945239.794997][2742:2742] CHIP:DMG:                         CommandPathIB =
+          [1659945239.795055][2742:2742] CHIP:DMG:                         {
+          [1659945239.795112][2742:2742] CHIP:DMG:                                 EndpointId = 0x1,
+          [1659945239.795177][2742:2742] CHIP:DMG:                                 ClusterId = 0x102,
+          [1659945239.795239][2742:2742] CHIP:DMG:                                 CommandId = 0x0,
+          [1659945239.795297][2742:2742] CHIP:DMG:                         },
+          [1659945239.795353][2742:2742] CHIP:DMG:
+          [1659945239.795403][2742:2742] CHIP:DMG:                         CommandFields =
+          [1659945239.795451][2742:2742] CHIP:DMG:                         {
+          [1659945239.795500][2742:2742] CHIP:DMG:                         },
+          [1659945239.795547][2742:2742] CHIP:DMG:                 },
+          [1659945239.795594][2742:2742] CHIP:DMG:
       disabled: true
 
     - label: "Check DownOrClose command"
@@ -80,43 +69,35 @@ tests:
           ./chip-tool windowcovering down-or-close 1 1
 
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify the " DUT responds with request response" on TH(all-clusters-app):
 
-          [1657103347.810523][4668:4673] CHIP:DMG: InvokeResponseMessage =
-          [1657103347.810548][4668:4673] CHIP:DMG: {
-          [1657103347.810572][4668:4673] CHIP:DMG:         suppressResponse = false,
-          [1657103347.810597][4668:4673] CHIP:DMG:         InvokeResponseIBs =
-          [1657103347.810628][4668:4673] CHIP:DMG:         [
-          [1657103347.810653][4668:4673] CHIP:DMG:                 InvokeResponseIB =
-          [1657103347.810685][4668:4673] CHIP:DMG:                 {
-          [1657103347.810711][4668:4673] CHIP:DMG:                         CommandStatusIB =
-          [1657103347.810744][4668:4673] CHIP:DMG:                         {
-          [1657103347.810776][4668:4673] CHIP:DMG:                                 CommandPathIB =
-          [1657103347.810816][4668:4673] CHIP:DMG:                                 {
-          [1657103347.810855][4668:4673] CHIP:DMG:                                         EndpointId = 0x1,
-          [1657103347.810895][4668:4673] CHIP:DMG:                                         ClusterId = 0x102,
-          [1657103347.810933][4668:4673] CHIP:DMG:                                         CommandId = 0x1,
-          [1657103347.810969][4668:4673] CHIP:DMG:                                 },
-          [1657103347.811011][4668:4673] CHIP:DMG:
-          [1657103347.811041][4668:4673] CHIP:DMG:                                 StatusIB =
-          [1657103347.811078][4668:4673] CHIP:DMG:                                 {
-          [1657103347.811112][4668:4673] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657103347.811149][4668:4673] CHIP:DMG:                                 },
-          [1657103347.811183][4668:4673] CHIP:DMG:
-          [1657103347.811212][4668:4673] CHIP:DMG:                         },
-          [1657103347.811245][4668:4673] CHIP:DMG:
-          [1657103347.811271][4668:4673] CHIP:DMG:                 },
-          [1657103347.811300][4668:4673] CHIP:DMG:
-          [1657103347.811324][4668:4673] CHIP:DMG:         ],
-          [1657103347.811353][4668:4673] CHIP:DMG:
-          [1657103347.811378][4668:4673] CHIP:DMG:         InteractionModelRevision = 1
-          [1657103347.811401][4668:4673] CHIP:DMG: },
-          [1657103347.811461][4668:4673] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0102 Command=0x0000_0001 Status=0x0
-          [1657103347.811504][4668:4673] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1659945343.976313][2742:2742] CHIP:DMG: InvokeRequestMessage =
+          [1659945343.976344][2742:2742] CHIP:DMG: {
+          [1659945343.976367][2742:2742] CHIP:DMG:         suppressResponse = false,
+          [1659945343.976399][2742:2742] CHIP:DMG:         timedRequest = false,
+          [1659945343.976424][2742:2742] CHIP:DMG:         InvokeRequests =
+          [1659945343.976454][2742:2742] CHIP:DMG:         [
+          [1659945343.976479][2742:2742] CHIP:DMG:                 CommandDataIB =
+          [1659945343.976510][2742:2742] CHIP:DMG:                 {
+          [1659945343.976539][2742:2742] CHIP:DMG:                         CommandPathIB =
+          [1659945343.976571][2742:2742] CHIP:DMG:                         {
+          [1659945343.976605][2742:2742] CHIP:DMG:                                 EndpointId = 0x1,
+          [1659945343.976639][2742:2742] CHIP:DMG:                                 ClusterId = 0x102,
+          [1659945343.976672][2742:2742] CHIP:DMG:                                 CommandId = 0x1,
+          [1659945343.976701][2742:2742] CHIP:DMG:                         },
+          [1659945343.976734][2742:2742] CHIP:DMG:
+          [1659945343.976764][2742:2742] CHIP:DMG:                         CommandFields =
+          [1659945343.976792][2742:2742] CHIP:DMG:                         {
+          [1659945343.976823][2742:2742] CHIP:DMG:                         },
+          [1659945343.976852][2742:2742] CHIP:DMG:                 },
+          [1659945343.976882][2742:2742] CHIP:DMG:
+          [1659945343.976906][2742:2742] CHIP:DMG:         ],
+          [1659945343.976936][2742:2742] CHIP:DMG:
+          [1659945343.976960][2742:2742] CHIP:DMG:         InteractionModelRevision = 1
+          [1659945343.976984][2742:2742] CHIP:DMG: },
       disabled: true
 
     - label: "Check StopMotion command"
-      PICS: ""
       verification: |
           verification step to be updated.
       disabled: true
@@ -127,7 +108,7 @@ tests:
           ./chip-tool windowcovering stop-motion 1 1
 
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify the " DUT responds with status as SUCCESS" on TH(all-clusters-app):
 
           [1657103367.961698][4676:4681] CHIP:DMG: InvokeResponseMessage =
           [1657103367.961722][4676:4681] CHIP:DMG: {

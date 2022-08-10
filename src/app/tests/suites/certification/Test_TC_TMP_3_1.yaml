@@ -32,9 +32,11 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool temperaturemeasurement read measured-value 1 1
 
-          on TH(all-cluster-app) verify the ReadRequestMessage
+          Verify DUT receives measured-value attribute response on the TH(all-clusters-app) Log:
 
           1650880412.037722][15013:15013] CHIP:DMG: ReadRequestMessage =
           [1650880412.037749][15013:15013] CHIP:DMG: {
@@ -57,7 +59,7 @@ tests:
 
           ./chip-tool temperaturemeasurement read max-measured-value 1 1
 
-          on TH(all-cluster-app) verify the ReadRequestMessage
+          Verify DUT receives max-measured-value  attribute response on the TH(all-clusters-app) Log:
 
           [1650880462.518114][15013:15013] CHIP:DMG: ReadRequestMessage =
           [1650880462.518149][15013:15013] CHIP:DMG: {
@@ -79,7 +81,7 @@ tests:
 
           ./chip-tool temperaturemeasurement read min-measured-value 1 1
 
-          on TH(all-cluster-app) verify the ReadRequestMessage
+          Verify DUT receives min-measured-value  attribute response on the TH(all-clusters-app) Log:
 
           [1650880507.409653][15013:15013] CHIP:DMG: ReadRequestMessage =
           [1650880507.409703][15013:15013] CHIP:DMG: {
@@ -103,11 +105,11 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          On Reference app  verify TH receives the read command and knows this attribute for this cluster and provides a plausable value
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool temperaturemeasurement read tolerance  1 1
 
-          on TH(all-cluster-app) verify the ReadRequestMessage
+          Verify DUT receives  tolerance attribute response on the TH(all-clusters-app) Log:
 
           [1658141616.808771][13946:13946] CHIP:IM: Received Read request
           [1658141616.808855][13946:13946] CHIP:DMG: ReadRequestMessage =
@@ -150,10 +152,11 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
           To verify all below steps use all-clusters-minimal-app
 
            ./chip-tool temperaturemeasurement read measured-value 1 1
-          on TH(all-clusters-minimal-app) verify the ReadRequestMessage
+          Verify DUT receives measured-value attribute response on the TH(all-clusters-minimal-app) Log:
           1650880412.037722][15013:15013] CHIP:DMG: ReadRequestMessage =
           [1650880412.037749][15013:15013] CHIP:DMG: {
           [1650880412.037772][15013:15013] CHIP:DMG:         AttributePathIBs =
@@ -174,7 +177,7 @@ tests:
 
 
           ./chip-tool temperaturemeasurement read max-measured-value 1 1
-          on TH(all-clusters-minimal-app) verify the ReadRequestMessage
+          Verify DUT receives max-measured-value attribute response on the TH(all-clusters-minimal-app) Log:
           [1650880462.518114][15013:15013] CHIP:DMG: ReadRequestMessage =
           [1650880462.518149][15013:15013] CHIP:DMG: {
           [1650880462.518176][15013:15013] CHIP:DMG:         AttributePathIBs =
@@ -194,7 +197,7 @@ tests:
 
 
           ./chip-tool temperaturemeasurement read min-measured-value 1 1
-          on TH(all-clusters-minimal-app) verify the ReadRequestMessage
+          Verify DUT receives min-measured-value attribute response on the TH(all-clusters-minimal-app) Log:
           [1650880507.409653][15013:15013] CHIP:DMG: ReadRequestMessage =
           [1650880507.409703][15013:15013] CHIP:DMG: {
           [1650880507.409727][15013:15013] CHIP:DMG:         AttributePathIBs =
@@ -217,9 +220,11 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          ./chip-tool temperaturemeasurement read tolerance 1 1
+          .Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          On DUT as a client side, verify that TH all-clusters-minimal-app sent  UNSUPPORTED_ATTRIBUTE response
+          /chip-tool temperaturemeasurement read tolerance 1 1
+
+          Verify DUT receives tolerence attribute response on the TH(all-clusters-minimal-app) Log:
            General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 

@@ -36,7 +36,7 @@ tests:
           ./chip-tool pressuremeasurement read measured-value 1 1
 
 
-          On TH, verify that DUT  responds value  read is successful and note down the value read
+           verify MeasuredValue on TH(chip-tool) logs:
 
           CHIP:TOO:   MeasuredValue: 0
       disabled: true
@@ -54,5 +54,7 @@ tests:
       verification: |
           ./chip-tool pressuremeasurement read measured-value 1 1
 
-          DUT action missing [cant verify using Raspi]
+           verify MeasuredValue on TH(chip-tool) logs:
+
+          CHIP:TOO:   MeasuredValue: 1
       disabled: true

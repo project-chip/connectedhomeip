@@ -30,7 +30,7 @@ tests:
           "DUT is instructed to start advertising its presence as a commissioner
           in the network"
       verification: |
-          verification step to be updated.
+          To verify this test case use TV Reference app
       disabled: true
 
     - label: "Check DNS-SD subtypes used by DUT"
@@ -38,24 +38,21 @@ tests:
           MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.VP_KEY && MCORE.SC.DT_KEY &&
           MCORE.SC.DN_KEY
       verification: |
-          avahi-publish-service --subtype=_V123._sub._matterd._udp DD200C20D25AE5F7 _matterd._udp 33333 VP=123+456 DT=35 DN="Living Room TV"
+          Execute the following command on the TH and verify the AAA records:
 
-          Verify on the TH Log:
+          ubuntu@ubuntu:~$
+          avahi-browse -rt _matterd._udp
 
-          ubuntu@ubuntu:~$ avahi-browse _matterd._udp -r
+          ++   eth0 IPv6 8BA9B3B40B98E9BB                              _matterd._udp        local
+          =   eth0 IPv6 8BA9B3B40B98E9BB                              _matterd._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::e65f:1ff:fe49:ae29]
+             port = [5650]
+             txt = ["T=1" "SAI=300" "SII=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
 
-          +   eth0 IPv6 DD200C20D25AE5F7                              _matterd._udp        local
-          +   eth0 IPv4 DD200C20D25AE5F7                              _matterd._udp        local
-          =   eth0 IPv6 DD200C20D25AE5F7                              _matterd._udp        local
-             hostname = [ubuntu-4.local]
-             address = [fd00::9e]
-             port = [33333]
-             txt = ["DN=Living Room TV" "DT=35" "VP=123+456"]
-          =   eth0 IPv4 DD200C20D25AE5F7                              _matterd._udp        local
-             hostname = [ubuntu-4.local]
-             address = [192.168.1.47]
-             port = [33333]
-             txt = ["DN=Living Room TV" "DT=35" "VP=123+456"]
+
+
+
 
 
 
