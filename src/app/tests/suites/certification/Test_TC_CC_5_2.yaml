@@ -97,8 +97,8 @@ tests:
       attribute: "CurrentX"
       response:
           constraints:
-              minValue: 31885
-              maxValue: 32115
+              minValue: 31500
+              maxValue: 32500
 
     - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
@@ -106,8 +106,8 @@ tests:
       attribute: "CurrentY"
       response:
           constraints:
-              minValue: 26885
-              maxValue: 27115
+              minValue: 26500
+              maxValue: 27500
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -123,8 +123,8 @@ tests:
       attribute: "CurrentX"
       response:
           constraints:
-              minValue: 30885
-              maxValue: 31115
+              minValue: 30500
+              maxValue: 31500
 
     - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
@@ -132,8 +132,8 @@ tests:
       attribute: "CurrentY"
       response:
           constraints:
-              minValue: 27885
-              maxValue: 28115
+              minValue: 27500
+              maxValue: 28500
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -150,8 +150,8 @@ tests:
       response:
           saveAs: CurrentXValue
           constraints:
-              minValue: 30000
-              maxValue: 30115
+              minValue: 29500
+              maxValue: 30500
 
     - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
@@ -160,8 +160,8 @@ tests:
       response:
           saveAs: CurrentYValue
           constraints:
-              minValue: 28885
-              maxValue: 29115
+              minValue: 28500
+              maxValue: 29500
 
     - label: "TH sends StopMoveStep command to DUT"
       PICS: CC.S.F03 && CC.S.C47.Rsp

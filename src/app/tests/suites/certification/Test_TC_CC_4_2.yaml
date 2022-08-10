@@ -154,7 +154,7 @@ tests:
                 value: 100
 
     - label:
-          "TH sends MoveSaturation command to DUT with MoveMode=0x03 (up) and
+          "TH sends MoveSaturation command to DUT with MoveMode=0x03 (down) and
           Rate=5 (units/s)"
       command: "MoveSaturation"
       PICS: CC.S.F00 && CC.S.C04.Rsp
@@ -200,8 +200,8 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: 17
-              maxValue: 23
+              minValue: 5
+              maxValue: 35
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -300,8 +300,8 @@ tests:
       response:
           saveAs: CurrentSaturationValueStep4e
           constraints:
-              minValue: 190
-              maxValue: 200
+              minValue: 170
+              maxValue: 230
 
     - label: "Wait 2s"
       cluster: "DelayCommands"
