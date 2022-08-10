@@ -42,10 +42,22 @@
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+#include <platform/ESP32/ESP32DeviceInfoProvider.h>
+#else
+#include <DeviceInfoProviderImpl.h>
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+
 namespace {
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+chip::DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
+#else
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 } // namespace
 
 const char * TAG = "bridge-app";
@@ -409,6 +421,8 @@ extern "C" void app_main()
     gLight2.SetChangeCallback(&HandleDeviceStatusChanged);
     gLight3.SetChangeCallback(&HandleDeviceStatusChanged);
     gLight4.SetChangeCallback(&HandleDeviceStatusChanged);
+
+    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 

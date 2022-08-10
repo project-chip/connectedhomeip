@@ -100,9 +100,9 @@ DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
 #if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
-chip::DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
+DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
 #else
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 } // namespace
@@ -148,7 +148,7 @@ extern "C" void app_main()
     ThreadStackMgr().InitThreadStack();
 #endif
 
-    DeviceLayer::SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
+    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
     CHIP_ERROR error              = deviceMgr.Init(&EchoCallbacks);
