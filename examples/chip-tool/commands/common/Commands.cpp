@@ -350,6 +350,11 @@ void Commands::ShowCommand(std::string executable, std::string clusterName, Comm
     }
     fprintf(stderr, "  %s %s %s\n", executable.c_str(), clusterName.c_str(), arguments.c_str());
 
+    if (command->GetHelpText())
+    {
+        fprintf(stderr, "\n%s\n", command->GetHelpText());
+    }
+
     if (description.size() > 0)
     {
         fprintf(stderr, "%s\n", description.c_str());

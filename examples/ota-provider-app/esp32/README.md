@@ -2,19 +2,18 @@
 
 A prototype application that demonstrates OTA provider capabilities.
 
-Refer to
-[setup ESP-IDF and CHIP Environment](#setup-esp-idf-and-chip-environment) guide
-to get started.
+Please
+[setup ESP-IDF and CHIP Environment](../../../docs/guides/esp32/setup_idf_chip.md)
 
 ---
 
--   [Build, Flash, Monitor, and Commissioning](#build-flash-monitor-and-commissioning)
+-   [Building and Commissioning](#building-and-commissioning)
 -   [Access control list requirements](#access-control-list-requirements)
 -   [Set delayed action time (Optional)](#set-delayed-action-time-optional)
 
 ---
 
-### Build, Flash, Monitor, and Commissioning
+### Building and Commissioning
 
 Generate the OTA image as described
 [here](../../../docs/guides/esp32/ota.md#generate-chip-ota-image)

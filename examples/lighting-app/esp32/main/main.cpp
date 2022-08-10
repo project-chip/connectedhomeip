@@ -28,6 +28,7 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
+#include <DeviceInfoProviderImpl.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -48,8 +49,10 @@ static AppDeviceCallbacks EchoCallbacks;
 
 namespace {
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
+DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
+DeviceLayer::DeviceInfoProviderImpl sExampleDeviceInfoProvider;
 } // namespace
 
 static void InitServer(intptr_t context)
@@ -77,9 +80,11 @@ extern "C" void app_main()
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
 #endif
-    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
-    CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
+    DeviceLayer::SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
+
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    CHIP_ERROR error              = deviceMgr.Init(&EchoCallbacks);
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
