@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <lib/support/Span.h>
+
 namespace chip {
 namespace TestCerts {
 
