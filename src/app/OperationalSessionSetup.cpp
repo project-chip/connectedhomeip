@@ -463,13 +463,16 @@ void OperationalSessionSetup::PerformLookupOnExistingSession()
         // freshly created and we are expecting there to be an already established session
         // that needs to have LookupPeerAddress.
         isConnected = AttachToExistingSecureSession();
-        if (isConnected)
+        if (!isConnected)
         {
-            mPerformingLookupOnConnectedSession = true;
-            MoveToState(State::SecureConnected);
-            LookupPeerAddress();
+            ChipLogError(Controller, "PerformLookupOnExistingSession on non-existent session");
+            DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
             return;
         }
+        mPerformingLookupOnConnectedSession = true;
+        MoveToState(State::SecureConnected);
+        LookupPeerAddress();
+        return;
     }
 
     ChipLogDetail(Controller, "Request to lookup address again ignored, session establishment in progress");
