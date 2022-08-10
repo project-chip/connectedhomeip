@@ -16,14 +16,14 @@
  */
 #pragma once
 
-#include <lib/core/DataModelTypes.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/GroupId.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 #include <stdarg.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 namespace chip {
