@@ -2696,6 +2696,20 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
     ctx.CreateSessionBobToAlice();
 }
 
+namespace {
+
+void CheckForInvalidAction(nlTestSuite * apSuite, Test::MessageCapturer & messageLog)
+{
+    NL_TEST_ASSERT(apSuite, messageLog.MessageCount() == 1);
+    NL_TEST_ASSERT(apSuite, messageLog.IsMessageType(0, Protocols::InteractionModel::MsgType::StatusResponse));
+    CHIP_ERROR status;
+    NL_TEST_ASSERT(apSuite,
+                   StatusResponse::ProcessStatusResponse(std::move(messageLog.MessagePayload(0)), status) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, status == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+}
+
+} // anonymous namespace
+
 // Read Client sends the read request, Read Handler drops the response, then test injects unknown status reponse message for Read
 // Client.
 void TestReadInteraction::TestReadClientReceiveInvalidMessage(nlTestSuite * apSuite, void * apContext)
@@ -2750,6 +2764,9 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage(nlTestSuite * apSu
         payloadHeader.SetExchangeID(0);
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
+        Test::MessageCapturer messageLog(ctx);
+        messageLog.mCaptureStandaloneAcks = false;
+
         rm->ClearRetransTable(readClient.mExchange.Get());
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
@@ -2760,12 +2777,12 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage(nlTestSuite * apSu
         readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
         ctx.DrainAndServiceIO();
 
-        // TODO: Need to validate what status is being sent to the ReadHandler
         // The ReadHandler closed its exchange when it sent the Report Data (which we dropped).
         // Since we synthesized the StatusResponse to the ReadClient, instead of sending it from the ReadHandler,
         // the only messages here are the ReadClient's StatusResponse to the unexpected message and an MRP ack.
-        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
         NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_IM_GLOBAL_STATUS(Busy));
+
+        CheckForInvalidAction(apSuite, messageLog);
     }
 
     engine->Shutdown();
