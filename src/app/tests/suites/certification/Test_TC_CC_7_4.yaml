@@ -118,8 +118,8 @@ tests:
       response:
           constraints:
               type: int16u
-              minValue: 17700
-              maxValue: 18300
+              minValue: 17000
+              maxValue: 19000
 
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F01 && CC.S.A0001
@@ -146,7 +146,7 @@ tests:
           constraints:
               type: int16u
               minValue: 16000
-              maxValue: 16300
+              maxValue: 17000
 
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F01 && CC.S.A0001

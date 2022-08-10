@@ -113,8 +113,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 38
-              maxValue: 52
+              minValue: 35
+              maxValue: 55
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -147,8 +147,8 @@ tests:
       response:
           saveAs: CurrentHueValueStep2f
           constraints:
-              minValue: 81
-              maxValue: 95
+              minValue: 80
+              maxValue: 110
 
     - label: "Wait 2s"
       cluster: "DelayCommands"
@@ -221,8 +221,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 8
-              maxValue: 12
+              minValue: 5
+              maxValue: 15
 
     - label: "Wait 10s"
       cluster: "DelayCommands"

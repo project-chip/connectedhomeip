@@ -102,8 +102,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 7700
-              maxValue: 8300
+              minValue: 7000
+              maxValue: 9000
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -119,8 +119,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 9700
-              maxValue: 10300
+              minValue: 9000
+              maxValue: 11000
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -136,7 +136,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 11500
+              minValue: 11000
               maxValue: 12000
 
     - label: "Wait 5s"

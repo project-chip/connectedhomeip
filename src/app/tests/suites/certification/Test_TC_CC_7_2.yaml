@@ -277,7 +277,7 @@ tests:
       response:
           constraints:
               minValue: 10000
-              maxValue: 10250
+              maxValue: 12000
 
     - label: "Wait 2s"
       cluster: "DelayCommands"
