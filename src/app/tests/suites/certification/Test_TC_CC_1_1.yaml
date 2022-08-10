@@ -12,10 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 27.1.1. [TC-CC-1.1] Global attributes with server as DUT
-
-PICS:
-    - CC.S
+name: 25.1.1. [TC-CC-1.1] Global attributes with server as DUT
 
 config:
     nodeId: 0x12344321
@@ -57,13 +54,363 @@ tests:
               type: list
               contains: [8, 15, 16385, 16394, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Read the global attribute: AcceptedCommandList"
+    - label: "Read the optional attribute(CurrentHue) in AttributeList"
+      PICS: CC.S.A0000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "Read the optional attribute(CurrentSaturation) in AttributeList"
+      PICS: CC.S.A0001
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label: "Read the optional attribute(RemainingTime) in AttributeList"
+      PICS: CC.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label: "Read the optional attribute(CurrentX) in AttributeList"
+      PICS: CC.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label: "Read the optional attribute(CurrentY) in AttributeList"
+      PICS: CC.S.A0004
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
+
+    - label: "Read the optional attribute(DriftCompensation) in AttributeList"
+      PICS: CC.S.A0005
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
+
+    - label: "Read the optional attribute(CompensationText) in AttributeList"
+      PICS: CC.S.A0006
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [6]
+
+    - label:
+          "Read the optional attribute(ColorTemperatureMireds) in AttributeList"
+      PICS: CC.S.A0007
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [7]
+
+    - label: "Read the optional attribute(EnhancedCurrentHue) in AttributeList"
+      PICS: CC.S.A4000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16384]
+
+    - label: "Read the optional attribute(ColorLoopActive) in AttributeList"
+      PICS: CC.S.A4002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16386]
+
+    - label: "Read the optional attribute(ColorLoopDirection) in AttributeList"
+      PICS: CC.S.A4003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16387]
+
+    - label: "Read the optional attribute(ColorLoopTime) in AttributeList"
+      PICS: CC.S.A4004
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16388]
+
+    - label:
+          "Read the optional attribute(ColorLoopStartEnhancedHue) in
+          AttributeList"
+      PICS: CC.S.A4005
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16389]
+
+    - label:
+          "Read the optional attribute(ColorLoopStoredEnhancedHue) in
+          AttributeList"
+      PICS: CC.S.A4006
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16390]
+
+    - label:
+          "Read the optional attribute(ColorTempPhysicalMinMireds) in
+          AttributeList"
+      PICS: CC.S.A400b
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16395]
+
+    - label:
+          "Read the optional attribute(ColorTempPhysicalMaxMireds) in
+          AttributeList"
+      PICS: CC.S.A400c
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16396]
+
+    - label:
+          "Read the optional attribute(CoupleColorTempToLevelMinMireds) in
+          AttributeList"
+      PICS: CC.S.A400d
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16397]
+
+    - label:
+          "Read the optional attribute(StartUpColorTemperatureMireds) in
+          AttributeList"
+      PICS: CC.S.A4010
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16400]
+
+    - label: "Read the optional command(MoveToHue) in AcceptedCommandList"
+      PICS: CC.S.C00.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
-              contains: []
+              contains: [0]
+
+    - label: "Read the optional command(MoveHue) in AcceptedCommandList"
+      PICS: CC.S.C01.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label: "Read the optional command(StepHue) in AcceptedCommandList"
+      PICS: CC.S.C02.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label:
+          "Read the optional command(MoveToSaturation) in AcceptedCommandList"
+      PICS: CC.S.C03.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label: "Read the optional command(MoveSaturation) in AcceptedCommandList"
+      PICS: CC.S.C04.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
+
+    - label: "Read the optional command(StepSaturation) in AcceptedCommandList"
+      PICS: CC.S.C05.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
+
+    - label:
+          "Read the optional command(MoveToHueAndSaturation) in
+          AcceptedCommandList"
+      PICS: CC.S.C06.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [6]
+
+    - label: "Read the optional command(MoveToColor) in AcceptedCommandList"
+      PICS: CC.S.C07.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [7]
+
+    - label: "Read the optional command(MoveColor) in AcceptedCommandList"
+      PICS: CC.S.C08.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [8]
+
+    - label: "Read the optional command(StepColor) in AcceptedCommandList"
+      PICS: CC.S.C09.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [9]
+
+    - label:
+          "Read the optional command(MoveToColorTemperature) in
+          AcceptedCommandList"
+      PICS: CC.S.C0a.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [10]
+
+    - label:
+          "Read the optional command(EnhancedMoveToHue) in AcceptedCommandList"
+      PICS: CC.S.C40.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [64]
+
+    - label: "Read the optional command(EnhancedMoveHue) in AcceptedCommandList"
+      PICS: CC.S.C41.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [65]
+
+    - label: "Read the optional command(EnhancedStepHue) in AcceptedCommandList"
+      PICS: CC.S.C42.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [66]
+
+    - label:
+          "Read the optional command(EnhancedMoveToHueAndSaturation) in
+          AcceptedCommandList"
+      PICS: CC.S.C43.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [67]
+
+    - label: "Read the optional command(ColorLoopSet) in AcceptedCommandList"
+      PICS: CC.S.C44.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [68]
+
+    - label: "Read the optional command(StopMoveStep) in AcceptedCommandList"
+      PICS: CC.S.C47.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [71]
+
+    - label:
+          "Read the optional command(MoveColorTemperature) in
+          AcceptedCommandList"
+      PICS: CC.S.C4b.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [75]
+
+    - label:
+          "Read the optional command(StepColorTemperature) in
+          AcceptedCommandList"
+      PICS: CC.S.C4c.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [76]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
@@ -72,19 +419,18 @@ tests:
           value: []
           constraints:
               type: list
-
-    #issue #15011
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

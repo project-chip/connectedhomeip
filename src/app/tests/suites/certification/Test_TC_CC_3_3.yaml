@@ -12,18 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 27.2.4. [TC-CC-3.3] Hue Step functionality with server as DUT
-
-PICS:
-    - CC.S
+name: 25.3.3. [TC-CC-3.3] Hue Step functionality with server as DUT
 
 config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
-    StepSizeConfigValue:
-        type: int8u
-        defaultValue: 5
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -34,19 +28,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Turn on light for color control tests"
-      PICS: OO.S.C01.Rsp
-      cluster: "On/Off"
-      command: "on"
-
-    - label: "Check on/off attribute value is true after on command"
-      cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      PICS: OO.S.A0000
-      response:
-          value: 1
-
     - label: "TH writes 0 to the Options attribute"
       PICS: CC.S.F00 && CC.S.A000f
       command: "writeAttribute"
@@ -54,17 +35,40 @@ tests:
       arguments:
           value: 0
 
-    - label: "TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
+    - label: "TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      cluster: "On/Off"
+      command: "On"
 
-    - label: "TH sends StepHue command to DUT with StepMode Up"
+    - label:
+          "TH sends MoveToHue command to DUT with Hue=200, Direction=0x00
+          (shortest distance) and TransitionTime=0 (immediately)"
+      PICS: CC.S.F00 && CC.S.C00.Rsp
+      command: "MoveToHue"
+      arguments:
+          values:
+              - name: "hue"
+                value: 200
+              - name: "Direction"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "TH sends StepHue command to DUT with StepMode=0x01 (up), StepSize=60
+          and TransitionTime=200 (20s)"
       PICS: CC.S.F00 && CC.S.C02.Rsp
       command: "StepHue"
       arguments:
@@ -72,34 +76,92 @@ tests:
               - name: "StepMode"
                 value: 1
               - name: "StepSize"
-                value: StepSizeConfigValue
+                value: 60
               - name: "TransitionTime"
-                value: 5
+                value: 200
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    #Delay step is necessary to let the attribute value change over time
-    - label: "Wait 1000ms"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 1000
+                value: 10000
 
-    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C02.Rsp
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: int8u
-              minValue: 5
-              maxValue: 254
+              minValue: 215
+              maxValue: 245
 
-    - label: "TH sends StepHue command to DUT with StepMode Down"
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 10
+
+    - label: "Wait 5s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          value: 5
+
+    - label:
+          "TH sends MoveToHue command to DUT with Hue=50, Direction=0x00
+          (shortest distance) and TransitionTime=0 (immediately)"
+      PICS: CC.S.F00 && CC.S.C00.Rsp
+      command: "MoveToHue"
+      arguments:
+          values:
+              - name: "hue"
+                value: 50
+              - name: "Direction"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "TH sends StepHue command to DUT with StepMode=0x03 (down),
+          StepSize=60 and TransitionTime=200 (20s)"
       PICS: CC.S.F00 && CC.S.C02.Rsp
       command: "StepHue"
       arguments:
@@ -107,36 +169,85 @@ tests:
               - name: "StepMode"
                 value: 3
               - name: "StepSize"
-                value: StepSizeConfigValue
+                value: 60
               - name: "TransitionTime"
-                value: 5
+                value: 200
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 1000ms"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 1000
+                value: 10000
 
-    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C02.Rsp
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              type: int8u
+              minValue: 17
+              maxValue: 23
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 245
+              maxValue: 255
+
+    - label: "Wait 5s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          value: 245
+
+    - label: "TH reads ColorMode attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0008
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
+          constraints:
               minValue: 0
-              maxValue: 249
+              maxValue: 2
+
+    - label: "TH reads EnhancedColorMode attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A4001
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 3
 
     - label: "Turn off light that we turned on"
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"
-      command: "off"
+      command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
       cluster: "On/Off"

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 name:
-    27.2.14. [TC-CC-6.3] Color Temperature Step functionality with server as DUT
+    25.3.16. [TC-CC-6.3] Color Temperature Step functionality with server as DUT
 
 PICS:
     - CC.S
@@ -32,25 +32,17 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Turn on light for color control tests"
-      PICS: OO.S.C01.Rsp
-      cluster: "On/Off"
-      command: "on"
-
-    - label: "Check on/off attribute value is true after on command"
-      cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      PICS: OO.S.A0000
-      response:
-          value: 1
-
     - label: "TH writes 0 to the Options attribute"
       PICS: CC.S.F04 && CC.S.A000f
       command: "writeAttribute"
       attribute: "Options"
       arguments:
           value: 0
+
+    - label: "TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      cluster: "On/Off"
+      command: "On"
 
     - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
       PICS: CC.S.F04 && CC.S.A400b
@@ -85,7 +77,7 @@ tests:
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "TH sends StepColorTemperature command to DUT with MoveMode = Up"
-      PICS: CC.S.F04 && CC.S.C4C.Rsp
+      PICS: CC.S.F04 && CC.S.C4c.Rsp
       command: "StepColorTemperature"
       arguments:
           values:
@@ -113,7 +105,7 @@ tests:
                 value: 500
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4C.Rsp
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -131,7 +123,7 @@ tests:
                 value: 500
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4C.Rsp
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -149,7 +141,7 @@ tests:
                 value: 700
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4C.Rsp
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -159,7 +151,7 @@ tests:
               maxValue: 65279
 
     - label: "TH sends StepColorTemperature command to DUT with MoveMode = Down"
-      PICS: CC.S.F04 && CC.S.C4C.Rsp
+      PICS: CC.S.F04 && CC.S.C4c.Rsp
       command: "StepColorTemperature"
       arguments:
           values:
@@ -187,7 +179,7 @@ tests:
                 value: 500
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4C.Rsp
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -205,7 +197,7 @@ tests:
                 value: 500
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4C.Rsp
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -223,7 +215,7 @@ tests:
                 value: 500
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4C.Rsp
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
