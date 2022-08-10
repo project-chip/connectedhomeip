@@ -32,11 +32,9 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          verify on Reference app receives the right request for the data sent in the above commands
-
           ./chip-tool modeselect read supported-modes 1 1
 
-          Verify in TH all-clusters-app log
+          verify the "supported-modes response" on the TH (all-cluster-app) log:
 
           [1650968776.863713][12747:12747] CHIP:IM: Received Read request
           [1650968776.863767][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -65,7 +63,7 @@ tests:
 
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify in TH all-clusters-app log
+          verify the "current-modes response" on the TH (all-cluster-app) log:
 
           1650968848.687576][12747:12747] CHIP:IM: Received Read request
           [1650968848.687628][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -91,7 +89,7 @@ tests:
 
            ./chip-tool modeselect read standard-namespace 1 1
 
-          Verify in TH all-clusters-app log
+          verify the "standard-namespace response" on the TH (all-cluster-app) log:
 
           1650968644.223891][12747:12747] CHIP:IM: Received Read request
           [1650968644.223954][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -121,7 +119,7 @@ tests:
 
           ./chip-tool modeselect read description 1 1
 
-          Verify in TH all-clusters-app log
+          verify the "description response" on the TH (all-cluster-app) log:
 
           [1650969447.413679][12747:12747] CHIP:EM: Handling via exchange: 65381r, Delegate: 0xaaaae5201098
           [1650969447.413718][12747:12747] CHIP:IM: Received Read request
@@ -148,9 +146,9 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          verify on Reference app receives the right response for the data sent in the above commands
-
           ./chip-tool modeselect read on-mode 1 1
+
+          verify the "on-modes response" on the TH (all-cluster-app) log:
 
           [1650969570.494960][12747:12747] CHIP:IM: Received Read request
           [1650969570.495012][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -172,6 +170,9 @@ tests:
           [1650969570.495503][12747:12747] CHIP:DMG: IM RH moving to [GeneratingReports]
 
           ./chip-tool modeselect read start-up-mode 1 1
+
+
+          verify the "start-up-modes response" on the TH (all-cluster-app) log:
 
           [1650970821.970899][12747:12747] CHIP:IM: Received Read request
           [1650970821.970950][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -213,31 +214,33 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          verify on Reference app receives the right response for the data sent in the above commands
-
-
           ./chip-tool modeselect read attribute-list  1 1
 
-          Verify in TH all-clusters-app log
+          verify the "attribute-list response" on the TH (all-cluster-minimal-app) log:
 
-          [1654244736050] [91506:3999585] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_FFFB DataVersion: 1865308556
-          [1654244736050] [91506:3999585] CHIP: [TOO]   AttributeList: 9 entries
-          [1654244736050] [91506:3999585] CHIP: [TOO]     [1]: 0
-          [1654244736050] [91506:3999585] CHIP: [TOO]     [2]: 1
-          [1654244736050] [91506:3999585] CHIP: [TOO]     [3]: 2
-          [1654244736050] [91506:3999585] CHIP: [TOO]     [4]: 3
-          [1654244736050] [91506:3999585] CHIP: [TOO]     [5]: 65528
-          [1654244736050] [91506:3999585] CHIP: [TOO]     [6]: 65529
-          [1654244736050] [91506:3999585] CHIP: [TOO]     [7]: 65531
-          [1654244736050] [91506:3999585] CHIP: [TOO]     [8]: 65532
-          [1654244736050] [91506:3999585] CHIP: [TOO]     [9]: 65533
+          [1659589890.492170][3088:3088] CHIP:IM: Received Read request
+          [1659589890.492250][3088:3088] CHIP:DMG: ReadRequestMessage =
+          [1659589890.492274][3088:3088] CHIP:DMG: {
+          [1659589890.492292][3088:3088] CHIP:DMG:         AttributePathIBs =
+          [1659589890.492315][3088:3088] CHIP:DMG:         [
+          [1659589890.492350][3088:3088] CHIP:DMG:                 AttributePathIB =
+          [1659589890.492382][3088:3088] CHIP:DMG:                 {
+          [1659589890.492416][3088:3088] CHIP:DMG:                         Endpoint = 0x1,
+          [1659589890.492444][3088:3088] CHIP:DMG:                         Cluster = 0x50,
+          [1659589890.492481][3088:3088] CHIP:DMG:                         Attribute = 0x0000_FFFB,
+          [1659589890.492510][3088:3088] CHIP:DMG:                 }
+          [1659589890.492545][3088:3088] CHIP:DMG:
+          [1659589890.492569][3088:3088] CHIP:DMG:         ],
+          [1659589890.492603][3088:3088] CHIP:DMG:
+          [1659589890.492627][3088:3088] CHIP:DMG:         isFabricFiltered = true,
+          [1659589890.492658][3088:3088] CHIP:DMG:         InteractionModelRevision = 1
+          [1659589890.492679][3088:3088] CHIP:DMG: },
 
 
 
+          ./chip-tool modeselect read supported-modes 1 1
 
-          "./chip-tool modeselect read supported-modes 1 1
-
-          Verify in TH all-clusters-app log
+          verify the "supported-modes response" on the TH (all-cluster-minimal-app) log:
 
           [1650968776.863713][12747:12747] CHIP:IM: Received Read request
           [1650968776.863767][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -266,7 +269,7 @@ tests:
 
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify in TH all-clusters-app log
+          verify the "current-modes response" on the TH (all-cluster-minimal-app) log:
 
           1650968848.687576][12747:12747] CHIP:IM: Received Read request
           [1650968848.687628][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -292,7 +295,7 @@ tests:
 
            ./chip-tool modeselect read standard-namespace 1 1
 
-          Verify in TH all-clusters-app log
+          verify the "standard-namespace response" on the TH (all-cluster-minimal-app) log:
 
           1650968644.223891][12747:12747] CHIP:IM: Received Read request
           [1650968644.223954][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -322,7 +325,7 @@ tests:
 
           ./chip-tool modeselect read description 1 1
 
-          Verify in TH all-clusters-app log
+          verify the "description response" on the TH (all-cluster-minimal-app) log:
 
           [1650969447.413679][12747:12747] CHIP:EM: Handling via exchange: 65381r, Delegate: 0xaaaae5201098
           [1650969447.413718][12747:12747] CHIP:IM: Received Read request
@@ -349,15 +352,10 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          verify on Reference app receives the right response for the data sent in the above commands
-
-          Verify in TH all-clusters-app log
+          TH all-clusters-minimal-app does not support optional attributes
 
           ./chip-tool modeselect read on-mode 1 1
-           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
           ./chip-tool modeselect read start-up-mode 1 1
-           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label:

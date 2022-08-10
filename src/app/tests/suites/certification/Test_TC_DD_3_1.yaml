@@ -378,8 +378,8 @@ tests:
           CHIP:CTL: Commissioning stage next step: "SendNOC" -> "FindOperational"
           [1653471976.344532][30157:30162] CHIP:CTL: Performing next commissioning step "FindOperational"
           [1653471976.344586][30157:30162] CHIP:CSM: FindOrEstablishSession: PeerId = CCCB8A2597E4538B:0000000000000001
-          [1653471976.344642][30157:30162] CHIP:CSM: FindOrEstablishSession: No existing OperationalSessionSetup instance found
-          [1653471976.344715][30157:30162] CHIP:CTL: OperationalSessionSetup[CCCB8A2597E4538B:0000000000000001]: State change 1 --> 2
+          [1653471976.344642][30157:30162] CHIP:CSM: FindOrEstablishSession: No existing OperationalDeviceProxy instance found
+          [1653471976.344715][30157:30162] CHIP:CTL: OperationalDeviceProxy[CCCB8A2597E4538B:0000000000000001]: State change 1 --> 2
           [1653471976.344783][30157:30162] CHIP:DIS: Resolving CCCB8A2597E4538B:0000000000000001 ...
           [1653471976.346864][30157:30162] CHIP:DIS: Operational node lookup already in progress. Will NOT start a new one.
           [1653471976.347000][30157:30162] CHIP:DMG: ICR moving to [AwaitingDe]
