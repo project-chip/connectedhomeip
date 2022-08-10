@@ -99,8 +99,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 23500
-              maxValue: 26500
+              minValue: 22500
+              maxValue: 27500
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -116,8 +116,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 28500
-              maxValue: 31500
+              minValue: 27500
+              maxValue: 32500
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -149,8 +149,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 33500
-              maxValue: 35000
+              minValue: 34000
+              maxValue: 36000
 
     - label: "Wait 2s"
       cluster: "DelayCommands"
@@ -168,7 +168,7 @@ tests:
       response:
           constraints:
               minValue: 34500
-              maxValue: 35500
+              maxValue: 36000
 
     - label:
           "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=25000,
@@ -226,8 +226,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 18500
-              maxValue: 21500
+              minValue: 17500
+              maxValue: 22500
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -243,8 +243,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 13500
-              maxValue: 16500
+              minValue: 12500
+              maxValue: 17500
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -276,8 +276,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 10000
-              maxValue: 12000
+              minValue: 9500
+              maxValue: 12500
 
     - label: "Wait 2s"
       cluster: "DelayCommands"
@@ -295,7 +295,7 @@ tests:
       response:
           constraints:
               minValue: 9500
-              maxValue: 11000
+              maxValue: 12500
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008
