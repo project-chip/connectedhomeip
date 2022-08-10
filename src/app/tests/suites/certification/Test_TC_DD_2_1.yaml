@@ -50,13 +50,13 @@ tests:
       disabled: true
 
     - label: "TH does not respond to DUT and DUT keeps sending ADVs"
-      PICS: MCORE.DD.BLE
+      PICS: MCORE.COM.BLE
       verification: |
           [5855][P][DIS]Advertise commission parameter vendorID=65521 productID=32773 discriminator=3840/15
       disabled: true
 
     - label: "TH does not respond to DUT and DUT keeps sending ADVs"
-      PICS: MCORE.DD.BLE
+      PICS: MCORE.COM.BLE
       verification: |
           This step can be verified using a BLE discovery tool of choice.
           Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
@@ -65,7 +65,7 @@ tests:
       disabled: true
 
     - label: "TH does not respond to DUT and DUT keeps sending ADVs"
-      PICS: MCORE.DD.BLE
+      PICS: MCORE.COM.BLE
       verification: |
           This step can be verified using  BLE discovery tool of choice (Try NRF Connect OR HCIDump)
           ->For T0 and 30s we have to get advertisement range between 20ms to 60ms
@@ -95,7 +95,7 @@ tests:
       disabled: true
 
     - label: "TH does not respond to DUT. User power cycles the DUT"
-      PICS: MCORE.DD.BLE
+      PICS: MCORE.COM.BLE
       verification: |
           sudo reboot
       disabled: true
@@ -103,7 +103,7 @@ tests:
     - label:
           "TH does not respond to DUT and DUT keeps sending ADVs. TH waits at
           least 15 minutes"
-      PICS: MCORE.DD.BLE
+      PICS: MCORE.COM.BLE
       verification: |
           Check timestamp, ADV stop after 15 mins
 
@@ -112,7 +112,7 @@ tests:
       disabled: true
 
     - label: "TH scans and finds the DUT SSID"
-      PICS: MCORE.DD.WIFI
+      PICS: MCORE.COM.WIFI
       verification: |
           Out of Scope for V1.0
           SoftAP commissioning not currently supported on TH=chip-tool
@@ -122,7 +122,7 @@ tests:
           "TH scans and finds the DUT SSID TH sends to DUT a 1st power cycle
           command (or reset manually) TH sends to DUT a 2nd power cycle command
           (or reset manually)"
-      PICS: MCORE.DD.WIFI
+      PICS: MCORE.COM.WIFI
       verification: |
           Out of Scope for V1.0
           SoftAP commissioning not currently supported on TH=chip-tool

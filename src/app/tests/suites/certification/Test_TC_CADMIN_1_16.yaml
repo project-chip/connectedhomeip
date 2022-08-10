@@ -181,7 +181,7 @@ tests:
           CHIP:EM: Sending Standalone Ack for MessageCounter:9143157 on exchange 1147i
       disabled: true
 
-    - label: "TH_CR2 sends RemoveFabric with FabricIndex = 2command to DUT_CE"
+    - label: "TH_CR2 sends RemoveFabric with FabricIndex = 2 command to DUT_CE"
       PICS: OPCREDS.S.C0a.Rsp
       verification: |
           on 2nd controller using chip tool, remove fabric with FabricIndex=2

@@ -34,7 +34,7 @@ tests:
       verification: |
           ./chip-tool occupancysensing read occupancy 1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify the " occupancy response" on the TH (all-cluster-app) log:
 
           [1657906563.293939][2361:2361] CHIP:IM: Received Read request
           [1657906563.294045][2361:2361] CHIP:DMG: ReadRequestMessage =
@@ -60,7 +60,7 @@ tests:
       verification: |
           ./chip-tool occupancysensing read occupancy-sensor-type 1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify the " occupancy-sensor-type response" on the TH (all-cluster-app) log:
 
           [1657906599.161154][2361:2361] CHIP:IM: Received Read request
           [1657906599.161269][2361:2361] CHIP:DMG: ReadRequestMessage =
@@ -88,7 +88,7 @@ tests:
       verification: |
           ./chip-tool occupancysensing read occupancy-sensor-type-bitmap 1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify the " occupancy-sensor-type-bitmap response" on the TH (all-cluster-app) log:
 
           [1657906629.182638][2361:2361] CHIP:IM: Received Read request
           [1657906629.182760][2361:2361] CHIP:DMG: ReadRequestMessage =
@@ -119,7 +119,7 @@ tests:
 
           ./chip-tool occupancysensing read pir-occupied-to-unoccupied-delay 1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify the " pir-occupied-to-unoccupied-delay response" on the TH (all-cluster-app) log:
 
           [1657906650.927182][2361:2361] CHIP:IM: Received Read request
           [1657906650.927324][2361:2361] CHIP:DMG: ReadRequestMessage =
@@ -150,7 +150,7 @@ tests:
 
            ./chip-tool occupancysensing read  pir-unoccupied-to-occupied-delay  1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify the " pir-unoccupied-to-occupied-delay response" on the TH (all-cluster-app) log:
 
           [1657906670.678493][2361:2361] CHIP:IM: Received Read request
           [1657906670.678680][2361:2361] CHIP:DMG: ReadRequestMessage =
@@ -181,7 +181,7 @@ tests:
 
           ./chip-tool occupancysensing read pir-unoccupied-to-occupied-threshold  1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify the " pir-unoccupied-to-occupied-threshold response" on the TH (all-cluster-app) log:
 
           [1657906696.122069][2361:2361] CHIP:IM: Received Read request
           [1657906696.122210][2361:2361] CHIP:DMG: ReadRequestMessage =
@@ -213,7 +213,7 @@ tests:
 
           ./chip-tool occupancysensing read ultrasonic-occupied-to-unoccupied-delay  1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify the " ultrasonic-occupied-to-unoccupied-delay response" on the TH (all-cluster-app) log:
 
           [1657906729.107330][2361:2361] CHIP:IM: Received Read request
           [1657906729.107455][2361:2361] CHIP:DMG: ReadRequestMessage =
@@ -245,7 +245,7 @@ tests:
 
           ./chip-tool occupancysensing read  ultrasonic-unoccupied-to-occupied-delay 1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify the " ultrasonic-unoccupied-to-occupied-delay response" on the TH (all-cluster-app) log:
 
           [1657906752.147785][2361:2361] CHIP:IM: Received Read request
           [1657906752.147914][2361:2361] CHIP:DMG: ReadRequestMessage =
@@ -278,7 +278,7 @@ tests:
 
           ./chip-tool occupancysensing read ultrasonic-unoccupied-to-occupied-threshold 1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify the " ultrasonic-unoccupied-to-occupied-threshold response" on the TH (all-cluster-app) log:
 
           [1657906770.663661][2361:2361] CHIP:IM: Received Read request
           [1657906770.663787][2361:2361] CHIP:DMG: ReadRequestMessage =
@@ -309,7 +309,7 @@ tests:
 
           ./chip-tool occupancysensing read physical-contact-occupied-to-unoccupied-delay 1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify the " physical-contact-occupied-to-unoccupied-delay response" on the TH (all-cluster-app) log:
 
           [1657906788.836643][2361:2361] CHIP:IM: Received Read request
           [1657906788.836806][2361:2361] CHIP:DMG: ReadRequestMessage =
@@ -341,7 +341,7 @@ tests:
 
           ./chip-tool occupancysensing read physical-contact-unoccupied-to-occupied-delay 1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify the " physical-contact-unoccupied-to-occupied-delay response" on the TH (all-cluster-app) log:
 
           [1657906806.229307][2361:2361] CHIP:IM: Received Read request
           [1657906806.229449][2361:2361] CHIP:DMG: ReadRequestMessage =
@@ -373,7 +373,7 @@ tests:
 
           ./chip-tool occupancysensing read  physical-contact-unoccupied-to-occupied-threshold 1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify the " physical-contact-unoccupied-to-occupied-threshold response" on the TH (all-cluster-app) log:
 
           [1657906821.965692][2361:2361] CHIP:IM: Received Read request
           [1657906821.965776][2361:2361] CHIP:DMG: ReadRequestMessage =

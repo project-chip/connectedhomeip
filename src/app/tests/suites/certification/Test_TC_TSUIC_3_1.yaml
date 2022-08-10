@@ -32,8 +32,10 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool thermostatuserinterfaceconfiguration read temperature-display-mode 1 1
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify DUT receives  temperature-display-mode attribute response on the TH(all-clusters-app) Log:
           [1658142864.198892][13946:13946] CHIP:IM: Received Read request
           [1658142864.198979][13946:13946] CHIP:DMG: ReadRequestMessage =
           [1658142864.199008][13946:13946] CHIP:DMG: {
@@ -53,18 +55,9 @@ tests:
           [1658142864.199421][13946:13946] CHIP:DMG: },
           [1658142864.199502][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-          On DUT as a client side, verify that TH all-clusters-app sent  temperature display mode attribute value
-          [1658142864.203659][8868:8873] CHIP:DMG: }
-          [1658142864.203865][8868:8873] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 682086754
-          [1658142864.203966][8868:8873] CHIP:TOO:   temperature display mode: 0
-          [1658142864.204082][8868:8873] CHIP:EM: Sending Standalone Ack for MessageCounter:26677540 on exchange 12305i
-
-
-
-
 
           ./chip-tool thermostatuserinterfaceconfiguration read keypad-lockout 1 1
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify DUT receives keypad-lockout attribute response on the TH(all-clusters-app) Log:
           [1658142905.390042][13946:13946] CHIP:IM: Received Read request
           [1658142905.390148][13946:13946] CHIP:DMG: ReadRequestMessage =
           [1658142905.390177][13946:13946] CHIP:DMG: {
@@ -84,20 +77,16 @@ tests:
           [1658142905.390557][13946:13946] CHIP:DMG: },
           [1658142905.390634][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1658142905.390718][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-
-          On DUT as a client side, verify that TH all-clusters-app sent  keypad lockout attribute value
-          [1658142905.393178][8876:8881] CHIP:DMG: }
-          [1658142905.393364][8876:8881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0001 DataVersion: 682086754
-          [1658142905.393454][8876:8881] CHIP:TOO:   keypad lockout: 0
-          [1658142905.393558][8876:8881] CHIP:EM: Sending Standalone Ack for MessageCounter:118574768 on exchange 20562i
       disabled: true
 
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool thermostatuserinterfaceconfiguration read  schedule-programming-visibility  1 1
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify DUT receives  schedule-programming-visibility  attribute response on the TH(all-clusters-app) Log:
           [1658143293.502829][13946:13946] CHIP:EM: Handling via exchange: 655r, Delegate: 0xaaaad3403ed0
           [1658143293.502867][13946:13946] CHIP:IM: Received Read request
           [1658143293.502943][13946:13946] CHIP:DMG: ReadRequestMessage =
@@ -117,20 +106,16 @@ tests:
           [1658143293.503351][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
           [1658143293.503374][13946:13946] CHIP:DMG: },
           [1658143293.503450][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
-
-          On DUT as a client side, verify that TH all-clusters-app sent  schedule programming visibility attribute value
-          [1658143293.447125][8901:8906] CHIP:DMG: }
-          [1658143293.447279][8901:8906] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0002 DataVersion: 682086754
-          [1658143293.447352][8901:8906] CHIP:TOO:   schedule programming visibility: 0
-          [1658143293.447431][8901:8906] CHIP:EM: Sending Standalone Ack for MessageCounter:142018492 on exchange 655i
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          ./chip-tool thermostatuserinterfaceconfiguration write keypad-lockout 1 1 1
-          verify On TH(Reference app) receives the right write Request Message for the data sent in the above command
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool thermostatuserinterfaceconfiguration write temperature-display-mode  1 1 1
+          Verify DUT receives  temperature-display-mode   attribute  write response on the TH(all-clusters-app) Log:
           [1658143515.699171][13946:13946] CHIP:DMG: WriteRequestMessage =
           [1658143515.699197][13946:13946] CHIP:DMG: {
           [1658143515.699221][13946:13946] CHIP:DMG:         suppressResponse = false,
@@ -156,17 +141,9 @@ tests:
           [1658143515.699792][13946:13946] CHIP:DMG: },
           [1658143515.699876][13946:13946] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=m
 
-          On DUT as a client side, verify that TH all-clusters-app sent  success response
-          [1658143515.619630][8919:8924] CHIP:DMG:                         StatusIB =
-          [1658143515.619669][8919:8924] CHIP:DMG:                         {
-          [1658143515.619707][8919:8924] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1658143515.619747][8919:8924] CHIP:DMG:                         },
-
-
-
 
            ./chip-tool thermostatuserinterfaceconfiguration write keypad-lockout 1  1 1
-          verify On TH(Reference app) receives the right write Request Message for the data sent in the above command
+          Verify DUT receives keypad-lockout  attribute  write response on the TH(all-clusters-app) Log:
           [1658143708.436060][13946:13946] CHIP:DMG: WriteRequestMessage =
           [1658143708.436090][13946:13946] CHIP:DMG: {
           [1658143708.436115][13946:13946] CHIP:DMG:         suppressResponse = false,
@@ -192,20 +169,16 @@ tests:
           [1658143708.436770][13946:13946] CHIP:DMG: },
           [1658143708.436862][13946:13946] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=m
           [1658143708.436903][13946:13946] CHIP:DMG: AccessControl: allowed
-
-          On DUT as a client side, verify that TH all-clusters-app sent  success response
-          [1658143708.341102][8933:8938] CHIP:DMG:                         StatusIB =
-          [1658143708.341156][8933:8938] CHIP:DMG:                         {
-          [1658143708.341211][8933:8938] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1658143708.341257][8933:8938] CHIP:DMG:                         },
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool thermostatuserinterfaceconfiguration write schedule-programming-visibility 1 1 1
-          verify On TH(Reference app) receives the right write Request Message for the data sent in the above command
+          Verify DUT receives schedule-programming-visibility   attribute  write response on the TH(all-clusters-app) Log:
           [1658143828.619738][13946:13946] CHIP:DMG: WriteRequestMessage =
           [1658143828.619764][13946:13946] CHIP:DMG: {
           [1658143828.619787][13946:13946] CHIP:DMG:         suppressResponse = false,
@@ -230,15 +203,6 @@ tests:
           [1658143828.620330][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
           [1658143828.620353][13946:13946] CHIP:DMG: },
           [1658143828.620434][13946:13946] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=m
-
-
-          On DUT as a client side, verify that TH all-clusters-app sent  success response
-          [1658143828.519585][8944:8949] CHIP:DMG:
-          [1658143828.519632][8944:8949] CHIP:DMG:                         StatusIB =
-          [1658143828.519683][8944:8949] CHIP:DMG:                         {
-          [1658143828.519734][8944:8949] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1658143828.519784][8944:8949] CHIP:DMG:                         },
-          [1658143828.519834][8944:8949] CHIP:DMG:
       disabled: true
 
     - label:
@@ -247,8 +211,10 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool thermostatuserinterfaceconfiguration read temperature-display-mode 1 1
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify DUT receives  temperature-display-mode attribute response on the TH(all-clusters-minimal-app) Log:
           [1658142864.198892][13946:13946] CHIP:IM: Received Read request
           [1658142864.198979][13946:13946] CHIP:DMG: ReadRequestMessage =
           [1658142864.199008][13946:13946] CHIP:DMG: {
@@ -268,18 +234,9 @@ tests:
           [1658142864.199421][13946:13946] CHIP:DMG: },
           [1658142864.199502][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-          On DUT as a client side, verify that TH all-clusters-app sent  temperature display mode attribute value
-          [1658142864.203659][8868:8873] CHIP:DMG: }
-          [1658142864.203865][8868:8873] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 682086754
-          [1658142864.203966][8868:8873] CHIP:TOO:   temperature display mode: 0
-          [1658142864.204082][8868:8873] CHIP:EM: Sending Standalone Ack for MessageCounter:26677540 on exchange 12305i
-
-
-
-
 
           ./chip-tool thermostatuserinterfaceconfiguration read keypad-lockout 1 1
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify DUT receives  keypad-lockout attribute response on the TH(all-clusters-minimal-app) Log:
           [1658142905.390042][13946:13946] CHIP:IM: Received Read request
           [1658142905.390148][13946:13946] CHIP:DMG: ReadRequestMessage =
           [1658142905.390177][13946:13946] CHIP:DMG: {
@@ -299,21 +256,17 @@ tests:
           [1658142905.390557][13946:13946] CHIP:DMG: },
           [1658142905.390634][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1658142905.390718][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-
-          On DUT as a client side, verify that TH all-clusters-app sent  keypad lockout attribute value
-          [1658142905.393178][8876:8881] CHIP:DMG: }
-          [1658142905.393364][8876:8881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0001 DataVersion: 682086754
-          [1658142905.393454][8876:8881] CHIP:TOO:   keypad lockout: 0
-          [1658142905.393558][8876:8881] CHIP:EM: Sending Standalone Ack for MessageCounter:118574768 on exchange 20562i
       disabled: true
 
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool thermostatuserinterfaceconfiguration read  schedule-programming-visibility  1 1
 
-          On DUT as a client side, verify that TH all-clusters-app sent  UNSUPPORTED_ATTRIBUTE response
+          Verify DUT receives   schedule-programming-visibility attribute response on the TH(all-clusters-minimal-app) Log:
            General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
@@ -321,7 +274,10 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool thermostatuserinterfaceconfiguration write schedule-programming-visibility 1 1 1
-          On DUT as a client side, verify that TH all-clusters-app sent  UNSUPPORTED_ATTRIBUTE response
+
+          Verify DUT receives   schedule-programming-visibility attribute write response on the TH(all-clusters-minimal-app) Log:
            General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true

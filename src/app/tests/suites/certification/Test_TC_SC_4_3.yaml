@@ -51,17 +51,9 @@ tests:
           "TH is instructed to start advertising an operational service using
           DNS-SD with non-standard TXT record keys"
       verification: |
-          ubuntu@ubuntu:~$ avahi-browse -rt _matter._tcp
+          Run the publish service command on TH:
 
-
-          Verify on the TH Log:
-
-          ++ veth34b1077 IPv6 4B475AAEB62F42A1-0000000000000001             _matter._tcp         local
-          = veth34b1077 IPv6 4B475AAEB62F42A1-0000000000000001             _matter._tcp         local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::14ad:64ff:fe95:d164]
-             port = [5540]
-             txt = ["T=1" "SAI=300" "SII=5000"]
+          avahi-publish-service --subtype=_S3._sub._matter._tcp --subtype=_L840._sub._matter._tcp DD200C20D25AE5F7 --subtype=_CM._sub._matter._tcp _matter._tcp 11111 D=840 CM=2  INVALID_TEST=40
       disabled: true
 
     - label:
@@ -69,68 +61,19 @@ tests:
           Mode using Open Basic Commissioning Window command, DUT is instructed
           to advertise its service with the modified TXT record."
       verification: |
-          avahi-publish-service --subtype=_S3._sub._matter._tcp --subtype=_L840._sub._matter._tcp DD200C20D25AE5F7 --subtype=_CM._sub._matter._tcp _matter._tcp 11111 D=840 CM=2  INVALID_TEST=40
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 200 1 0 --timedInteractionTimeoutMs 1000
 
+          verify on TH (Chip-tool) logs:
 
-          Verify on the TH Log:
-
-          ubuntu@ubuntu:~$ avahi-browse -rt _matter._tcp
-
-
-          + br-21ec3c459020 IPv4 DD200C20D25AE5F7                              _matter._tcp         local
-          + docker0 IPv4 DD200C20D25AE5F7                              _matter._tcp         local
-          + br-50884ced4bd8 IPv4 DD200C20D25AE5F7                              _matter._tcp         local
-          +   eth0 IPv6 DD200C20D25AE5F7                              _matter._tcp         local
-          +   eth0 IPv4 DD200C20D25AE5F7                              _matter._tcp         local
-          +     lo IPv4 DD200C20D25AE5F7                              _matter._tcp         local
-          = br-21ec3c459020 IPv4 DD200C20D25AE5F7                              _matter._tcp         local
-             hostname = [ubuntu-2.local]
-             address = [172.18.0.1]
-             port = [11111]
-             txt = ["INVALID_TEST=40" "CM=2" "D=840"]
-          = docker0 IPv4 DD200C20D25AE5F7                              _matter._tcp         local
-             hostname = [ubuntu-2.local]
-             address = [172.17.0.1]
-             port = [11111]
-             txt = ["INVALID_TEST=40" "CM=2" "D=840"]
-          = br-50884ced4bd8 IPv4 DD200C20D25AE5F7                              _matter._tcp         local
-             hostname = [ubuntu-2.local]
-             address = [172.19.0.1]
-             port = [11111]
-             txt = ["INVALID_TEST=40" "CM=2" "D=840"]
-          =   eth0 IPv6 DD200C20D25AE5F7                              _matter._tcp         local
-             hostname = [ubuntu-2.local]
-             address = [fd00::ef]
-             port = [11111]
-             txt = ["INVALID_TEST=40" "CM=2" "D=840"]
-          =   eth0 IPv4 DD200C20D25AE5F7                              _matter._tcp         local
-             hostname = [ubuntu-2.local]
-             address = [192.168.1.70]
-             port = [11111]
-             txt = ["INVALID_TEST=40" "CM=2" "D=840"]
-          =     lo IPv4 DD200C20D25AE5F7                              _matter._tcp         local
-             hostname = [ubuntu-2.local]
-             address = [127.0.0.1]
-             port = [11111]
-             txt = ["INVALID_TEST=40" "CM=2" "D=840"]
-          +   eth0 IPv6 21F41C9933CAAF62-000000000000003C             _matter._tcp         local
-          +   eth0 IPv6 5DA80B8DD9E64426-0000000000000046             _matter._tcp         local
-          +   eth0 IPv6 B1605B84E886EDCF-0000000000000258             _matter._tcp         local
-          =   eth0 IPv6 21F41C9933CAAF62-000000000000003C             _matter._tcp         local
-             hostname = [E45F010EBE440000.local]
-             address = [fe80::e65f:1ff:fe0e:be44]
-             port = [5540]
-             txt = ["T=1" "SAI=300" "SII=5000"]
-          =   eth0 IPv6 5DA80B8DD9E64426-0000000000000046             _matter._tcp         local
-             hostname = [E45F010EBE440000.local]
-             address = [fe80::e65f:1ff:fe0e:be44]
-             port = [5540]
-             txt = ["T=1" "SAI=300" "SII=5000"]
-          =   eth0 IPv6 B1605B84E886EDCF-0000000000000258             _matter._tcp         local
-             hostname = [E45F010EBE440000.local]
-             address = [fe80::e65f:1ff:fe0e:be44]
-             port = [5540]
-             txt = ["T=1" "SAI=300" "SII=5000"]
+          [1650873075.234374][7964:7969] CHIP:DMG:                                         EndpointId = 0x0,
+          [1650873075.234449][7964:7969] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1650873075.234542][7964:7969] CHIP:DMG:                                         CommandId = 0x1,
+          [1650873075.234613][7964:7969] CHIP:DMG:                                 },
+          [1650873075.234693][7964:7969] CHIP:DMG:
+          [1650873075.234758][7964:7969] CHIP:DMG:                                 StatusIB =
+          [1650873075.234829][7964:7969] CHIP:DMG:                                 {
+          [1650873075.234909][7964:7969] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1650873075.234984][7964:7969] CHIP:DMG:                                 },
       disabled: true
 
     - label: "Scan for DNS-SD advertising"
@@ -139,5 +82,13 @@ tests:
           MCORE.SC.SII_OP_DISCOVERY_KEY && MCORE.SC.SAI_OP_DISCOVERY_KEY &&
           MCORE.SC.T_KEY
       verification: |
-          verification step to be updated.
+          ubuntu@ubuntu:~$ avahi-browse -rt _matter._tcp
+          Verify on the TH Log:
+
+          +   eth0 IPv6 B1605B84E886EDCF-0000000000000258             _matter._tcp         local
+          =   eth0 IPv6 21F41C9933CAAF62-000000000000003C             _matter._tcp         local
+             hostname = [E45F010EBE440000.local]
+             address = [fe80::e65f:1ff:fe0e:be44]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
       disabled: true

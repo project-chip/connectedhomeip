@@ -32,42 +32,35 @@ tests:
     - label: "DUT sends GoToLiftPercentage command with 50% to TH"
       PICS: WNCV.C.C05.Tx
       verification: |
-          ./chip-tool windowcovering go-to-lift-percentage 50 1 1
+          ./chip-tool windowcovering go-to-lift-percentage 5000 1 1
 
+          Verify the "DUT responds with right request response"
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
-
-          [1657103392.913017][4682:4687] CHIP:DMG: InvokeResponseMessage =
-          [1657103392.913042][4682:4687] CHIP:DMG: {
-          [1657103392.913066][4682:4687] CHIP:DMG:         suppressResponse = false,
-          [1657103392.913090][4682:4687] CHIP:DMG:         InvokeResponseIBs =
-          [1657103392.913120][4682:4687] CHIP:DMG:         [
-          [1657103392.913145][4682:4687] CHIP:DMG:                 InvokeResponseIB =
-          [1657103392.913184][4682:4687] CHIP:DMG:                 {
-          [1657103392.913212][4682:4687] CHIP:DMG:                         CommandStatusIB =
-          [1657103392.913247][4682:4687] CHIP:DMG:                         {
-          [1657103392.913276][4682:4687] CHIP:DMG:                                 CommandPathIB =
-          [1657103392.913310][4682:4687] CHIP:DMG:                                 {
-          [1657103392.913345][4682:4687] CHIP:DMG:                                         EndpointId = 0x1,
-          [1657103392.913380][4682:4687] CHIP:DMG:                                         ClusterId = 0x102,
-          [1657103392.913413][4682:4687] CHIP:DMG:                                         CommandId = 0x5,
-          [1657103392.913442][4682:4687] CHIP:DMG:                                 },
-          [1657103392.913477][4682:4687] CHIP:DMG:
-          [1657103392.913505][4682:4687] CHIP:DMG:                                 StatusIB =
-          [1657103392.913536][4682:4687] CHIP:DMG:                                 {
-          [1657103392.913571][4682:4687] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657103392.913603][4682:4687] CHIP:DMG:                                 },
-          [1657103392.913635][4682:4687] CHIP:DMG:
-          [1657103392.913664][4682:4687] CHIP:DMG:                         },
-          [1657103392.913696][4682:4687] CHIP:DMG:
-          [1657103392.913723][4682:4687] CHIP:DMG:                 },
-          [1657103392.913753][4682:4687] CHIP:DMG:
-          [1657103392.913776][4682:4687] CHIP:DMG:         ],
-          [1657103392.913805][4682:4687] CHIP:DMG:
-          [1657103392.913828][4682:4687] CHIP:DMG:         InteractionModelRevision = 1
-          [1657103392.913851][4682:4687] CHIP:DMG: },
-          [1657103392.913912][4682:4687] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0102 Command=0x0000_0005 Status=0x0
-          [1657103392.913952][4682:4687] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1659945446.669477][2742:2742] CHIP:DMG: InvokeRequestMessage =
+          [1659945446.669520][2742:2742] CHIP:DMG: {
+          [1659945446.669555][2742:2742] CHIP:DMG:         suppressResponse = false,
+          [1659945446.669599][2742:2742] CHIP:DMG:         timedRequest = false,
+          [1659945446.669639][2742:2742] CHIP:DMG:         InvokeRequests =
+          [1659945446.669688][2742:2742] CHIP:DMG:         [
+          [1659945446.669729][2742:2742] CHIP:DMG:                 CommandDataIB =
+          [1659945446.669773][2742:2742] CHIP:DMG:                 {
+          [1659945446.669815][2742:2742] CHIP:DMG:                         CommandPathIB =
+          [1659945446.669866][2742:2742] CHIP:DMG:                         {
+          [1659945446.669919][2742:2742] CHIP:DMG:                                 EndpointId = 0x1,
+          [1659945446.669975][2742:2742] CHIP:DMG:                                 ClusterId = 0x102,
+          [1659945446.670033][2742:2742] CHIP:DMG:                                 CommandId = 0x5,
+          [1659945446.670084][2742:2742] CHIP:DMG:                         },
+          [1659945446.670137][2742:2742] CHIP:DMG:
+          [1659945446.670191][2742:2742] CHIP:DMG:                         CommandFields =
+          [1659945446.670247][2742:2742] CHIP:DMG:                         {
+          [1659945446.670302][2742:2742] CHIP:DMG:                                 0x0 = 5000,
+          [1659945446.670361][2742:2742] CHIP:DMG:                         },
+          [1659945446.670409][2742:2742] CHIP:DMG:                 },
+          [1659945446.670460][2742:2742] CHIP:DMG:
+          [1659945446.670499][2742:2742] CHIP:DMG:         ],
+          [1659945446.670548][2742:2742] CHIP:DMG:
+          [1659945446.670587][2742:2742] CHIP:DMG:         InteractionModelRevision = 1
+          [1659945446.670626][2742:2742] CHIP:DMG: },
       disabled: true
 
     - label: "Check GoToTiltPercentage command 50%"
@@ -78,40 +71,34 @@ tests:
     - label: "DUT sends GoToTiltPercentage command with 50% to TH"
       PICS: WNCV.C.C08.Tx
       verification: |
-          ./chip-tool windowcovering go-to-tilt-percentage 50 1 1
+          ./chip-tool windowcovering go-to-tilt-percentage 5000 1 1
 
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify the "DUT responds with right  request response"
 
-          [1657103413.915095][4688:4693] CHIP:DMG: InvokeResponseMessage =
-          [1657103413.915136][4688:4693] CHIP:DMG: {
-          [1657103413.915175][4688:4693] CHIP:DMG:         suppressResponse = false,
-          [1657103413.915216][4688:4693] CHIP:DMG:         InvokeResponseIBs =
-          [1657103413.915267][4688:4693] CHIP:DMG:         [
-          [1657103413.915308][4688:4693] CHIP:DMG:                 InvokeResponseIB =
-          [1657103413.915361][4688:4693] CHIP:DMG:                 {
-          [1657103413.915403][4688:4693] CHIP:DMG:                         CommandStatusIB =
-          [1657103413.915456][4688:4693] CHIP:DMG:                         {
-          [1657103413.915508][4688:4693] CHIP:DMG:                                 CommandPathIB =
-          [1657103413.915563][4688:4693] CHIP:DMG:                                 {
-          [1657103413.915614][4688:4693] CHIP:DMG:                                         EndpointId = 0x1,
-          [1657103413.915672][4688:4693] CHIP:DMG:                                         ClusterId = 0x102,
-          [1657103413.915729][4688:4693] CHIP:DMG:                                         CommandId = 0x8,
-          [1657103413.915782][4688:4693] CHIP:DMG:                                 },
-          [1657103413.915839][4688:4693] CHIP:DMG:
-          [1657103413.915889][4688:4693] CHIP:DMG:                                 StatusIB =
-          [1657103413.915943][4688:4693] CHIP:DMG:                                 {
-          [1657103413.915992][4688:4693] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657103413.916046][4688:4693] CHIP:DMG:                                 },
-          [1657103413.916095][4688:4693] CHIP:DMG:
-          [1657103413.916142][4688:4693] CHIP:DMG:                         },
-          [1657103413.916197][4688:4693] CHIP:DMG:
-          [1657103413.916238][4688:4693] CHIP:DMG:                 },
-          [1657103413.916287][4688:4693] CHIP:DMG:
-          [1657103413.916326][4688:4693] CHIP:DMG:         ],
-          [1657103413.916366][4688:4693] CHIP:DMG:
-          [1657103413.916396][4688:4693] CHIP:DMG:         InteractionModelRevision = 1
-          [1657103413.916425][4688:4693] CHIP:DMG: },
-          [1657103413.916507][4688:4693] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0102 Command=0x0000_0008 Status=0x0
-          [1657103413.916558][4688:4693] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1659945481.649337][2742:2742] CHIP:DMG: InvokeRequestMessage =
+          [1659945481.649367][2742:2742] CHIP:DMG: {
+          [1659945481.649393][2742:2742] CHIP:DMG:         suppressResponse = false,
+          [1659945481.649424][2742:2742] CHIP:DMG:         timedRequest = false,
+          [1659945481.649452][2742:2742] CHIP:DMG:         InvokeRequests =
+          [1659945481.649487][2742:2742] CHIP:DMG:         [
+          [1659945481.649515][2742:2742] CHIP:DMG:                 CommandDataIB =
+          [1659945481.649551][2742:2742] CHIP:DMG:                 {
+          [1659945481.649582][2742:2742] CHIP:DMG:                         CommandPathIB =
+          [1659945481.649622][2742:2742] CHIP:DMG:                         {
+          [1659945481.649660][2742:2742] CHIP:DMG:                                 EndpointId = 0x1,
+          [1659945481.649702][2742:2742] CHIP:DMG:                                 ClusterId = 0x102,
+          [1659945481.649743][2742:2742] CHIP:DMG:                                 CommandId = 0x8,
+          [1659945481.649778][2742:2742] CHIP:DMG:                         },
+          [1659945481.649819][2742:2742] CHIP:DMG:
+          [1659945481.649856][2742:2742] CHIP:DMG:                         CommandFields =
+          [1659945481.649892][2742:2742] CHIP:DMG:                         {
+          [1659945481.649929][2742:2742] CHIP:DMG:                                 0x0 = 5000,
+          [1659945481.649970][2742:2742] CHIP:DMG:                         },
+          [1659945481.650002][2742:2742] CHIP:DMG:                 },
+          [1659945481.650037][2742:2742] CHIP:DMG:
+          [1659945481.650065][2742:2742] CHIP:DMG:         ],
+          [1659945481.650099][2742:2742] CHIP:DMG:
+          [1659945481.650126][2742:2742] CHIP:DMG:         InteractionModelRevision = 1
+          [1659945481.650153][2742:2742] CHIP:DMG: },
       disabled: true

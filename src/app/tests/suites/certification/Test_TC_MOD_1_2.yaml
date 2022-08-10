@@ -29,7 +29,7 @@ tests:
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          on TH,Verify that the DUT response provides a list of supported modes
+          Verify on TH(chip-tool) logs supported modes provides a list of mode, each mode should be a struct containing a label and All of these values should be no larger than 16 bits
 
           [1654595167.600241][14362:14367] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
           [1654595167.600345][14362:14367] CHIP:TOO:   SupportedModes: 3 entries
@@ -67,7 +67,7 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          on TH,Verify that the DUT response is an integer that is in the list of modes returned in step 1.
+          Verify on TH(chip-tool) logs ,current-mode value is in the list of modes from step 1
 
           [1645776767.611140][4667:4672] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469718
 
@@ -79,7 +79,7 @@ tests:
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
-          on TH,Verify that the DUT response The attribute is nullable, and null is  valid value.
+          Verify on TH(chip-tool) logs ,onmode value is listed in the supported modes or null is also acceptable
 
 
           [1649676072.465968][10754:10759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065072
@@ -92,7 +92,7 @@ tests:
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
 
-          on TH,Verify that the DUT response is an integer that is in the list of modes returned in step 1.
+          Verify on TH(chip-tool) logs ,start-up-mode  value is in the list of modes from step 1
 
 
           [1649677014.496348][10778:10784] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 4277065072
@@ -105,8 +105,7 @@ tests:
       verification: |
           ./chip-tool modeselect read description 1 1
 
-
-          on TH,Verify that the DUT response is an integer that is in the list of modes returned in step 1.
+          Verify on TH(chip-tool) logs , Description value has human readable text string
 
           [1649677114.614974][10787:10792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000 DataVersion: 4277065072
 
@@ -118,10 +117,7 @@ tests:
       verification: |
           ./chip-tool modeselect read standard-namespace 1 1
 
-
-          on TH,Verify that the DUT response  is an integer that is in the list of modes returned in step 1.(OR)
-           The attribute is nullable, and null is  valid value.
-
+          Verify on TH(chip-tool) logs ,standard-namespace value is listed in the supported modes from step 1 or null is also acceptable
 
           [1649677167.900539][10795:10801] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0001 DataVersion: 4277065072
 

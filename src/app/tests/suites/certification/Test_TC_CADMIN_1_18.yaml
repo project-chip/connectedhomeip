@@ -370,3 +370,9 @@ tests:
           [1647863342.982512][9309:9314] CHIP:TOO:      }
           [1647863342.982738][9309:9314] CHIP:EM: Sending Standalone Ack for MessageCounter:5772016 on exchange 3310i
       disabled: true
+
+    - label: "TH_CR2 sends command to TH_CE to read the list of Fabrics"
+      PICS: OPCREDS.C.A0001
+      verification: |
+          verification step to be updated.
+      disabled: true

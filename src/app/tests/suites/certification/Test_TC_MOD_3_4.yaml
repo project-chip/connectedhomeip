@@ -31,7 +31,7 @@ tests:
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
 
-          on TH,Verify that the DUT response is the integer. Record this value for usage in step 2.
+          on TH(chip-tool),Verify that the DUT response is the integer. Record this value for usage in step 2.
 
 
           [1651099663211] [82177:7560652] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 2609052118
@@ -43,7 +43,7 @@ tests:
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
-          on TH,Verify that the DUT response is the integer. Record this value for usage in step 2b.
+          on TH(chip-tool),Verify that the DUT response is the integer. Record this value for usage in step 2b.
 
 
           [1654780979.979743][61542:61547] CHIP:DMG: }
@@ -65,7 +65,7 @@ tests:
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          on TH,Verify that the DUT response provides a list of supported modes
+          on TH(chip-tool),Verify that the DUT response provides a list of supported modes
 
           [1654154058.284710][3492:3497] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 694763126
           [1654154058.284829][3492:3497] CHIP:TOO:   SupportedModes: 3 entries
@@ -106,7 +106,7 @@ tests:
       verification: |
           ./chip-tool modeselect write on-mode 7 1 1
 
-          on TH,Verify that the DUT with a successful (value 0x00) status response.
+          on TH(chip-tool),Verify that the DUT with a successful (value 0x00) status response.
 
           [1651099941884] [84269:7567211] CHIP: [DMG] WriteResponseMessage =
           [1651099941884] [84269:7567211] CHIP: [DMG] {
@@ -139,10 +139,10 @@ tests:
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
-          on TH,Verify that the DUT responds with an integer
+          on TH(chip-tool),Verify that the DUT responds with an integer
 
           [1651100140426] [84609:7569911] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 2609052120
-          [1651100140426] [84609:7569911] CHIP: [TOO]   OnMode: 7
+          [1651100140426] [84609:7569911] CHIP: [TOO]   OnMode: 4
       disabled: true
 
     - label:
@@ -151,7 +151,7 @@ tests:
       verification: |
           ./chip-tool onoff write start-up-on-off 1 1 1
 
-          on TH,Verify that the response status was success
+          on TH(chip-tool),Verify that the response status was success
 
           [1651101661959] [90832:7598169] CHIP: [DMG] WriteResponseMessage =
           [1651101661959] [90832:7598169] CHIP: [DMG] {
@@ -190,7 +190,7 @@ tests:
           ./chip-tool modeselect read current-mode 1 1
 
 
-          on TH,Verify that this number is the same with the number recorded in step 3
+          on TH(chip-tool),Verify that this number is the same with the number recorded in step 3
 
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 2609052120
           [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 4

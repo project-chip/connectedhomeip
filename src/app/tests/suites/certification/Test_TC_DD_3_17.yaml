@@ -240,7 +240,10 @@ tests:
           "Provide each of the Manual Pairing Codes, generated in the previous
           step, to the DUT in any format supported by the DUT"
       verification: |
-          (0xFFF1)
+          1. Run each of the following DUT commands below containing invalid Vendor IDs.
+          2. Verify that the TH commissionee=all-cluserters-app does not get commissioned -or- the DUT make the user fully aware of the security risks of providing an uncertified device with operational and networking credentials
+
+           (0xFFF1)
            $  ./chip-tool pairing code 1 749701123365521327694
 
            (0xFFF2)
