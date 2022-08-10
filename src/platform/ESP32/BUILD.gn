@@ -22,6 +22,7 @@ declare_args() {
   # By default use default/example implementation of CommissionableDataProvider,
   # DeviceAttestationCredentialsProvider and DeviceInstanceInforProvider
   chip_use_factory_data_provider = false
+  chip_use_device_info_provider = false
 }
 
 static_library("ESP32") {
@@ -105,6 +106,13 @@ static_library("ESP32") {
     sources += [
       "ESP32FactoryDataProvider.cpp",
       "ESP32FactoryDataProvider.h",
+    ]
+  }
+
+  if (chip_use_device_info_provider) {
+    sources += [
+      "ESP32DeviceInfoProvider.cpp",
+      "ESP32DeviceInfoProvider.h",
     ]
   }
 }
