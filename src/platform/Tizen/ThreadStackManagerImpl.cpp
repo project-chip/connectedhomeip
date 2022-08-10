@@ -422,8 +422,18 @@ CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyFull()
 
 CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
 {
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    uint64_t extAddr;
+    int threadErr;
+
+    threadErr = thread_get_extended_address(mThreadInstance, &extAddr);
+    VerifyOrReturnError(
+        threadErr == THREAD_ERROR_NONE,
+        (ChipLogError(DeviceLayer, "thread_get_extended_address() failed. ret: %d", threadErr), CHIP_ERROR_INTERNAL));
+
+    extAddr = htobe64(extAddr);
+    memcpy(buf, &extAddr, sizeof(extAddr));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
