@@ -156,10 +156,7 @@ CHIP_ERROR CC13X2_26X2Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t 
     VerifyOrExit(sNvoctpFps.readItem(key.nvID, 0, (uint16_t) len, buf) == NVINTF_SUCCESS,
                  err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
-    if (outLen)
-    {
-        outLen = len;
-    }
+    outLen = len;
 
 exit:
     return err;
