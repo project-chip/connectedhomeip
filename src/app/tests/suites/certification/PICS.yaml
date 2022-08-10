@@ -261,15 +261,15 @@ PICS:
     - label:
           "Does the device implement receiving the MoveToColorTemperature
           command?"
-      id: CC.S.C0A.Rsp
+      id: CC.S.C0a.Rsp
 
     - label:
           "Does the device implement receiving the MoveColorTemperature command?"
-      id: CC.S.C4B.Rsp
+      id: CC.S.C4b.Rsp
 
     - label:
           "Does the device implement receiving the StepColorTemperature command?"
-      id: CC.S.C4C.Rsp
+      id: CC.S.C4c.Rsp
 
     - label:
           "Does the device implement receiving the EnhancedMoveToHue command?"

@@ -25,6 +25,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition: Reset DUT_CE to factory defaults"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
     - label: "TH_CR1 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |

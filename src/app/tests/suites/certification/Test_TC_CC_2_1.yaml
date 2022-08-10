@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 27.2.1. [TC-CC-2.1] Attributes with server as DUT
+name: 25.2.1. [TC-CC-2.1] Attributes with server as DUT
 
 PICS:
     - CC.S
