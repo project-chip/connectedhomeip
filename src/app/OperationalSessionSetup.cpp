@@ -436,7 +436,6 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
 
 void OperationalSessionSetup::PerformLookupOnExistingSession()
 {
-    CHIP_ERROR err   = CHIP_NO_ERROR;
     bool isConnected = false;
 
     if (mPerformingLookupOnConnectedSession)
