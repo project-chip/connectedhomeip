@@ -51,8 +51,25 @@ from __future__ import print_function
 
 import subprocess
 import sys
+import os
 
-args = sys.argv[1:]
+# add windows check
+
+if(sys.platform.startswith('win')):
+    file_name = os.path.splitext(sys.argv[1])
+    args = ''
+    for x in file_name:
+        if x == '.py':
+            args = ['python.exe'] + sys.argv[1:]
+            break
+
+    if bool(args) == False:
+
+        args = sys.argv[1:]
+
+else:
+    args = sys.argv[1:]
+
 
 ret = subprocess.call(args)
 if ret != 0:
