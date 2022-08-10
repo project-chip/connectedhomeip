@@ -849,6 +849,67 @@ async function if_is_non_zero_default(value, options)
   }
 }
 
+function isPixit(val)
+{
+  if (val.toString().startsWith("PIXIT.")) {
+    return true;
+  }
+
+  return false;
+}
+
+async function GetPixitType(type)
+{
+  if (StringHelper.isOctetString(type) || StringHelper.isCharString(type)) {
+    return "std::string";
+  } else if (type === "size_t" || type === "bool") {
+    return type
+  }
+  const basicType = await asNativeType.call(this, type);
+  return basicType;
+}
+
+async function PixitInC(val, type)
+{
+  const basicType = await GetPixitType.call(this, type);
+  return "mPixit[\"" + val + "\"].Get<" + basicType + ">()"
+}
+
+async function formatPixit(val, type, useSpans)
+{
+  const pixitInC = await PixitInC.call(this, val, type);
+  if (StringHelper.isOctetString(type)) {
+    if (useSpans) {
+      // This will currently do weird things if the pixit is a hex string. So...don't do that.
+      return "chip::ByteSpan(chip::Uint8::from_const_char(" + pixitInC + ".c_str()), " + pixitInC + ".length())";
+    } else {
+      return pixitInC + ".c_str()";
+    }
+  } else if (StringHelper.isCharString(type)) {
+    if (useSpans) {
+      // This should be the UTF-8 encode length, but it's just the length. So, don't use weird chars.
+      return "chip::CharSpan(" + pixitInC + ".c_str(), " + pixitInC + ".length())";
+    } else {
+      return pixitInC + ".c_str()";
+    }
+  } else {
+    return pixitInC;
+  }
+}
+
+async function maybeSubPixit(val, type, typedLiteral, useSpans)
+{
+  if (isPixit(val)) {
+    return await formatPixit.call(this, val, type, useSpans);
+  } else if (typedLiteral) {
+    return await asTypedLiteral.call(this, val, type);
+  } else if (StringHelper.isOctetString(type) || StringHelper.isCharString(type)) {
+    return "\"" + val + "\"";
+  } else {
+    return val;
+  }
+}
+
 //
 // Module exports
 //
@@ -874,3 +935,6 @@ exports.zcl_events_fields_by_event_name       = zcl_events_fields_by_event_name;
 exports.zcl_commands_that_need_timed_invoke   = zcl_commands_that_need_timed_invoke;
 exports.if_is_fabric_scoped_struct            = if_is_fabric_scoped_struct;
 exports.if_is_non_zero_default                = if_is_non_zero_default;
+exports.isPixit                               = isPixit;
+exports.maybeSubPixit                         = maybeSubPixit;
+exports.formatPixit                           = formatPixit;

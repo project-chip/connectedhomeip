@@ -127,6 +127,7 @@ executable("darwin-framework-tool") {
 
     # pics is needed by tests
     "${chip_root}/src/app/tests/suites/pics",
+    "${chip_root}/src/app/tests/suites/pixit",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
   ]

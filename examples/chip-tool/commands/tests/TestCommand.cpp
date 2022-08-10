@@ -25,6 +25,16 @@ CHIP_ERROR TestCommand::RunCommand()
         PICS.SetValue(PICSBooleanReader::Read(mPICSFilePath.Value()));
     }
 
+    if (mPixitFilePath.HasValue())
+    {
+        CHIP_ERROR err = PixitReader::UpdateFromFile(mPixitFilePath.Value(), mPixit);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool, "Error parsing PIXITs file");
+            return err;
+        }
+    }
+
     NextTest();
 
     return CHIP_NO_ERROR;

@@ -57,6 +57,7 @@
     VerifyOrReturn(CheckValue{{#if (isString type)}}AsString{{/if}}("{{label}}", {{actual}}, 
       {{~#if (chip_tests_variables_has expected)}}{{expected}}
       {{else if keepAsExpected}}{{expected}}
+      {{else if (isPixit expected)}}{{formatPixit expected type true}}
       {{else if (isOctetString type)}}
         {{> octetStringValue value=expected}}
       {{else if (isCharString type)}}chip::CharSpan("{{expected}}", {{utf8StringLength expected}})

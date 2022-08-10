@@ -54,6 +54,16 @@
           {{asTypedExpression (chip_tests_config_get_default_value definedValue) type}};
         {{/if_is_strongly_typed_bitmap}}
       {{/if_is_strongly_typed_chip_enum~}}
+    {{else if (isPixit definedValue)}}
+      {{~#if_is_strongly_typed_chip_enum type~}}
+        static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{formatPixit definedValue type true}});
+      {{else}}
+        {{#if_is_strongly_typed_bitmap type}}
+          static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{formatPixit definedValue type true}});
+        {{else}}
+          {{formatPixit definedValue type true}};
+        {{/if_is_strongly_typed_bitmap}}
+      {{/if_is_strongly_typed_chip_enum~}}
     {{else~}}
       {{~#if_is_strongly_typed_chip_enum type~}}
         static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{definedValue}});

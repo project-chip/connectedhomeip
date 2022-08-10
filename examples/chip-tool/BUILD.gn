@@ -97,6 +97,7 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/app/tests/suites/commands/log",
     "${chip_root}/src/app/tests/suites/commands/system",
     "${chip_root}/src/app/tests/suites/pics",
+    "${chip_root}/src/app/tests/suites/pixit",
     "${chip_root}/src/credentials:file_attestation_trust_store",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",

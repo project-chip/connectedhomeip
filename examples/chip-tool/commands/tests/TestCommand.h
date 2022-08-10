@@ -27,6 +27,7 @@
 #include <app/tests/suites/commands/system/SystemCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
 #include <app/tests/suites/include/PICSChecker.h>
+#include <app/tests/suites/include/PixitStorage.h>
 #include <app/tests/suites/include/TestRunner.h>
 #include <app/tests/suites/include/ValueChecker.h>
 
@@ -37,6 +38,7 @@ class TestCommand : public TestRunner,
                     public ValueChecker,
                     public ConstraintsChecker,
                     public PICSChecker,
+                    public PixitStorage,
                     public LogCommands,
                     public CommissionerCommands,
                     public DiscoveryCommands,
@@ -53,6 +55,7 @@ public:
                     "Boolean indicating if the test runner should continue execution if a test fails. Default to false.");
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
         AddArgument("PICS", &mPICSFilePath);
+        AddArgument("PIXIT", &mPixitFilePath);
     }
 
     ~TestCommand(){};
@@ -94,6 +97,7 @@ protected:
     }
 
     chip::Optional<char *> mPICSFilePath;
+    chip::Optional<char *> mPixitFilePath;
     chip::Optional<uint16_t> mTimeout;
     std::map<std::string, std::unique_ptr<chip::OperationalDeviceProxy>> mDevices;
 
