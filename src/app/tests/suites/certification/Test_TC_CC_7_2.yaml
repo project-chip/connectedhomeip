@@ -99,8 +99,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 24250
-              maxValue: 25750
+              minValue: 23500
+              maxValue: 26500
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -116,8 +116,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 29250
-              maxValue: 30750
+              minValue: 28500
+              maxValue: 31500
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -149,7 +149,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 34250
+              minValue: 33500
               maxValue: 35000
 
     - label: "Wait 2s"
@@ -226,8 +226,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 19750
-              maxValue: 20250
+              minValue: 18500
+              maxValue: 21500
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -243,8 +243,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 14750
-              maxValue: 15250
+              minValue: 13500
+              maxValue: 16500
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -295,7 +295,7 @@ tests:
       response:
           constraints:
               minValue: 9500
-              maxValue: 10250
+              maxValue: 11000
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008
