@@ -981,10 +981,15 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBy
     return ScheduleBufferPressureEventDelivery(aBytesWritten);
 }
 
-void Engine::ScheduleUrgentEventDeliverySync()
+void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
 {
-    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([](ReadHandler * handler) {
+    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([fabricIndex](ReadHandler * handler) {
         if (handler->IsType(ReadHandler::InteractionType::Read))
+        {
+            return Loop::Continue;
+        }
+
+        if (fabricIndex.HasValue() && fabricIndex.Value() != handler->GetAccessingFabricIndex())
         {
             return Loop::Continue;
         }
