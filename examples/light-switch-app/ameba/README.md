@@ -97,7 +97,8 @@ to be On or Off.
             A19           TX
             A18           RX
             GND           GND
-            
+
+
 -   For AmebaZ2
 
             Ameba         USB-TTL
