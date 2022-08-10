@@ -36,16 +36,13 @@ tests:
       PICS: ILL.S.A0001 && ILL.S.A0002
       verification: |
           ./chip-tool illuminancemeasurement read min-measured-value 1 1
-          On TH, verify the MinMeasuredValue as 1
-
+          On TH(chip-tool), verify the MinMeasuredValue as 1
           [1650881571.375482][2777:2782] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0001 DataVersion: 1034665079
           [1650881571.375596][2777:2782] CHIP:TOO:   MinMeasuredValue: 1
 
           ./chip-tool illuminancemeasurement read max-measured-value 1 1
-          On TH, verify the MaxMeasuredValue as 65534
-
+          On TH(chip-tool), verify the MaxMeasuredValue as 65534
           [1650881715.935533][2791:2797] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0002 DataVersion: 1034665079
-          Verify in TH Log
           [1650881715.935645][2791:2797] CHIP:TOO:   MaxMeasuredValue: 65534
       disabled: true
 

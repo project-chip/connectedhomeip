@@ -26,11 +26,15 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label: "Start the commissioning process of TH1 on DUT"
       verification: |
           sudo ./chip-all-clusters-app --wifi
 
-          DUT as commissioner side:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
 
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
@@ -49,7 +53,7 @@ tests:
           "DUT sends AttestationRequest Command with AttestationNonce as field
           to the TH1."
       verification: |
-          DUT sends AttestationRequest Command with AttestationNonce as field to the TH1.
+          DUT sends AttestationRequest Command with AttestationNonce as field to the TH1, verify attestation response is received on TH(all-clusters-app) log
 
            ./chip-tool operationalcredentials attestation-request hex:F573438E58E445EAB50665023A298E351446F5E5E9493F05F4C63CCC02E1F834 1 0
 
@@ -79,7 +83,7 @@ tests:
 
           3. Copy the result from step 2 in json file and transfer the json file to Raspi That will be running chip-all-clusters-app
 
-          4. Commission DUT to TH using the above generated CD by using dac_provider parameter
+          4. Commission TH to DUT using the above generated CD by using dac_provider parameter
 
           ------>sudo ./chip-all-clusters-app --dac_provide /dec_message.json
 
@@ -164,7 +168,7 @@ tests:
 
           3. Copy the result from step 2 in json file and transfer the json file to Raspi That will be running chip-all-clusters-app
 
-          4. Commission DUT to TH using the above generated CD by using dac_provider parameter
+          4. Commission TH to DUT using the above generated CD by using dac_provider parameter
 
           sudo rm -rf /tmp/chip_*
           ./all-cluster-app --wifi --dac_provider /dec_3.json
@@ -216,7 +220,7 @@ tests:
 
           3. Copy the result from step 2 in json file and transfer the json file to Raspi That will be running chip-all-clusters-app
 
-          4. Commission DUT to TH using the above generated CD by using dac_provider parameter
+          4. Commission TH to DUT using the above generated CD by using dac_provider parameter
 
           sudo rm -rf /tmp/chip_*
           sudo ./chip-all-clusters-app  --dac_provider /cd.json

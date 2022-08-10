@@ -24,14 +24,19 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label: "DUT reads DeviceTypeList from TH."
       PICS: DESC.C.A0000
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool descriptor read device-list 1 0
 
-          verify TH(On a reference app) receives the right Read Request Message for the data sent in the above command
-
-          Verify in DUT as client side:
+          verify the " device-list response" on the TH (all-cluster-app) log:
 
           [1657095358.858070][3443:3448] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2880250959
           [1657095358.858130][3443:3448] CHIP:TOO:   device list: 1 entries
@@ -46,10 +51,7 @@ tests:
       verification: |
           ./chip-tool descriptor read server-list 1 0
 
-          verify TH(On a reference app) receives the right Read Request Message for the data sent in the above command
-
-          Verify in DUT as client side:
-
+          verify the " server-list response" on the TH (all-cluster-app) log:
 
           [1657095388.496869][3451:3456] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 2880250959
           [1657095388.496964][3451:3456] CHIP:TOO:   server list: 26 entries
@@ -86,10 +88,7 @@ tests:
       verification: |
           ./chip-tool descriptor read client-list 1 0
 
-          verify TH(On a reference app) receives the right Read Request Message for the data sent in the above command
-
-          Verify in DUT as client side:
-
+          verify the " client-list response" on the TH (all-cluster-app) log:
 
           [1657095415.492647][3459:3464] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 2880250959
           [1657095415.492717][3459:3464] CHIP:TOO:   client list: 1 entries
@@ -101,10 +100,7 @@ tests:
       verification: |
           ./chip-tool descriptor read  parts-list 1 0
 
-          verify TH(On a reference app) receives the right Read Request Message for the data sent in the above command
-
-          Verify in DUT as client side:
-
+          verify the " parts-list response" on the TH (all-cluster-app) log:
 
           [1657095439.967554][3470:3475] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2880250959
           [1657095439.967633][3470:3475] CHIP:TOO:   parts list: 2 entries

@@ -237,6 +237,7 @@ TEMPLATE = '''/*
 #pragma once
 
 #include <cstdint>
+#include <cstddef>
 
 namespace chip {
 namespace ASN1 {

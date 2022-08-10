@@ -29,7 +29,7 @@ tests:
       verification: |
           ./chip-tool groups read name-support 1 1
 
-          Verify the name support value on the TH Log:
+          Verify the "name support value" on the TH(Chip-tool)  Log:
 
           [1651217306.461810][2457:2462] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_0000 DataVersion: 745654550
           [1651217306.461894][2457:2462] CHIP:TOO:   name support: 128(binary:10000000)
@@ -41,7 +41,7 @@ tests:
       verification: |
           ./chip-tool groups write-by-id 0x0000 126 1 1
 
-          Verify the response is UNSUPPORTED_WRITE on the TH Log:
+          Verify the "response is UNSUPPORTED_WRITE" on the TH(Chip-tool)  Log:
 
           [1651217949.041814][2514:2519] CHIP:DMG: }
           [1651217949.041889][2514:2519] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
@@ -51,7 +51,7 @@ tests:
       verification: |
           ./chip-tool groups read name-support 1 1
 
-          Verify the name support value on the TH Log:
+          Verify the "name support value" on the TH(Chip-tool)  Log:
 
           [1651217306.461810][2457:2462] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_0000 DataVersion: 745654550
           [1651217306.461894][2457:2462] CHIP:TOO:   name support: 128

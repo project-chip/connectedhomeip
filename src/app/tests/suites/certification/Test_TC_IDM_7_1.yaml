@@ -24,6 +24,12 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+      disabled: true
+
     - label:
           "RD1, RD2, RD3, RD4, RD5 send 3 Subscribe Request Messages to
           DUT.(Total - 15 active subscriptions) Each subscribe request should

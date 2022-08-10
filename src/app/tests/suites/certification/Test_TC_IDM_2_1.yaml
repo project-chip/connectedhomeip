@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT sends the Read Request Message to the TH to read one attribute on
           a given cluster and endpoint. AttributePath = [[Endpoint = Specific
@@ -31,7 +36,7 @@ tests:
           Attribute]] On receipt of this message, TH should send a report data
           action with the attribute value to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool identify read identify-time 1 1
 
@@ -56,7 +61,7 @@ tests:
           [1655720917.721144][10909:10909] CHIP:DMG: },
           [1655720917.721267][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent success response
 
           [1657881522.001890][2575:2580] CHIP:DMG: }
           [1657881522.002053][2575:2580] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3999381333
@@ -71,7 +76,7 @@ tests:
           TH should send a report data action with the attribute value to the
           DUT."
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0x3 0xFFFFFFFF 1 0
 
@@ -99,7 +104,7 @@ tests:
 
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1657881584.166241][2584:2589] CHIP:DMG: }
           [1657881584.166599][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 4079829024
           [1657881584.166672][2584:2589] CHIP:TOO:   identify time: 0
@@ -133,12 +138,12 @@ tests:
           message, TH should send a report data action with the attribute values
           to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 0xFFFF
 
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command and
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
       disabled: true
 
     - label:
@@ -147,6 +152,7 @@ tests:
           Attribute = Specific Attribute]] On receipt of this message, TH should
           send a report data action with the attribute value to the DUT."
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD  1 0xFFFF
 
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
@@ -168,7 +174,7 @@ tests:
           [1655721447.463382][10909:10909] CHIP:DMG: },
           [1655721447.463503][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
       disabled: true
 
     - label:
@@ -177,7 +183,7 @@ tests:
           Specific ClusterID]] On receipt of this message, TH should send a
           report data action with the attribute value to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0x03 0xFFFFFFFF  1 0xFFFF
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
@@ -201,7 +207,7 @@ tests:
           [1655721586.588403][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1655721586.588510][10909:10909] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657881729.900518][2608:2613] CHIP:DMG: }
           [1657881729.901108][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 4079829024
           [1657881729.901182][2608:2613] CHIP:TOO:   identify time: 0
@@ -259,7 +265,7 @@ tests:
           receipt of this message, TH should send a report data action with the
           attribute value to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0x03 0x01  1 0xFFFF
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
@@ -283,7 +289,7 @@ tests:
           [1655721699.305990][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657881792.350417][2616:2621] CHIP:DMG: }
           [1657881792.350641][2616:2621] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
           [1657881792.350742][2616:2621] CHIP:TOO:   identify type: 2
@@ -298,7 +304,7 @@ tests:
           Specific Endpoint]] On receipt of this message, TH should send a
           report data action with the attribute value to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 1
 
@@ -324,7 +330,7 @@ tests:
 
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
       disabled: true
 
     - label:
@@ -334,7 +340,7 @@ tests:
           attribute]] On receipt of this message, TH should send a report data
           action with the attribute value to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD  1 0
 
@@ -360,7 +366,7 @@ tests:
           [1655721935.484595][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657881935.225146][2631:2636] CHIP:DMG: }
           [1657881935.225620][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 4079829024
           [1657881935.225700][2631:2636] CHIP:TOO:   ClusterRevision: 4
@@ -422,7 +428,7 @@ tests:
           data type bool."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Bool
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool onoff read on-off 1 1
 
@@ -449,7 +455,7 @@ tests:
           [1655722298.459820][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657881978.415828][2640:2645] CHIP:DMG: }
           [1657881978.416014][2640:2645] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 4019194565
           [1657881978.416091][2640:2645] CHIP:TOO:   OnOff: FALSE
@@ -461,7 +467,7 @@ tests:
           data type string."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_String
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool modeselect read description  1 1
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
@@ -487,7 +493,7 @@ tests:
           [1655722750.453457][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657882077.867099][2655:2660] CHIP:DMG: }
           [1657882077.867278][2655:2660] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000 DataVersion: 321966114
           [1657882077.867352][2655:2660] CHIP:TOO:   Description: Coffee
@@ -499,7 +505,7 @@ tests:
           data type unsigned integer."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_UnsignedInteger
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0x3 0x1 1 0
 
@@ -526,7 +532,7 @@ tests:
 
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657882043.053353][2648:2653] CHIP:DMG: }
           [1657882043.053561][2648:2653] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
           [1657882043.053662][2648:2653] CHIP:TOO:   identify type: 2
@@ -538,7 +544,7 @@ tests:
           data type signed integer."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_SignedInteger
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool pressuremeasurement read measured-value 1 1
 
@@ -565,7 +571,7 @@ tests:
 
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657882152.821695][2665:2670] CHIP:DMG: }
           [1657882152.821886][2665:2670] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0403 Attribute 0x0000_0000 DataVersion: 1184750328
           [1657882152.821981][2665:2670] CHIP:TOO:   MeasuredValue: 0
@@ -585,7 +591,7 @@ tests:
           data type Octet String."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_OctetString
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool operationalcredentials read trusted-root-certificates 1 0
 
@@ -611,8 +617,7 @@ tests:
           [1655723062.691494][10909:10909] CHIP:DMG: },
           [1655723062.691635][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs , verify that TH all-clusters-app sent success response with attribute values
           [1657882197.831561][2673:2678] CHIP:DMG: }
           [1657882197.831802][2673:2678] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 1112172817
           [1657882197.831892][2673:2678] CHIP:TOO:   TrustedRootCertificates: 1 entries
@@ -625,7 +630,7 @@ tests:
           data type Struct."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Struct
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            sudo ./chip-tool  generalcommissioning read  basic-commissioning-info   1 0
 
@@ -652,7 +657,7 @@ tests:
           [1655723112.902782][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657882247.469521][2681:2686] CHIP:DMG:         InteractionModelRevision = 1
           [1657882247.469553][2681:2686] CHIP:DMG: }
           [1657882247.469732][2681:2686] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0001 DataVersion: 3643421834
@@ -668,7 +673,7 @@ tests:
           data type List."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_List
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool modeselect read  supported-modes 1 1
 
@@ -695,7 +700,7 @@ tests:
           [1655723151.160243][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
 
           [1657882339.679133][2701:2706] CHIP:DMG: }
           [1657882339.679605][2701:2706] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 321966114
@@ -735,7 +740,7 @@ tests:
           data type enum."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Enum
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
@@ -760,7 +765,7 @@ tests:
           [1655723234.549097][10909:10909] CHIP:DMG: },
           [1655723234.549241][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657882403.876372][2715:2720] CHIP:DMG: }
           [1657882403.876514][2715:2720] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 737072536
           [1657882403.876595][2715:2720] CHIP:TOO:   occupancy sensor type: 0
@@ -772,7 +777,7 @@ tests:
           data type bitmap."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Bitmap
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool levelcontrol read options 1 1
 
@@ -798,7 +803,7 @@ tests:
           [1655723282.098206][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657882440.996840][2725:2730] CHIP:DMG:         InteractionModelRevision = 1
           [1657882440.996862][2725:2730] CHIP:DMG: }
           [1657882440.997003][2725:2730] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_000F DataVersion: 3900213102
@@ -810,7 +815,7 @@ tests:
           "DUT sends the Read Request Message to the TH to read an attribute
           Repeat the above steps 3 times."
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool  occupancysensing read occupancy    1 1
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
@@ -835,7 +840,7 @@ tests:
           [1655723372.329162][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          If the DUT has to provision to verify the logs verify that TH all-clusters-app sent success response with attribute values
           [1657883628.582877][2780:2785] CHIP:DMG:         InteractionModelRevision = 1
           [1657883628.582909][2780:2785] CHIP:DMG: }
           [1657883628.583066][2780:2785] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000 DataVersion: 737072536
@@ -891,6 +896,8 @@ tests:
           TH should send a report data action with the attribute values to the
           DUT."
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           sudo ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF --timeout 40
           On TH verify that Read Request Message received from DUT
       disabled: true

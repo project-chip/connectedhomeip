@@ -41,7 +41,7 @@ tests:
       verification: |
           ./chip-tool descriptor read server-list 54 0
 
-          Verify the "ServerList" in the TH(chip-tool) Log:
+          Verify the "ServerList" in the TH(Chip-tool) Log:
 
           [1645772414.100694][3827:3832] CHIP:DMG:         SuppressResponse = true,
           [1645772414.100718][3827:3832] CHIP:DMG:         InteractionModelRevision = 1
@@ -76,7 +76,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read feature-map 54 0
 
-          Verify the "FeatureMap: 2" in  the TH(chip-tool) Log:
+          Verify the "FeatureMap: 2" in  the TH(Chip-tool) Log:
 
           [1645772204.502545][3809:3814] CHIP:DMG:         SuppressResponse = true,
           [1645772204.502608][3809:3814] CHIP:DMG:         InteractionModelRevision = 1
@@ -91,7 +91,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read max-networks 54 0
 
-          Verify "MaxNetworks" on the TH(chip-tool) Log:
+          Verify "MaxNetworks" on the TH(Chip-tool) Log:
 
           [1645772548.257320][3837:3842] CHIP:DMG:         SuppressResponse = true,
           [1645772548.257381][3837:3842] CHIP:DMG:         InteractionModelRevision = 1
@@ -113,7 +113,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read networks 54 0
 
-          Verify "Networks entries and its status" on the TH(chip-tool) Log:
+          Verify "Networks entries and its status" on the TH(Chip-tool) Log:
 
           [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true,
           [1645772651.445149][3856:3861] CHIP:DMG:         InteractionModelRevision = 1
@@ -132,7 +132,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read scan-max-time-seconds 54 0
 
-          Verify  "ScanMaxTimeSeconds" on the TH(chip-tool) Log:
+          Verify  "ScanMaxTimeSeconds" on the TH(Chip-tool) Log:
 
           [1645772820.740795][3867:3872] CHIP:DMG:         SuppressResponse = true,
           [1645772820.740855][3867:3872] CHIP:DMG:         InteractionModelRevision = 1
@@ -147,7 +147,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read connect-max-time-seconds 54 0
 
-          Verify "ConnectMaxTimeSeconds" on the TH(chip-tool) Log:
+          Verify "ConnectMaxTimeSeconds" on the TH(Chip-tool) Log:
 
           [1645772901.118880][3879:3884] CHIP:DMG:         SuppressResponse = true,
           [1645772901.119008][3879:3884] CHIP:DMG:         InteractionModelRevision = 1
@@ -162,7 +162,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read interface-enabled 54 0
 
-          Verify "InterfaceEnabled" on the TH(chip-tool) Log:
+          Verify "InterfaceEnabled" on the TH(Chip-tool) Log:
 
           [1645772984.653996][3895:3900] CHIP:DMG:         SuppressResponse = true,
           [1645772984.654043][3895:3900] CHIP:DMG:         InteractionModelRevision = 1
@@ -178,7 +178,7 @@ tests:
           ./chip-tool networkcommissioning read last-networking-status 54 0
 
 
-          Verify "LastNetworkingStatus" on the TH(chip-tool) Log:
+          Verify "LastNetworkingStatus" on the TH(Chip-tool) Log:
 
           [1645773078.930516][3905:3910] CHIP:DMG:         SuppressResponse = true,
           [1645773078.930579][3905:3910] CHIP:DMG:         InteractionModelRevision = 1
@@ -196,7 +196,7 @@ tests:
           ./chip-tool networkcommissioning read last-network-id 54 0
 
 
-          Verify "LastNetworkID" on the TH(chip-tool) Log:
+          Verify "LastNetworkID" on the TH(Chip-tool) Log:
 
           [1645773167.178501][3913:3918] CHIP:DMG:         SuppressResponse = true,
           [1645773167.178561][3913:3918] CHIP:DMG:         InteractionModelRevision = 1
@@ -211,7 +211,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read last-connect-error-value 54 0
 
-          Verify "LastConnectErrorValue" on the TH(chip-tool) Log:
+          Verify "LastConnectErrorValue" on the TH(Chip-tool) Log:
 
           [1645773318.752774][3938:3943] CHIP:DMG:         SuppressResponse = true,
           [1645773318.752861][3938:3943] CHIP:DMG:         InteractionModelRevision = 1

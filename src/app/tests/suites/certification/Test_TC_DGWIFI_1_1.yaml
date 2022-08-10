@@ -33,7 +33,7 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read cluster-revision 1 0
 
-          On TH, verify that DUT sends ClusterRevision attribute  value as 1
+          Verify " ClusterRevision " on the TH(Chip-tool) Log:
 
           [1651834623.658618][3910:3916] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFFD DataVersion: 2858283115
           [1651834623.658776][3910:3916] CHIP:TOO:   ClusterRevision: 1
@@ -43,7 +43,7 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read feature-map 1 0
 
-          On TH, verify that DUT sends  FeatureMap attribute value as 0
+          Verify " Featuremap " on the TH(Chip-tool) Log:
 
           [1651834671.432383][3919:3924] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFFC DataVersion: 2858283115
           [1651834671.432466][3919:3924] CHIP:TOO:   FeatureMap: 3
@@ -53,7 +53,7 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read attribute-list 1 0
 
-          On TH, verify that DUT  sends a list of supported attributes
+          Verify " AttributeList " on the TH(Chip-tool) Log:
 
           [1651834734.844051][3928:3933] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFFB DataVersion: 2858283115
           [1651834734.844159][3928:3933] CHIP:TOO:   AttributeList: 18 entries
@@ -81,7 +81,7 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read accepted-command-list 1 0
 
-          On TH, verify that DUT  responds as list of Accepted Command as 1 entries.
+          Verify " AcceptedCommandList " on the TH(Chip-tool) Log:
 
           [1651788161.332422][241228:241233] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFF9 DataVersion: 3097381936
           [1651788161.332475][241228:241233] CHIP:TOO:   AcceptedCommandList: 1 entries
@@ -92,7 +92,7 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read generated-command-list 1 0
 
-          On TH, verify that DUT  responds as list of GeneratedCommandList as 0 entries.
+          Verify " GeneratedCommandList " on the TH(Chip-tool) Log:
 
           [1651788208.608429][241239:241244] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFF8 DataVersion: 3097381936
           [1651788208.608490][241239:241244] CHIP:TOO:   GeneratedCommandList: 0 entries

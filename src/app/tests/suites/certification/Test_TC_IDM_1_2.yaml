@@ -326,7 +326,7 @@ tests:
            ./chip-tool onoff on 1 1 --timedInteractionTimeoutMs 100
           On TH, verify DUT  responsds as UNSUPPORTED_ACCESS  for the data sent in the above command
           [1659422136.353455][2014:2019] CHIP:DMG:
-          [1659422136.353482][2014:2019] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659422136.353482][2014:2019] CHIP:DMG:         InteractionModelRevision = 1
           [1659422136.353510][2014:2019] CHIP:DMG: },
           [1659422136.353575][2014:2019] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x7e
           [1659422136.353612][2014:2019] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)

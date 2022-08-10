@@ -44,7 +44,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read fabrics 1 0
 
-          Verify that there is a single entry in the list
+          Verify that there is a single entry in the list TH (chip-tool) Log
 
           [1655471672.386120][13377:13382] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2667297992
           [1655471672.386213][13377:13382] CHIP:TOO:   Fabrics: 1 entries
@@ -64,7 +64,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read nocs 1 0
 
-          Verify there is single entry and Fabric ID matches FabricID of TH1
+          Verify there is single entry and Fabric ID matches FabricID of TH1 on TH(chip-tool) log:
 
           [1658392350.745452][3254:3259] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 1660110003
           [1658392350.748972][3254:3259] CHIP:TOO:   NOCs: 1 entries
@@ -93,7 +93,7 @@ tests:
           To commission DUT to TH2 follow below procedure
           1../chip-tool  pairing open-commissioning-window 1 1 400 2000 3840  on TH
 
-          Verify in TH Log:
+          Verify manual parin code on TH1 (chip-tool) Log:
           CHIP:IN: Sending encrypted msg 0xaaaad3464d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 5805157 msec
           [1635691999.946536][3822:3827] CHIP:DMG: ICR moving to [CommandSen]
           [1635691999.946586][3822:3827] CHIP:CTL: Manual pairing code: [35407541839]
@@ -104,9 +104,9 @@ tests:
           [1635691999.946983][3822:3827] CHIP:EM: Flushed pending ack for MessageCounter:3234931243 on exchange 35324i
 
 
-          2. manualcode will be provided by TH when we pass above command pass manualcode in TH2 to commission by using "./chip-tool pairing code 2 36199720672" considering 36199720672 as manualcode generated in TH
+          2. Verify TH2 is commissioned  by using "./chip-tool pairing code 2 36199720672" considering 36199720672 as manualcode generated in TH1
 
-          Verify whether you got below message in the log of TH
+          Verify whether you got below message on TH2 (chip-tool) log
           Device commissioning completed with success
       disabled: true
 
@@ -116,7 +116,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read fabrics 2 0
 
-          Verify there is single entry and FabricID matches the FabricID of TH2
+          Verify there is single entry and FabricID matches the FabricID of TH2 on TH2 (chip-tool) log
 
           [1655471672.386120][13377:13382] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2667297992
           [1655471672.386213][13377:13382] CHIP:TOO:   Fabrics: 1 entries
@@ -133,9 +133,9 @@ tests:
     - label:
           "TH2 does a non-fabric-filtered read of NOCs attribute list from DUT"
       verification: |
-          "./chip-tool operationalcredentials read nocs 2 0
+          ./chip-tool operationalcredentials read nocs 2 0
 
-          Verify there is single entry and verify the NOC entry of TH1 and NOC entry of TH2 are different
+          Verify there is single entry on TH2 (chip-tool) log
 
           [1655471146.098327][13302:13307] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2667297991
           [1655471146.098416][13302:13307] CHIP:TOO:   NOCs: 1 entries
@@ -146,4 +146,6 @@ tests:
           [1655471146.098660][13302:13307] CHIP:TOO:      }
 
           "
+
+          Verify the NOC entry of TH1 and NOC entry of TH2 are different in TH
       disabled: true

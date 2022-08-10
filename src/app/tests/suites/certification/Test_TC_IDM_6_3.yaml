@@ -32,8 +32,10 @@ tests:
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
           sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+           On TH(Reference app) verify  the Read Request Message received has these fields
+           EventRequests, EventFilters and FabricFiltered
 
-          On TH(Reference app) verify that Read Request Message received has these fields  EventRequests, EventFilters, and FabricFiltered.
+          If the DUT has to provision to verify the logs,   verify that Read Request Message received has these fields  EventRequests, EventFilters, and FabricFiltered.
 
 
 

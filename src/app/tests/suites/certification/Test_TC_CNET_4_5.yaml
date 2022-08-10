@@ -38,7 +38,7 @@ tests:
 
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
 
-          Verify  "FAILSAFE_REQUIRED status code"  on the TH(chip-tool) Log:
+          Verify  "FAILSAFE_REQUIRED status code"  on the TH(Chip-tool) Log:
 
           [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
           [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
@@ -56,7 +56,7 @@ tests:
 
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
 
-          Verify  "FAILSAFE_REQUIRED status code"  on the TH(chip-tool) Log:
+          Verify  "FAILSAFE_REQUIRED status code"  on the TH(Chip-tool) Log:
 
           [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
           [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
@@ -74,7 +74,7 @@ tests:
 
           ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
 
-          Verify  "FAILSAFE_REQUIRED status code"  on the TH(chip-tool) Log:
+          Verify  "FAILSAFE_REQUIRED status code"  on the TH(Chip-tool) Log:
 
           [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
           [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)

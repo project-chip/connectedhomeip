@@ -458,6 +458,16 @@ void ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchange
     Status status = Status::Success;
     mExchange.Grab(apExchangeContext);
 
+    //
+    // Let's update the session we're tracking in our SessionHolder to that associated with the message that was just received.
+    // This CAN be different from the one we were tracking before, since the server is permitted to send exchanges on any valid
+    // session to us, of which there could be multiple.
+    //
+    // Since receipt of a message is proof of a working session on the peer, it's always best to update to that if possible
+    // to maximize our chances of success later.
+    //
+    mReadPrepareParams.mSessionHolder.Grab(mExchange->GetSessionHandle());
+
     CHIP_ERROR err = ProcessReportData(std::move(aPayload));
     if (err != CHIP_NO_ERROR)
     {
@@ -576,14 +586,14 @@ exit:
         {
             MoveToState(ClientState::AwaitingSubscribeResponse);
         }
-        else if (IsSubscriptionActive())
+        else if (IsSubscriptionActive() && err == CHIP_NO_ERROR)
         {
             //
             // Only refresh the liveness check timer if we've successfully established
             // a subscription and have a valid value for mMaxInterval which the function
             // relies on.
             //
-            RefreshLivenessCheckTimer();
+            err = RefreshLivenessCheckTimer();
         }
     }
 
@@ -753,7 +763,11 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
 void ReadClient::OverrideLivenessTimeout(System::Clock::Timeout aLivenessTimeout)
 {
     mLivenessTimeoutOverride = aLivenessTimeout;
-    RefreshLivenessCheckTimer();
+    auto err                 = RefreshLivenessCheckTimer();
+    if (err != CHIP_NO_ERROR)
+    {
+        Close(err);
+    }
 }
 
 CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
@@ -783,11 +797,6 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
         static_cast<long unsigned>(timeout.count()), mSubscriptionId, GetFabricIndex(), ChipLogValueX64(GetPeerNodeId()));
     err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
         timeout, OnLivenessTimeoutCallback, this);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        Close(err);
-    }
 
     return err;
 }
@@ -854,7 +863,7 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
 
     mNumRetries = 0;
 
-    RefreshLivenessCheckTimer();
+    ReturnErrorOnFailure(RefreshLivenessCheckTimer());
 
     return CHIP_NO_ERROR;
 }
@@ -874,12 +883,18 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(const ReadPrepareParams & aReadPrepa
 {
     VerifyOrReturnError(aReadPrepareParams.mMinIntervalFloorSeconds <= aReadPrepareParams.mMaxIntervalCeilingSeconds,
                         CHIP_ERROR_INVALID_ARGUMENT);
+
     return SendSubscribeRequestImpl(aReadPrepareParams);
 }
 
 CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadPrepareParams)
 {
     VerifyOrReturnError(ClientState::Idle == mState, CHIP_ERROR_INCORRECT_STATE);
+
+    if (&aReadPrepareParams != &mReadPrepareParams)
+    {
+        mReadPrepareParams.mSessionHolder = aReadPrepareParams.mSessionHolder;
+    }
 
     mMinIntervalFloorSeconds = aReadPrepareParams.mMinIntervalFloorSeconds;
 

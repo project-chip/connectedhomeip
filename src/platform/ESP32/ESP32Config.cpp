@@ -73,6 +73,8 @@ const ESP32Config::Key ESP32Config::kConfigKey_VendorName            = { kConfig
 const ESP32Config::Key ESP32Config::kConfigKey_ProductId             = { kConfigNamespace_ChipFactory, "product-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_ProductName           = { kConfigNamespace_ChipFactory, "product-name" };
 const ESP32Config::Key ESP32Config::kConfigKey_UniqueId              = { kConfigNamespace_ChipFactory, "unique-id" };
+const ESP32Config::Key ESP32Config::kConfigKey_SupportedCalTypes     = { kConfigNamespace_ChipFactory, "cal-types" };
+const ESP32Config::Key ESP32Config::kConfigKey_SupportedLocaleSize   = { kConfigNamespace_ChipFactory, "locale-sz" };
 
 // Keys stored in the chip-config namespace
 const ESP32Config::Key ESP32Config::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };

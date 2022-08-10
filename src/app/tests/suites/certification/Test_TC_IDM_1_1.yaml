@@ -24,12 +24,17 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT sends the Invoke Request Message to the TH. The Message should
           contain one valid CommandDataIB, which has the specific Endpoint,
           Specific Cluster and Specific Command."
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool onoff on 1 1
 
@@ -93,7 +98,7 @@ tests:
           Specific Cluster and Specific Command. Send 2 more Invoke Request
           Messages to the TH."
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
           ./chip-tool onoff off 1 1
 
           On TH all-clusters-app, verify that we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
