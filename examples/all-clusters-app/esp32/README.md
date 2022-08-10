@@ -12,7 +12,6 @@ guides to get started.
 ---
 
 -   [Cluster control](#cluster-control)
--   [Note](#note)
 -   [Matter OTA guide](../../../docs/guides/esp32/ota.md)
 -   [RPC console and Device Tracing](../../../docs/guides/esp32/rpc_console.md)
 
