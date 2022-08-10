@@ -5093,11 +5093,6 @@ PICS:
     - label: "Does the Controller DUT support Service Advertising?"
       id: MCORE.SC.ADV
 
-    - label:
-          "Does device support Extended Discovery for Commissionable Node
-          Discovery?"
-      id: MCORE_COM_WIFI
-
     - label: "Does the Controller DUT support Service Advertising?"
       id: MCORE.SC.ADV
 
