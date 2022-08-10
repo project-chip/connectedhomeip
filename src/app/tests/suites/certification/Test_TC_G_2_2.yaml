@@ -33,7 +33,7 @@ tests:
       verification: |
           ./chip-tool groups add-group 0x0001 grp1 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1651218084.427102][2526:2531] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
           [1651218084.427203][2526:2531] CHIP:TOO:   AddGroupResponse: {
@@ -49,7 +49,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the grouptable entries on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1651218198.062850][2538:2543] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 2261933069
           [1651218198.062980][2538:2543] CHIP:TOO:   GroupTable: 1 entries
@@ -69,7 +69,7 @@ tests:
       verification: |
           ./chip-tool groups add-group 0x0002 grp2 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1653484028.897698][11275:11280] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
           [1653484028.897804][11275:11280] CHIP:TOO:   AddGroupResponse: {
@@ -85,7 +85,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the grouptable entries on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1653484065.934504][11281:11286] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1368205390
           [1653484065.934631][11281:11286] CHIP:TOO:   GroupTable: 2 entries
@@ -112,7 +112,7 @@ tests:
       verification: |
           ./chip-tool groups add-group 0x0003 grp3 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1653484116.857523][11289:11294] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
           [1653484116.857675][11289:11294] CHIP:TOO:   AddGroupResponse: {
@@ -128,7 +128,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the grouptable entries on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1653484156.968253][11299:11304] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1368205390
           [1653484156.968414][11299:11304] CHIP:TOO:   GroupTable: 3 entries
@@ -162,7 +162,7 @@ tests:
       verification: |
           ./chip-tool groups add-group 0x0004 grp4 1 1
 
-          Verify the status is RESOURCE_EXHAUSTED on the TH Log:
+          Verify the "status is RESOURCE_EXHAUSTED" on the TH(Chip-tool)  Log:
 
           [1653484187.170553][11306:11311] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
           [1653484187.170637][11306:11311] CHIP:TOO:   AddGroupResponse: {
@@ -178,7 +178,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the grouptable entries on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1653484324.735216][11318:11323] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1368205390
           [1653484324.735368][11318:11323] CHIP:TOO:   GroupTable: 3 entries
@@ -212,7 +212,7 @@ tests:
       verification: |
           ./chip-tool groups add-group 0x0000 grp6 1 1
 
-          Verify the status is CONSTRAINT_ERROR on the TH Log:
+          Verify the "status is CONSTRAINT_ERROR" on the TH(Chip-tool)  Log:
 
           [1653484439.884144][11341:11346] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
           [1653484439.884258][11341:11346] CHIP:TOO:   AddGroupResponse: {
@@ -228,7 +228,7 @@ tests:
       verification: |
           ./chip-tool groups add-group 0x0005 grp5 1 1
 
-          Verify the status is UNSUPPORTED_ACCESS on the TH Log:
+          Verify the "status is UNSUPPORTED_ACCESS" on the TH(Chip-tool)  Log:
 
           [1658302176.951047][2747:2752] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Command 0x0000_0000
           [1658302176.951103][2747:2752] CHIP:TOO:   AddGroupResponse: {
@@ -244,7 +244,7 @@ tests:
       verification: |
           ./chip-tool groups view-group 0x0001 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           1653484504.667714][11349:11354] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
           [1653484504.667841][11349:11354] CHIP:TOO: ViewGroupResponse: {
@@ -261,7 +261,7 @@ tests:
       verification: |
           ./chip-tool groups view-group 0x0000 1 1
 
-          Verify the status is CONSTRAINT_ERROR on the TH Log:
+          Verify the "status is CONSTRAINT_ERROR" on the TH(Chip-tool)  Log:
 
           [1653484611.595344][11412:11417] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
           [1653484611.595454][11412:11417] CHIP:TOO:   ViewGroupResponse: {
@@ -278,7 +278,7 @@ tests:
       verification: |
           ./chip-tool groups remove-group 0x0001 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1653484876.432744][11451:11456] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0003
           [1653484876.432915][11451:11456] CHIP:TOO:   RemoveGroupResponse: {
@@ -294,7 +294,7 @@ tests:
       verification: |
           ./chip-tool groups view-group 0x0001 1 1
 
-          Verify the status is NOT_FOUND on the TH Log:
+          Verify the "status is NOT_FOUND" on the TH(Chip-tool)  Log:
 
           [1653484952.142387][11458:11463] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
           [1653484952.142476][11458:11463] CHIP:TOO:   ViewGroupResponse: {
@@ -309,7 +309,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the grouptable entries on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1655125356.123370][27657:27662] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1860794324
           [1655125356.123494][27657:27662] CHIP:TOO:   GroupTable: 2 entries
@@ -336,7 +336,7 @@ tests:
       verification: |
           ./chip-tool groups remove-group 0x0000 1 1
 
-          Verify the status as CONSTRAINT_ERROR on the TH Log:
+          Verify the "status as CONSTRAINT_ERROR" on the TH(Chip-tool)  Log:
 
           [1653485045.328766][11473:11478] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0003
           [1653485045.328896][11473:11478] CHIP:TOO:   RemoveGroupResponse: {
@@ -352,7 +352,7 @@ tests:
       verification: |
           ./chip-tool groups remove-group 0x0001 1 1
 
-          Verify the status is NOT_FOUND  on the TH Log:
+          Verify the "status is NOT_FOUND"  on the TH(Chip-tool)  Log:
 
           [1653485126.672869][11483:11488] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0003
           [1653485126.672969][11483:11488] CHIP:TOO:   RemoveGroupResponse: {
@@ -366,7 +366,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the grouptable entries on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1655125356.123370][27657:27662] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1860794324
           [1655125356.123494][27657:27662] CHIP:TOO:   GroupTable: 2 entries
@@ -391,7 +391,7 @@ tests:
       verification: |
           ./chip-tool groups remove-all-groups 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1653485455.344097][11508:11513] CHIP:DMG:                              StatusIB =
           [1653485455.344141][11508:11513] CHIP:DMG:                              {
@@ -406,7 +406,7 @@ tests:
       verification: |
           ./chip-tool groups view-group 0x0001 1 1
 
-          Verify the status is NOT_FOUND on the TH Log:
+          Verify the "status is NOT_FOUND" on the TH(Chip-tool)  Log:
 
           [1653559917.259920][3227:3232] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
           [1653559917.259993][3227:3232] CHIP:TOO:   ViewGroupResponse: {
@@ -421,7 +421,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the grouptable entries on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1656332191.739327][27032:27037] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 3761602970
           [1656332191.739391][27032:27037] CHIP:TOO:   GroupTable: 0 entries

@@ -39,9 +39,9 @@ tests:
           "TH1 sends AttestationRequest Command with a random 32 bytes
           AttestationNonce` to the DUT."
       verification: |
-          ./chip-tool operationalcredentials attestation-request hex:hex:97B823C0207728BEC509CFE4D413C95AA693140D1F5D60215913ABB1F220E631 1 0
+          ./chip-tool operationalcredentials attestation-request hex:97B823C0207728BEC509CFE4D413C95AA693140D1F5D60215913ABB1F220E631 1 0 --trace_decode 1
 
-          Verify  attestation response in TH Log:
+          Verify  attestation response in TH(chip-tool) Log:
 
           [1657814395.876850][2481:2486] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
           [1657814395.876900][2481:2486] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0001
@@ -56,16 +56,132 @@ tests:
           "Verify that the DUT generates the Attestation Information and that it
           is sent to TH1 using AttestationResponse Command"
       verification: |
-          Verify DUT generates Attestation Information
+          Verify the attestation information field on TH(chip-tool) Log generated from the previous step
+
+          [1655374218.453303][35023:35028] CHIP:DMG: Attestation Elements (585 bytes) =
+          [1655374218.453366][35023:35028] CHIP:DMG: {
+          [1655374218.453431][35023:35028] CHIP:DMG:     Certification Declaration =
+          [1655374218.453483][35023:35028] CHIP:DMG:     {
+          [1655374218.455342][35023:35028] CHIP:DMG:         Format Version = 1
+          [1655374218.455398][35023:35028] CHIP:DMG:         Vendor Id = 65521
+          [1655374218.455438][35023:35028] CHIP:DMG:         Product Ids =
+          [1655374218.455474][35023:35028] CHIP:DMG:         {
+          [1655374218.455512][35023:35028] CHIP:DMG:             Product Id = 32768
+          [1655374218.455552][35023:35028] CHIP:DMG:             Product Id = 32769
+          [1655374218.455590][35023:35028] CHIP:DMG:             Product Id = 32770
+          [1655374218.455628][35023:35028] CHIP:DMG:             Product Id = 32771
+          [1655374218.455666][35023:35028] CHIP:DMG:             Product Id = 32772
+          [1655374218.455704][35023:35028] CHIP:DMG:             Product Id = 32773
+          [1655374218.455742][35023:35028] CHIP:DMG:             Product Id = 32774
+          [1655374218.455780][35023:35028] CHIP:DMG:             Product Id = 32775
+          [1655374218.455818][35023:35028] CHIP:DMG:             Product Id = 32776
+          [1655374218.455855][35023:35028] CHIP:DMG:             Product Id = 32777
+          [1655374218.455893][35023:35028] CHIP:DMG:             Product Id = 32778
+          [1655374218.455931][35023:35028] CHIP:DMG:             Product Id = 32779
+          [1655374218.455969][35023:35028] CHIP:DMG:             Product Id = 32780
+          [1655374218.456007][35023:35028] CHIP:DMG:             Product Id = 32781
+          [1655374218.456045][35023:35028] CHIP:DMG:             Product Id = 32782
+          [1655374218.456082][35023:35028] CHIP:DMG:             Product Id = 32783
+          [1655374218.456120][35023:35028] CHIP:DMG:             Product Id = 32784
+          [1655374218.456158][35023:35028] CHIP:DMG:             Product Id = 32785
+          [1655374218.456196][35023:35028] CHIP:DMG:             Product Id = 32786
+          [1655374218.456234][35023:35028] CHIP:DMG:             Product Id = 32787
+          [1655374218.456271][35023:35028] CHIP:DMG:             Product Id = 32788
+          [1655374218.456309][35023:35028] CHIP:DMG:             Product Id = 32789
+          [1655374218.456347][35023:35028] CHIP:DMG:             Product Id = 32790
+          [1655374218.456385][35023:35028] CHIP:DMG:             Product Id = 32791
+          [1655374218.456423][35023:35028] CHIP:DMG:             Product Id = 32792
+          [1655374218.456461][35023:35028] CHIP:DMG:             Product Id = 32793
+          [1655374218.456498][35023:35028] CHIP:DMG:             Product Id = 32794
+          [1655374218.456536][35023:35028] CHIP:DMG:             Product Id = 32795
+          [1655374218.456573][35023:35028] CHIP:DMG:             Product Id = 32796
+          [1655374218.456611][35023:35028] CHIP:DMG:             Product Id = 32797
+          [1655374218.456649][35023:35028] CHIP:DMG:             Product Id = 32798
+          [1655374218.456687][35023:35028] CHIP:DMG:             Product Id = 32799
+          [1655374218.456724][35023:35028] CHIP:DMG:             Product Id = 32800
+          [1655374218.456761][35023:35028] CHIP:DMG:             Product Id = 32801
+          [1655374218.456799][35023:35028] CHIP:DMG:             Product Id = 32802
+          [1655374218.456836][35023:35028] CHIP:DMG:             Product Id = 32803
+          [1655374218.456874][35023:35028] CHIP:DMG:             Product Id = 32804
+          [1655374218.456912][35023:35028] CHIP:DMG:             Product Id = 32805
+          [1655374218.456949][35023:35028] CHIP:DMG:             Product Id = 32806
+          [1655374218.456987][35023:35028] CHIP:DMG:             Product Id = 32807
+          [1655374218.457024][35023:35028] CHIP:DMG:             Product Id = 32808
+          [1655374218.457061][35023:35028] CHIP:DMG:             Product Id = 32809
+          [1655374218.457099][35023:35028] CHIP:DMG:             Product Id = 32810
+          [1655374218.457138][35023:35028] CHIP:DMG:             Product Id = 32811
+          [1655374218.457175][35023:35028] CHIP:DMG:             Product Id = 32812
+          [1655374218.457212][35023:35028] CHIP:DMG:             Product Id = 32813
+          [1655374218.457250][35023:35028] CHIP:DMG:             Product Id = 32814
+          [1655374218.457288][35023:35028] CHIP:DMG:             Product Id = 32815
+          [1655374218.457326][35023:35028] CHIP:DMG:             Product Id = 32816
+          [1655374218.457363][35023:35028] CHIP:DMG:             Product Id = 32817
+          [1655374218.457401][35023:35028] CHIP:DMG:             Product Id = 32818
+          [1655374218.457439][35023:35028] CHIP:DMG:             Product Id = 32819
+          [1655374218.457476][35023:35028] CHIP:DMG:             Product Id = 32820
+          [1655374218.457514][35023:35028] CHIP:DMG:             Product Id = 32821
+          [1655374218.457552][35023:35028] CHIP:DMG:             Product Id = 32822
+          [1655374218.457590][35023:35028] CHIP:DMG:             Product Id = 32823
+          [1655374218.457627][35023:35028] CHIP:DMG:             Product Id = 32824
+          [1655374218.457665][35023:35028] CHIP:DMG:             Product Id = 32825
+          [1655374218.457702][35023:35028] CHIP:DMG:             Product Id = 32826
+          [1655374218.457740][35023:35028] CHIP:DMG:             Product Id = 32827
+          [1655374218.457777][35023:35028] CHIP:DMG:             Product Id = 32828
+          [1655374218.457833][35023:35028] CHIP:DMG:             Product Id = 32829
+          [1655374218.457874][35023:35028] CHIP:DMG:             Product Id = 32830
+          [1655374218.457912][35023:35028] CHIP:DMG:             Product Id = 32831
+          [1655374218.457950][35023:35028] CHIP:DMG:             Product Id = 32832
+          [1655374218.457987][35023:35028] CHIP:DMG:             Product Id = 32833
+          [1655374218.458026][35023:35028] CHIP:DMG:             Product Id = 32834
+          [1655374218.458063][35023:35028] CHIP:DMG:             Product Id = 32835
+          [1655374218.458101][35023:35028] CHIP:DMG:             Product Id = 32836
+          [1655374218.458139][35023:35028] CHIP:DMG:             Product Id = 32837
+          [1655374218.458177][35023:35028] CHIP:DMG:             Product Id = 32838
+          [1655374218.458215][35023:35028] CHIP:DMG:             Product Id = 32839
+          [1655374218.458253][35023:35028] CHIP:DMG:             Product Id = 32840
+          [1655374218.458291][35023:35028] CHIP:DMG:             Product Id = 32841
+          [1655374218.458328][35023:35028] CHIP:DMG:             Product Id = 32842
+          [1655374218.458366][35023:35028] CHIP:DMG:             Product Id = 32843
+          [1655374218.458404][35023:35028] CHIP:DMG:             Product Id = 32844
+          [1655374218.458441][35023:35028] CHIP:DMG:             Product Id = 32845
+          [1655374218.458480][35023:35028] CHIP:DMG:             Product Id = 32846
+          [1655374218.458517][35023:35028] CHIP:DMG:             Product Id = 32847
+          [1655374218.458555][35023:35028] CHIP:DMG:             Product Id = 32848
+          [1655374218.458592][35023:35028] CHIP:DMG:             Product Id = 32849
+          [1655374218.458630][35023:35028] CHIP:DMG:             Product Id = 32850
+          [1655374218.458667][35023:35028] CHIP:DMG:             Product Id = 32851
+          [1655374218.458706][35023:35028] CHIP:DMG:             Product Id = 32852
+          [1655374218.458743][35023:35028] CHIP:DMG:             Product Id = 32853
+          [1655374218.458781][35023:35028] CHIP:DMG:             Product Id = 32854
+          [1655374218.458818][35023:35028] CHIP:DMG:             Product Id = 32855
+          [1655374218.458856][35023:35028] CHIP:DMG:             Product Id = 32856
+          [1655374218.458893][35023:35028] CHIP:DMG:             Product Id = 32857
+          [1655374218.458932][35023:35028] CHIP:DMG:             Product Id = 32858
+          [1655374218.458969][35023:35028] CHIP:DMG:             Product Id = 32859
+          [1655374218.459007][35023:35028] CHIP:DMG:             Product Id = 32860
+          [1655374218.459045][35023:35028] CHIP:DMG:             Product Id = 32861
+          [1655374218.459082][35023:35028] CHIP:DMG:             Product Id = 32862
+          [1655374218.459120][35023:35028] CHIP:DMG:             Product Id = 32863
+          [1655374218.459159][35023:35028] CHIP:DMG:             Product Id = 32864
+          [1655374218.459196][35023:35028] CHIP:DMG:             Product Id = 32865
+          [1655374218.459234][35023:35028] CHIP:DMG:             Product Id = 32866
+          [1655374218.459271][35023:35028] CHIP:DMG:             Product Id = 32867
+          [1655374218.459309][35023:35028] CHIP:DMG:         }
+          [1655374218.459347][35023:35028] CHIP:DMG:         Device Type Id = 22
+          [1655374218.459390][35023:35028] CHIP:DMG:         Certificate Id (19) = ZIG20142ZB330003-24
+          [1655374218.459430][35023:35028] CHIP:DMG:         Security Level = 0
+          [1655374218.459470][35023:35028] CHIP:DMG:         Security Information = 0
+          [1655374218.459508][35023:35028] CHIP:DMG:         Version Number = 9876
+          [1655374218.459546][35023:35028] CHIP:DMG:         Certification Type = 0
       disabled: true
 
     - label:
           "TH1 sends CertificateChainRequest Command with CertificateType field
           set to DACCertificate (1) to DUT to obtain DAC"
       verification: |
-          ./chip-tool operationalcredentials certificate-chain-request 1 1 0
+          ./chip-tool operationalcredentials certificate-chain-request 1 1 0  --trace_decode 1
 
-          Verify certificate chain response in TH Log:
+          Verify certificate chain response in TH (chip-tool) Log:
 
           CertificateChainResponse: {
           [1657814457.685538][2491:2496] CHIP:TOO:     certificate: 308201E73082018EA003020102020869CDF10DE9E54ED1300A06082A8648CE3D040302303D3125302306035504030C1C4D6174746572204465762050414920307846464631206E6F2050494431143012060A2B0601040182A27C02010C04464646313020170D3232303230353030303030305A180F39393939313233313233353935395A30533125302306035504030C1C4D61747465722044657620444143203078464646312F30783830303131143012060A2B0601040182A27C02010C044646463131143012060A2B0601040182A27C02020C04383030313059301306072A8648CE3D020106082A8648CE3D03010703420004463AC69342910A0E5588FC6FF56BB63E62ECCECB148F7D4EB03EE552601415767D16A5C663F793E49123260B8297A7CD7E7CFC7B316B39D98E90D29377738E82A360305E300C0603551D130101FF04023000300E0603551D0F0101FF040403020780301D0603551D0E0416041488DDE7B300382932CFF734C04624810F44168A6F301F0603551D2304183016801463540E47F64B1C38D13884A462D16C195D8FFB3C300A06082A8648CE3D040302
@@ -84,9 +200,9 @@ tests:
           "TH1 sends CertificateChainRequest Command with CertificateType field
           set to PAICertificate (2) to DUT to obtain DAC"
       verification: |
-          ./chip-tool operationalcredentials certificate-chain-request 2 1 0
+          ./chip-tool operationalcredentials certificate-chain-request 2 1 0  --trace_decode 1
 
-          Verify CertificateChainResponse and the size is 600 bytes in TH Log:
+          Verify CertificateChainResponse and the size is 600 bytes in TH (chip-tool) Log:
 
           [1657814533.325960][2501:2506] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
           [1657814533.326064][2501:2506] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
@@ -107,9 +223,9 @@ tests:
           "TH1 Reads the VendorID attribute of the Basic Information cluster and
           saves it as basic_info_vendor_id"
       verification: |
-          ./chip-tool basic read vendor-id 1 0
+          ./chip-tool basic read vendor-id 1 0  --trace_decode 1
 
-          Verify the vendorId in TH Log:
+          Verify the vendorId in TH (chip-tool) Log
 
           [1654068802.514300][10990:10995] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0002 DataVersion: 2079473956
           [1654068802.514357][10990:10995] CHIP:TOO:   VendorID: 65521
@@ -120,9 +236,9 @@ tests:
           "TH1 Reads the ProductID attribute of the Basic Information cluster
           and saves it as basic_info_product_id"
       verification: |
-          ./chip-tool basic read product-id 1 0
+          ./chip-tool basic read product-id 1 0  --trace_decode 1
 
-          Verify  ProductId in TH Log:
+          Verify  ProductId in TH (chip-tool) Log
 
           [1654068987.385768][11050:11055] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0004 DataVersion: 2079473956
           [1654068987.385820][11050:11055] CHIP:TOO:   ProductID: 32769
@@ -137,9 +253,10 @@ tests:
            echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom)
 
 
-          ./chip-tool operationalcredentials attestation-request hex:3577CA6EFFFC560E287604663AE5BE2F11D1B1CF99BE326AF5B3B114A2E91395 1 0
+          ./chip-tool operationalcredentials attestation-request hex:3577CA6EFFFC560E287604663AE5BE2F11D1B1CF99BE326AF5B3B114A2E91395 1 0 --trace_decode 1
 
-          Verify attestation response in TH Log
+
+          Verify attestation response in TH (chip-tool) Log
 
           [1658223434.718871][5712:5717] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
           [1658223434.718921][5712:5717] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0001
@@ -150,11 +267,9 @@ tests:
           [1658223434.719135][5712:5717] CHIP:TOO:    }
       disabled: true
 
-    - label:
-          "Verify that the DUT generated the AttestationResponse has the
-          following fields:AttestationElements ,AttestationSignature"
+    - label: ""
       verification: |
-          Verify that the DUT generated the AttestationResponse has the following fields:
+          Verify that the DUT generated the AttestationResponse has the following fields in the TH (Chip-Tool ) log generated from the previous step command
           1. AttestationElements
           2. AttestationSignature
 
@@ -166,7 +281,8 @@ tests:
 
     - label: "Read the attestation_elements_message structure fields"
       verification: |
-          Verify the attestation elements field
+          Verify the attestation elements field on TH(chip-tool) Log generated  from  step 5
+          1. AttestationElements
 
           [1655374218.453303][35023:35028] CHIP:DMG: Attestation Elements (585 bytes) =
           [1655374218.453366][35023:35028] CHIP:DMG: {
@@ -289,7 +405,7 @@ tests:
           "Verify that the attestation_elements_message structure fields satisfy
           the following conditions:"
       verification: |
-          Verify that the attestation_elements_message structure fields satisfy the following conditions
+          Verify that the attestation_elements_message structure fields satisfy the following conditions on TH(chip-tool) Log
           1. AttestationElements field size should not be greater than RESP_MAX(900 bytes)
           2. certification_declaration is present and is an octet string
 
@@ -414,7 +530,7 @@ tests:
           "AttestationElements field size should not be greater than
           RESP_MAX(900 bytes)"
       verification: |
-          AttestationElements field size should not be greater than RESP_MAX(900 bytes)
+          Verify AttestationElements field size should not be greater than RESP_MAX(900 bytes) on TH(chip-tool) log from step 5
 
           Attestation Elements (585 bytes) =
           [1655374218.453366][35023:35028] CHIP:DMG: {
@@ -430,7 +546,7 @@ tests:
           representation CMS-format certification declaration, as described in
           section 6.3.1"
       verification: |
-          Verify  certification_declaration is present and is an octet string in TH log:
+          Verify  certification_declaration is present and is an octet string in TH(chip-tool) log:
 
           [1655374218.453303][35023:35028] CHIP:DMG: Attestation Elements (585 bytes) =
           [1655374218.453366][35023:35028] CHIP:DMG: {
@@ -558,7 +674,7 @@ tests:
           ,security level = 0 ,security_information = 0 ,version_number is an
           integer in range 0..65535 ,certification_type has a value between 1..2"
       verification: |
-          Verify Verify for the following contents of CD in TH log:
+          Verify Verify for the following contents of CD (certificate declaration) in TH (chip-tool) log:
           format_version = 1,
           vendor_id matches the basic_info_vendor_id,
           product_id_array matches the basic_info_product_id saved earlier,
@@ -569,7 +685,122 @@ tests:
           version_number should be in range 0..65535,
           certification_type should be  between 1..2
 
-          https://github.com/project-chip/connectedhomeip/issues/21578
+
+          [1655374218.453303][35023:35028] CHIP:DMG: Attestation Elements (585 bytes) =
+          [1655374218.453366][35023:35028] CHIP:DMG: {
+          [1655374218.453431][35023:35028] CHIP:DMG:     Certification Declaration =
+          [1655374218.453483][35023:35028] CHIP:DMG:     {
+          [1655374218.455342][35023:35028] CHIP:DMG:         Format Version = 1
+          [1655374218.455398][35023:35028] CHIP:DMG:         Vendor Id = 65521
+          [1655374218.455438][35023:35028] CHIP:DMG:         Product Ids =
+          [1655374218.455474][35023:35028] CHIP:DMG:         {
+          [1655374218.455512][35023:35028] CHIP:DMG:             Product Id = 32768
+          [1655374218.455552][35023:35028] CHIP:DMG:             Product Id = 32769
+          [1655374218.455590][35023:35028] CHIP:DMG:             Product Id = 32770
+          [1655374218.455628][35023:35028] CHIP:DMG:             Product Id = 32771
+          [1655374218.455666][35023:35028] CHIP:DMG:             Product Id = 32772
+          [1655374218.455704][35023:35028] CHIP:DMG:             Product Id = 32773
+          [1655374218.455742][35023:35028] CHIP:DMG:             Product Id = 32774
+          [1655374218.455780][35023:35028] CHIP:DMG:             Product Id = 32775
+          [1655374218.455818][35023:35028] CHIP:DMG:             Product Id = 32776
+          [1655374218.455855][35023:35028] CHIP:DMG:             Product Id = 32777
+          [1655374218.455893][35023:35028] CHIP:DMG:             Product Id = 32778
+          [1655374218.455931][35023:35028] CHIP:DMG:             Product Id = 32779
+          [1655374218.455969][35023:35028] CHIP:DMG:             Product Id = 32780
+          [1655374218.456007][35023:35028] CHIP:DMG:             Product Id = 32781
+          [1655374218.456045][35023:35028] CHIP:DMG:             Product Id = 32782
+          [1655374218.456082][35023:35028] CHIP:DMG:             Product Id = 32783
+          [1655374218.456120][35023:35028] CHIP:DMG:             Product Id = 32784
+          [1655374218.456158][35023:35028] CHIP:DMG:             Product Id = 32785
+          [1655374218.456196][35023:35028] CHIP:DMG:             Product Id = 32786
+          [1655374218.456234][35023:35028] CHIP:DMG:             Product Id = 32787
+          [1655374218.456271][35023:35028] CHIP:DMG:             Product Id = 32788
+          [1655374218.456309][35023:35028] CHIP:DMG:             Product Id = 32789
+          [1655374218.456347][35023:35028] CHIP:DMG:             Product Id = 32790
+          [1655374218.456385][35023:35028] CHIP:DMG:             Product Id = 32791
+          [1655374218.456423][35023:35028] CHIP:DMG:             Product Id = 32792
+          [1655374218.456461][35023:35028] CHIP:DMG:             Product Id = 32793
+          [1655374218.456498][35023:35028] CHIP:DMG:             Product Id = 32794
+          [1655374218.456536][35023:35028] CHIP:DMG:             Product Id = 32795
+          [1655374218.456573][35023:35028] CHIP:DMG:             Product Id = 32796
+          [1655374218.456611][35023:35028] CHIP:DMG:             Product Id = 32797
+          [1655374218.456649][35023:35028] CHIP:DMG:             Product Id = 32798
+          [1655374218.456687][35023:35028] CHIP:DMG:             Product Id = 32799
+          [1655374218.456724][35023:35028] CHIP:DMG:             Product Id = 32800
+          [1655374218.456761][35023:35028] CHIP:DMG:             Product Id = 32801
+          [1655374218.456799][35023:35028] CHIP:DMG:             Product Id = 32802
+          [1655374218.456836][35023:35028] CHIP:DMG:             Product Id = 32803
+          [1655374218.456874][35023:35028] CHIP:DMG:             Product Id = 32804
+          [1655374218.456912][35023:35028] CHIP:DMG:             Product Id = 32805
+          [1655374218.456949][35023:35028] CHIP:DMG:             Product Id = 32806
+          [1655374218.456987][35023:35028] CHIP:DMG:             Product Id = 32807
+          [1655374218.457024][35023:35028] CHIP:DMG:             Product Id = 32808
+          [1655374218.457061][35023:35028] CHIP:DMG:             Product Id = 32809
+          [1655374218.457099][35023:35028] CHIP:DMG:             Product Id = 32810
+          [1655374218.457138][35023:35028] CHIP:DMG:             Product Id = 32811
+          [1655374218.457175][35023:35028] CHIP:DMG:             Product Id = 32812
+          [1655374218.457212][35023:35028] CHIP:DMG:             Product Id = 32813
+          [1655374218.457250][35023:35028] CHIP:DMG:             Product Id = 32814
+          [1655374218.457288][35023:35028] CHIP:DMG:             Product Id = 32815
+          [1655374218.457326][35023:35028] CHIP:DMG:             Product Id = 32816
+          [1655374218.457363][35023:35028] CHIP:DMG:             Product Id = 32817
+          [1655374218.457401][35023:35028] CHIP:DMG:             Product Id = 32818
+          [1655374218.457439][35023:35028] CHIP:DMG:             Product Id = 32819
+          [1655374218.457476][35023:35028] CHIP:DMG:             Product Id = 32820
+          [1655374218.457514][35023:35028] CHIP:DMG:             Product Id = 32821
+          [1655374218.457552][35023:35028] CHIP:DMG:             Product Id = 32822
+          [1655374218.457590][35023:35028] CHIP:DMG:             Product Id = 32823
+          [1655374218.457627][35023:35028] CHIP:DMG:             Product Id = 32824
+          [1655374218.457665][35023:35028] CHIP:DMG:             Product Id = 32825
+          [1655374218.457702][35023:35028] CHIP:DMG:             Product Id = 32826
+          [1655374218.457740][35023:35028] CHIP:DMG:             Product Id = 32827
+          [1655374218.457777][35023:35028] CHIP:DMG:             Product Id = 32828
+          [1655374218.457833][35023:35028] CHIP:DMG:             Product Id = 32829
+          [1655374218.457874][35023:35028] CHIP:DMG:             Product Id = 32830
+          [1655374218.457912][35023:35028] CHIP:DMG:             Product Id = 32831
+          [1655374218.457950][35023:35028] CHIP:DMG:             Product Id = 32832
+          [1655374218.457987][35023:35028] CHIP:DMG:             Product Id = 32833
+          [1655374218.458026][35023:35028] CHIP:DMG:             Product Id = 32834
+          [1655374218.458063][35023:35028] CHIP:DMG:             Product Id = 32835
+          [1655374218.458101][35023:35028] CHIP:DMG:             Product Id = 32836
+          [1655374218.458139][35023:35028] CHIP:DMG:             Product Id = 32837
+          [1655374218.458177][35023:35028] CHIP:DMG:             Product Id = 32838
+          [1655374218.458215][35023:35028] CHIP:DMG:             Product Id = 32839
+          [1655374218.458253][35023:35028] CHIP:DMG:             Product Id = 32840
+          [1655374218.458291][35023:35028] CHIP:DMG:             Product Id = 32841
+          [1655374218.458328][35023:35028] CHIP:DMG:             Product Id = 32842
+          [1655374218.458366][35023:35028] CHIP:DMG:             Product Id = 32843
+          [1655374218.458404][35023:35028] CHIP:DMG:             Product Id = 32844
+          [1655374218.458441][35023:35028] CHIP:DMG:             Product Id = 32845
+          [1655374218.458480][35023:35028] CHIP:DMG:             Product Id = 32846
+          [1655374218.458517][35023:35028] CHIP:DMG:             Product Id = 32847
+          [1655374218.458555][35023:35028] CHIP:DMG:             Product Id = 32848
+          [1655374218.458592][35023:35028] CHIP:DMG:             Product Id = 32849
+          [1655374218.458630][35023:35028] CHIP:DMG:             Product Id = 32850
+          [1655374218.458667][35023:35028] CHIP:DMG:             Product Id = 32851
+          [1655374218.458706][35023:35028] CHIP:DMG:             Product Id = 32852
+          [1655374218.458743][35023:35028] CHIP:DMG:             Product Id = 32853
+          [1655374218.458781][35023:35028] CHIP:DMG:             Product Id = 32854
+          [1655374218.458818][35023:35028] CHIP:DMG:             Product Id = 32855
+          [1655374218.458856][35023:35028] CHIP:DMG:             Product Id = 32856
+          [1655374218.458893][35023:35028] CHIP:DMG:             Product Id = 32857
+          [1655374218.458932][35023:35028] CHIP:DMG:             Product Id = 32858
+          [1655374218.458969][35023:35028] CHIP:DMG:             Product Id = 32859
+          [1655374218.459007][35023:35028] CHIP:DMG:             Product Id = 32860
+          [1655374218.459045][35023:35028] CHIP:DMG:             Product Id = 32861
+          [1655374218.459082][35023:35028] CHIP:DMG:             Product Id = 32862
+          [1655374218.459120][35023:35028] CHIP:DMG:             Product Id = 32863
+          [1655374218.459159][35023:35028] CHIP:DMG:             Product Id = 32864
+          [1655374218.459196][35023:35028] CHIP:DMG:             Product Id = 32865
+          [1655374218.459234][35023:35028] CHIP:DMG:             Product Id = 32866
+          [1655374218.459271][35023:35028] CHIP:DMG:             Product Id = 32867
+          [1655374218.459309][35023:35028] CHIP:DMG:         }
+          [1655374218.459347][35023:35028] CHIP:DMG:         Device Type Id = 22
+          [1655374218.459390][35023:35028] CHIP:DMG:         Certificate Id (19) = ZIG20142ZB330003-24
+          [1655374218.459430][35023:35028] CHIP:DMG:         Security Level = 0
+          [1655374218.459470][35023:35028] CHIP:DMG:         Security Information = 0
+          [1655374218.459508][35023:35028] CHIP:DMG:         Version Number = 9876
+          [1655374218.459546][35023:35028] CHIP:DMG:         Certification Type = 0
       disabled: true
 
     - label:
@@ -581,7 +812,7 @@ tests:
           MCORE.DA.CERTDECL_ORIGIN_VENDORID &&
           MCORE.DA.CERTDECL_ORIGIN_PRODUCTID
       verification: |
-          Verify vendor_id and product_id are present in Certification Declaration in TH log:
+          Verify vendor_id and product_id are present in Certification Declaration in TH(chip-tool) log:
 
           [1655374218.453303][35023:35028] CHIP:DMG: Attestation Elements (585 bytes) =
           [1655374218.453366][35023:35028] CHIP:DMG: {
@@ -714,21 +945,33 @@ tests:
           MCORE.DA.CERTDECL_ORIGIN_VENDORID &&
           MCORE.DA.CERTDECL_ORIGIN_PRODUCTID
       verification: |
-          Verify both vendorID has same value
-
-          Verify in DUT log:
-          [1655374218.453431][35023:35028] CHIP:DMG:     Certification Declaration =
-          [1655374218.453483][35023:35028] CHIP:DMG:     {
-          [1655374218.455342][35023:35028] CHIP:DMG:         Format Version = 1
-          [1655374218.455398][35023:35028] CHIP:DMG:         Vendor Id = 65521
+          Verify The Vendor ID (VID) in the DAC subject and PAI subject are the same as the vendor_id field in the Certification Declaration.
+          To decode the DAC/PAI subject, refer TC-DA-1.7 - step 6 & then verify the vendorID and ProductID is same from the previous step log output.
 
 
-          "./chip-tool basic read vendor-id 1 0
 
-          Verify in TH log:
-          [1654068750.496162][10974:10979] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0002 DataVersion: 2079473956
-          [1654068750.496206][10974:10979] CHIP:TOO:   VendorID: 65521
-          [1654068750.496287][10974:10979] CHIP:EM: Sending Standalone Ack for MessageCounter:5436360 on exchange 400i"
+          Certificate:
+              Data:
+                  Version: 3 (0x2)
+                  Serial Number: 7624014786269105873 (0x69cdf10de9e54ed1)
+                  Signature Algorithm: ecdsa-with-SHA256
+                  Issuer: CN = Matter Dev PAI 0xFFF1 no PID, 1.3.6.1.4.1.37244.2.1 = FFF1
+                  Validity
+                      Not Before: Feb  5 00:00:00 2022 GMT
+                      Not After : Dec 31 23:59:59 9999 GMT
+                  Subject: CN = Matter Dev DAC 0xFFF1/0x8001, 1.3.6.1.4.1.37244.2.1 = FFF1, 1.3.6.1.4.1.37244.2.2 = 8001
+                  Subject Public Key Info:
+                      Public Key Algorithm: id-ecPublicKey
+                          Public-Key: (256 bit)
+                          pub:
+                              04:46:3a:c6:93:42:91:0a:0e:55:88:fc:6f:f5:6b:
+                              b6:3e:62:ec:ce:cb:14:8f:7d:4e:b0:3e:e5:52:60:
+                              14:15:76:7d:16:a5:c6:63:f7:93:e4:91:23:26:0b:
+                              82:97:a7:cd:7e:7c:fc:7b:31:6b:39:d9:8e:90:d2:
+                              93:77:73:8e:82
+                          ASN1 OID: prime256v1
+                          NIST CURVE: P-256
+                  X509v3 extensions:
       disabled: true
 
     - label:
@@ -746,20 +989,31 @@ tests:
           MCORE.DA.CERTDECL_ORIGIN_PRODUCTID
       verification: |
           Verify The Vendor ID (VID) in the DAC subject and PAI subject are the same as the vendor_id field in the Certification Declaration.
-
-          Verify in DUT log:
-          [1655374218.453431][35023:35028] CHIP:DMG:     Certification Declaration =
-          [1655374218.453483][35023:35028] CHIP:DMG:     {
-          [1655374218.455342][35023:35028] CHIP:DMG:         Format Version = 1
-          [1655374218.455398][35023:35028] CHIP:DMG:         Vendor Id = 65521
+          To decode the DAC/PAI subject, refer TC-DA-1.7 - step 6 & then verify the vendorID and ProductID is same from the previous step log output.
 
 
-          "./chip-tool basic read vendor-id 1 0
-
-          Verify in TH log:
-          [1654068750.496162][10974:10979] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0002 DataVersion: 2079473956
-          [1654068750.496206][10974:10979] CHIP:TOO:   VendorID: 65521
-          [1654068750.496287][10974:10979] CHIP:EM: Sending Standalone Ack for MessageCounter:5436360 on exchange 400i"
+          Certificate:
+              Data:
+                  Version: 3 (0x2)
+                  Serial Number: 7624014786269105873 (0x69cdf10de9e54ed1)
+                  Signature Algorithm: ecdsa-with-SHA256
+                  Issuer: CN = Matter Dev PAI 0xFFF1 no PID, 1.3.6.1.4.1.37244.2.1 = FFF1
+                  Validity
+                      Not Before: Feb  5 00:00:00 2022 GMT
+                      Not After : Dec 31 23:59:59 9999 GMT
+                  Subject: CN = Matter Dev DAC 0xFFF1/0x8001, 1.3.6.1.4.1.37244.2.1 = FFF1, 1.3.6.1.4.1.37244.2.2 = 8001
+                  Subject Public Key Info:
+                      Public Key Algorithm: id-ecPublicKey
+                          Public-Key: (256 bit)
+                          pub:
+                              04:46:3a:c6:93:42:91:0a:0e:55:88:fc:6f:f5:6b:
+                              b6:3e:62:ec:ce:cb:14:8f:7d:4e:b0:3e:e5:52:60:
+                              14:15:76:7d:16:a5:c6:63:f7:93:e4:91:23:26:0b:
+                              82:97:a7:cd:7e:7c:fc:7b:31:6b:39:d9:8e:90:d2:
+                              93:77:73:8e:82
+                          ASN1 OID: prime256v1
+                          NIST CURVE: P-256
+                  X509v3 extensions:
       disabled: true
 
     - label:
@@ -776,7 +1030,7 @@ tests:
           verified with the well-known Certification Declaration public key used
           to originally sign the Certification Declaration"
       verification: |
-          Not verifiable
+          Not verifiable, which requires a specific decode tool
       disabled: true
 
     - label:
@@ -811,7 +1065,7 @@ tests:
           secure session over which the AttestationResponse was obtained, using
           the subject public key found in the DAC."
       verification: |
-          Not verifiable
+          Not verifiable, which requires a specific decode tool to decode the signature & construct a new message.
       disabled: true
 
     - label:
@@ -825,9 +1079,9 @@ tests:
           "TH1 sends AttestationRequestCommand with Invalid AttestationNonce
           (size> 32 bytes) as the field to the DUT."
       verification: |
-          Verify INVALID_COMMAND error when Attestation Request sent with attestation nonce >32 byte  in TH Log:
+          Verify INVALID_COMMAND error when Attestation Request sent with attestation nonce >32 byte  in TH(chip-tool) Log:
 
-           ./chip-tool operationalcredentials attestation-request   762B6B9DA08F7FC63BB693E38634EC6F87CEFF28AB1554A16AD43DCEC24C2466A16AD43DCEC24C2466   1 0
+           ./chip-tool operationalcredentials attestation-request   762B6B9DA08F7FC63BB693E38634EC6F87CEFF28AB1554A16AD43DCEC24C2466A16AD43DCEC24C2466   1 0  --trace_decode 1
 
           [1655984597.150863][23339:23344] CHIP:DMG: InvokeResponseMessage =
           [1655984597.150923][23339:23344] CHIP:DMG: {
@@ -867,9 +1121,9 @@ tests:
           "TH1 sends AttestationRequestCommand with invalid AttestationNonce
           (size < 32 bytes) as the field to the DUT."
       verification: |
-          Verify INVALID_COMMAND error when Attestation Request sent with attestation nonce <32 byte  in TH Log:
+          Verify INVALID_COMMAND error when Attestation Request sent with attestation nonce <32 byte  in TH(chip-tool) Log:
 
-          ./chip-tool operationalcredentials attestation-request   762B6B9DA08F7FC63BB693E38634EC6F87CEFF28AB1554A1   1 0
+          ./chip-tool operationalcredentials attestation-request   762B6B9DA08F7FC63BB693E38634EC6F87CEFF28AB1554A1   1 0  --trace_decode 1
 
 
           [1655984597.150863][23339:23344] CHIP:DMG: InvokeResponseMessage =

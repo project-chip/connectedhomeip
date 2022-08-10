@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "Pre-Conditions 1. Device Attestation is completed 2. PAI, DAC
           certificates are obtained and validated against externally obtained
@@ -34,7 +39,7 @@ tests:
 
     - label: "DUT completes the attestation procedure"
       verification: |
-          DUT as commissioner side:
+          Veriy attestation request is sent on TH(all-clusters-app)
 
           [1655374218.114327][35023:35028] CHIP:CTL: Performing next commissioning step "SendAttestationRequest"
           [1655374218.114378][35023:35028] CHIP:CTL: Sending Attestation Request to the device.
@@ -285,7 +290,7 @@ tests:
 
           ./chip-tool generalcommissioning arm-fail-safe 500 900 1 0
 
-          Verify ArmFailSafeResponse in TH log :
+          Verify ArmFailSafeResponse in TH(all-clusters-app) log :
           [1657546015.217932][18649:18654] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657546015.217979][18649:18654] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1657546015.218043][18649:18654] CHIP:TOO:   ArmFailSafeResponse: {
@@ -296,7 +301,7 @@ tests:
 
           ./chip-tool operationalcredentials csrrequest hex:F707BFC795117AAD94D5D95586B3B33984B475E00FFB5950BA21736FFB0FAFDE 1 0 --IsForUpdateNOC true
 
-          Verify CSRResponse in TH log:
+          Verify CSRResponse in TH(all-cluster-app) log:
           [1657546020.124932][18656:18661] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0005
           [1657546020.124991][18656:18661] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0005
           [1657546020.125052][18656:18661] CHIP:TOO:   CSRResponse: {
