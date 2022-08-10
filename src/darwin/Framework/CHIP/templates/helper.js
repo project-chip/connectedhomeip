@@ -56,7 +56,7 @@ async function asTypedExpressionFromObjectiveC(value, type)
   let expr = [];
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
-    if ([ '+', '-', '/', '*', '%' ].includes(token)) {
+    if ([ '+', '-', '/', '*', '%', '(', ')' ].includes(token)) {
       expr[i] = token;
     } else if (!isNaN(token.replace(/ULL$|UL$|U$|LL$|L$/i, ''))) {
       expr[i] = await appHelper.asTypedLiteral.call(this, token, type);
