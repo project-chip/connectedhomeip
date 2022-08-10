@@ -76,6 +76,15 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
 
     mExchangeCtx->SetResponseTimeout(timeout.ValueOr(session->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
 
+    if (mTimedRequest != mTimedInvokeTimeoutMs.HasValue())
+    {
+        ChipLogError(
+            DataManagement,
+            "Inconsistent timed request state in CommandSender: mTimedRequest (%d) != mTimedInvokeTimeoutMs.HasValue() (%d)",
+            mTimedRequest, mTimedInvokeTimeoutMs.HasValue());
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     if (mTimedInvokeTimeoutMs.HasValue())
     {
         ReturnErrorOnFailure(TimedRequest::Send(mExchangeCtx.Get(), mTimedInvokeTimeoutMs.Value()));
