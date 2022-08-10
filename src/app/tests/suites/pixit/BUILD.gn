@@ -19,6 +19,8 @@ static_library("pixit") {
   output_name = "libPixit"
 
   sources = [
+    "PixitReader.cpp",
+    "PixitReader.h",
     "PixitTypeTransformer.cpp",
     "PixitTypeTransformer.h",
   ]

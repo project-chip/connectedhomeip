@@ -22,6 +22,7 @@ chip_test_suite("tests") {
   output_name = "libPixitTests"
 
   test_sources = [
+    "TestPixitReader.cpp",
     "TestPixitTypeTransformer.cpp",
   ]
   sources = []
