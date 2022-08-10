@@ -94,7 +94,7 @@ void CASESessionManager::UpdatePeerAddress(ScopedNodeId peerId)
         }
     }
 
-    session->PerformLookupIfSessionAlreadyEstablished();
+    session->PerformLookupOnExistingSession();
 }
 
 OperationalSessionSetup * CASESessionManager::FindExistingSessionSetup(const ScopedNodeId & peerId) const

@@ -259,8 +259,7 @@ public:
      */
     CHIP_ERROR LookupPeerAddress();
 
-    // TODO find a better name for this
-    void PerformLookupIfSessionAlreadyEstablished();
+    void PerformLookupOnExistingSession();
 
     // AddressResolve::NodeListener - notifications when dnssd finds a node IP address
     void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override;

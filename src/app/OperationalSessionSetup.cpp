@@ -96,7 +96,7 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
     if (mPerformingLookupOnConnectedSession)
     {
         // If there is an ongoing address lookup happening, now that we have enqueued the callbacks
-        // we can exit early. Callbacks will occur once address resolution is complete.
+        // we can exit early. Callbacks will be called upon completino of address resolution.
         return;
     }
 
@@ -205,17 +205,25 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
             // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
             return;
         }
+        // We expect to get a callback via OnSessionEstablished or OnSessionEstablishmentError to continue
+        // the state machine forward.
         return;
     }
-    // TODO is this check needed?
-    if (mPerformingLookupOnConnectedSession)
+
+    // TODO Do we want to also provide ReliableMessageProtocolConfig?
+    mInitParams.sessionManager->UpdateAllSessionsPeerAddress(mPeerId, addr);
+    if (!mPerformingLookupOnConnectedSession)
     {
-        // TODO Do we want to also provide ReliableMessageProtocolConfig?
-        mInitParams.sessionManager->UpdateAllSessionsPeerAddress(mPeerId, addr);
-        DequeueConnectionCallbacks(CHIP_NO_ERROR);
-        // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
-        return;
+        // If we have reached this point that means we got an address resolution call in a state we were
+        // not expecting. While we have notified the SessionManager of the new peer address we are in an
+        // unexpected state for that reason we want to call DequeueConnectionCallbacks with an error to
+        // prevent `this` instance of OperationalSessionSetup from staying permanently stuck.
+        ChipLogError(Controller, "Received UpdateDeviceData in incorrect state");
+        err = CHIP_ERROR_INCORRECT_STATE;
     }
+    // No need to set mPerformingLookupOnConnectedSession to false since call below releases `this`.
+    DequeueConnectionCallbacks(err);
+    // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
 CHIP_ERROR OperationalSessionSetup::EstablishConnection()
@@ -365,13 +373,11 @@ void OperationalSessionSetup::CleanupCASEClient()
 
 void OperationalSessionSetup::OnSessionReleased()
 {
-    if (mPerformingLookupOnConnectedSession)
-    {
-        // TODO what should we do here?
-    }
-    // I think overall we should be calling DequeueConnectionCallbacks(reason) here
-    // or we should be calling EstablishConnection() to re-establish a connection.
-    MoveToState(State::HasAddress);
+    // Is most cases the call below is a no-op. The only corner case where a callback is actually
+    // called would be if we are performing an address lookup on an already established
+    // connection, and during that address resolution we got a call to establish a connection.
+    DequeueConnectionCallbacks(CHIP_ERROR_MISSING_SECURE_SESSION);
+    // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
 void OperationalSessionSetup::OnSessionHang()
@@ -428,7 +434,7 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
     return Resolver::Instance().LookupNode(request, mAddressLookupHandle);
 }
 
-void OperationalSessionSetup::PerformLookupIfSessionAlreadyEstablished()
+void OperationalSessionSetup::PerformLookupOnExistingSession()
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     bool isConnected = false;
@@ -436,43 +442,38 @@ void OperationalSessionSetup::PerformLookupIfSessionAlreadyEstablished()
     if (mPerformingLookupOnConnectedSession)
     {
         // We are already in the middle of a lookup from a previous call to
-        // PerformLookupIfSessionAlreadyEstablished. In that case we will just exit right away as
+        // PerformLookupOnExistingSession. In that case we will just exit right away as
         // we are already looking to update the results from the previous lookup.
         return;
     }
 
-    switch (mState)
+    if (mState == State::Uninitialized)
     {
-    case State::Uninitialized:
-        err = CHIP_ERROR_INCORRECT_STATE;
         // Thing are very wrong and we are just going to call DequeueConnectionCallbacks which will
         // release ourself.
-        DequeueConnectionCallbacks(err);
+        DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
         // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
         // While it is odd to have an explicit return here at the end of the function, we do so
         // as a precaution in case someone later on adds something to the end of this function.
         return;
-    case State::NeedsAddress:
+    }
+
+    if (mState == State::NeedsAddress)
+    {
         // When mState is State::NeedsAddress this means that OperationalSessionSetup has been
         // freshly created and we are expecting there to be an already established session
         // that needs to have LookupPeerAddress.
         isConnected = AttachToExistingSecureSession();
-        if (!isConnected)
+        if (isConnected)
         {
-            // TODO what should we do here? Clearly the session has expired
-            // We could call Connect() with null callbacks.
+            mPerformingLookupOnConnectedSession = true;
+            MoveToState(State::SecureConnected);
+            LookupPeerAddress();
             return;
         }
-        mPerformingLookupOnConnectedSession = true;
-        MoveToState(State::SecureConnected);
-        LookupPeerAddress();
-        break;
-    default:
-        // When mState is any other valid value, the session is in the middle of being established.
-        // We are not going to do an additional lookup, nor are we going to call
-        // DequeueConnectionCallbacks since we do not want to release ourselves.
-        break;
     }
+
+    ChipLogDetail(Controller, "Request to lookup address again ignored, session establishment in progress");
 }
 
 void OperationalSessionSetup::OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result)
