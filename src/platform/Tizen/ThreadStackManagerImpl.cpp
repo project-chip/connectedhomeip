@@ -562,26 +562,22 @@ exit:
 
 CHIP_ERROR ThreadStackManagerImpl::_SetupSrpHost(const char * aHostName)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int threadErr    = THREAD_ERROR_NONE;
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(aHostName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(strlen(aHostName) <= Dnssd::kHostNameMaxLength, CHIP_ERROR_INVALID_STRING_LENGTH);
 
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(aHostName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aHostName) <= Dnssd::kHostNameMaxLength, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+    int threadErr;
 
     threadErr = thread_srp_client_set_host_name(mThreadInstance, aHostName);
     if (threadErr != THREAD_ERROR_NONE && threadErr != THREAD_ERROR_ALREADY_DONE)
-        ChipLogError(DeviceLayer, "FAIL: thread_srp_client_set_host_name");
+        ChipLogError(DeviceLayer, "thread_srp_client_set_host_name() failed. ret: %d", threadErr);
 
     /* Get external ip address */
     threadErr = thread_get_ipaddr(mThreadInstance, _ThreadIpAddressCb, THREAD_IPADDR_TYPE_MLEID, nullptr);
-    VerifyOrExit(threadErr == THREAD_ERROR_NONE, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE,
+                        (ChipLogError(DeviceLayer, "thread_get_ipaddr() failed. ret: %d", threadErr), CHIP_ERROR_INTERNAL));
 
     return CHIP_NO_ERROR;
-
-exit:
-    ChipLogError(DeviceLayer, "FAIL: thread_srp_client_set_host_address");
-    return error;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_ClearSrpHost(const char * aHostName)
