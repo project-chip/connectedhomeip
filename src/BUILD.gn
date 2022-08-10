@@ -118,6 +118,11 @@ if (chip_build_tests) {
       deps += [ "${chip_root}/src/lib/shell/tests" ]
     }
 
+    # PIXIT parser is used for chip-tool / darwin tests.
+    if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
+      deps += [ "${chip_root}/src/app/tests/suites/pixit/tests/" ]
+    }
+
     if (chip_monolithic_tests) {
       build_monolithic_library = true
       output_name = "libCHIP_tests"
