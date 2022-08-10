@@ -171,7 +171,6 @@ public:
 
 private:
     friend LockManager & LockMgr();
-    chip::EndpointId mEndpointId;
     State_t mState;
 
     Callback_fn_initiated mActionInitiated_CB;
