@@ -257,8 +257,8 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;
 
-    case DeviceEventType::kCHIPoBLENotifyConfirm:
-        HandleIndicationConfirmation(event->CHIPoBLENotifyConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+    case DeviceEventType::kCHIPoBLEIndicateConfirm:
+        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         break;
 
     case DeviceEventType::kCHIPoBLEConnectionError:
@@ -331,26 +331,18 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     VerifyOrExit(conState != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
 #ifdef BLE_DEBUG
-    ChipLogDetail(DeviceLayer, "Sending notification for CHIPoBLE TX characteristic (con %u, len %u)", conId, dataLen);
+    ChipLogDetail(DeviceLayer, "Sending indication for CHIPoBLE TX characteristic (con %u, len %u)", conId, dataLen);
 #endif
 
-    // Send a notification for the CHIPoBLE TX characteristic to the client containing the supplied data.
+    // Send a indication for the CHIPoBLE TX characteristic to the client containing the supplied data.
     gatt_err =
-        wiced_bt_gatt_server_send_notification((uint16_t) conId, HDLC_CHIP_SERVICE_CHAR_C2_VALUE, dataLen, data->Start(), NULL);
+        wiced_bt_gatt_server_send_indication((uint16_t) conId, HDLC_CHIP_SERVICE_CHAR_C2_VALUE, dataLen, data->Start(), NULL);
 
 exit:
     if (gatt_err != WICED_BT_GATT_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "BLEManagerImpl::SendNotification() failed: %d", gatt_err);
+        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %d", gatt_err);
         return false;
-    }
-    else
-    {
-        // Post an event to the CHIP queue.
-        ChipDeviceEvent event;
-        event.Type                        = DeviceEventType::kCHIPoBLENotifyConfirm;
-        event.CHIPoBLENotifyConfirm.ConId = conId;
-        err                               = PlatformMgr().PostEvent(&event);
     }
     return err == CHIP_NO_ERROR;
 }
@@ -662,6 +654,27 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceMtuReq(uint16_t conn_id,
 }
 
 /*
+ * Process GATT Indication Confirm from the client
+ */
+wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceIndCfm(uint16_t conn_id, uint16_t handle)
+{
+#ifdef BLE_DEBUG
+    ChipLogDetail(DeviceLayer, "GATT Ind Cfm received con:%04x handle:%d", conn_id, handle);
+#endif
+    if (handle == HDLC_CHIP_SERVICE_CHAR_C2_VALUE)
+    {
+        ChipDeviceEvent event;
+        event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
+        event.CHIPoBLEIndicateConfirm.ConId = conn_id;
+        if (PlatformMgr().PostEvent(&event) != CHIP_NO_ERROR)
+        {
+            return WICED_BT_GATT_INTERNAL_ERROR;
+        }
+    }
+    return WICED_BT_GATT_SUCCESS;
+}
+
+/*
  * Process GATT attribute requests
  */
 wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceRequestEvent(wiced_bt_gatt_attribute_request_t * p_request,
@@ -691,6 +704,10 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceRequestEvent(wiced_bt_ga
 
     case GATT_REQ_MTU:
         result = HandleGattServiceMtuReq(p_request->conn_id, p_request->data.remote_mtu);
+        break;
+
+    case GATT_HANDLE_VALUE_CONF:
+        result = HandleGattServiceIndCfm(p_request->conn_id, p_request->data.confirm.handle);
         break;
 
     default:
