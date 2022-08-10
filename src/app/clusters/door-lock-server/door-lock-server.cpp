@@ -304,6 +304,16 @@ bool DoorLockServer::SendLockAlarmEvent(chip::EndpointId endpointId, DlAlarmCode
     return true;
 }
 
+namespace {
+// Check whether this is valid UserStatus for a SetUser or SetCredential
+// command.
+bool IsValidUserStatusForSet(const Nullable<DlUserStatus> & userStatus)
+{
+    return userStatus.IsNull() || (userStatus.Value() == DlUserStatus::kOccupiedEnabled) ||
+        (userStatus.Value() == DlUserStatus::kOccupiedDisabled);
+}
+} // anonymous namespace
+
 void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandObj,
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData)
@@ -362,8 +372,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
         return;
     }
 
-    if (!userStatus.IsNull() &&
-        (userStatus.Value() < DlUserStatus::kAvailable || userStatus.Value() > DlUserStatus::kOccupiedDisabled))
+    if (!IsValidUserStatusForSet(userStatus))
     {
         emberAfDoorLockClusterPrintln(
             "[SetUser] Unable to set the user: user status is out of range [endpointId=%d,userIndex=%d,userStatus=%u]",
@@ -677,9 +686,7 @@ void DoorLockServer::setCredentialCommandHandler(
         return;
     }
 
-    // OPTIMIZE: We can unify the checks for enum validity here and in set user command handler
-    if (!userStatus.IsNull() &&
-        (userStatus.Value() < DlUserStatus::kAvailable || userStatus.Value() > DlUserStatus::kOccupiedDisabled))
+    if (!IsValidUserStatusForSet(userStatus))
     {
         emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: user status is out of range "
                                       "[endpointId=%d,credentialIndex=%d,userStatus=%u]",

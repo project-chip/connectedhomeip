@@ -70,7 +70,7 @@ const uint8_t gatt_database[] = {
                                     GATTDB_CHAR_PROP_WRITE, GATTDB_PERM_READABLE | GATTDB_PERM_WRITE_REQ),
     /* Characteristic: C2 */
     CHARACTERISTIC_UUID128_WRITABLE(HDLC_CHIP_SERVICE_CHAR_C2, HDLC_CHIP_SERVICE_CHAR_C2_VALUE, __UUID128_CHIPoBLEChar_C2,
-                                    GATTDB_CHAR_PROP_READ | GATTDB_CHAR_PROP_NOTIFY,
+                                    GATTDB_CHAR_PROP_READ | GATTDB_CHAR_PROP_INDICATE,
                                     GATTDB_PERM_RELIABLE_WRITE | GATTDB_PERM_READABLE | GATTDB_CHAR_PROP_WRITE),
 
     /* Descriptor: Client Characteristic Configuration */

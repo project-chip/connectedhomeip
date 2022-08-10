@@ -866,6 +866,14 @@ tests:
               - name: "OffWaitTime"
                 value: 300
 
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
     - label: "21b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"

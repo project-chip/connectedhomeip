@@ -150,6 +150,17 @@ void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
         ChipLogError(chipTool, "Secure Pairing Failed");
         SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE);
         break;
+    case DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices:
+        if (IsDiscoverOnce())
+        {
+            ChipLogError(chipTool, "Secure Pairing Failed");
+            SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE);
+        }
+        else
+        {
+            ChipLogProgress(chipTool, "Secure Pairing Discovering More Devices");
+        }
+        break;
     }
 }
 

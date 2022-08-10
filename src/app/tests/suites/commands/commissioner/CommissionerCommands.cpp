@@ -83,6 +83,8 @@ void CommissionerCommands::OnStatusUpdate(DevicePairingDelegate::Status status)
         ChipLogError(chipTool, "Secure Pairing Failed");
         OnResponse(ConvertToStatusIB(CHIP_ERROR_INCORRECT_STATE), nullptr);
         break;
+    case DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices:
+        break;
     }
 }
 

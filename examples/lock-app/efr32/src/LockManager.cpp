@@ -643,15 +643,20 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     // If a pin code is not given
     if (!pin.HasValue())
     {
-        ChipLogDetail(Zcl, "Door Lock App: PIN code is not specified, but it is required [endpointId=%d]", mEndpointId);
+        ChipLogDetail(Zcl, "Door Lock App: PIN code is not specified [endpointId=%d]", endpointId);
 
         // If a pin code is not required
         if (!requirePin)
         {
             ChipLogDetail(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", lockStateToString(lockState),
                           endpointId);
+
+            DoorLockServer::Instance().SetLockState(endpointId, lockState);
+
             return true;
         }
+
+        ChipLogError(Zcl, "Door Lock App: PIN code is not specified, but it is required [endpointId=%d]", endpointId);
 
         return false;
     }
@@ -669,7 +674,9 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
         {
             ChipLogDetail(Zcl,
                           "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
-                          lockStateToString(lockState), mEndpointId);
+                          lockStateToString(lockState), endpointId);
+
+            DoorLockServer::Instance().SetLockState(endpointId, lockState);
 
             return true;
         }
@@ -678,7 +685,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     ChipLogDetail(Zcl,
                   "Door Lock App: specified PIN code was not found in the database, ignoring command to set lock state to \"%s\" "
                   "[endpointId=%d]",
-                  lockStateToString(lockState), mEndpointId);
+                  lockStateToString(lockState), endpointId);
 
     err = DlOperationError::kInvalidCredential;
     return false;

@@ -66,7 +66,6 @@ tests:
       command: "readAttribute"
       attribute: "PIR occupied to unoccupied delay"
       response:
-          value: 0
           constraints:
               type: int16u
               minValue: 0
@@ -77,7 +76,6 @@ tests:
       command: "readAttribute"
       attribute: "PIR unoccupied to occupied delay"
       response:
-          value: 0
           constraints:
               type: int16u
               minValue: 0
@@ -89,7 +87,6 @@ tests:
       command: "readAttribute"
       attribute: "PIR unoccupied to occupied threshold"
       response:
-          value: 1
           constraints:
               type: int8u
               minValue: 1
@@ -100,7 +97,6 @@ tests:
       command: "readAttribute"
       attribute: "ultrasonic occupied to unoccupied delay"
       response:
-          value: 0
           constraints:
               type: int16u
               minValue: 0
@@ -111,7 +107,6 @@ tests:
       command: "readAttribute"
       attribute: "ultrasonic unoccupied to occupied delay"
       response:
-          value: 0
           constraints:
               type: int16u
               minValue: 0
@@ -122,7 +117,6 @@ tests:
       command: "readAttribute"
       attribute: "ultrasonic unoccupied to occupied threshold"
       response:
-          value: 1
           constraints:
               type: int8u
               minValue: 1
@@ -135,7 +129,6 @@ tests:
       command: "readAttribute"
       attribute: "physical contact occupied to unoccupied delay"
       response:
-          value: 0
           constraints:
               type: int16u
               minValue: 0
@@ -148,7 +141,6 @@ tests:
       command: "readAttribute"
       attribute: "physical contact unoccupied to occupied delay"
       response:
-          value: 0
           constraints:
               type: int16u
               minValue: 0
@@ -161,7 +153,6 @@ tests:
       command: "readAttribute"
       attribute: "physical contact unoccupied to occupied threshold"
       response:
-          value: 1
           constraints:
               type: int8u
               minValue: 1

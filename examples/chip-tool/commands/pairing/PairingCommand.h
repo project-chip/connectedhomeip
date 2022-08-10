@@ -80,6 +80,7 @@ public:
         case PairingMode::Code:
         case PairingMode::CodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
+            AddArgument("discover-once", 0, 1, &mDiscoverOnce);
             break;
         case PairingMode::Ble:
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
@@ -144,6 +145,7 @@ public:
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+    bool IsDiscoverOnce() { return mDiscoverOnce.ValueOr(false); }
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
@@ -160,6 +162,7 @@ private:
     Command::AddressWithInterface mRemoteAddr;
     NodeId mNodeId;
     chip::Optional<uint16_t> mTimeout;
+    chip::Optional<bool> mDiscoverOnce;
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
