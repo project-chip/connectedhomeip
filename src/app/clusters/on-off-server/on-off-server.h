@@ -30,7 +30,7 @@ using chip::app::Clusters::OnOff::OnOffFeature;
  *********************************************************/
 
 static constexpr chip::System::Clock::Milliseconds32 UPDATE_TIME_MS = chip::System::Clock::Milliseconds32(100);
-static constexpr uint16_t TRANSITION_TIME_1S = 10;
+static constexpr uint16_t TRANSITION_TIME_1S                        = 10;
 
 static constexpr uint16_t MAX_TIME_VALUE = 0xFFFF;
 static constexpr uint8_t MIN_TIME_VALUE  = 1;
@@ -86,7 +86,7 @@ private:
 
     static OnOffServer instance;
     EmberEventControl eventControls[EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT];
-    chip::System::Clock::Timestamp      nextDesiredOnWithTimedOffTimestamp;
+    chip::System::Clock::Timestamp nextDesiredOnWithTimedOffTimestamp;
 };
 
 struct OnOffEffect
