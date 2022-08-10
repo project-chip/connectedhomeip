@@ -1137,7 +1137,7 @@ tests:
 
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0
-          On TH, verify DUT  responsds as UNSUPPORTED_ACCESS  for the data sent in the above command
+           Verify that there are no errors sent back for attributes the TH has no access to.
           [1659422360.478947][2049:2054] CHIP:DMG: }
           [1659422360.479556][2049:2054] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 3949809681
           [1659422360.479619][2049:2054] CHIP:TOO:   ACL: 1 entries

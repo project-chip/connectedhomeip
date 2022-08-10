@@ -40,7 +40,7 @@ tests:
       verification: |
           ./chip-tool booleanstate read state-value 1 1
 
-          On TH, verify the StateValue value as FALSE
+          On TH(chip-tool), verify the StateValue value as FALSE
 
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: FALSE
@@ -57,7 +57,7 @@ tests:
       verification: |
           ./chip-tool booleanstate read state-value 1 1
 
-          On TH, verify the StateValue value as TRUE
+          On TH(chip-tool), verify the StateValue value as TRUE
 
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: TRUE
@@ -69,7 +69,7 @@ tests:
           Run the below command to start interactive mode
           ./chip-tool interactive start
 
-          Subscribe the event using below command in Interactive mode. Once the event occurs, TH get the subscription message.
+          Subscribe the event using below command in Interactive mode. Once the event occurs, TH(chip-tool) get the subscription message.
 
            booleanstate subscribe-event-by-id 0x0 1 100 2 1
       disabled: true
@@ -77,7 +77,7 @@ tests:
     - label: "Bring the DUT into a state so StateValue is FALSE"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
-          On TH, verify the StateValue value as FALSE
+          On TH(chip-tool), verify the StateValue value as FALSE
 
           [1646119162.628169][3311:3316] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646119162.628207][3311:3316] CHIP:TOO:   StateValue: FALSE
@@ -88,7 +88,7 @@ tests:
       verification: |
           ./chip-tool booleanstate read state-value 1 1
 
-          On TH, verify the StateValue value as FALSE
+          On TH(chip-tool), verify the StateValue value as FALSE
 
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: FALSE
@@ -97,7 +97,7 @@ tests:
     - label: "Bring the DUT into a state so StateValue is TRUE"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
-          On TH, verify the StateValue value as TRUE
+          On TH(chip-tool), verify the StateValue value as TRUE
 
           [1646119162.628169][3311:3316] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646119162.628207][3311:3316] CHIP:TOO:   StateValue: TRUE
@@ -108,7 +108,7 @@ tests:
       verification: |
           ./chip-tool booleanstate read state-value 1 1
 
-          On TH, verify the StateValue value as TRUE
+          On TH(chip-tool), verify the StateValue value as TRUE
 
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: TRUE

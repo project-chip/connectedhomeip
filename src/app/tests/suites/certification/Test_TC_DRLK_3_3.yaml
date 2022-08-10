@@ -22,39 +22,26 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label: "TH will initiate DoorLockAlarm Event (LockJammed scenario)"
       PICS: DRLK.C.E00
       verification: |
           ./chip-tool doorlock read-event door-lock-alarm 1 1
 
-          Verify DUT receives the DoorLockAlarm event on TH / lock app log:
+          Verify "DUT receives the DoorLockAlarm event " on the TH(Lock-app) Log:
 
-          [1658143092.410930][3017:3023] CHIP:DMG: ReportDataMessage =
-          [1658143092.410964][3017:3023] CHIP:DMG: {
-          [1658143092.410994][3017:3023] CHIP:DMG:        SuppressResponse = true,
-          [1658143092.411026][3017:3023] CHIP:DMG:        InteractionModelRevision = 1
-          [1658143092.411056][3017:3023] CHIP:DMG: }
-
-          DUT/ChipTool log:
-
-          [1658399559.467861][2474:2474] CHIP:IM: Received Read request
-          [1658399559.467960][2474:2474] CHIP:DMG: ReadRequestMessage =
-          [1658399559.467994][2474:2474] CHIP:DMG: {
-          [1658399559.468022][2474:2474] CHIP:DMG:        EventPathIBs =
-          [1658399559.468054][2474:2474] CHIP:DMG:        [
-          [1658399559.468084][2474:2474] CHIP:DMG:                EventPath =
-          [1658399559.468118][2474:2474] CHIP:DMG:                {
-          [1658399559.468154][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
-          [1658399559.468200][2474:2474] CHIP:DMG:                        Cluster = 0x101,
-          [1658399559.468238][2474:2474] CHIP:DMG:                        Event = 0x0,
-          [1658399559.468274][2474:2474] CHIP:DMG:                },
-          [1658399559.468308][2474:2474] CHIP:DMG:
-          [1658399559.468337][2474:2474] CHIP:DMG:        ],
-          [1658399559.468371][2474:2474] CHIP:DMG:
-          [1658399559.468403][2474:2474] CHIP:DMG:        isFabricFiltered = true,
-          [1658399559.468434][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
-          [1658399559.468463][2474:2474] CHIP:DMG: },
-          [1658399559.468543][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659520755.536021][3987:3992] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0000
+          [1659520755.536048][3987:3992] CHIP:TOO:   Event number: 4
+          [1659520755.536069][3987:3992] CHIP:TOO:   Priority: Critical
+          [1659520755.536089][3987:3992] CHIP:TOO:   Timestamp: 22818908
+          [1659520755.536198][3987:3992] CHIP:TOO:   DoorLockAlarm: {
+          [1659520755.536234][3987:3992] CHIP:TOO:     AlarmCode: 0
+          [1659520755.536259][3987:3992] CHIP:TOO:    }
+          [1659520755.536347][3987:3992] CHIP:EM: Sending Standalone Ack for MessageCounter:229373286 on exchange 22555i
       disabled: true
 
     - label: "DUT sends the Unlock Door command to the TH with valid PINCode"
@@ -62,7 +49,7 @@ tests:
       verification: |
           ./chip-tool doorlock set-user 0 1 xxx 6452 1 0 0 1 1  --timedInteractionTimeoutMs 1000
 
-          Verify Test Harness receives the Set User Door command from the DUT on TH / lock app log:
+          Verify "DUT receives the set-user response " on the TH(Lock-app) Log:
 
           [1658143230.937379][3029:3034] CHIP:DMG:                                StatusIB =
           [1658143230.937412][3029:3034] CHIP:DMG:                                {
@@ -94,7 +81,7 @@ tests:
 
           ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify Test Harness receives the Set Credential command from the DUT on TH / lock app log:
+          Verify "DUT receives the set-credential response " on the TH(Lock-app) Log:
 
           [1658143318.915533][3039:3044] CHIP:DMG: },
           [1658143318.915609][3039:3044] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
@@ -136,7 +123,7 @@ tests:
 
           ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
 
-          Verify Test Harness receives the Unlock Door command from the DUT on TH / lock app log:
+          Verify "DUT receives the unlock-door response " on the TH(Lock-app) Log:
 
           [1658143429.670361][3057:3062] CHIP:DMG:                                },
           [1658143429.670411][3057:3062] CHIP:DMG:
@@ -193,34 +180,16 @@ tests:
       verification: |
           ./chip-tool doorlock read-event door-state-change 1 1
 
-          Verify DUT receives the DoorStateChange event on TH / lock app log:
+          Verify "DUT receives DoorStateChange Event" on the TH(Lock-app) Log:
 
-          [1658143492.705309][3065:3070] CHIP:DMG: ReportDataMessage =
-          [1658143492.705348][3065:3070] CHIP:DMG: {
-          [1658143492.705374][3065:3070] CHIP:DMG:        SuppressResponse = true,
-          [1658143492.705402][3065:3070] CHIP:DMG:        InteractionModelRevision = 1
-          [1658143492.705427][3065:3070] CHIP:DMG: }
-
-          DUT/ChipTool log:
-
-          [1658400265.159396][2474:2474] CHIP:IM: Received Read request
-          [1658400265.159485][2474:2474] CHIP:DMG: ReadRequestMessage =
-          [1658400265.159518][2474:2474] CHIP:DMG: {
-          [1658400265.159544][2474:2474] CHIP:DMG:        EventPathIBs =
-          [1658400265.159574][2474:2474] CHIP:DMG:        [
-          [1658400265.159602][2474:2474] CHIP:DMG:                EventPath =
-          [1658400265.159633][2474:2474] CHIP:DMG:                {
-          [1658400265.159665][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
-          [1658400265.159703][2474:2474] CHIP:DMG:                        Cluster = 0x101,
-          [1658400265.159738][2474:2474] CHIP:DMG:                        Event = 0x1,
-          [1658400265.159770][2474:2474] CHIP:DMG:                },
-          [1658400265.159803][2474:2474] CHIP:DMG:
-          [1658400265.159830][2474:2474] CHIP:DMG:        ],
-          [1658400265.159862][2474:2474] CHIP:DMG:
-          [1658400265.159891][2474:2474] CHIP:DMG:        isFabricFiltered = true,
-          [1658400265.159920][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
-          [1658400265.159947][2474:2474] CHIP:DMG: },
-          [1658400265.160024][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659521149.394340][4046:4051] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0001
+          [1659521149.394391][4046:4051] CHIP:TOO:   Event number: 1
+          [1659521149.394412][4046:4051] CHIP:TOO:   Priority: Critical
+          [1659521149.394433][4046:4051] CHIP:TOO:   Timestamp: 22783568
+          [1659521149.394503][4046:4051] CHIP:TOO:   DoorStateChange: {
+          [1659521149.394539][4046:4051] CHIP:TOO:     DoorState: 1
+          [1659521149.394564][4046:4051] CHIP:TOO:    }
+          [1659521149.394654][4046:4051] CHIP:EM: Sending Standalone Ack for MessageCounter:231120057 on exchange 10153i
       disabled: true
 
     - label: "DUT sends the Lock Door command to the TH with valid PINCode"
@@ -228,7 +197,7 @@ tests:
       verification: |
           ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
 
-          Verify Test Harness receives the lock Door command from the DUT on TH / lock app log:
+          Verify "DUT receives lock Door response" on the TH(Lock-app) Log:
 
           [1658143612.854142][3083:3088] CHIP:DMG:
           [1658143612.854178][3083:3088] CHIP:DMG:                                StatusIB =
@@ -284,7 +253,8 @@ tests:
       verification: |
           ./chip-tool doorlock read-event lock-operation 1 1
 
-          Verify DUT receives the LockOperation event on TH / lock app log:
+
+          Verify "DUT receives LockOperation event  response" on the TH(Lock-app) Log:
 
           [1658220863.460617][4105:4110] CHIP:DMG: }
           [1658220863.460814][4105:4110] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
@@ -335,7 +305,7 @@ tests:
       verification: |
           ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 12345678
 
-          Verify Test Harness receives the Unlock Door command from the DUT on TH / lock app log:
+          Verify "DUT receives Unlock Door command  response" on the TH(Lock-app) Log:
 
           [1658143767.123426][3101:3106] CHIP:DMG:                                },
           [1658143767.123464][3101:3106] CHIP:DMG:
@@ -388,7 +358,7 @@ tests:
       verification: |
           ./chip-tool doorlock read-event lock-operation-error 1 1
 
-          Verify DUT receives the LockOperationError event on TH / lock app log:
+          Verify "DUT receives LockOperationError event  response" on the TH(Lock-app) Log:
 
           [1658221172.148732][4132:4137] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0003
           [1658221172.148764][4132:4137] CHIP:TOO:         Event number: 6
@@ -439,7 +409,7 @@ tests:
       verification: |
           ./chip-tool doorlock set-user 0 3 xxx 6452 1 0 0 1 1  --timedInteractionTimeoutMs 1000
 
-          Verify Test Harness receives the Set User Door command from the DUT on TH / lock app log:
+          Verify "DUT receives Set User command response" on the TH(Lock-app) Log:
 
           [1658143964.643101][3139:3144] CHIP:DMG:
           [1658143964.643137][3139:3144] CHIP:DMG:                                StatusIB =
@@ -500,50 +470,7 @@ tests:
       verification: |
           ./chip-tool doorlock read-event lock-user-change 1 1
 
-          verify  DUT receives LockUserChange from TH on TH / lock app log:
-
-          [1658400921.180741][3300:3305] CHIP:DMG: }
-          [1658400921.181012][3300:3305] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
-          [1658400921.181047][3300:3305] CHIP:TOO:         Event number: 3
-          [1658400921.181075][3300:3305] CHIP:TOO:         Priority: Info
-          [1658400921.181104][3300:3305] CHIP:TOO:         Timestamp: 4919184
-          [1658400921.181240][3300:3305] CHIP:TOO:   LockUserChange: {
-          [1658400921.181288][3300:3305] CHIP:TOO:     LockDataType: 2
-          [1658400921.181322][3300:3305] CHIP:TOO:     DataOperationType: 0
-          [1658400921.181354][3300:3305] CHIP:TOO:     OperationSource: 7
-          [1658400921.181386][3300:3305] CHIP:TOO:     UserIndex: 1
-          [1658400921.181418][3300:3305] CHIP:TOO:     FabricIndex: 1
-          [1658400921.181452][3300:3305] CHIP:TOO:     SourceNode: 112233
-          [1658400921.181483][3300:3305] CHIP:TOO:     DataIndex: 1
-          [1658400921.181513][3300:3305] CHIP:TOO:    }
-          [1658400921.181654][3300:3305] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
-          [1658400921.181686][3300:3305] CHIP:TOO:         Event number: 4
-          [1658400921.181716][3300:3305] CHIP:TOO:         Priority: Info
-          [1658400921.181745][3300:3305] CHIP:TOO:         Timestamp: 4928528
-          [1658400921.181791][3300:3305] CHIP:TOO:   LockUserChange: {
-          [1658400921.181825][3300:3305] CHIP:TOO:     LockDataType: 6
-          [1658400921.181856][3300:3305] CHIP:TOO:     DataOperationType: 0
-          [1658400921.181886][3300:3305] CHIP:TOO:     OperationSource: 7
-          [1658400921.181916][3300:3305] CHIP:TOO:     UserIndex: 1
-          [1658400921.181945][3300:3305] CHIP:TOO:     FabricIndex: 1
-          [1658400921.181975][3300:3305] CHIP:TOO:     SourceNode: 112233
-          [1658400921.182006][3300:3305] CHIP:TOO:     DataIndex: 1
-          [1658400921.182035][3300:3305] CHIP:TOO:    }
-          [1658400921.182174][3300:3305] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
-          [1658400921.182206][3300:3305] CHIP:TOO:         Event number: 7
-          [1658400921.182235][3300:3305] CHIP:TOO:         Priority: Info
-          [1658400921.182263][3300:3305] CHIP:TOO:         Timestamp: 5193731
-          [1658400921.182400][3300:3305] CHIP:TOO:   LockUserChange: {
-          [1658400921.182435][3300:3305] CHIP:TOO:     LockDataType: 2
-          [1658400921.182467][3300:3305] CHIP:TOO:     DataOperationType: 0
-          [1658400921.182497][3300:3305] CHIP:TOO:     OperationSource: 7
-          [1658400921.182527][3300:3305] CHIP:TOO:     UserIndex: 3
-          [1658400921.182557][3300:3305] CHIP:TOO:     FabricIndex: 1
-          [1658400921.182587][3300:3305] CHIP:TOO:     SourceNode: 112233
-          [1658400921.182617][3300:3305] CHIP:TOO:     DataIndex: 3
-          [1658400921.182645][3300:3305] CHIP:TOO:    }
-
-          DUT/ChipTool log:
+          Verify "DUT receives read-event lock-user-change response" on the TH(Lock-app) Log:
 
           [1658400921.173789][3227:3227] CHIP:IM: Received Read request
           [1658400921.173921][3227:3227] CHIP:DMG: ReadRequestMessage =

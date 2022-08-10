@@ -38,7 +38,7 @@ tests:
       verification: |
           ./chip-tool descriptor read server-list 1 0
 
-          Verify on the TH Log:
+          Verify "server list" on the TH(Chip-tool) Log:
 
           [1654250292.680821][5262:5267] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 812190876
           [1654250292.681079][5262:5267] CHIP:TOO:   server list: 26 entries
@@ -74,8 +74,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read feature-map 1 0
 
-
-          Verify on the TH Log:
+          Verify "FeatureMap: 1" on the TH(Chip-tool) Log:
 
           [1653473169.784344][29771:29776] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 1600858167
           [1653473169.784413][29771:29776] CHIP:TOO:   FeatureMap: 1
@@ -87,8 +86,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read max-networks 1 0
 
-
-          Verify on the TH Log:
+          Verify "MaxNetworks" on the TH(Chip-tool) Log:
 
           [1653473181.407542][29777:29782] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0000 DataVersion: 1600858167
           [1653473181.407621][29777:29782] CHIP:TOO:   MaxNetworks: 1
@@ -108,7 +106,7 @@ tests:
           ./chip-tool networkcommissioning read networks 1 0
 
 
-          Verify on the TH Log:
+          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
 
           [1654250379.881780][5309:5314] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3741733376
           [1654250379.881974][5309:5314] CHIP:TOO:   Networks: 1 entries
@@ -123,7 +121,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read scan-max-time-seconds 1 0
 
-          Verify on the TH Log:
+          Verify  "ScanMaxTimeSeconds" on the TH(Chip-tool) Log:
 
 
           [1653473784.850830][29813:29818] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0002 DataVersion: 1600858167
@@ -137,7 +135,7 @@ tests:
           ./chip-tool networkcommissioning read connect-max-time-seconds 1 0
 
 
-          Verify on the TH Log:
+          Verify "ConnectMaxTimeSeconds" on the TH(Chip-tool) Log:
 
           [1653473821.367214][29821:29826] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0003 DataVersion: 1600858167
           [1653473821.367283][29821:29826] CHIP:TOO:   ConnectMaxTimeSeconds: 20
@@ -150,7 +148,7 @@ tests:
           ./chip-tool networkcommissioning read interface-enabled 1 0
 
 
-          Verify on the TH Log:
+          Verify "InterfaceEnabled" on the TH(Chip-tool) Log:
 
           [1653473893.275901][29834:29839] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0004 DataVersion: 1600858167
           [1653473893.275964][29834:29839] CHIP:TOO:   InterfaceEnabled: TRUE
@@ -163,7 +161,7 @@ tests:
           ./chip-tool networkcommissioning read last-networking-status 1 0
 
 
-          Verify on the TH Log:
+          Verify "LastNetworkingStatus" on the TH(Chip-tool) Log:
 
           [1653473918.484769][29840:29845] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005 DataVersion: 1600858167
           [1653473918.484843][29840:29845] CHIP:TOO:   LastNetworkingStatus: 0
@@ -177,7 +175,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read last-network-id 1
 
-          Verify on the TH Log:
+          Verify "LastNetworkID" on the TH(Chip-tool) Log:
 
 
           "[1653474059.383553][27286:27291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 1912591449
@@ -191,7 +189,7 @@ tests:
           ./chip-tool networkcommissioning read last-connect-error-value 1 0
 
 
-          Verify on the TH Log:
+          Verify "LastConnectErrorValue" on the TH(Chip-tool) Log:
 
 
           [1653474102.061746][29860:29865] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0007 DataVersion: 1600858167

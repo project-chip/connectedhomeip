@@ -47,7 +47,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 0 62 0
 
-          Verify on the TH Log:
+          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
 
           [1650392597.976230][10152:10157] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1650392597.976363][10152:10157] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -66,7 +66,11 @@ tests:
       verification: |
           ./chip-tool networkcommissioning remove-network 47524C50726976617465 62 0
 
-          Verify on the TH Log:
+          Below is an example:
+
+          ./chip-tool networkcommissioning remove-network 47524C50726976617465 54 0
+
+          Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
 
           [1650392982.606392][10188:10193] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1650392982.606501][10188:10193] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
@@ -84,7 +88,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning connect-network 47524C50726976617465 62 0
 
-          Verify on the TH Log:
+          Verify "ConnectNetworkResponse and its arguments" on the TH(Chip-tool) Log:
 
           [1650392982.606392][10188:10193] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1650392982.606501][10188:10193] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007

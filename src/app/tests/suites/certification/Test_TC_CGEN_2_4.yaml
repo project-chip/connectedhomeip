@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    92.2.3. [TC-CGEN-2.4] Verification For CommissioningError on response
+    93.2.3. [TC-CGEN-2.4] Verification For CommissioningError on response
     message [DUT - Server]
 
 PICS:

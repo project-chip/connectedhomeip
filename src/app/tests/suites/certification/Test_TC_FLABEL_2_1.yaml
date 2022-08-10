@@ -29,7 +29,7 @@ tests:
       verification: |
           ./chip-tool fixedlabel read label-list 1 0
 
-          On TH verify that DUT responds with labellist  empty or has one or more entries, each entry should contain label and value field
+          On TH(chip-tool), verify that DUT responds with labellist  empty or has one or more entries, each entry should contain label and value field
 
           [1651124649.820293][2819:2824] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_0000 DataVersion: 3688229931
           [1651124649.820478][2819:2824] CHIP:TOO:   label list: 4 entries
@@ -59,7 +59,7 @@ tests:
       verification: |
           ./chip-tool fixedlabel write-by-id  0x00 "["label","Testlabel", "value","testvalue"]" 1 0
 
-          On TH, verify that DUT responds with UNSUPPORTED_WRITE
+          On TH(chip-tool), Verify the  status code  as UNSUPPORTED_WRITE
 
           [1657629968.892879][2505:2510] CHIP:DMG: WriteResponseMessage =
           [1657629968.892909][2505:2510] CHIP:DMG: {
@@ -94,9 +94,7 @@ tests:
       verification: |
           ./chip-tool fixedlabel read label-list 1 0
 
-
-          On TH verify that  LabelList should be same as step 1
-
+          On TH(all-clusters-app) Verify that the LabelList value is same as value from step 1
 
           [1651124649.820293][2819:2824] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_0000 DataVersion: 3688229931
           [1651124649.820478][2819:2824] CHIP:TOO:   label list: 4 entries

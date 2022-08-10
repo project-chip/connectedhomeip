@@ -27,11 +27,11 @@ tests:
     - label:
           "TH reads DeviceTypeList and PartsList attributes from DUT for
           Endpoint 0"
-      PICS: DESC.S.A0000 && DESC.S.A0004 && DESC.S.A0003
+      PICS: DESC.S.A0000 && DESC.S.A0003
       verification: |
           ./chip-tool descriptor read device-list 1 0
 
-          Verify on the TH Log:
+          Verify DeviceList response on the TH (Chip-tool) Log:
 
           [1641454498.809603][16120:16125] CHIP:TOO: Descriptor.DeviceList response: 1 entries
           [1641454498.809737][16120:16125] CHIP:TOO:   [1]: {
@@ -44,11 +44,11 @@ tests:
     - label:
           "TH reads DeviceTypeList and PartsList attributes from DUT for each
           Endpoint supported by DUT (except Endpoint 0)."
-      PICS: DESC.S.A0000 && DESC.S.A0004 && DESC.S.A0003
+      PICS: DESC.S.A0000 && DESC.S.A0003
       verification: |
           ./chip-tool descriptor read device-list 1 1
 
-          Verify on the TH Log:
+          Verify DeviceList response on the TH(Chip-tool) Log:
 
 
           [1657200303.724408][2509:2514] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1624758542
@@ -64,7 +64,7 @@ tests:
       verification: |
           ./chip-tool descriptor read server-list 1 0
 
-          Verify on the TH Log:
+          Verify server list on the TH (Chip-tool) Log:
 
           [1654155402.956829][3701:3706] CHIP:TOO:   server list: 26 entries
           [1654155402.956863][3701:3706] CHIP:TOO:     [1]: 3
@@ -100,7 +100,7 @@ tests:
       verification: |
           ./chip-tool descriptor read client-list 1 0
 
-          Verify on the TH Log:
+          Verify client list on the TH (Chip-tool) Log:
 
           [1650281818.533446][9679:9684] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 1976976904
           [1650281818.533514][9679:9684] CHIP:TOO:   client list: 1 entries
@@ -112,7 +112,7 @@ tests:
       verification: |
           ./chip-tool descriptor read  parts-list 1 0
 
-          Verify on the TH Log:
+          Verify PartsList response on the TH (Chip-tool) Log:
 
           [1641456769.777217][16238:16244] CHIP:DMG:      SuppressResponse = true,
           [1641456769.777267][16238:16244] CHIP:DMG: }
