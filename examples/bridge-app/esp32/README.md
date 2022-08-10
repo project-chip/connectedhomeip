@@ -21,10 +21,10 @@ commissioning and cluster control. It adds the non-chip device as endpoints on a
 bridge(Matter device). In this example four light devices supporting on-off
 cluster have been added as endpoints
 
-1. Light1 at endpoint 2
-2. Light2 at endpoint 6
-3. Light3 at endpoint 4
-4. Light4 at endpoint 5
+1. Light1 at endpoint 3
+2. Light2 at endpoint 7
+3. Light3 at endpoint 5
+4. Light4 at endpoint 6
 
 ## Dynamic Endpoints
 
