@@ -15,6 +15,7 @@
 #include "lwip/timeouts.h"
 
 #define MAX_RIO_ROUTE 20
+#define MAX_RIO_TIMEOUT UINT32_MAX / (1000 * 4) // lwIP defined reasonable timeout value
 
 #define TAG "ROUTE_HOOK"
 
@@ -59,7 +60,7 @@ static void route_timeout_handler(void * arg)
 
 esp_route_entry_t * esp_route_table_add_route_entry(const esp_route_entry_t * route_entry)
 {
-    if (route_entry == NULL)
+    if (route_entry == NULL || (route_entry->lifetime_seconds > MAX_RIO_TIMEOUT && route_entry->lifetime_seconds != UINT32_MAX))
     {
         return NULL;
     }
@@ -85,7 +86,10 @@ esp_route_entry_t * esp_route_table_add_route_entry(const esp_route_entry_t * ro
     }
     entry->preference       = route_entry->preference;
     entry->lifetime_seconds = route_entry->lifetime_seconds;
-    sys_timeout(entry->lifetime_seconds * 1000, route_timeout_handler, entry);
+    if (entry->lifetime_seconds != UINT32_MAX)
+    {
+        sys_timeout(entry->lifetime_seconds * 1000, route_timeout_handler, entry);
+    }
     return entry;
 }
 
