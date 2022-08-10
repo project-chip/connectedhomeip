@@ -20,6 +20,7 @@
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
+#include <protocols/secure_channel/Constants.h>
 
 namespace chip {
 namespace Test {
@@ -202,6 +203,17 @@ Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::Exc
 Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::ExchangeDelegate * delegate)
 {
     return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate);
+}
+
+void MessageCapturer::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                        const SessionHandle & session, DuplicateMessage isDuplicate,
+                                        System::PacketBufferHandle && msgBuf)
+{
+    if (mCaptureStandaloneAcks || !payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+    {
+        mCapturedMessages.emplace_back(Message{ packetHeader, payloadHeader, isDuplicate, msgBuf.CloneData() });
+    }
+    mOriginalDelegate.OnMessageReceived(packetHeader, payloadHeader, session, isDuplicate, std::move(msgBuf));
 }
 
 } // namespace Test
