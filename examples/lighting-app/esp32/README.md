@@ -2,17 +2,16 @@
 
 This example demonstrates the Matter Lighting application on ESP platforms.
 
-Refer to
+Please
 [setup ESP-IDF and CHIP Environment](../../../docs/guides/esp32/setup_idf_chip.md)
-and
-[Build, Flash, Monitor, and Commissioning](../../../docs/guides/esp32/build_app_and_commission.md)
+and refer
+[building and commissioning](../../../docs/guides/esp32/build_app_and_commission.md)
 guides to get started.
 
 ---
 
 -   [Cluster Control](#cluster-control)
--   Please check [Matter OTA guide](../../../docs/guides/esp32/ota.md) for
-    trying out OTA
+-   [Matter OTA guide](../../../docs/guides/esp32/ota.md)
 
 ---
 

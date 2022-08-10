@@ -2,10 +2,10 @@
 
 A prototype application that demonstrates OTA Requestor capabilities.
 
-Refer to
+Please
 [setup ESP-IDF and CHIP Environment](../../../docs/guides/esp32/setup_idf_chip.md)
-and
-[Build, Flash, Monitor, and Commissioning](../../../docs/guides/esp32/build_app_and_commission.md)
+and refer
+[building and commissioning](../../../docs/guides/esp32/build_app_and_commission.md)
 guides to get started.
 
 ---
@@ -14,9 +14,7 @@ guides to get started.
 -   [Query for an OTA Image](#query-for-an-ota-image)
 -   [ESP32 OTA Requestor with Linux OTA Provider](#esp32-ota-requestor-with-linux-ota-provider)
 -   [Generate OTA image](#generate-ota-image)
--   Please refer
-    [RPC console and Device Tracing](../../../docs/guides/esp32/rpc_console.md)
-    for using RPC and device tracing
+-   [RPC console and Device Tracing](../../../docs/guides/esp32/rpc_console.md)
 
 ---
 

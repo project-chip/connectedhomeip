@@ -3,21 +3,18 @@
 A prototype application that demonstrates device commissioning and cluster
 control.
 
-Refer to
+Please
 [setup ESP-IDF and CHIP Environment](../../../docs/guides/esp32/setup_idf_chip.md)
-and
-[Build, Flash, Monitor, and Commissioning](../../../docs/guides/esp32/build_app_and_commission.md)
+and refer
+[building and commissioning](../../../docs/guides/esp32/build_app_and_commission.md)
 guides to get started.
 
 ---
 
 -   [Cluster control](#cluster-control)
 -   [Note](#note)
--   Please refer [Matter OTA guide](../../../docs/guides/esp32/ota.md) for
-    trying out OTA
--   Please refer
-    [RPC console and Device Tracing](../../../docs/guides/esp32/rpc_console.md)
-    for using RPC and device tracing
+-   [Matter OTA guide](../../../docs/guides/esp32/ota.md)
+-   [RPC console and Device Tracing](../../../docs/guides/esp32/rpc_console.md)
 
 ---
 
@@ -41,7 +38,7 @@ Usage:
   $ ./out/debug/chip-tool levelcontrol move-to-level Level=10 TransitionTime=0 OptionMask=0 OptionOverride=0 <NODE ID> <ENDPOINT>
 ```
 
-### Note
+---
 
 This demo app illustrates controlling OnOff cluster (Server) attributes of an
 endpoint. For `ESP32-DevKitC`, `ESP32-WROVER-KIT_V4.1` and `ESP32C3-DevKitM`, a

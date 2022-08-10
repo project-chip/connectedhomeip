@@ -2,19 +2,17 @@
 
 This example demonstrates the mapping of OnOff cluster to lock/unlock logic.
 
-Refer to
+Please
 [setup ESP-IDF and CHIP Environment](../../../docs/guides/esp32/setup_idf_chip.md)
-and
-[Build, Flash, Monitor, and Commissioning](../../../docs/guides/esp32/build_app_and_commission.md)
+and refer
+[building and commissioning](../../../docs/guides/esp32/build_app_and_commission.md)
 guides to get started.
 
 ---
 
 -   [Cluster control](#cluster-control)
 -   [Example Demo](#example-demo)
--   Please refer
-    [RPC console and Device Tracing](../../../docs/guides/esp32/rpc_console.md)
-    for using RPC and device tracing
+-   [RPC console and Device Tracing](../../../docs/guides/esp32/rpc_console.md)
 
 ---
 
