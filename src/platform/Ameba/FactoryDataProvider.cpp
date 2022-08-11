@@ -36,6 +36,7 @@ namespace DeviceLayer {
 // TODO: This should be moved to a method of P256Keypair
 CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
 {
+    printf("\r\n%d", __LINE__);
     Crypto::P256SerializedKeypair serialized_keypair;
     ReturnErrorOnFailure(serialized_keypair.SetLength(private_key.size() + public_key.size()));
     memcpy(serialized_keypair.Bytes(), public_key.data(), public_key.size());
@@ -45,6 +46,7 @@ CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto:
 
 CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
+    printf("\r\n%d", __LINE__);
     // TODO: CD is Hardcoded temporarily, will read from flash/efuse in the future
 
     //-> format_version = 1
@@ -101,6 +103,7 @@ CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & ou
 
 CHIP_ERROR FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
 {
+    printf("\r\n%d", __LINE__);
     // TODO: We need a real example FirmwareInformation to be populated.
     out_firmware_info_buffer.reduce_size(0);
 
@@ -109,6 +112,7 @@ CHIP_ERROR FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & out_fir
 
 CHIP_ERROR FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & outBuffer)
 {
+    printf("\r\n%d", __LINE__);
     // TODO: DAC is Hardcoded temporarily, will read from flash/efuse in the future
     
     const uint8_t kDacCert[491] = {
@@ -142,6 +146,7 @@ CHIP_ERROR FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & outBu
 
 CHIP_ERROR FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer)
 {
+    printf("\r\n%d", __LINE__);
     // TODO: PAI is Hardcoded temporarily, will read from flash/efuse in the future
 
     const uint8_t kPaiCert[463] = {
@@ -175,6 +180,7 @@ CHIP_ERROR FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByt
 CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & messageToSign,
                                                                                MutableByteSpan & outSignBuffer)
 {
+    printf("\r\n%d", __LINE__);
     // TODO: DAC keys are Hardcoded temporarily, will read from flash/efuse in the future
 
     const uint8_t kDacPublicKey[65] = {
@@ -206,6 +212,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
 
 CHIP_ERROR FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
+    printf("\r\n%d", __LINE__);
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     uint32_t val;
 
@@ -238,6 +245,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCou
 
 CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
 {
+    printf("\r\n%d", __LINE__);
     static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
 
     CHIP_ERROR err                          = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -263,6 +271,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
 
 CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & verifierLen)
 {
+    printf("\r\n%d", __LINE__);
     static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
         BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
 
@@ -288,6 +297,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf
 
 CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
 {
+    printf("\r\n%d", __LINE__);
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
@@ -300,11 +310,13 @@ CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
 
 CHIP_ERROR FactoryDataProvider::SetSetupPasscode(uint32_t setupPasscode)
 {
+    printf("\r\n%d", __LINE__);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
+    printf("\r\n%d", __LINE__);
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
     return CHIP_NO_ERROR;
@@ -312,12 +324,14 @@ CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 
 CHIP_ERROR FactoryDataProvider::GetVendorId(uint16_t & vendorId)
 {
+    printf("\r\n%d", __LINE__);
     vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
 {
+    printf("\r\n%d", __LINE__);
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
     return CHIP_NO_ERROR;
@@ -325,12 +339,14 @@ CHIP_ERROR FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
 
 CHIP_ERROR FactoryDataProvider::GetProductId(uint16_t & productId)
 {
+    printf("\r\n%d", __LINE__);
     productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
+    printf("\r\n%d", __LINE__);
     ChipError err       = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     size_t serialNumLen = 0; // without counting null-terminator
 
@@ -352,16 +368,19 @@ CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 
 CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
+    printf("\r\n%d", __LINE__);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 {
+    printf("\r\n%d", __LINE__);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
 {
+    printf("\r\n%d", __LINE__);
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
     return CHIP_NO_ERROR;
@@ -369,6 +388,7 @@ CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufS
 
 CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
+    printf("\r\n%d", __LINE__);
     ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,

@@ -24,7 +24,6 @@
 #include "LEDWidget.h"
 #include "chip_porting.h"
 #include <DeviceInfoProviderImpl.h>
-#include <FactoryDataProvider.h>
 #include <lwip_netconf.h>
 
 #include <app/clusters/identify-server/identify-server.h>
@@ -36,6 +35,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/Ameba/FactoryDataProvider.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
