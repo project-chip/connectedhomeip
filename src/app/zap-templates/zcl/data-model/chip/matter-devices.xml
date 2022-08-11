@@ -1602,8 +1602,6 @@ limitations under the License.
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
             <include cluster="Door Lock" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Alarms" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Poll Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Electrical Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Time" client="false" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Time Synchronization" client="false" server="false" clientLocked="false" serverLocked="false"></include>
@@ -1850,7 +1848,6 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Alarms" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Thermostat User Interface Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Fan Control" client="false" server="false" clientLocked="false" serverLocked="false"></include>
