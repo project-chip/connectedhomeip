@@ -58,7 +58,7 @@ tests:
       verification: |
           ./chip-tool descriptor read parts-list 1 0
 
-          On TH, verify the PartsList value as 13 entries
+          On TH(chip-tool), verify the PartsList value as 13 entries (number may vary by DUT capabilities)
 
           [1658393733.358450][13576:13581] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3528858866
           [1658393733.358548][13576:13581] CHIP:TOO:   parts list: 13 entries
@@ -83,7 +83,7 @@ tests:
       verification: |
           ./chip-tool bridgedactions read endpoint-list 1 1
 
-          On TH, verify the EndpointListStructs in TH Log:
+          On TH(chip-tool), verify the EndpointListStructs in TH Log:
 
           [1658474608.888833][20775:20780] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2082192894
           [1658474608.888887][20775:20780] CHIP:TOO:   endpoint list: 2 entries
@@ -109,14 +109,14 @@ tests:
           "For each EndpointListStruct, verify that the endpoints in the
           Endpoints field are in the list of endpoints of the DUT"
       verification: |
-          Verify all referenced endpoints present in list from step 3
+          On TH(chip-tool), Verify all referenced endpoints present in list from step 3
 
           [1658474608.888833][20775:20780] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2082192894 [1658474608.888887][20775:20780] CHIP:TOO: endpoint list: 2 entries [1658474608.888949][20775:20780] CHIP:TOO: [1]: { [1658474608.888968][20775:20780] CHIP:TOO: EndpointListID: 57345 [1658474608.888985][20775:20780] CHIP:TOO: Name: Room 1 [1658474608.889001][20775:20780] CHIP:TOO: Type: 1 [1658474608.889020][20775:20780] CHIP:TOO: Endpoints: 2 entries [1658474608.889040][20775:20780] CHIP:TOO: [1]: 10 [1658474608.889056][20775:20780] CHIP:TOO: [2]: 11 [1658474608.889072][20775:20780] CHIP:TOO: } [1658474608.889099][20775:20780] CHIP:TOO: [2]: { [1658474608.889114][20775:20780] CHIP:TOO: EndpointListID: 57346 [1658474608.889128][20775:20780] CHIP:TOO: Name: Room 2 [1658474608.889142][20775:20780] CHIP:TOO: Type: 1 [1658474608.889159][20775:20780] CHIP:TOO: Endpoints: 2 entries [1658474608.889175][20775:20780] CHIP:TOO: [1]: 12 [1658474608.889191][20775:20780] CHIP:TOO: [2]: 13 [1658474608.889205][20775:20780] CHIP:TOO: }
       disabled: true
 
     - label: "For each EndpointListStruct, verify that the Name is present"
       verification: |
-          Verify each entry has Name in following log
+          On TH(chip-tool), Verify each entry has Name in following log
 
           [1658474608.888833][20775:20780] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2082192894 [1658474608.888887][20775:20780] CHIP:TOO: endpoint list: 2 entries [1658474608.888949][20775:20780] CHIP:TOO: [1]: { [1658474608.888968][20775:20780] CHIP:TOO: EndpointListID: 57345 [1658474608.888985][20775:20780] CHIP:TOO: Name: Room 1 [1658474608.889001][20775:20780] CHIP:TOO: Type: 1 [1658474608.889020][20775:20780] CHIP:TOO: Endpoints: 2 entries [1658474608.889040][20775:20780] CHIP:TOO: [1]: 10 [1658474608.889056][20775:20780] CHIP:TOO: [2]: 11 [1658474608.889072][20775:20780] CHIP:TOO: } [1658474608.889099][20775:20780] CHIP:TOO: [2]: { [1658474608.889114][20775:20780] CHIP:TOO: EndpointListID: 57346 [1658474608.889128][20775:20780] CHIP:TOO: Name: Room 2 [1658474608.889142][20775:20780] CHIP:TOO: Type: 1 [1658474608.889159][20775:20780] CHIP:TOO: Endpoints: 2 entries [1658474608.889175][20775:20780] CHIP:TOO: [1]: 12 [1658474608.889191][20775:20780] CHIP:TOO: [2]: 13 [1658474608.889205][20775:20780] CHIP:TOO: }
       disabled: true
@@ -125,7 +125,7 @@ tests:
           "For each EndpointListStruct, verify that the Type is present and
           valid"
       verification: |
-          Verify the type is oresent and valid in following log
+          On TH(chip-tool), Verify the type is present and valid in following log
 
           [1658474608.888833][20775:20780] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2082192894 [1658474608.888887][20775:20780] CHIP:TOO: endpoint list: 2 entries [1658474608.888949][20775:20780] CHIP:TOO: [1]: { [1658474608.888968][20775:20780] CHIP:TOO: EndpointListID: 57345 [1658474608.888985][20775:20780] CHIP:TOO: Name: Room 1 [1658474608.889001][20775:20780] CHIP:TOO: Type: 1 [1658474608.889020][20775:20780] CHIP:TOO: Endpoints: 2 entries [1658474608.889040][20775:20780] CHIP:TOO: [1]: 10 [1658474608.889056][20775:20780] CHIP:TOO: [2]: 11 [1658474608.889072][20775:20780] CHIP:TOO: } [1658474608.889099][20775:20780] CHIP:TOO: [2]: { [1658474608.889114][20775:20780] CHIP:TOO: EndpointListID: 57346 [1658474608.889128][20775:20780] CHIP:TOO: Name: Room 2 [1658474608.889142][20775:20780] CHIP:TOO: Type: 1 [1658474608.889159][20775:20780] CHIP:TOO: Endpoints: 2 entries [1658474608.889175][20775:20780] CHIP:TOO: [1]: 12 [1658474608.889191][20775:20780] CHIP:TOO: [2]: 13 [1658474608.889205][20775:20780] CHIP:TOO: }
       disabled: true
@@ -134,7 +134,7 @@ tests:
           "Verify that the EndPointListIDs of all EndpointListStruct are unique
           (no duplicates)"
       verification: |
-          Verify there are no duplicate entry in following log
+          On TH(chip-tool), Verify there are no duplicate entry in following log
 
           [1658474608.888833][20775:20780] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2082192894 [1658474608.888887][20775:20780] CHIP:TOO: endpoint list: 2 entries [1658474608.888949][20775:20780] CHIP:TOO: [1]: { [1658474608.888968][20775:20780] CHIP:TOO: EndpointListID: 57345 [1658474608.888985][20775:20780] CHIP:TOO: Name: Room 1 [1658474608.889001][20775:20780] CHIP:TOO: Type: 1 [1658474608.889020][20775:20780] CHIP:TOO: Endpoints: 2 entries [1658474608.889040][20775:20780] CHIP:TOO: [1]: 10 [1658474608.889056][20775:20780] CHIP:TOO: [2]: 11 [1658474608.889072][20775:20780] CHIP:TOO: } [1658474608.889099][20775:20780] CHIP:TOO: [2]: { [1658474608.889114][20775:20780] CHIP:TOO: EndpointListID: 57346 [1658474608.889128][20775:20780] CHIP:TOO: Name: Room 2 [1658474608.889142][20775:20780] CHIP:TOO: Type: 1 [1658474608.889159][20775:20780] CHIP:TOO: Endpoints: 2 entries [1658474608.889175][20775:20780] CHIP:TOO: [1]: 12 [1658474608.889191][20775:20780] CHIP:TOO: [2]: 13 [1658474608.889205][20775:20780] CHIP:TOO: }
       disabled: true
@@ -145,7 +145,7 @@ tests:
           means"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          Verify the information matches, Name and Type against the name/type of each group of endpoints provided
+          On TH(chip-tool), Verify the information matches, Name and Type against the name/type of each group of endpoints provided
 
           [1658474608.888833][20775:20780] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2082192894 [1658474608.888887][20775:20780] CHIP:TOO: endpoint list: 2 entries [1658474608.888949][20775:20780] CHIP:TOO: [1]: { [1658474608.888968][20775:20780] CHIP:TOO: EndpointListID: 57345 [1658474608.888985][20775:20780] CHIP:TOO: Name: Room 1 [1658474608.889001][20775:20780] CHIP:TOO: Type: 1 [1658474608.889020][20775:20780] CHIP:TOO: Endpoints: 2 entries [1658474608.889040][20775:20780] CHIP:TOO: [1]: 10 [1658474608.889056][20775:20780] CHIP:TOO: [2]: 11 [1658474608.889072][20775:20780] CHIP:TOO: } [1658474608.889099][20775:20780] CHIP:TOO: [2]: { [1658474608.889114][20775:20780] CHIP:TOO: EndpointListID: 57346 [1658474608.889128][20775:20780] CHIP:TOO: Name: Room 2 [1658474608.889142][20775:20780] CHIP:TOO: Type: 1 [1658474608.889159][20775:20780] CHIP:TOO: Endpoints: 2 entries [1658474608.889175][20775:20780] CHIP:TOO: [1]: 12 [1658474608.889191][20775:20780] CHIP:TOO: [2]: 13 [1658474608.889205][20775:20780] CHIP:TOO: }
       disabled: true
@@ -155,7 +155,7 @@ tests:
       verification: |
           ./chip-tool bridgedactions read action-list 1 1
 
-          Verify  ActionStructs in TH Log:
+          Verify  ActionStructs in TH(chip-tool) Log:
 
           [1658473018.104129][16539:16544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3292516604
           [1658473018.104215][16539:16544] CHIP:TOO:   action list: 2 entries
@@ -179,7 +179,7 @@ tests:
 
     - label: "For each ActionStruct, verify the Name is present"
       verification: |
-          Verify  ActionStructs has Name in below Log:
+          On TH(chip-tool), Verify  ActionStructs has Name in below Log:
 
           [1658473018.104129][16539:16544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3292516604
           [1658473018.104215][16539:16544] CHIP:TOO:   action list: 2 entries
@@ -203,7 +203,7 @@ tests:
 
     - label: "For each ActionStruct, verify the Type is present and valid"
       verification: |
-          Verify  Type ActionStructs is present and valid in below Log:
+          On TH(chip-tool), Verify  Type ActionStructs is present and valid in below Log:
 
           [1658473018.104129][16539:16544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3292516604
           [1658473018.104215][16539:16544] CHIP:TOO:   action list: 2 entries
@@ -236,7 +236,7 @@ tests:
           "For each ActionStruct, verify the SupportedCommands field is present
           and valid (at least one bit is set)"
       verification: |
-          verify the SupportedCommands field is present and valid in below log
+          On TH(chip-tool), verify the SupportedCommands field is present and valid in below log
 
           [1658473018.104129][16539:16544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3292516604
           [1658473018.104215][16539:16544] CHIP:TOO:   action list: 2 entries
@@ -261,7 +261,7 @@ tests:
     - label:
           "For each ActionStruct, verify the State field is present and valid"
       verification: |
-          verify the State field is present and valid in below log
+          On TH(chip-tool), verify the State field is present and valid in below log
 
           [1658473018.104129][16539:16544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3292516604
           [1658473018.104215][16539:16544] CHIP:TOO:   action list: 2 entries
@@ -287,7 +287,7 @@ tests:
           "Verify that the ActionIDs of all ActionStructs are unique (no
           duplicates)"
       verification: |
-          Verify that the ActionIDs of all ActionStructs are unique in below log
+          On TH(chip-tool), Verify that the ActionIDs of all ActionStructs are unique in below log
 
           [1658473018.104129][16539:16544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3292516604
           [1658473018.104215][16539:16544] CHIP:TOO:   action list: 2 entries
@@ -315,7 +315,7 @@ tests:
           means"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          verify Name, Type and State against the name/type/state info for the action provided in below log:
+          On TH(chip-tool), verify Name, Type and State against the name/type/state info for the action provided in below log:
 
           [1658473018.104129][16539:16544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3292516604
           [1658473018.104215][16539:16544] CHIP:TOO:   action list: 2 entries
@@ -342,7 +342,7 @@ tests:
       verification: |
           ./chip-tool bridgedactions read setup-url 1 1
 
-          Verify in TH log
+          Verify in TH(chip-tool) log
 
           [1658473627.759830][18059:18064] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0002 DataVersion: 3292516604
           [1658473627.759880][18059:18064] CHIP:TOO:   setup url: https://example.com
@@ -350,7 +350,7 @@ tests:
 
     - label: "Verify that its syntax"
       verification: |
-          Verify the syntax as specified in RFC 3986, max. 512 ASCII characters in below log
+          On TH(chip-tool), Verify the syntax as specified in RFC 3986, max. 512 ASCII characters in below log
 
           [1658473627.759830][18059:18064] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0002 DataVersion: 3292516604
           [1658473627.759880][18059:18064] CHIP:TOO:   setup url: https://example.com
@@ -360,7 +360,7 @@ tests:
           "Verify SetupURL points to a site providing information about the
           actions"
       verification: |
-          Verify SetupURL points to a site providing information about the actions in below log
+          On TH(chip-tool), Verify SetupURL points to a site providing information about the actions in below log
 
           [1658473627.759830][18059:18064] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0002 DataVersion: 3292516604
           [1658473627.759880][18059:18064] CHIP:TOO:   setup url: https://example.com

@@ -35,7 +35,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read current-fabric-index 1 0
 
-          On TH, Verify DUT Responds  to CurrentFabricIndex attribute of operationalCredential cluster  as 1
+          On TH(Chiptool), verify  the CurrentFabricIndex attribute of operationalCredential cluster  as 1
 
           [1658323393.451141][2316:2321] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 3882577299
           [1658323393.465921][2316:2321] CHIP:TOO:   CurrentFabricIndex: 1
@@ -47,7 +47,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read extension 1 0
 
-          On TH , Verify DUT  Responds to extension attribute value as an empty list
+          On TH(Chiptool) , Verify the to extension attribute value as an empty list
 
           [1657116435.352869][2667:2672] CHIP:DMG:        SuppressResponse = true,
           [1657116435.352904][2667:2672] CHIP:DMG:        InteractionModelRevision = 1
@@ -65,7 +65,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":"1718"}]" 1 0
 
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool) , Verify  AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element
 
           [1656416335.284463][3747:3752] CHIP:DMG: WriteResponseMessage =
           [1656416335.284498][3747:3752] CHIP:DMG: {
@@ -111,7 +111,9 @@ tests:
       verification: |
           ./chip-tool accesscontrol read extension 1 0
 
-          On TH , Verify DUT  Responds  Successfully .
+          On TH(Chiptool) , Verify value is list of AccessControlExtensionStructcontaining 1 element .  Data field: D_OK_EMPTY : "1718"
+
+          FabricIndex field: F1
 
           [1657278638.722246][9030:9035] CHIP:DMG:                AttributeReportIB =
           [1657278638.722296][9030:9035] CHIP:DMG:                {
@@ -154,13 +156,14 @@ tests:
     - label:
           "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
           value is list of AccessControlExtensionStruct containing 1 element
-          struct Data field: D_OK_SINGLE
+          1.struct Data field: D_OK_SINGLE
           :17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
 
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool) , Verify  AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element  .
+
 
           [1656416899.781899][3814:3819] CHIP:DMG: WriteResponseMessage =
 
@@ -214,7 +217,8 @@ tests:
       verification: |
           ./chip-tool accesscontrol read extension 1 0
 
-          On TH , Verify DUT  Responds  Successfully  .
+          On TH(Chiptool) , Verify value is list of AccessControlExtensionStructcontaining 1 element                                                              1.struct
+          Data field: D_OK_SINGLE :"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
 
           [1657278788.400832][9048:9053] CHIP:DMG: ReportDataMessage =
           [1657278788.400863][9048:9053] CHIP:DMG: {
@@ -287,7 +291,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003148656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E0018"}]" 1 0
 
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool) , Verify  AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element
           [1656417544.279572][3888:3893] CHIP:DMG: WriteResponseMessage =
           [1656417544.279598][3888:3893] CHIP:DMG: {
           [1656417544.279620][3888:3893] CHIP:DMG:        AttributeStatusIBs =
@@ -330,8 +334,10 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol read extension 1 0
+          On TH(Chiptool) , Verify value is list of AccessControlExtensionStructcontaining 1 element                                                                     1.struct
+          Data field:
+          D_OK_FULL  :"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003148656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E0018"
 
-          On TH , Verify DUT  Responds  Successfully .
 
           1657278905.391846][9065:9070] CHIP:DMG: ReportDataMessage =
           [1657278905.391878][9065:9070] CHIP:DMG: {
@@ -402,7 +408,7 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"}]" 1 0
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool) , Verify  AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element  Returns  CONSTRAINT_ERROR (0x87)
           1657279033.590101][9081:9086] CHIP:DMG: WriteResponseMessage =
           [1657279033.590134][9081:9086] CHIP:DMG: {
           [1657279033.590167][9081:9086] CHIP:DMG:        AttributeStatusIBs =
@@ -460,7 +466,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":"1518"}]" 1 0
 
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool) , Verify  AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element  Returns  CONSTRAINT_ERROR (0x87)
 
           [1657609094.514337][8195:8200] CHIP:DMG: WriteResponseMessage =
           [1657609094.514410][8195:8200] CHIP:DMG: {
@@ -516,7 +522,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":"3701D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
 
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool) , Verify  AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element  Returns  CONSTRAINT_ERROR (0x87)
 
           [1657609434.913859][8206:8211] CHIP:DMG: WriteResponseMessage =
           [1657609434.913892][8206:8211] CHIP:DMG: {
@@ -572,7 +578,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":"17103D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
 
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool) , Verify  AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element  Returns  CONSTRAINT_ERROR (0x87)
 
           [1657609579.493445][8215:8220] CHIP:DMG: WriteResponseMessage =
           [1657609579.493480][8215:8220] CHIP:DMG: {
@@ -628,7 +634,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018FF"}]" 1 0
 
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool) , Verify  AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element  Returns  CONSTRAINT_ERROR (0x87)
           [1657609625.258101][8223:8228] CHIP:DMG: WriteResponseMessage =
           [1657609625.258129][8223:8228] CHIP:DMG: {
           [1657609625.258152][8223:8228] CHIP:DMG:        AttributeStatusIBs =
@@ -683,8 +689,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700"}]" 1 0
 
-
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool) , Verify    AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element,  Returns  CONSTRAINT_ERROR (0x87)
 
           [1657609654.298297][8229:8234] CHIP:DMG: WriteResponseMessage =
           [1657609654.298338][8229:8234] CHIP:DMG: {
@@ -739,7 +744,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":""}]" 1 0
 
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool) , Verify    AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element,  Returns  CONSTRAINT_ERROR (0x87)
 
           [1657609694.044950][8236:8241] CHIP:DMG: WriteResponseMessage =
           [1657609694.044980][8236:8241] CHIP:DMG: {
@@ -797,7 +802,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":"1718"},{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
 
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool) , Verify  Successfully AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 2 elements and  CONSTRAINT_ERROR (0x87) for second element path
           1657279798.807750][9208:9213] CHIP:DMG: WriteResponseMessage =
           [1657279798.807783][9208:9213] CHIP:DMG: {
           [1657279798.807812][9208:9213] CHIP:DMG:        AttributeStatusIBs =
@@ -867,7 +872,8 @@ tests:
       verification: |
           ./chip-tool accesscontrol read extension 1 0
 
-          On TH , Verify DUT  Responds  Successfully .
+          On TH(Chiptool) , Verify Successfully the value is list of AccessControlExtensionStruct containing 1 element.
+
 
           1657279968.695899][9221:9226] CHIP:DMG: ReportDataMessage =
           [1657279968.695931][9221:9226] CHIP:DMG: {
@@ -937,7 +943,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension "[]" 1 0
 
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool) , Verify  Successfully,AccessControl cluster Extension attribute, value is an empty list
 
           7625][1521:1526] CHIP:DMG:                AttributeStatusIB =
           [1657692723.227673][1521:1526] CHIP:DMG:                {
@@ -971,7 +977,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read extension 1 0
 
-          On TH , Verify DUT  Responds  Successfully .
+          On TH(Chiptool) , Verify AccessControl cluster Extension attribute, value is an empty list
 
           1657280113.650757][9255:9260] CHIP:DMG: ReportDataMessage =
           [1657280113.650786][9255:9260] CHIP:DMG: {

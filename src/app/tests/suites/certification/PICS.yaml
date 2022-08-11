@@ -1593,6 +1593,15 @@ PICS:
     - label: "Does the device implement the CurrentScene attribute?"
       id: SWTCH.C.F01
 
+    - label: "Does the MS device support Momentary Switch Release?"
+      id: SWTCH.C.F02
+
+    - label: "Does the MS device support Momentary Switch LongPress?"
+      id: SWTCH.C.F03
+
+    - label: "Does the MS device support Momentary Switch MultiPress?"
+      id: SWTCH.C.F04
+
     #General Commissioning Cluster
     - label: "Does the device(Server) support Breadcrumb attribute?"
       id: CGEN.S.A0000
@@ -4110,6 +4119,16 @@ PICS:
           "Does the DUT(server) support the 'Lock supports the user commands and
           database' feature?"
       id: DRLK.S.F08
+
+    - label:
+          "Does the DUT(server) support the 'Lock supports yearday access
+          schedules' feature?"
+      id: DRLK.S.F10
+
+    - label:
+          "Does the DUT(server) support the 'Lock supports holiday access
+          schedules' feature?"
+      id: DRLK.S.F11
 
     - label:
           "Does the DUT(server) support the 'PIN codes over the-air supported

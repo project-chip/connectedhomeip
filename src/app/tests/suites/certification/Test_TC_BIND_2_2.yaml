@@ -34,6 +34,8 @@ tests:
 
     - label: "Commission DUT to TH1s fabric"
       verification: |
+          Run this cmmd in Thread device terminal:
+
           ./chip-tool pairing ble-thread 73 hex:0e080000000000010000000300000f35060004001fffe0020810101191022022920708fd6587bfe9821353051000112237945966880899aabbccddeeff030f7070656e5468726561644465696f6c010212340410f23d85dd55d9748cc6a1fd5fccbb1da20c0402a0fff8 20202021 3840
       disabled: true
 
@@ -46,8 +48,10 @@ tests:
       verification: |
           ./chip-tool pairing onnetwork 1 20202021
 
-          [1659104612.592373][62366:62371] CHIP:DMG: 	SuppressResponse = true,
-          [1659104612.592399][62366:62371] CHIP:DMG: 	InteractionModelRevision = 1
+          On TH(Chip-tool), Verify the success response
+
+          [1659104612.592373][62366:62371] CHIP:DMG:         SuppressResponse = true,
+          [1659104612.592399][62366:62371] CHIP:DMG:         InteractionModelRevision = 1
           [1659104612.592432][62366:62371] CHIP:DMG: }
           [1659104612.593187][62366:62371] CHIP:CTL: Successfully finished commissioning step "ReadCommissioningInfo"
       disabled: true
@@ -70,7 +74,7 @@ tests:
           "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
           "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }" 2 0
 
-
+          On DUT, Verify the success response for KeySetWrite
 
 
           [1657717291.809861][3361:3366] CHIP:DMG: ICR moving to [ResponseRe]
@@ -113,6 +117,8 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement write group-key-map "[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]" 2 0
 
+          On DUT, Verify the success response for GroupKeySetID
+
           StatusIB =
                           {
                                   status = 0x00 (SUCCESS),
@@ -125,6 +131,8 @@ tests:
       PICS: G.C.C00.Tx
       verification: |
           ./chip-tool groups add-group 0x0001 grp1 2 1
+
+          On DUT, Verify the success response for AddGroup
 
           [1657717342.599740][3368:3373] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Command 0x0000_0000
           [1657717342.599891][3368:3373] CHIP:TOO:   AddGroupResponse: {
@@ -157,6 +165,7 @@ tests:
       verification: |
           ./chip-tool binding write binding "[{"group" : "0x0001"}]" 73 1
 
+          On TH, Verify the success response for binding entry
 
           [1657717436.184899][4353:4358] CHIP:DMG:                         StatusIB =
           [1657717436.184940][4353:4358] CHIP:DMG:                         {
@@ -170,6 +179,22 @@ tests:
           entries"
       PICS: OO.C.C01.Tx
       verification: |
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]" 74 0
+
+          On TH(Chip-tool), Verify the success response for Acl:
+
+          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
+          [1659075680.944052][2687:2692] CHIP:DMG:                         {
+          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]" 1 0
+
+          On TH(Chip-tool), Verify the success response for Acl:
+
+          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
+          [1659075680.944052][2687:2692] CHIP:DMG:                         {
+          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+
           Press button no.2 on thread board
       disabled: true
 
@@ -177,6 +202,8 @@ tests:
       PICS: OO.C.C01.Tx
       verification: |
           ./chip-tool onoff read on-off 1 1
+
+          On TH (Chip-tool), Verify the value is set to ON
 
           [1657717900.832851][4381:4386] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 1558029216
           [1657717900.832890][4381:4386] CHIP:TOO:   OnOff: TRUE
@@ -186,11 +213,12 @@ tests:
       verification: |
           ./chip-tool binding write binding "[]" 73 1
 
+          On TH(Chip-tool), Verify the success response for removing binding entry
 
-          [1659362827.431927][2469:2475] CHIP:DMG: 			StatusIB =
-          [1659362827.431996][2469:2475] CHIP:DMG: 			{
-          [1659362827.432070][2469:2475] CHIP:DMG: 				status = 0x00 (SUCCESS),
-          [1659362827.432154][2469:2475] CHIP:DMG: 			},
+          [1659362827.431927][2469:2475] CHIP:DMG:                         StatusIB =
+          [1659362827.431996][2469:2475] CHIP:DMG:                         {
+          [1659362827.432070][2469:2475] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1659362827.432154][2469:2475] CHIP:DMG:                         },
       disabled: true
 
     - label:
@@ -205,6 +233,8 @@ tests:
       PICS: OO.C.C01.Tx
       verification: |
           ./chip-tool onoff read on-off 1 1
+
+          On TH(Chip-tool), Verify the value is set to ON
 
           [1657718251.169765][4425:4431] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 1558029223
           [1657718251.169817][4425:4431] CHIP:TOO:   OnOff: TRUE

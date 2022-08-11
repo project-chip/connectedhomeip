@@ -48,10 +48,10 @@ tests:
           "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin
           node ID N2"
       verification: |
-          Open a commissioning window on TH1 using below command
+          Open a commissioning window On TH(Chiptool)1 using below command
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 180 1  0 --timedInteractionTimeoutMs 1000
-          On TH2, verify DUT Responds SUCCESSFULLY
+          On TH(Chiptool)2, verify DUT is commissioned On TH(Chiptool)2 fabric
 
           [1657286379.420840][4724:4729] CHIP:DMG: InvokeResponseMessage =
           [1657286379.420894][4724:4729] CHIP:DMG: {
@@ -87,7 +87,7 @@ tests:
 
 
 
-          Commission TH2 to DUT using below command
+          CommissiOn TH(Chiptool)2 to DUT using below command
 
           ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta --commissioner-nodeid 223344
 
@@ -100,7 +100,7 @@ tests:
           CurrentFabricIndex attribute"
       verification: |
           ./chip-tool operationalcredentials read current-fabric-index 2 0 --commissioner-nodeid 223344 --commissioner-name beta
-          On TH, Verify DUT Responds  to CurrentFabricIndex attribute of operationalCredential cluster  as 2
+          On TH(Chiptool), verify  to CurrentFabricIndex attribute of operationalCredential cluster  as 2
 
           1658329570.828165][4563:4568] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 1369963572
           [1658329570.831838][4563:4568] CHIP:TOO:   CurrentFabricIndex: 2
@@ -117,8 +117,9 @@ tests:
       PICS: ACL.S.A0000
       verification: |
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233,1111], "targets": null},
-           {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects":[3333] , "targets": null}]" 1 0 --commissioner-nodeid 223344 --commissioner-name beta
-          On TH1 , Verify DUT  Responds  Successfully
+           {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects":[3333] , "targets": null}]" 1 0
+          On TH(Chiptool)1 , Verify Successfully   AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements
+
           [1658329787.635523][3056:3061] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1658329787.635615][3056:3061] CHIP:DMG: WriteResponseMessage =
           [1658329787.635661][3056:3061] CHIP:DMG: {
@@ -195,7 +196,8 @@ tests:
            {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects":[4444] , "targets": null}]" 2 0 --commissioner-nodeid 223344 --commissioner-name beta
 
 
-          On TH2 , Verify DUT  Responds  Successfully
+          On TH(Chiptool)2 , Verify  AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 2 elements
+
 
           [1658329868.113411][4587:4592] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1658329868.113469][4587:4592] CHIP:DMG: WriteResponseMessage =
@@ -267,7 +269,7 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":"1718"}]" 1 0
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element
+          On TH(Chiptool)1 , Verify  Successfully to extension attribute list containg one element
           [1658330105.863185][3079:3084] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1658330105.863237][3079:3084] CHIP:DMG: WriteResponseMessage =
           [1658330105.863262][3079:3084] CHIP:DMG: {
@@ -322,7 +324,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 2 0 --commissioner-nodeid 223344 --commissioner-name beta
 
-          On TH2 , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool)2 , Verify Successfully  extension attribute list containg one element .
 
           [1658819083.842765][8349:8354] CHIP:EM: Removed CHIP MessageCounter:249057275 from RetransTable on exchange 59888i
           [1658819083.842800][8349:8354] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -388,7 +390,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read acl  1 0
 
-          On TH 1, Verify DUT  Responds  Successfully.
+          On TH(Chiptool) 1, Verify  AccessControlEntryStruct containing 2 elements, and MUST NOT contain an element with FabricIndex F2
 
           [1657289627.393651][5251:5256] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 1884338152
           [1657289627.393731][5251:5256] CHIP:TOO:   ACL: 2 entries
@@ -416,7 +418,7 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol read extension 1 0
-          On TH1 , Verify DUT  Responds  Successfully
+          On TH(Chiptool)1 , Verify  Successfully AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F2
 
 
           [1657289676.947323][5260:5265] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 1884338152
@@ -432,7 +434,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read acl 2 0 --commissioner-name beta --commissioner-nodeid 223344
 
-          On TH 2, Verify DUT  Responds  Successfully .
+          On TH(Chiptool) 2, Verify AccessControlEntryStruct containing 2 elements, and MUST NOT contain an element with FabricIndex F1
 
 
           [1657289713.626327][19279:19284] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 1884338152
@@ -462,7 +464,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read extension 2 0 --commissioner-name beta --commissioner-nodeid 223344
 
-          On TH2 , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool)2 , Verify AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
 
           [1657289746.737641][19293:19298] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 1884338152
           [1657289746.737713][19293:19298] CHIP:TOO:   Extension: 1 entries
@@ -483,7 +485,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials remove-fabric 2 2 0 --commissioner-name beta --commissioner-nodeid 223344
 
-          On TH2 , Verify DUT  Responds  Successfully .
+          On TH(Chiptool)1 , Verify successfully removed fabric F2
 
           [1657289809.358455][19309:19314] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1657289809.358500][19309:19314] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
@@ -497,7 +499,8 @@ tests:
       PICS: ACL.S.A0000
       verification: |
           ./chip-tool accesscontrol read acl  1 0
-          On TH1 , Verify DUT  Responds  Successfully .
+          On TH(Chiptool)1 , Verify AccessControlEntryStruct containing 2 elements, and MUST NOT contain an element with FabricIndex F2
+
 
 
           [1657289848.956276][5274:5279] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 1884338152
@@ -526,7 +529,7 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol read extension 1 0
-          On TH1 , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+          On TH(Chiptool)1 , Verify   Successfully to AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F2
 
 
           [1657289881.142883][5283:5288] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 1884338152
