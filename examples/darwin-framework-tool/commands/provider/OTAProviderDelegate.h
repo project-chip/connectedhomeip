@@ -39,14 +39,20 @@ typedef NS_ENUM(uint8_t, UserConsentState) {
 
 @interface OTAProviderDelegate : NSObject <MTROTAProviderDelegate>
 - (void)handleQueryImage:(MTROtaSoftwareUpdateProviderClusterQueryImageParams * _Nonnull)params
+              controller:(MTRDeviceController * _Nonnull)controller
+                  nodeID:(NSNumber * _Nonnull)nodeID
        completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                              NSError * _Nullable error))completionHandler;
 
 - (void)handleApplyUpdateRequest:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * _Nonnull)params
+                      controller:(MTRDeviceController * _Nonnull)controller
+                          nodeID:(NSNumber * _Nonnull)nodeID
                completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler;
 
 - (void)handleNotifyUpdateApplied:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * _Nonnull)params
+                       controller:(MTRDeviceController * _Nonnull)controller
+                           nodeID:(NSNumber * _Nonnull)nodeID
                 completionHandler:(StatusCompletion _Nonnull)completionHandler;
 
 @property (strong, nonatomic, nullable) NSArray<DeviceSoftwareVersionModel *> * candidates;
