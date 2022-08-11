@@ -1485,6 +1485,21 @@ CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan 
 CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & x509Cert, AttestationCertVidPid & vidpid);
 
 /**
+ * @brief The set of credentials needed to operate group message security with symmetric keys.
+ */
+typedef struct GroupOperationalCredentials
+{
+    /// Validity start time in microseconds since 2000-01-01T00:00:00 UTC ("the Epoch")
+    uint64_t start_time;
+    /// Session Id
+    uint16_t hash;
+    /// Operational group key
+    uint8_t encryption_key[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    /// Privacy key
+    uint8_t privacy_key[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+} GroupOperationalCredentials;
+
+/**
  * @brief Opaque context used to protect a symmetric key. The key operations must
  *        be performed without exposing the protected key value.
  */
@@ -1511,7 +1526,7 @@ public:
      * for ciphertext, and plaintext.
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR EncryptMessage(const ByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
+    virtual CHIP_ERROR MessageEncrypt(const ByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
                                       MutableByteSpan & mic, MutableByteSpan & ciphertext) const = 0;
     /**
      * @brief Perform the message decryption as described in 4.7.3.(Security Processing of Incoming Messages)
@@ -1523,30 +1538,26 @@ public:
      * for plaintext, and ciphertext.
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR DecryptMessage(const ByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
+    virtual CHIP_ERROR MessageDecrypt(const ByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
                                       const ByteSpan & mic, MutableByteSpan & plaintext) const = 0;
 
     /**
      * @brief Perform privacy encoding as described in 4.8.2. (Privacy Processing of Outgoing Messages)
-     * @param[in,out] header    Message header to encrypt
-     * @param[in] session_id    Outgoing SessionID
-     * @param[in] payload       Encrypted payload
-     * @param[in] mic       Outgoing Message Integrity Check
+     * @param[in] input         Message header to privacy encrypt
+     * @param[in] nonce         Privacy Nonce = session_id | mic
+     * @param[out] output       Message header obfuscated
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR EncryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
-                                      const ByteSpan & mic) const = 0;
+    virtual CHIP_ERROR PrivacyEncrypt(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const = 0;
 
     /**
      * @brief Perform privacy decoding as described in 4.8.3. (Privacy Processing of Incoming Messages)
-     * @param[in,out] header    Message header to decrypt
-     * @param[in] session_id    Incoming SessionID
-     * @param[in] payload       Encrypted payload
-     * @param[in] mic           Outgoing Message Integrity Check
+     * @param[in] input         Message header to privacy decrypt
+     * @param[in] nonce         Privacy Nonce = session_id | mic
+     * @param[out] output       Message header deobfuscated
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR DecryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
-                                      const ByteSpan & mic) const = 0;
+    virtual CHIP_ERROR PrivacyDecrypt(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const = 0;
 
     /**
      * @brief Release resources such as dynamic memory used to allocate this instance of the SymmetricKeyContext
@@ -1577,10 +1588,22 @@ CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & ses
  *  @brief Derives the Privacy Group Key using the Key Derivation Function (KDF) from the given epoch key.
  * @param[in] epoch_key  The epoch key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
  * @param[out] out_key  Symmetric key used as the privacy key during message processing for group communication.
- The buffer size must be at least CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
+ *                      The buffer size must be at least CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
  * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INTERNAL if the provided key is invalid.
  **/
 CHIP_ERROR DeriveGroupPrivacyKey(const ByteSpan & epoch_key, MutableByteSpan & out_key);
 
+/**
+ *  @brief Derives the complete set of credentials needed for group security.
+ *
+ * This function will derive the Encryption Key, Group Key Hash (Session Id), and Privacy Key
+ * for the given Epoch Key and Compressed Fabric Id.
+ * @param[in] epoch_key  The epoch key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
+ * @param[in] compressed_fabric_id The compressed fabric ID for the fabric (big endian byte string)
+ * @param[out] operational_credentials The set of Symmetric keys used during message processing for group communication.
+ * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INTERNAL if the provided key is invalid.
+ **/
+CHIP_ERROR DeriveGroupOperationalCredentials(const ByteSpan & epoch_key, const ByteSpan & compressed_fabric_id,
+                                             GroupOperationalCredentials & operational_credentials);
 } // namespace Crypto
 } // namespace chip

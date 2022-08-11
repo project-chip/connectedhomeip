@@ -1138,7 +1138,7 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(
         apSuite,
         CHIP_NO_ERROR ==
-            key_context->EncryptMessage(plaintext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag, ciphertext));
+            key_context->MessageEncrypt(plaintext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag, ciphertext));
 
     // The ciphertext must be different to the original message
     NL_TEST_ASSERT(apSuite, memcmp(ciphertext.data(), kMessage, sizeof(kMessage)));
@@ -1169,7 +1169,7 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
             // Decrypt the ciphertext
             NL_TEST_ASSERT(apSuite,
                            CHIP_NO_ERROR ==
-                               session.key->DecryptMessage(ciphertext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)),
+                               session.key->MessageDecrypt(ciphertext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)),
                                                            tag, plaintext));
 
             // The new plaintext must match the original message
