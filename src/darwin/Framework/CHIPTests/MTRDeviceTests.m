@@ -347,6 +347,51 @@ static MTRBaseDevice * GetConnectedDevice(void)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)test004_InvokeTimedCommand
+{
+#if MANUAL_INDIVIDUAL_TEST
+    [self initStack];
+    [self waitForCommissionee];
+#endif
+    XCTestExpectation * expectation = [self expectationWithDescription:@"invoke Off command"];
+
+    MTRBaseDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    NSDictionary * fields = @{
+        @"type" : @"Structure",
+        @"value" : @[],
+    };
+    [device invokeCommandWithEndpointId:@1
+                              clusterId:@6
+                              commandId:@0
+                          commandFields:fields
+                     timedInvokeTimeout:@10000
+                            clientQueue:queue
+                             completion:^(id _Nullable values, NSError * _Nullable error) {
+                                 NSLog(@"invoke command: Off values: %@, error: %@", values, error);
+
+                                 XCTAssertNil(error);
+
+                                 {
+                                     XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+                                     NSArray * resultArray = values;
+                                     for (NSDictionary * result in resultArray) {
+                                         MTRCommandPath * path = result[@"commandPath"];
+                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+                                         XCTAssertEqual([path.command unsignedIntegerValue], 0);
+                                         XCTAssertNil(result[@"error"]);
+                                     }
+                                     XCTAssertEqual([resultArray count], 1);
+                                 }
+
+                                 [expectation fulfill];
+                             }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
 
 - (void)test005_Subscribe
@@ -1047,6 +1092,55 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ deregisterExpectation ] timeout:kTimeoutInSeconds];
 }
 #endif
+
+- (void)test013_ReuseChipClusterObject
+{
+#if MANUAL_INDIVIDUAL_TEST
+    [self initStack];
+    [self waitForCommissionee];
+#endif
+
+    MTRDeviceController * controller = sController;
+    XCTAssertNotNil(controller);
+
+    __block MTRBaseDevice * device;
+    __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
+    [controller getBaseDevice:kDeviceId
+                        queue:dispatch_get_main_queue()
+            completionHandler:^(MTRBaseDevice * _Nullable retrievedDevice, NSError * _Nullable error) {
+                XCTAssertEqual(error.code, 0);
+                [connectionExpectation fulfill];
+                connectionExpectation = nil;
+                device = retrievedDevice;
+            }];
+    [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"ReuseMTRClusterObjectFirstCall"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    MTRBaseClusterTestCluster * cluster = [[MTRBaseClusterTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster testWithCompletionHandler:^(NSError * err) {
+        NSLog(@"ReuseMTRClusterObject test Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    expectation = [self expectationWithDescription:@"ReuseMTRClusterObjectSecondCall"];
+
+    // Reuse the MTRCluster Object for multiple times.
+
+    [cluster testWithCompletionHandler:^(NSError * err) {
+        NSLog(@"ReuseMTRClusterObject test Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)test900_SubscribeAllAttributes
 {
