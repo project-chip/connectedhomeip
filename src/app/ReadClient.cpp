@@ -86,7 +86,7 @@ ReadClient::~ReadClient()
         // This won't be the case if the engine shut down before this destructor was called (in which case, mpImEngine
         // will point to null)
         //
-        if (mpImEngine && mpImEngine->InActiveReadClientList(this))
+        if (mpImEngine)
         {
             mpImEngine->RemoveReadClient(this);
         }

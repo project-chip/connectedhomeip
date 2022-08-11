@@ -731,6 +731,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_MISSING_URI_SEPARATOR.AsInteger():
         desc = "The URI separator is missing";
         break;
+    case CHIP_ERROR_IM_FABRIC_DELETED.AsInteger():
+        desc = "The fabric is deleted, and the corresponding IM resources are released";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 

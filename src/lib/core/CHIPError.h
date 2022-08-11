@@ -2428,6 +2428,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_MISSING_URI_SEPARATOR                      CHIP_CORE_ERROR(0xe0)
 
+/**
+ * @def CHIP_ERROR_IM_FABRIC_DELETED
+ *
+ * @brief
+ *   The fabric is deleted, and the corresponding IM resources are released
+ */
+#define CHIP_ERROR_IM_FABRIC_DELETED                            CHIP_CORE_ERROR(0xe1)
+
 // clang-format on
 
 // !!!!! IMPORTANT !!!!!  If you add new CHIP errors, please update the translation

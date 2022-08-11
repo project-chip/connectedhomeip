@@ -383,11 +383,7 @@ public:
     }
 
     // Gets called when a fabric is added/updated, but not necessarily committed to storage
-    void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(InteractionModel, "OnFabricUpdated debugging from opertonal-credential!!!!!!!");
-        NotifyFabricTableChanged();
-    }
+    void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override { NotifyFabricTableChanged(); }
 
     // Gets called when a fabric in FabricTable is persisted to storage
     void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override

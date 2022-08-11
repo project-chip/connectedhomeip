@@ -3686,13 +3686,14 @@ void TestReadInteraction::TestSubscribeInvalidateFabric(nlTestSuite * apSuite, v
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-    readPrepareParams.mEventPathParamsListSize = 0;
+    readPrepareParams.mpAttributePathParamsList    = new chip::app::AttributePathParams[1];
+    readPrepareParams.mAttributePathParamsListSize = 1;
 
-    readPrepareParams.mpAttributePathParamsList    = new chip::app::AttributePathParams[2];
-    readPrepareParams.mAttributePathParamsListSize = 2;
+    readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = Test::kMockEndpoint3;
+    readPrepareParams.mpAttributePathParamsList[0].mClusterId   = Test::MockClusterId(2);
+    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = Test::MockAttributeId(4);
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 0;
@@ -3709,11 +3710,6 @@ void TestReadInteraction::TestSubscribeInvalidateFabric(nlTestSuite * apSuite, v
         ctx.DrainAndServiceIO();
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
-
-        // We have 29 attributes in our mock attribute storage. And we subscribed twice.
-        // And attribute 3/2/4 is a list with 6 elements and list chunking is applied to it, thus we should receive ( 29 + 6 ) * 2 =
-        // 70 attribute data in total.
-        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 70);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);

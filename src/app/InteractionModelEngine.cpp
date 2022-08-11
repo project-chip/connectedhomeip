@@ -77,9 +77,9 @@ void InteractionModelEngine::Shutdown()
     //
     while (handlerIter)
     {
-        CommandHandlerInterface * pNext = handlerIter->GetNext();
+        CommandHandlerInterface * nextHandler = handlerIter->GetNext();
         handlerIter->SetNext(nullptr);
-        handlerIter = pNext;
+        handlerIter = nextHandler;
     }
 
     mCommandHandlerList = nullptr;
@@ -234,24 +234,6 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
     }
 
     return numActive;
-}
-
-void InteractionModelEngine::CloseTransactionsFromFabricIndex(FabricIndex aFabricIndex)
-{
-    //
-    // Walk through all existing subscriptions and shut down those whose subscriber matches
-    // that which just came in.
-    //
-    mReadHandlers.ForEachActiveObject([this, aFabricIndex](ReadHandler * handler) {
-        if (handler->GetAccessingFabricIndex() == aFabricIndex)
-        {
-            ChipLogProgress(InteractionModel, "Deleting expired ReadHandler for NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
-                            ChipLogValueX64(handler->GetInitiatorNodeId()), aFabricIndex);
-            mReadHandlers.ReleaseObject(handler);
-        }
-
-        return Loop::Continue;
-    });
 }
 
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(SubscriptionId aSubscriptionId)
@@ -1440,7 +1422,8 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
     mReadHandlers.ForEachActiveObject([fabricIndex](ReadHandler * handler) {
         if (handler->GetAccessingFabricIndex() == fabricIndex)
         {
-            ChipLogProgress(InteractionModel, "Fabric removed, deleting obsolete read handler with FabricIndex: %u", fabricIndex);
+            ChipLogProgress(InteractionModel, "Deleting expired ReadHandler for NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
+                            ChipLogValueX64(handler->GetInitiatorNodeId()), fabricIndex);
             handler->Close();
         }
 
@@ -1452,8 +1435,9 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
         if (readClient->GetFabricIndex() == fabricIndex)
         {
             ChipLogProgress(InteractionModel, "Fabric removed, deleting obsolete read client with FabricIndex: %u", fabricIndex);
-            readClient->Close(CHIP_NO_ERROR, false);
             RemoveReadClient(readClient);
+            readClient->mpImEngine = nullptr;
+            readClient->Close(CHIP_ERROR_IM_FABRIC_DELETED, false);
         }
     }
 

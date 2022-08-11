@@ -144,12 +144,6 @@ public:
      */
     void ShutdownAllSubscriptions();
 
-    /**
-     * Expire active transactions and release related objects for the given fabric index.
-     * This is used for releasing transactions that won't be closed when a fabric is removed.
-     */
-    void CloseTransactionsFromFabricIndex(FabricIndex aFabricIndex);
-
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
 
@@ -290,6 +284,7 @@ public:
      */
     uint16_t GetMinGuaranteedSubscriptionsPerFabric() const;
 
+    // virtual method from FabricTable::Delegate
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
