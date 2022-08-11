@@ -15,6 +15,13 @@
 
 name: 4.3.1. [TC-OO-3.1] Attributes with client as DUT
 
+PICS:
+    - OO.C
+    - OO.C.AM-READ
+    - OO.C.AO-READ
+    - OO.C.AM-WRITE
+    - OO.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -29,7 +36,7 @@ tests:
 
           ./chip-tool onoff read on-off 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " on-off response" on the TH (all-cluster-app) log:
 
           [1650535426.653349][3678:3678] CHIP:IM: Received Read request
           [1650535426.653451][3678:3678] CHIP:DMG: ReadRequestMessage =
@@ -51,7 +58,7 @@ tests:
 
           ./chip-tool onoff read global-scene-control 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " global-scene-control response" on the TH (all-cluster-app) log:
 
           [...]
           [1650535491.289766][3678:3678] CHIP:IM: Received Read request
@@ -74,7 +81,7 @@ tests:
 
           ./chip-tool onoff read on-time 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " on-time-control response" on the TH (all-cluster-app) log:
 
           [...]
           [1650535552.255428][3678:3678] CHIP:IM: Received Read request
@@ -98,7 +105,7 @@ tests:
 
           ./chip-tool onoff read off-wait-time 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " off-wait-time response" on the TH (all-cluster-app) log:
 
           [...]
           [1650535606.512822][3678:3678] CHIP:IM: Received Read request
@@ -121,7 +128,7 @@ tests:
 
           ./chip-tool onoff read start-up-on-off 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " start-up-on-off response" on the TH (all-cluster-app) log:
 
           [...]
           [1650535667.846050][3678:3678] CHIP:IM: Received Read request
@@ -147,7 +154,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          This cluster doesn't have any  optional attribute
+          This cluster doesn"t have any  optional attribute
       disabled: true
 
     - label:
@@ -160,7 +167,7 @@ tests:
 
           ./chip-tool onoff write on-time 1 1 1
 
-          Verify in TH all-clusters-app log
+          verify the WriteRequestMessage of " on-time" on the TH (all-cluster-app) log:
 
           [1650536057.105214][3678:3678] CHIP:DMG: WriteRequestMessage =
           [1650536057.105276][3678:3678] CHIP:DMG: {
@@ -188,7 +195,7 @@ tests:
 
           ./chip-tool onoff write off-wait-time 22 1 1
 
-          Verify in TH all-clusters-app log
+          verify the WriteRequestMessage of " off-wait-time" on the TH (all-cluster-app) log:
 
           [1650536319.716722][3678:3678] CHIP:IM: Received Write request
           [1650536319.716777][3678:3678] CHIP:DMG: IM WH moving to [Initialized]
@@ -216,14 +223,14 @@ tests:
 
           ./chip-tool onoff write start-up-on-off 60 1 1
 
-          Verify in TH all-clusters-app log
+          verify the WriteRequestMessage of " start-up-on-off " on the TH (all-cluster-app) log:
 
           [1650536431.411044][3678:3678] CHIP:DMG: WriteRequestMessage =
           [1650536431.411090][3678:3678] CHIP:DMG: {
           [1650536431.411132][3678:3678] CHIP:DMG:         suppressResponse = false,
           [1650536431.411180][3678:3678] CHIP:DMG:         timedRequest = false,
           [1650536431.411224][3678:3678] CHIP:DMG:         AttributeDataIBs =
-          [1650536431.411278][3678:3678] CHIP:DMG:         [
+          [1650536431.411278][3678:3678] CHIP:DMG:         [4
           [1650536431.411323][3678:3678] CHIP:DMG:                 AttributeDataIB =
           [1650536431.411386][3678:3678] CHIP:DMG:                 {
           [1650536431.411434][3678:3678] CHIP:DMG:                         AttributePathIB =
@@ -247,7 +254,7 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any optional attributes
+          This cluster doesn"t have any optional attributes
       disabled: true
 
     - label:
@@ -263,21 +270,30 @@ tests:
 
            ./chip-tool onoff read attribute-list 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " attribute-list response" on the TH (all-cluster-minimal-app) log:
 
-          [1654242750470] [91276:3990451] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_FFFB DataVersion: 2879590817
-          [1654242750471] [91276:3990451] CHIP: [TOO]   AttributeList: 6 entries
-          [1654242750471] [91276:3990451] CHIP: [TOO]     [1]: 0
-          [1654242750471] [91276:3990451] CHIP: [TOO]     [2]: 65528
-          [1654242750471] [91276:3990451] CHIP: [TOO]     [3]: 65529
-          [1654242750471] [91276:3990451] CHIP: [TOO]     [4]: 65531
-          [1654242750471] [91276:3990451] CHIP: [TOO]     [5]: 65532
-          [1654242750471] [91276:3990451] CHIP: [TOO]     [6]: 65533
+          [1657906380.687418][2361:2361] CHIP:DMG: ReadRequestMessage =
+          [1657906380.687448][2361:2361] CHIP:DMG: {
+          [1657906380.687471][2361:2361] CHIP:DMG:        AttributePathIBs =
+          [1657906380.687497][2361:2361] CHIP:DMG:        [
+          [1657906380.687520][2361:2361] CHIP:DMG:                AttributePathIB =
+          [1657906380.687556][2361:2361] CHIP:DMG:                {
+          [1657906380.687587][2361:2361] CHIP:DMG:                        Endpoint = 0x1,
+          [1657906380.687624][2361:2361] CHIP:DMG:                        Cluster = 0x6,
+          [1657906380.687677][2361:2361] CHIP:DMG:                        Attribute = 0x0000_FFFB,
+          [1657906380.687712][2361:2361] CHIP:DMG:                }
+          [1657906380.687744][2361:2361] CHIP:DMG:
+          [1657906380.687783][2361:2361] CHIP:DMG:        ],
+          [1657906380.687814][2361:2361] CHIP:DMG:
+          [1657906380.687844][2361:2361] CHIP:DMG:        isFabricFiltered = true,
+          [1657906380.687872][2361:2361] CHIP:DMG:        InteractionModelRevision = 1
+          [1657906380.687904][2361:2361] CHIP:DMG: },
+
 
 
           ./chip-tool onoff read on-off 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " on-off response" on the TH (all-cluster-minimal-app) log:
 
           [1650535426.653349][3678:3678] CHIP:IM: Received Read request
           [1650535426.653451][3678:3678] CHIP:DMG: ReadRequestMessage =
@@ -299,7 +315,7 @@ tests:
 
           ./chip-tool onoff read global-scene-control 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " global-scene-control response" on the TH (all-cluster-minimal-app) log:
 
           [...]
           [1650535491.289766][3678:3678] CHIP:IM: Received Read request
@@ -322,7 +338,7 @@ tests:
 
           ./chip-tool onoff read on-time 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " on-time response" on the TH (all-cluster-minimal-app) log:
 
           [...]
           [1650535552.255428][3678:3678] CHIP:IM: Received Read request
@@ -346,7 +362,7 @@ tests:
 
           ./chip-tool onoff read off-wait-time 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " off-wait-time response" on the TH (all-cluster-minimal-app) log:
 
           [...]
           [1650535606.512822][3678:3678] CHIP:IM: Received Read request
@@ -369,7 +385,7 @@ tests:
 
           ./chip-tool onoff read start-up-on-off 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " start-up-on-off response" on the TH (all-cluster-minimal-app) log:
 
           [...]
           [1650535667.846050][3678:3678] CHIP:IM: Received Read request
@@ -395,12 +411,12 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          This cluster doesn't have any optional attributes
+          This cluster doesn"t have any optional attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any optional attributes
+          This cluster doesn"t have any optional attributes
       disabled: true

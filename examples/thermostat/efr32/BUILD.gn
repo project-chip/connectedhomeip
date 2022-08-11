@@ -81,8 +81,8 @@ if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
 }
 
-# BRD4166A --> ThunderBoard Sense 2 (No LCD)
-if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
+# ThunderBoards  (No LCD)
+if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B") {
   show_qr_code = false
   disable_lcd = true
 }

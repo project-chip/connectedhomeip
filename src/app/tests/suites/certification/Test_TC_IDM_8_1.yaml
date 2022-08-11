@@ -24,6 +24,12 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+      disabled: true
+
     - label:
           "Send a Read Request Message from RC1 and RC2 to read the ACL
           attribute, which is a fabric scoped list, from the DUT. Fabric
@@ -606,5 +612,5 @@ tests:
           where an event in the path is fabric-sensitive and the associated
           fabric does not match the accessing fabric."
       verification: |
-          Waiting for test-plan author input
+          Mark this as not testable /NA. Out of Scope for V1.0
       disabled: true

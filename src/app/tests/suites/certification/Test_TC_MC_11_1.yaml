@@ -16,6 +16,7 @@
 name:
     19.13.1. [TC-MC-11.1] Casting Video Player via User-Directed Commissioning
     Verification (DUT as Server)
+
 PICS:
     - MC.S.UDCLOGIN
 

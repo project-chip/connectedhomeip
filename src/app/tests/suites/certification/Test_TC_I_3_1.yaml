@@ -15,18 +15,31 @@
 
 name: 59.3.1. [TC-I-3.1] Attributes with Client as DUT
 
+PICS:
+    - I.C
+    - I.C.AM-READ
+    - I.C.AO-READ
+    - I.C.AM-WRITE
+    - I.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
           ./chip-tool identify read identify-time 1 1
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify DUT receives  identify-time attribute response on the TH(all-clusters-app) Log:
 
           [1648015371.159715][2506:2506] CHIP:IM: Received Read request
           [1648015371.159805][2506:2506] CHIP:DMG: ReadRequestMessage =
@@ -46,15 +59,9 @@ tests:
           [1648015371.160300][2506:2506] CHIP:DMG:         InteractionModelRevision = 1
           [1648015371.160324][2506:2506] CHIP:DMG: },
 
-          On DUT as a client side, verify that TH all-clusters-app sent identify time attribute value
-          [1658144129.651688][8964:8969] CHIP:DMG: }
-          [1658144129.651919][8964:8969] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 774797081
-          [1658144129.652113][8964:8969] CHIP:TOO:   identify time: 0
-          [1658144129.652237][8964:8969] CHIP:EM: Sending Standalone Ack for MessageCounter:17091478 on exchange 42014i
-
 
            ./chip-tool identify  read   identify-type 1 1
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify DUT receives   identify-type attribute response on the TH(all-clusters-app) Log:
 
           [1648015519.017225][2506:2506] CHIP:IM: Received Read request
           [1648015519.017293][2506:2506] CHIP:DMG: ReadRequestMessage =
@@ -73,12 +80,6 @@ tests:
           [1648015519.017932][2506:2506] CHIP:DMG:         isFabricFiltered = true,
           [1648015519.017969][2506:2506] CHIP:DMG:         InteractionModelRevision = 1
           [1648015519.018003][2506:2506] CHIP:DMG: },
-
-          On DUT as a client side, verify that TH all-clusters-app sent identify type attribute value
-          [1658144152.172514][8970:8975] CHIP:DMG: }
-          [1658144152.172661][8970:8975] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 774797081
-          [1658144152.172726][8970:8975] CHIP:TOO:   identify type: 2
-          [1658144152.172813][8970:8975] CHIP:EM: Sending Standalone Ack for MessageCounter:190112026 on exchange 9214i
       disabled: true
 
     - label:
@@ -92,9 +93,11 @@ tests:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool identify  write   identify-time  1 1 1
 
-          verify On TH(Reference app) receives the right write Request Message for the data sent in the above command
+          Verify DUT receives  identify-time attribute write response on the TH(all-clusters-app) Log:
           [1646012277.591912][33190:33190] CHIP:IM: Received Write request
           [1646012277.591936][33190:33190] CHIP:DMG: IM WH moving to [Initialized]
           [1646012277.591987][33190:33190] CHIP:DMG: WriteRequestMessage =
@@ -121,20 +124,13 @@ tests:
           [1646012277.592589][33190:33190] CHIP:DMG: },
           [1646012277.592669][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=o
           [1646012277.592721][33190:33190] CHIP:DMG: Endpoint 1, Cluster 0x0000_0003 update version to d4fdf520
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
-          [1658144181.287676][8979:8984] CHIP:DMG:
-          [1658144181.287736][8979:8984] CHIP:DMG:                         StatusIB =
-          [1658144181.287792][8979:8984] CHIP:DMG:                         {
-          [1658144181.287849][8979:8984] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1658144181.287907][8979:8984] CHIP:DMG:                         },
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          There is no optional attibute for this cluster
+          There is no write optional attibute for this cluster
       disabled: true
 
     - label:
@@ -143,8 +139,10 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool identify read identify-time 1 1
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify DUT receives  identify-time attribute response on theTH(all-clusters-minimal-app)
 
           [1648015371.159715][2506:2506] CHIP:IM: Received Read request
           [1648015371.159805][2506:2506] CHIP:DMG: ReadRequestMessage =
@@ -164,15 +162,9 @@ tests:
           [1648015371.160300][2506:2506] CHIP:DMG:         InteractionModelRevision = 1
           [1648015371.160324][2506:2506] CHIP:DMG: },
 
-          On DUT as a client side, verify that TH all-clusters-app sent identify time attribute value
-          [1658144129.651688][8964:8969] CHIP:DMG: }
-          [1658144129.651919][8964:8969] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 774797081
-          [1658144129.652113][8964:8969] CHIP:TOO:   identify time: 0
-          [1658144129.652237][8964:8969] CHIP:EM: Sending Standalone Ack for MessageCounter:17091478 on exchange 42014i
-
 
            ./chip-tool identify  read   identify-type 1 1
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          Verify DUT receives  identify-type attribute response on theTH(all-clusters-minimal-app)
 
           [1648015519.017225][2506:2506] CHIP:IM: Received Read request
           [1648015519.017293][2506:2506] CHIP:DMG: ReadRequestMessage =
@@ -191,12 +183,6 @@ tests:
           [1648015519.017932][2506:2506] CHIP:DMG:         isFabricFiltered = true,
           [1648015519.017969][2506:2506] CHIP:DMG:         InteractionModelRevision = 1
           [1648015519.018003][2506:2506] CHIP:DMG: },
-
-          On DUT as a client side, verify that TH all-clusters-app sent identify type attribute value
-          [1658144152.172514][8970:8975] CHIP:DMG: }
-          [1658144152.172661][8970:8975] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 774797081
-          [1658144152.172726][8970:8975] CHIP:TOO:   identify type: 2
-          [1658144152.172813][8970:8975] CHIP:EM: Sending Standalone Ack for MessageCounter:190112026 on exchange 9214i
       disabled: true
 
     - label:
@@ -210,5 +196,5 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          There is no optional attibute for this cluster
+          There is no optional write attibute for this cluster
       disabled: true

@@ -112,13 +112,12 @@ public class ChipEventStructs {
     }
   }
 
-  public static class BridgedActionsClusterStateChangedEvent {
+  public static class ActionsClusterStateChangedEvent {
     public Integer actionID;
     public Long invokeID;
     public Integer newState;
 
-    public BridgedActionsClusterStateChangedEvent(
-        Integer actionID, Long invokeID, Integer newState) {
+    public ActionsClusterStateChangedEvent(Integer actionID, Long invokeID, Integer newState) {
       this.actionID = actionID;
       this.invokeID = invokeID;
       this.newState = newState;
@@ -127,7 +126,7 @@ public class ChipEventStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BridgedActionsClusterStateChangedEvent {\n");
+      output.append("ActionsClusterStateChangedEvent {\n");
       output.append("\tactionID: ");
       output.append(actionID);
       output.append("\n");
@@ -142,13 +141,13 @@ public class ChipEventStructs {
     }
   }
 
-  public static class BridgedActionsClusterActionFailedEvent {
+  public static class ActionsClusterActionFailedEvent {
     public Integer actionID;
     public Long invokeID;
     public Integer newState;
     public Integer error;
 
-    public BridgedActionsClusterActionFailedEvent(
+    public ActionsClusterActionFailedEvent(
         Integer actionID, Long invokeID, Integer newState, Integer error) {
       this.actionID = actionID;
       this.invokeID = invokeID;
@@ -159,7 +158,7 @@ public class ChipEventStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BridgedActionsClusterActionFailedEvent {\n");
+      output.append("ActionsClusterActionFailedEvent {\n");
       output.append("\tactionID: ");
       output.append(actionID);
       output.append("\n");

@@ -17,6 +17,9 @@ name:
     3.9.1. [TC-SU-3.4] Handling different ApplyUpdateResponse scenarios on
     Provider
 
+PICS:
+    - MCORE.OTA.Provider
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -27,7 +30,7 @@ tests:
           "OTA-R/TH on completion of image download sends an
           ApplyUpdateRequestCommand to the DUT."
       verification: |
-          Verify on the OTA Requestor logs
+          Verify on the OTA Requestor logs receives ApplyUpdateResponse
 
           [1645743059328] [97809:20280957] CHIP: [SWU] ApplyUpdateResponse:
           [1645743059328] [97809:20280957] CHIP: [SWU]   action: 0
@@ -35,11 +38,11 @@ tests:
       disabled: true
 
     - label:
-          'OTA-R/TH on completion of image download sends an ApplyUpdateRequest
+          "OTA-R/TH on completion of image download sends an ApplyUpdateRequest
           command to the DUT. DUT responds with the ApplyUpdateResponse with
-          Action set to "AwaitNextAction", DelayedActionTime set to 3 minutes.
-          On the subsequent ApplyUpdateRequest command, DUT sends a
-          ApplyUpdateResponse back to DUT. Action is set to Proceed.'
+          Action set to AwaitNextAction, DelayedActionTime set to 3 minutes. On
+          the subsequent ApplyUpdateRequest command, DUT sends a
+          ApplyUpdateResponse back to DUT. Action is set to Proceed."
       verification: |
           Run the OTA Requestor App using command
 
@@ -47,7 +50,7 @@ tests:
 
           chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -a awaitNextAction -p 180
 
-          Verify on the OTA Requestor logs:
+          Verify on the OTA Requestor logs receives ApplyUpdateResponse:
 
           [1651273867647] [25752:35374182] CHIP: [SWU] ApplyUpdateResponse:
           [1651273867647] [25752:35374182] CHIP: [SWU]   action: 1
@@ -61,10 +64,10 @@ tests:
       disabled: true
 
     - label:
-          'OTA-R/TH on completion of image download sends an ApplyUpdateRequest
+          "OTA-R/TH on completion of image download sends an ApplyUpdateRequest
           command to the DUT. DUT responds with the ApplyUpdateResponse with
-          Action set to "Discontinue". Initiate another QueryImage Command from
-          OTA-R/TH to the DUT.'
+          Action set to Discontinue. Initiate another QueryImage Command from
+          OTA-R/TH to the DUT."
       verification: |
           Run the OTA Requestor App using command
 

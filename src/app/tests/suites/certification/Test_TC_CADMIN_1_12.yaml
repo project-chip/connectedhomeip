@@ -17,12 +17,20 @@ name:
     4.1.12. [TC-CADMIN-1.12] Open commissioning window on DUT twice using ECM
     then BCM [DUT - Commissioner]
 
+PICS:
+    - CADMIN.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Precondition: Reset DUT_CE to factory defaults"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
     - label: "DUT_CR1 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |

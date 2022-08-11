@@ -21,6 +21,8 @@
  *
  */
 
+#include <protocols/secure_channel/MessageCounterManager.h>
+
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPKeyIds.h>
@@ -32,7 +34,6 @@
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
 
 namespace chip {
 namespace secure_channel {

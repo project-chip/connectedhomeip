@@ -15,6 +15,9 @@
 
 name: 4.3.2. [TC-OO-3.2] Functionality with client as DUT
 
+PICS:
+    - OO.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -28,8 +31,14 @@ tests:
 
           ./chip-tool onoff off 1 1
 
+          verify the " Off command response" on the TH (all-cluster-app) log:
 
-          Verify in TH all-clusters-app log
+          StatusIB =
+          {
+                  status = 0x00,
+          },
+
+          Verify in TH as all-clusters app (Optional log verification in TH as server side)
 
           [1650537121.464763][3678:3678] CHIP:DMG: InvokeRequestMessage =
           [1650537121.464818][3678:3678] CHIP:DMG: {
@@ -70,7 +79,7 @@ tests:
           ./chip-tool onoff on 1 1
 
 
-          Verify in TH all-clusters-app log
+          verify the " On command response" on the TH (all-cluster-app) log:
 
           [1650537309.217556][3678:3678] CHIP:DMG: InvokeRequestMessage =
           [1650537309.217647][3678:3678] CHIP:DMG: {
@@ -111,7 +120,7 @@ tests:
           ./chip-tool onoff toggle 1 1
 
 
-          Verify in TH all-clusters-app log
+          verify the " Toggle command response" on the TH (all-cluster-app) log:
 
           [1650537502.260837][3678:3678] CHIP:DMG: InvokeRequestMessage =
           [1650537502.260877][3678:3678] CHIP:DMG: {
@@ -152,7 +161,7 @@ tests:
           ./chip-tool onoff off-with-effect 1 2 1 1
 
 
-          Verify in TH all-clusters-app log
+          verify the " OffWithEffect command response" on the TH (all-cluster-app) log:
 
           [1650538107.639049][3678:3678] CHIP:DMG: InvokeRequestMessage =
           [1650538107.639115][3678:3678] CHIP:DMG: {
@@ -202,7 +211,7 @@ tests:
           ./chip-tool onoff on-with-recall-global-scene 1 1
 
 
-          Verify in TH all-clusters-app log
+          verify the " OnWithRecallGlobalScene command response" on the TH (all-cluster-app) log:
 
           [1650537790.690122][3678:3678] CHIP:DMG: InvokeRequestMessage =
           [1650537790.690188][3678:3678] CHIP:DMG: {
@@ -246,7 +255,7 @@ tests:
           ./chip-tool onoff on-with-timed-off 0 120 5 1 1
 
 
-          Verify in TH all-clusters-app log
+          verify the " OnWithTimedOff command response" on the TH (all-cluster-app) log:
 
           [1650538315.673606][3678:3678] CHIP:DMG: InvokeRequestMessage =
           [1650538315.673697][3678:3678] CHIP:DMG: {

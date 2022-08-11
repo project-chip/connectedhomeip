@@ -36,9 +36,9 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning add-or-update-thread-network 1232034768527434274  51 0
+          ./chip-tool networkcommissioning add-or-update-thread-network hex:1232034768527434274  51 0
 
-          Verify  "FAILSAFE_REQUIRED status code"  on the TH(chip-tool) Log:
+          Verify  "FAILSAFE_REQUIRED status code"  on the TH(Chip-tool) Log:
 
           [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
           [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
@@ -54,9 +54,9 @@ tests:
 
           Below is an example:
 
-          /chip-tool networkcommissioning remove-network 1232034768527434274 51 0
+          /chip-tool networkcommissioning remove-network hex:1232034768527434274 51 0
 
-          Verify  "FAILSAFE_REQUIRED status code"  on the TH(chip-tool) Log:
+          Verify  "FAILSAFE_REQUIRED status code"  on the TH(Chip-tool) Log:
 
           [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
           [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
@@ -72,7 +72,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning connect-network 1232034768527434274 51 0
+          ./chip-tool networkcommissioning connect-network hex:1232034768527434274 51 0
 
           Verify  "FAILSAFE_REQUIRED status code"  on the TH(chip-tool) Log:
 

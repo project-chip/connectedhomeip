@@ -117,7 +117,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     {
         uint8_t previousPosition = static_cast<uint8_t>(self->mJsonValue["PreviousPosition"].asUInt());
         uint8_t count            = static_cast<uint8_t>(self->mJsonValue["TotalNumberOfPressesCounted"].asUInt());
-        self->OnSwitchMultiPressOngoingHandler(previousPosition, count);
+        self->OnSwitchMultiPressCompleteHandler(previousPosition, count);
     }
     else if (name == "PowerOnReboot")
     {

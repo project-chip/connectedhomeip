@@ -15,6 +15,9 @@
 
 name: 33.7.1. [TC-SU-3.1] QueryImageResponse from DUT to OTA-R
 
+PICS:
+    - MCORE.OTA.Provider
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -29,7 +32,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Requestor logs
+          Verify on the OTA Requestor logs receives QueryImageResponse
 
           [1651265462659] [21768:35233106] CHIP: [SWU] QueryImageResponse:
           [1651265462659] [21768:35233106] CHIP: [SWU]   status: 0

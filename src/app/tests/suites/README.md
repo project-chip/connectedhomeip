@@ -399,7 +399,7 @@ src/app/tests/suites/examples/gen_readme_example.sh
 | Binding                        | Thermostat                               | BromoformConcentrationMeasurement             |
 | AccessControl                  | FanControl                               | ChlorodibromomethaneConcentrationMeasurement  |
 | PollControl                    | DehumidificationControl                  | ChloroformConcentrationMeasurement            |
-| BridgedActions                 | ThermostatUserInterfaceConfiguration     | SodiumConcentrationMeasurement                |
+| Actions                        | ThermostatUserInterfaceConfiguration     | SodiumConcentrationMeasurement                |
 | Basic                          | ColorControl                             | IasZone                                       |
 | OtaSoftwareUpdateProvider      | BallastConfiguration                     | IasAce                                        |
 | OtaSoftwareUpdateRequestor     | IlluminanceMeasurement                   | IasWd                                         |

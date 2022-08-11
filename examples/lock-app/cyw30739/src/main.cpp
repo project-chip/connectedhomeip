@@ -30,6 +30,7 @@
 #endif
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <inet/EndPointStateOpenThread.h>
@@ -59,8 +60,6 @@ wiced_bool_t syncClusterToButtonAction = false;
 
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 static void InitApp(intptr_t args);
-static void EventHandler(const ChipDeviceEvent * event, intptr_t arg);
-static void HandleThreadStateChangeEvent(const ChipDeviceEvent * event);
 static void ActionInitiated(LockManager::Action_t aAction, int32_t aActor);
 static void ActionCompleted(LockManager::Action_t aAction);
 static void WriteClusterState(uint8_t value);
@@ -172,8 +171,8 @@ APPLICATION_START()
 void InitApp(intptr_t args)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    PlatformMgrImpl().AddEventHandler(EventHandler, 0);
-
+    // Print QR Code URL
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
     /* Start CHIP datamodel server */
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
@@ -264,20 +263,6 @@ void InitApp(intptr_t args)
     OTAConfig::Init();
 #endif
 }
-
-void EventHandler(const ChipDeviceEvent * event, intptr_t arg)
-{
-    switch (event->Type)
-    {
-    case DeviceEventType::kThreadStateChange:
-        HandleThreadStateChangeEvent(event);
-        break;
-    default:
-        break;
-    }
-}
-
-void HandleThreadStateChangeEvent(const ChipDeviceEvent * event) {}
 
 void ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
 {

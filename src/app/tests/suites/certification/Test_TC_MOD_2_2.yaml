@@ -15,6 +15,9 @@
 
 name: 80.2.2. [TC-MOD-2.2] ChangeToMode Verification (DUT as Client)
 
+PICS:
+    - MOD.C.C00.Tx
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -22,83 +25,77 @@ config:
 
 tests:
     - label: "DUT reads the SupportedModes attribute from the TH"
+      PICS: MOD.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the above commands
-
           ./chip-tool modeselect read supported-modes 1 1
 
-          Verify in TH all-clusters-app
+          verify the "supported-modes response" on the TH (all-cluster-app) log:
 
-          [1657112483.855657][5411:5417] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 736180028
-          [1657112483.855821][5411:5417] CHIP:TOO:   SupportedModes: 3 entries
-          [1657112483.856016][5411:5417] CHIP:TOO:     [1]: {
-          [1657112483.856069][5411:5417] CHIP:TOO:       Label: Black
-          [1657112483.856158][5411:5417] CHIP:TOO:       Mode: 0
-          [1657112483.856218][5411:5417] CHIP:TOO:       SemanticTags: 1 entries
-          [1657112483.856281][5411:5417] CHIP:TOO:         [1]: {
-          [1657112483.856397][5411:5417] CHIP:TOO:           MfgCode: 0
-          [1657112483.856466][5411:5417] CHIP:TOO:           Value: 0
-          [1657112483.856515][5411:5417] CHIP:TOO:          }
-          [1657112483.856582][5411:5417] CHIP:TOO:      }
-          [1657112483.856652][5411:5417] CHIP:TOO:     [2]: {
-          [1657112483.856700][5411:5417] CHIP:TOO:       Label: Cappuccino
-          [1657112483.856864][5411:5417] CHIP:TOO:       Mode: 4
-          [1657112483.856924][5411:5417] CHIP:TOO:       SemanticTags: 1 entries
-          [1657112483.857004][5411:5417] CHIP:TOO:         [1]: {
-          [1657112483.857055][5411:5417] CHIP:TOO:           MfgCode: 0
-          [1657112483.857102][5411:5417] CHIP:TOO:           Value: 0
-          [1657112483.857166][5411:5417] CHIP:TOO:          }
-          [1657112483.857215][5411:5417] CHIP:TOO:      }
-          [1657112483.857302][5411:5417] CHIP:TOO:     [3]: {
-          [1657112483.857351][5411:5417] CHIP:TOO:       Label: Espresso
-          [1657112483.857414][5411:5417] CHIP:TOO:       Mode: 7
-          [1657112483.857469][5411:5417] CHIP:TOO:       SemanticTags: 1 entries
-          [1657112483.857549][5411:5417] CHIP:TOO:         [1]: {
-          [1657112483.857598][5411:5417] CHIP:TOO:           MfgCode: 0
-          [1657112483.857665][5411:5417] CHIP:TOO:           Value: 0
-          [1657112483.857713][5411:5417] CHIP:TOO:          }
-          [1657112483.857778][5411:5417] CHIP:TOO:      }
+          [1659591404.431063][3214:3214] CHIP:IM: Received Read request
+          [1659591404.431235][3214:3214] CHIP:DMG: ReadRequestMessage =
+          [1659591404.431304][3214:3214] CHIP:DMG: {
+          [1659591404.431360][3214:3214] CHIP:DMG:         AttributePathIBs =
+          [1659591404.431482][3214:3214] CHIP:DMG:         [
+          [1659591404.431549][3214:3214] CHIP:DMG:                 AttributePathIB =
+          [1659591404.431687][3214:3214] CHIP:DMG:                 {
+          [1659591404.431820][3214:3214] CHIP:DMG:                         Endpoint = 0x1,
+          [1659591404.432034][3214:3214] CHIP:DMG:                         Cluster = 0x50,
+          [1659591404.432118][3214:3214] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1659591404.432192][3214:3214] CHIP:DMG:                 }
+          [1659591404.432260][3214:3214] CHIP:DMG:
+          [1659591404.432322][3214:3214] CHIP:DMG:         ],
+          [1659591404.432384][3214:3214] CHIP:DMG:
+          [1659591404.432441][3214:3214] CHIP:DMG:         isFabricFiltered = true,
+          [1659591404.432497][3214:3214] CHIP:DMG:         InteractionModelRevision = 1
+          [1659591404.432549][3214:3214] CHIP:DMG: },
+          [1659591404.432701][3214:3214] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659591404.432906][3214:3214] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659591404.432967][3214:3214] CHIP:DMG: <RE:Run> Cluster 50, Attribute 2 is dirty
+          [1659591404.433013][3214:3214] CHIP:DMG: Reading attribute: Cluster=0x0000_0050 Endpoint=1 AttributeId=0x0000_0002 (expanded=0)
+          [1659591404.433321][3214:3214] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0050 e=1 p=v
+          [1659591404.433466][3214:3214] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label:
           "DUT sends a ChangeToMode command to the TH with a integer from the
-          list in step 1"
+          list in step 1."
+      PICS: MOD.C.C00.Tx
       verification: |
-          verify on Reference app receives the right response for the data sent in the above commands
+          ./chip-tool modeselect change-to-mode 4 1 1
 
-           ./chip-tool modeselect change-to-mode 4 1 1
+          verify the "change-to-modes response" on the TH (all-cluster-app) log:
 
-          Verify in TH all-clusters-app
-
-          [1657112505.553012][5418:5423] CHIP:DMG: InvokeResponseMessage =
-          [1657112505.553052][5418:5423] CHIP:DMG: {
-          [1657112505.553091][5418:5423] CHIP:DMG:         suppressResponse = false,
-          [1657112505.553133][5418:5423] CHIP:DMG:         InvokeResponseIBs =
-          [1657112505.553183][5418:5423] CHIP:DMG:         [
-          [1657112505.553223][5418:5423] CHIP:DMG:                 InvokeResponseIB =
-          [1657112505.553276][5418:5423] CHIP:DMG:                 {
-          [1657112505.553319][5418:5423] CHIP:DMG:                         CommandStatusIB =
-          [1657112505.553371][5418:5423] CHIP:DMG:                         {
-          [1657112505.553418][5418:5423] CHIP:DMG:                                 CommandPathIB =
-          [1657112505.553473][5418:5423] CHIP:DMG:                                 {
-          [1657112505.553527][5418:5423] CHIP:DMG:                                         EndpointId = 0x1,
-          [1657112505.553588][5418:5423] CHIP:DMG:                                         ClusterId = 0x50,
-          [1657112505.553645][5418:5423] CHIP:DMG:                                         CommandId = 0x0,
-          [1657112505.553698][5418:5423] CHIP:DMG:                                 },
-          [1657112505.553762][5418:5423] CHIP:DMG:
-          [1657112505.553810][5418:5423] CHIP:DMG:                                 StatusIB =
-          [1657112505.553870][5418:5423] CHIP:DMG:                                 {
-          [1657112505.553929][5418:5423] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657112505.553983][5418:5423] CHIP:DMG:                                 },
-          [1657112505.554037][5418:5423] CHIP:DMG:
-          [1657112505.554085][5418:5423] CHIP:DMG:                         },
-          [1657112505.554136][5418:5423] CHIP:DMG:
-          [1657112505.554181][5418:5423] CHIP:DMG:                 },
-          [1657112505.554238][5418:5423] CHIP:DMG:
-          [1657112505.554277][5418:5423] CHIP:DMG:         ],
-          [1657112505.554325][5418:5423] CHIP:DMG:
-          [1657112505.554364][5418:5423] CHIP:DMG:         InteractionModelRevision = 1
-          [1657112505.554432][5418:5423] CHIP:DMG: },
-          [1657112505.554523][5418:5423] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
-          [1657112505.554587][5418:5423] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1659591478.638391][3214:3214] CHIP:DMG: InvokeRequestMessage =
+          [1659591478.638460][3214:3214] CHIP:DMG: {
+          [1659591478.638519][3214:3214] CHIP:DMG:         suppressResponse = false,
+          [1659591478.638588][3214:3214] CHIP:DMG:         timedRequest = false,
+          [1659591478.638652][3214:3214] CHIP:DMG:         InvokeRequests =
+          [1659591478.638730][3214:3214] CHIP:DMG:         [
+          [1659591478.638792][3214:3214] CHIP:DMG:                 CommandDataIB =
+          [1659591478.638863][3214:3214] CHIP:DMG:                 {
+          [1659591478.638938][3214:3214] CHIP:DMG:                         CommandPathIB =
+          [1659591478.639019][3214:3214] CHIP:DMG:                         {
+          [1659591478.639101][3214:3214] CHIP:DMG:                                 EndpointId = 0x1,
+          [1659591478.639198][3214:3214] CHIP:DMG:                                 ClusterId = 0x50,
+          [1659591478.639285][3214:3214] CHIP:DMG:                                 CommandId = 0x0,
+          [1659591478.639366][3214:3214] CHIP:DMG:                         },
+          [1659591478.639495][3214:3214] CHIP:DMG:
+          [1659591478.639572][3214:3214] CHIP:DMG:                         CommandFields =
+          [1659591478.639654][3214:3214] CHIP:DMG:                         {
+          [1659591478.639739][3214:3214] CHIP:DMG:                                 0x0 = 4,
+          [1659591478.639833][3214:3214] CHIP:DMG:                         },
+          [1659591478.639917][3214:3214] CHIP:DMG:                 },
+          [1659591478.639998][3214:3214] CHIP:DMG:
+          [1659591478.640060][3214:3214] CHIP:DMG:         ],
+          [1659591478.640135][3214:3214] CHIP:DMG:
+          [1659591478.640197][3214:3214] CHIP:DMG:         InteractionModelRevision = 1
+          [1659591478.640257][3214:3214] CHIP:DMG: },
+          [1659591478.640403][3214:3214] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0050 e=1 p=o
+          [1659591478.640486][3214:3214] CHIP:DMG: AccessControl: allowed
+          [1659591478.640556][3214:3214] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000
+          [1659591478.640631][3214:3214] CHIP:ZCL: ModeSelect: Entering emberAfModeSelectClusterChangeToModeCallback
+          [1659591478.641038][3214:3214] CHIP:DL: writing settings to file (/tmp/chip_kvs-FK3J0v)
+          [1659591478.642863][3214:3214] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1659591478.643014][3214:3214] CHIP:DMG: Endpoint 1, Cluster 0x0000_0050 update version to dad78d3a
+          [1659591478.643085][3214:3214] CHIP:ZCL: ModeSelect: ChangeToMode successful
       disabled: true

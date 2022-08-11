@@ -43,23 +43,13 @@ tests:
           "TH sends CertificateChainRequest Command to DUT1 with the
           CertificateType set to PAICertificate"
       verification: |
-          To get DAC value, send below command.
-          ./chip-tool operationalcredentials certificate-chain-request 1 1 0
-
-          "Verify in TH log:
-
-          [1657774717.721972][7956:7961] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
-          [1657774717.722019][7956:7961] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
-          [1657774717.722135][7956:7961] CHIP:TOO:   CertificateChainResponse: {
-          [1657774717.722181][7956:7961] CHIP:TOO:     certificate: 308201E73082018EA003020102020869CDF10DE9E54ED1300A06082A8648CE3D040302303D3125302306035504030C1C4D6174746572204465762050414920307846464631206E6F2050494431143012060A2B0601040182A27C02010C04464646313020170D3232303230353030303030305A180F39393939313233313233353935395A30533125302306035504030C1C4D61747465722044657620444143203078464646312F30783830303131143012060A2B0601040182A27C02010C044646463131143012060A2B0601040182A27C02020C04383030313059301306072A8648CE3D020106082A8648CE3D03010703420004463AC69342910A0E5588FC6FF56BB63E62ECCECB148F7D4EB03EE552601415767D16A5C663F793E49123260B8297A7CD7E7CFC7B316B39D98E90D29377738E82A360305E300C0603551D130101FF04023000300E0603551D0F0101FF040403020780301D0603551D0E0416041488DDE7B300382932CFF734C04624810F44168A6F301F0603551D2304183016801463540E47F64B1C38D13884A462D16C195D8FFB3C300A06082A8648CE3D040302
-          [1657774717.722269][7956:7961] CHIP:TOO:     ...........: 034700304402200127A27B4B44610EE2FCDC4D2B7885563660BC0F76F17219ED6A08DFB2B3C1CD02206B59E0AF45F3EB2A85B919D35731528C6028C415239545E108E4E54E70971353
-          [1657774717.722297][7956:7961] CHIP:TOO:    }
-
+          Verify that the DUT returns a CertificateChainResponse. Save the returned Certificate as "pai_1"
 
           To get PAI value, send below command.
-          ./chip-tool operationalcredentials certificate-chain-request 2 1 0
 
-          "Verify in TH log:
+          ./chip-tool operationalcredentials certificate-chain-request 2 1 0  --trace_decode 1
+
+          "Verify in TH(chip-tool) log:
 
           [1657774756.281112][7964:7969] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
           [1657774756.281164][7964:7969] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
@@ -73,12 +63,25 @@ tests:
           "TH sends CertificateChainRequest Command to DUT1 with the
           CertificateType set to DACCertificate"
       verification: |
-          See above
+          Verify that the DUT returns a CertificateChainResponse. Save the returned Certificate as "dac_1"
+
+          To get DAC value, send below command.
+
+          ./chip-tool operationalcredentials certificate-chain-request 1 1 0  --trace_decode 1
+
+          "Verify in TH(all-clusters-app) log:
+
+          [1657774717.721972][7956:7961] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
+          [1657774717.722019][7956:7961] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
+          [1657774717.722135][7956:7961] CHIP:TOO:   CertificateChainResponse: {
+          [1657774717.722181][7956:7961] CHIP:TOO:     certificate: 308201E73082018EA003020102020869CDF10DE9E54ED1300A06082A8648CE3D040302303D3125302306035504030C1C4D6174746572204465762050414920307846464631206E6F2050494431143012060A2B0601040182A27C02010C04464646313020170D3232303230353030303030305A180F39393939313233313233353935395A30533125302306035504030C1C4D61747465722044657620444143203078464646312F30783830303131143012060A2B0601040182A27C02010C044646463131143012060A2B0601040182A27C02020C04383030313059301306072A8648CE3D020106082A8648CE3D03010703420004463AC69342910A0E5588FC6FF56BB63E62ECCECB148F7D4EB03EE552601415767D16A5C663F793E49123260B8297A7CD7E7CFC7B316B39D98E90D29377738E82A360305E300C0603551D130101FF04023000300E0603551D0F0101FF040403020780301D0603551D0E0416041488DDE7B300382932CFF734C04624810F44168A6F301F0603551D2304183016801463540E47F64B1C38D13884A462D16C195D8FFB3C300A06082A8648CE3D040302
+          [1657774717.722269][7956:7961] CHIP:TOO:     ...........: 034700304402200127A27B4B44610EE2FCDC4D2B7885563660BC0F76F17219ED6A08DFB2B3C1CD02206B59E0AF45F3EB2A85B919D35731528C6028C415239545E108E4E54E70971353
+          [1657774717.722297][7956:7961] CHIP:TOO:    }
       disabled: true
 
     - label: "TH extracts the Authority Key Identifier from the PAI certificate"
       verification: |
-          During commissioning we will get PAI  certificate,  see in below log:
+          During commissioning we will get PAI  certificate, see on TH(chip-tool) log:
 
           [1659415376.883870][2666:2671] CHIP:CTL: Performing next commissioning step "SendPAICertificateRequest"
           [1659415376.883925][2666:2671] CHIP:CTL: Sending request for PAI certificate
@@ -273,6 +276,225 @@ tests:
 
     - label: "TH extracts the public key from the DAC and saves as pk_1"
       verification: |
+          During commissioning we will get DAC certificate,  see on TH(chip-tool) log:
+
+          [1659509320.714103][3165:3170] CHIP:CTL: Performing next commissioning step "SendDACCertificateRequest"
+          [1659509320.714155][3165:3170] CHIP:CTL: Sending request for DAC certificate
+          [1659509320.714225][3165:3170] CHIP:CTL: Sending Certificate Chain request to 0xffff74000b60 device
+          [1659509320.714397][3165:3170] CHIP:DMG: ICR moving to [AddingComm]
+          [1659509320.714470][3165:3170] CHIP:DMG: ICR moving to [AddedComma]
+          [1659509320.715027][3165:3170] CHIP:IN: Prepared secure message 0xffff74001d38 to 0xFFFFFFFB00000000 (0)  of type 0x8 and protocolId (0, 1) on exchange 17089i with MessageCounter:86888459.
+          [1659509320.715128][3165:3170] CHIP:IN: Sending encrypted msg 0xffff74001d38 with MessageCounter:86888459 to 0xFFFFFFFB00000000 (0) at monotonic time: 0000000000ADAD48 msec
+          [1659509320.715804][3165:3170] CHIP:DMG: >> to UDP:[fe80::e65f:1ff:fe0f:2753%eth0]:5540 | 86888459 | [Interaction Model  (1) / InvokeCommandRequest (0x08) / Session = 29587 / Exchange = 17089]
+          [1659509320.715898][3165:3170] CHIP:DMG: Header Flags =
+          [1659509320.715952][3165:3170] CHIP:DMG: {
+          [1659509320.716035][3165:3170] CHIP:DMG:     Exchange (0x05) =
+          [1659509320.716089][3165:3170] CHIP:DMG:     {
+          [1659509320.716158][3165:3170] CHIP:DMG:         Initiator = true
+          [1659509320.716212][3165:3170] CHIP:DMG:         NeedsAck = true
+          [1659509320.716264][3165:3170] CHIP:DMG:     }
+          [1659509320.716353][3165:3170] CHIP:DMG: }
+          [1659509320.716405][3165:3170] CHIP:DMG:
+          [1659509320.716491][3165:3170] CHIP:DMG: Encrypted Payload (62 bytes) =
+          [1659509320.716544][3165:3170] CHIP:DMG: {
+          [1659509320.716616][3165:3170] CHIP:DMG:     data = 009373000bd02d05c296dbc864194390f3d020eb61ee335c0d61263dd0d5f4849a5c6a601f73c80e6775d2b422e816cf8e3ae224d59c01f53783a657bd0d
+          [1659509320.716672][3165:3170] CHIP:DMG:     buffer_ptr = 281472627949680
+          [1659509320.716742][3165:3170] CHIP:DMG: }
+          [1659509320.716793][3165:3170] CHIP:DMG:
+          [1659509320.716965][3165:3170] CHIP:DMG: InvokeRequestMessage =
+          [1659509320.717029][3165:3170] CHIP:DMG: {
+          [1659509320.717084][3165:3170] CHIP:DMG:         suppressResponse = false,
+          [1659509320.717148][3165:3170] CHIP:DMG:         timedRequest = false,
+          [1659509320.717206][3165:3170] CHIP:DMG:         InvokeRequests =
+          [1659509320.717276][3165:3170] CHIP:DMG:         [
+          [1659509320.717335][3165:3170] CHIP:DMG:                 CommandDataIB =
+          [1659509320.717399][3165:3170] CHIP:DMG:                 {
+          [1659509320.717461][3165:3170] CHIP:DMG:                         CommandPathIB =
+          [1659509320.717535][3165:3170] CHIP:DMG:                         {
+          [1659509320.717788][3165:3170] CHIP:DMG:                                 EndpointId = 0x0,
+          [1659509320.717870][3165:3170] CHIP:DMG:                                 ClusterId = 0x3e,
+          [1659509320.717947][3165:3170] CHIP:DMG:                                 CommandId = 0x2,
+          [1659509320.718019][3165:3170] CHIP:DMG:                         },
+          [1659509320.718116][3165:3170] CHIP:DMG:
+          [1659509320.718181][3165:3170] CHIP:DMG:                         CommandFields =
+          [1659509320.718273][3165:3170] CHIP:DMG:                         {
+          [1659509320.718436][3165:3170] CHIP:DMG:                                 0x0 = 1,
+          [1659509320.718521][3165:3170] CHIP:DMG:                         },
+          [1659509320.718609][3165:3170] CHIP:DMG:                 },
+          [1659509320.718706][3165:3170] CHIP:DMG:
+          [1659509320.718766][3165:3170] CHIP:DMG:         ],
+          [1659509320.718855][3165:3170] CHIP:DMG:
+          [1659509320.718915][3165:3170] CHIP:DMG:         InteractionModelRevision = 1
+          [1659509320.718971][3165:3170] CHIP:DMG: },
+          [1659509320.719024][3165:3170] CHIP:DMG:
+          [1659509320.719407][3165:3170] CHIP:DMG: ICR moving to [CommandSen]
+          [1659509320.719536][3165:3170] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1659509320.719608][3165:3170] CHIP:EM: Sending Standalone Ack for MessageCounter:148943591 on exchange 17088i
+          [1659509320.720332][3165:3170] CHIP:IN: Prepared secure message 0xffff88e5c9e8 to 0xFFFFFFFB00000000 (0)  of type 0x10 and protocolId (0, 0) on exchange 17088i with MessageCounter:86888460.
+          [1659509320.720493][3165:3170] CHIP:IN: Sending encrypted msg 0xffff88e5c9e8 with MessageCounter:86888460 to 0xFFFFFFFB00000000 (0) at monotonic time: 0000000000ADAD4E msec
+          [1659509320.721152][3165:3170] CHIP:DMG: >> to UDP:[fe80::e65f:1ff:fe0f:2753%eth0]:5540 | 86888460 | [Secure Channel  (0) / Standalone Ack (0x10) / Session = 29587 / Exchange = 17088]
+          [1659509320.721242][3165:3170] CHIP:DMG: Header Flags =
+          [1659509320.721298][3165:3170] CHIP:DMG: {
+          [1659509320.721381][3165:3170] CHIP:DMG:     Exchange (0x03) =
+          [1659509320.721434][3165:3170] CHIP:DMG:     {
+          [1659509320.721505][3165:3170] CHIP:DMG:         Initiator = true
+          [1659509320.721562][3165:3170] CHIP:DMG:         AckMsg = 148943591
+          [1659509320.721634][3165:3170] CHIP:DMG:     }
+          [1659509320.721706][3165:3170] CHIP:DMG: }
+          [1659509320.721759][3165:3170] CHIP:DMG:
+          [1659509320.721846][3165:3170] CHIP:DMG: Encrypted Payload (34 bytes) =
+          [1659509320.721901][3165:3170] CHIP:DMG: {
+          [1659509320.721972][3165:3170] CHIP:DMG:     data = 009373000cd02d05ff4214e467b1c7a3664b8d8c5628c4e291f833b9f2f35d953235
+          [1659509320.722027][3165:3170] CHIP:DMG:     buffer_ptr = 281472627939824
+          [1659509320.722077][3165:3170] CHIP:DMG: }
+          [1659509320.722125][3165:3170] CHIP:DMG:
+          [1659509320.722485][3165:3170] CHIP:EM: Flushed pending ack for MessageCounter:148943591 on exchange 17088i
+          [1659509320.724260][3165:3170] CHIP:DMG: << from UDP:[fe80::e65f:1ff:fe0f:2753%eth0]:5540 | 148943592 | [Interaction Model  (1) / InvokeCommandResponse (0x09) / Session = 49327 / Exchange = 17089]
+          [1659509320.724362][3165:3170] CHIP:DMG: Header Flags =
+          [1659509320.724417][3165:3170] CHIP:DMG: {
+          [1659509320.724503][3165:3170] CHIP:DMG:     Exchange (0x06) =
+          [1659509320.724558][3165:3170] CHIP:DMG:     {
+          [1659509320.724647][3165:3170] CHIP:DMG:         AckMsg = 86888459
+          [1659509320.724704][3165:3170] CHIP:DMG:         NeedsAck = true
+          [1659509320.724756][3165:3170] CHIP:DMG:     }
+          [1659509320.724827][3165:3170] CHIP:DMG: }
+          [1659509320.724879][3165:3170] CHIP:DMG:
+          [1659509320.724950][3165:3170] CHIP:DMG: Encrypted Payload (559 bytes) =
+          [1659509320.725003][3165:3170] CHIP:DMG: {
+          [1659509320.725056][3165:3170] CHIP:DMG:     data = 00afc000e8b2e008b40e7ea031654ba52d0e71f9a877ec233377ef9eef00611412271b31992e30753df53f0bfac6b5f9a30217f67d03a17653c5ee991a0266f3ef286188e3f977d3dd94fbbb60323a74c2b685309d607af14c0b4c7214c7579cf43e9ed90d4256382e5d40bc46796e06fdb6b220bbc5e7b6fc812f2c5bc357fcbda79d6dcb464f42d04ab1708fdfb5ea8b90c3720257e9da78ba877b24b99d7f104c4ee199923c876d8c07903beab5f93a784f226d1e82f8d5f001f23457965c9ddbcc8661d00b7202a9932b1ae92ff36d80b8e5ac2d18d65e8a3957486ef86ca4f056218677958f9be17ab6c54d3dedb7e88a144ef607f692d3131276dbb2803e6e93dc5d330ef13b0e00289e6a9186e1f1c0e5b9615ace2c1d544f4b6bc58f700b47a11fc2278977b2a1595c96532daefe44db899e3f75f473ffbf4ac1e93ba76033dfa562beedf4b9a5fe9b985e6a0227efdcf5ced1b966bd78addb1ad5950c6378dc149a6372888683a8539a4d59958c7460b1968b0d8dcfa2d3660dc07c4e0e44095ef14c4cdd249727caad086e8630f9df296d8fa426f01f58f532ac1a91cb1da874055711edd4f13c722a0e66f850d0f455c09fbc2c049852ec936545b2bf2798f9c614e4488707a1f38fee8c08fe3c886fd89d9e3578fad68077133c7e086d5ba7df2a7323d10f03602d46c1e172e993fd3b6d5d468b7da8dc315711d53ded3ab7f38f7517f23394c7c9438ce5726449cca510956add995f76140fe3bd0a63ea024058898635373e68e9e3
+          [1659509320.725163][3165:3170] CHIP:DMG:     buffer_ptr = 281472627931376
+          [1659509320.725214][3165:3170] CHIP:DMG: }
+          [1659509320.725263][3165:3170] CHIP:DMG:
+          [1659509320.725501][3165:3170] CHIP:DMG: DAC/PAI (491) =
+          [1659509320.725616][3165:3170] CHIP:DMG: {
+          -----BEGIN CERTIFICATE-----
+          MIIB5zCCAY6gAwIBAgIIac3xDenlTtEwCgYIKoZIzj0EAwIwPTElMCMGA1UEAwwc
+          TWF0dGVyIERldiBQQUkgMHhGRkYxIG5vIFBJRDEUMBIGCisGAQQBgqJ8AgEMBEZG
+          RjEwIBcNMjIwMjA1MDAwMDAwWhgPOTk5OTEyMzEyMzU5NTlaMFMxJTAjBgNVBAMM
+          HE1hdHRlciBEZXYgREFDIDB4RkZGMS8weDgwMDExFDASBgorBgEEAYKifAIBDARG
+          RkYxMRQwEgYKKwYBBAGConwCAgwEODAwMTBZMBMGByqGSM49AgEGCCqGSM49AwEH
+          A0IABEY6xpNCkQoOVYj8b/Vrtj5i7M7LFI99TrA+5VJgFBV2fRalxmP3k+SRIyYL
+          gpenzX58/HsxaznZjpDSk3dzjoKjYDBeMAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/
+          BAQDAgeAMB0GA1UdDgQWBBSI3eezADgpMs/3NMBGJIEPRBaKbzAfBgNVHSMEGDAW
+          gBRjVA5H9kscONE4hKRi0WwZXY/7PDAKBggqhkjOPQQDAgNHADBEAiABJ6J7S0Rh
+          DuL83E0reIVWNmC8D3bxchntagjfsrPBzQIga1ngr0Xz6yqFuRnTVzFSjGAoxBUj
+          lUXhCOTlTnCXE1M=
+          -----END CERTIFICATE-----
+          [1659509320.725847][3165:3170] CHIP:DMG: }
+          [1659509320.725898][3165:3170] CHIP:DMG:
+          [1659509320.725961][3165:3170] CHIP:DMG:
+          [1659509320.726043][3165:3170] CHIP:DMG: Additional Fields =
+          [1659509320.726099][3165:3170] CHIP:DMG: {
+          [1659509320.726158][3165:3170] CHIP:DMG:     peer_address = UDP:[fe80::e65f:1ff:fe0f:2753%eth0]:5540
+          [1659509320.726215][3165:3170] CHIP:DMG: }
+          [1659509320.726265][3165:3170] CHIP:DMG:
+          [1659509320.726334][3165:3170] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:148943592 on exchange 17089i
+          [1659509320.726446][3165:3170] CHIP:EM: Found matching exchange: 17089i, Delegate: 0xffff74009c78
+          [1659509320.726534][3165:3170] CHIP:EM: Rxd Ack; Removing MessageCounter:86888459 from Retrans Table on exchange 17089i
+          [1659509320.726594][3165:3170] CHIP:EM: Removed CHIP MessageCounter:86888459 from RetransTable on exchange 17089i
+          [1659509320.726669][3165:3170] CHIP:DMG: ICR moving to [ResponseRe]
+          [1659509320.726761][3165:3170] CHIP:DMG: InvokeResponseMessage =
+          [1659509320.726818][3165:3170] CHIP:DMG: {
+          [1659509320.726876][3165:3170] CHIP:DMG:         suppressResponse = false,
+          [1659509320.726934][3165:3170] CHIP:DMG:         InvokeResponseIBs =
+          [1659509320.727010][3165:3170] CHIP:DMG:         [
+          [1659509320.727068][3165:3170] CHIP:DMG:                 InvokeResponseIB =
+          [1659509320.727154][3165:3170] CHIP:DMG:                 {
+          [1659509320.727217][3165:3170] CHIP:DMG:                         CommandDataIB =
+          [1659509320.727291][3165:3170] CHIP:DMG:                         {
+          [1659509320.727362][3165:3170] CHIP:DMG:                                 CommandPathIB =
+          [1659509320.727442][3165:3170] CHIP:DMG:                                 {
+          [1659509320.727523][3165:3170] CHIP:DMG:                                         EndpointId = 0x0,
+          [1659509320.727607][3165:3170] CHIP:DMG:                                         ClusterId = 0x3e,
+          [1659509320.727698][3165:3170] CHIP:DMG:                                         CommandId = 0x3,
+          [1659509320.727777][3165:3170] CHIP:DMG:                                 },
+          [1659509320.727857][3165:3170] CHIP:DMG:
+          [1659509320.727928][3165:3170] CHIP:DMG:                                 CommandFields =
+          [1659509320.728004][3165:3170] CHIP:DMG:                                 {
+          [1659509320.728081][3165:3170] CHIP:DMG:                                         0x0 = [
+          [1659509320.728404][3165:3170] CHIP:DMG:                                                         0x30, 0x82, 0x1, 0xe7, 0x30, 0x82, 0x1, 0x8e, 0xa0, 0x3, 0x2, 0x1, 0x2, 0x2, 0x8, 0x69, 0xcd, 0xf1, 0xd, 0xe9, 0xe5, 0x4e, 0xd1, 0x30, 0xa, 0x6, 0x8, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x4, 0x3, 0x2, 0x30, 0x3d, 0x31, 0x25, 0x30, 0x23, 0x6, 0x3, 0x55, 0x4, 0x3, 0xc, 0x1c, 0x4d, 0x61, 0x74, 0x74, 0x65, 0x72, 0x20, 0x44, 0x65, 0x76, 0x20, 0x50, 0x41, 0x49, 0x20, 0x30, 0x78, 0x46, 0x46, 0x46, 0x31, 0x20, 0x6e, 0x6f, 0x20, 0x50, 0x49, 0x44, 0x31, 0x14, 0x30, 0x12, 0x6, 0xa, 0x2b, 0x6, 0x1, 0x4, 0x1, 0x82, 0xa2, 0x7c, 0x2, 0x1, 0xc, 0x4, 0x46, 0x46, 0x46, 0x31, 0x30, 0x20, 0x17, 0xd, 0x32, 0x32, 0x30, 0x32, 0x30, 0x35, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x5a, 0x18, 0xf, 0x39, 0x39, 0x39, 0x39, 0x31, 0x32, 0x33, 0x31, 0x32, 0x33, 0x35, 0x39, 0x35, 0x39, 0x5a, 0x30, 0x53, 0x31, 0x25, 0x30, 0x23, 0x6, 0x3, 0x55, 0x4, 0x3, 0xc, 0x1c, 0x4d, 0x61, 0x74, 0x74, 0x65, 0x72, 0x20, 0x44, 0x65, 0x76, 0x20, 0x44, 0x41, 0x43, 0x20, 0x30, 0x78, 0x46, 0x46, 0x46, 0x31, 0x2f, 0x30, 0x78, 0x38, 0x30, 0x30, 0x31, 0x31, 0x14, 0x30, 0x12, 0x6, 0xa, 0x2b, 0x6, 0x1, 0x4, 0x1, 0x82, 0xa2, 0x7c, 0x2, 0x1, 0xc, 0x4, 0x46, 0x46, 0x46, 0x31, 0x31, 0x14, 0x30, 0x12, 0x6, 0xa, 0x2b, 0x6, 0x1, 0x4, 0x1, 0x82, 0xa2, 0x7c, 0x2, 0x2, 0xc, 0x4, 0x38, 0x30, 0x30, 0x31, 0x30, 0x59, 0x30, 0x13, 0x6, 0x7, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x2, 0x1, 0x6, 0x8, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x3, 0x1, 0x7, 0x3, 0x42, 0x0, 0x4, 0x46, 0x3a, 0xc6, 0x93, 0x42, 0x91, 0xa, 0xe, 0x55, 0x88, 0xfc, 0x6f, 0xf5, 0x6b, 0xb6, 0x3e, 0x62, 0xec, 0xce, 0xcb, 0x14, 0x8f, 0x7d, 0x4e, 0xb0, 0x3e, 0xe5, 0x52, 0x60, 0x14, 0x15, 0x76, 0x7d, 0x16, 0xa5, 0xc6, 0x63, 0xf7, 0x93, 0xe4, 0x91, 0x23, 0x26, 0xb, 0x82, 0x97, 0xa7, 0xcd, 0x7e, 0x7c, 0xfc, 0x
+          [1659509320.728579][3165:3170] CHIP:DMG:                                         ] (491 bytes)
+          [1659509320.728664][3165:3170] CHIP:DMG:                                 },
+          [1659509320.728738][3165:3170] CHIP:DMG:                         },
+          [1659509320.728818][3165:3170] CHIP:DMG:
+          [1659509320.728879][3165:3170] CHIP:DMG:                 },
+          [1659509320.728952][3165:3170] CHIP:DMG:
+          [1659509320.729010][3165:3170] CHIP:DMG:         ],
+          [1659509320.729082][3165:3170] CHIP:DMG:
+          [1659509320.729140][3165:3170] CHIP:DMG:         InteractionModelRevision = 1
+          [1659509320.729197][3165:3170] CHIP:DMG: },
+          [1659509320.729335][3165:3170] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
+          [1659509320.729409][3165:3170] CHIP:CTL: Received certificate chain from the device
+          [1659509320.729476][3165:3170] CHIP:CTL: Successfully finished commissioning step "SendDACCertificateRequest"
+
+
+
+
+
+          "1. Save the DAC value from commissioning log of TH in the file as below
+          vi dac.pem
+
+          2. Give the below command to extract the Authority key ID
+          openssl x509 -in dac.pem -text
+
+          Below certificate has been extracted using the sample DUT, hence the Authority key ID is same as SDK"s test PAA
+
+          grl@grl-ThinkPad-L480:~/jul14_2ndcntrl/connectedhomeip$ openssl x509 -in dac.pem -text
+          Certificate:
+              Data:
+                  Version: 3 (0x2)
+                  Serial Number: 7624014786269105873 (0x69cdf10de9e54ed1)
+                  Signature Algorithm: ecdsa-with-SHA256
+                  Issuer: CN = Matter Dev PAI 0xFFF1 no PID, 1.3.6.1.4.1.37244.2.1 = FFF1
+                  Validity
+                      Not Before: Feb  5 00:00:00 2022 GMT
+                      Not After : Dec 31 23:59:59 9999 GMT
+                  Subject: CN = Matter Dev DAC 0xFFF1/0x8001, 1.3.6.1.4.1.37244.2.1 = FFF1, 1.3.6.1.4.1.37244.2.2 = 8001
+                  Subject Public Key Info:
+                      Public Key Algorithm: id-ecPublicKey
+                          Public-Key: (256 bit)
+                          pub:
+                              04:46:3a:c6:93:42:91:0a:0e:55:88:fc:6f:f5:6b:
+                              b6:3e:62:ec:ce:cb:14:8f:7d:4e:b0:3e:e5:52:60:
+                              14:15:76:7d:16:a5:c6:63:f7:93:e4:91:23:26:0b:
+                              82:97:a7:cd:7e:7c:fc:7b:31:6b:39:d9:8e:90:d2:
+                              93:77:73:8e:82
+                          ASN1 OID: prime256v1
+                          NIST CURVE: P-256
+                  X509v3 extensions:
+                      X509v3 Basic Constraints: critical
+                          CA:FALSE
+                      X509v3 Key Usage: critical
+                          Digital Signature
+                      X509v3 Subject Key Identifier:
+                          88:DD:E7:B3:00:38:29:32:CF:F7:34:C0:46:24:81:0F:44:16:8A:6F
+                      X509v3 Authority Key Identifier:
+                          keyid:63:54:0E:47:F6:4B:1C:38:D1:38:84:A4:62:D1:6C:19:5D:8F:FB:3C
+
+              Signature Algorithm: ecdsa-with-SHA256
+                   30:44:02:20:01:27:a2:7b:4b:44:61:0e:e2:fc:dc:4d:2b:78:
+                   85:56:36:60:bc:0f:76:f1:72:19:ed:6a:08:df:b2:b3:c1:cd:
+                   02:20:6b:59:e0:af:45:f3:eb:2a:85:b9:19:d3:57:31:52:8c:
+                   60:28:c4:15:23:95:45:e1:08:e4:e5:4e:70:97:13:53
+          -----BEGIN CERTIFICATE-----
+          MIIB5zCCAY6gAwIBAgIIac3xDenlTtEwCgYIKoZIzj0EAwIwPTElMCMGA1UEAwwc
+          TWF0dGVyIERldiBQQUkgMHhGRkYxIG5vIFBJRDEUMBIGCisGAQQBgqJ8AgEMBEZG
+          RjEwIBcNMjIwMjA1MDAwMDAwWhgPOTk5OTEyMzEyMzU5NTlaMFMxJTAjBgNVBAMM
+          HE1hdHRlciBEZXYgREFDIDB4RkZGMS8weDgwMDExFDASBgorBgEEAYKifAIBDARG
+          RkYxMRQwEgYKKwYBBAGConwCAgwEODAwMTBZMBMGByqGSM49AgEGCCqGSM49AwEH
+          A0IABEY6xpNCkQoOVYj8b/Vrtj5i7M7LFI99TrA+5VJgFBV2fRalxmP3k+SRIyYL
+          gpenzX58/HsxaznZjpDSk3dzjoKjYDBeMAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/
+          BAQDAgeAMB0GA1UdDgQWBBSI3eezADgpMs/3NMBGJIEPRBaKbzAfBgNVHSMEGDAW
+          gBRjVA5H9kscONE4hKRi0WwZXY/7PDAKBggqhkjOPQQDAgNHADBEAiABJ6J7S0Rh
+          DuL83E0reIVWNmC8D3bxchntagjfsrPBzQIga1ngr0Xz6yqFuRnTVzFSjGAoxBUj
+          lUXhCOTlTnCXE1M=
+          -----END CERTIFICATE-----
+      disabled: true
+
+    - label:
+          "Repeat Step 1 to 4 with DUT2, saving the PAI, DAC and public key as
+          pk_2"
+      verification: |
           To commission DUT2 to TH
 
           "sudo ./chip-all-clusters-app --wifi --discriminator 3844
@@ -283,9 +505,9 @@ tests:
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success"
 
 
-          Verify in TH log:
+          Verify in TH(chip-tool) log:
 
-          ./chip-tool operationalcredentials certificate-chain-request 1 1 0
+          ./chip-tool operationalcredentials certificate-chain-request 1 1 0  --trace_decode 1
           [1657774717.721972][7956:7961] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
           [1657774717.722019][7956:7961] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
           [1657774717.722135][7956:7961] CHIP:TOO:   CertificateChainResponse: {
@@ -295,7 +517,7 @@ tests:
 
 
 
-          ./chip-tool operationalcredentials certificate-chain-request 2 1 0
+          ./chip-tool operationalcredentials certificate-chain-request 2 1 0  --trace_decode 1
 
           [1657774756.281112][7964:7969] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
           [1657774756.281164][7964:7969] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
@@ -305,7 +527,7 @@ tests:
           [1657774756.281388][7964:7969] CHIP:TOO:    }
 
 
-          During commissioning we will get PAI  certificate,  see in below log:
+          During commissioning we will get PAI  certificate,  see on TH(chip-tool) log:
 
           [1659415376.883870][2666:2671] CHIP:CTL: Performing next commissioning step "SendPAICertificateRequest"
           [1659415376.883925][2666:2671] CHIP:CTL: Sending request for PAI certificate

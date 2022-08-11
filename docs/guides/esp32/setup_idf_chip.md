@@ -74,3 +74,8 @@ running:
 ```
 source scripts/bootstrap.sh
 ```
+
+---
+
+Once IDF and CHIP environment is set up, head over to
+[application building and commissioning guide](build_app_and_commission.md).

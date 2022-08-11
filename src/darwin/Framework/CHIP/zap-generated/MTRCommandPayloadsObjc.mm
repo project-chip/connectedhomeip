@@ -1563,7 +1563,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRBridgedActionsClusterInstantActionParams
+@implementation MTRActionsClusterInstantActionParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1578,7 +1578,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(nullable NSZone *)zone;
 {
-    auto other = [[MTRBridgedActionsClusterInstantActionParams alloc] init];
+    auto other = [[MTRActionsClusterInstantActionParams alloc] init];
 
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
@@ -1595,7 +1595,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRBridgedActionsClusterInstantActionWithTransitionParams
+@implementation MTRActionsClusterInstantActionWithTransitionParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1612,7 +1612,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(nullable NSZone *)zone;
 {
-    auto other = [[MTRBridgedActionsClusterInstantActionWithTransitionParams alloc] init];
+    auto other = [[MTRActionsClusterInstantActionWithTransitionParams alloc] init];
 
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
@@ -1630,7 +1630,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRBridgedActionsClusterStartActionParams
+@implementation MTRActionsClusterStartActionParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1645,7 +1645,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(nullable NSZone *)zone;
 {
-    auto other = [[MTRBridgedActionsClusterStartActionParams alloc] init];
+    auto other = [[MTRActionsClusterStartActionParams alloc] init];
 
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
@@ -1662,7 +1662,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRBridgedActionsClusterStartActionWithDurationParams
+@implementation MTRActionsClusterStartActionWithDurationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1679,7 +1679,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(nullable NSZone *)zone;
 {
-    auto other = [[MTRBridgedActionsClusterStartActionWithDurationParams alloc] init];
+    auto other = [[MTRActionsClusterStartActionWithDurationParams alloc] init];
 
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
@@ -1697,7 +1697,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRBridgedActionsClusterStopActionParams
+@implementation MTRActionsClusterStopActionParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1712,7 +1712,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(nullable NSZone *)zone;
 {
-    auto other = [[MTRBridgedActionsClusterStopActionParams alloc] init];
+    auto other = [[MTRActionsClusterStopActionParams alloc] init];
 
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
@@ -1729,7 +1729,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRBridgedActionsClusterPauseActionParams
+@implementation MTRActionsClusterPauseActionParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1744,7 +1744,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(nullable NSZone *)zone;
 {
-    auto other = [[MTRBridgedActionsClusterPauseActionParams alloc] init];
+    auto other = [[MTRActionsClusterPauseActionParams alloc] init];
 
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
@@ -1761,7 +1761,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRBridgedActionsClusterPauseActionWithDurationParams
+@implementation MTRActionsClusterPauseActionWithDurationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1778,7 +1778,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(nullable NSZone *)zone;
 {
-    auto other = [[MTRBridgedActionsClusterPauseActionWithDurationParams alloc] init];
+    auto other = [[MTRActionsClusterPauseActionWithDurationParams alloc] init];
 
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
@@ -1796,7 +1796,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRBridgedActionsClusterResumeActionParams
+@implementation MTRActionsClusterResumeActionParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1811,7 +1811,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(nullable NSZone *)zone;
 {
-    auto other = [[MTRBridgedActionsClusterResumeActionParams alloc] init];
+    auto other = [[MTRActionsClusterResumeActionParams alloc] init];
 
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
@@ -1828,7 +1828,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRBridgedActionsClusterEnableActionParams
+@implementation MTRActionsClusterEnableActionParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1843,7 +1843,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(nullable NSZone *)zone;
 {
-    auto other = [[MTRBridgedActionsClusterEnableActionParams alloc] init];
+    auto other = [[MTRActionsClusterEnableActionParams alloc] init];
 
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
@@ -1860,7 +1860,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRBridgedActionsClusterEnableActionWithDurationParams
+@implementation MTRActionsClusterEnableActionWithDurationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1877,7 +1877,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(nullable NSZone *)zone;
 {
-    auto other = [[MTRBridgedActionsClusterEnableActionWithDurationParams alloc] init];
+    auto other = [[MTRActionsClusterEnableActionWithDurationParams alloc] init];
 
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
@@ -1895,7 +1895,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRBridgedActionsClusterDisableActionParams
+@implementation MTRActionsClusterDisableActionParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1910,7 +1910,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(nullable NSZone *)zone;
 {
-    auto other = [[MTRBridgedActionsClusterDisableActionParams alloc] init];
+    auto other = [[MTRActionsClusterDisableActionParams alloc] init];
 
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
@@ -1927,7 +1927,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRBridgedActionsClusterDisableActionWithDurationParams
+@implementation MTRActionsClusterDisableActionWithDurationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1944,7 +1944,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(nullable NSZone *)zone;
 {
-    auto other = [[MTRBridgedActionsClusterDisableActionWithDurationParams alloc] init];
+    auto other = [[MTRActionsClusterDisableActionWithDurationParams alloc] init];
 
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;

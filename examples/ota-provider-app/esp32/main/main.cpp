@@ -38,6 +38,12 @@
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+#include <platform/ESP32/ESP32DeviceInfoProvider.h>
+#else
+#include <DeviceInfoProviderImpl.h>
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+
 using chip::Callback::Callback;
 using namespace chip;
 using namespace chip::Shell;
@@ -138,9 +144,14 @@ static void InitServer(intptr_t context)
 }
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
+DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
+#else
+DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 } // namespace
 
 CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset)
@@ -230,6 +241,8 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
+
+    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 

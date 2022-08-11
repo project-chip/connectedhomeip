@@ -16,6 +16,9 @@
 name:
     31.15.1. [TC-SU-4.2] Tests for verifying cluster attributes from Admin(DUT)
 
+PICS:
+    - MCORE.ACL.Administrator
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

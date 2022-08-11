@@ -637,6 +637,15 @@ menu "CHIP Device Layer"
                 Hardware Version, Hardware Version String, and Rotating Device Id UniqueId will be read from factory
                 partition.
 
+        config ENABLE_ESP32_DEVICE_INFO_PROVIDER
+            depends on ENABLE_ESP32_FACTORY_DATA_PROVIDER
+            bool "Use ESP32 Device Info Provider"
+            default n
+            help
+                Use ESP32 Device Info Provider to get device instance info from factory partition.
+                Details like Supported calendar types, supported locales, and fixed labels will be read from factory
+                partition.
+
     endmenu
 
 

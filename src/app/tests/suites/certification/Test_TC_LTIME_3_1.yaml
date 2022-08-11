@@ -17,6 +17,9 @@ name:
     4.3.1. [TC-LTIME-3.1] Read and Write Time Format Localization Cluster
     Attributes [DUT as Server]
 
+PICS:
+    - LTIME.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -27,7 +30,7 @@ tests:
       PICS: LTIME.S.A0000
       verification: |
           ./chip-tool timeformatlocalization read hour-format 1 0
-          On TH, verify that  HourFormat attribute value is of Enum8 datatype
+          On TH(chip-tool), verify that  HourFormat attribute value is of Enum8 datatype
 
           [1651191944157] [13649:182326] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530441
           [1651191944158] [13649:182326] CHIP: [TOO]   HourFormat: 0
@@ -38,7 +41,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write hour-format 0 1 0
 
-          On TH verify that DUT sends a success response
+          On TH(chip-tool) verify that DUT sends a success response
           [1651192743588] [14026:192208] CHIP: [DMG] WriteResponseMessage =
           [1651192743588] [14026:192208] CHIP: [DMG] {
           [1651192743588] [14026:192208] CHIP: [DMG]         AttributeStatusIBs =
@@ -69,7 +72,7 @@ tests:
       PICS: LTIME.S.A0000
       verification: |
           ./chip-tool timeformatlocalization read hour-format 1 0
-          On TH verify that  HourFormat attribute value changed as  0
+          On TH(chip-tool) verify that  HourFormat attribute value changed as  0
           [1651193120969] [14169:196901] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530443
           [1651193120969] [14169:196901] CHIP: [TOO]   HourFormat: 0
       disabled: true
@@ -79,7 +82,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write hour-format 1 1 0
 
-          On TH verify that DUT sends a success response
+          On TH(chip-tool) verify that DUT sends a success response
           [1651193043035] [14140:195730] CHIP: [DMG] WriteResponseMessage =
           [1651193043035] [14140:195730] CHIP: [DMG] {
           [1651193043035] [14140:195730] CHIP: [DMG]         AttributeStatusIBs =
@@ -111,7 +114,7 @@ tests:
       PICS: LTIME.S.A0000
       verification: |
           ./chip-tool timeformatlocalization read hour-format 1 0
-          On TH verify that  HourFormat attribute value changed as  1
+          On TH(chip-tool) verify that  HourFormat attribute value changed as  1
           [1651193120969] [14169:196901] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530443
           [1651193120969] [14169:196901] CHIP: [TOO]   HourFormat: 1
       disabled: true
@@ -120,7 +123,7 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          On TH, verify that  ActiveCalendarType attribute value is in between 0 to 11
+          On TH(chip-tool), verify that  ActiveCalendarType attribute value is in between 0 to 11
           [1651193250602] [14215:198406] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3316530443
           [1651193250602] [14215:198406] CHIP: [TOO]   ActiveCalendarType: 0
       disabled: true
@@ -129,7 +132,7 @@ tests:
       PICS: LTIME.S.A0002
       verification: |
           ./chip-tool timeformatlocalization read supported-calendar-types 1 0
-          On TH, verify that  SupportedCalendarTypes attribute value is in between 0 to 11
+          On TH(chip-tool), verify that  SupportedCalendarTypes attribute value is in between 0 to 11
           [1651194334793] [14653:210647] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0002 DataVersion: 3316530443
           [1651194334794] [14653:210647] CHIP: [TOO]   SupportedCalendarTypes: 12 entries
           [1651194334794] [14653:210647] CHIP: [TOO]     [1]: 0
@@ -153,7 +156,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 0 1 0
 
-          On TH verify that DUT sends a success response
+          On TH(chip-tool) verify that DUT sends a success response
           [1651194449245] [14699:212201] CHIP: [DMG] WriteResponseMessage =
           [1651194449245] [14699:212201] CHIP: [DMG] {
           [1651194449245] [14699:212201] CHIP: [DMG]         AttributeStatusIBs =
@@ -199,7 +202,7 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization write  active-calendar-type 50 1 0
-          On TH verify that DUT sends a CONSTRAINT_ERROR response
+          On TH(chip-tool) verify that DUT sends a CONSTRAINT_ERROR response
           [1658742658.653019][3572:3577] CHIP:DMG:         ],
           [1658742658.653047][3572:3577] CHIP:DMG:
           [1658742658.653071][3572:3577] CHIP:DMG:         InteractionModelRevision = 1
@@ -213,7 +216,7 @@ tests:
       PICS: LTIME.S.A0000
       verification: |
           ./chip-tool timeformatlocalization write   hour-format  5 1 0
-          On TH verify that DUT sends a CONSTRAINT_ERROR response
+          On TH(chip-tool) verify that DUT sends a CONSTRAINT_ERROR response
 
           [1656934321.910991][6387:6392] CHIP:DMG: WriteResponseMessage =
           [1656934321.911025][6387:6392] CHIP:DMG: {

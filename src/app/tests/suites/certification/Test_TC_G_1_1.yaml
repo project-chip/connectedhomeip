@@ -15,6 +15,9 @@
 
 name: 121.1.1. [TC-G-1.1] Global Attributes [DUT-Server]
 
+PICS:
+    - G.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -23,14 +26,14 @@ config:
 tests:
     - label: "Commission DUT to TH"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "TH reads the ClusterRevision from DUT"
       verification: |
           ./chip-tool groups read cluster-revision 1 1
 
-          Verify on the TH Log:
+          Verify the "clusterrevision value" on the TH(Chip-tool)  Log:
 
           [1651216621.203474][2391:2396] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFD DataVersion: 745654550
           [1651216621.204919][2391:2396] CHIP:TOO:   ClusterRevision: 4
@@ -40,7 +43,7 @@ tests:
       verification: |
           ./chip-tool groups read feature-map 1 1
 
-          Verify on the TH Log:
+          Verify the "featuremap value" on the TH(Chip-tool)  Log:
 
           [1653556224.547920][18764:18769] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFC DataVersion: 3409054639
           [1653556224.548038][18764:18769] CHIP:TOO:   FeatureMap: 1
@@ -50,7 +53,7 @@ tests:
       verification: |
           ./chip-tool groups read attribute-list 1 1
 
-          Verify on the TH Log:
+          Verify the "attibute list contains the mandatory attributes and global attributes" on the TH(Chip-tool)  Log:
 
           [1653556295.417734][18773:18779] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFB DataVersion: 3409054639
           [1653556295.417900][18773:18779] CHIP:TOO:   AttributeList: 6 entries
@@ -64,14 +67,14 @@ tests:
 
     - label: "TH reads EventList from DUT"
       verification: |
-          Event List is not implemented
+          Out of scope for V1.0
       disabled: true
 
     - label: "TH reads AcceptedCommandList from DUT"
       verification: |
           ./chip-tool groups read accepted-command-list 1 1
 
-          Verify on the TH Log:
+          Verify the "AcceptedCommands" on the TH(Chip-tool)  Log:
 
           [1651217107.034926][2435:2440] CHIP:TOO:   AcceptedCommandList: 6 entries
           [1651217107.034984][2435:2440] CHIP:TOO:     [1]: 0
@@ -86,7 +89,7 @@ tests:
       verification: |
           ./chip-tool groups read generated-command-list 1 1
 
-          Verify on the TH Log:
+          Verify the "GeneratedCommands" on the TH(Chip-tool)  Log:
 
           [1651217152.020233][2444:2449] CHIP:TOO:   GeneratedCommandList: 4 entries
           [1651217152.020276][2444:2449] CHIP:TOO:     [1]: 0

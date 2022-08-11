@@ -40,6 +40,7 @@ public:
     {
         SecurePairingSuccess = 0,
         SecurePairingFailed,
+        SecurePairingDiscoveringMoreDevices,
     };
 
     /**

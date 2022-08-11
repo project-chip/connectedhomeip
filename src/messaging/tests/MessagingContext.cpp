@@ -16,10 +16,12 @@
  */
 
 #include "MessagingContext.h"
+#include "system/SystemClock.h"
 
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
+#include <protocols/secure_channel/Constants.h>
 
 namespace chip {
 namespace Test {
@@ -96,6 +98,28 @@ void MessagingContext::ShutdownAndRestoreExisting(MessagingContext & existing)
     // Point the transport back to the original session manager, since we had
     // pointed it to ours.
     existing.mTransport->SetSessionManager(&existing.GetSecureSessionManager());
+}
+
+void MessagingContext::SetMRPMode(MRPMode mode)
+{
+    if (mode == MRPMode::kDefault)
+    {
+        mSessionBobToAlice->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+        mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+        mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+        mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+    }
+    else
+    {
+        mSessionBobToAlice->AsSecureSession()->SetRemoteMRPConfig(
+            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
+        mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(
+            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
+        mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(
+            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
+        mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(
+            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
+    }
 }
 
 CHIP_ERROR MessagingContext::CreateSessionBobToAlice()
@@ -202,6 +226,17 @@ Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::Exc
 Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::ExchangeDelegate * delegate)
 {
     return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate);
+}
+
+void MessageCapturer::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                        const SessionHandle & session, DuplicateMessage isDuplicate,
+                                        System::PacketBufferHandle && msgBuf)
+{
+    if (mCaptureStandaloneAcks || !payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+    {
+        mCapturedMessages.emplace_back(Message{ packetHeader, payloadHeader, isDuplicate, msgBuf.CloneData() });
+    }
+    mOriginalDelegate.OnMessageReceived(packetHeader, payloadHeader, session, isDuplicate, std::move(msgBuf));
 }
 
 } // namespace Test

@@ -423,22 +423,30 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
         MoveToState(State::ResponseReceived);
     }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    bool sendStatusResponse = false;
     // Assert that the exchange context matches the client's current context.
     // This should never fail because even if SendWriteRequest is called
     // back-to-back, the second call will call Close() on the first exchange,
     // which clears the OnMessageReceived callback.
     VerifyOrExit(apExchangeContext == mExchangeCtx.Get(), err = CHIP_ERROR_INCORRECT_STATE);
 
+    sendStatusResponse = true;
+
     if (mState == State::AwaitingTimedStatus)
     {
-        VerifyOrExit(aPayloadHeader.HasMessageType(MsgType::StatusResponse), err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
-        CHIP_ERROR statusError = CHIP_NO_ERROR;
-        SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
-        SuccessOrExit(err = statusError);
-        err = SendWriteRequest();
-
+        if (aPayloadHeader.HasMessageType(MsgType::StatusResponse))
+        {
+            CHIP_ERROR statusError = CHIP_NO_ERROR;
+            SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
+            sendStatusResponse = false;
+            SuccessOrExit(err = statusError);
+            err = SendWriteRequest();
+        }
+        else
+        {
+            err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
+        }
         // Skip all other processing here (which is for the response to the
         // write request), no matter whether err is success or not.
         goto exit;
@@ -448,6 +456,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
     {
         err = ProcessWriteResponseMessage(std::move(aPayload));
         SuccessOrExit(err);
+        sendStatusResponse = false;
         if (!mChunks.IsNull())
         {
             // Send the next chunk.
@@ -473,6 +482,11 @@ exit:
         {
             mpCallback->OnError(this, err);
         }
+    }
+
+    if (sendStatusResponse)
+    {
+        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     }
 
     if (mState != State::AwaitingResponse)

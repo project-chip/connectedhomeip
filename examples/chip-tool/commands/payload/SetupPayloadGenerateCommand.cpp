@@ -77,7 +77,12 @@ CHIP_ERROR SetupPayloadGenerateQRCodeCommand::Run()
 
     if (mRendezvous.HasValue())
     {
-        payload.rendezvousInformation.SetRaw(mRendezvous.Value());
+        payload.rendezvousInformation.Emplace().SetRaw(mRendezvous.Value());
+    }
+    else if (!payload.rendezvousInformation.HasValue())
+    {
+        // Default to not having anything in the discovery capabilities.
+        payload.rendezvousInformation.SetValue(RendezvousInformationFlag::kNone);
     }
 
     if (mTLVBytes.HasValue())

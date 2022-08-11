@@ -105,10 +105,11 @@ public:
         ::chip::Inet::InterfaceId interfaceId;
     };
 
-    Command(const char * commandName) : mName(commandName) {}
+    Command(const char * commandName, const char * helpText = nullptr) : mName(commandName), mHelpText(helpText) {}
     virtual ~Command() {}
 
     const char * GetName(void) const { return mName; }
+    const char * GetHelpText() const { return mHelpText; }
     const char * GetAttribute(void) const;
     const char * GetEvent(void) const;
     const char * GetArgumentName(size_t index) const;
@@ -271,7 +272,8 @@ private:
      */
     size_t AddArgumentToList(Argument && argument);
 
-    const char * mName  = nullptr;
-    bool mIsInteractive = false;
+    const char * mName     = nullptr;
+    const char * mHelpText = nullptr;
+    bool mIsInteractive    = false;
     std::vector<Argument> mArgs;
 };

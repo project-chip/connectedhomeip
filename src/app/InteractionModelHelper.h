@@ -18,7 +18,10 @@
 
 #pragma once
 
+#include <app/StatusResponse.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
+
 namespace chip {
 namespace app {
 

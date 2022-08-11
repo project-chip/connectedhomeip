@@ -16,6 +16,9 @@ name:
     Window Covering [TC-WNCV-4.4] GoToTiltPercentage Limits Verification with
     server as DUT
 
+PICS:
+    - WNCV.S
+
 config:
     nodeId: 0x12344321
     cluster: "Window Covering"

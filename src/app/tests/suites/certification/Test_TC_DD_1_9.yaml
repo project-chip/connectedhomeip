@@ -17,6 +17,10 @@ name:
     3.1.9. [TC-DD-1.9] Manual Pairing Code Payload Verification [DUT -
     Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.MANUAL_PC_COMMISSIONING
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -26,7 +30,6 @@ tests:
     - label:
           "Provide the 11-digit/21-digit Manual Pairing Code from the TH Device
           in text, speech or any format supported by DUT"
-      PICS: ""
       verification: |
           1. Launch all-clusters-app on the raspi , get the Manual Pairing code from the log
 

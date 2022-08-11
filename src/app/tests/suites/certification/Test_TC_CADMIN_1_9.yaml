@@ -16,6 +16,9 @@ name:
     24.1.9. [TC-CADMIN-1.9] Device exit commissioning mode after 20 failed
     commission attempts [ECM] [DUT - Commissionee]
 
+PICS:
+    - CADMIN.S
+
 config:
     nodeId: 0x12344321
     timeout: 700
@@ -32,14 +35,35 @@ config:
     discriminator:
         type: int16u
         defaultValue: 3840
-    payload:
+    correctPayload:
         type: char_string
-        defaultValue: "MT:-24J0AFN00KA0648G00"
-    payload2:
+        defaultValue: "MT:-24J0AFN00I31506010"
+    incorrectSetupCodePayload:
         type: char_string
-        defaultValue: "MT:0000000000I.0648G00"
+        defaultValue: "MT:-24J0AFN00I.0648G00"
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
 
 tests:
+    - label: "Precondition: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Precondition: Reset Devices to factory defaults"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -48,6 +72,71 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label:
+          "Open commissioning window exactly like we plan to later to verify
+          that `correctPayload` can in fact commision the device."
+      cluster: "AdministratorCommissioning"
+      command: "OpenCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 900
+              - name: "PAKEVerifier"
+                value: PakeVerifier
+              - name: "discriminator"
+                value: discriminator
+              - name: "iterations"
+                value: 1000
+              - name: "salt"
+                value: "SPAKE2P Key Salt"
+
+    - label:
+          "Temporarily commission device with `correctPayload` just like we will
+          try to later"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      # Only run this if we ran the previous step.
+      PICS: CADMIN.S && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: correctPayload
+
+    - label: "Wait for a CASE session"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+
+    - label: "Read FabricIndex of beta so we can delete the temp fabric"
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      # Only run this if we commissioned the device.
+      PICS: CADMIN.S.C00.Rsp
+      response:
+          saveAs: tempFabricIndex
+
+    - label: "Remove the temp fabric"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      # Only run this if we commissioned the device.
+      PICS: CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: tempFabricIndex
 
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
@@ -59,7 +148,7 @@ tests:
               - name: "CommissioningTimeout"
                 value: 900
               - name: "PAKEVerifier"
-                value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
+                value: PakeVerifier
               - name: "discriminator"
                 value: discriminator
               - name: "iterations"
@@ -79,7 +168,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -95,7 +184,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -111,7 +200,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -127,7 +216,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -143,7 +232,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -159,7 +248,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -175,7 +264,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -191,7 +280,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -207,7 +296,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -223,7 +312,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -239,7 +328,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -255,7 +344,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -271,7 +360,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -287,7 +376,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -303,7 +392,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -319,7 +408,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -335,7 +424,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -351,7 +440,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -367,7 +456,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
@@ -383,10 +472,11 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: incorrectSetupCodePayload
       response:
           error: FAILURE
 
+    # This step must match the verification step above where we checked `payload`
     - label:
           "TH_CR2 starts a commissioning process with DUT_CE using valid setup
           code"
@@ -399,7 +489,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload
+                value: correctPayload
       response:
           error: FAILURE
 
@@ -413,6 +503,6 @@ tests:
               - name: "nodeId"
                 value: nodeId3
               - name: "payload"
-                value: payload
+                value: correctPayload
       response:
           error: FAILURE

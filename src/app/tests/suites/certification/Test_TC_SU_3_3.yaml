@@ -34,7 +34,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Requestor logs
+          Verify on the OTA Requestor logs receives QueryImageResponse
 
           [1645743053319] [97809:20280821] CHIP: [SWU] QueryImageResponse:
           [1645743053319] [97809:20280821] CHIP: [SWU]   status: 0

@@ -82,6 +82,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
     entry = FindEntry(key);
     VerifyOrExit(entry != nullptr, err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrExit(value_size != 0, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     size_t byte_count;
     err = CYW30739Config::ReadConfigValueBin(entry->GetValueConfigKey(), value, value_size, byte_count);

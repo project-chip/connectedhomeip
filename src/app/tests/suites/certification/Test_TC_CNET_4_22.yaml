@@ -33,7 +33,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning scan-networks 54 0 --Breadcrumb 1
 
-          Verify  ScanNetworksResponse and its arguments on the TH/All-cluster-app Log:
+          Verify  "ScanNetworksResponse and its arguments" on the TH(Chip-tool) Log:
 
           [1658297246.000815][7679:7684] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0001
           [1658297246.001029][7679:7684] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
@@ -111,7 +111,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 54 0
 
-          Verify Breadcrumb: 2 on the TH/All-cluster-app Log:
+          Verify "Breadcrumb: 2" on the TH(Chip-tool)  Log:
 
 
           [1657688397.398564][1626:1631] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 829017613
@@ -127,7 +127,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning scan-networks 54 0 --Breadcrumb 3
 
-          Verify  ScanNetworksResponse and its arguments on the TH/All-cluster-app Log:
+          Verify  "ScanNetworksResponse and its arguments" on the TH(Chip-tool)  Log:
 
           [1658297312.201709][7708:7713] CHIP:DMG: },
           [1658297312.201898][7708:7713] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0001
@@ -155,7 +155,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 54 0
 
-          Verify Breadcrumb: 3 on the TH/All-cluster-app Log:
+          Verify "Breadcrumb: 3" on the TH(Chip-tool)  Log:
 
           [1657688489.553742][1639:1644] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 829017614
           [1657688489.553897][1639:1644] CHIP:TOO:   Breadcrumb: 3

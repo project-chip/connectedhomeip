@@ -11,7 +11,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/audio-output-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/basic-information-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/binding-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/boolean-state-cluster.xml";
-load "../src/app/zap-templates/zcl/data-model/chip/bridged-actions-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/bridged-device-basic.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/chip-ota.xml";

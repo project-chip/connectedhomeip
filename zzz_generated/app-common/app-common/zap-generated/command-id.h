@@ -88,7 +88,7 @@
 #define ZCL_STOP_WITH_ON_OFF_COMMAND_ID (0x07)
 #define ZCL_MOVE_TO_CLOSEST_FREQUENCY_COMMAND_ID (0x08)
 
-// Commands for cluster: Bridged Actions
+// Commands for cluster: Actions
 #define ZCL_INSTANT_ACTION_COMMAND_ID (0x00)
 #define ZCL_INSTANT_ACTION_WITH_TRANSITION_COMMAND_ID (0x01)
 #define ZCL_START_ACTION_COMMAND_ID (0x02)

@@ -98,9 +98,9 @@ void ShareQRCodeOverNFC(chip::RendezvousInformationFlags aRendezvousFlags)
 
 CHIP_ERROR GetPayloadContents(chip::PayloadContents & aPayload, chip::RendezvousInformationFlags aRendezvousFlags)
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    aPayload.version               = 0;
-    aPayload.rendezvousInformation = aRendezvousFlags;
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    aPayload.version = 0;
+    aPayload.rendezvousInformation.SetValue(aRendezvousFlags);
 
     err = GetCommissionableDataProvider()->GetSetupPasscode(aPayload.setUpPINCode);
     if (err != CHIP_NO_ERROR)

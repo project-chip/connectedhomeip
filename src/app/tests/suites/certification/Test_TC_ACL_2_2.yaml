@@ -15,6 +15,9 @@
 
 name: 129.2.2. [TC-ACL-2.2] Cluster endpoint
 
+PICS:
+    - ACL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

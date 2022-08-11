@@ -16,6 +16,9 @@
 name:
     3.3.1.[TC-SU-2.3]Transfer of Software Update images between DUT and TH/OTA-P
 
+PICS:
+    - MCORE.OTA.Requestor
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -40,10 +43,9 @@ tests:
       disabled: true
 
     - label:
-          'IF DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to
-          "UpdateAvailable". Set ImageURI to the location where the image is
-          located.'
+          "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
+          QueryImageResponse back to DUT. QueryStatus is set to UpdateAvailable.
+          Set ImageURI to the location where the image is located."
       verification: |
           "Run the OTA Provider App using the command:
 
@@ -60,10 +62,9 @@ tests:
       disabled: true
 
     - label:
-          'DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to
-          "UpdateAvailable". Set ImageURI with the https url of the software
-          image.'
+          "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
+          QueryImageResponse back to DUT. QueryStatus is set to UpdateAvailable.
+          Set ImageURI with the https url of the software image."
       PICS: MCORE.OTA.HTTPS
       verification: |
           Out of scope for V1.0

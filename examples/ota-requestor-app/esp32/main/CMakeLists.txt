@@ -21,6 +21,7 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/ota-requestor-app/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
 )
 
 set(SRC_DIRS_LIST
@@ -38,7 +39,10 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/descriptor"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/diagnostic-logs-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ethernet-network-diagnostics-server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/identify-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/localization-configuration-server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/on-off-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/time-format-localization-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/fixed-label-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/user-label-server"
@@ -56,6 +60,7 @@ set(SRC_DIRS_LIST
 		      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/ota"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/route_hook"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/common"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
 )
 
 set(PRIV_REQUIRES_LIST chip QRCode bt console app_update)

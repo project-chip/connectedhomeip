@@ -31,7 +31,7 @@ tests:
       verification: |
           ./chip-tool administratorcommissioning open-basic-commissioning-window 200 1 0 --timedInteractionTimeoutMs 1000
 
-          verify on TH Logs:
+          verify on TH (Chip-tool) Logs:
 
           [1652340903.034346][2874:2879] CHIP:DMG: InvokeResponseMessage =
           [1652340903.034398][2874:2879] CHIP:DMG: {
@@ -76,61 +76,24 @@ tests:
           MCORE.SC.DT_KEY&& MCORE.SC.DN_KEY && MCORE.SC.RI_KEY &&
           MCORE.SC.PH_KEY && MCORE.SC.PI_KEY
       verification: |
+          Run the below avahi browse command in the TH terminal
+
           avahi-browse -rt _matterc._udp
 
 
           ubuntu@ubuntu:~$   avahi-browse -rt _matterc._udp
 
-          Verify on the DUT Log:
+          Verify the device is advertising _matterc._udp service like below output in TH terminal Log: (Verify for the DUT"s actual values (like vendor ID, PID ..etc) as mentioned in the expected outcome of the test plan, The below log contains the data from the reference raspi accessory)
 
-          + vethd8d0eac IPv6 279142392CEB80C3                              _matterc._udp        local
-          + vethbbadff8 IPv6 279142392CEB80C3                              _matterc._udp        local
-          + veth15cb450 IPv6 279142392CEB80C3                              _matterc._udp        local
-          + veth811acb4 IPv6 279142392CEB80C3                              _matterc._udp        local
-          + veth588856b IPv6 279142392CEB80C3                              _matterc._udp        local
+
           + br-f08e8f665bd1 IPv6 279142392CEB80C3                              _matterc._udp        local
           + br-6fe235aff062 IPv6 279142392CEB80C3                              _matterc._udp        local
-          +   eth0 IPv6 279142392CEB80C3                              _matterc._udp        local
           = vethd8d0eac IPv6 279142392CEB80C3                              _matterc._udp        local
              hostname = [E45F0149AE290000.local]
              address = [fe80::4070:50ff:fe90:759d]
              port = [5540]
              txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          = vethbbadff8 IPv6 279142392CEB80C3                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::a849:d3ff:fefa:72a3]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          = veth15cb450 IPv6 279142392CEB80C3                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::5c30:4fff:fe7f:51d]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          = veth811acb4 IPv6 279142392CEB80C3                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::4c41:b1ff:feb2:abfa]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          = veth588856b IPv6 279142392CEB80C3                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::4003:6ff:fe78:9663]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          = br-f08e8f665bd1 IPv6 279142392CEB80C3                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::42:4ff:fe41:2db2]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          = br-6fe235aff062 IPv6 279142392CEB80C3                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::1]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          =   eth0 IPv6 279142392CEB80C3                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::e65f:1ff:fe49:ae29]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+
 
 
           Service Domain 422F10CDC290A406.local
@@ -150,12 +113,11 @@ tests:
           Mode using Open Basic Commissioning Window command, starting
           advertising Commissionable Node Discovery service using DNS- SD"
       verification: |
-          Reboot the device
-          if the device proivisioning state persists, run the chip-tool cmd in Step2
+          Reboot the device and commission the DUT again. Open the commissioning window using the below command in the TH (Chip-tool) terminal
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 200 1 0 --timedInteractionTimeoutMs 1000
 
-          verify on TH logs:
+          verify on TH (Chip-tool) logs:
 
           [1652341174.803430][2893:2898] CHIP:DMG: InvokeResponseMessage =
           [1652341174.803488][2893:2898] CHIP:DMG: {
@@ -199,17 +161,15 @@ tests:
           MCORE.SC.DT_KEY && MCORE.SC.DN_KEY && MCORE.SC.RI_KEY &&
           MCORE.SC.PH_KEY && MCORE.SC.PI_KEY
       verification: |
-          avahi-browse -rt _matterc._udp
+          Run the below avahi browse command in  TH terminal
 
-          Verify on the DUT Log:
+           avahi-browse -rt _matterc._udp
+
+          Verify on  the below output in TH terminal Log:
 
           + veth721e1d9 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
           + veth961779b IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-          + veth6995c44 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-          + veth6c964b1 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-          + veth3222831 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-          + br-6fe235aff062 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-          + br-f08e8f665bd1 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+
           +   eth0 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
           = veth721e1d9 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
              hostname = [E45F0149AE290000.local]
@@ -221,36 +181,8 @@ tests:
              address = [fe80::d417:1eff:fe03:eb81]
              port = [5540]
              txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          = veth6995c44 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::24ae:58ff:fe2f:5609]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          = veth6c964b1 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::cca1:6aff:fe6e:f76d]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          = veth3222831 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::410:b8ff:fe10:8cfe]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          = br-6fe235aff062 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::1]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          = br-f08e8f665bd1 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::42:43ff:fe99:75b3]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          =   eth0 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::e65f:1ff:fe49:ae29]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+
+
 
 
 
@@ -270,11 +202,11 @@ tests:
           "DUT is Commissioned and instructed to enter in commissioning mode
           using Open Commissioning Window command"
       verification: |
-          run chip tool command to open
+          Run the below open-commissioning-window in TH Terminal
 
           ./chip-tool pairing open-commissioning-window 1 1 200 2000 3840
 
-          Verify on the TH Log:
+          verify on TH (Chip-tool) logs:
 
           [1652341411.383669][2929:2934] CHIP:DMG: InvokeResponseMessage =
           [1652341411.383720][2929:2934] CHIP:DMG: {
@@ -317,44 +249,15 @@ tests:
           MCORE.SC.DT_KEY && MCORE.SC.DN_KEY && MCORE.SC.RI_KEY &&
           MCORE.SC.PH_KEY && MCORE.SC.PI_KEY
       verification: |
-          Same verification steps as Step 3, Except Verify CM flag to be 2
+          Same verification steps as Step 3, Except Verify CM flag  value to be 2
 
 
           ubuntu@ubuntu:~$ avahi-browse -rt _matterc._udp
 
-          Verify on the DUT Log:
-
-          + veth721e1d9 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
-          + veth721e1d9 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-          + veth961779b IPv6 9BFF1DCA106E337B                              _matterc._udp        local
-          + veth961779b IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-          + veth6995c44 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
-          + veth6995c44 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-          + veth6c964b1 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
-          + veth6c964b1 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-          + veth3222831 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
-          + veth3222831 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-          + br-6fe235aff062 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
-          + br-6fe235aff062 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-          + br-f08e8f665bd1 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
-          + br-f08e8f665bd1 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-          +   eth0 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
-          +   eth0 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          Verify on  the below output in TH terminal Log:
 
 
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          = veth3222831 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::410:b8ff:fe10:8cfe]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          = br-6fe235aff062 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::1]
-             port = [5540]
-             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
 
-             txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
           = veth961779b IPv6 9BFF1DCA106E337B                              _matterc._udp        local
              hostname = [E45F0149AE290000.local]
              address = [fe80::d417:1eff:fe03:eb81]
@@ -374,16 +277,16 @@ tests:
 
     - label: "Wait for OCW timeout to expire"
       verification: |
-          Wait until timeout to expire
+          Wait until open-commissioning-window time to expire. (In our example above its 200 sec)
       disabled: true
 
     - label: "If (MCORE.SC.EXTENDED_DISCOVERY ) enable Extended Discovery"
       PICS: MCORE.SC.EXTENDED_DISCOVERY
       verification: |
-          If the device supports Discovery for extended period of time, Device should continue to advertise that duration
+          If the device supports Discovery for an extended period of time, the Device should continue to advertise. Use the avahi-browse command and you should see the _matterc._udp advertisement
 
 
-          Raspberrypi device is not supporting extended discovery.
+          Reference Raspberrypi device is not supporting extended discovery.
       disabled: true
 
     - label: "If (PICS_EXTENDED_DISCOVERY) check DNS-SD subtypes used by DUT"
@@ -394,6 +297,9 @@ tests:
           MCORE.SC.SAI_OP_DISCOVERY_KEY && MCORE.SC.DT_KEY && MCORE.SC.DN_KEY &&
           MCORE.SC.RI_KEY && MCORE.SC.PH_KEY && MCORE.SC.PI_KEY
       verification: |
+          Run and Verify on  the below output in TH terminal Log: (Below is the sample log , as RPI doesn"t support the extended discovery)
+          Verify the CM flag value is 0
+
           avahi-browse -rt _matterc._udp
           +   eth0 IPv6 DD200C20D25AE5F7                              _matterc._udp        local
           +   eth0 IPv4 DD200C20D25AE5F7                              _matterc._udp        local

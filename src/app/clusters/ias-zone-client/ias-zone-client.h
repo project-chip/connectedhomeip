@@ -40,6 +40,7 @@
 
 #pragma once
 
+#include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 
 typedef struct

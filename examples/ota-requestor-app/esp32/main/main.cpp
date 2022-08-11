@@ -45,6 +45,12 @@
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+#include <platform/ESP32/ESP32DeviceInfoProvider.h>
+#else
+#include <DeviceInfoProviderImpl.h>
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+
 using namespace ::chip;
 using namespace ::chip::System;
 using namespace ::chip::DeviceManager;
@@ -66,9 +72,14 @@ static void InitServer(intptr_t context)
 }
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
+DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
+#else
+DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 } // namespace
 
 extern "C" void app_main()
@@ -102,6 +113,8 @@ extern "C" void app_main()
     chip::LaunchShell();
     OTARequestorCommands::GetInstance().Register();
 #endif // CONFIG_ENABLE_CHIP_SHELL
+
+    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 

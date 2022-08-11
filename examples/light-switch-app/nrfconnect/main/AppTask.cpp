@@ -20,7 +20,6 @@
 #include "AppConfig.h"
 #include "LEDWidget.h"
 #include "LightSwitch.h"
-#include "ThreadUtil.h"
 
 #include <DeviceInfoProviderImpl.h>
 #include <app/clusters/identify-server/identify-server.h>

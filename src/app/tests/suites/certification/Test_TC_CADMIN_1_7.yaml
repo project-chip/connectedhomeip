@@ -17,12 +17,20 @@ name:
     4.1.7. [TC-CADMIN-1.7] Commissioning window handling timeout and revocation
     using ECM [DUT - Commissioner]
 
+PICS:
+    - CADMIN.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Precondition: Reset DUT_CE to factory defaults"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
     - label: "DUT_CR1 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |

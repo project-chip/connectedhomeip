@@ -165,7 +165,6 @@ function getManualTests() {
         "Test_TC_DGGEN_2_2",
         "Test_TC_DGGEN_2_3",
         "Test_TC_DGGEN_3_1",
-        "Test_TC_DGGEN_3_2",
     ];
 
     const Identify = [
@@ -211,6 +210,7 @@ function getManualTests() {
         "Test_TC_CHANNEL_5_4",
         "Test_TC_CHANNEL_5_5",
         "Test_TC_CHANNEL_5_6",
+        "Test_TC_KEYPADINPUT_3_1",
         "Test_TC_MEDIAPLAYBACK_6_5",
         "Test_TC_MEDIAPLAYBACK_6_7",
         "Test_TC_AUDIOOUTPUT_7_3",
@@ -500,6 +500,7 @@ function getManualTests() {
     ];
 
     const UserLabel = [
+        "Test_TC_ULABEL_2_1",
         "Test_TC_ULABEL_3_1",
     ];
 
@@ -675,6 +676,7 @@ function getTests() {
         "Test_TC_MEDIAPLAYBACK_1_7",
         "Test_TC_AUDIOOUTPUT_1_8",
         "Test_TC_TGTNAV_1_9",
+        "Test_TC_TGTNAV_8_2",
         "Test_TC_APBSC_1_10",
         "Test_TC_CONTENTLAUNCHER_1_11",
         "Test_TC_ALOGIN_1_12",
@@ -866,7 +868,7 @@ function getTests() {
     ];
 
     const DoorLock = [
-        //"DL_UsersAndCredentials", TODO: This test is not aligned with spec
+        "DL_UsersAndCredentials",
         "DL_LockUnlock",
         "DL_Schedules",
         "Test_TC_DRLK_2_2",
@@ -874,7 +876,7 @@ function getTests() {
         "Test_TC_DRLK_2_4",
         "Test_TC_DRLK_2_5",
         "Test_TC_DRLK_2_7",
-        //"Test_TC_DRLK_2_9", TODO: This test is not aligned with spec
+        "Test_TC_DRLK_2_9",
     ];
 
     const Groups = [

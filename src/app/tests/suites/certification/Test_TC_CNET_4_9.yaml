@@ -32,7 +32,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 1 1 0
 
-          Verify "ArmFailSafeResponse" on the TH(chip-tool) Log:
+          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
 
           [1653478311.640549][30368:30373] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1653478311.640646][30368:30373] CHIP:TOO:   ArmFailSafeResponse: {
@@ -48,7 +48,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify "Networks entiries and its status" on the TH(chip-tool) Log:
+          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
 
           [1654250379.881780][5309:5314] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3741733376
           [1654250379.881974][5309:5314] CHIP:TOO:   Networks: 1 entries
@@ -65,7 +65,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read last-network-id 1 0
 
-          Verify "LastNetworkID" on the TH(chip-tool) Log:
+          Verify "LastNetworkID" on the TH(Chip-tool) Log:
 
           [1657198553.376268][5799:5804] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 2494552649
           [1657198553.376351][5799:5804] CHIP:TOO:   LastNetworkID: 47524C50726976617465
@@ -82,7 +82,7 @@ tests:
 
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
 
-          Verify "NetworkConfigResponse and its arguments" on the TH(chip-tool) Log:
+          Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
 
 
           [1653478327.351092][30388:30393] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
@@ -99,7 +99,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify "Networks entiries and its status" on the TH(chip-tool) Log:
+          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
 
           [1653478331.979300][30395:30400] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1600858167
           [1653478331.979380][30395:30400] CHIP:TOO:   Networks: 0 entries
@@ -111,7 +111,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read last-networking-status 1 0
 
-          Verify "LastNetworkingStatus" on the TH(chip-tool) Log:
+          Verify "LastNetworkingStatus" on the TH(Chip-tool) Log:
 
           [1653478850.425096][30420:30425] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005 DataVersion: 1600858167
           [1653478850.425170][30420:30425] CHIP:TOO:   LastNetworkingStatus: 0
@@ -123,7 +123,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read last-network-id 1 0
 
-          Verify "LastNetworkID" on the TH(chip-tool) Log:
+          Verify "LastNetworkID" on the TH(Chip-tool) Log:
 
           [1657197861.497831][5737:5742] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 2494552649
           [1657197861.497897][5737:5742] CHIP:TOO:   LastNetworkID: 47524C50726976617465
@@ -136,7 +136,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-          Verify "Breadcrumb: 1" on the TH(chip-tool) Log:
+          Verify "Breadcrumb: 1" on the TH(Chip-tool) Log:
 
           [1657197903.686316][5745:5750] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2805642043
           [1657197903.686428][5745:5750] CHIP:TOO:   Breadcrumb: 1
@@ -154,7 +154,7 @@ tests:
 
           ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0 --Breadcrumb 2
 
-          Verify "ConnectNetworkResponse and its arguments" on the TH(chip-tool) Log:
+          Verify "ConnectNetworkResponse and its arguments" on the TH(Chip-tool) Log:
 
           [1657288261.892249][2347:2352] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1657288261.892304][2347:2352] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
@@ -171,7 +171,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-          Verify "Breadcrumb: 1" on the TH(chip-tool) Log:
+          Verify "Breadcrumb: 1" on the TH(Chip-tool) Log:
 
           [1657288331.671111][2360:2365] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 3470734109
           [1657288331.671207][2360:2365] CHIP:TOO:   Breadcrumb: 1
@@ -183,7 +183,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
 
-          Verify "ArmFailSafeResponse" on the TH(chip-tool) Log:
+          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
 
           [1657288382.006035][2369:2374] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657288382.006094][2369:2374] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -198,7 +198,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify "Networks entiries and its status" on the TH(chip-tool) Log:
+          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
 
           [1657288403.226567][2376:2381] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1420716065
           [1657288403.226663][2376:2381] CHIP:TOO:   Networks: 0 entries
@@ -210,7 +210,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 90 1 1 0
 
-          Verify "ArmFailSafeResponse" on the TH(chip-tool) Log:
+          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
 
           [1657288428.409103][2382:2388] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657288428.409191][2382:2388] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -230,7 +230,7 @@ tests:
 
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1  0 --Breadcrumb 1
 
-          Verify "NetworkConfigResponse and its arguments" on the TH(chip-tool) Log:
+          Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
 
           [1657288459.534546][2390:2395] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1657288459.534622][2390:2395] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
@@ -244,7 +244,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning commissioning-complete 1 0
 
-          Verify "CommissioningCompleteResponse and its arguments" on the TH(chip-tool) Log:
+          Verify "CommissioningCompleteResponse and its arguments" on the TH(Chip-tool) Log:
 
           [1657288504.905001][2397:2402] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           [1657288504.905050][2397:2402] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0005
@@ -262,7 +262,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
 
-          Verify "ArmFailSafeResponse" on the TH(chip-tool) Log:
+          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
 
           [1657288529.987350][2404:2409] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657288529.987514][2404:2409] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -277,7 +277,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify "Networks entiries and its status" on the TH(chip-tool) Log:
+          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
 
           [1657288549.446752][2412:2417] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1420716065
           [1657288549.446852][2412:2417] CHIP:TOO:   Networks: 0 entries

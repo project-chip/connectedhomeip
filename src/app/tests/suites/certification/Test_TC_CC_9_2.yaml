@@ -15,6 +15,9 @@
 name:
     27.2.21. [TC-CC-9.2] ColorLoopSet Validation - change direction without stop
 
+PICS:
+    - CC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Color Control"
@@ -30,23 +33,21 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Precondition: Turn on light for color control tests"
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.A000f && CC.S.F02 && CC.S.F01
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "TH sends On command to DUT"
       PICS: OO.S.C01.Rsp
       cluster: "On/Off"
-      command: "on"
+      command: "On"
 
     - label:
-          "Precondition: Check on/off attribute value is true after on command"
-      cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      PICS: OO.S.A0000
-      response:
-          value: 1
-
-    - label:
-          "Precondition : Set DUT EnhancedCurrentHue to 0x4000 using
-          EnhancedMoveToHue command"
+          "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=0x4000,
+          Direction=0x00 (shortest distance) and TransitionTime=0 (immediately)."
       command: "EnhancedMoveToHue"
       PICS: CC.S.F01 && CC.S.F02 && CC.S.C40.Rsp
       arguments:
@@ -70,14 +71,11 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label: "TH writes 0 to the Options attribute"
-      PICS: CC.S.A000f && CC.S.F02 && CC.S.F01
-      command: "writeAttribute"
-      attribute: "Options"
-      arguments:
-          value: 0
-
-    - label: "Sends ColorLoopSet Command - Set all Attributes"
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0xF,
+          Action attribute to 0x0 (De-activate), Direction attribute to 0x0
+          (decrement hue), Time attribute to 30, and StartHue attribute to
+          0x00A0 to DUT."
       command: "ColorLoopSet"
       PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
       arguments:
@@ -125,7 +123,10 @@ tests:
       response:
           value: 160
 
-    - label: "Color Loop Set Command - Set all Attributes"
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x1
+          (UpdateAction) and Action attribute to 0x1 (start from
+          ColorLoopStartEnhancedHue) to DUT."
       command: "ColorLoopSet"
       PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
       arguments:
@@ -202,7 +203,10 @@ tests:
               minValue: ColorLoopStartEnhancedHueValue
               maxValue: 65535
 
-    - label: "Color Loop Set Command - Start Color Loop"
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x2
+          (UpdateDirection) and Direction attribute to 0x1 (increment hue) to
+          DUT."
       command: "ColorLoopSet"
       PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
       arguments:
@@ -272,7 +276,9 @@ tests:
               minValue: ColorLoopStartEnhancedHue
               maxValue: 65535
 
-    - label: "Color Loop Set Command - Start Color Loop"
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x1
+          (UpdateAction) and Action attribute to 0x0 (De-activate) to DUT."
       command: "ColorLoopSet"
       PICS: CC.S.F01 && CC.S.F02 && CC.S.C44.Rsp
       arguments:
@@ -316,7 +322,7 @@ tests:
     - label: "Turn off light for color control tests"
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"
-      command: "off"
+      command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
       cluster: "On/Off"

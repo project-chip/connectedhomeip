@@ -36,7 +36,7 @@ public class Clusters {
   public static final int ClusterId_Binding = 0x0000001E;
   public static final int ClusterId_AccessControl = 0x0000001F;
   public static final int ClusterId_PollControl = 0x00000020;
-  public static final int ClusterId_BridgedActions = 0x00000025;
+  public static final int ClusterId_Actions = 0x00000025;
   public static final int ClusterId_Basic = 0x00000028;
   public static final int ClusterId_OtaSoftwareUpdateProvider = 0x00000029;
   public static final int ClusterId_OtaSoftwareUpdateRequestor = 0x0000002A;

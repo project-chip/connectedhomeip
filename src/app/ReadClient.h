@@ -411,7 +411,7 @@ private:
         SubscriptionActive,        ///< The client is maintaining subscription
     };
 
-    bool IsMatchingClient(SubscriptionId aSubscriptionId)
+    bool IsMatchingSubscriptionId(SubscriptionId aSubscriptionId)
     {
         return aSubscriptionId == mSubscriptionId && mInteractionType == InteractionType::Subscribe;
     }
@@ -516,6 +516,12 @@ private:
 
     ReadClient * mpNext                 = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;
+
+    //
+    // This stores the params associated with the interaction in a specific set of cases:
+    //      1. Stores all parameters when used with subscriptions initiated using SendAutoResubscribeRequest.
+    //      2. Stores just the SessionHolder when used with any subscriptions.
+    //
     ReadPrepareParams mReadPrepareParams;
     uint32_t mNumRetries = 0;
 
