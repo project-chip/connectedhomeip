@@ -1200,9 +1200,9 @@ void InteractionModelEngine::ReleasePool(ObjectList<T> *& aObjectList, ObjectPoo
     ObjectList<T> * current = aObjectList;
     while (current != nullptr)
     {
-        ObjectList<T> * pNext = current->mpNext;
+        ObjectList<T> * nextObject = current->mpNext;
         aObjectPool.ReleaseObject(current);
-        current = pNext;
+        current = nextObject;
     }
 
     aObjectList = nullptr;
