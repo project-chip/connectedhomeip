@@ -433,7 +433,7 @@ void OperationalSessionSetup::PerformAddressUpdate()
     // We must be newly-allocated to handle this address lookup, so must be in the NeedsAddress state.
     VerifyOrDie(mState == State::NeedsAddress);
 
-    // We are doing an address lookup regardless if the the session is currently active.
+    // We are doing an address lookup whether we have an active session for this peer or not.
     mPerformingAddressUpdate = true;
     MoveToState(State::ResolvingAddress);
     CHIP_ERROR err = LookupPeerAddress();
