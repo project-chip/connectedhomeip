@@ -150,7 +150,7 @@ tests:
       response:
           constraints:
               minValue: 34000
-              maxValue: 36000
+              maxValue: 36500
 
     - label: "Wait 2s"
       cluster: "DelayCommands"
@@ -168,7 +168,7 @@ tests:
       response:
           constraints:
               minValue: 34500
-              maxValue: 36000
+              maxValue: 36500
 
     - label:
           "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=25000,
@@ -276,7 +276,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 9500
+              minValue: 7500
               maxValue: 12500
 
     - label: "Wait 2s"
@@ -294,7 +294,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 9500
+              minValue: 7500
               maxValue: 12500
 
     - label: "TH reads ColorMode attribute from DUT"

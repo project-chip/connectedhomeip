@@ -24,6 +24,9 @@ config:
     nodeId: 0x12344321
     timeout: 330
     endpoint: 0
+    discriminator:
+        type: int16u
+        defaultValue: 3840
 
 tests:
     - label: "Precondition: Reset Devices to factory defaults"
@@ -62,6 +65,8 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "discriminator"
+                value: discriminator
 
     - label: "Wait for commissioning Window to 301 seconds"
       cluster: "DelayCommands"
@@ -89,6 +94,8 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 179
+              - name: "discriminator"
+                value: discriminator
       response:
           error: INVALID_COMMAND
 

@@ -76,158 +76,228 @@ tests:
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
-    - label: "TH sends StepColorTemperature command to DUT with MoveMode = Up"
-      PICS: CC.S.F04 && CC.S.C4c.Rsp
-      command: "StepColorTemperature"
+    - label:
+          "TH sends MoveToColorTemperature command to DUT with
+          ColorTemperatureMireds=(ColorTempPhysicalMinMireds +
+          ColorTempPhysicalMaxMireds)/2 and TransitionTime=0 (immediately)."
+      PICS: CC.S.F04 && CC.S.C0a.Rsp && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool colorcontrol move-to-color-temperature 32639 0 0 0 1 1
+
+          Verify in TH(chip-tool) Log:
+          [1649666592.559286][9065:9070] CHIP:DMG:                                StatusIB =
+          [1649666592.559322][9065:9070] CHIP:DMG:                                {
+          [1649666592.559357][9065:9070] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1649666592.559391][9065:9070] CHIP:DMG:                                },
+      cluster: "LogCommands"
+      command: "UserPrompt"
       arguments:
           values:
-              - name: "StepMode"
-                value: 1
-              - name: "StepSize"
-                value: 100
-              - name: "TransitionTime"
-                value: 15
-              - name: "ColorTemperatureMinimumMireds"
-                value: ColorTempPhysicalMinMiredsValue
-              - name: "ColorTemperatureMaximumMireds"
-                value: ColorTempPhysicalMaxMiredsValue
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
+              - name: "message"
+                value: "please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Wait 500ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
+    - label:
+          "TH sends StepColorTemperature command to DUT with StepMode = 0x01
+          (up), StepSize = (ColorTempPhysicalMaxMireds -
+          ColorTempPhysicalMinMireds)/2 and TransitionTime = 200 (20s)."
+      PICS: CC.S.F04 && CC.S.C4c.Rsp && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool colorcontrol step-color-temperature 1 32639 200 0 65279 0 0 1 1
+
+          Verify in TH(chip-tool) Log:
+          [1649667424.918523][9183:9188] CHIP:DMG:                                StatusIB =
+          [1649667424.918601][9183:9188] CHIP:DMG:                                {
+          [1649667424.918678][9183:9188] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1649667424.918741][9183:9188] CHIP:DMG:                                },
+      cluster: "LogCommands"
+      command: "UserPrompt"
       arguments:
           values:
-              - name: "ms"
-                value: 500
+              - name: "message"
+                value: "please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
-      command: "readAttribute"
-      attribute: "ColorTemperature"
-      response:
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "After 10 seconds, TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A0007 && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool colorcontrol read color-temperature 1 1
 
-    - label: "Wait 500ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
+          Verify in TH(chip-tool) Log:
+          [1649667419.577304][9177:9182] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0007 DataVersion: 4087380060
+          [1649667419.577405][9177:9182] CHIP:TOO:   ColorTemperature: 22000 (value can vary)
+          [1649667419.577532][9177:9182] CHIP:EM: Sending Standalone Ack for MessageCounter:15518191 on exchange 14182i
+      cluster: "LogCommands"
+      command: "UserPrompt"
       arguments:
           values:
-              - name: "ms"
-                value: 500
+              - name: "message"
+                value: "please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
-      command: "readAttribute"
-      attribute: "ColorTemperature"
-      response:
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "After 10 seconds, TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A0007 && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool colorcontrol read color-temperature 1 1
 
-    - label: "Wait 700ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
+          Verify in TH(chip-tool) Log:
+          [1649667419.577304][9177:9182] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0007 DataVersion: 4087380060
+          [1649667419.577405][9177:9182] CHIP:TOO:   ColorTemperature: 25000 (value can vary)
+          [1649667419.577532][9177:9182] CHIP:EM: Sending Standalone Ack for MessageCounter:15518191 on exchange 14182i
+      cluster: "LogCommands"
+      command: "UserPrompt"
       arguments:
           values:
-              - name: "ms"
-                value: 700
+              - name: "message"
+                value: "please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
-      command: "readAttribute"
-      attribute: "ColorTemperature"
-      response:
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "After another 5 seconds, TH reads ColorTemperatureMireds attribute
+          from DUT."
+      PICS: CC.S.F04 && CC.S.A0007 && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool colorcontrol read color-temperature 1 1
 
-    - label: "TH sends StepColorTemperature command to DUT with MoveMode = Down"
-      PICS: CC.S.F04 && CC.S.C4c.Rsp
-      command: "StepColorTemperature"
+          Verify in TH(chip-tool) Log:
+          [1649667419.577304][9177:9182] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0007 DataVersion: 4087380060
+          [1649667419.577405][9177:9182] CHIP:TOO:   ColorTemperature: 25000 (value can vary)
+          [1649667419.577532][9177:9182] CHIP:EM: Sending Standalone Ack for MessageCounter:15518191 on exchange 14182i
+      cluster: "LogCommands"
+      command: "UserPrompt"
       arguments:
           values:
-              - name: "StepMode"
-                value: 3
-              - name: "StepSize"
-                value: 100
-              - name: "TransitionTime"
-                value: 10
-              - name: "ColorTemperatureMinimumMireds"
-                value: ColorTempPhysicalMinMiredsValue
-              - name: "ColorTemperatureMaximumMireds"
-                value: ColorTempPhysicalMaxMiredsValue
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
+              - name: "message"
+                value: "please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Wait 500ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
+    - label:
+          "TH sends StepColorTemperature command to DUT with StepMode = 0x03
+          (down), StepSize = (ColorTempPhysicalMaxMireds -
+          ColorTempPhysicalMinMireds) and TransitionTime = 200 (20s)."
+      PICS: CC.S.F04 && CC.S.C4c.Rsp && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool colorcontrol step-color-temperature 3 65279 200 0 65279 0 0 1 1
+
+          Verify in TH(chip-tool) Log:
+          [1649667424.918523][9183:9188] CHIP:DMG:                                StatusIB =
+          [1649667424.918601][9183:9188] CHIP:DMG:                                {
+          [1649667424.918678][9183:9188] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1649667424.918741][9183:9188] CHIP:DMG:                                },
+      cluster: "LogCommands"
+      command: "UserPrompt"
       arguments:
           values:
-              - name: "ms"
-                value: 500
+              - name: "message"
+                value: "please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
-      command: "readAttribute"
-      attribute: "ColorTemperature"
-      response:
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "After 10 seconds, TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A0007 && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool colorcontrol read color-temperature 1 1
 
-    - label: "Wait 500ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
+          Verify in TH(chip-tool) Log:
+          [1649667431.007143][9189:9194] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0007 DataVersion: 4087380282
+          [1649667431.007227][9189:9194] CHIP:TOO:    ColorTemperature: 55000  (value can vary)
+          [1649667431.007331][9189:9194] CHIP:EM: Sending Standalone Ack for MessageCounter:16519125 on exchange 51144i
+      cluster: "LogCommands"
+      command: "UserPrompt"
       arguments:
           values:
-              - name: "ms"
-                value: 500
+              - name: "message"
+                value: "please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
-      command: "readAttribute"
-      attribute: "ColorTemperature"
-      response:
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "After 10 seconds, TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A0007 && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool colorcontrol read color-temperature 1 1
 
-    - label: "Wait 500ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
+          Verify in TH(chip-tool) Log:
+          [1649667431.007143][9189:9194] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0007 DataVersion: 4087380282
+          [1649667431.007227][9189:9194] CHIP:TOO:    ColorTemperature: 52300  (value can vary)
+          [1649667431.007331][9189:9194] CHIP:EM: Sending Standalone Ack for MessageCounter:16519125 on exchange 51144i
+      cluster: "LogCommands"
+      command: "UserPrompt"
       arguments:
           values:
-              - name: "ms"
-                value: 500
+              - name: "message"
+                value: "please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
-      command: "readAttribute"
-      attribute: "ColorTemperature"
-      response:
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "After another 5 seconds, TH reads ColorTemperatureMireds attribute
+          from DUT."
+      PICS: CC.S.F04 && CC.S.A0007 && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool colorcontrol read color-temperature 1 1
 
-    - label: "Turn off light that we turned on"
+          Verify in TH(chip-tool) Log:
+          [1649667479.607750][9202:9207] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0007 DataVersion: 4087381226
+          [1649667479.607822][9202:9207] CHIP:TOO:   ColorTemperature: 52300  (value can vary)
+          [1649667479.607915][9202:9207] CHIP:EM: Sending Standalone Ack for MessageCounter:10286581 on exchange 17774i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "TH reads ColorMode attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A0008 && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool colorcontrol read color-mode 1 1
+
+          Verify in TH(chip-tool) Log:
+          [1659712688.315752][5086:5091] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0008 DataVersion: 468119348
+          [1659712688.315831][5086:5091] CHIP:TOO:   ColorMode: 2
+          [1659712688.315957][5086:5091] CHIP:EM: Sending Standalone Ack for MessageCounter:240585607 on exchange 4537i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "TH reads EnhancedColorMode attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A4001 && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool colorcontrol read enhanced-color-mode 1 1
+
+          Verify in TH(chip-tool) Log:
+          [1659712734.529238][5094:5099] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4001 DataVersion: 468119348
+          [1659712734.529360][5094:5099] CHIP:TOO:   EnhancedColorMode: 2
+          [1659712734.529552][5094:5099] CHIP:EM: Sending Standalone Ack for MessageCounter:39175367 on exchange 3560i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Turn Off light that we turned on"
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"
-      command: "off"
+      command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
       cluster: "On/Off"

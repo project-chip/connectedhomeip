@@ -114,7 +114,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: 85
+              minValue: 80
               maxValue: 115
 
     - label: "Wait 10s"
