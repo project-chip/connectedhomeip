@@ -182,7 +182,7 @@ tests:
       response:
           constraints:
               type: list
-    # #issue #15011 disabled steps below Global attributes missing from YAML framework
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
     # - label: "Read the global attribute: EventList"
     #   disabled: true
     #   verification: |

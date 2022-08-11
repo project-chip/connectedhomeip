@@ -34,7 +34,7 @@ tests:
       verification: |
           ./chip-tool powersourceconfiguration read sources 1 0
 
-          On TH, verify that that the DUT response provides a list
+           verify on TH(chip-tool) that source attribute provides a list, and each entry in the list has to be  number of an endpoint having a Power Source cluster.
 
           The response should look like this:
 

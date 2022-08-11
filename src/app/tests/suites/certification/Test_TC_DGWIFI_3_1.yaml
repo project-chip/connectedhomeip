@@ -25,6 +25,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label: "Commission TH to DUT"
       verification: |
           verification step to be updated.
@@ -35,11 +40,25 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read bssid 1 0
 
+          verify the " bssid  Received Read response" on the TH (all-cluster-app) log:
 
-          On DUT as a client side, verify that TH all-clusters-app   bssid value.
-
-          [1650451782.025188][9063:9068] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0000 DataVersion: 1028539580
-          [1650451782.025262][9063:9068] CHIP:TOO:   bssid:  21020000FFFF
+          [1659959901.791873][4826:4826] CHIP:IM: Received Read request
+          [1659959901.791946][4826:4826] CHIP:DMG: ReadRequestMessage =
+          [1659959901.791970][4826:4826] CHIP:DMG: {
+          [1659959901.791989][4826:4826] CHIP:DMG:         AttributePathIBs =
+          [1659959901.792012][4826:4826] CHIP:DMG:         [
+          [1659959901.792033][4826:4826] CHIP:DMG:                 AttributePathIB =
+          [1659959901.792064][4826:4826] CHIP:DMG:                 {
+          [1659959901.792091][4826:4826] CHIP:DMG:                         Endpoint = 0x0,
+          [1659959901.792121][4826:4826] CHIP:DMG:                         Cluster = 0x36,
+          [1659959901.792151][4826:4826] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659959901.792178][4826:4826] CHIP:DMG:                 }
+          [1659959901.792203][4826:4826] CHIP:DMG:
+          [1659959901.792227][4826:4826] CHIP:DMG:         ],
+          [1659959901.792251][4826:4826] CHIP:DMG:
+          [1659959901.792274][4826:4826] CHIP:DMG:         isFabricFiltered = true,
+          [1659959901.792296][4826:4826] CHIP:DMG:         InteractionModelRevision = 1
+          [1659959901.792316][4826:4826] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads a SecurityType attribute value from TH."
@@ -47,10 +66,25 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read security-type 1 0
 
-          On DUT as a client side, verify that TH all-clusters-app   security-type value.
+          verify the " security-type  Received Read  response" on the TH (all-cluster-app) log:
 
-          [1650451927.587236][9086:9091] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0001 DataVersion: 1028539580
-          [1650451927.587329][9086:9091] CHIP:TOO:   SecurityType: 4
+          [1659959989.666920][4826:4826] CHIP:IM: Received Read request
+          [1659959989.667091][4826:4826] CHIP:DMG: ReadRequestMessage =
+          [1659959989.667158][4826:4826] CHIP:DMG: {
+          [1659959989.667214][4826:4826] CHIP:DMG:         AttributePathIBs =
+          [1659959989.667279][4826:4826] CHIP:DMG:         [
+          [1659959989.667342][4826:4826] CHIP:DMG:                 AttributePathIB =
+          [1659959989.667419][4826:4826] CHIP:DMG:                 {
+          [1659959989.667491][4826:4826] CHIP:DMG:                         Endpoint = 0x0,
+          [1659959989.667582][4826:4826] CHIP:DMG:                         Cluster = 0x36,
+          [1659959989.667668][4826:4826] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1659959989.667746][4826:4826] CHIP:DMG:                 }
+          [1659959989.667817][4826:4826] CHIP:DMG:
+          [1659959989.667881][4826:4826] CHIP:DMG:         ],
+          [1659959989.667950][4826:4826] CHIP:DMG:
+          [1659959989.668017][4826:4826] CHIP:DMG:         isFabricFiltered = true,
+          [1659959989.668082][4826:4826] CHIP:DMG:         InteractionModelRevision = 1
+          [1659959989.668143][4826:4826] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads a WiFiVersion attribute value from TH."
@@ -58,10 +92,24 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read wi-fi-version 1 0
 
-          On DUT as a client side, verify that TH all-clusters-app  WiFiVersion value.
-
-          [1650451948.677197][9092:9097] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0002 DataVersion: 1028539580
-          [1650451948.677299][9092:9097] CHIP:TOO:   WiFiVersion: 3
+          verify the " wi-fi-version Received Read  response" on the TH (all-cluster-app) log:
+          [1659960013.130130][4826:4826] CHIP:IM: Received Read request
+          [1659960013.130211][4826:4826] CHIP:DMG: ReadRequestMessage =
+          [1659960013.130252][4826:4826] CHIP:DMG: {
+          [1659960013.130276][4826:4826] CHIP:DMG:         AttributePathIBs =
+          [1659960013.130303][4826:4826] CHIP:DMG:         [
+          [1659960013.130339][4826:4826] CHIP:DMG:                 AttributePathIB =
+          [1659960013.130371][4826:4826] CHIP:DMG:                 {
+          [1659960013.130413][4826:4826] CHIP:DMG:                         Endpoint = 0x0,
+          [1659960013.130450][4826:4826] CHIP:DMG:                         Cluster = 0x36,
+          [1659960013.130492][4826:4826] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1659960013.130523][4826:4826] CHIP:DMG:                 }
+          [1659960013.130561][4826:4826] CHIP:DMG:
+          [1659960013.130590][4826:4826] CHIP:DMG:         ],
+          [1659960013.130619][4826:4826] CHIP:DMG:
+          [1659960013.130657][4826:4826] CHIP:DMG:         isFabricFiltered = true,
+          [1659960013.130683][4826:4826] CHIP:DMG:         InteractionModelRevision = 1
+          [1659960013.130716][4826:4826] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads a ChannelNumber attribute value from TH."
@@ -69,10 +117,25 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read channel-number 1 0
 
-          On DUT as a client side, verify that TH all-clusters-app  WiFiVersion value.
-
-          [1650451989.021486][9112:9117] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0003 DataVersion: 1028539580
-          [1650451989.021547][9112:9117] CHIP:TOO:   ChannelNumber: 1
+          verify the " channel-number  Received Read  response" on the TH (all-cluster-app) log:
+          [1659960026.962902][4826:4826] CHIP:IM: Received Read request
+          [1659960026.962973][4826:4826] CHIP:DMG: ReadRequestMessage =
+          [1659960026.963007][4826:4826] CHIP:DMG: {
+          [1659960026.963026][4826:4826] CHIP:DMG:         AttributePathIBs =
+          [1659960026.963058][4826:4826] CHIP:DMG:         [
+          [1659960026.963080][4826:4826] CHIP:DMG:                 AttributePathIB =
+          [1659960026.963111][4826:4826] CHIP:DMG:                 {
+          [1659960026.963143][4826:4826] CHIP:DMG:                         Endpoint = 0x0,
+          [1659960026.963172][4826:4826] CHIP:DMG:                         Cluster = 0x36,
+          [1659960026.963209][4826:4826] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659960026.963234][4826:4826] CHIP:DMG:                 }
+          [1659960026.963271][4826:4826] CHIP:DMG:
+          [1659960026.963295][4826:4826] CHIP:DMG:         ],
+          [1659960026.963326][4826:4826] CHIP:DMG:
+          [1659960026.963350][4826:4826] CHIP:DMG:         isFabricFiltered = true,
+          [1659960026.963372][4826:4826] CHIP:DMG:         InteractionModelRevision = 1
+          [1659960026.963400][4826:4826] CHIP:DMG: },
+          [1659960026.963475][4826:4826] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label: "DUT reads a RSSI attribute value from TH."
@@ -80,10 +143,25 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read rssi 1 0
 
-          On DUT as a client side, verify that TH all-clusters-app  attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
+          verify the " rssi  Received Read response" on the TH (all-cluster-app) log:
 
-          [1650452156.130334][9132:9137] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0004 DataVersion: 1028539580
-          [1650452156.130405][9132:9137] CHIP:TOO:   Rssi: -11
+          [1659960043.760899][4826:4826] CHIP:IM: Received Read request
+          [1659960043.760997][4826:4826] CHIP:DMG: ReadRequestMessage =
+          [1659960043.761024][4826:4826] CHIP:DMG: {
+          [1659960043.761046][4826:4826] CHIP:DMG:         AttributePathIBs =
+          [1659960043.761071][4826:4826] CHIP:DMG:         [
+          [1659960043.761095][4826:4826] CHIP:DMG:                 AttributePathIB =
+          [1659960043.761130][4826:4826] CHIP:DMG:                 {
+          [1659960043.761158][4826:4826] CHIP:DMG:                         Endpoint = 0x0,
+          [1659960043.761188][4826:4826] CHIP:DMG:                         Cluster = 0x36,
+          [1659960043.761219][4826:4826] CHIP:DMG:                         Attribute = 0x0000_0004,
+          [1659960043.761248][4826:4826] CHIP:DMG:                 }
+          [1659960043.761275][4826:4826] CHIP:DMG:
+          [1659960043.761302][4826:4826] CHIP:DMG:         ],
+          [1659960043.761329][4826:4826] CHIP:DMG:
+          [1659960043.761354][4826:4826] CHIP:DMG:         isFabricFiltered = true,
+          [1659960043.761378][4826:4826] CHIP:DMG:         InteractionModelRevision = 1
+          [1659960043.761401][4826:4826] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads a BeaconLostCount attribute value from TH."
@@ -91,10 +169,24 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read beacon-lost-count 1 0
 
-          On DUT as a client side, verify that TH all-clusters-app  attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
-
-          [1650450239.341208][5252:5257] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0005 DataVersion: 1626643502
-          [1650450239.341280][5252:5257] CHIP:TOO:   BeaconLostCount: 0
+          verify the " beacon-lost-count Received Read  response" on the TH (all-cluster-app) log:
+          [1659960064.667073][4826:4826] CHIP:IM: Received Read request
+          [1659960064.667144][4826:4826] CHIP:DMG: ReadRequestMessage =
+          [1659960064.667168][4826:4826] CHIP:DMG: {
+          [1659960064.667203][4826:4826] CHIP:DMG:         AttributePathIBs =
+          [1659960064.667227][4826:4826] CHIP:DMG:         [
+          [1659960064.667258][4826:4826] CHIP:DMG:                 AttributePathIB =
+          [1659960064.667290][4826:4826] CHIP:DMG:                 {
+          [1659960064.667325][4826:4826] CHIP:DMG:                         Endpoint = 0x0,
+          [1659960064.667356][4826:4826] CHIP:DMG:                         Cluster = 0x36,
+          [1659960064.667392][4826:4826] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659960064.667419][4826:4826] CHIP:DMG:                 }
+          [1659960064.667451][4826:4826] CHIP:DMG:
+          [1659960064.667475][4826:4826] CHIP:DMG:         ],
+          [1659960064.667508][4826:4826] CHIP:DMG:
+          [1659960064.667531][4826:4826] CHIP:DMG:         isFabricFiltered = true,
+          [1659960064.667553][4826:4826] CHIP:DMG:         InteractionModelRevision = 1
+          [1659960064.667580][4826:4826] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads a BeaconRxCount attribute value from TH."
@@ -102,10 +194,24 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read beacon-rx-count 1 0
 
-          On DUT as a client side, verify that TH all-clusters-app  attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
-
-          [1650454625.960728][9290:9295] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0006 DataVersion: 1028539580
-          [1650454625.960813][9290:9295] CHIP:TOO:   BeaconRxCount: 0
+          verify the " beacon-rx-count  Received Read  response" on the TH (all-cluster-app) log:
+          [1659960081.979736][4826:4826] CHIP:IM: Received Read request
+          [1659960081.979809][4826:4826] CHIP:DMG: ReadRequestMessage =
+          [1659960081.979832][4826:4826] CHIP:DMG: {
+          [1659960081.979851][4826:4826] CHIP:DMG:         AttributePathIBs =
+          [1659960081.979874][4826:4826] CHIP:DMG:         [
+          [1659960081.979895][4826:4826] CHIP:DMG:                 AttributePathIB =
+          [1659960081.979924][4826:4826] CHIP:DMG:                 {
+          [1659960081.979950][4826:4826] CHIP:DMG:                         Endpoint = 0x0,
+          [1659960081.979979][4826:4826] CHIP:DMG:                         Cluster = 0x36,
+          [1659960081.980007][4826:4826] CHIP:DMG:                         Attribute = 0x0000_0006,
+          [1659960081.980032][4826:4826] CHIP:DMG:                 }
+          [1659960081.980059][4826:4826] CHIP:DMG:
+          [1659960081.980082][4826:4826] CHIP:DMG:         ],
+          [1659960081.980106][4826:4826] CHIP:DMG:
+          [1659960081.980129][4826:4826] CHIP:DMG:         isFabricFiltered = true,
+          [1659960081.980151][4826:4826] CHIP:DMG:         InteractionModelRevision = 1
+          [1659960081.980171][4826:4826] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads a PacketMultiRxCount attribute value from TH."
@@ -113,11 +219,26 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read packet-multicast-rx-count 1 0
 
+          verify the " packet-multicast-rx-count  Received Read  response" on the TH (all-cluster-app) log:
 
-          On DUT as a client side, verify that TH all-clusters-app  attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
-
-          [1650454695.550436][9303:9308] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0007 DataVersion: 1028539580
-          [1650454695.550515][9303:9308] CHIP:TOO:   PacketMulticastRxCount: 401028
+          [1659960106.003457][4826:4826] CHIP:IM: Received Read request
+          [1659960106.003544][4826:4826] CHIP:DMG: ReadRequestMessage =
+          [1659960106.003573][4826:4826] CHIP:DMG: {
+          [1659960106.003597][4826:4826] CHIP:DMG:         AttributePathIBs =
+          [1659960106.003626][4826:4826] CHIP:DMG:         [
+          [1659960106.003654][4826:4826] CHIP:DMG:                 AttributePathIB =
+          [1659960106.003691][4826:4826] CHIP:DMG:                 {
+          [1659960106.003725][4826:4826] CHIP:DMG:                         Endpoint = 0x0,
+          [1659960106.003762][4826:4826] CHIP:DMG:                         Cluster = 0x36,
+          [1659960106.003800][4826:4826] CHIP:DMG:                         Attribute = 0x0000_0007,
+          [1659960106.003830][4826:4826] CHIP:DMG:                 }
+          [1659960106.003860][4826:4826] CHIP:DMG:
+          [1659960106.003890][4826:4826] CHIP:DMG:         ],
+          [1659960106.003921][4826:4826] CHIP:DMG:
+          [1659960106.003950][4826:4826] CHIP:DMG:         isFabricFiltered = true,
+          [1659960106.003977][4826:4826] CHIP:DMG:         InteractionModelRevision = 1
+          [1659960106.004007][4826:4826] CHIP:DMG: },
+          [1659960106.004085][4826:4826] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label: "DUT reads a PacketMultiTxCount attribute value from TH."
@@ -125,10 +246,25 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read packet-multicast-tx-count 1 0
 
-          On DUT as a client side, verify that TH all-clusters-app  attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
+          verify the " packet-multicast-tx-count  Received Read response" on the TH (all-cluster-app) log:
 
-          [1650454724.371654][9311:9316] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0008 DataVersion: 1028539580
-          [1650454724.371740][9311:9316] CHIP:TOO:   PacketMulticastTxCount: 0
+          [1659960130.770866][4826:4826] CHIP:IM: Received Read request
+          [1659960130.770973][4826:4826] CHIP:DMG: ReadRequestMessage =
+          [1659960130.771002][4826:4826] CHIP:DMG: {
+          [1659960130.771025][4826:4826] CHIP:DMG:         AttributePathIBs =
+          [1659960130.771052][4826:4826] CHIP:DMG:         [
+          [1659960130.771077][4826:4826] CHIP:DMG:                 AttributePathIB =
+          [1659960130.771106][4826:4826] CHIP:DMG:                 {
+          [1659960130.771143][4826:4826] CHIP:DMG:                         Endpoint = 0x0,
+          [1659960130.771176][4826:4826] CHIP:DMG:                         Cluster = 0x36,
+          [1659960130.771212][4826:4826] CHIP:DMG:                         Attribute = 0x0000_0008,
+          [1659960130.771244][4826:4826] CHIP:DMG:                 }
+          [1659960130.771272][4826:4826] CHIP:DMG:
+          [1659960130.771301][4826:4826] CHIP:DMG:         ],
+          [1659960130.771330][4826:4826] CHIP:DMG:
+          [1659960130.771357][4826:4826] CHIP:DMG:         isFabricFiltered = true,
+          [1659960130.771382][4826:4826] CHIP:DMG:         InteractionModelRevision = 1
+          [1659960130.771409][4826:4826] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads a PacketUniRxCount attribute value from TH."
@@ -137,10 +273,25 @@ tests:
           ./chip-tool wifinetworkdiagnostics read packet-unicast-rx-count 1 0
 
 
-          On DUT as a client side, verify that TH all-clusters-app  attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
+          verify the " packet-unicast-rx-count  Received Read response" on the TH (all-cluster-app) log:
 
-          [1650454751.954086][9317:9322] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0009 DataVersion: 1028539580
-          [1650454751.954174][9317:9322] CHIP:TOO:   PacketUnicastRxCount:  4855
+          [1659960152.073162][4826:4826] CHIP:IM: Received Read request
+          [1659960152.073238][4826:4826] CHIP:DMG: ReadRequestMessage =
+          [1659960152.073264][4826:4826] CHIP:DMG: {
+          [1659960152.073283][4826:4826] CHIP:DMG:         AttributePathIBs =
+          [1659960152.073307][4826:4826] CHIP:DMG:         [
+          [1659960152.073328][4826:4826] CHIP:DMG:                 AttributePathIB =
+          [1659960152.073400][4826:4826] CHIP:DMG:                 {
+          [1659960152.073455][4826:4826] CHIP:DMG:                         Endpoint = 0x0,
+          [1659960152.073504][4826:4826] CHIP:DMG:                         Cluster = 0x36,
+          [1659960152.073560][4826:4826] CHIP:DMG:                         Attribute = 0x0000_0009,
+          [1659960152.073595][4826:4826] CHIP:DMG:                 }
+          [1659960152.073638][4826:4826] CHIP:DMG:
+          [1659960152.073688][4826:4826] CHIP:DMG:         ],
+          [1659960152.073722][4826:4826] CHIP:DMG:
+          [1659960152.073746][4826:4826] CHIP:DMG:         isFabricFiltered = true,
+          [1659960152.073768][4826:4826] CHIP:DMG:         InteractionModelRevision = 1
+          [1659960152.073797][4826:4826] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads a PacketUniTxCount attribute value from TH."
@@ -148,10 +299,25 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read packet-unicast-tx-count 1 0
 
-          On DUT as a client side, verify that TH all-clusters-app  attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
+          verify the " packet-unicast-tx-count  Received Read response" on the TH (all-cluster-app) log:
 
-          [1650454782.789340][9323:9328] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_000A DataVersion: 1028539580
-          [1650454782.789426][9323:9328] CHIP:TOO:   PacketUnicastTxCount: 0
+          [1659960169.216377][4826:4826] CHIP:IM: Received Read request
+          [1659960169.216476][4826:4826] CHIP:DMG: ReadRequestMessage =
+          [1659960169.216504][4826:4826] CHIP:DMG: {
+          [1659960169.216527][4826:4826] CHIP:DMG:         AttributePathIBs =
+          [1659960169.216554][4826:4826] CHIP:DMG:         [
+          [1659960169.216579][4826:4826] CHIP:DMG:                 AttributePathIB =
+          [1659960169.216611][4826:4826] CHIP:DMG:                 {
+          [1659960169.216642][4826:4826] CHIP:DMG:                         Endpoint = 0x0,
+          [1659960169.216677][4826:4826] CHIP:DMG:                         Cluster = 0x36,
+          [1659960169.216711][4826:4826] CHIP:DMG:                         Attribute = 0x0000_000A,
+          [1659960169.216742][4826:4826] CHIP:DMG:                 }
+          [1659960169.216773][4826:4826] CHIP:DMG:
+          [1659960169.216801][4826:4826] CHIP:DMG:         ],
+          [1659960169.216830][4826:4826] CHIP:DMG:
+          [1659960169.216857][4826:4826] CHIP:DMG:         isFabricFiltered = true,
+          [1659960169.216883][4826:4826] CHIP:DMG:         InteractionModelRevision = 1
+          [1659960169.216907][4826:4826] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads CurrentMaxRate attribute value from TH."
@@ -159,11 +325,24 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read current-max-rate 1 0
 
-
-          On DUT as a client side, verify that TH all-clusters-app  attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot. log
-
-          [1650451685.092993][5470:5475] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_000B DataVersion: 1626643502
-          [1650451685.093078][5470:5475] CHIP:TOO:   CurrentMaxRate: 24000000
+          verify the " current-max-rate  Received Read response" on the TH (all-cluster-app) log:
+          [1659960187.413661][4826:4826] CHIP:IM: Received Read request
+          [1659960187.413732][4826:4826] CHIP:DMG: ReadRequestMessage =
+          [1659960187.413755][4826:4826] CHIP:DMG: {
+          [1659960187.413774][4826:4826] CHIP:DMG:         AttributePathIBs =
+          [1659960187.413797][4826:4826] CHIP:DMG:         [
+          [1659960187.413818][4826:4826] CHIP:DMG:                 AttributePathIB =
+          [1659960187.413846][4826:4826] CHIP:DMG:                 {
+          [1659960187.413871][4826:4826] CHIP:DMG:                         Endpoint = 0x0,
+          [1659960187.413902][4826:4826] CHIP:DMG:                         Cluster = 0x36,
+          [1659960187.413932][4826:4826] CHIP:DMG:                         Attribute = 0x0000_000B,
+          [1659960187.413959][4826:4826] CHIP:DMG:                 }
+          [1659960187.413985][4826:4826] CHIP:DMG:
+          [1659960187.414009][4826:4826] CHIP:DMG:         ],
+          [1659960187.414034][4826:4826] CHIP:DMG:
+          [1659960187.414056][4826:4826] CHIP:DMG:         isFabricFiltered = true,
+          [1659960187.414078][4826:4826] CHIP:DMG:         InteractionModelRevision = 1
+          [1659960187.414098][4826:4826] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads a OverrunCount attribute value from TH."
@@ -171,9 +350,23 @@ tests:
       verification: |
           ./chip-tool wifinetworkdiagnostics read overrun-count 1 0
 
+          verify the " overrun-count Received Read  response" on the TH (all-cluster-app) log:
 
-          On DUT as a client side, verify that TH all-clusters-app  attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
-
-          [1650451635.634814][9056:9061] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_000C DataVersion: 1028539580
-          [1650451635.634882][9056:9061] CHIP:TOO:   OverrunCount: 0
+          [1659960222.155944][4826:4826] CHIP:IM: Received Read request
+          [1659960222.156039][4826:4826] CHIP:DMG: ReadRequestMessage =
+          [1659960222.156073][4826:4826] CHIP:DMG: {
+          [1659960222.156101][4826:4826] CHIP:DMG:         AttributePathIBs =
+          [1659960222.156134][4826:4826] CHIP:DMG:         [
+          [1659960222.156165][4826:4826] CHIP:DMG:                 AttributePathIB =
+          [1659960222.156206][4826:4826] CHIP:DMG:                 {
+          [1659960222.156243][4826:4826] CHIP:DMG:                         Endpoint = 0x0,
+          [1659960222.156290][4826:4826] CHIP:DMG:                         Cluster = 0x36,
+          [1659960222.156333][4826:4826] CHIP:DMG:                         Attribute = 0x0000_000C,
+          [1659960222.156372][4826:4826] CHIP:DMG:                 }
+          [1659960222.156411][4826:4826] CHIP:DMG:
+          [1659960222.156489][4826:4826] CHIP:DMG:         ],
+          [1659960222.156526][4826:4826] CHIP:DMG:
+          [1659960222.156560][4826:4826] CHIP:DMG:         isFabricFiltered = true,
+          [1659960222.156593][4826:4826] CHIP:DMG:         InteractionModelRevision = 1
+          [1659960222.156629][4826:4826] CHIP:DMG: },
       disabled: true

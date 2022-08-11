@@ -29,7 +29,7 @@ tests:
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
 
-          on TH,Verify that the DUT response is the integer. Record this value for usage in step 2.
+          on TH(chip-tool),Verify that the DUT response is the integer. Record this value for usage in step 2.
 
           [1645778279.693082][4898:4903] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003DataVersion: 3781469722
           [1645778279.693151][4898:4903] CHIP:TOO:   StartUpMode: 0
@@ -40,10 +40,10 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          on TH,Verify that the DUT response is the integer. Record this value for usage in step 2b and 3.
+          on TH(chip-tool),Verify that the DUT response is the integer. Record this value for usage in step 2b and 3.
 
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
-          [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 7
+          [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 0
       disabled: true
 
     - label:
@@ -60,7 +60,7 @@ tests:
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          on TH,Verify that the DUT response provides a list of supported modes
+          on TH(chip-tool),Verify that the DUT response provides a list of supported modes
 
           [1645776742.667057][4661:4666] CHIP:TOO:   SupportedModes: 3 entries
           [1645776742.669546][4661:4666] CHIP:TOO:     [1]: {
@@ -88,7 +88,7 @@ tests:
       verification: |
           ./chip-tool modeselect change-to-mode 4 1 1
 
-          on TH,Verify that the DUT responds with a successful (value 0x00) status response.
+          on TH(chip-tool),Verify that the DUT responds with a successful (value 0x00) status response.
 
           [1645778189.045030][4888:4893] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
       disabled: true
@@ -97,7 +97,17 @@ tests:
           "Perform an OTA update on the device that requires a reboot. Allow for
           the DUT to update and fully reboot."
       verification: |
-          Perform an OTA update on the device that requires a reboot. Allow for the DUT to update and fully reboot.
+          To perform an OTA update on Thread device follow the cmmds below:
+
+          Step-1 : ./chip-ota-provider-app -f ~/chip_repos/connectedhomeip/examples/all-clusters-app/nrfconnect/build2/zephyr/matter.ota
+
+          Step-2: ./chip-tool pairing onnetwork 2 20202021
+
+          Step-3 : ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]" 2 0
+
+          Step-4: ./chip-tool otasoftwareupdaterequestor write default-ota-providers "[{"fabricIndex": 1, "providerNodeID": 2, "endpoint": 0}]" 1 0
+
+          Step-5: ./chip-tool otasoftwareupdaterequestor announce-ota-provider 2 0 0 0 1 0
       disabled: true
 
     - label: "TH reads the CurrentMode attribute from the DUT"
@@ -105,7 +115,7 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          on TH,Verify that the DUT response is the integer recorded in step 2a or, if the mode was changed, 2d.
+          on TH(chip-tool),Verify that the DUT response is the integer recorded in step 2a or, if the mode was changed, 2d.
 
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
           [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 4

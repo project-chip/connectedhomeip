@@ -33,7 +33,7 @@ tests:
       verification: |
           ./chip-tool groups add-group 0x0002 gp2 1 1
 
-          Verify the status is success and groupid on the TH Log:
+          Verify the "status is success and groupid" on the TH(Chip-tool)  Log:
 
           [1653552285.195099][2464:2469] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
           [1653552285.197783][2464:2469] CHIP:TOO:   AddGroupResponse: {
@@ -47,7 +47,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the grouptable entries on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1653552351.250570][2474:2479] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1424397362
           [1653552351.253012][2474:2479] CHIP:TOO:   GroupTable: 1 entries
@@ -67,7 +67,7 @@ tests:
       verification: |
           ./chip-tool groups add-group 0x0003 gp3 1 1
 
-          Verify the status is success and groupid on the TH Log:
+          Verify the "status is success and groupid" on the TH(Chip-tool)  Log:
 
           [1653552417.870291][2482:2487] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
           [1653552417.870407][2482:2487] CHIP:TOO:   AddGroupResponse: {
@@ -83,7 +83,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the grouptable entries on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1653552448.373558][2491:2496] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1424397362
           [1653552448.373710][2491:2496] CHIP:TOO:   GroupTable: 2 entries
@@ -110,7 +110,7 @@ tests:
       verification: |
           ./chip-tool groups get-group-membership [] 1 1
 
-          Verify the grouplist on the TH Log:
+          Verify the "grouplist" on the TH(Chip-tool)  Log:
 
           [1653552493.052711][2501:2506] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0002
           [1653552493.052792][2501:2506] CHIP:TOO:   GetGroupMembershipResponse: {
@@ -128,7 +128,7 @@ tests:
       verification: |
           ./chip-tool groups get-group-membership [0002] 1 1
 
-          Verify the grouplist on the TH Log:
+          Verify the "grouplist" on the TH(Chip-tool)  Log:
 
 
           [1653294426.515523][3638:3643] CHIP:TOO:   GetGroupMembershipResponse: {
@@ -147,7 +147,7 @@ tests:
           ./chip-tool groups get-group-membership [0002,0003] 1 1
 
 
-          Verify grouplist entries on the TH Log:
+          Verify "grouplist entries" on the TH(Chip-tool)  Log:
 
           [1653294490.030740][3646:3651] CHIP:TOO:   GetGroupMembershipResponse: {
           [1653294490.030775][3646:3651] CHIP:TOO:     capacity: null
@@ -162,7 +162,7 @@ tests:
       verification: |
           ./chip-tool groups remove-all-groups 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1651224377.831704][2989:2994] CHIP:DMG:                                StatusIB =
           [1651224377.831757][2989:2994] CHIP:DMG:                                {
@@ -178,7 +178,7 @@ tests:
       verification: |
           ./chip-tool identify identify 0x0078 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1658306666.592846][3044:3049] CHIP:DMG:                                StatusIB =
           [1658306666.592889][3044:3049] CHIP:DMG:                                {
@@ -191,7 +191,7 @@ tests:
       verification: |
           ./chip-tool identify read identify-time 1 1
 
-          Verify the identifytime on the TH Log:
+          Verify the "identifytime" on the TH(Chip-tool)  Log:
 
           [1658306684.629338][3050:3055] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3871913205
           [1658306684.629394][3050:3055] CHIP:TOO:   identify time: 102
@@ -205,7 +205,7 @@ tests:
       verification: |
           ./chip-tool groups  add-group-if-identifying 0x0006 gp6 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1653552667.307794][2571:2576] CHIP:DMG:                                StatusIB =
           [1653552667.307831][2571:2576] CHIP:DMG:                                {
@@ -218,7 +218,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify grouplist entries on the TH Log:
+          Verify "grouplist entries" on the TH(Chip-tool)  Log:
 
           [1658306579.092336][3028:3033] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 656741762
           [1658306579.094919][3028:3033] CHIP:TOO:   GroupTable: 1 entries
@@ -239,7 +239,7 @@ tests:
       verification: |
           ./chip-tool groups  add-group-if-identifying 0x0007 gp7 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1658306847.237724][3125:3130] CHIP:DMG:                                StatusIB =
           [1658306847.237765][3125:3130] CHIP:DMG:                                {
@@ -252,7 +252,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the grouplist entries on the TH Log:
+          Verify the "grouplist entries" on the TH(Chip-tool)  Log:
 
           [1658306870.013290][3132:3137] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 656741774
           [1658306870.013392][3132:3137] CHIP:TOO:   GroupTable: 2 entries
@@ -279,7 +279,7 @@ tests:
       verification: |
           ./chip-tool groups  add-group-if-identifying 0x0008 gp8 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1653552667.307794][2571:2576] CHIP:DMG:                                StatusIB =
           [1653552667.307831][2571:2576] CHIP:DMG:                                {
@@ -294,7 +294,7 @@ tests:
       verification: |
           ./chip-tool groups  add-group-if-identifying 0x0009 gp9 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1658317372.589336][4296:4301] CHIP:DMG:                                StatusIB =
           [1658317372.589363][4296:4301] CHIP:DMG:                                {
@@ -309,7 +309,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the grouptable entries on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1658309507.902666][3452:3457] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 656741784
           [1658309507.902779][3452:3457] CHIP:TOO:   GroupTable: 3 entries
@@ -341,7 +341,7 @@ tests:
       verification: |
           ./chip-tool groups remove-all-groups 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1651224377.831704][2989:2994] CHIP:DMG:                                StatusIB =
           [1651224377.831757][2989:2994] CHIP:DMG:                                {
@@ -358,7 +358,7 @@ tests:
           ./chip-tool groups  add-group-if-identifying 0x0000 gp45 1 1
 
 
-          Verify the status is constraint error on the TH Log:
+          Verify the "status is constraint error" on the TH(Chip-tool)  Log:
 
           [1658307266.719438][3251:3256] CHIP:DMG:                                StatusIB =
           [1658307266.719482][3251:3256] CHIP:DMG:                                {
@@ -373,7 +373,7 @@ tests:
       verification: |
           ./chip-tool groups  add-group-if-identifying 0x0045 gp46 1 1
 
-          Verify the status is unsupported access on the TH Log:
+          Verify the "status is unsupported access" on the TH(Chip-tool)  Log:
 
           [1658307298.568727][3257:3262] CHIP:DMG:                                StatusIB =
           [1658307298.568761][3257:3262] CHIP:DMG:                                {
@@ -388,7 +388,7 @@ tests:
       verification: |
           ./chip-tool identify identify 0x0000 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1658307387.097433][3268:3273] CHIP:DMG:                                StatusIB =
           [1658307387.097464][3268:3273] CHIP:DMG:                                {
@@ -401,7 +401,7 @@ tests:
       verification: |
           ./chip-tool identify read identify-time 1 1
 
-          Verify the identify time on the TH Log:
+          Verify the "identify time" on the TH(Chip-tool)  Log:
 
           [1658307393.820520][3274:3279] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3871913767
           [1658307393.820575][3274:3279] CHIP:TOO:   identify time: 0
@@ -414,7 +414,7 @@ tests:
       verification: |
           ./chip-tool groups  add-group-if-identifying 0x0004 gp4 1 1
 
-          Verify the status is success on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1651224746.146005][3038:3043] CHIP:DMG:                                StatusIB =
           [1651224746.146038][3038:3043] CHIP:DMG:                                {
@@ -427,7 +427,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the grouptable entries on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1658317914.656772][4650:4655] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 3844079664
           [1658317914.656843][4650:4655] CHIP:TOO:   GroupTable: 0 entries

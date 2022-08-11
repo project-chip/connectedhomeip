@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 27.2.10. [TC-CC-5.2] Color Move functionality with server as DUT
+name: 25.3.11. [TC-CC-5.2] Color Move functionality with server as DUT
 
 PICS:
     - CC.S
@@ -21,12 +21,6 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
-    RateXValue:
-        type: int16s
-        defaultValue: 50
-    RateYValue:
-        type: int16s
-        defaultValue: 50
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -37,19 +31,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Turn on light for color control tests"
-      PICS: OO.S.C01.Rsp
-      cluster: "On/Off"
-      command: "on"
-
-    - label: "Check on/off attribute value is true after on command"
-      cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      PICS: OO.S.A0000
-      response:
-          value: 1
-
     - label: "TH writes 0 to the Options attribute"
       PICS: CC.S.F03 && CC.S.A000f
       command: "writeAttribute"
@@ -57,27 +38,36 @@ tests:
       arguments:
           value: 0
 
-    - label: "TH reads CurrentX attribute from DUT"
-      command: "readAttribute"
-      PICS: CC.S.F03 && CC.S.A0003
-      attribute: "CurrentX"
-      response:
-          saveAs: CurrentXValue
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65279
+    - label: "TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      cluster: "On/Off"
+      command: "On"
 
-    - label: "TH reads CurrentY attribute from DUT"
-      command: "readAttribute"
-      PICS: CC.S.F03 && CC.S.A0004
-      attribute: "CurrentY"
-      response:
-          saveAs: CurrentYValue
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "TH sends MoveToColor command to DUT, with ColorX = 33000 ColorY =
+          26000 TransitionTime = 0 (immediate)"
+      PICS: CC.S.F03 && CC.S.C07.Rsp
+      command: "MoveToColor"
+      arguments:
+          values:
+              - name: "colorX"
+                value: 33000
+              - name: "colorY"
+                value: 26000
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
 
     - label: "TH sends MoveColor command to DUT"
       command: "MoveColor"
@@ -85,43 +75,93 @@ tests:
       arguments:
           values:
               - name: "rateX"
-                value: RateXValue
+                value: -100
               - name: "rateY"
-                value: RateYValue
+                value: 100
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 1000ms"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 1000
+                value: 10000
 
     - label: "TH reads CurrentX attribute from DUT"
-      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C08.Rsp
       command: "readAttribute"
+      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C08.Rsp
       attribute: "CurrentX"
       response:
-          saveAs: CurrentXBeforeStopCommand
           constraints:
-              type: int16u
-              minValue: CurrentXValue
-              maxValue: 65279
+              minValue: 31500
+              maxValue: 32500
 
     - label: "TH reads CurrentY attribute from DUT"
-      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C08.Rsp
       command: "readAttribute"
+      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C08.Rsp
       attribute: "CurrentY"
       response:
-          saveAs: CurrentYBeforeStopCommand
           constraints:
-              type: int16u
-              minValue: CurrentYValue
-              maxValue: 65279
+              minValue: 26500
+              maxValue: 27500
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentX attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C08.Rsp
+      attribute: "CurrentX"
+      response:
+          constraints:
+              minValue: 30500
+              maxValue: 31500
+
+    - label: "TH reads CurrentY attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C08.Rsp
+      attribute: "CurrentY"
+      response:
+          constraints:
+              minValue: 27500
+              maxValue: 28500
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentX attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C08.Rsp
+      attribute: "CurrentX"
+      response:
+          saveAs: CurrentXValue
+          constraints:
+              minValue: 29500
+              maxValue: 30500
+
+    - label: "TH reads CurrentY attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C08.Rsp
+      attribute: "CurrentY"
+      response:
+          saveAs: CurrentYValue
+          constraints:
+              minValue: 28500
+              maxValue: 29500
 
     - label: "TH sends StopMoveStep command to DUT"
       PICS: CC.S.F03 && CC.S.C47.Rsp
@@ -133,30 +173,48 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
+    #Checking range as exactly delay might not be achieved due to attribute reads
     - label: "TH reads CurrentX attribute from DUT"
-      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C47.Rsp
       command: "readAttribute"
+      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C08.Rsp
       attribute: "CurrentX"
       response:
           constraints:
-              type: int16u
-              minValue: CurrentXBeforeStopCommand
-              maxValue: 65279
+              minValue: 29500
+              maxValue: 30500
 
+    #Checking range as exactly delay might not be achieved due to attribute reads
     - label: "TH reads CurrentY attribute from DUT"
-      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C47.Rsp
       command: "readAttribute"
+      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C08.Rsp
       attribute: "CurrentY"
       response:
           constraints:
-              type: int16u
-              minValue: CurrentYBeforeStopCommand
-              maxValue: 65279
+              minValue: 28500
+              maxValue: 29500
+
+    - label: "TH reads ColorMode attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0008
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 2
+
+    - label: "TH reads EnhancedColorMode attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A4001
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 3
 
     - label: "Turn off light that we turned on"
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"
-      command: "off"
+      command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
       cluster: "On/Off"

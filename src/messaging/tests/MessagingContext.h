@@ -73,6 +73,17 @@ private:
 class MessagingContext : public PlatformMemoryUser
 {
 public:
+    enum MRPMode
+    {
+        kDefault = 1, // This adopts the default MRP values for idle/active as per the spec.
+                      //      i.e IDLE = 4s, ACTIVE = 300ms
+
+        kResponsive = 2, // This adopts values that are better suited for loopback tests that
+                         // don't actually go over a network interface, and are tuned much lower
+                         // to permit more responsive tests.
+                         //      i.e IDLE = 10ms, ACTIVE = 10ms
+    };
+
     MessagingContext() :
         mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
         mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT))
@@ -128,6 +139,8 @@ public:
     void ExpireSessionBobToAlice();
     void ExpireSessionAliceToBob();
     void ExpireSessionBobToFriends();
+
+    void SetMRPMode(MRPMode mode);
 
     SessionHandle GetSessionBobToAlice();
     SessionHandle GetSessionAliceToBob();

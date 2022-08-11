@@ -20,6 +20,7 @@
 
 #include <lib/support/BufferWriter.h>
 #include <protocols/Protocols.h>
+#include <protocols/secure_channel/Constants.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {

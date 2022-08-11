@@ -34,7 +34,7 @@ tests:
       verification: |
           ./chip-tool powersourceconfiguration read sources 1 0
 
-          Verify,On TestHarnes (all-cluster-app) a received read of the Sources attribute (id 0) looks like this:
+          verify the " sources response" on the TH (all-cluster-app) log:
 
           [1650881032.387446][2715:2715] CHIP:IM: Received Read request
           [1650881032.387500][2715:2715] CHIP:DMG: ReadRequestMessage =
@@ -88,7 +88,7 @@ tests:
       verification: |
           ./chip-tool powersourceconfiguration read sources 1 0
 
-          Verify,On TestHarnes (all-cluster-app) a received read of the Sources attribute (id 0) looks like this:
+          verify the " sources response" on the TH (all-cluster-minimal-app) log:
 
           [1650881032.387446][2715:2715] CHIP:IM: Received Read request
           [1650881032.387500][2715:2715] CHIP:DMG: ReadRequestMessage =

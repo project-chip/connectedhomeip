@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 27.2.2. [TC-CC-3.1] Hue MoveTo functionality with server as DUT
+name: 25.3.1. [TC-CC-3.1] Hue MoveTo functionality with server as DUT
 
 PICS:
     - CC.S
@@ -22,18 +22,6 @@ config:
     cluster: "Color Control"
     endpoint: 1
     timeout: 150
-    hueShortestDistance:
-        type: int8u
-        defaultValue: 150
-    hueLongestDistance:
-        type: int8u
-        defaultValue: 200
-    hueDirectionUp:
-        type: int8u
-        defaultValue: 250
-    hueDirectionDown:
-        type: int8u
-        defaultValue: 170
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -44,19 +32,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Turn on light for color control tests"
-      PICS: OO.S.C01.Rsp
-      cluster: "On/Off"
-      command: "on"
-
-    - label: "Check on/off attribute value is true after on command"
-      cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      PICS: OO.S.A0000
-      response:
-          value: 1
-
     - label: "TH writes 0 to the Options attribute"
       PICS: CC.S.F00 && CC.S.A000f
       command: "writeAttribute"
@@ -64,25 +39,46 @@ tests:
       arguments:
           value: 0
 
-    - label: "TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
+    - label: "TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      cluster: "On/Off"
+      command: "On"
 
     - label:
-          "TH sends MoveToHue command to DUT another Hue with Direction Shortest
-          distance and TransitionTime 300"
+          "TH sends MoveToHue command to DUT with Hue=60, Direction=0x00
+          (shortest distance) and TransitionTime=0 (immediately)"
       PICS: CC.S.F00 && CC.S.C00.Rsp
       command: "MoveToHue"
       arguments:
           values:
               - name: "hue"
-                value: hueShortestDistance
+                value: 60
+              - name: "Direction"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "TH sends MoveToHue command to DUT with Hue=120, Direction=0x00
+          (shortest distance) and TransitionTime=300 (30s)"
+      PICS: CC.S.F00 && CC.S.C00.Rsp
+      command: "MoveToHue"
+      arguments:
+          values:
+              - name: "hue"
+                value: 120
               - name: "Direction"
                 value: 0
               - name: "TransitionTime"
@@ -92,30 +88,105 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 30s"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 30000
+                value: 10000
 
-    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: hueShortestDistance
+          constraints:
+              minValue: 68
+              maxValue: 98
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 85
+              maxValue: 115
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          value: 120
+
+    - label: "Wait 5s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          value: 120
 
     - label:
-          "TH sends MoveToHue command to DUT another Hue with Direction Longest
-          distance and TransitionTime 300"
-      command: "MoveToHue"
+          "TH sends MoveToHue command to DUT with Hue=60, Direction=0x00
+          (Shortest distance) and TransitionTime=0 (immediately)"
       PICS: CC.S.F00 && CC.S.C00.Rsp
+      command: "MoveToHue"
       arguments:
           values:
               - name: "hue"
-                value: hueLongestDistance
+                value: 60
+              - name: "Direction"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "TH sends MoveToHue command to DUT with Hue=135, Direction=0x01
+          (longest distance) and TransitionTime=300 (30s)"
+      PICS: CC.S.F00 && CC.S.C00.Rsp
+      command: "MoveToHue"
+      arguments:
+          values:
+              - name: "hue"
+                value: 135
               - name: "Direction"
                 value: 1
               - name: "TransitionTime"
@@ -125,30 +196,107 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 30s"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 30000
+                value: 10000
 
-    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT."
-      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: hueLongestDistance
+          constraints:
+              minValue: 0
+              maxValue: 15
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 166
+              maxValue: 224
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 135
+              maxValue: 150
+
+    - label: "Wait 5s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          value: 135
 
     - label:
-          "TH sends MoveToHue command to DUT another Hue with Direction Up and
-          TransitionTime 300"
-      command: "MoveToHue"
+          "TH sends MoveToHue command to DUT with Hue=60, Direction=0x00
+          (shortest distance) and TransitionTime=0 (immediately)."
       PICS: CC.S.F00 && CC.S.C00.Rsp
+      command: "MoveToHue"
       arguments:
           values:
               - name: "hue"
-                value: hueDirectionUp
+                value: 60
+              - name: "Direction"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "TH sends MoveToHue command to DUT with Hue=120, Direction=0x02 (up)
+          and TransitionTime=300 (30s)"
+      PICS: CC.S.F00 && CC.S.C00.Rsp
+      command: "MoveToHue"
+      arguments:
+          values:
+              - name: "hue"
+                value: 120
               - name: "Direction"
                 value: 2
               - name: "TransitionTime"
@@ -158,30 +306,107 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 30s"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 30000
+                value: 10000
 
-    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: hueDirectionUp
+          constraints:
+              minValue: 68
+              maxValue: 92
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 85
+              maxValue: 115
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 105
+              maxValue: 120
+
+    - label: "Wait 5s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          value: 120
 
     - label:
-          "TH sends MoveToHue command to DUT another Hue with Direction Down and
-          TransitionTime 300"
-      command: "MoveToHue"
+          "TH sends MoveToHue command to DUT with Hue=120, Direction=0x00
+          (shortest distance) and TransitionTime=0 (immediately)"
       PICS: CC.S.F00 && CC.S.C00.Rsp
+      command: "MoveToHue"
       arguments:
           values:
               - name: "hue"
-                value: hueDirectionDown
+                value: 120
+              - name: "Direction"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "TH sends MoveToHue command to DUT with Hue=60, Direction=0x03 (down)
+          and TransitionTime=300 (30s)"
+      PICS: CC.S.F00 && CC.S.C00.Rsp
+      command: "MoveToHue"
+      arguments:
+          values:
+              - name: "hue"
+                value: 60
               - name: "Direction"
                 value: 3
               - name: "TransitionTime"
@@ -191,25 +416,94 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 30s"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 30000
+                value: 10000
 
-    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C00.Rsp
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: hueDirectionDown
+          constraints:
+              minValue: 85
+              maxValue: 115
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 68
+              maxValue: 92
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 60
+              maxValue: 72
+
+    - label: "Wait 5s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          value: 60
+
+    - label: "TH reads ColorMode attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0008
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 2
+
+    - label: "TH reads EnhancedColorMode attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A4001
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 3
 
     - label: "Turn off light that we turned on"
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"
-      command: "off"
+      command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
       cluster: "On/Off"

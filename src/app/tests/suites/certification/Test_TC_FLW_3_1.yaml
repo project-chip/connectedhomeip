@@ -28,13 +28,18 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
           ./chip-tool flowmeasurement read measured-value 1 1
 
-          Verify read command is received in DUT as client side log
+          Verify read command is received on TH(all-clusters-app) log
 
           [1658853801.750840][29347:29347] CHIP:IM: Received Read request
           [1658853801.750918][29347:29347] CHIP:DMG: ReadRequestMessage =
@@ -64,7 +69,7 @@ tests:
 
           "./chip-tool flowmeasurement read min-measured-value 1 1
 
-          Verify read command is received in DUT as client side log
+          Verify read command is received on TH(all-clusters-app) log
 
           [1658853849.969073][29347:29347] CHIP:IM: Received Read request
           [1658853849.969151][29347:29347] CHIP:DMG: ReadRequestMessage =
@@ -91,7 +96,7 @@ tests:
 
           "./chip-tool flowmeasurement read max-measured-value 1 1
 
-          Verify read command is received in DUT as client side log
+          Verify read command is received on TH(all-clusters-app) log
 
           [1658853898.416395][29347:29347] CHIP:IM: Received Read request
           [1658853898.416472][29347:29347] CHIP:DMG: ReadRequestMessage =
@@ -121,7 +126,7 @@ tests:
       verification: |
           chip-tool flowmeasurement read tolerance 1 1
 
-          Verify in DUT as client side log
+          Verify read command is received on TH(all-clusters-app) log
 
           [1658853991.266232][29347:29347] CHIP:IM: Received Read request
           [1658853991.266328][29347:29347] CHIP:DMG: ReadRequestMessage =
@@ -167,7 +172,7 @@ tests:
       verification: |
           ./chip-tool flowmeasurement read attribute-list 1 1
 
-          Verify a list of supported attributes which contains mandatory in DUT as client side log
+          Verify a list of supported attributes which contains mandatory on TH(all-clusters-minimal-app) log
 
           [1656478164937] [49517:5732586] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_FFFB DataVersion: 3423686907
           [1656478164937] [49517:5732586] CHIP: [TOO]   AttributeList: 8 entries
@@ -182,7 +187,7 @@ tests:
 
           ./chip-tool flowmeasurement read feature-map 1 1
 
-          Verify featuremap value is 0 in DUT as client side log
+          Verify featuremap value is 0 on TH(all-clusters-minimal-app) log
 
           [1656478242820] [49526:5733040] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_FFFC DataVersion: 3423686907
           [1656478242820] [49526:5733040] CHIP: [TOO]   FeatureMap: 0
@@ -190,7 +195,7 @@ tests:
 
           "./chip-tool flowmeasurement read measured-value 1 1
 
-          Verify read command is received in DUT as client side log
+          Verify read command is received on TH(all-clusters-minimal-app) log
 
           [1658853801.750840][29347:29347] CHIP:IM: Received Read request
           [1658853801.750918][29347:29347] CHIP:DMG: ReadRequestMessage =
@@ -220,7 +225,7 @@ tests:
 
           ""./chip-tool flowmeasurement read min-measured-value 1 1
 
-          Verify read command is received in DUT as client side log
+          Verify read command is received on TH(all-clusters-minimal-app) log
 
           [1658853849.969073][29347:29347] CHIP:IM: Received Read request
           [1658853849.969151][29347:29347] CHIP:DMG: ReadRequestMessage =
@@ -247,7 +252,7 @@ tests:
 
           ""./chip-tool flowmeasurement read max-measured-value 1 1
 
-          Verify read command is received in DUT as client side log
+          Verify read command is received on TH(all-clusters-minimal-app) log
 
           [1658853898.416395][29347:29347] CHIP:IM: Received Read request
           [1658853898.416472][29347:29347] CHIP:DMG: ReadRequestMessage =
@@ -276,7 +281,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Verify in DUT as client side log
+          Verify read command is received on TH(all-clusters-minimal-app) log
 
           ./chip-tool flowmeasurement read tolerance 1 1
 

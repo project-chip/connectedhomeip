@@ -16,7 +16,9 @@
 
 #pragma once
 
-#include <transport/SessionHandle.h>
+#include <inttypes.h>
+
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
 

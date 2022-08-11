@@ -1,0 +1,41 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2.1. [TC-ULABEL-2.1] User label cluster read verification [DUT-server]
+
+PICS:
+    - ULABEL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH reads LabelList from the DUT"
+      PICS: ULABEL.S.A0000
+      verification: |
+          ./chip-tool userlabel read label-list 1 0
+
+          On TH(chip-tool), Verify that the LabelList is empty or has one or more entries.  Each tuple has following fields:  Label field is of type string and have a length up to 16 bytes, Value field is of type string and have a length up to 16 bytes
+
+          OO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_0000 DataVersion: 3074415053
+          [1657180589.654586][4697:4702] CHIP:TOO:   label list: 1 entries
+          [1657180589.654652][4697:4702] CHIP:TOO:     [1]: {
+          [1657180589.654696][4697:4702] CHIP:TOO:       Label: roomName
+          [1657180589.654737][4697:4702] CHIP:TOO:       Value: master bedroom 1
+          [1657180589.654778][4697:4702] CHIP:TOO:      }
+          [1657180589.654901][4697:4702] CHIP:EM: Sending Standalone Ack for MessageCounter:68497701 on exchange 45271i
+      disabled: true

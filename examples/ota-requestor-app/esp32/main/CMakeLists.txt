@@ -21,6 +21,7 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/ota-requestor-app/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
 )
 
 set(SRC_DIRS_LIST
@@ -59,6 +60,7 @@ set(SRC_DIRS_LIST
 		      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/ota"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/route_hook"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/common"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
 )
 
 set(PRIV_REQUIRES_LIST chip QRCode bt console app_update)

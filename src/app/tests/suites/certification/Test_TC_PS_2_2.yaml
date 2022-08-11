@@ -37,11 +37,11 @@ tests:
 
     - label: "TH reads the ActiveWiredFaults attribute from the DUT"
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
           ./chip-tool powersource read active-wired-faults 1 1
 
-
+          Verify on TH logs:
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
@@ -84,7 +84,7 @@ tests:
     - label: "TH reads the ActiveWiredFaults attribute from the DUT"
       PICS: PS.S.A000a && PS.M.ManualWiredFault
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
           ./chip-tool powersource read active-wired-faults 1 1
 
@@ -107,12 +107,12 @@ tests:
 
     - label: "TH reads the ActiveBatFaults attribute from the DUT"
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
           ./chip-tool powersource read active-battery-faults 12345 1
 
-
           Verify on the TH Log:
+
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
@@ -154,7 +154,7 @@ tests:
     - label: "TH reads the ActiveBatFaults attribute from the DUT"
       PICS: PS.S.A0012 && PS.M.ManualBatFault
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
           ./chip-tool powersource read active-battery-faults 1 1
 
@@ -176,7 +176,7 @@ tests:
 
     - label: "TH reads the ActiveBatChargeFaults attribute from the DUT"
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
           ./chip-tool powersource read active-battery-charge-faults 1 1
 
@@ -223,7 +223,8 @@ tests:
     - label: "TH reads the ActiveBatChargeFaults attribute from the DUT"
       PICS: PS.S.A001e && PS.M.ManualBatChargeFault
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+
           ./chip-tool powersource read active-battery-charge-faults 1 1
 
           Verify on the TH Log:

@@ -47,8 +47,6 @@ using namespace ::chip::Shell;
 
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 static void InitApp(intptr_t args);
-static void EventHandler(const ChipDeviceEvent * event, intptr_t arg);
-static void HandleThreadStateChangeEvent(const ChipDeviceEvent * event);
 static void LightManagerCallback(LightingManager::Actor_t actor, LightingManager::Action_t action, uint8_t value);
 
 static wiced_led_config_t chip_lighting_led_config = {
@@ -148,7 +146,6 @@ void InitApp(intptr_t args)
 {
     ConfigurationMgr().LogDeviceConfig();
 
-    PlatformMgrImpl().AddEventHandler(EventHandler, 0);
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
     /* Start CHIP datamodel server */
@@ -173,20 +170,6 @@ void InitApp(intptr_t args)
     OTAConfig::Init();
 #endif
 }
-
-void EventHandler(const ChipDeviceEvent * event, intptr_t arg)
-{
-    switch (event->Type)
-    {
-    case DeviceEventType::kThreadStateChange:
-        HandleThreadStateChangeEvent(event);
-        break;
-    default:
-        break;
-    }
-}
-
-void HandleThreadStateChangeEvent(const ChipDeviceEvent * event) {}
 
 void LightManagerCallback(LightingManager::Actor_t actor, LightingManager::Action_t action, uint8_t level)
 {

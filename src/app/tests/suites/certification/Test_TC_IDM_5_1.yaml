@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT sends the Timed Request to the TH and then sends an Invoke
           Request Message to the TH after receiving the status response message
@@ -31,7 +36,8 @@ tests:
           in milliseconds. (Example - 200 milliseconds)"
       PICS: MCORE.IDM.C.InvokeRequest
       verification: |
-          In the case of chip tool as a client, here is an example command the client can send invoke request  to the TH
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool onoff on 1 1 --timedInteractionTimeoutMs 200
 
           On TH (On the reference app) Verify if DUT is responding with the below status response for the above command
@@ -121,7 +127,8 @@ tests:
           timeout value in milliseconds. (Example - 200 milliseconds)"
       PICS: MCORE.IDM.C.WriteRequest
       verification: |
-          Chip-tool as controller , here is the example command you can use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
            ./chip-tool onoff write  on-time 2 1 1 --timedInteractionTimeoutMs 200
 
           On TH (On the reference app) Verify if DUT is responding with the below status response for the above command

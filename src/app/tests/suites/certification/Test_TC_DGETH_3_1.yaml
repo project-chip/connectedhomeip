@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label: "Commission TH to DUT"
       verification: |
           verification step to be updated.
@@ -34,10 +39,32 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read phyrate 1 0
 
-          Verify the value of PHYRate is in range of PHYRate enum in DUT as Client side Log
+          Verify the value of PHYRate is in range of PHYRate enum in TH(all-clusters-app)Log
 
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0000 DataVersion: 3872576452
-          [1649663425.191426][8076:8082] CHIP:TOO:   PHYRate: 1
+          [1659971284.056816][3458:3458] CHIP:IM: Received Read request
+          [1659971284.056893][3458:3458] CHIP:DMG: ReadRequestMessage =
+          [1659971284.056920][3458:3458] CHIP:DMG: {
+          [1659971284.056942][3458:3458] CHIP:DMG: 	AttributePathIBs =
+          [1659971284.056968][3458:3458] CHIP:DMG: 	[
+          [1659971284.056992][3458:3458] CHIP:DMG: 		AttributePathIB =
+          [1659971284.057036][3458:3458] CHIP:DMG: 		{
+          [1659971284.057066][3458:3458] CHIP:DMG: 			Endpoint = 0x0,
+          [1659971284.057097][3458:3458] CHIP:DMG: 			Cluster = 0x37,
+          [1659971284.057126][3458:3458] CHIP:DMG: 			Attribute = 0x0000_0000,
+          [1659971284.057157][3458:3458] CHIP:DMG: 		}
+          [1659971284.057185][3458:3458] CHIP:DMG:
+          [1659971284.057209][3458:3458] CHIP:DMG: 	],
+          [1659971284.057237][3458:3458] CHIP:DMG:
+          [1659971284.057263][3458:3458] CHIP:DMG: 	isFabricFiltered = true,
+          [1659971284.057287][3458:3458] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659971284.057310][3458:3458] CHIP:DMG: },
+          [1659971284.057384][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659971284.057468][3458:3458] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659971284.057497][3458:3458] CHIP:DMG: <RE:Run> Cluster 37, Attribute 0 is dirty
+          [1659971284.057518][3458:3458] CHIP:DMG: Reading attribute: Cluster=0x0000_0037 Endpoint=0 AttributeId=0x0000_0000 (expanded=0)
+          [1659971284.057545][3458:3458] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0037 e=0 p=v
+          [1659971284.057577][3458:3458] CHIP:DMG: AccessControl: allowed
+          [1659971284.057707][3458:3458] CHIP:ZCL: The current nominal, usable speed at the top of the physical layer of the Node: 1
       disabled: true
 
     - label: "DUT reads a attribute value from TH."
@@ -45,10 +72,31 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read full-duplex 1 0
 
-          Verify the value of FullDuplex is boolean in DUT as Client side Log
+          Verify the value of FullDuplex is boolean in TH(all-clusters-app) Log
 
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0001 DataVersion: 3872576452
-          [1649663520.936873][8088:8093] CHIP:TOO:   FullDuplex: TRUE
+          [1659971415.211787][3458:3458] CHIP:IM: Received Read request
+          [1659971415.211891][3458:3458] CHIP:DMG: ReadRequestMessage =
+          [1659971415.211931][3458:3458] CHIP:DMG: {
+          [1659971415.211963][3458:3458] CHIP:DMG: 	AttributePathIBs =
+          [1659971415.212001][3458:3458] CHIP:DMG: 	[
+          [1659971415.212036][3458:3458] CHIP:DMG: 		AttributePathIB =
+          [1659971415.212084][3458:3458] CHIP:DMG: 		{
+          [1659971415.212126][3458:3458] CHIP:DMG: 			Endpoint = 0x0,
+          [1659971415.212171][3458:3458] CHIP:DMG: 			Cluster = 0x37,
+          [1659971415.212219][3458:3458] CHIP:DMG: 			Attribute = 0x0000_0001,
+          [1659971415.212262][3458:3458] CHIP:DMG: 		}
+          [1659971415.212303][3458:3458] CHIP:DMG:
+          [1659971415.212340][3458:3458] CHIP:DMG: 	],
+          [1659971415.212380][3458:3458] CHIP:DMG:
+          [1659971415.212419][3458:3458] CHIP:DMG: 	isFabricFiltered = true,
+          [1659971415.212456][3458:3458] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659971415.212490][3458:3458] CHIP:DMG: },
+          [1659971415.212590][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659971415.212704][3458:3458] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659971415.212746][3458:3458] CHIP:DMG: <RE:Run> Cluster 37, Attribute 1 is dirty
+          [1659971415.212777][3458:3458] CHIP:DMG: Reading attribute: Cluster=0x0000_0037 Endpoint=0 AttributeId=0x0000_0001 (expanded=0)
+          [1659971415.212816][3458:3458] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0037 e=0 p=v
+          [1659971415.212862][3458:3458] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads a attribute value from TH."
@@ -56,10 +104,31 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read packet-rx-count 1 0
 
-          Verify the value of PacketRxCount is in range uint64 in DUT as Client side Log
+          Verify the value of PacketRxCount is in range uint64 on TH(all-clusters-app) Log
 
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0002 DataVersion: 3872576452
-          [1649663623.009973][8103:8108] CHIP:TOO:   PacketRxCount: 3322
+          [1659971446.614287][3458:3458] CHIP:IM: Received Read request
+          [1659971446.614366][3458:3458] CHIP:DMG: ReadRequestMessage =
+          [1659971446.614393][3458:3458] CHIP:DMG: {
+          [1659971446.614414][3458:3458] CHIP:DMG:         AttributePathIBs =
+          [1659971446.614441][3458:3458] CHIP:DMG:         [
+          [1659971446.614464][3458:3458] CHIP:DMG:                 AttributePathIB =
+          [1659971446.614492][3458:3458] CHIP:DMG:                 {
+          [1659971446.614519][3458:3458] CHIP:DMG:                         Endpoint = 0x0,
+          [1659971446.614551][3458:3458] CHIP:DMG:                         Cluster = 0x37,
+          [1659971446.614582][3458:3458] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1659971446.614610][3458:3458] CHIP:DMG:                 }
+          [1659971446.614637][3458:3458] CHIP:DMG:
+          [1659971446.614661][3458:3458] CHIP:DMG:         ],
+          [1659971446.614689][3458:3458] CHIP:DMG:
+          [1659971446.614713][3458:3458] CHIP:DMG:         isFabricFiltered = true,
+          [1659971446.614738][3458:3458] CHIP:DMG:         InteractionModelRevision = 1
+          [1659971446.614761][3458:3458] CHIP:DMG: },
+          [1659971446.614831][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659971446.614913][3458:3458] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659971446.614942][3458:3458] CHIP:DMG: <RE:Run> Cluster 37, Attribute 2 is dirty
+          [1659971446.614963][3458:3458] CHIP:DMG: Reading attribute: Cluster=0x0000_0037 Endpoint=0 AttributeId=0x0000_0002 (expanded=0)
+          [1659971446.614991][3458:3458] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0037 e=0 p=v
+          [1659971446.615023][3458:3458] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads a attribute value from TH."
@@ -67,10 +136,31 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read packet-tx-count 1 0
 
-          Verify the value of PacketTxCount is in range uint64 in DUT as Client side Log
+          Verify the value of PacketTxCount is in range uint64 on TH(all-clusters-app) Log
 
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0003 DataVersion: 3872576452
-          [1649663793.192934][8117:8122] CHIP:TOO:   PacketTxCount: 3220
+          [1659971467.437214][3458:3458] CHIP:IM: Received Read request
+          [1659971467.437292][3458:3458] CHIP:DMG: ReadRequestMessage =
+          [1659971467.437318][3458:3458] CHIP:DMG: {
+          [1659971467.437339][3458:3458] CHIP:DMG:         AttributePathIBs =
+          [1659971467.437365][3458:3458] CHIP:DMG:         [
+          [1659971467.437388][3458:3458] CHIP:DMG:                 AttributePathIB =
+          [1659971467.437423][3458:3458] CHIP:DMG:                 {
+          [1659971467.437451][3458:3458] CHIP:DMG:                         Endpoint = 0x0,
+          [1659971467.437482][3458:3458] CHIP:DMG:                         Cluster = 0x37,
+          [1659971467.437513][3458:3458] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659971467.437542][3458:3458] CHIP:DMG:                 }
+          [1659971467.437569][3458:3458] CHIP:DMG:
+          [1659971467.437594][3458:3458] CHIP:DMG:         ],
+          [1659971467.437622][3458:3458] CHIP:DMG:
+          [1659971467.437648][3458:3458] CHIP:DMG:         isFabricFiltered = true,
+          [1659971467.437672][3458:3458] CHIP:DMG:         InteractionModelRevision = 1
+          [1659971467.437693][3458:3458] CHIP:DMG: },
+          [1659971467.437765][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659971467.437848][3458:3458] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659971467.437877][3458:3458] CHIP:DMG: <RE:Run> Cluster 37, Attribute 3 is dirty
+          [1659971467.437898][3458:3458] CHIP:DMG: Reading attribute: Cluster=0x0000_0037 Endpoint=0 AttributeId=0x0000_0003 (expanded=0)
+          [1659971467.437926][3458:3458] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0037 e=0 p=v
+          [1659971467.437958][3458:3458] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads a attribute value from TH."
@@ -78,10 +168,31 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read tx-err-count 1 1
 
-          Verify the value of TxErrCount is in range uint64 in DUT as Client side Log
+          Verify the value of TxErrCount is in range uint64 on TH(all-clusters-app) Log
 
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0004 DataVersion: 3872576452
-          [1649663843.295395][8123:8128] CHIP:TOO:   TxErrCount: 0
+          [1659971467.437214][3458:3458] CHIP:IM: Received Read request
+          [1659971467.437292][3458:3458] CHIP:DMG: ReadRequestMessage =
+          [1659971467.437318][3458:3458] CHIP:DMG: {
+          [1659971467.437339][3458:3458] CHIP:DMG:         AttributePathIBs =
+          [1659971467.437365][3458:3458] CHIP:DMG:         [
+          [1659971467.437388][3458:3458] CHIP:DMG:                 AttributePathIB =
+          [1659971467.437423][3458:3458] CHIP:DMG:                 {
+          [1659971467.437451][3458:3458] CHIP:DMG:                         Endpoint = 0x0,
+          [1659971467.437482][3458:3458] CHIP:DMG:                         Cluster = 0x37,
+          [1659971467.437513][3458:3458] CHIP:DMG:                         Attribute = 0x0000_0004,
+          [1659971467.437542][3458:3458] CHIP:DMG:                 }
+          [1659971467.437569][3458:3458] CHIP:DMG:
+          [1659971467.437594][3458:3458] CHIP:DMG:         ],
+          [1659971467.437622][3458:3458] CHIP:DMG:
+          [1659971467.437648][3458:3458] CHIP:DMG:         isFabricFiltered = true,
+          [1659971467.437672][3458:3458] CHIP:DMG:         InteractionModelRevision = 1
+          [1659971467.437693][3458:3458] CHIP:DMG: },
+          [1659971467.437765][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659971467.437848][3458:3458] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659971467.437877][3458:3458] CHIP:DMG: <RE:Run> Cluster 37, Attribute 3 is dirty
+          [1659971467.437898][3458:3458] CHIP:DMG: Reading attribute: Cluster=0x0000_0037 Endpoint=0 AttributeId=0x0000_0003 (expanded=0)
+          [1659971467.437926][3458:3458] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0037 e=0 p=v
+          [1659971467.437958][3458:3458] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads a attribute value from TH."
@@ -89,10 +200,31 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read collision-count 1 1
 
-          Verify the value of  CollisionCount is in range uint64 in DUT as Client side Log
+          Verify the value of  CollisionCount is in range uint64 on TH(all-clusters-app) Log
 
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0005 DataVersion: 3872576452
-          [1649663870.221742][8133:8138] CHIP:TOO:   CollisionCount: 0
+          [1659971467.437214][3458:3458] CHIP:IM: Received Read request
+          [1659971467.437292][3458:3458] CHIP:DMG: ReadRequestMessage =
+          [1659971467.437318][3458:3458] CHIP:DMG: {
+          [1659971467.437339][3458:3458] CHIP:DMG:         AttributePathIBs =
+          [1659971467.437365][3458:3458] CHIP:DMG:         [
+          [1659971467.437388][3458:3458] CHIP:DMG:                 AttributePathIB =
+          [1659971467.437423][3458:3458] CHIP:DMG:                 {
+          [1659971467.437451][3458:3458] CHIP:DMG:                         Endpoint = 0x0,
+          [1659971467.437482][3458:3458] CHIP:DMG:                         Cluster = 0x37,
+          [1659971467.437513][3458:3458] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659971467.437542][3458:3458] CHIP:DMG:                 }
+          [1659971467.437569][3458:3458] CHIP:DMG:
+          [1659971467.437594][3458:3458] CHIP:DMG:         ],
+          [1659971467.437622][3458:3458] CHIP:DMG:
+          [1659971467.437648][3458:3458] CHIP:DMG:         isFabricFiltered = true,
+          [1659971467.437672][3458:3458] CHIP:DMG:         InteractionModelRevision = 1
+          [1659971467.437693][3458:3458] CHIP:DMG: },
+          [1659971467.437765][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659971467.437848][3458:3458] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659971467.437877][3458:3458] CHIP:DMG: <RE:Run> Cluster 37, Attribute 3 is dirty
+          [1659971467.437898][3458:3458] CHIP:DMG: Reading attribute: Cluster=0x0000_0037 Endpoint=0 AttributeId=0x0000_0003 (expanded=0)
+          [1659971467.437926][3458:3458] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0037 e=0 p=v
+          [1659971467.437958][3458:3458] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads a attribute value from TH."
@@ -100,10 +232,31 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read overrun-count 1 1
 
-          Verify in DUT as Client side Log
+          Verify on TH(all-clusters-app) Log
 
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0006 DataVersion: 3872576452
-          [1649663948.738274][8142:8147] CHIP:TOO:   OverrunCount: 0
+          [1659971467.437214][3458:3458] CHIP:IM: Received Read request
+          [1659971467.437292][3458:3458] CHIP:DMG: ReadRequestMessage =
+          [1659971467.437318][3458:3458] CHIP:DMG: {
+          [1659971467.437339][3458:3458] CHIP:DMG:         AttributePathIBs =
+          [1659971467.437365][3458:3458] CHIP:DMG:         [
+          [1659971467.437388][3458:3458] CHIP:DMG:                 AttributePathIB =
+          [1659971467.437423][3458:3458] CHIP:DMG:                 {
+          [1659971467.437451][3458:3458] CHIP:DMG:                         Endpoint = 0x0,
+          [1659971467.437482][3458:3458] CHIP:DMG:                         Cluster = 0x37,
+          [1659971467.437513][3458:3458] CHIP:DMG:                         Attribute = 0x0000_0006,
+          [1659971467.437542][3458:3458] CHIP:DMG:                 }
+          [1659971467.437569][3458:3458] CHIP:DMG:
+          [1659971467.437594][3458:3458] CHIP:DMG:         ],
+          [1659971467.437622][3458:3458] CHIP:DMG:
+          [1659971467.437648][3458:3458] CHIP:DMG:         isFabricFiltered = true,
+          [1659971467.437672][3458:3458] CHIP:DMG:         InteractionModelRevision = 1
+          [1659971467.437693][3458:3458] CHIP:DMG: },
+          [1659971467.437765][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659971467.437848][3458:3458] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659971467.437877][3458:3458] CHIP:DMG: <RE:Run> Cluster 37, Attribute 3 is dirty
+          [1659971467.437898][3458:3458] CHIP:DMG: Reading attribute: Cluster=0x0000_0037 Endpoint=0 AttributeId=0x0000_0003 (expanded=0)
+          [1659971467.437926][3458:3458] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0037 e=0 p=v
+          [1659971467.437958][3458:3458] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads a attribute value from TH."
@@ -111,10 +264,31 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read carrier-detect 1 1
 
-          Verify the value of CarrierDetect is either bool or null in DUT as Client side Log
+          Verify the value of CarrierDetect is either bool or null on TH(all-clusters-app) Log
 
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0007 DataVersion: 3872576452
-          [1649663972.829304][8149:8154] CHIP:TOO:   CarrierDetect: null
+          [1659971467.437214][3458:3458] CHIP:IM: Received Read request
+          [1659971467.437292][3458:3458] CHIP:DMG: ReadRequestMessage =
+          [1659971467.437318][3458:3458] CHIP:DMG: {
+          [1659971467.437339][3458:3458] CHIP:DMG:         AttributePathIBs =
+          [1659971467.437365][3458:3458] CHIP:DMG:         [
+          [1659971467.437388][3458:3458] CHIP:DMG:                 AttributePathIB =
+          [1659971467.437423][3458:3458] CHIP:DMG:                 {
+          [1659971467.437451][3458:3458] CHIP:DMG:                         Endpoint = 0x0,
+          [1659971467.437482][3458:3458] CHIP:DMG:                         Cluster = 0x37,
+          [1659971467.437513][3458:3458] CHIP:DMG:                         Attribute = 0x0000_0007,
+          [1659971467.437542][3458:3458] CHIP:DMG:                 }
+          [1659971467.437569][3458:3458] CHIP:DMG:
+          [1659971467.437594][3458:3458] CHIP:DMG:         ],
+          [1659971467.437622][3458:3458] CHIP:DMG:
+          [1659971467.437648][3458:3458] CHIP:DMG:         isFabricFiltered = true,
+          [1659971467.437672][3458:3458] CHIP:DMG:         InteractionModelRevision = 1
+          [1659971467.437693][3458:3458] CHIP:DMG: },
+          [1659971467.437765][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659971467.437848][3458:3458] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659971467.437877][3458:3458] CHIP:DMG: <RE:Run> Cluster 37, Attribute 3 is dirty
+          [1659971467.437898][3458:3458] CHIP:DMG: Reading attribute: Cluster=0x0000_0037 Endpoint=0 AttributeId=0x0000_0003 (expanded=0)
+          [1659971467.437926][3458:3458] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0037 e=0 p=v
+          [1659971467.437958][3458:3458] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads a attribute value from TH."
@@ -122,8 +296,29 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read  time-since-reset 1 1
 
-          Verify the value of TimeSinceReset is in range uint64 in DUT as Client side Log
+          Verify the value of TimeSinceReset is in range uint64 on TH(all-clusters-app) Log
 
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0008 DataVersion: 3872576452
-          [1649664046.010810][8158:8163] CHIP:TOO:   TimeSinceReset: 5219
+          [1659971467.437214][3458:3458] CHIP:IM: Received Read request
+          [1659971467.437292][3458:3458] CHIP:DMG: ReadRequestMessage =
+          [1659971467.437318][3458:3458] CHIP:DMG: {
+          [1659971467.437339][3458:3458] CHIP:DMG:         AttributePathIBs =
+          [1659971467.437365][3458:3458] CHIP:DMG:         [
+          [1659971467.437388][3458:3458] CHIP:DMG:                 AttributePathIB =
+          [1659971467.437423][3458:3458] CHIP:DMG:                 {
+          [1659971467.437451][3458:3458] CHIP:DMG:                         Endpoint = 0x0,
+          [1659971467.437482][3458:3458] CHIP:DMG:                         Cluster = 0x37,
+          [1659971467.437513][3458:3458] CHIP:DMG:                         Attribute = 0x0000_0008,
+          [1659971467.437542][3458:3458] CHIP:DMG:                 }
+          [1659971467.437569][3458:3458] CHIP:DMG:
+          [1659971467.437594][3458:3458] CHIP:DMG:         ],
+          [1659971467.437622][3458:3458] CHIP:DMG:
+          [1659971467.437648][3458:3458] CHIP:DMG:         isFabricFiltered = true,
+          [1659971467.437672][3458:3458] CHIP:DMG:         InteractionModelRevision = 1
+          [1659971467.437693][3458:3458] CHIP:DMG: },
+          [1659971467.437765][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659971467.437848][3458:3458] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659971467.437877][3458:3458] CHIP:DMG: <RE:Run> Cluster 37, Attribute 3 is dirty
+          [1659971467.437898][3458:3458] CHIP:DMG: Reading attribute: Cluster=0x0000_0037 Endpoint=0 AttributeId=0x0000_0003 (expanded=0)
+          [1659971467.437926][3458:3458] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0037 e=0 p=v
+          [1659971467.437958][3458:3458] CHIP:DMG: AccessControl: allowed
       disabled: true
