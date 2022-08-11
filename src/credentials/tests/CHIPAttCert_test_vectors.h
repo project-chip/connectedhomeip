@@ -193,6 +193,11 @@ extern const ByteSpan sTestCert_DAC_FFF2_8004_0021_ValInFuture_SKID;
 extern const ByteSpan sTestCert_DAC_FFF2_8004_0021_ValInFuture_PublicKey;
 extern const ByteSpan sTestCert_DAC_FFF2_8004_0021_ValInFuture_PrivateKey;
 
+extern const ByteSpan sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_Cert;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_SKID;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_PrivateKey;
+
 extern const ByteSpan sTestCert_DAC_FFF2_8005_0022_ValInPast_Cert;
 extern const ByteSpan sTestCert_DAC_FFF2_8005_0022_ValInPast_SKID;
 extern const ByteSpan sTestCert_DAC_FFF2_8005_0022_ValInPast_PublicKey;
@@ -203,6 +208,16 @@ extern const ByteSpan sTestCert_DAC_FFF2_8005_0023_ValInFuture_SKID;
 extern const ByteSpan sTestCert_DAC_FFF2_8005_0023_ValInFuture_PublicKey;
 extern const ByteSpan sTestCert_DAC_FFF2_8005_0023_ValInFuture_PrivateKey;
 
+extern const ByteSpan sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_Cert;
+extern const ByteSpan sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_SKID;
+extern const ByteSpan sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_Cert;
+extern const ByteSpan sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_SKID;
+extern const ByteSpan sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_PrivateKey;
+
 extern const ByteSpan sTestCert_DAC_FFF2_8006_0024_ValInPast_Cert;
 extern const ByteSpan sTestCert_DAC_FFF2_8006_0024_ValInPast_SKID;
 extern const ByteSpan sTestCert_DAC_FFF2_8006_0024_ValInPast_PublicKey;
@@ -212,6 +227,16 @@ extern const ByteSpan sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert;
 extern const ByteSpan sTestCert_DAC_FFF2_8006_0025_ValInFuture_SKID;
 extern const ByteSpan sTestCert_DAC_FFF2_8006_0025_ValInFuture_PublicKey;
 extern const ByteSpan sTestCert_DAC_FFF2_8006_0025_ValInFuture_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF2_8006_0034_ValInFuture_Cert;
+extern const ByteSpan sTestCert_DAC_FFF2_8006_0034_ValInFuture_SKID;
+extern const ByteSpan sTestCert_DAC_FFF2_8006_0034_ValInFuture_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF2_8006_0034_ValInFuture_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_Cert;
+extern const ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_SKID;
+extern const ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PrivateKey;
 
 extern const ByteSpan sTestCert_PAA_FFF1_Cert;
 extern const ByteSpan sTestCert_PAA_FFF1_SKID;
@@ -247,6 +272,11 @@ extern const ByteSpan sTestCert_PAI_FFF2_8004_FB_Cert;
 extern const ByteSpan sTestCert_PAI_FFF2_8004_FB_SKID;
 extern const ByteSpan sTestCert_PAI_FFF2_8004_FB_PublicKey;
 extern const ByteSpan sTestCert_PAI_FFF2_8004_FB_PrivateKey;
+
+extern const ByteSpan sTestCert_PAI_FFF2_8005_Val1SecBefore_Cert;
+extern const ByteSpan sTestCert_PAI_FFF2_8005_Val1SecBefore_SKID;
+extern const ByteSpan sTestCert_PAI_FFF2_8005_Val1SecBefore_PublicKey;
+extern const ByteSpan sTestCert_PAI_FFF2_8005_Val1SecBefore_PrivateKey;
 
 extern const ByteSpan sTestCert_PAI_FFF2_8005_ValInFuture_Cert;
 extern const ByteSpan sTestCert_PAI_FFF2_8005_ValInFuture_SKID;

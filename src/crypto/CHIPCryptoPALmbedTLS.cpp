@@ -1250,13 +1250,70 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
     return CHIP_NO_ERROR;
 }
 
+namespace {
+
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
-static int mbedTLSCallbackIgnoreCertValidityCheck(void * data, mbedtls_x509_crt * crt, int depth, uint32_t * flags)
+bool IsTimeGreaterThanEqual(const mbedtls_x509_time * const timeA, const mbedtls_x509_time * const timeB)
 {
+
+    // checks if two values are different and if yes, then returns first > second.
+#define RETURN_STRICTLY_GREATER_IF_DIFFERENT(component)                                                                            \
+    {                                                                                                                              \
+        auto valueA = timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(component);                                                              \
+        auto valueB = timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(component);                                                              \
+                                                                                                                                   \
+        if (valueA != valueB)                                                                                                      \
+        {                                                                                                                          \
+            return valueA > valueB;                                                                                                \
+        }                                                                                                                          \
+    }
+
+    RETURN_STRICTLY_GREATER_IF_DIFFERENT(year);
+    RETURN_STRICTLY_GREATER_IF_DIFFERENT(mon);
+    RETURN_STRICTLY_GREATER_IF_DIFFERENT(day);
+    RETURN_STRICTLY_GREATER_IF_DIFFERENT(hour);
+    RETURN_STRICTLY_GREATER_IF_DIFFERENT(min);
+    RETURN_STRICTLY_GREATER_IF_DIFFERENT(sec);
+
+    // all above are equal
+    return true;
+}
+
+CHIP_ERROR IsCertificateValidAtIssuance(const mbedtls_x509_crt * candidateCertificate, const mbedtls_x509_crt * issuerCertificate)
+{
+    mbedtls_x509_time candidateNotBeforeTime = candidateCertificate->CHIP_CRYPTO_PAL_PRIVATE_X509(valid_from);
+    mbedtls_x509_time issuerNotBeforeTime    = issuerCertificate->CHIP_CRYPTO_PAL_PRIVATE_X509(valid_from);
+    mbedtls_x509_time issuerNotAfterTime     = issuerCertificate->CHIP_CRYPTO_PAL_PRIVATE_X509(valid_to);
+
+    // check if candidateCertificate is issued at or after issuerCertificate's notBefore timestamp
+    VerifyOrReturnError(IsTimeGreaterThanEqual(&candidateNotBeforeTime, &issuerNotBeforeTime), CHIP_ERROR_CERT_EXPIRED);
+
+    // check if candidateCertificate is issued at or before issuerCertificate's notAfter timestamp
+    VerifyOrReturnError(IsTimeGreaterThanEqual(&issuerNotAfterTime, &candidateNotBeforeTime), CHIP_ERROR_CERT_EXPIRED);
+
+    return CHIP_NO_ERROR;
+}
+
+static int CallbackForCustomValidityCheck(void * data, mbedtls_x509_crt * crt, int depth, uint32_t * flags)
+{
+    mbedtls_x509_crt * leafCert   = reinterpret_cast<mbedtls_x509_crt *>(data);
+    mbedtls_x509_crt * issuerCert = crt;
+
+    // Ignore any time validy error performed by the standard mbedTLS code.
     *flags &= ~(static_cast<uint32_t>(MBEDTLS_X509_BADCERT_EXPIRED | MBEDTLS_X509_BADCERT_FUTURE));
+
+    // Verify that the leaf certificate has a notBefore time valid within the validity period of the issuerCertificate.
+    // Note that this callback is invoked for each certificate in the chain.
+    if (IsCertificateValidAtIssuance(leafCert, issuerCert) != CHIP_NO_ERROR)
+    {
+        return MBEDTLS_ERR_X509_INVALID_DATE;
+    }
+
     return 0;
 }
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+
+} // anonymous namespace
 
 CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen,
@@ -1295,7 +1352,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
 
     /* Verify the chain against the root */
     mbedResult =
-        mbedtls_x509_crt_verify(&certChain, &rootCert, nullptr, nullptr, &flags, mbedTLSCallbackIgnoreCertValidityCheck, nullptr);
+        mbedtls_x509_crt_verify(&certChain, &rootCert, nullptr, nullptr, &flags, CallbackForCustomValidityCheck, &certChain);
 
     switch (mbedResult)
     {
@@ -1303,6 +1360,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
         VerifyOrExit(flags == 0, (result = CertificateChainValidationResult::kInternalFrameworkError, error = CHIP_ERROR_INTERNAL));
         result = CertificateChainValidationResult::kSuccess;
         break;
+    case MBEDTLS_ERR_X509_INVALID_DATE:
     case MBEDTLS_ERR_X509_CERT_VERIFY_FAILED:
         result = CertificateChainValidationResult::kChainInvalid;
         error  = CHIP_ERROR_CERT_NOT_TRUSTED;
@@ -1330,74 +1388,38 @@ exit:
     return error;
 }
 
-inline bool IsTimeGreaterThanEqual(const mbedtls_x509_time * const timeA, const mbedtls_x509_time * const timeB)
-{
-
-    // checks if two values are different and if yes, then returns first > second.
-#define RETURN_STRICTLY_GREATER_IF_DIFFERENT(component)                                                                            \
-    {                                                                                                                              \
-        auto valueA = timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(component);                                                              \
-        auto valueB = timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(component);                                                              \
-                                                                                                                                   \
-        if (valueA != valueB)                                                                                                      \
-        {                                                                                                                          \
-            return valueA > valueB;                                                                                                \
-        }                                                                                                                          \
-    }
-
-    RETURN_STRICTLY_GREATER_IF_DIFFERENT(year);
-    RETURN_STRICTLY_GREATER_IF_DIFFERENT(mon);
-    RETURN_STRICTLY_GREATER_IF_DIFFERENT(day);
-    RETURN_STRICTLY_GREATER_IF_DIFFERENT(hour);
-    RETURN_STRICTLY_GREATER_IF_DIFFERENT(min);
-    RETURN_STRICTLY_GREATER_IF_DIFFERENT(sec);
-
-    // all above are equal
-    return true;
-}
-
-CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, const ByteSpan & toBeEvaluatedCertificate)
+CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & candidateCertificate, const ByteSpan & issuerCertificate)
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
-    mbedtls_x509_crt mbedReferenceCertificate;
-    mbedtls_x509_crt mbedToBeEvaluatedCertificate;
-    mbedtls_x509_time refNotBeforeTime;
-    mbedtls_x509_time tbeNotBeforeTime;
-    mbedtls_x509_time tbeNotAfterTime;
+    mbedtls_x509_crt mbedCandidateCertificate;
+    mbedtls_x509_crt mbedIssuerCertificate;
     int result;
 
-    VerifyOrReturnError(!referenceCertificate.empty() && !toBeEvaluatedCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!candidateCertificate.empty() && !issuerCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    mbedtls_x509_crt_init(&mbedReferenceCertificate);
-    mbedtls_x509_crt_init(&mbedToBeEvaluatedCertificate);
+    mbedtls_x509_crt_init(&mbedCandidateCertificate);
+    mbedtls_x509_crt_init(&mbedIssuerCertificate);
 
-    result = mbedtls_x509_crt_parse(&mbedReferenceCertificate, Uint8::to_const_uchar(referenceCertificate.data()),
-                                    referenceCertificate.size());
+    result = mbedtls_x509_crt_parse(&mbedCandidateCertificate, Uint8::to_const_uchar(candidateCertificate.data()),
+                                    candidateCertificate.size());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_x509_crt_parse(&mbedToBeEvaluatedCertificate, Uint8::to_const_uchar(toBeEvaluatedCertificate.data()),
-                                    toBeEvaluatedCertificate.size());
+    result =
+        mbedtls_x509_crt_parse(&mbedIssuerCertificate, Uint8::to_const_uchar(issuerCertificate.data()), issuerCertificate.size());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    refNotBeforeTime = mbedReferenceCertificate.CHIP_CRYPTO_PAL_PRIVATE_X509(valid_from);
-    tbeNotBeforeTime = mbedToBeEvaluatedCertificate.CHIP_CRYPTO_PAL_PRIVATE_X509(valid_from);
-    tbeNotAfterTime  = mbedToBeEvaluatedCertificate.CHIP_CRYPTO_PAL_PRIVATE_X509(valid_to);
-
-    // check if referenceCertificate is issued at or after tbeCertificate's notBefore timestamp
-    VerifyOrExit(IsTimeGreaterThanEqual(&refNotBeforeTime, &tbeNotBeforeTime), error = CHIP_ERROR_CERT_EXPIRED);
-
-    // check if referenceCertificate is issued at or before tbeCertificate's notAfter timestamp
-    VerifyOrExit(IsTimeGreaterThanEqual(&tbeNotAfterTime, &refNotBeforeTime), error = CHIP_ERROR_CERT_EXPIRED);
+    // Verify that the candidateCertificate has a notBefore time valid within the validity period of the issuerCertificate.
+    SuccessOrExit(error = IsCertificateValidAtIssuance(&mbedCandidateCertificate, &mbedIssuerCertificate));
 
 exit:
     _log_mbedTLS_error(result);
-    mbedtls_x509_crt_free(&mbedReferenceCertificate);
-    mbedtls_x509_crt_free(&mbedToBeEvaluatedCertificate);
+    mbedtls_x509_crt_free(&mbedCandidateCertificate);
+    mbedtls_x509_crt_free(&mbedIssuerCertificate);
 
 #else
-    (void) referenceCertificate;
-    (void) toBeEvaluatedCertificate;
+    (void) candidateCertificate;
+    (void) issuerCertificate;
     CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 
