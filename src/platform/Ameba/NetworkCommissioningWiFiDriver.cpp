@@ -109,7 +109,7 @@ Status AmebaWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outD
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
 
     // Use empty ssid for representing invalid network
-    mStagingNetwork = {};
+    mStagingNetwork         = {};
     mStagingNetwork.ssidLen = 0;
     return Status::kSuccess;
 }
