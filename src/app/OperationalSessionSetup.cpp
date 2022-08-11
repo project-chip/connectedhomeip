@@ -191,7 +191,6 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
     if (mState == State::ResolvingAddress)
     {
         MoveToState(State::HasAddress);
-        // TODO Do we want to also provide ReliableMessageProtocolConfig?
         mInitParams.sessionManager->UpdateAllSessionsPeerAddress(mPeerId, addr);
         if (!mPerformingLookupOnConnectedSession)
         {
@@ -364,9 +363,9 @@ void OperationalSessionSetup::CleanupCASEClient()
 
 void OperationalSessionSetup::OnSessionReleased()
 {
-    // Is most cases the call below is a no-op. The only corner case where a callback is actually
-    // called would be if we are performing an address lookup on an already established
-    // connection, and during that address resolution we got a call to establish a connection.
+    // This will not be called when we are in the process of establishing a session. This will
+    // only be called if we are doing an address look up. The error code we send really doesn't
+    // matter since there are not callbacks registered.
     DequeueConnectionCallbacks(CHIP_ERROR_MISSING_SECURE_SESSION);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
@@ -439,15 +438,13 @@ void OperationalSessionSetup::PerformLookupOnExistingSession()
 
     if (mState != State::NeedsAddress)
     {
-        // The expectation is if we are no already performing and address lookup on an existing
-        // session that we should be recently allocated and should be in the State::NeedsAddress
-        // state. Something has gone pretty wrong so we call DequeueConnectionCallbacks which will
-        // release ourself.
+        // The expectation is if we are not already performing and address lookup on an existing
+        // session that we should be recently allocated which implies we should be in the
+        // State::NeedsAddress state. Something has gone pretty wrong so we call
+        // DequeueConnectionCallbacks which will release ourself.
         VerifyOrDie(false);
         DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
         // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
-        // While it is odd to have an explicit return here at the end of the function, we do so
-        // as a precaution in case someone later on adds something to the end of this function.
         return;
     }
 

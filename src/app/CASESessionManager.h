@@ -82,8 +82,6 @@ public:
 
     void ReleaseSession(const ScopedNodeId & peerId);
 
-    void ReleaseSession(OperationalSessionSetup * device) override;
-
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
     void ReleaseAllSessions();
@@ -97,6 +95,9 @@ public:
      * `CHIP_ERROR_NOT_CONNECTED` error.
      */
     CHIP_ERROR GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr);
+
+    //////////// OperationalSessionReleaseDelegate Implementation ///////////////
+    void ReleaseSession(OperationalSessionSetup * device) override;
 
     //////////// SessionUpdateDelegate Implementation ///////////////
     void UpdatePeerAddress(ScopedNodeId peerId) override;
