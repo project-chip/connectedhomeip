@@ -276,7 +276,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 9000
+              minValue: 7500
               maxValue: 12500
 
     - label: "Wait 2s"
@@ -294,7 +294,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 9000
+              minValue: 7500
               maxValue: 12500
 
     - label: "TH reads ColorMode attribute from DUT"
