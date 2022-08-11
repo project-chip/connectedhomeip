@@ -486,7 +486,6 @@ function getManualTests() {
     ];
 
     const AccessControl = [
-        "Test_TC_ACL_1_1",
         "Test_TC_ACL_2_1",
         "Test_TC_ACL_2_2",
         "Test_TC_ACL_2_3",
@@ -570,6 +569,7 @@ function getManualTests() {
 function getTests() {
     const AccessControl = [
         "TestAccessControlCluster",
+        "Test_TC_ACL_1_1",
     ];
 
     const BooleanState = [
