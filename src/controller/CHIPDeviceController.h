@@ -215,14 +215,6 @@ public:
     }
 
     /**
-     * DEPRECATED - to be removed
-     *
-     * Forces a DNSSD lookup for the specified device. It finds the corresponding session
-     * for the given peerNodeId and initiates a DNSSD lookup to find/update the node address
-     */
-    CHIP_ERROR UpdateDevice(NodeId peerNodeId);
-
-    /**
      * @brief
      *   Compute a PASE verifier and passcode ID for the desired setup pincode.
      *
@@ -301,15 +293,12 @@ public:
         return mSystemState->Fabrics();
     }
 
-    // TODO(#20452): This should be removed/renamed once #20452 is fixed
-    void ReleaseOperationalDevice(NodeId remoteNodeId);
-
     OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }
 
     /**
-     * TODO(#20452): This needs to be refactored to reflect what it actually does (which is not disconnecting anything)
+     * TODO(#21885): This needs to be removed. This currently is not disconnecting anything.
      *
-     * TEMPORARY - DO NOT USE or if you use please request review on why/how to
+     * DEPRECATED - DO NOT USE or if you use please request review on why/how to
      * officially support such an API.
      *
      * This was added to support the 'reuse session' logic in cirque integration
@@ -369,14 +358,7 @@ protected:
 
     chip::VendorId mVendorId;
 
-    /// Fetches the session to use for the current device. Allows overriding
-    /// in case subclasses want to create the session if it does not yet exist
-    virtual OperationalSessionSetup * GetDeviceSession(const ScopedNodeId & peerId);
-
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
-
-private:
-    void ReleaseOperationalDevice(OperationalSessionSetup * device);
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
@@ -659,9 +641,6 @@ public:
 
     // ClusterStateCache::Callback impl
     void OnDone(app::ReadClient *) override;
-
-    // Commissioner will establish new device connections after PASE.
-    OperationalSessionSetup * GetDeviceSession(const ScopedNodeId & peerId) override;
 
     // Issue an NOC chain using the associated OperationalCredentialsDelegate. The NOC chain will
     // be provided in X509 DER format.

@@ -805,7 +805,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
             return;
         }
 
-        // TODO: This is a hack and needs to go away or use some sane API.
+        // TODO(#21885): This is a hack and needs to go away or use some sane API.
         self->_cppCommissioner->DisconnectDevice(nodeID);
     });
 }

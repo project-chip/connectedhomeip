@@ -80,8 +80,6 @@ public:
 
     OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId, bool forAddressUpdate = false) const;
 
-    void ReleaseSession(const ScopedNodeId & peerId);
-
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
     void ReleaseAllSessions();

@@ -352,6 +352,12 @@ public:
     /**
      * @brief
      *   Marks all active sessions that match provided arguments as defunct.
+     * 
+     * TODO(#21885): This needs to be removed. This was added to reduce code churn
+     * on PR that was a large refactor.
+     *
+     * DEPRECATED - DO NOT USE or if you use please request review on why/how to
+     * officially support such an API.
      *
      * @param node    Scoped node ID of the active sessions we should mark as defunct.
      * @param type    Type of session we are looking to mark as defunct. If matching
