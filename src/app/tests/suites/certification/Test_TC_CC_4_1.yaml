@@ -94,7 +94,73 @@ tests:
       response:
           value: SaturationConfigValue
           constraints:
-              type: int8u
+              minValue: 68
+              maxValue: 92
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentSaturation"
+      response:
+          constraints:
+              minValue: 80
+              maxValue: 115
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentSaturation"
+      response:
+          constraints:
+              minValue: 110
+              maxValue: 120
+
+    - label: "Wait 5s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentSaturation"
+      response:
+          value: 120
+
+    - label: "TH reads ColorMode attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0008
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 2
+
+    - label: "TH reads EnhancedColorMode attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A4001
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
+          constraints:
               minValue: 0
               maxValue: 254
 

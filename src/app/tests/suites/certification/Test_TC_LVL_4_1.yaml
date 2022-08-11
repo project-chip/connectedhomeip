@@ -198,13 +198,13 @@ tests:
               - name: "OptionsOverride"
                 value: 1
 
-    - label: "Wait 500ms"
+    - label: "Wait 13s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 500
+                value: 13000
 
     - label:
           "Physically verify that the device moves at the rate recorded in step

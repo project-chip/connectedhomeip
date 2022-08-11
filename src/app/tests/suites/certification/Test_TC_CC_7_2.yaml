@@ -153,9 +153,8 @@ tests:
       response:
           saveAs: EnhancedCurrentHueStep3b
           constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65535
+              minValue: 34000
+              maxValue: 36500
 
     - label: "Wait 1000ms"
       cluster: "DelayCommands"
@@ -172,9 +171,34 @@ tests:
       response:
           value: EnhancedCurrentHueStep3b
           constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65535
+              minValue: 34500
+              maxValue: 36500
+
+    - label:
+          "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=25000,
+          Direction=0x00 (shortest distance) and TransitionTime=0 (immediately)."
+      PICS: CC.S.F01 && CC.S.C40.Rsp
+      command: "EnhancedMoveToHue"
+      arguments:
+          values:
+              - name: "EnhancedHue"
+                value: 25000
+              - name: "Direction"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
 
     - label: "TH sends EnhancedMoveHue command to DUT with MoveMode Down"
       PICS: CC.S.F01 && CC.S.C41.Rsp
@@ -265,9 +289,8 @@ tests:
       response:
           saveAs: EnhancedCurrentHueStep5b
           constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65535
+              minValue: 7500
+              maxValue: 12500
 
     - label: "Wait 1000ms"
       cluster: "DelayCommands"
@@ -279,6 +302,14 @@ tests:
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT several times."
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              minValue: 7500
+              maxValue: 12500
+
+    - label: "TH reads ColorMode attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0008
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
