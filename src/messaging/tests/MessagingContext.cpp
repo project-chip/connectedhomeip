@@ -115,6 +115,7 @@ void MessagingContext::SetMRPMode(MRPMode mode)
         mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(
             ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
     }
+}
 
 CHIP_ERROR MessagingContext::CreateAliceFabric()
 {

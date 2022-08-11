@@ -3717,7 +3717,7 @@ void TestReadInteraction::TestSubscribeInvalidateFabric(nlTestSuite * apSuite, v
         ctx.GetFabricTable().Delete(ctx.GetAliceFabricIndex());
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 0);
         ctx.GetFabricTable().Delete(ctx.GetBobFabricIndex());
-        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+        NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_ERROR_IM_FABRIC_DELETED);
         ctx.ExpireSessionAliceToBob();
         ctx.ExpireSessionBobToAlice();
         ctx.CreateAliceFabric();
@@ -3725,7 +3725,7 @@ void TestReadInteraction::TestSubscribeInvalidateFabric(nlTestSuite * apSuite, v
         ctx.CreateSessionAliceToBob();
         ctx.CreateSessionBobToAlice();
     }
-
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
     engine->Shutdown();
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }

@@ -1435,8 +1435,6 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
         if (readClient->GetFabricIndex() == fabricIndex)
         {
             ChipLogProgress(InteractionModel, "Fabric removed, deleting obsolete read client with FabricIndex: %u", fabricIndex);
-            RemoveReadClient(readClient);
-            readClient->mpImEngine = nullptr;
             readClient->Close(CHIP_ERROR_IM_FABRIC_DELETED, false);
         }
     }
