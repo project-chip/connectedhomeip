@@ -33,7 +33,7 @@ tests:
       verification: |
           ./chip-tool doorlock read cluster-revision 1 1
 
-          On TH, verify  DUT responsds ClusterRevision attribute as the value 6
+          Verify " ClusterRevision " on the TH(Chip-tool) Log:
 
           [1654670381.498137][2934:2939] CHIP:DMG:
           [1654670381.498163][2934:2939] CHIP:DMG:        SuppressResponse = true,
@@ -46,7 +46,8 @@ tests:
     - label: "TH reads the FeatureMap from DUT"
       verification: |
           ./chip-tool doorlock read feature-map 1 1
-          On TH, verify that DUT responds the  Featuremap  value as 3507
+
+          Verify " Featuremap " on the TH(Chip-tool) Log:
 
           [1659339327.515963][3169:3174] CHIP:DMG:        SuppressResponse = true,
           [1659339327.516018][3169:3174] CHIP:DMG:        InteractionModelRevision = 1
@@ -58,7 +59,8 @@ tests:
     - label: "TH reads AttributeList from DUT"
       verification: |
           ./chip-tool doorlock read attribute-list 1 1
-          On TH, verify that DUT responds as list of supported attributes as 31 entries
+
+          Verify " AttributeList " on the TH(Chip-tool) Log:
 
           [1656418220.810680][10056:10061] CHIP:DMG:      ],
           [1656418220.810827][10056:10061] CHIP:DMG:
@@ -101,14 +103,14 @@ tests:
 
     - label: "TH reads EventList from DUT"
       verification: |
-          verification step to be updated.
+          OUT OF SCOPE FOR V1.0
       disabled: true
 
     - label: "TH reads AcceptedCommandList from DUT"
       verification: |
           ./chip-tool doorlock read accepted-command-list 1 1
-          On TH, verify that DUT responds as list of Accepted Commands as 18 entries
 
+          Verify " AcceptedCommandList " on the TH(Chip-tool) Log:
 
           [1656418338.200497][10068:10073] CHIP:DMG:      ],
           [1656418338.200598][10068:10073] CHIP:DMG:
@@ -139,7 +141,8 @@ tests:
     - label: "TH reads GeneratedCommandList from DUT"
       verification: |
           ./chip-tool doorlock read generated-command-list 1 1
-          On TH, verify that DUT responds as list of GeneratedCommands as 6 entries
+
+          Verify " GeneratedCommandList " on the TH(Chip-tool) Log:
 
           [1659330738.031410][2549:2555] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFF8 DataVersion: 1452725250
           [1659339542.981573][3222:3227] CHIP:TOO:     [1]: 12

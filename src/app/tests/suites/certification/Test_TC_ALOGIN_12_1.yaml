@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          Test Setup: Commission DUT to TH, if not done so already. In some cases, such as with a Casting Video Player, the DUT commissions the TH (eg. tv-casting-app).
+      disabled: true
+
     - label:
           "Make sure there is a Content App endpoint implementing the Account
           Login cluster. Product maker may provide pre-setup steps"

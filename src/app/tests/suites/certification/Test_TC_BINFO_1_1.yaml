@@ -34,7 +34,7 @@ tests:
     - label: "TH reads the ClusterRevision from DUT"
       verification: |
           ./chip-tool basic read cluster-revision 1 0
-          On TH, verify that DUT sends ClusterRevision attribute value as 1
+          Verify " ClusterRevision " on the TH(Chip-tool) Log:
 
           [1651214669.313397][2666:2671] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFFD DataVersion: 158558310
           [1651214669.313472][2666:2671] CHIP:TOO:   ClusterRevision: 1
@@ -44,7 +44,7 @@ tests:
       verification: |
           ./chip-tool basic read feature-map 1 0
 
-          On TH, verify that DUT sends  FeatureMap attribute value as 0
+          Verify " Featuremap " on the TH(Chip-tool) Log:
 
           [1653459580.065669][29174:29179] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFFC DataVersion: 46104872
           [1653459580.065758][29174:29179] CHIP:TOO:   FeatureMap: 0
@@ -55,7 +55,7 @@ tests:
       verification: |
           ./chip-tool basic read attribute-list 1 0
 
-          On TH, verify that DUT  sends a list of supported attributes
+          Verify " AttributeList " on the TH(Chip-tool) Log:
 
           [1657021528.885544][7089:7094] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFFB DataVersion: 1869107664
           [1657021528.885637][7089:7094] CHIP:TOO:   AttributeList: 25 entries
@@ -95,7 +95,7 @@ tests:
       verification: |
           ./chip-tool basic read accepted-command-list 1 0
 
-          On TH, verify that DUT  responsds as list of Accepted Command as 0 entries.
+          Verify " AcceptedCommandList " on the TH(Chip-tool) Log:
 
           [1651214820.355561][2695:2700] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFF9 DataVersion: 158558310
           [1651214820.355673][2695:2700] CHIP:TOO:   AcceptedCommandList: 0 entries
@@ -105,7 +105,7 @@ tests:
       verification: |
           ./chip-tool basic read generated-command-list 1 0
 
-          On TH, verify that DUT  responsds as list of GeneratedCommandList as 0 entries.
+          Verify " GeneratedCommandList " on the TH(Chip-tool) Log:
 
           [1651214861.208575][2702:2707] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFF8 DataVersion: 158558310
           [1651214861.208682][2702:2707] CHIP:TOO:   GeneratedCommandList: 0 entries

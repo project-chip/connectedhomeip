@@ -35,7 +35,7 @@ tests:
       PICS: ACL.S.A0002
       verification: |
           ./chip-tool accesscontrol read subjects-per-access-control-entry 1 0
-          On TH, verify DUT responds with value 4 or greater as  subjects-per-access-control-entry.
+          On TH(Chiptool), verify with value 4 or greater as  subjects-per-access-control-entry.
           [1656409485.639551][2769:2774] CHIP:DMG:        ],
           [1656409485.639582][2769:2774] CHIP:DMG:
           [1656409485.639608][2769:2774] CHIP:DMG:        SuppressResponse = true,
@@ -53,7 +53,7 @@ tests:
       PICS: ACL.S.A0003
       verification: |
           ./chip-tool accesscontrol read targets-per-access-control-entry 1 0
-          On TH, verify DUT responds with value 3  or greater as  Targets-per-access-control-entry.
+          On TH(Chiptool), verify with value 3  or greater as  Targets-per-access-control-entry.
 
           [1656409746.779627][2799:2804] CHIP:DMG:                },
           [1656409746.779672][2799:2804] CHIP:DMG:
@@ -73,7 +73,7 @@ tests:
       PICS: ACL.S.A0004
       verification: |
           ./chip-tool accesscontrol read  access-control-entries-per-fabric 1 0
-          On TH, verify DUT responds with value 3  or greater as AccessControlEntriesPerFabric.
+          On TH(Chiptool), verify with value 3  or greater as AccessControlEntriesPerFabric.
 
           [1656409955.865361][2822:2827] CHIP:DMG:
           [1656409955.865393][2822:2827] CHIP:DMG:        ],
@@ -95,7 +95,7 @@ tests:
           "TH1 reads DUT Descriptor cluster ServerList attribute from Endpoint 0"
       verification: |
           ./chip-tool  descriptor read server-list 1 0
-          On TH ,Verify DUT  responds to serverList attribute of Descriptor Cluster with an element of 31( 0x001F)
+          On TH(Chiptool) ,Verify the serverList attribute of Descriptor Cluster with an element of 31( 0x001F)
 
           [1658323282.743614][2301:2306] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 680928677
           [1658323282.743771][2301:2306] CHIP:TOO:   server list: 26 entries
@@ -135,7 +135,7 @@ tests:
           ./chip-tool  descriptor read server-list 1 1
 
 
-          On TH ,Verify DUT  responds to serverList attribute of Descriptor Cluster without  an element of 31( 0x001F)
+          On TH(Chiptool) ,Verify the serverList attribute of Descriptor Cluster without  an element of 31( 0x001F)
 
           [1656412927.698026][3383:3388] CHIP:DMG:        SuppressResponse = true,
           [1656412927.698052][3383:3388] CHIP:DMG:        InteractionModelRevision = 1
