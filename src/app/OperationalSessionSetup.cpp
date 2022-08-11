@@ -192,7 +192,7 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
     {
         MoveToState(State::HasAddress);
         mInitParams.sessionManager->UpdateAllSessionsPeerAddress(mPeerId, addr);
-        if (!mPerformingLookupOnConnectedSession)
+        if (!mPerformingAddressUpdate)
         {
             err = EstablishConnection();
             if (err != CHIP_NO_ERROR)
@@ -365,7 +365,7 @@ void OperationalSessionSetup::OnSessionReleased()
 {
     // This will not be called when we are in the process of establishing a session. This will
     // only be called if we are doing an address look up. The error code we send really doesn't
-    // matter since there are not callbacks registered.
+    // matter since there are no callbacks registered.
     DequeueConnectionCallbacks(CHIP_ERROR_MISSING_SECURE_SESSION);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
@@ -424,44 +424,35 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
     return Resolver::Instance().LookupNode(request, mAddressLookupHandle);
 }
 
-void OperationalSessionSetup::PerformLookupOnExistingSession()
+void OperationalSessionSetup::PerformAddressUpdate()
 {
     bool isConnected = false;
 
-    if (mPerformingLookupOnConnectedSession)
+    if (mPerformingAddressUpdate)
     {
         // We are already in the middle of a lookup from a previous call to
-        // PerformLookupOnExistingSession. In that case we will just exit right away as
+        // PerformAddressUpdate. In that case we will just exit right away as
         // we are already looking to update the results from the previous lookup.
         return;
     }
 
-    if (mState != State::NeedsAddress)
-    {
-        // The expectation is if we are not already performing and address lookup on an existing
-        // session that we should be recently allocated which implies we should be in the
-        // State::NeedsAddress state. Something has gone pretty wrong so we call
-        // DequeueConnectionCallbacks which will release ourself.
-        VerifyOrDie(false);
-        DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
-        // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
-        return;
-    }
+    // We must be newly-allocated to handle this address lookup, so must be in the NeedsAddress state.
+    VerifyOrDie(mState == State::NeedsAddress);
 
     isConnected = AttachToExistingSecureSession();
     if (!isConnected)
     {
-        ChipLogError(Controller, "PerformLookupOnExistingSession on non-existent session");
+        ChipLogError(Controller, "PerformAddressUpdate on non-existent session");
         DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
         // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
         return;
     }
-    mPerformingLookupOnConnectedSession = true;
+    mPerformingAddressUpdate = true;
     MoveToState(State::ResolvingAddress);
     CHIP_ERROR err = LookupPeerAddress();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "PerformLookupOnExistingSession could not perform lookup");
+        ChipLogError(Controller, "PerformAddressUpdate could not perform lookup");
         DequeueConnectionCallbacks(err);
         // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
         return;
@@ -483,7 +474,7 @@ void OperationalSessionSetup::OnNodeAddressResolutionFailed(const PeerId & peerI
         MoveToState(State::NeedsAddress);
     }
 
-    // No need to set mPerformingLookupOnConnectedSession to false since call below releases `this`.
+    // No need to set mPerformingAddressUpdate to false since call below releases `this`.
     DequeueConnectionCallbacks(reason);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }

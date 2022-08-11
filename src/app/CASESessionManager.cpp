@@ -35,8 +35,8 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
                   ChipLogValueX64(peerId.GetNodeId()));
 
-    bool isSessionDesignatedLookup    = false;
-    OperationalSessionSetup * session = FindExistingSessionSetup(peerId, isSessionDesignatedLookup);
+    bool forAddressUpdate             = false;
+    OperationalSessionSetup * session = FindExistingSessionSetup(peerId, forAddressUpdate);
     if (session == nullptr)
     {
         ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing OperationalSessionSetup instance found");
@@ -58,8 +58,7 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
 
 void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)
 {
-    bool isSessionDesignatedLookup = false;
-    ReleaseSession(FindExistingSessionSetup(peerId, isSessionDesignatedLookup));
+    ReleaseSession(FindExistingSessionSetup(peerId));
 }
 
 void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
@@ -83,8 +82,8 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Trans
 
 void CASESessionManager::UpdatePeerAddress(ScopedNodeId peerId)
 {
-    bool isSessionDesignatedLookup    = true;
-    OperationalSessionSetup * session = FindExistingSessionSetup(peerId, isSessionDesignatedLookup);
+    bool forAddressUpdate             = true;
+    OperationalSessionSetup * session = FindExistingSessionSetup(peerId, forAddressUpdate);
     if (session == nullptr)
     {
         ChipLogDetail(CASESessionManager, "UpdatePeerAddress: No existing OperationalSessionSetup instance found");
@@ -97,13 +96,13 @@ void CASESessionManager::UpdatePeerAddress(ScopedNodeId peerId)
         }
     }
 
-    session->PerformLookupOnExistingSession();
+    session->PerformAddressUpdate();
 }
 
 OperationalSessionSetup * CASESessionManager::FindExistingSessionSetup(const ScopedNodeId & peerId,
-                                                                       bool isSessionDesignatedLookup) const
+                                                                       bool forAddressUpdate) const
 {
-    return mConfig.sessionSetupPool->FindSessionSetup(peerId, isSessionDesignatedLookup);
+    return mConfig.sessionSetupPool->FindSessionSetup(peerId, forAddressUpdate);
 }
 
 Optional<SessionHandle> CASESessionManager::FindExistingSession(const ScopedNodeId & peerId) const

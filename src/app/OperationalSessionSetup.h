@@ -202,7 +202,7 @@ public:
 
     bool IsConnecting() const { return mState == State::Connecting; }
 
-    bool IsSessionDesignatedLookup() const { return mPerformingLookupOnConnectedSession; }
+    bool IsForAddressUpdate() const { return mPerformingAddressUpdate; }
 
     /**
      * IsResolvingAddress returns true if we are doing an address resolution
@@ -261,7 +261,7 @@ public:
      */
     CHIP_ERROR LookupPeerAddress();
 
-    void PerformLookupOnExistingSession();
+    void PerformAddressUpdate();
 
     // AddressResolve::NodeListener - notifications when dnssd finds a node IP address
     void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override;
@@ -306,7 +306,7 @@ private:
 
     ReliableMessageProtocolConfig mRemoteMRPConfig = GetDefaultMRPConfig();
 
-    bool mPerformingLookupOnConnectedSession = false;
+    bool mPerformingAddressUpdate = false;
 
     CHIP_ERROR EstablishConnection();
 

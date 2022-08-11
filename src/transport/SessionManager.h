@@ -364,7 +364,7 @@ public:
 
     /**
      * @brief
-     *   Update all active sessions that match `node` with the provided transport peer address.
+     *   Update all active CASE sessions that match `node` with the provided transport peer address.
      *
      * @param node    Scoped node ID of the active sessions we want to update.
      * @param addr    Transport peer address that we want to update to.

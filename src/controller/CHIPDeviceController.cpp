@@ -369,9 +369,8 @@ CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
         return CHIP_NO_ERROR;
     }
 
-    const bool isSessionDesignatedLookup = false;
     OperationalSessionSetup * proxy =
-        mSystemState->CASESessionMgr()->FindExistingSessionSetup(GetPeerScopedId(nodeId), isSessionDesignatedLookup);
+        mSystemState->CASESessionMgr()->FindExistingSessionSetup(GetPeerScopedId(nodeId));
     if (proxy == nullptr)
     {
         ChipLogProgress(Controller, "Attempted to close a session that does not exist.");
@@ -2326,8 +2325,7 @@ CHIP_ERROR DeviceController::UpdateDevice(NodeId peerNodeId)
 
 OperationalSessionSetup * DeviceController::GetDeviceSession(const ScopedNodeId & peerId)
 {
-    const bool isSessionDesignatedLookup = false;
-    return mSystemState->CASESessionMgr()->FindExistingSessionSetup(peerId, isSessionDesignatedLookup);
+    return mSystemState->CASESessionMgr()->FindExistingSessionSetup(peerId);
 }
 
 OperationalSessionSetup * DeviceCommissioner::GetDeviceSession(const ScopedNodeId & peerId)

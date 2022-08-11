@@ -78,7 +78,7 @@ public:
     void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId, bool isSessionDesignatedLookup) const;
+    OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId, bool forAddressUpdate = false) const;
 
     void ReleaseSession(const ScopedNodeId & peerId);
 

@@ -22,9 +22,8 @@ namespace chip {
 
 /**
  * @brief
- *   This class provides a skeleton for the callback functions. The functions will be
- *   called by ReliableMessageMgr object when an exchange fails to deliver the first
- *   message.
+ *   Delegate interface that will be notified by ReliableMessageMgr when an exchange
+ *   fails to deliver the first message.
  */
 class DLL_EXPORT SessionUpdateDelegate
 {
