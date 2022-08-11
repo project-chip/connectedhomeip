@@ -24,6 +24,7 @@
 #include "LEDWidget.h"
 #include "chip_porting.h"
 #include <DeviceInfoProviderImpl.h>
+#include <FactoryDataProvider.h>
 #include <lwip_netconf.h>
 
 #include <app/clusters/identify-server/identify-server.h>
@@ -96,6 +97,7 @@ Identify gIdentify1 = {
 
 static DeviceCallbacks EchoCallbacks;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 
 static void InitServer(intptr_t context)
 {
@@ -107,7 +109,10 @@ static void InitServer(intptr_t context)
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
     NetWorkCommissioningInstInit();
 
     if (RTW_SUCCESS != wifi_is_connected_to_ap())
