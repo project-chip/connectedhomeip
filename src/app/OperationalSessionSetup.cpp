@@ -363,11 +363,7 @@ void OperationalSessionSetup::CleanupCASEClient()
 
 void OperationalSessionSetup::OnSessionReleased()
 {
-    // This will not be called when we are in the process of establishing a session. This will
-    // only be called if we are doing an address look up. The error code we send really doesn't
-    // matter since there are no callbacks registered.
-    DequeueConnectionCallbacks(CHIP_ERROR_MISSING_SECURE_SESSION);
-    // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
+    MoveToState(State::HasAddress);
 }
 
 void OperationalSessionSetup::OnSessionHang()
@@ -426,8 +422,6 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
 
 void OperationalSessionSetup::PerformAddressUpdate()
 {
-    bool isConnected = false;
-
     if (mPerformingAddressUpdate)
     {
         // We are already in the middle of a lookup from a previous call to
@@ -439,14 +433,7 @@ void OperationalSessionSetup::PerformAddressUpdate()
     // We must be newly-allocated to handle this address lookup, so must be in the NeedsAddress state.
     VerifyOrDie(mState == State::NeedsAddress);
 
-    isConnected = AttachToExistingSecureSession();
-    if (!isConnected)
-    {
-        ChipLogError(Controller, "PerformAddressUpdate on non-existent session");
-        DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
-        // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
-        return;
-    }
+    // We are doing an address lookup regardless if the the session is currently active.
     mPerformingAddressUpdate = true;
     MoveToState(State::ResolvingAddress);
     CHIP_ERROR err = LookupPeerAddress();

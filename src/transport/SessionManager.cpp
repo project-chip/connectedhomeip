@@ -464,8 +464,9 @@ bool SessionManager::MarkSessionsAsDefunct(const ScopedNodeId & node, const Opti
 void SessionManager::UpdateAllSessionsPeerAddress(const ScopedNodeId & node, const Transport::PeerAddress & addr)
 {
     mSecureSessions.ForEachSession([&node, &addr](auto session) {
-        if (session->IsActiveSession() && session->GetPeer() == node &&
-            Transport::SecureSession::Type::kCASE == session->GetSecureSessionType())
+        // Arguably we should only be updating active and defunct sessions, but there is no harm
+        // in updating evicted sessions.
+        if (session->GetPeer() == node && Transport::SecureSession::Type::kCASE == session->GetSecureSessionType())
         {
             session->SetPeerAddress(addr);
         }
