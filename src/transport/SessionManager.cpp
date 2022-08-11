@@ -452,7 +452,7 @@ bool SessionManager::MarkSessionsAsDefunct(const ScopedNodeId & node, const Opti
         if (session->IsActiveSession() && session->GetPeer() == node &&
             (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
         {
-            session->AsSecureSession()->MarkAsDefunct();
+            session->MarkAsDefunct();
             found = true;
         }
         return Loop::Continue;
@@ -467,7 +467,7 @@ void SessionManager::UpdateAllSessionsPeerAddress(const ScopedNodeId & node, con
         if (session->IsActiveSession() && session->GetPeer() == node &&
             Transport::SecureSession::Type::kCASE == session->GetSecureSessionType())
         {
-            session->AsSecureSession()->SetPeerAddress(addr);
+            session->SetPeerAddress(addr);
         }
         return Loop::Continue;
     });

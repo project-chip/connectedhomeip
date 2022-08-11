@@ -99,8 +99,7 @@ void CASESessionManager::UpdatePeerAddress(ScopedNodeId peerId)
     session->PerformAddressUpdate();
 }
 
-OperationalSessionSetup * CASESessionManager::FindExistingSessionSetup(const ScopedNodeId & peerId,
-                                                                       bool forAddressUpdate) const
+OperationalSessionSetup * CASESessionManager::FindExistingSessionSetup(const ScopedNodeId & peerId, bool forAddressUpdate) const
 {
     return mConfig.sessionSetupPool->FindSessionSetup(peerId, forAddressUpdate);
 }

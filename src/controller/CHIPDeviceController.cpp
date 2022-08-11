@@ -369,8 +369,7 @@ CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
         return CHIP_NO_ERROR;
     }
 
-    OperationalSessionSetup * proxy =
-        mSystemState->CASESessionMgr()->FindExistingSessionSetup(GetPeerScopedId(nodeId));
+    OperationalSessionSetup * proxy = mSystemState->CASESessionMgr()->FindExistingSessionSetup(GetPeerScopedId(nodeId));
     if (proxy == nullptr)
     {
         ChipLogProgress(Controller, "Attempted to close a session that does not exist.");
