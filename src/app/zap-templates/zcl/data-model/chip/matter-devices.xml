@@ -2147,9 +2147,6 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="IAS Zone" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireCommand>ZoneEnrollResponse</requireCommand>
-            </include>
             <include cluster="Level Control" client="true" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireCommand>MoveToLevel</requireCommand>
