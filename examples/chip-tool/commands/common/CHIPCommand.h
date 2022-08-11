@@ -124,7 +124,7 @@ protected:
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
 
-    chip::Credentials::GroupDataProviderImpl mGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
+    static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
@@ -135,14 +135,15 @@ protected:
     // --identity "instance name" when running a command.
     ChipDeviceCommissioner & CurrentCommissioner();
 
-    ChipDeviceCommissioner & GetCommissioner(const char * identity);
+    ChipDeviceCommissioner & GetCommissioner(std::string identity);
 
 private:
     CHIP_ERROR MaybeSetUpStack();
     void MaybeTearDownStack();
 
-    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
-                                      const chip::Credentials::AttestationTrustStore * trustStore);
+    CHIP_ERROR EnsureCommissionerForIdentity(std::string identity);
+
+    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId);
     void ShutdownCommissioner(std::string key);
     chip::FabricId CurrentCommissionerId();
     static std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
@@ -152,6 +153,10 @@ private:
     chip::Optional<chip::NodeId> mCommissionerNodeId;
     chip::Optional<uint16_t> mBleAdapterId;
     chip::Optional<char *> mPaaTrustStorePath;
+
+    // Cached trust store so commands other than the original startup command
+    // can spin up commissioners as needed.
+    static const chip::Credentials::AttestationTrustStore * sPaaTrustStore;
 
     static void RunQueuedCommand(intptr_t commandArg);
 
