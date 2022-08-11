@@ -82,7 +82,7 @@ class OperationalSessionSetup;
 class OperationalSessionReleaseDelegate
 {
 public:
-    virtual ~OperationalSessionReleaseDelegate() = default;
+    virtual ~OperationalSessionReleaseDelegate()                        = default;
     virtual void ReleaseSession(OperationalSessionSetup * sessionSetup) = 0;
 };
 
