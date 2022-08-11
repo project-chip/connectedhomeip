@@ -35,7 +35,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read cluster-revision 1 0
 
-          On TH, verify DUT responds the cluster revision value as 1
+          Verify Successfully" ClusterRevision " on the TH(Chip-tool) Log:
 
           [1656335651.726036][4621:4626] CHIP:DMG:        SuppressResponse = true,
           [1656335651.726074][4621:4626] CHIP:DMG:        InteractionModelRevision = 1
@@ -50,7 +50,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read feature-map 1 0
 
-          On TH, verify DUT responds the  Featuremap  value as 0
+          Verify Successfully " FeatureMap attribute " on the TH(Chip-tool) Log:
 
           [1656335839.955385][4637:4642] CHIP:DMG:
           [1656335839.955419][4637:4642] CHIP:DMG:        SuppressResponse = true,
@@ -67,7 +67,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read attribute-list 1 0
 
-          On TH, verify DUT responds with a list  of  Attributes with 10 entries.
+          Verify Successfully"AttributeList attribute " on the TH(Chip-tool) Log:.
 
           [1655960990.225266][2516:2521] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFFB DataVersion: 477297741
           [1655960990.225364][2516:2521] CHIP:TOO:   AttributeList: 10 entries
@@ -94,8 +94,7 @@ tests:
           attribute"
       verification: |
           ./chip-tool accesscontrol read accepted-command-list 1 0
-
-          on TH , verify DUT responds right to acceptedcommand list with 0 entries
+          Verify Successfully"  AcceptedCommandList attribute " on the TH(Chip-tool) Log:
 
           [[1656478328.210742][2458:2463] CHIP:DMG:
           [1656478328.210767][2458:2463] CHIP:DMG:        ],
@@ -115,7 +114,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read generated-command-list 1 0
 
-          on TH , verify DUT responds right to GeneratedCommandList  with 0 entries
+          Verify Successfully" GeneratedCommandList attribute " on the TH(Chip-tool) Log:
 
           [[1656478396.324314][2467:2472] CHIP:DMG:
           [1656478396.324346][2467:2472] CHIP:DMG:        ],

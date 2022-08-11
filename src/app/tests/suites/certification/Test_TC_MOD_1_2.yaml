@@ -118,12 +118,8 @@ tests:
       verification: |
           ./chip-tool modeselect read standard-namespace 1 1
 
-
-          on TH,Verify that the DUT response  is an integer that is in the list of modes returned in step 1.(OR)
-           The attribute is nullable, and null is  valid value.
-
+          Verify on TH(chip-tool) logs ,standard-namespace value has 16 bit enum (null is also acceptable).
 
           [1649677167.900539][10795:10801] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0001 DataVersion: 4277065072
-
           [1649677167.900660][10795:10801] CHIP:TOO:   StandardNamespace: 0
       disabled: true

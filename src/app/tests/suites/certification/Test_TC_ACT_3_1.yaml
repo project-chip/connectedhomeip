@@ -34,32 +34,55 @@ tests:
       verification: |
           ./chip-tool bridgedactions  read action-list 1 1
 
-          Verify in DUT as client side log
-          [1657608767.991103][57130:57135] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 2843363251
-          [1657608767.991158][57130:57135] CHIP:TOO:   action list: 0 entries
+          Verify read command is received on TH(all-clusters-app)
+
+          [1658848323.188336][28392:28392] CHIP:IM: Received Read request
+          [1658848323.188433][28392:28392] CHIP:DMG: ReadRequestMessage =
+          [1658848323.188470][28392:28392] CHIP:DMG: {
+          [1658848323.188500][28392:28392] CHIP:DMG:         AttributePathIBs =
+          [1658848323.188535][28392:28392] CHIP:DMG:         [
+          [1658848323.188568][28392:28392] CHIP:DMG:                 AttributePathIB =
+          [1658848323.188605][28392:28392] CHIP:DMG:                 {
+          [1658848323.188643][28392:28392] CHIP:DMG:                         Endpoint = 0x1,
+          [1658848323.188690][28392:28392] CHIP:DMG:                         Cluster = 0x25,
+          [1658848323.188733][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1658848323.188774][28392:28392] CHIP:DMG:                 }
+          [1658848323.188812][28392:28392] CHIP:DMG:
+          [1658848323.188846][28392:28392] CHIP:DMG:         ],
+          [1658848323.188884][28392:28392] CHIP:DMG:
+          [1658848323.188919][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848323.188954][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
+          [1658848323.188985][28392:28392] CHIP:DMG: },
+          [1658848323.189080][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658848323.189190][28392:28392] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658848323.189229][28392:28392] CHIP:DMG: <RE:Run> Cluster 25, Attribute 0 is dirty
+
 
 
           ./chip-tool bridgedactions  read endpoint-list   1 1
 
-          Verify in DUT as client side log
-          [1657608786.230461][57139:57144] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2843363251
-          [1657608786.230485][57139:57144] CHIP:TOO:   endpoint list: 2 entries
-          [1657608786.230504][57139:57144] CHIP:TOO:     [1]: {
-          [1657608786.230514][57139:57144] CHIP:TOO:       EndpointListID: 57345
-          [1657608786.230519][57139:57144] CHIP:TOO:       Name: Room 1
-          [1657608786.230525][57139:57144] CHIP:TOO:       Type: 1
-          [1657608786.230531][57139:57144] CHIP:TOO:       Endpoints: 2 entries
-          [1657608786.230538][57139:57144] CHIP:TOO:         [1]: 10
-          [1657608786.230544][57139:57144] CHIP:TOO:         [2]: 11
-          [1657608786.230549][57139:57144] CHIP:TOO:      }
-          [1657608786.230558][57139:57144] CHIP:TOO:     [2]: {
-          [1657608786.230563][57139:57144] CHIP:TOO:       EndpointListID: 57346
-          [1657608786.230567][57139:57144] CHIP:TOO:       Name: Room 2
-          [1657608786.230572][57139:57144] CHIP:TOO:       Type: 1
-          [1657608786.230578][57139:57144] CHIP:TOO:       Endpoints: 2 entries
-          [1657608786.230583][57139:57144] CHIP:TOO:         [1]: 12
-          [1657608786.230589][57139:57144] CHIP:TOO:         [2]: 13
-          [1657608786.230594][57139:57144] CHIP:TOO:      }
+          Verify read command is received on TH(all-clusters-app
+          )
+          [1658848398.260378][28392:28392] CHIP:IM: Received Read request
+          [1658848398.260455][28392:28392] CHIP:DMG: ReadRequestMessage =
+          [1658848398.260483][28392:28392] CHIP:DMG: {
+          [1658848398.260505][28392:28392] CHIP:DMG:         AttributePathIBs =
+          [1658848398.260531][28392:28392] CHIP:DMG:         [
+          [1658848398.260555][28392:28392] CHIP:DMG:                 AttributePathIB =
+          [1658848398.260583][28392:28392] CHIP:DMG:                 {
+          [1658848398.260611][28392:28392] CHIP:DMG:                         Endpoint = 0x1,
+          [1658848398.260642][28392:28392] CHIP:DMG:                         Cluster = 0x25,
+          [1658848398.260673][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1658848398.260702][28392:28392] CHIP:DMG:                 }
+          [1658848398.260731][28392:28392] CHIP:DMG:
+          [1658848398.260756][28392:28392] CHIP:DMG:         ],
+          [1658848398.260784][28392:28392] CHIP:DMG:
+          [1658848398.260810][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848398.260836][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
+          [1658848398.260859][28392:28392] CHIP:DMG: },
+          [1658848398.260930][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658848398.261011][28392:28392] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658848398.261040][28392:28392] CHIP:DMG: <RE:Run> Cluster 25, Attribute 1 is dirty
       disabled: true
 
     - label:
@@ -67,24 +90,45 @@ tests:
           a manufacturer specific order"
       verification: |
           Optional attibute
-          Verify in DUT as client side log
 
-          ./chip-tool bridgedactions  read  setup-url  1 1
-          Needs an SDK Implementation
+          ./chip-tool bridgedactions read setup-url 1 1
+
+          Verify read command is received on TH(all-clusters-app)
+
+          [1658848453.728775][28392:28392] CHIP:IM: Received Read request
+          [1658848453.728895][28392:28392] CHIP:DMG: ReadRequestMessage =
+          [1658848453.728927][28392:28392] CHIP:DMG: {
+          [1658848453.728950][28392:28392] CHIP:DMG:         AttributePathIBs =
+          [1658848453.728975][28392:28392] CHIP:DMG:         [
+          [1658848453.728999][28392:28392] CHIP:DMG:                 AttributePathIB =
+          [1658848453.729046][28392:28392] CHIP:DMG:                 {
+          [1658848453.729081][28392:28392] CHIP:DMG:                         Endpoint = 0x1,
+          [1658848453.729118][28392:28392] CHIP:DMG:                         Cluster = 0x25,
+          [1658848453.729157][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1658848453.729191][28392:28392] CHIP:DMG:                 }
+          [1658848453.729223][28392:28392] CHIP:DMG:
+          [1658848453.729251][28392:28392] CHIP:DMG:         ],
+          [1658848453.729280][28392:28392] CHIP:DMG:
+          [1658848453.729307][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848453.729332][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
+          [1658848453.729358][28392:28392] CHIP:DMG: },
+          [1658848453.729436][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658848453.729538][28392:28392] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658848453.729570][28392:28392] CHIP:DMG: <RE:Run> Cluster 25, Attribute 2 is dirty
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
@@ -93,78 +137,88 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
+          ./chip-tool bridgedactions  read  attribute-list 1 1
+
+          Verify attribute-list attribute contains 7 entries on TH(all-clusters-minimal-app)
+          [1658393025.602745][13481:13486] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_FFFB DataVersion: 2868144574
+          [1658393025.602867][13481:13486] CHIP:TOO:   AttributeList: 7 entries
+          [1658393025.602917][13481:13486] CHIP:TOO:     [1]: 0
+          [1658393025.602945][13481:13486] CHIP:TOO:     [2]: 1
+          [1658393025.602997][13481:13486] CHIP:TOO:     [3]: 65528
+          [1658393025.603023][13481:13486] CHIP:TOO:     [4]: 65529
+          [1658393025.603049][13481:13486] CHIP:TOO:     [5]: 65531
+          [1658393025.603094][13481:13486] CHIP:TOO:     [6]: 65532
+          [1658393025.603121][13481:13486] CHIP:TOO:     [7]: 65533
+          [1658393025.603258][13481:13486] CHIP:EM: Sending Standalone Ack for MessageCounter:114510707 on exchange 23501i
+
+
           ./chip-tool bridgedactions  read action-list 1 1
 
-          Verify in DUT as client side log
-          [1657608767.991103][57130:57135] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 2843363251
-          [1657608767.991158][57130:57135] CHIP:TOO:   action list: 0 entries
+          Verify read command is received on TH(all-clusters-minimal-app) Log
+
+          [1658848323.188336][28392:28392] CHIP:IM: Received Read request
+          [1658848323.188433][28392:28392] CHIP:DMG: ReadRequestMessage =
+          [1658848323.188470][28392:28392] CHIP:DMG: {
+          [1658848323.188500][28392:28392] CHIP:DMG:         AttributePathIBs =
+          [1658848323.188535][28392:28392] CHIP:DMG:         [
+          [1658848323.188568][28392:28392] CHIP:DMG:                 AttributePathIB =
+          [1658848323.188605][28392:28392] CHIP:DMG:                 {
+          [1658848323.188643][28392:28392] CHIP:DMG:                         Endpoint = 0x1,
+          [1658848323.188690][28392:28392] CHIP:DMG:                         Cluster = 0x25,
+          [1658848323.188733][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1658848323.188774][28392:28392] CHIP:DMG:                 }
+          [1658848323.188812][28392:28392] CHIP:DMG:
+          [1658848323.188846][28392:28392] CHIP:DMG:         ],
+          [1658848323.188884][28392:28392] CHIP:DMG:
+          [1658848323.188919][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848323.188954][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
+          [1658848323.188985][28392:28392] CHIP:DMG: },
+          [1658848323.189080][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658848323.189190][28392:28392] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658848323.189229][28392:28392] CHIP:DMG: <RE:Run> Cluster 25, Attribute 0 is dirty
+
 
 
           ./chip-tool bridgedactions  read endpoint-list   1 1
 
-          Verify in DUT as client side log
-          [1657608786.230461][57139:57144] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2843363251
-          [1657608786.230485][57139:57144] CHIP:TOO:   endpoint list: 2 entries
-          [1657608786.230504][57139:57144] CHIP:TOO:     [1]: {
-          [1657608786.230514][57139:57144] CHIP:TOO:       EndpointListID: 57345
-          [1657608786.230519][57139:57144] CHIP:TOO:       Name: Room 1
-          [1657608786.230525][57139:57144] CHIP:TOO:       Type: 1
-          [1657608786.230531][57139:57144] CHIP:TOO:       Endpoints: 2 entries
-          [1657608786.230538][57139:57144] CHIP:TOO:         [1]: 10
-          [1657608786.230544][57139:57144] CHIP:TOO:         [2]: 11
-          [1657608786.230549][57139:57144] CHIP:TOO:      }
-          [1657608786.230558][57139:57144] CHIP:TOO:     [2]: {
-          [1657608786.230563][57139:57144] CHIP:TOO:       EndpointListID: 57346
-          [1657608786.230567][57139:57144] CHIP:TOO:       Name: Room 2
-          [1657608786.230572][57139:57144] CHIP:TOO:       Type: 1
-          [1657608786.230578][57139:57144] CHIP:TOO:       Endpoints: 2 entries
-          [1657608786.230583][57139:57144] CHIP:TOO:         [1]: 12
-          [1657608786.230589][57139:57144] CHIP:TOO:         [2]: 13
-          [1657608786.230594][57139:57144] CHIP:TOO:      }
+          Verify read command is received on TH(all-clusters-minimal-app)
+
+          [1658848398.260378][28392:28392] CHIP:IM: Received Read request
+          [1658848398.260455][28392:28392] CHIP:DMG: ReadRequestMessage =
+          [1658848398.260483][28392:28392] CHIP:DMG: {
+          [1658848398.260505][28392:28392] CHIP:DMG:         AttributePathIBs =
+          [1658848398.260531][28392:28392] CHIP:DMG:         [
+          [1658848398.260555][28392:28392] CHIP:DMG:                 AttributePathIB =
+          [1658848398.260583][28392:28392] CHIP:DMG:                 {
+          [1658848398.260611][28392:28392] CHIP:DMG:                         Endpoint = 0x1,
+          [1658848398.260642][28392:28392] CHIP:DMG:                         Cluster = 0x25,
+          [1658848398.260673][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1658848398.260702][28392:28392] CHIP:DMG:                 }
+          [1658848398.260731][28392:28392] CHIP:DMG:
+          [1658848398.260756][28392:28392] CHIP:DMG:         ],
+          [1658848398.260784][28392:28392] CHIP:DMG:
+          [1658848398.260810][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848398.260836][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
+          [1658848398.260859][28392:28392] CHIP:DMG: },
+          [1658848398.260930][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658848398.261011][28392:28392] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658848398.261040][28392:28392] CHIP:DMG: <RE:Run> Cluster 25, Attribute 1 is dirty
       disabled: true
 
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          ./chip-tool bridgedactions  read  setup-url  1 1
+          Optional attibute
 
-          Verify in DUT as client side log
-          [1656480136859] [49753:5741500] CHIP: [DMG] ReportDataMessage =
-          [1656480136859] [49753:5741500] CHIP: [DMG] {
-          [1656480136859] [49753:5741500] CHIP: [DMG]         AttributeReportIBs =
-          [1656480136859] [49753:5741500] CHIP: [DMG]         [
-          [1656480136859] [49753:5741500] CHIP: [DMG]                 AttributeReportIB =
-          [1656480136859] [49753:5741500] CHIP: [DMG]                 {
-          [1656480136859] [49753:5741500] CHIP: [DMG]                         AttributeStatusIB =
-          [1656480136859] [49753:5741500] CHIP: [DMG]                         {
-          [1656480136859] [49753:5741500] CHIP: [DMG]                                 AttributePathIB =
-          [1656480136859] [49753:5741500] CHIP: [DMG]                                 {
-          [1656480136859] [49753:5741500] CHIP: [DMG]                                         Endpoint = 0x1,
-          [1656480136859] [49753:5741500] CHIP: [DMG]                                         Cluster = 0x25,
-          [1656480136859] [49753:5741500] CHIP: [DMG]                                         Attribute = 0x0000_0002,
-          [1656480136859] [49753:5741500] CHIP: [DMG]                                 }
-          [1656480136859] [49753:5741500] CHIP: [DMG]
-          [1656480136859] [49753:5741500] CHIP: [DMG]                                 StatusIB =
-          [1656480136859] [49753:5741500] CHIP: [DMG]                                 {
-          [1656480136859] [49753:5741500] CHIP: [DMG]                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1656480136859] [49753:5741500] CHIP: [DMG]                                 },
-          [1656480136859] [49753:5741500] CHIP: [DMG]
-          [1656480136859] [49753:5741500] CHIP: [DMG]                         },
-          [1656480136859] [49753:5741500] CHIP: [DMG]
-          [1656480136859] [49753:5741500] CHIP: [DMG]                 },
-          [1656480136859] [49753:5741500] CHIP: [DMG]
-          [1656480136859] [49753:5741500] CHIP: [DMG]         ],
-          [1656480136859] [49753:5741500] CHIP: [DMG]
-          [1656480136859] [49753:5741500] CHIP: [DMG]         SuppressResponse = true,
-          [1656480136859] [49753:5741500] CHIP: [DMG]         InteractionModelRevision = 1
-          [1656480136859] [49753:5741500] CHIP: [DMG] }
-          [1656480136859] [49753:5741500] CHIP: [TOO] Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          ./chip-tool bridgedactions read setup-url 1 1
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
