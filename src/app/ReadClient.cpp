@@ -828,6 +828,29 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
+    // We didn't get a message from the server on time; it's possible that it no
+    // longer has a useful CASE session to us.  Mark defunct all sessions that
+    // have not seen peer activity in at least as long as our session.
+    const auto & holder = _this->mReadPrepareParams.mSessionHolder;
+    if (holder)
+    {
+        System::Clock::Timestamp lastPeerActivity = holder->AsSecureSession()->GetLastPeerActivityTime();
+        _this->mpImEngine->GetExchangeManager()->GetSessionManager()->ForEachMatchingSession(
+            _this->mPeer, [&lastPeerActivity](auto * session) {
+                if (!session->IsCASESession())
+                {
+                    return;
+                }
+
+                if (session->GetLastPeerActivityTime() > lastPeerActivity)
+                {
+                    return;
+                }
+
+                session->MarkAsDefunct();
+            });
+    }
+
     // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
     // response timeouts).
     _this->Close(CHIP_ERROR_TIMEOUT);
