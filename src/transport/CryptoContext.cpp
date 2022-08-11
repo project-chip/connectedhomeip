@@ -149,10 +149,11 @@ CHIP_ERROR CryptoContext::BuildNonce(NonceView nonce, uint8_t securityFlags, uin
 
 CHIP_ERROR CryptoContext::BuildPrivacyNonce(NonceView nonce, uint16_t sessionId, const MessageAuthenticationCode & mac)
 {
-    Encoding::LittleEndian::BufferWriter bbuf(nonce.data(), nonce.size());
+    const uint8_t * micFragment = &mac.GetTag()[kPrivacyNonceMicFragmentOffset];
+    Encoding::BigEndian::BufferWriter bbuf(nonce.data(), nonce.size());
 
     bbuf.Put16(sessionId);
-    bbuf.Put(mac.GetTag(), kPrivacyNonceMicFragmentLen);
+    bbuf.Put(micFragment, kPrivacyNonceMicFragmentLength);
     return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
