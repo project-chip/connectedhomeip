@@ -1039,6 +1039,7 @@ private:
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
     chip::ClusterId mClusterId;
+    // Id of the command we send.
     chip::CommandId mCommandId;
 };
 
@@ -1051,7 +1052,12 @@ void NSObjectCommandCallback::OnResponse(app::CommandSender * apCommandSender, c
     //
     // Validate that the data response we received matches what we expect in terms of its cluster and command IDs.
     //
-    VerifyOrExit(aCommandPath.mClusterId == mClusterId && aCommandPath.mCommandId == mCommandId, err = CHIP_ERROR_SCHEMA_MISMATCH);
+    VerifyOrExit(aCommandPath.mClusterId == mClusterId, err = CHIP_ERROR_SCHEMA_MISMATCH);
+
+    // If aReader is null, we got a status response and the command id in the
+    // path should match our command id.  If aReader is not null, we got a data
+    // response, which will have its own command id, which we don't know.
+    VerifyOrExit(aCommandPath.mCommandId == mCommandId || aReader != nullptr, err = CHIP_ERROR_SCHEMA_MISMATCH);
 
     if (aReader != nullptr) {
         err = app::DataModel::Decode(*aReader, response);
