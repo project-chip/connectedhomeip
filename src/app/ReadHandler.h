@@ -32,6 +32,8 @@
 #include <app/EventManagement.h>
 #include <app/EventPathParams.h>
 #include <app/MessageDef/AttributePathIBs.h>
+#include <app/MessageDef/DataVersionFilterIBs.h>
+#include <app/MessageDef/EventFilterIBs.h>
 #include <app/MessageDef/EventPathIBs.h>
 #include <app/ObjectList.h>
 #include <lib/core/CHIPCore.h>

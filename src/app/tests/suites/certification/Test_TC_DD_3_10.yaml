@@ -50,6 +50,7 @@ tests:
     - label:
           "DUT fetches commissioning data from DCL using VID and PID from
           Onboarding Payload"
+      PICS: MCORE.DD.FETCH_DCL
       verification: |
           1. Observe the TH"s DCL on the DUT
       disabled: true
@@ -58,6 +59,7 @@ tests:
           "Using the instructions located at the CommissioningCustomFlowURL from
           the DCL, DUT guides the user in next steps to prepare the commissionee
           (TH) for commissioning"
+      PICS: MCORE.DD.FETCH_DCL
       verification: |
           1. Follow instructions for commissioning using the URL contained in the DCL
       disabled: true

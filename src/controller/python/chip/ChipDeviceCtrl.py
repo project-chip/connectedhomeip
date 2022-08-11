@@ -40,11 +40,11 @@ from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import *
 from . import clusters as Clusters
+from .FabricAdmin import FabricAdmin
 import enum
 import threading
 import typing
 import builtins
-import ipdb
 import ctypes
 import copy
 
@@ -157,7 +157,7 @@ class DiscoveryFilterType(enum.IntEnum):
 class ChipDeviceController():
     activeList = set()
 
-    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
+    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, paaTrustStorePath: str = "", useTestCommissioner: bool = False, fabricAdmin: FabricAdmin = None, name: str = None):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         self._ChipStack = builtins.chipStack
@@ -174,18 +174,22 @@ class ChipDeviceController():
                 opCredsContext), pointer(devCtrl), fabricId, nodeId, adminVendorId, ctypes.c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
         )
 
-        self.nodeId = nodeId
-
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
         self.devCtrl = devCtrl
+        self._fabricAdmin = fabricAdmin
+        self._fabricId = fabricId
+        self._nodeId = nodeId
+        self._adminIndex = fabricAdmin.adminIndex
+
+        if name is None:
+            self._name = "adminIndex(%x)/fabricId(0x%016X)/nodeId(0x%016X)" % (fabricAdmin.adminIndex, fabricId, nodeId)
+        else:
+            self._name = name
 
         self._Cluster = ChipClusters(builtins.chipStack)
         self._Cluster.InitLib(self._dmLib)
-
-        def GetNodeId(self):
-            return self.nodeId
 
         def HandleCommissioningComplete(nodeid, err):
             if err != 0:
@@ -198,7 +202,7 @@ class ChipDeviceController():
             self._ChipStack.commissioningCompleteEvent.set()
             self._ChipStack.completeEvent.set()
 
-        def HandleKeyExchangeComplete(err):
+        def HandlePASEEstablishmentComplete(err):
             if err != 0:
                 print("Failed to establish secure session to device: {}".format(err))
                 self._ChipStack.callbackRes = self._ChipStack.ErrorToException(
@@ -207,7 +211,7 @@ class ChipDeviceController():
                 print("Established secure session with Device")
 
             if self.state != DCState.COMMISSIONING:
-                # During Commissioning, HandleKeyExchangeComplete will also be called,
+                # During Commissioning, HandlePASEEstablishmentComplete will also be called,
                 # in this case the async operation should be marked as finished by
                 # HandleCommissioningComplete instead this function.
                 self.state = DCState.IDLE
@@ -218,10 +222,10 @@ class ChipDeviceController():
                 if err != 0:
                     HandleCommissioningComplete(0, err)
 
-        self.cbHandleKeyExchangeCompleteFunct = _DevicePairingDelegate_OnPairingCompleteFunct(
-            HandleKeyExchangeComplete)
+        self.cbHandlePASEEstablishmentCompleteFunct = _DevicePairingDelegate_OnPairingCompleteFunct(
+            HandlePASEEstablishmentComplete)
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(
-            self.devCtrl, self.cbHandleKeyExchangeCompleteFunct)
+            self.devCtrl, self.cbHandlePASEEstablishmentCompleteFunct)
 
         self.cbHandleCommissioningCompleteFunct = _DevicePairingDelegate_OnCommissioningCompleteFunct(
             HandleCommissioningComplete)
@@ -231,7 +235,39 @@ class ChipDeviceController():
         self.state = DCState.IDLE
         self.isActive = True
 
+        # Validate FabricID/NodeID followed from NOC Chain
+        self._fabricId = self.GetFabricIdInternal()
+        assert self._fabricId == fabricId
+        self._nodeId = self.GetNodeIdInternal()
+        assert self._nodeId == nodeId
+
         ChipDeviceController.activeList.add(self)
+
+    @property
+    def fabricAdmin(self) -> FabricAdmin:
+        return self._fabricAdmin
+
+    @property
+    def nodeId(self) -> int:
+        self.CheckIsActive()
+        return self._nodeId
+
+    @property
+    def fabricId(self) -> int:
+        self.CheckIsActive()
+        return self._fabricId
+
+    @property
+    def adminIndex(self) -> int:
+        return self._adminIndex
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, new_name: str):
+        self._name = new_name
 
     def Shutdown(self):
         ''' Shuts down this controller and reclaims any used resources, including the bound
@@ -447,6 +483,7 @@ class ChipDeviceController():
         return self._ChipStack.commissioningEventRes == 0
 
     def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int):
+        """ DEPRECATED, DO NOT USE! Use `CommissionOnNetwork` or `CommissionWithCode` """
         self.CheckIsActive()
 
         # IP connection will run through full commissioning, so we need to wait
@@ -614,7 +651,8 @@ class ChipDeviceController():
         else:
             raise self._ChipStack.ErrorToException(res)
 
-    def GetFabricId(self):
+    def GetFabricIdInternal(self):
+        """Get the fabric ID from the object. Only used to validate cached value from property."""
         self.CheckIsActive()
 
         fabricid = c_uint64(0)
@@ -629,7 +667,8 @@ class ChipDeviceController():
         else:
             raise self._ChipStack.ErrorToException(res)
 
-    def GetNodeId(self):
+    def GetNodeIdInternal(self) -> int:
+        """Get the node ID from the object. Only used to validate cached value from property."""
         self.CheckIsActive()
 
         nodeid = c_uint64(0)

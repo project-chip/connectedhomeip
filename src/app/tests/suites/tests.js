@@ -500,6 +500,7 @@ function getManualTests() {
     ];
 
     const UserLabel = [
+        "Test_TC_ULABEL_2_1",
         "Test_TC_ULABEL_3_1",
     ];
 
@@ -675,6 +676,7 @@ function getTests() {
         "Test_TC_MEDIAPLAYBACK_1_7",
         "Test_TC_AUDIOOUTPUT_1_8",
         "Test_TC_TGTNAV_1_9",
+        "Test_TC_TGTNAV_8_2",
         "Test_TC_APBSC_1_10",
         "Test_TC_CONTENTLAUNCHER_1_11",
         "Test_TC_ALOGIN_1_12",

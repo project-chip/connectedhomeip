@@ -32,8 +32,10 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          ./chip-tool thermostat read  local-temperature  1 1
-          On TH(thermostat app), verify the read request
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+           ./chip-tool thermostat read  local-temperature  1 1
+
+          Verify the ReadRequestMessage on TH(all-clusters-app)
 
           [1652264555.303895][7099:7099] CHIP:IM: Received Read request
           [1652264555.303980][7099:7099] CHIP:DMG: ReadRequestMessage =
@@ -56,7 +58,8 @@ tests:
 
           ./chip-tool thermostat read  control-sequence-of-operation 1 1
 
-          On TH(thermostat app), verify the read request
+
+          Verify the ReadRequestMessage on TH(all-clusters-app)
 
           [1652265275.022068][7099:7099] CHIP:DMG: ReadRequestMessage =
           [1652265275.022110][7099:7099] CHIP:DMG: {
@@ -77,7 +80,7 @@ tests:
 
           ./chip-tool thermostat read   system-mode    1 1
 
-          On TH(thermostat app), verify the read request
+          Verify the ReadRequestMessage on TH(all-clusters-app)
           [1652265332.311723][7099:7099] CHIP:DMG: ReadRequestMessage =
           [1652265332.311772][7099:7099] CHIP:DMG: {
           [1652265332.311812][7099:7099] CHIP:DMG:         AttributePathIBs =
@@ -110,11 +113,13 @@ tests:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          verify on Reference app receives the right Read Request Message for the data sent in the below commands
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
 
           ./chip-tool thermostat write system-mode 2 1 1
-          On TH(thermostat app), verify the write request
+
+          Verify the WriteRequestMessage on TH(all-clusters-app)
+
           [1652265582.913625][7099:7099] CHIP:IM: Received Write request
           [1652265582.913672][7099:7099] CHIP:DMG: IM WH moving to [Initialized]
           [1652265582.913768][7099:7099] CHIP:DMG: WriteRequestMessage =
@@ -144,7 +149,8 @@ tests:
 
 
            ./chip-tool thermostat write  control-sequence-of-operation 1 1 1
-          On TH(thermostat app), verify the write request
+          Verify the WriteRequestMessage on TH(all-clusters-app)
+
           [1652265678.578137][7099:7099] CHIP:IM: Received Write request
           [1652265678.578192][7099:7099] CHIP:DMG: IM WH moving to [Initialized]
           [1652265678.578284][7099:7099] CHIP:DMG: WriteRequestMessage =
@@ -187,12 +193,12 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
           To verify all below steps use all-clusters-minimal-app
-          verify on Reference app receives the right Read Request Message for the data sent in the below commands
 
           ./chip-tool thermostat read attribute-list 1 1
-          On  TH(all-clusters-minimal-app) verify the read request
-          [1657179340.726622][2249:2249] CHIP:IM: Received Read request
+          verify on TH(all-cluster-minimal-app) receives the right Read Request Message for the data sent in the below commands
+          1657179340.726622][2249:2249] CHIP:IM: Received Read request
           [1657179340.726762][2249:2249] CHIP:DMG: ReadRequestMessage =
           [1657179340.726817][2249:2249] CHIP:DMG: {
           [1657179340.726863][2249:2249] CHIP:DMG:         AttributePathIBs =
@@ -215,7 +221,7 @@ tests:
 
 
           ./chip-tool thermostat read  local-temperature  1 1
-          On  TH(all-clusters-minimal-app) verify the read request
+          verify on TH(all-cluster-minimal-app) receives the right Read Request Message for the data sent in the below commands
           [1652264555.303895][7099:7099] CHIP:IM: Received Read request
           [1652264555.303980][7099:7099] CHIP:DMG: ReadRequestMessage =
           [1652264555.304045][7099:7099] CHIP:DMG: {
@@ -236,7 +242,8 @@ tests:
 
 
           ./chip-tool thermostat read  control-sequence-of-operation 1 1
-          On  TH(all-clusters-minimal-app) verify the read request
+
+          Verify the ReadRequestMessage on TH(all-clusters-app)
           [1652265275.022068][7099:7099] CHIP:DMG: ReadRequestMessage =
           [1652265275.022110][7099:7099] CHIP:DMG: {
           [1652265275.022145][7099:7099] CHIP:DMG:         AttributePathIBs =
@@ -255,7 +262,8 @@ tests:
           [1652265275.022756][7099:7099] CHIP:DMG: },
 
           ./chip-tool thermostat read   system-mode    1 1
-          On  TH(all-clusters-minimal-app) verify the read request
+
+          Verify the ReadRequestMessage on TH(all-clusters-app)
           [1652265332.311723][7099:7099] CHIP:DMG: ReadRequestMessage =
           [1652265332.311772][7099:7099] CHIP:DMG: {
           [1652265332.311812][7099:7099] CHIP:DMG:         AttributePathIBs =

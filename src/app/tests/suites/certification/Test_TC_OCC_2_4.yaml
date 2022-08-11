@@ -36,7 +36,7 @@ tests:
       verification: |
           ./chip-tool occupancysensing read occupancy-sensor-type 1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify the " occupancy-sensor-type response" on the TH (all-cluster-app) log:
 
           [1657906852.014556][2361:2361] CHIP:IM: Received Read request
           [1657906852.014724][2361:2361] CHIP:DMG: ReadRequestMessage =
@@ -62,7 +62,7 @@ tests:
       verification: |
           ./chip-tool occupancysensing read occupancy-sensor-type-bitmap 1 1
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify the " occupancy-sensor-type-bitmap response" on the TH (all-cluster-app) log:
 
           [1657906867.937264][2361:2361] CHIP:IM: Received Read request
           [1657906867.937390][2361:2361] CHIP:DMG: ReadRequestMessage =
