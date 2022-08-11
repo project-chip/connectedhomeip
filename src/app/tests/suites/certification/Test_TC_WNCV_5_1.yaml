@@ -35,11 +35,25 @@ tests:
           On TestHarnes (all-cluster-app) a received read of feature-map looks like this:
 
           ./chip-tool windowcovering read feature-map 1 1
+          Verify the "feature-map  " read response on TH(all-cluster-app):
 
-          Verify in TH all-clusters-app log data type is map32
-
-          [1657103226.784391][4633:4638] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_FFFC DataVersion: 383647307
-          [1657103226.784460][4633:4638] CHIP:TOO:   FeatureMap: 23
+          [1659944836.658724][2742:2742] CHIP:IM: Received Read request
+          [1659944836.658804][2742:2742] CHIP:DMG: ReadRequestMessage =
+          [1659944836.658833][2742:2742] CHIP:DMG: {
+          [1659944836.658854][2742:2742] CHIP:DMG:         AttributePathIBs =
+          [1659944836.658880][2742:2742] CHIP:DMG:         [
+          [1659944836.658904][2742:2742] CHIP:DMG:                 AttributePathIB =
+          [1659944836.658932][2742:2742] CHIP:DMG:                 {
+          [1659944836.658960][2742:2742] CHIP:DMG:                         Endpoint = 0x1,
+          [1659944836.658995][2742:2742] CHIP:DMG:                         Cluster = 0x102,
+          [1659944836.659031][2742:2742] CHIP:DMG:                         Attribute = 0x0000_FFFC,
+          [1659944836.659062][2742:2742] CHIP:DMG:                 }
+          [1659944836.659091][2742:2742] CHIP:DMG:
+          [1659944836.659116][2742:2742] CHIP:DMG:         ],
+          [1659944836.659144][2742:2742] CHIP:DMG:
+          [1659944836.659171][2742:2742] CHIP:DMG:         isFabricFiltered = true,
+          [1659944836.659196][2742:2742] CHIP:DMG:         InteractionModelRevision = 1
+          [1659944836.659219][2742:2742] CHIP:DMG: },
       disabled: true
 
     - label: "Check Attribute defining the product"
@@ -54,10 +68,23 @@ tests:
 
           ./chip-tool windowcovering read type 1 1
 
-          Verify in TH all-clusters-app log  data type is enum8
-
-          [1657103199.191382][4627:4632] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0000 DataVersion: 383647307
-          [1657103199.191447][4627:4632] CHIP:TOO:   Type: 8
+          Verify the "type" read response on TH(all-cluster-app):
+          [1659944958.215763][2742:2742] CHIP:DMG: ReadRequestMessage =
+          [1659944958.215792][2742:2742] CHIP:DMG: {
+          [1659944958.215813][2742:2742] CHIP:DMG:         AttributePathIBs =
+          [1659944958.215839][2742:2742] CHIP:DMG:         [
+          [1659944958.215863][2742:2742] CHIP:DMG:                 AttributePathIB =
+          [1659944958.215892][2742:2742] CHIP:DMG:                 {
+          [1659944958.215920][2742:2742] CHIP:DMG:                         Endpoint = 0x1,
+          [1659944958.215955][2742:2742] CHIP:DMG:                         Cluster = 0x102,
+          [1659944958.215989][2742:2742] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659944958.216019][2742:2742] CHIP:DMG:                 }
+          [1659944958.216050][2742:2742] CHIP:DMG:
+          [1659944958.216077][2742:2742] CHIP:DMG:         ],
+          [1659944958.216106][2742:2742] CHIP:DMG:
+          [1659944958.216134][2742:2742] CHIP:DMG:         isFabricFiltered = true,
+          [1659944958.216160][2742:2742] CHIP:DMG:         InteractionModelRevision = 1
+          [1659944958.216185][2742:2742] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads the EndProductType attribute from TH"
@@ -67,10 +94,24 @@ tests:
 
           ./chip-tool windowcovering read end-product-type 1 1
 
-          Verify in TH all-clusters-app log  data type is enum8
-
-          [1657103251.203086][4641:4646] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_000D DataVersion: 383647307
-          [1657103251.203153][4641:4646] CHIP:TOO:   EndProductType: 0
+          Verify the "end-product-type "read response on TH(all-cluster-app):
+          [1659945106.066589][2742:2742] CHIP:IM: Received Read request
+          [1659945106.066665][2742:2742] CHIP:DMG: ReadRequestMessage =
+          [1659945106.066691][2742:2742] CHIP:DMG: {
+          [1659945106.066713][2742:2742] CHIP:DMG: 	AttributePathIBs =
+          [1659945106.066741][2742:2742] CHIP:DMG: 	[
+          [1659945106.066765][2742:2742] CHIP:DMG: 		AttributePathIB =
+          [1659945106.066795][2742:2742] CHIP:DMG: 		{
+          [1659945106.066824][2742:2742] CHIP:DMG: 			Endpoint = 0x1,
+          [1659945106.066862][2742:2742] CHIP:DMG: 			Cluster = 0x102,
+          [1659945106.066920][2742:2742] CHIP:DMG: 			Attribute = 0x0000_000D,
+          [1659945106.066973][2742:2742] CHIP:DMG: 		}
+          [1659945106.067020][2742:2742] CHIP:DMG:
+          [1659945106.067065][2742:2742] CHIP:DMG: 	],
+          [1659945106.067110][2742:2742] CHIP:DMG:
+          [1659945106.067154][2742:2742] CHIP:DMG: 	isFabricFiltered = true,
+          [1659945106.067196][2742:2742] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659945106.067235][2742:2742] CHIP:DMG: },
       disabled: true
 
     - label: "Check Attribute defining the working status"
@@ -85,10 +126,25 @@ tests:
 
           ./chip-tool windowcovering read mode 1 1
 
-          Verify in TH all-clusters-app log  data type is map8
+          Verify the "mode" read response on TH(all-cluster-app):
 
-          [1657103273.905725][4647:4652] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0017 DataVersion: 383647307
-          [1657103273.905816][4647:4652] CHIP:TOO:   Mode: 0
+          [1659945146.241332][2742:2742] CHIP:IM: Received Read request
+          [1659945146.241409][2742:2742] CHIP:DMG: ReadRequestMessage =
+          [1659945146.241436][2742:2742] CHIP:DMG: {
+          [1659945146.241457][2742:2742] CHIP:DMG: 	AttributePathIBs =
+          [1659945146.241483][2742:2742] CHIP:DMG: 	[
+          [1659945146.241507][2742:2742] CHIP:DMG: 		AttributePathIB =
+          [1659945146.241535][2742:2742] CHIP:DMG: 		{
+          [1659945146.241562][2742:2742] CHIP:DMG: 			Endpoint = 0x1,
+          [1659945146.241594][2742:2742] CHIP:DMG: 			Cluster = 0x102,
+          [1659945146.241625][2742:2742] CHIP:DMG: 			Attribute = 0x0000_0017,
+          [1659945146.241655][2742:2742] CHIP:DMG: 		}
+          [1659945146.241682][2742:2742] CHIP:DMG:
+          [1659945146.241707][2742:2742] CHIP:DMG: 	],
+          [1659945146.241735][2742:2742] CHIP:DMG:
+          [1659945146.241761][2742:2742] CHIP:DMG: 	isFabricFiltered = true,
+          [1659945146.241787][2742:2742] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659945146.241810][2742:2742] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads the ConfigStatus attribute from TH"
@@ -98,8 +154,23 @@ tests:
 
           ./chip-tool windowcovering read config-status 1 1
 
-          Verify in TH all-clusters-app log  data type is map8
+          Verify the "config-status"read response on TH(all-cluster-app):
 
-          [1657103295.608407][4654:4659] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0007 DataVersion: 383647307
-          [1657103295.608521][4654:4659] CHIP:TOO:   ConfigStatus: 27
+          [1659945171.752215][2742:2742] CHIP:IM: Received Read request
+          [1659945171.752329][2742:2742] CHIP:DMG: ReadRequestMessage =
+          [1659945171.752367][2742:2742] CHIP:DMG: {
+          [1659945171.752389][2742:2742] CHIP:DMG: 	AttributePathIBs =
+          [1659945171.752426][2742:2742] CHIP:DMG: 	[
+          [1659945171.752458][2742:2742] CHIP:DMG: 		AttributePathIB =
+          [1659945171.752497][2742:2742] CHIP:DMG: 		{
+          [1659945171.752536][2742:2742] CHIP:DMG: 			Endpoint = 0x1,
+          [1659945171.752569][2742:2742] CHIP:DMG: 			Cluster = 0x102,
+          [1659945171.752608][2742:2742] CHIP:DMG: 			Attribute = 0x0000_0007,
+          [1659945171.752640][2742:2742] CHIP:DMG: 		}
+          [1659945171.752680][2742:2742] CHIP:DMG:
+          [1659945171.752719][2742:2742] CHIP:DMG: 	],
+          [1659945171.752750][2742:2742] CHIP:DMG:
+          [1659945171.752778][2742:2742] CHIP:DMG: 	isFabricFiltered = true,
+          [1659945171.752815][2742:2742] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659945171.752840][2742:2742] CHIP:DMG: },
       disabled: true

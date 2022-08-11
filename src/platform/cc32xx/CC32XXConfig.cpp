@@ -378,10 +378,7 @@ CHIP_ERROR CC32XXConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSi
     VerifyOrReturnError(pEntry != nullptr, CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
     pEntry->ReadVal(buf, bufSize);
-    if (outLen)
-    {
-        outLen = pEntry->Len();
-    }
+    outLen = pEntry->Len();
     return CHIP_NO_ERROR;
 }
 

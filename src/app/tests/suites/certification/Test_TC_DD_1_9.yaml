@@ -30,7 +30,6 @@ tests:
     - label:
           "Provide the 11-digit/21-digit Manual Pairing Code from the TH Device
           in text, speech or any format supported by DUT"
-      PICS: ""
       verification: |
           1. Launch all-clusters-app on the raspi , get the Manual Pairing code from the log
 

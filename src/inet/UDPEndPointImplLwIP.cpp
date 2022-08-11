@@ -60,6 +60,16 @@ static_assert(LWIP_VERSION_MAJOR > 1, "CHIP requires LwIP 2.0 or later");
 #endif
 
 namespace chip {
+namespace Platform {
+template <>
+struct Deleter<struct pbuf>
+{
+    void operator()(struct pbuf * p) { pbuf_free(p); }
+};
+} // namespace Platform
+} // namespace chip
+
+namespace chip {
 namespace Inet {
 
 CHIP_ERROR UDPEndPointImplLwIP::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port,
@@ -352,31 +362,20 @@ CHIP_ERROR UDPEndPointImplLwIP::GetPCB(IPAddressType addrType)
 void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr,
                                                 u16_t port)
 {
-    UDPEndPointImplLwIP * ep       = static_cast<UDPEndPointImplLwIP *>(arg);
-    IPPacketInfo * pktInfo         = nullptr;
-    System::PacketBufferHandle buf = System::PacketBufferHandle::Adopt(p);
-
+    Platform::UniquePtr<struct pbuf> pbufFreeGuard(p);
+    UDPEndPointImplLwIP * ep = static_cast<UDPEndPointImplLwIP *>(arg);
+    IPPacketInfo * pktInfo   = nullptr;
     if (ep->mState == State::kClosed)
+    {
         return;
-
-    if (buf->HasChainedBuffer())
-    {
-        // Try the simple expedient of flattening in-place.
-        buf->CompactHead();
     }
-
-    if (buf->HasChainedBuffer())
+    // TODO: Skip copying the buffer if the pbuf already meets the PacketBuffer memory model
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(p->tot_len);
+    if (buf.IsNull() || pbuf_copy_partial(p, buf->Start(), p->tot_len, 0) != p->tot_len)
     {
-        // Have to allocate a new big-enough buffer and copy.
-        uint16_t messageSize            = buf->TotalLength();
-        System::PacketBufferHandle copy = System::PacketBufferHandle::New(messageSize, 0);
-        if (copy.IsNull() || buf->Read(copy->Start(), messageSize) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Inet, "No memory to flatten incoming packet buffer chain of size %u", buf->TotalLength());
-            return;
-        }
-        buf = std::move(copy);
+        ChipLogError(Inet, "Cannot copy received pbuf of size %u", p->tot_len);
     }
+    buf->SetDataLength(p->tot_len);
 
     pktInfo = GetPacketInfo(buf);
     if (pktInfo != nullptr)
@@ -388,10 +387,10 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
         pktInfo->DestPort    = pcb->local_port;
     }
 
-    // TODO: add thread-safe reference counting for UDP endpoints
     CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf)] {
         ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
     });
+
     if (err == CHIP_NO_ERROR)
     {
         // If ScheduleLambda() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).

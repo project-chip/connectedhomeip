@@ -57,6 +57,10 @@ function getTests() {
   // TODO: Test_TC_DIAG_TH_NW_2_4 does not work on Darwin for now.
   tests.disable('Test_TC_DGTHREAD_2_4');
 
+  // TODO: Test_TC_CC_7_2 seems to rely on pretty tight timing that seem to not
+  // work right in the darwin tests.
+  tests.disable('Test_TC_CC_7_2');
+
   // TODO: Test_TC_CC_9_1 does not work on Darwin for now.
   // But is disabled in CI, so we can't disable it here.
   //tests.disable('Test_TC_CC_9_1');
