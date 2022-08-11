@@ -172,10 +172,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET_ESP32=1",
         "CHIP_DEVICE_LAYER_TARGET=ESP32",
       ]
-    } else if (chip_device_platform == "p6") {
+    } else if (chip_device_platform == "psoc6") {
       defines += [
-        "CHIP_DEVICE_LAYER_TARGET_P6=1",
-        "CHIP_DEVICE_LAYER_TARGET=P6",
+        "CHIP_DEVICE_LAYER_TARGET_PSOC6=1",
+        "CHIP_DEVICE_LAYER_TARGET=Infineon/PSOC6",
       ]
     } else if (chip_device_platform == "linux") {
       defines += [
@@ -421,8 +421,8 @@ if (chip_device_platform != "none") {
       _platform_target = "android"
     } else if (chip_device_platform == "external") {
       _platform_target = chip_platform_target
-    } else if (chip_device_platform == "p6") {
-      _platform_target = "P6"
+    } else if (chip_device_platform == "psoc6") {
+      _platform_target = "Infineon/PSOC6"
     } else if (chip_device_platform == "ameba") {
       _platform_target = "Ameba"
     } else if (chip_device_platform == "webos") {

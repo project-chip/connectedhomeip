@@ -215,7 +215,7 @@ requirements
 -   [nRF Connect Pump](/examples/pump-app/nrfconnect/README.md)
 -   [NXP Examples](./nxp_imx8m_linux_examples.md)
 -   [NXP](/examples/all-clusters-app/nxp/mw320/README.md)
--   [P6](/examples/all-clusters-app/p6/README.md)
+-   [P6](/examples/all-clusters-app/infineon/p6/README.md)
 -   [Qorvo](/examples/lighting-app/qpg/README.md)
 -   [SiliconLabs](./silabs_efr32_building.md)
 -   [Simulated Linux](./simulated_device_linux.md)
