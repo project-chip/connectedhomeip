@@ -78,9 +78,11 @@ public:
     void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId) const;
+    OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId, bool isSessionDesignatedLookup) const;
 
-    void ReleaseSession(const ScopedNodeId & peerId) override;
+    void ReleaseSession(const ScopedNodeId & peerId);
+
+    void ReleaseSession(OperationalSessionSetup * device) override;
 
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
@@ -96,12 +98,11 @@ public:
      */
     CHIP_ERROR GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr);
 
+    //////////// SessionUpdateDelegate Implementation ///////////////
     void UpdatePeerAddress(ScopedNodeId peerId) override;
 
 private:
     Optional<SessionHandle> FindExistingSession(const ScopedNodeId & peerId) const;
-
-    void ReleaseSession(OperationalSessionSetup * device) const;
 
     CASESessionManagerConfig mConfig;
 };

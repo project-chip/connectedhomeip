@@ -70,6 +70,8 @@ struct DeviceProxyInitParams
     }
 };
 
+class OperationalSessionSetup;
+
 /**
  * @brief Delegate provided when creating OperationalSessionSetup.
  *
@@ -81,9 +83,7 @@ class OperationalSessionReleaseDelegate
 {
 public:
     virtual ~OperationalSessionReleaseDelegate() = default;
-    // TODO Issue #20452: Once cleanup from #20452 takes place we can provide OperationalSessionSetup *
-    // instead of ScopedNodeId here.
-    virtual void ReleaseSession(const ScopedNodeId & peerId) = 0;
+    virtual void ReleaseSession(OperationalSessionSetup * sessionSetup) = 0;
 };
 
 /**
@@ -201,6 +201,8 @@ public:
     bool IsConnected() const { return mState == State::SecureConnected; }
 
     bool IsConnecting() const { return mState == State::Connecting; }
+
+    bool IsSessionDesignatedLookup() const { return mPerformingLookupOnConnectedSession; }
 
     /**
      * IsResolvingAddress returns true if we are doing an address resolution
