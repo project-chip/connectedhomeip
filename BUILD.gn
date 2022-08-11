@@ -116,10 +116,15 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     source_packages = _matter_python_packages + _pigweed_python_packages
   }
 
+  pw_internal_pip_install("pip_install_matter_packages") {
+    packages = [ "//examples/common/pigweed/rpc_console:chip_rpc_distribution" ]
+  }
+
   # Python packages installed during bootstrap.
   pw_python_group("python_packages") {
     python_deps = [
       ":pip_install_editable_matter_packages",
+      ":pip_install_matter_packages",
       "$dir_pw_env_setup:pip_install_pigweed_package",
     ]
   }
@@ -129,7 +134,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     packages = [
       "//integrations/mobly:chip_mobly",
       "//examples/chef",
-      "//examples/common/pigweed/rpc_console/py:chip_rpc",
     ]
     editable = true
   }
