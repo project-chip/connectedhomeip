@@ -700,7 +700,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     ERR_clear_error();
 
     static_assert(P256ECDSASignature::Capacity() >= kP256_ECDSA_Signature_Length_Raw, "P256ECDSASignature must be large enough");
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
     nid = _nidForCurve(MapECName(mPublicKey.Type()));
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -919,7 +919,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     EC_KEY * ec_key = EC_KEY_dup(to_const_EC_KEY(&mKeypair));
     VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
 
     local_key = EVP_PKEY_new();
     VerifyOrExit(local_key != nullptr, error = CHIP_ERROR_INTERNAL);
@@ -1199,7 +1199,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     X509_NAME * subject = X509_NAME_new();
     VerifyOrExit(subject != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
 
     result = X509_REQ_set_version(x509_req, 0);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
