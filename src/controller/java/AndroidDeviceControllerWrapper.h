@@ -26,7 +26,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
-#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/CloudDeviceAttestationVerifier.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/android/CHIPP256KeypairBridge.h>
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -95,7 +95,7 @@ public:
 
     chip::Controller::AutoCommissioner * GetAutoCommissioner() { return &mAutoCommissioner; }
 
-    chip::Credentials::DefaultDACVerifier * GetDACVerifier() { return &mDACVerifier; }
+    chip::Credentials::CloudDACVerifier * GetCloudDACVerifier() { return &mCloudDACVerifier; }
 
     const chip::Controller::CommissioningParameters & GetCommissioningParameters() const
     {
@@ -178,8 +178,7 @@ private:
 
     chip::Controller::AutoCommissioner mAutoCommissioner;
 
-    // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-    chip::Credentials::DefaultDACVerifier mDACVerifier{ chip::Credentials::GetTestAttestationTrustStore() };
+    chip::Credentials::CloudDACVerifier mCloudDACVerifier;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidOperationalCredentialsIssuerPtr opCredsIssuer) :
         mController(std::move(controller)), mOpCredsIssuer(std::move(opCredsIssuer))
