@@ -236,11 +236,13 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
     return numActive;
 }
 
-CHIP_ERROR InteractionModelEngine::ShutdownSubscription(SubscriptionId aSubscriptionId)
+CHIP_ERROR InteractionModelEngine::ShutdownSubscription(FabricIndex aFabricIndex, NodeId aPeerNodeId,
+                                                        SubscriptionId aSubscriptionId)
 {
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
-        if (readClient->IsSubscriptionType() && readClient->IsMatchingSubscriptionId(aSubscriptionId))
+        if (readClient->IsSubscriptionType() && readClient->IsMatchingSubscriptionId(aSubscriptionId) &&
+            readClient->GetFabricIndex() == aFabricIndex && readClient->GetPeerNodeId() == aPeerNodeId)
         {
             readClient->Close(CHIP_NO_ERROR);
             return CHIP_NO_ERROR;

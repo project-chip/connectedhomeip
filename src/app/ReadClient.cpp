@@ -152,10 +152,9 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
     }
     else
     {
+        ClearActiveSubscriptionState();
         if (aError != CHIP_NO_ERROR)
         {
-            ClearActiveSubscriptionState();
-
             //
             // We infer that re-subscription was requested by virtue of having a non-zero list of event OR attribute paths present
             // in mReadPrepareParams. This would only be the case if an application called SendAutoResubscribeRequest which
