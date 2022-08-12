@@ -40,11 +40,11 @@ constexpr uint8_t kUpdateTokenLen = 32;
     return self;
 }
 
-- (void)handleQueryImage:(MTROtaSoftwareUpdateProviderClusterQueryImageParams * _Nonnull)params
-              controller:(MTRDeviceController *)controller
-                  nodeID:(NSNumber *)nodeID
-       completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                             NSError * _Nullable error))completionHandler
+- (void)handleQueryImageForNodeID:(NSNumber * _Nonnull)nodeID
+                       controller:(MTRDeviceController * _Nonnull)controller
+                           params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams * _Nonnull)params
+                completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler
 {
     NSError * error;
 
@@ -104,11 +104,12 @@ constexpr uint8_t kUpdateTokenLen = 32;
     completionHandler(_selectedCandidate, error);
 }
 
-- (void)handleApplyUpdateRequest:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * _Nonnull)params
-                      controller:(MTRDeviceController *)controller
-                          nodeID:(NSNumber *)nodeID
-               completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler
+- (void)handleApplyUpdateRequestForNodeID:(NSNumber * _Nonnull)nodeID
+                               controller:(MTRDeviceController * _Nonnull)controller
+                                   params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * _Nonnull)params
+                        completionHandler:
+                            (void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                NSError * _Nullable error))completionHandler
 {
     MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * applyUpdateResponseParams =
         [[MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
@@ -116,10 +117,10 @@ constexpr uint8_t kUpdateTokenLen = 32;
     completionHandler(applyUpdateResponseParams, nil);
 }
 
-- (void)handleNotifyUpdateApplied:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * _Nonnull)params
-                       controller:(MTRDeviceController *)controller
-                           nodeID:(NSNumber *)nodeID
-                completionHandler:(StatusCompletion _Nonnull)completionHandler
+- (void)handleNotifyUpdateAppliedForNodeID:(NSNumber * _Nonnull)nodeID
+                                controller:(MTRDeviceController * _Nonnull)controller
+                                    params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * _Nonnull)params
+                         completionHandler:(StatusCompletion _Nonnull)completionHandler
 {
     completionHandler(nil);
 }

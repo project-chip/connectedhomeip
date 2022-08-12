@@ -449,7 +449,10 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleQueryImage:commandParams controller:controller nodeID:@(nodeId) completionHandler:completionHandler];
+        [strongDelegate handleQueryImageForNodeID:@(nodeId)
+                                       controller:controller
+                                           params:commandParams
+                                completionHandler:completionHandler];
     });
 }
 
@@ -484,10 +487,10 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleApplyUpdateRequest:commandParams
-                                      controller:controller
-                                          nodeID:@(nodeId)
-                               completionHandler:completionHandler];
+        [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
+                                               controller:controller
+                                                   params:commandParams
+                                        completionHandler:completionHandler];
     });
 }
 
@@ -519,10 +522,10 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleNotifyUpdateApplied:commandParams
-                                       controller:controller
-                                           nodeID:@(nodeId)
-                                completionHandler:completionHandler];
+        [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
+                                                controller:controller
+                                                    params:commandParams
+                                         completionHandler:completionHandler];
     });
 }
 

@@ -20,26 +20,26 @@
 @end
 
 @implementation MTRTestOTAProvider
-- (void)handleQueryImage:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
-              controller:(MTRDeviceController *)controller
-                  nodeID:(NSNumber *)nodeID
-       completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                             NSError * _Nullable error))completionHandler
-{
-}
-
-- (void)handleApplyUpdateRequest:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-                      controller:(MTRDeviceController *)controller
-                          nodeID:(NSNumber *)nodeID
-               completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler
-{
-}
-
-- (void)handleNotifyUpdateApplied:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+- (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
-                           nodeID:(NSNumber *)nodeID
-                completionHandler:(StatusCompletion)completionHandler
+                           params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
+                completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler
+{
+}
+
+- (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
+                               controller:(MTRDeviceController *)controller
+                                   params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+                        completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler
+{
+}
+
+- (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
+                                controller:(MTRDeviceController *)controller
+                                    params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+                         completionHandler:(StatusCompletion)completionHandler
 {
 }
 

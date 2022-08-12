@@ -38,22 +38,23 @@ typedef NS_ENUM(uint8_t, UserConsentState) {
 @end
 
 @interface OTAProviderDelegate : NSObject <MTROTAProviderDelegate>
-- (void)handleQueryImage:(MTROtaSoftwareUpdateProviderClusterQueryImageParams * _Nonnull)params
-              controller:(MTRDeviceController * _Nonnull)controller
-                  nodeID:(NSNumber * _Nonnull)nodeID
-       completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                             NSError * _Nullable error))completionHandler;
-
-- (void)handleApplyUpdateRequest:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * _Nonnull)params
-                      controller:(MTRDeviceController * _Nonnull)controller
-                          nodeID:(NSNumber * _Nonnull)nodeID
-               completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler;
-
-- (void)handleNotifyUpdateApplied:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * _Nonnull)params
+- (void)handleQueryImageForNodeID:(NSNumber * _Nonnull)nodeID
                        controller:(MTRDeviceController * _Nonnull)controller
-                           nodeID:(NSNumber * _Nonnull)nodeID
-                completionHandler:(StatusCompletion _Nonnull)completionHandler;
+                           params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams * _Nonnull)params
+                completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler;
+
+- (void)handleApplyUpdateRequestForNodeID:(NSNumber * _Nonnull)nodeID
+                               controller:(MTRDeviceController * _Nonnull)controller
+                                   params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * _Nonnull)params
+                        completionHandler:
+                            (void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                NSError * _Nullable error))completionHandler;
+
+- (void)handleNotifyUpdateAppliedForNodeID:(NSNumber * _Nonnull)nodeID
+                                controller:(MTRDeviceController * _Nonnull)controller
+                                    params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * _Nonnull)params
+                         completionHandler:(StatusCompletion _Nonnull)completionHandler;
 
 @property (strong, nonatomic, nullable) NSArray<DeviceSoftwareVersionModel *> * candidates;
 @property (strong, nonatomic, nullable) DeviceSoftwareVersionModel * selectedCandidate;
