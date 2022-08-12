@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "CloudDeviceAttestationVerifier.h"
+#include "DacOnlyPartialAttestationVerifier.h"
 
 #include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/CHIPCert.h>

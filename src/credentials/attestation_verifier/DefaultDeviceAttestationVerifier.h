@@ -17,7 +17,6 @@
 #pragma once
 
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
-#include <lib/support/ScopedBuffer.h>
 
 namespace chip {
 namespace Credentials {
