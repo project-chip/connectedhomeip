@@ -127,6 +127,11 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 
     chip::Controller::AndroidOperationalCredentialsIssuer * opCredsIssuer = wrapper->mOpCredsIssuer.get();
 
+    // Initialize device attestation verifier
+    // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+    const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+
     chip::Controller::FactoryInitParams initParams;
     chip::Controller::SetupParams setupParams;
 
@@ -143,7 +148,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
     setupParams.defaultCommissioner            = &wrapper->mAutoCommissioner;
-    setupParams.deviceAttestationVerifier      = &wrapper->mDACVerifier;
     initParams.fabricIndependentStorage        = wrapperStorage;
 
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
