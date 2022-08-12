@@ -107,7 +107,7 @@ void ExchangeManager::Shutdown()
     mState = State::kState_NotInitialized;
 }
 
-ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, ExchangeDelegate * delegate)
+ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, ExchangeDelegate * delegate, bool isInitiator)
 {
     if (!session->IsActiveSession())
     {
@@ -115,7 +115,7 @@ ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, Exc
         ChipLogError(ExchangeManager, "NewContext failed: session inactive");
         return nullptr;
     }
-    return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
+    return mContextPool.CreateObject(this, mNextExchangeId++, session, isInitiator, delegate);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId,

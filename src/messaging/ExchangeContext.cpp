@@ -54,6 +54,8 @@ using namespace chip::Encoding;
 using namespace chip::Inet;
 using namespace chip::System;
 
+#define CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING 1
+
 namespace chip {
 namespace Messaging {
 
@@ -139,12 +141,15 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     bool isStandaloneAck =
         (protocolId == Protocols::SecureChannel::Id) && msgType == to_underlying(Protocols::SecureChannel::MsgType::StandaloneAck);
+
+    //
+    // The caller clearly intends to send a message. Let's set the WillSendMessage flag so that if we fail at any
+    // point below, the exchange is still in a mode of being ready to send a message again, as well as being setup
+    // correctly for delegates to know that they still need to release the ref on this exchange.
+    //
     if (!isStandaloneAck)
     {
-        // If we were waiting for a message send, this is it.  Standalone acks
-        // are not application-level sends, which is why we don't allow those to
-        // clear the WillSendMessage flag.
-        mFlags.Clear(Flags::kFlagWillSendMessage);
+        mFlags.Set(Flags::kFlagWillSendMessage);
     }
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
@@ -208,10 +213,24 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
             return CHIP_ERROR_MISSING_SECURE_SESSION;
         }
 
+        CHIP_ERROR err;
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         // Create a new scope for `err`, to avoid shadowing warning previous `err`.
-        CHIP_ERROR err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), mSession.Get().Value(), mExchangeId,
-                                               IsInitiator(), GetReliableMessageContext(), reliableTransmissionRequested,
-                                               protocolId, msgType, std::move(msgBuf));
+        if (mInjectedFailures.Has(InjectedFailureType::kFailOnSend))
+        {
+            err = CHIP_ERROR_SENDING_BLOCKED;
+        }
+        else
+        {
+#endif
+            err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), mSession.Get().Value(), mExchangeId, IsInitiator(),
+                                        GetReliableMessageContext(), reliableTransmissionRequested, protocolId, msgType,
+                                        std::move(msgBuf));
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        }
+#endif
+
         if (err != CHIP_NO_ERROR && IsResponseExpected())
         {
             CancelResponseTimer();
@@ -219,8 +238,12 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         }
 
         // Standalone acks are not application-level message sends.
-        if (err == CHIP_NO_ERROR && !isStandaloneAck)
+        if (!isStandaloneAck && err == CHIP_NO_ERROR)
         {
+            //
+            // Once we've sent the message successfully, we can clear out the WillSendMessage flag.
+            //
+            mFlags.Clear(Flags::kFlagWillSendMessage);
             MessageHandled();
         }
 
@@ -230,6 +253,11 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
 void ExchangeContext::DoClose(bool clearRetransTable)
 {
+    if (mFlags.Has(Flags::kFlagClosed))
+    {
+        return;
+    }
+
     mFlags.Set(Flags::kFlagClosed);
 
     // Clear protocol callbacks
@@ -336,7 +364,6 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
 ExchangeContext::~ExchangeContext()
 {
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
-    VerifyOrDie(!IsAckPending());
 
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
     // Make sure that the exchange withdraws the request for Sleepy End Device active mode.
@@ -398,28 +425,27 @@ void ExchangeContext::OnSessionReleased()
     // decrease our refcount without worrying about use-after-free.
     ExchangeHandle ref(*this);
 
-    if (IsResponseExpected())
+    //
+    // If a send is not expected (either because we're waiting for a response OR
+    // we're in the middle of processing a OnMessageReceived call), we can go ahead
+    // and notify our delegate and abort the exchange since we still own the ref.
+    //
+    if (!IsSendExpected())
     {
-        // If we're waiting on a response, we now know it's never going to show up
-        // and we should notify our delegate accordingly.
-        CancelResponseTimer();
-        // We want to Abort, not just Close, so that RMP bits are cleared, so
-        // don't let NotifyResponseTimeout close us.
-        NotifyResponseTimeout(/* aCloseIfNeeded = */ false);
+        if (IsResponseExpected())
+        {
+            // If we're waiting on a response, we now know it's never going to show up
+            // and we should notify our delegate accordingly.
+            CancelResponseTimer();
+            // We want to Abort, not just Close, so that RMP bits are cleared, so
+            // don't let NotifyResponseTimeout close us.
+            NotifyResponseTimeout(/* aCloseIfNeeded = */ false);
+        }
+
         Abort();
     }
     else
     {
-        // Either we're expecting a send or we are in our "just allocated, first
-        // send has not happened yet" state.
-        //
-        // Just mark ourselves as closed.  The consumer is responsible for
-        // releasing us.  See documentation for
-        // ExchangeDelegate::OnExchangeClosing.
-        if (IsSendExpected())
-        {
-            mFlags.Clear(Flags::kFlagWillSendMessage);
-        }
         DoClose(true /* clearRetransTable */);
     }
 }

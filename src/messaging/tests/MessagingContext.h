@@ -154,8 +154,8 @@ public:
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate);
 
-    Messaging::ExchangeContext * NewExchangeToAlice(Messaging::ExchangeDelegate * delegate);
-    Messaging::ExchangeContext * NewExchangeToBob(Messaging::ExchangeDelegate * delegate);
+    Messaging::ExchangeContext * NewExchangeToAlice(Messaging::ExchangeDelegate * delegate, bool isInitiator = true);
+    Messaging::ExchangeContext * NewExchangeToBob(Messaging::ExchangeDelegate * delegate, bool isInitiator = true);
 
     System::Layer & GetSystemLayer() { return mIOContext->GetSystemLayer(); }
 

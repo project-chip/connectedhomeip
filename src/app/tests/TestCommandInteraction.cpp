@@ -496,10 +496,15 @@ void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSu
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     TestExchangeDelegate delegate;
-    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
+
     err = commandHandler.SendCommandResponse();
 
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+
+    exchange->Close();
 }
 
 void TestCommandInteraction::TestCommandSenderWithSendCommand(nlTestSuite * apSuite, void * apContext)
@@ -532,7 +537,8 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     TestExchangeDelegate delegate;
-    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
 
     err = commandHandler.PrepareCommand(path);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -540,6 +546,7 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = commandHandler.SendCommandResponse();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
     commandHandler.Close();
 }
 
@@ -565,7 +572,8 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
-    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
 
     AddInvokeResponseData(apSuite, apContext, &commandHandler, aNeedStatusCode);
     err = commandHandler.Finalize(commandPacket);
@@ -580,6 +588,8 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     err = invokeResponseMessageParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
+
+    exchange->Close();
 }
 
 void TestCommandInteraction::TestCommandHandlerWithSendSimpleCommandData(nlTestSuite * apSuite, void * apContext)
@@ -625,7 +635,8 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
     System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
-    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
 
     auto path = MakeTestCommandPath();
 
@@ -642,6 +653,8 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
     err = invokeResponseMessageParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
+
+    exchange->Close();
 }
 
 void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite * apSuite, void * apContext)
@@ -652,7 +665,8 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
     System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
-    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
 
     auto path = MakeTestCommandPath();
 
@@ -669,6 +683,8 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
     err = invokeResponseMessageParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
+
+    exchange->Close();
 }
 
 // Command Sender sends invoke request, command handler drops invoke response, then test injects status response message with
@@ -1001,7 +1017,8 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
     System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
-    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
 
     auto path = MakeTestCommandPath();
 
@@ -1022,6 +1039,8 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
     err = invokeResponseMessageParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
+
+    exchange->Close();
 }
 
 void TestCommandInteraction::TestCommandHandlerWithSendSimpleStatusCode(nlTestSuite * apSuite, void * apContext)
@@ -1060,13 +1079,16 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
             System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
             TestExchangeDelegate delegate;
-            commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+            auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+            commandHandler.mExchangeCtx.Grab(exchange);
 
             chip::isCommandDispatched = false;
             GenerateInvokeRequest(apSuite, apContext, commandDatabuf, messageIsTimed, kTestCommandIdNoData);
             commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), transactionIsTimed);
 
             NL_TEST_ASSERT(apSuite, chip::isCommandDispatched == (messageIsTimed == transactionIsTimed));
+
+            exchange->Close();
         }
     }
 }
@@ -1295,8 +1317,7 @@ void TestCommandInteraction::TestCommandHandlerReleaseWithExchangeClosed(nlTestS
     // Verify that async command handle has been allocated
     NL_TEST_ASSERT(apSuite, asyncCommandHandle.Get() != nullptr);
 
-    // Close the exchange associated with the handle and verify the handle can be gracefully released
-    asyncCommandHandle.Get()->mExchangeCtx->Close();
+    // Close the handle and ensure it's handled correctly.
     asyncCommandHandle = nullptr;
 }
 
