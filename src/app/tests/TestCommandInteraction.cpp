@@ -1064,8 +1064,16 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
 
             chip::isCommandDispatched = false;
             GenerateInvokeRequest(apSuite, apContext, commandDatabuf, messageIsTimed, kTestCommandIdNoData);
-            commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), transactionIsTimed);
-
+            Protocols::InteractionModel::Status status =
+                commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), transactionIsTimed);
+            if (messageIsTimed != transactionIsTimed)
+            {
+                NL_TEST_ASSERT(apSuite, status == Protocols::InteractionModel::Status::UnsupportedAccess);
+            }
+            else
+            {
+                NL_TEST_ASSERT(apSuite, status == Protocols::InteractionModel::Status::Success);
+            }
             NL_TEST_ASSERT(apSuite, chip::isCommandDispatched == (messageIsTimed == transactionIsTimed));
         }
     }
