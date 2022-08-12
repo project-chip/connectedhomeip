@@ -135,7 +135,6 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
         else
         {
             status = ProcessCommandDataIB(commandData);
-            ;
         }
         if (status != Status::Success)
         {
@@ -271,11 +270,7 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
             ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
                           ChipLogValueMEI(concretePath.mCommandId), ChipLogValueMEI(concretePath.mClusterId),
                           concretePath.mEndpointId);
-            if (AddStatus(concretePath, commandExists) != CHIP_NO_ERROR)
-            {
-                return Status::Failure;
-            }
-            return Status::Success;
+            return AddStatus(concretePath, commandExists) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
 
@@ -290,18 +285,10 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
         {
             if (err != CHIP_ERROR_ACCESS_DENIED)
             {
-                if (AddStatus(concretePath, Status::Failure) != CHIP_NO_ERROR)
-                {
-                    return Status::Failure;
-                }
-                return Status::Success;
+                return AddStatus(concretePath, Status::Failure) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
             }
             // TODO: when wildcard invokes are supported, handle them to discard rather than fail with status
-            if (AddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR)
-            {
-                return Status::Failure;
-            }
-            return Status::Success;
+            return AddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
 
@@ -309,11 +296,7 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
     {
         // TODO: when wildcard invokes are supported, discard a
         // wildcard-expanded path instead of returning a status.
-        if (AddStatus(concretePath, Status::NeedsTimedInteraction) != CHIP_NO_ERROR)
-        {
-            return Status::Failure;
-        }
-        return Status::Success;
+        return AddStatus(concretePath, Status::NeedsTimedInteraction) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
     }
 
     if (CommandIsFabricScoped(concretePath.mClusterId, concretePath.mCommandId))
@@ -324,11 +307,7 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
         {
             // TODO: when wildcard invokes are supported, discard a
             // wildcard-expanded path instead of returning a status.
-            if (AddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR)
-            {
-                return Status::Failure;
-            }
-            return Status::Success;
+            return AddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
 
@@ -353,11 +332,7 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        if (AddStatus(concretePath, Status::InvalidCommand) != CHIP_NO_ERROR)
-        {
-            return Status::Failure;
-        }
-        return Status::Success;
+        return AddStatus(concretePath, Status::InvalidCommand) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
     }
 
     // We have handled the error status above and put the error status in response, now return success status so we can process
