@@ -25,6 +25,7 @@ CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CAS
 {
     ReturnErrorOnFailure(params.sessionInitParams.Validate());
     mConfig = params;
+    params.sessionInitParams.exchangeMgr->GetReliableMessageMgr()->RegisterSessionUpdateDelegate(this);
     return AddressResolve::Resolver::Instance().Init(systemLayer);
 }
 
@@ -34,7 +35,8 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
                   ChipLogValueX64(peerId.GetNodeId()));
 
-    OperationalSessionSetup * session = FindExistingSessionSetup(peerId);
+    bool forAddressUpdate             = false;
+    OperationalSessionSetup * session = FindExistingSessionSetup(peerId, forAddressUpdate);
     if (session == nullptr)
     {
         ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing OperationalSessionSetup instance found");
@@ -78,9 +80,28 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Trans
     return CHIP_NO_ERROR;
 }
 
-OperationalSessionSetup * CASESessionManager::FindExistingSessionSetup(const ScopedNodeId & peerId) const
+void CASESessionManager::UpdatePeerAddress(ScopedNodeId peerId)
 {
-    return mConfig.sessionSetupPool->FindSessionSetup(peerId);
+    bool forAddressUpdate             = true;
+    OperationalSessionSetup * session = FindExistingSessionSetup(peerId, forAddressUpdate);
+    if (session == nullptr)
+    {
+        ChipLogDetail(CASESessionManager, "UpdatePeerAddress: No existing OperationalSessionSetup instance found");
+
+        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, peerId, this);
+        if (session == nullptr)
+        {
+            ChipLogDetail(CASESessionManager, "UpdatePeerAddress: Failed to allocate OperationalSessionSetup instance");
+            return;
+        }
+    }
+
+    session->PerformAddressUpdate();
+}
+
+OperationalSessionSetup * CASESessionManager::FindExistingSessionSetup(const ScopedNodeId & peerId, bool forAddressUpdate) const
+{
+    return mConfig.sessionSetupPool->FindSessionSetup(peerId, forAddressUpdate);
 }
 
 Optional<SessionHandle> CASESessionManager::FindExistingSession(const ScopedNodeId & peerId) const
@@ -89,7 +110,7 @@ Optional<SessionHandle> CASESessionManager::FindExistingSession(const ScopedNode
                                                                               MakeOptional(Transport::SecureSession::Type::kCASE));
 }
 
-void CASESessionManager::ReleaseSession(OperationalSessionSetup * session) const
+void CASESessionManager::ReleaseSession(OperationalSessionSetup * session)
 {
     if (session != nullptr)
     {

@@ -452,13 +452,26 @@ bool SessionManager::MarkSessionsAsDefunct(const ScopedNodeId & node, const Opti
         if (session->IsActiveSession() && session->GetPeer() == node &&
             (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
         {
-            session->AsSecureSession()->MarkAsDefunct();
+            session->MarkAsDefunct();
             found = true;
         }
         return Loop::Continue;
     });
 
     return found;
+}
+
+void SessionManager::UpdateAllSessionsPeerAddress(const ScopedNodeId & node, const Transport::PeerAddress & addr)
+{
+    mSecureSessions.ForEachSession([&node, &addr](auto session) {
+        // Arguably we should only be updating active and defunct sessions, but there is no harm
+        // in updating evicted sessions.
+        if (session->GetPeer() == node && Transport::SecureSession::Type::kCASE == session->GetSecureSessionType())
+        {
+            session->SetPeerAddress(addr);
+        }
+        return Loop::Continue;
+    });
 }
 
 Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,
