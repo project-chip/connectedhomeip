@@ -57,8 +57,8 @@ public:
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
 
 private:
-    static constexpr uint8_t kDACPrivateKeyLength          = 32;
-    static constexpr uint8_t kDACPublicKeyLength           = 65;
+    static constexpr uint8_t kDACPrivateKeyLength = 32;
+    static constexpr uint8_t kDACPublicKeyLength  = 65;
 };
 
 } // namespace DeviceLayer

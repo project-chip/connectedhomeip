@@ -150,7 +150,7 @@ extern "C" void ChipTest(void)
 
     // Initialize device attestation, commissionable data and device instance info
     // TODO: Use our own DeviceInstanceInfoProvider
-    //SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    // SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
     SetCommissionableDataProvider(&mFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
