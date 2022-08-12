@@ -127,14 +127,19 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
         VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), Status::InvalidAction);
         CommandDataIB::Parser commandData;
         VerifyOrReturnError(commandData.Init(invokeRequestsReader) == CHIP_NO_ERROR, Status::InvalidAction);
-
+        Status status = Status::Success;
         if (mExchangeCtx->IsGroupExchangeContext())
         {
-            VerifyOrReturnError(ProcessGroupCommandDataIB(commandData) == CHIP_NO_ERROR, Status::Failure);
+            status = ProcessGroupCommandDataIB(commandData);
         }
         else
         {
-            VerifyOrReturnError(ProcessCommandDataIB(commandData) == CHIP_NO_ERROR, Status::Failure);
+            status = ProcessCommandDataIB(commandData);
+            ;
+        }
+        if (status != Status::Success)
+        {
+            return status;
         }
     }
 
@@ -238,7 +243,7 @@ constexpr uint8_t sNoFields[] = {
 };
 } // anonymous namespace
 
-CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
+Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPathIB::Parser commandPath;
@@ -248,16 +253,16 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     // NOTE: errors may occur before the concrete command path is even fully decoded.
 
     err = aCommandElement.GetPath(&commandPath);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     err = commandPath.GetClusterId(&concretePath.mClusterId);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     err = commandPath.GetCommandId(&concretePath.mCommandId);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     err = commandPath.GetEndpointId(&concretePath.mEndpointId);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     {
         Status commandExists = mpCallback->CommandExists(concretePath);
@@ -266,7 +271,11 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
             ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
                           ChipLogValueMEI(concretePath.mCommandId), ChipLogValueMEI(concretePath.mClusterId),
                           concretePath.mEndpointId);
-            return AddStatus(concretePath, commandExists);
+            if (AddStatus(concretePath, commandExists) != CHIP_NO_ERROR)
+            {
+                return Status::Failure;
+            }
+            return Status::Success;
         }
     }
 
@@ -281,10 +290,18 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         {
             if (err != CHIP_ERROR_ACCESS_DENIED)
             {
-                return AddStatus(concretePath, Status::Failure);
+                if (AddStatus(concretePath, Status::Failure) != CHIP_NO_ERROR)
+                {
+                    return Status::Failure;
+                }
+                return Status::Success;
             }
             // TODO: when wildcard invokes are supported, handle them to discard rather than fail with status
-            return AddStatus(concretePath, Status::UnsupportedAccess);
+            if (AddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR)
+            {
+                return Status::Failure;
+            }
+            return Status::Success;
         }
     }
 
@@ -292,7 +309,11 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     {
         // TODO: when wildcard invokes are supported, discard a
         // wildcard-expanded path instead of returning a status.
-        return AddStatus(concretePath, Status::NeedsTimedInteraction);
+        if (AddStatus(concretePath, Status::NeedsTimedInteraction) != CHIP_NO_ERROR)
+        {
+            return Status::Failure;
+        }
+        return Status::Success;
     }
 
     if (CommandIsFabricScoped(concretePath.mClusterId, concretePath.mCommandId))
@@ -303,7 +324,11 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         {
             // TODO: when wildcard invokes are supported, discard a
             // wildcard-expanded path instead of returning a status.
-            return AddStatus(concretePath, Protocols::InteractionModel::Status::UnsupportedAccess);
+            if (AddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR)
+            {
+                return Status::Failure;
+            }
+            return Status::Success;
         }
     }
 
@@ -328,15 +353,19 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        return AddStatus(concretePath, Status::InvalidCommand);
+        if (AddStatus(concretePath, Status::InvalidCommand) != CHIP_NO_ERROR)
+        {
+            return Status::Failure;
+        }
+        return Status::Success;
     }
 
     // We have handled the error status above and put the error status in response, now return success status so we can process
     // other commands in the invoke request.
-    return CHIP_NO_ERROR;
+    return Status::Success;
 }
 
-CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement)
+Status CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPathIB::Parser commandPath;
@@ -351,13 +380,13 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     Credentials::GroupDataProvider::EndpointIterator * iterator;
 
     err = aCommandElement.GetPath(&commandPath);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     err = commandPath.GetClusterId(&clusterId);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     err = commandPath.GetCommandId(&commandId);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     groupId = mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     fabric  = GetAccessingFabricIndex();
@@ -373,8 +402,9 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
                       ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
         commandDataReader.Init(sNoFields);
         err = commandDataReader.Next();
+        VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
     }
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
 
     // Per spec, we do the "is this a timed command?" check for every path, but
     // since all paths that fail it just get silently discarded we can do it
@@ -384,7 +414,7 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     if (CommandNeedsTimedInvoke(clusterId, commandId))
     {
         // Group commands are never timed.
-        ExitNow();
+        return Status::Success;
     }
 
     // No check for `CommandIsFabricScoped` unlike in `ProcessCommandDataIB()` since group commands
@@ -392,7 +422,7 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
     // Find which endpoints can process the command, and dispatch to them.
     iterator = groupDataProvider->IterateEndpoints(fabric);
-    VerifyOrExit(iterator != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(iterator != nullptr, Status::Failure);
 
     while (iterator->Next(mapping))
     {
@@ -444,9 +474,7 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
         }
     }
     iterator->Release();
-
-exit:
-    return CHIP_NO_ERROR;
+    return Status::Success;
 }
 
 CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus)
