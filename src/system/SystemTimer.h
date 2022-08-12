@@ -64,6 +64,9 @@ public:
         Layer * GetSystemLayer() const { return mSystemLayer; }
 
     private:
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+        friend class LayerImplSelect;
+#endif
         Layer * mSystemLayer;
         TimerCompleteCallback mOnComplete;
         void * mAppState;
@@ -77,12 +80,18 @@ public:
     /**
      * Return the expiration time.
      */
-    Clock::Timestamp AwakenTime() const { return mAwakenTime; }
+    Clock::Timestamp AwakenTime() const
+    {
+        return mAwakenTime;
+    }
 
     /**
      * Return callback information.
      */
-    const Callback & GetCallback() const { return mCallback; }
+    const Callback & GetCallback() const
+    {
+        return mCallback;
+    }
 
 private:
     Clock::Timestamp mAwakenTime;
@@ -91,10 +100,13 @@ private:
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     friend class LayerImplSelect;
     dispatch_source_t mTimerSource = nullptr;
+#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+    friend class LayerImplSelect;
+    struct ev_timer mLibEvTimer;
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
     // Not defined
-    TimerData(const TimerData &) = delete;
+    TimerData(const TimerData &)             = delete;
     TimerData & operator=(const TimerData &) = delete;
 };
 

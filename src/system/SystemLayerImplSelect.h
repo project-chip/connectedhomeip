@@ -29,6 +29,13 @@
 #include <pthread.h>
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+#include <ev.h>
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#error "CHIP_SYSTEM_CONFIG_USE_LIBEV and CHIP_SYSTEM_CONFIG_USE_DISPATCH are mutually exclusive"
+#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
+
 #include <lib/support/ObjectLifeCycle.h>
 #include <system/SystemLayer.h>
 #include <system/SystemTimer.h>
@@ -70,13 +77,29 @@ public:
     void EventLoopEnds() override {}
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    void SetDispatchQueue(dispatch_queue_t dispatchQueue) override { mDispatchQueue = dispatchQueue; };
-    dispatch_queue_t GetDispatchQueue() override { return mDispatchQueue; };
+    void SetDispatchQueue(dispatch_queue_t dispatchQueue) override
+    {
+        mDispatchQueue = dispatchQueue;
+    };
+    dispatch_queue_t GetDispatchQueue() override
+    {
+        return mDispatchQueue;
+    };
     void HandleTimerComplete(TimerList::Node * timer);
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+    virtual void SetLibEvLoop(struct ev_loop * aLibEvLoopP) override
+    {
+        mLibEvLoopP = aLibEvLoopP;
+    };
+    static void HandleLibEvTimer(EV_P_ struct ev_timer * t, int revents);
+    static void HandleLibEvIoWatcher(EV_P_ struct ev_io * i, int revents);
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
     // Expose the result of WaitForEvents() for non-blocking socket implementations.
-    bool IsSelectResultValid() const { return mSelectResult >= 0; }
+    bool IsSelectResultValid() const
+    {
+        return mSelectResult >= 0;
+    }
 
 protected:
     static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
@@ -95,6 +118,12 @@ protected:
         dispatch_source_t mWrSource;
         void DisableAndClear();
 #endif
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+        struct ev_io mIoWatcher;
+        LayerImplSelect * mLayerImplSelectP;
+        void DisableAndClear();
+#endif
+
         intptr_t mCallbackData;
     };
     SocketWatch mSocketWatchPool[kSocketWatchMax];
@@ -125,6 +154,8 @@ protected:
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_queue_t mDispatchQueue = nullptr;
+#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+    struct ev_loop * mLibEvLoopP;
 #endif
 };
 

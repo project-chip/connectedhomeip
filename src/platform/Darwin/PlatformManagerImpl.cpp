@@ -54,8 +54,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     mRunLoopSem = dispatch_semaphore_create(0);
 
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
     // Ensure there is a dispatch queue available
     static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
+#endif
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.

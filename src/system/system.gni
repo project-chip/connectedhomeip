@@ -37,7 +37,9 @@ declare_args() {
 }
 
 declare_args() {
-  # use the dispatch library
+  # do not use libev by default
+  chip_system_config_use_libev = false
+  # use the dispatch library on darwin targets
   chip_system_config_use_dispatch = chip_system_config_use_sockets &&
                                     (current_os == "mac" || current_os == "ios")
 }
