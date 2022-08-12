@@ -49,19 +49,22 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         return (err = CHIP_ERROR_NOT_IMPLEMENTED);
     }
 
-    ret = getPref_bin_new(key, key, (uint8_t *) value, value_size, read_bytes_size);
-    switch (ret)
+    if (read_bytes_size)
     {
-    case 0:
-        return CHIP_NO_ERROR;
-    case -6:
-        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    case -7:
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    case -8:
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    default:
-        break;
+        ret = getPref_bin_new(key, key, (uint8_t *) value, value_size, read_bytes_size);
+        switch (ret)
+        {
+        case 0:
+            return CHIP_NO_ERROR;
+        case -6:
+            return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        case -7:
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        case -8:
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        default:
+            break;
+        }
     }
 
     return CHIP_ERROR_INTERNAL;
