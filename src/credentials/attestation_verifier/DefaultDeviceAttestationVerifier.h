@@ -41,9 +41,9 @@ public:
                                                    const ByteSpan & attestationSignatureBuffer,
                                                    const Crypto::P256PublicKey & dacPublicKey, const ByteSpan & csrNonce) override;
 
+protected:
     DefaultDACVerifier() {}
 
-protected:
     const AttestationTrustStore * mAttestationTrustStore;
 };
 

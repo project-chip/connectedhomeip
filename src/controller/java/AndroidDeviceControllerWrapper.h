@@ -95,7 +95,7 @@ public:
 
     chip::Controller::AutoCommissioner * GetAutoCommissioner() { return &mAutoCommissioner; }
 
-    chip::Credentials::DacOnlyPartialAttestationVerifier * GetPartialDACVerifier() { return &mPartialDACVerifier; }
+    chip::Credentials::PartialDACVerifier * GetPartialDACVerifier() { return &mPartialDACVerifier; }
 
     const chip::Controller::CommissioningParameters & GetCommissioningParameters() const
     {
@@ -178,7 +178,7 @@ private:
 
     chip::Controller::AutoCommissioner mAutoCommissioner;
 
-    chip::Credentials::DacOnlyPartialAttestationVerifier mPartialDACVerifier;
+    chip::Credentials::PartialDACVerifier mPartialDACVerifier;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidOperationalCredentialsIssuerPtr opCredsIssuer) :
         mController(std::move(controller)), mOpCredsIssuer(std::move(opCredsIssuer))

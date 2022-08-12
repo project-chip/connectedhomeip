@@ -21,10 +21,10 @@
 namespace chip {
 namespace Credentials {
 
-class CloudDACVerifier : public DefaultDACVerifier
+class PartialDACVerifier : public DefaultDACVerifier
 {
 public:
-    CloudDACVerifier() {}
+    PartialDACVerifier() {}
 
     void VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;

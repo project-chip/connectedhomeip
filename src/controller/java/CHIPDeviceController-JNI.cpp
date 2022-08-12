@@ -545,7 +545,7 @@ JNI_METHOD(void, setUseJavaCallbackForNOCRequest)
     if (useCallback)
     {
         // if we are assigning a callback, then make the device commissioner delegate verification to the cloud
-        wrapper->Controller()->SetDeviceAttestationVerifier(wrapper->GetCloudDACVerifier());
+        wrapper->Controller()->SetDeviceAttestationVerifier(wrapper->GetPartialDACVerifier());
     }
     else
     {

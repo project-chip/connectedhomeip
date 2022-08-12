@@ -36,13 +36,11 @@ namespace Credentials {
 // As per specifications section 11.22.5.1. Constant RESP_MAX
 constexpr size_t kMaxResponseLength = 900;
 
-void CloudDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
-                                                    Callback::Callback<OnAttestationInformationVerification> * onCompletion)
+void PartialDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
+                                                      Callback::Callback<OnAttestationInformationVerification> * onCompletion)
 {
     AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
 
-    Platform::ScopedMemoryBuffer<uint8_t> paaCert;
-    MutableByteSpan paaDerBuffer;
     AttestationCertVidPid dacVidPid;
     AttestationCertVidPid paiVidPid;
     AttestationCertVidPid paaVidPid;
@@ -99,7 +97,7 @@ void CloudDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerif
         VerifyOrExit(ExtractAKIDFromX509Cert(info.paiDerBuffer, akid) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kPaiFormatInvalid);
 
-        ChipLogProgress(Support, "CloudDACVerifier::CheckPAA skipping vid-scoped PAA check - PAARootStore disabled");
+        ChipLogProgress(Support, "PartialDACVerifier::CheckPAA skipping vid-scoped PAA check - PAARootStore disabled");
     }
 
 #if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
@@ -107,7 +105,7 @@ void CloudDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerif
                  attestationError = AttestationVerificationResult::kDacExpired);
 #endif
 
-    ChipLogProgress(Support, "CloudDACVerifier::CheckCertChain skipping cert chain check - PAARootStore disabled");
+    ChipLogProgress(Support, "PartialDACVerifier::CheckCertChain skipping cert chain check - PAARootStore disabled");
 
     {
         ByteSpan certificationDeclarationSpan;
@@ -123,11 +121,9 @@ void CloudDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerif
         deviceInfo.paiProductId = paiVidPid.mProductId.ValueOr(0);
         deviceInfo.paaVendorId  = paaVidPid.mVendorId.ValueOr(VendorId::NotSpecified);
 
-        MutableByteSpan paaSKID(deviceInfo.paaSKID);
-        VerifyOrExit(ExtractSKIDFromX509Cert(paaDerBuffer, paaSKID) == CHIP_NO_ERROR,
-                     attestationError = AttestationVerificationResult::kPaaFormatInvalid);
-        VerifyOrExit(paaSKID.size() == sizeof(deviceInfo.paaSKID),
-                     attestationError = AttestationVerificationResult::kPaaFormatInvalid);
+        ChipLogProgress(
+            Support,
+            "PartialDACVerifier::VerifyAttestationInformation skipping PAA subject key id extraction - PAARootStore disabled");
 
         VerifyOrExit(DeconstructAttestationElements(info.attestationElementsBuffer, certificationDeclarationSpan,
                                                     attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan,
@@ -139,7 +135,7 @@ void CloudDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerif
                      attestationError = AttestationVerificationResult::kAttestationNonceMismatch);
 
         ChipLogProgress(Support,
-                        "CloudDACVerifier::VerifyAttestationInformation skipping CD signature check - LocalCSAStore disabled");
+                        "PartialDACVerifier::VerifyAttestationInformation skipping CD signature check - LocalCSAStore disabled");
         VerifyOrExit(CMS_ExtractCDContent(certificationDeclarationSpan, certificationDeclarationPayload) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kPaaFormatInvalid);
 
