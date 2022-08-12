@@ -7912,6 +7912,36 @@ private:
     bool keepAlive;
 };
 
+class CHIPColorControlStartUpColorTemperatureMiredsAttributeCallback
+    : public chip::Callback::Callback<CHIPColorControlClusterStartUpColorTemperatureMiredsAttributeCallbackType>
+{
+public:
+    CHIPColorControlStartUpColorTemperatureMiredsAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPColorControlStartUpColorTemperatureMiredsAttributeCallback();
+
+    static void maybeDestroy(CHIPColorControlStartUpColorTemperatureMiredsAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPColorControlStartUpColorTemperatureMiredsAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPColorControlStartUpColorTemperatureMiredsAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPColorControlGeneratedCommandListAttributeCallback
     : public chip::Callback::Callback<CHIPColorControlClusterGeneratedCommandListAttributeCallbackType>
 {
