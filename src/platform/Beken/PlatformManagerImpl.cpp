@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <platform/Beken/DeviceInfoProviderImpl.h>
 #include <platform/Beken/DiagnosticDataProviderImpl.h>
 #include <platform/Beken/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>

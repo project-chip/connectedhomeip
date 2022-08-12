@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,7 +56,7 @@ struct ChipDeviceEvent;
 
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF 0
 #define CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS 0
-#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS00
+#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS0 0
 #define CHIP_SYSTEM_CONFIG_USE_LWIP 1
 #define CHIP_SYSTEM_CONFIG_USE_SOCKETS 0
 #define CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK 0

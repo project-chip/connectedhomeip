@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 
 #pragma once
+#include "matter_pal.h"
 #include <platform/NetworkCommissioning.h>
 
 #define NC_SECURITYCONVERT(security) ((security < 3) ? security : (security == 3) ? 2 : (security < 7) ? 3 : 4)
