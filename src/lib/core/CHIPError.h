@@ -1879,13 +1879,12 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND           CHIP_CORE_ERROR(0xa0)
 
 /**
- *  @def CHIP_ERROR_PROFILE_STRING_CONTEXT_ALREADY_REGISTERED
+ * @def CHIP_ERROR_IM_FABRIC_DELETED
  *
- *  @brief
- *    The specified profile string support context is already registered.
- *
+ * @brief
+ *   The fabric is deleted, and the corresponding IM resources are released
  */
-#define CHIP_ERROR_PROFILE_STRING_CONTEXT_ALREADY_REGISTERED   CHIP_CORE_ERROR(0xa1)
+#define CHIP_ERROR_IM_FABRIC_DELETED                            CHIP_CORE_ERROR(0xa1)
 
 /**
  *  @def CHIP_ERROR_PROFILE_STRING_CONTEXT_NOT_REGISTERED

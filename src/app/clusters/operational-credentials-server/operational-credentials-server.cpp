@@ -282,7 +282,6 @@ CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
 
 void CleanupSessionsForFabric(SessionManager & sessionMgr, FabricIndex fabricIndex)
 {
-    InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(fabricIndex);
     sessionMgr.ExpireAllSessionsForFabric(fabricIndex);
 }
 
@@ -379,6 +378,7 @@ public:
         ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
 
         EventManagement::GetInstance().FabricRemoved(fabricIndex);
+
         NotifyFabricTableChanged();
     }
 
