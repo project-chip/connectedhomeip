@@ -136,7 +136,7 @@ tests:
 
     - label: "TH reads GeneratedCommandList from DUT"
       verification: |
-          ( WiFi) 
+          ( WiFi)
           ./chip-tool networkcommissioning read generated-command-list 1 0
 
 
@@ -149,7 +149,7 @@ tests:
           [1650370123.418013][42418:42423] CHIP:TOO:     [3]: 7
           [1650370123.418143][42418:42423] CHIP:EM: Sending Standalone Ack for MessageCounter:759910 on exchange 25409i
 
-           ( Thread ) 
+           ( Thread )
           ./chip-tool networkcommissioning read generated-command-list 51 0
 
 

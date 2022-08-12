@@ -34,7 +34,7 @@ tests:
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
-          "1. Provision the device using 1st controller chip tool(use above instructions) , 
+          "1. Provision the device using 1st controller chip tool(use above instructions) ,
           "
       disabled: true
 
