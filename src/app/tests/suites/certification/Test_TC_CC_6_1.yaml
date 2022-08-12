@@ -112,11 +112,25 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
-          value: ColorTempPhysicalMaxMiredsValue
+          value: 250
+
+    - label: "TH reads ColorMode attribute from DUT"
+      PICS: CC.S.F04 && CC.S.A0008
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
           constraints:
-              type: int16u
-              minValue: ColorTempPhysicalMinMiredsValue
-              maxValue: ColorTempPhysicalMaxMiredsValue
+              minValue: 0
+              maxValue: 2
+
+    - label: "TH reads EnhancedColorMode attribute from DUT"
+      PICS: CC.S.F04 && CC.S.A4001
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 3
 
     - label: "Turn off light that we turned on"
       PICS: OO.S.C00.Rsp

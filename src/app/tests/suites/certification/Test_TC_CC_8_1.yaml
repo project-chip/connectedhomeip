@@ -66,8 +66,41 @@ tests:
       arguments:
           value: 0
 
-    - label: "TH sends MoveHue command to DUT"
-      PICS: CC.S.C01.Rsp && CC.S.F00
+    - label: "TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      cluster: "On/Off"
+      command: "On"
+
+    - label:
+          "TH sends MoveToHue command to DUT with Hue=200, Direction=0x00
+          (shortest distance) and TransitionTime=0 (immediately)."
+      PICS: CC.S.C00.Rsp
+      command: "MoveToHue"
+      arguments:
+          values:
+              - name: "hue"
+                value: 200
+              - name: "Direction"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "TH sends MoveHue command to DUT with MoveMode=0x01 (up) and Rate=5
+          (units/s)"
+      PICS: CC.S.C01.Rsp
       command: "MoveHue"
       arguments:
           values:
@@ -91,7 +124,7 @@ tests:
               maxValue: 254
 
     - label: "TH sends StopMoveStep command to DUT"
-      PICS: CC.S.C47.Rsp && CC.S.F00
+      PICS: CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
           values:
@@ -101,7 +134,7 @@ tests:
                 value: 0
 
     - label: "TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.A0000 && CC.S.C47.Rsp && CC.S.F00
+      PICS: CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -120,7 +153,7 @@ tests:
                 value: 100
 
     - label: "TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.A0000 && CC.S.C47.Rsp && CC.S.F00
+      PICS: CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -130,9 +163,11 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "TH sends MoveSaturation command to DUT"
-      PICS: CC.S.C04.Rsp && CC.S.F00
-      command: "MoveSaturation"
+    - label:
+          "TH sends MoveToSaturation command to DUT with Saturation=150 and
+          TransitionTime=0 (immediately)"
+      PICS: CC.S.C03.Rsp
+      command: "MoveToSaturation"
       arguments:
           values:
               - name: "MoveMode"
@@ -183,20 +218,11 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.A0001 && CC.S.C47.Rsp && CC.S.F00
-      command: "readAttribute"
-      attribute: "CurrentSaturation"
-      response:
-          value: CurrentSaturationValue
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
-
-    - label: "TH sends MoveColor command to DUT"
-      PICS: CC.S.C08.Rsp && CC.S.F03
-      command: "MoveColor"
+    - label:
+          "TH sends MoveSaturation command to DUT with MoveMode=0x01 (up) and
+          Rate=5 (units/s)"
+      command: "MoveSaturation"
+      PICS: CC.S.C04.Rsp
       arguments:
           values:
               - name: "rateX"
@@ -237,7 +263,7 @@ tests:
               maxValue: 65279
 
     - label: "TH sends StopMoveStep command to DUT"
-      PICS: CC.S.C47.Rsp && CC.S.F03
+      PICS: CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
           values:
@@ -246,8 +272,8 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "TH reads CurrentX attribute from DUT"
-      PICS: CC.S.A0003 && CC.S.C47.Rsp && CC.S.F03
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -274,10 +300,19 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 1000
+                value: 2000
 
-    - label: "TH reads CurrentY attribute from DUT"
-      PICS: CC.S.A0003 && CC.S.C47.Rsp && CC.S.F03
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentSaturation"
+      response:
+          constraints:
+              minValue: CurrentSaturationValue
+              maxValue: 230
+
+    - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
+      PICS: CC.S.A400b
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -287,8 +322,8 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads CurrentY attribute from DUT"
-      PICS: CC.S.A0004 && CC.S.C47.Rsp && CC.S.F03
+    - label: "TH reads ColorTempPhysicalMaxMireds attribute from DUT."
+      PICS: CC.S.A400c
       command: "readAttribute"
       attribute: "CurrentY"
       response:
@@ -298,45 +333,106 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH sends MoveColorTemperature command to DUT"
-      PICS: CC.S.C4B.Rsp && CC.S.F04
-      command: "MoveColorTemperature"
+    - label:
+          "TH sends MoveToColorTemperature command to DUT with
+          ColorTemperatureMireds= ColorTempPhysicalMaxMireds / 2 and
+          TransitionTime=0 (immediately)."
+      PICS: CC.S.C0a.Rsp
+      command: "MoveToColorTemperature"
       arguments:
           values:
-              - name: "MoveMode"
-                value: 1
-              - name: "Rate"
-                value: RateConfigValue
-              - name: "ColorTemperatureMinimumMireds"
-                value: ColorTemperatureMinMiredsConfigValue
-              - name: "ColorTemperatureMaximumMireds"
-                value: ColorTemperatureMaxMiredsConfigValue
+              - name: "colorTemperature"
+                value:
+                    ( ColorTempPhysicalMinMireds + ColorTempPhysicalMaxMireds )
+                    / 2
+              - name: "TransitionTime"
+                value: 0
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 1000ms"
+    - label: "Wait 100ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 1000
+                value: 100
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT"
-      PICS: CC.S.A0007 && CC.S.C4B.Rsp && CC.S.F04
+    - label:
+          "TH sends MoveColorTemperature command to DUT with MoveMode = 0x01
+          (up), Rate = (ColorTempPhysicalMaxMireds -
+          ColorTempPhysicalMinMireds)/40"
+      PICS: CC.S.C4b.Rsp
+      command: MoveColorTemperature
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 1
+              - name: "Rate"
+                value:
+                    ( ColorTempPhysicalMaxMireds - ColorTempPhysicalMinMireds )
+                    / 40
+              - name: "ColorTemperatureMinimumMireds"
+                value: ColorTempPhysicalMinMireds
+              - name: "ColorTemperatureMaximumMireds"
+                value: ColorTempPhysicalMaxMireds
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "TH sends StopMoveStep command to DUT"
+      PICS: CC.S.C4b.Rsp && CC.S.C47.Rsp
+      command: StopMoveStep
+      arguments:
+          values:
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.A0007 && CC.S.C4b.Rsp && CC.S.C47.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
+          saveAs: ColorTemperatureMiredsStep4f
           constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65279
+              minValue:
+                  ( ColorTempPhysicalMaxMireds + ColorTempPhysicalMinMireds ) /
+                  2
+              maxValue: ColorTempPhysicalMaxMireds
 
-    - label: "TH sends StopMoveStep command to DUT"
-      PICS: CC.S.C47.Rsp && CC.S.F04
-      command: "StopMoveStep"
+    - label: "Wait 2s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.A0007 && CC.S.C4b.Rsp && CC.S.C47.Rsp
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          value: ColorTemperatureMiredsStep4f
+
+    - label:
+          "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=20000,
+          Direction=0x00 (shortest distance) and TransitionTime=0 (immediately)."
+      PICS: CC.S.C40.Rsp
+      command: "EnhancedMoveToHue"
       arguments:
           values:
               - name: "OptionsMask"
@@ -364,20 +460,9 @@ tests:
                 value: 500
 
     - label:
-          "Reads current color attribute value matched the value sent by the
-          last attribute"
-      PICS: CC.S.A0007 && CC.S.C47.Rsp && CC.S.F04
-      command: "readAttribute"
-      attribute: "ColorTemperature"
-      response:
-          value: ColorTemperatureMiredsValue
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65279
-
-    - label: "TH sends EnhancedMoveHue command to DUT."
-      PICS: CC.S.C41.Rsp && CC.S.F01
+          "TH sends EnhancedMoveHue command to DUT with MoveMode=0x01 (up) and
+          Rate=500 (units/s)"
+      PICS: CC.S.C41.Rsp
       command: "EnhancedMoveHue"
       arguments:
           values:

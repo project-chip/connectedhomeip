@@ -153,7 +153,6 @@ function getManualTests() {
     ];
 
     const EthernetNetworkDiagnostics = [
-        "Test_TC_DGETH_1_1",
         "Test_TC_DGETH_3_1",
         "Test_TC_DGETH_3_2",
     ];
@@ -315,7 +314,6 @@ function getManualTests() {
     ];
 
     const SoftwareDiagnostics = [
-        "Test_TC_DGSW_1_1",
         "Test_TC_DGSW_3_1",
         "Test_TC_DGSW_3_2",
     ];
@@ -377,7 +375,6 @@ function getManualTests() {
     ];
 
     const DoorLock = [
-        "Test_TC_DRLK_1_1",
         "Test_TC_DRLK_2_1",
         "Test_TC_DRLK_2_6",
         "Test_TC_DRLK_2_8",
@@ -431,7 +428,6 @@ function getManualTests() {
     ];
 
     const ThreadNetworkDiagnostics = [
-        "Test_TC_DGTHREAD_1_1",
         "Test_TC_DGTHREAD_2_5",
         "Test_TC_DGTHREAD_3_1",
         "Test_TC_DGTHREAD_3_2",
@@ -468,7 +464,6 @@ function getManualTests() {
     ];
 
     const Binding = [
-        "Test_TC_BIND_1_1",
         "Test_TC_BIND_2_1",
         "Test_TC_BIND_2_2",
         "Test_TC_BIND_2_3",
@@ -487,9 +482,6 @@ function getManualTests() {
     ];
 
     const AccessControl = [
-        "Test_TC_ACL_1_1",
-        "Test_TC_ACL_2_1",
-        "Test_TC_ACL_2_2",
         "Test_TC_ACL_2_3",
         "Test_TC_ACL_2_4",
         "Test_TC_ACL_2_5",
@@ -570,6 +562,9 @@ function getManualTests() {
 function getTests() {
     const AccessControl = [
         "TestAccessControlCluster",
+        "Test_TC_ACL_1_1",
+        "Test_TC_ACL_2_1",
+        "Test_TC_ACL_2_2",
     ];
 
     const BooleanState = [
@@ -580,6 +575,10 @@ function getTests() {
     const Actions = [
         "Test_TC_ACT_1_1",
     ];
+
+    const Binding = [
+        "Test_TC_BIND_1_1",
+    ]
 
     const ColorControl = [
         "Test_TC_CC_1_1",
@@ -611,6 +610,7 @@ function getTests() {
     ];
 
     const EthernetNetworkDiagnostics = [
+        "Test_TC_DGETH_1_1",
         "Test_TC_DGETH_2_1",
         "Test_TC_DGETH_2_2",
     ];
@@ -775,6 +775,7 @@ function getTests() {
     ];
 
     const ThreadNetworkDiagnostics = [
+        "Test_TC_DGTHREAD_1_1",
         "Test_TC_DGTHREAD_2_1",
         "Test_TC_DGTHREAD_2_2",
         "Test_TC_DGTHREAD_2_3",
@@ -855,6 +856,7 @@ function getTests() {
     ];
 
     const SoftwareDiagnostics = [
+        "Test_TC_DGSW_1_1",
         "Test_TC_DGSW_2_1",
         "Test_TC_DGSW_2_2",
         "Test_TC_DGSW_2_3",
@@ -868,6 +870,7 @@ function getTests() {
         "DL_UsersAndCredentials",
         "DL_LockUnlock",
         "DL_Schedules",
+        "Test_TC_DRLK_1_1",
         "Test_TC_DRLK_2_2",
         "Test_TC_DRLK_2_3",
         "Test_TC_DRLK_2_4",
@@ -886,6 +889,7 @@ function getTests() {
         AccessControl,
         BooleanState,
         Actions,
+        Binding,
         ColorControl,
         DeviceManagement,
         Descriptor,
