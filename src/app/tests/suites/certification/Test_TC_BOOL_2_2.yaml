@@ -71,7 +71,7 @@ tests:
 
           Subscribe the event using below command in Interactive mode. Once the event occurs, TH(chip-tool) get the subscription message.
 
-           booleanstate subscribe-event-by-id 0x0 1 100 2 1
+          booleanstate subscribe-by-id 0x0 1 100 2 1
       disabled: true
 
     - label: "Bring the DUT into a state so StateValue is FALSE"

@@ -23,169 +23,561 @@ config:
 tests:
     - label: "Note"
       verification: |
+          Note: : For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Note"
+      verification: |
           For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
     - label: "DUT reads VendorName from the TH"
       PICS: BRBINFO.C.A0001
       verification: |
-          ./chip-tool bridgeddevicebasic read vendor-name  1 3
+          ./chip-tool bridgeddevicebasic read vendor-name 1 0
 
-          Verify that DUT reads VendorName from the TH successfully on TH(all-clusters-app) Log
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          [1656495199.434300][2158:2163] CHIP:TOO:   VendorName: TEST_VENDOR
+          Example Log:
+          [1659966264.659547][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966264.659591][3334:3334] CHIP:DMG: {
+          [1659966264.659616][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966264.659647][3334:3334] CHIP:DMG:         [
+          [1659966264.659684][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966264.659716][3334:3334] CHIP:DMG:                 {
+          [1659966264.659759][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966264.659809][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966264.659845][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1659966264.659892][3334:3334] CHIP:DMG:                 }
+          [1659966264.659925][3334:3334] CHIP:DMG:
+          [1659966264.659963][3334:3334] CHIP:DMG:         ],
+          [1659966264.659996][3334:3334] CHIP:DMG:
+          [1659966264.660036][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966264.660074][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966264.660101][3334:3334] CHIP:DMG: },
+          [1659966264.660194][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966264.660306][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966264.660339][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute 1 is dirty
+          [1659966264.660374][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_0001 (expanded=0)
+          [1659966264.660408][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966264.660445][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads VendorID from the TH"
       PICS: BRBINFO.C.A0002
       verification: |
-          ./chip-tool bridgeddevicebasic read vendor-id  1 3
+          ./chip-tool bridgeddevicebasic read vendor-id 1 0
 
-          Verify that DUT reads VendorID from the TH successfully on TH(all-clusters-app) Log
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          [1656495322.252171][2177:2182] CHIP:TOO:   VendorID: 65521
+          Example Log:
+          [1659966317.983464][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966317.983491][3334:3334] CHIP:DMG: {
+          [1659966317.983513][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966317.983539][3334:3334] CHIP:DMG:         [
+          [1659966317.983563][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966317.983590][3334:3334] CHIP:DMG:                 {
+          [1659966317.983618][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966317.983655][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966317.983687][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1659966317.983716][3334:3334] CHIP:DMG:                 }
+          [1659966317.983744][3334:3334] CHIP:DMG:
+          [1659966317.983770][3334:3334] CHIP:DMG:         ],
+          [1659966317.983798][3334:3334] CHIP:DMG:
+          [1659966317.983825][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966317.983851][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966317.983874][3334:3334] CHIP:DMG: },
+          [1659966317.983949][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966317.984045][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966317.984077][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute 2 is dirty
+          [1659966317.984099][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_0002 (expanded=0)
+          [1659966317.984128][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966317.984161][3334:3334] CHIP:DMG: AccessControl: allowed
+          [1659966317.983464][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966317.983491][3334:3334] CHIP:DMG: {
+          [1659966317.983513][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966317.983539][3334:3334] CHIP:DMG:         [
+          [1659966317.983563][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966317.983590][3334:3334] CHIP:DMG:                 {
+          [1659966317.983618][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966317.983655][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966317.983687][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1659966317.983716][3334:3334] CHIP:DMG:                 }
+          [1659966317.983744][3334:3334] CHIP:DMG:
+          [1659966317.983770][3334:3334] CHIP:DMG:         ],
+          [1659966317.983798][3334:3334] CHIP:DMG:
+          [1659966317.983825][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966317.983851][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966317.983874][3334:3334] CHIP:DMG: },
+          [1659966317.983949][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966317.984045][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966317.984077][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute 2 is dirty
+          [1659966317.984099][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_0002 (expanded=0)
+          [1659966317.984128][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966317.984161][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads ProductName from the TH"
       PICS: BRBINFO.C.A0003
       verification: |
-          ./chip-tool bridgeddevicebasic read product-name  1 3
+          ./chip-tool bridgeddevicebasic read product-name 1 0
 
-          Verify that DUT reads ProductName from the TH successfully on TH(clusters-app)
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          [1656495708.412745][2200:2205] CHIP:TOO:   ProductName: TEST_PRODUCT
+          Example Log:
+          [1659966351.620979][3334:3334] CHIP:IM: Received Read request
+          [1659966351.621076][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966351.621104][3334:3334] CHIP:DMG: {
+          [1659966351.621128][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966351.621154][3334:3334] CHIP:DMG:         [
+          [1659966351.621178][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966351.621206][3334:3334] CHIP:DMG:                 {
+          [1659966351.621234][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966351.621265][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966351.621297][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659966351.621323][3334:3334] CHIP:DMG:                 }
+          [1659966351.621350][3334:3334] CHIP:DMG:
+          [1659966351.621375][3334:3334] CHIP:DMG:         ],
+          [1659966351.621403][3334:3334] CHIP:DMG:
+          [1659966351.621429][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966351.621454][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966351.621476][3334:3334] CHIP:DMG: },
+          [1659966351.621549][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966351.621633][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966351.621662][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute 3 is dirty
       disabled: true
 
     - label: "DUT reads NodeLabel from the TH"
       PICS: BRBINFO.C.A0005
       verification: |
-          Nodelabel is an optional Attribute -
+          ./chip-tool bridgeddevicebasic read node-label 1 0
 
-          ./chip-tool bridgeddevicebasic read node-label 1 3
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          Verify Node-label is read sucessfully on TH(all-clusters-app)
-
-          [1657696463.081741][15476:15481] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 2577979325
-          [1657696463.081791][15476:15481] CHIP:TOO:   NodeLabel: Light 1
+          Example Log:
+          [1659966481.748125][3334:3334] CHIP:IM: Received Read request
+          [1659966481.748209][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966481.748236][3334:3334] CHIP:DMG: {
+          [1659966481.748258][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966481.748283][3334:3334] CHIP:DMG:         [
+          [1659966481.748307][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966481.748334][3334:3334] CHIP:DMG:                 {
+          [1659966481.748362][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966481.748397][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966481.748429][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659966481.748458][3334:3334] CHIP:DMG:                 }
+          [1659966481.748486][3334:3334] CHIP:DMG:
+          [1659966481.748511][3334:3334] CHIP:DMG:         ],
+          [1659966481.748539][3334:3334] CHIP:DMG:
+          [1659966481.748566][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966481.748590][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966481.748614][3334:3334] CHIP:DMG: },
+          [1659966481.748689][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966481.748787][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966481.748818][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute 5 is dirty
+          [1659966481.748839][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_0005 (expanded=0)
+          [1659966481.748868][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966481.748901][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads Location from the TH"
       PICS: BRBINFO.C.A0006
       verification: |
-          ./chip-tool bridgeddevicebasic read location 1 3
+          ./chip-tool bridgeddevicebasic read location 1 0
 
-          Verify that DUT reads Location from the TH successfully on TH(all-clusters-app) Log
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          Note: The Location attribute is optional so no example log can be provided.
+          Example Log:
+          [1659966523.437542][3334:3334] CHIP:IM: Received Read request
+          [1659966523.437648][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966523.437686][3334:3334] CHIP:DMG: {
+          [1659966523.437719][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966523.437757][3334:3334] CHIP:DMG:         [
+          [1659966523.437792][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966523.437838][3334:3334] CHIP:DMG:                 {
+          [1659966523.437879][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966523.437924][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966523.437972][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0006,
+          [1659966523.438013][3334:3334] CHIP:DMG:                 }
+          [1659966523.438054][3334:3334] CHIP:DMG:
+          [1659966523.438092][3334:3334] CHIP:DMG:         ],
+          [1659966523.438133][3334:3334] CHIP:DMG:
+          [1659966523.438171][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966523.438208][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966523.438243][3334:3334] CHIP:DMG: },
+          [1659966523.438346][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966523.438456][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966523.438499][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute 6 is dirty
+          [1659966523.438529][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_0006 (expanded=0)
+          [1659966523.438563][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966523.438603][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads HardwareVersion from the TH"
       PICS: BRBINFO.C.A0007
       verification: |
-          ./chip-tool bridgeddevicebasic read hardware-version  1 3
+          ./chip-tool bridgeddevicebasic read  hardware-version-string 1 0
 
-          Verify that DUT reads HardwareVersion from the TH successfully on TH(all-clusters-app) Log
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          [1656496175.564718][2302:2307] CHIP:TOO:   HardwareVersion: 0
+          Example Log:
+          [1659966609.655514][3334:3334] CHIP:IM: Received Read request
+          [1659966609.655592][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966609.655618][3334:3334] CHIP:DMG: {
+          [1659966609.655640][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966609.655666][3334:3334] CHIP:DMG:         [
+          [1659966609.655689][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966609.655719][3334:3334] CHIP:DMG:                 {
+          [1659966609.655748][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966609.655778][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966609.655810][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0008,
+          [1659966609.655841][3334:3334] CHIP:DMG:                 }
+          [1659966609.655871][3334:3334] CHIP:DMG:
+          [1659966609.655898][3334:3334] CHIP:DMG:         ],
+          [1659966609.655925][3334:3334] CHIP:DMG:
+          [1659966609.655951][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966609.655979][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966609.656001][3334:3334] CHIP:DMG: },
+          [1659966609.656073][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966609.656154][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966609.656183][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute 8 is dirty
+          [1659966609.656204][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_0008 (expanded=0)
+          [1659966609.656233][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966609.656266][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads HardwareVersionString from the TH"
       PICS: BRBINFO.C.A0008
       verification: |
-          ./chip-tool bridgeddevicebasic read hardware-version-string  1 3
+          ./chip-tool bridgeddevicebasic read  hardware-version-string 1 0
 
-          Verify that DUT reads HardwareVersionString from the TH successfully on TH(all-clusters-app) Log
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          [1656496257.298675][2315:2320] CHIP:TOO:   HardwareVersionString: TEST_VERSION
+          Example Log:
+
+          [1659966639.857534][3334:3334] CHIP:IM: Received Read request
+          [1659966639.857613][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966639.857640][3334:3334] CHIP:DMG: {
+          [1659966639.857661][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966639.857687][3334:3334] CHIP:DMG:         [
+          [1659966639.857711][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966639.857739][3334:3334] CHIP:DMG:                 {
+          [1659966639.857766][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966639.857798][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966639.857828][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0008,
+          [1659966639.857856][3334:3334] CHIP:DMG:                 }
+          [1659966639.857884][3334:3334] CHIP:DMG:
+          [1659966639.857909][3334:3334] CHIP:DMG:         ],
+          [1659966639.857936][3334:3334] CHIP:DMG:
+          [1659966639.857962][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966639.857987][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966639.858010][3334:3334] CHIP:DMG: },
+          [1659966639.858080][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966639.858163][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966639.858192][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute 8 is dirty
+          [1659966639.858213][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_0008 (expanded=0)
+          [1659966639.858243][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966639.858275][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads SoftwareVersion from the TH"
       PICS: BRBINFO.C.A0009
       verification: |
-          ./chip-tool bridgeddevicebasic read software-version 1 3
+          ./chip-tool bridgeddevicebasic read software-version 1 0
 
-          Verify that DUT reads SoftwareVersion from the TH successfully
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          [1656496411.609866][2348:2353] CHIP:TOO:   SoftwareVersion: 1
+          Example Log:
+
+          [1659966672.320763][3334:3334] CHIP:IM: Received Read request
+          [1659966672.320848][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966672.320876][3334:3334] CHIP:DMG: {
+          [1659966672.320898][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966672.320987][3334:3334] CHIP:DMG:         [
+          [1659966672.321033][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966672.321066][3334:3334] CHIP:DMG:                 {
+          [1659966672.321095][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966672.321128][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966672.321161][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0009,
+          [1659966672.321191][3334:3334] CHIP:DMG:                 }
+          [1659966672.321220][3334:3334] CHIP:DMG:
+          [1659966672.321244][3334:3334] CHIP:DMG:         ],
+          [1659966672.321273][3334:3334] CHIP:DMG:
+          [1659966672.321299][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966672.321324][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966672.321347][3334:3334] CHIP:DMG: },
+          [1659966672.321427][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966672.321529][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966672.321561][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute 9 is dirty
+          [1659966672.321583][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_0009 (expanded=0)
+          [1659966672.321612][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966672.321646][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads SoftwareVersionString from the TH"
       PICS: BRBINFO.C.A000a
       verification: |
-          ./chip-tool bridgeddevicebasic read software-version-string  1 3
+          ./chip-tool bridgeddevicebasic read software-version-string 1 0
 
-          Verify that DUT reads SoftwareVersionString from the TH successfully on TH(all-clusters-app) Log
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          [1656496498.568951][2362:2367] CHIP:TOO:   SoftwareVersionString: 1.0
+          Example Log:
+
+          [1659966701.890819][3334:3334] CHIP:IM: Received Read request
+          [1659966701.890896][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966701.890922][3334:3334] CHIP:DMG: {
+          [1659966701.890944][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966701.890973][3334:3334] CHIP:DMG:         [
+          [1659966701.890997][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966701.891024][3334:3334] CHIP:DMG:                 {
+          [1659966701.891052][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966701.891083][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966701.891116][3334:3334] CHIP:DMG:                         Attribute = 0x0000_000A,
+          [1659966701.891148][3334:3334] CHIP:DMG:                 }
+          [1659966701.891178][3334:3334] CHIP:DMG:
+          [1659966701.891203][3334:3334] CHIP:DMG:         ],
+          [1659966701.891230][3334:3334] CHIP:DMG:
+          [1659966701.891256][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966701.891281][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966701.891304][3334:3334] CHIP:DMG: },
+          [1659966701.891376][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966701.891456][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966701.891485][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute a is dirty
+          [1659966701.891507][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_000A (expanded=0)
+          [1659966701.891536][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966701.891568][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads ManufacturingDate from the TH"
       PICS: BRBINFO.C.A000b
       verification: |
-          ./chip-tool bridgeddevicebasic read manufacturing-date  1 3
+          ./chip-tool bridgeddevicebasic read manufacturing-date  1 0
 
-          Verify that DUT reads ManufacturingDate from the TH successfully on TH(all-clusters-app) Log
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          [1656496661.777852][2388:2393] CHIP:TOO:   ManufacturingDate: 20200101
+          Example Log:
+
+          [1659966734.117679][3334:3334] CHIP:IM: Received Read request
+          [1659966734.117757][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966734.117784][3334:3334] CHIP:DMG: {
+          [1659966734.117806][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966734.117832][3334:3334] CHIP:DMG:         [
+          [1659966734.117856][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966734.117892][3334:3334] CHIP:DMG:                 {
+          [1659966734.117920][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966734.117952][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966734.117987][3334:3334] CHIP:DMG:                         Attribute = 0x0000_000B,
+          [1659966734.118016][3334:3334] CHIP:DMG:                 }
+          [1659966734.118046][3334:3334] CHIP:DMG:
+          [1659966734.118073][3334:3334] CHIP:DMG:         ],
+          [1659966734.118100][3334:3334] CHIP:DMG:
+          [1659966734.118126][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966734.118151][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966734.118175][3334:3334] CHIP:DMG: },
+          [1659966734.118248][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966734.118331][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966734.118360][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute b is dirty
+          [1659966734.118382][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_000B (expanded=0)
+          [1659966734.118411][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966734.118444][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads PartNumber from the TH"
       PICS: BRBINFO.C.A000c
       verification: |
-          ./chip-tool bridgeddevicebasic read part-number  1 3
+          ./chip-tool bridgeddevicebasic read part-number  1 0
 
-          Verify that DUT reads PartNumber from the TH successfully on TH(all-clusters-app) Log
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          [1656496800.941788][2405:2410] CHIP:TOO:   PartNumber: 1234
+          Example Log:
+
+          [1659966759.882885][3334:3334] CHIP:IM: Received Read request
+          [1659966759.882962][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966759.882989][3334:3334] CHIP:DMG: {
+          [1659966759.883011][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966759.883037][3334:3334] CHIP:DMG:         [
+          [1659966759.883061][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966759.883089][3334:3334] CHIP:DMG:                 {
+          [1659966759.883117][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966759.883153][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966759.883182][3334:3334] CHIP:DMG:                         Attribute = 0x0000_000C,
+          [1659966759.883215][3334:3334] CHIP:DMG:                 }
+          [1659966759.883243][3334:3334] CHIP:DMG:
+          [1659966759.883268][3334:3334] CHIP:DMG:         ],
+          [1659966759.883296][3334:3334] CHIP:DMG:
+          [1659966759.883322][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966759.883347][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966759.883370][3334:3334] CHIP:DMG: },
+          [1659966759.883444][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966759.883528][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966759.883557][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute c is dirty
+          [1659966759.883579][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_000C (expanded=0)
+          [1659966759.883608][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966759.883642][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads ProductURL from the TH"
       PICS: BRBINFO.C.A000d
       verification: |
-          ./chip-tool bridgeddevicebasic read product-url  1 3
+          ./chip-tool bridgeddevicebasic read product-url  1 0
 
-          Verify that DUT reads ProductURL from the TH successfully on TH(all-clusters-app) Log
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          [1656497181.118653][2436:2441] CHIP:TOO:   ProductURL: https://example.com/myproduct
+          Example Log:
+
+          [1659966801.953254][3334:3334] CHIP:IM: Received Read request
+          [1659966801.953352][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966801.953388][3334:3334] CHIP:DMG: {
+          [1659966801.953417][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966801.953452][3334:3334] CHIP:DMG:         [
+          [1659966801.953484][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966801.953531][3334:3334] CHIP:DMG:                 {
+          [1659966801.953569][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966801.953611][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966801.953653][3334:3334] CHIP:DMG:                         Attribute = 0x0000_000D,
+          [1659966801.953693][3334:3334] CHIP:DMG:                 }
+          [1659966801.953731][3334:3334] CHIP:DMG:
+          [1659966801.953765][3334:3334] CHIP:DMG:         ],
+          [1659966801.953802][3334:3334] CHIP:DMG:
+          [1659966801.953837][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966801.953871][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966801.953903][3334:3334] CHIP:DMG: },
+          [1659966801.953996][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966801.954102][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966801.954177][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute d is dirty
+          [1659966801.954208][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_000D (expanded=0)
+          [1659966801.954246][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966801.954288][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads ProductLabel from the TH"
       PICS: BRBINFO.C.A000e
       verification: |
-          ./chip-tool bridgeddevicebasic read product-label  1 3
+          ./chip-tool bridgeddevicebasic read product-label  1 0
 
-          Verify that DUT reads ProductLabel from the TH successfully on TH(all-clusters-app) Log
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          [1656501313.811305][2602:2607] CHIP:TOO:   ProductLabel: ABCD
+          Example Log:
+
+          [1659966838.501579][3334:3334] CHIP:IM: Received Read request
+          [1659966838.501708][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966838.501758][3334:3334] CHIP:DMG: {
+          [1659966838.501799][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966838.501846][3334:3334] CHIP:DMG:         [
+          [1659966838.501892][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966838.501942][3334:3334] CHIP:DMG:                 {
+          [1659966838.501994][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966838.502081][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966838.502146][3334:3334] CHIP:DMG:                         Attribute = 0x0000_000E,
+          [1659966838.502202][3334:3334] CHIP:DMG:                 }
+          [1659966838.502254][3334:3334] CHIP:DMG:
+          [1659966838.502301][3334:3334] CHIP:DMG:         ],
+          [1659966838.502352][3334:3334] CHIP:DMG:
+          [1659966838.502401][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966838.502448][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966838.502492][3334:3334] CHIP:DMG: },
+          [1659966838.502613][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966838.502731][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966838.502768][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute e is dirty
+          [1659966838.502793][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_000E (expanded=0)
+          [1659966838.502827][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966838.502864][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads SerialNumber from the TH"
       PICS: BRBINFO.C.A000f
       verification: |
-          ./chip-tool bridgeddevicebasic read serial-number  1 3
+          ./chip-tool bridgeddevicebasic read serial-number  1 0
 
-          Verify that DUT reads SerialNumber from the TH successfully on TH(all-clusters-app) Log
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          [1656501452.183890][2624:2630] CHIP:TOO:   SerialNumber: 5678
+          Example Log:
+
+          [1659966910.846054][3334:3334] CHIP:IM: Received Read request
+          [1659966910.846136][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966910.846163][3334:3334] CHIP:DMG: {
+          [1659966910.846185][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966910.846218][3334:3334] CHIP:DMG:         [
+          [1659966910.846243][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966910.846275][3334:3334] CHIP:DMG:                 {
+          [1659966910.846307][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966910.846344][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966910.846381][3334:3334] CHIP:DMG:                         Attribute = 0x0000_000F,
+          [1659966910.846414][3334:3334] CHIP:DMG:                 }
+          [1659966910.846445][3334:3334] CHIP:DMG:
+          [1659966910.846473][3334:3334] CHIP:DMG:         ],
+          [1659966910.846501][3334:3334] CHIP:DMG:
+          [1659966910.846527][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966910.846552][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966910.846578][3334:3334] CHIP:DMG: },
+          [1659966910.846653][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966910.846749][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966910.846780][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute f is dirty
+          [1659966910.846801][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_000F (expanded=0)
+          [1659966910.846831][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966910.846865][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads Reachable from the TH"
       PICS: BRBINFO.C.A0011
       verification: |
-          ./chip-tool bridgeddevicebasic read reachable 1 3
+          ./chip-tool bridgeddevicebasic read reachable 1 0
 
-          Verify in reachable attribute is read successfully in DUT as client side log
-
-          [1657696571.056869][15499:15504] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0011 DataVersion: 2577979325
-          [1657696571.056932][15499:15504] CHIP:TOO:   Reachable: TRUE
+          Verify ReadRequestMessage is displayed on TH(all-clusters-app) Log
+          [1659966974.431316][3334:3334] CHIP:IM: Received Read request
+          [1659966974.431423][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659966974.431461][3334:3334] CHIP:DMG: {
+          [1659966974.431493][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659966974.431531][3334:3334] CHIP:DMG:         [
+          [1659966974.431567][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659966974.431607][3334:3334] CHIP:DMG:                 {
+          [1659966974.431649][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659966974.431696][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659966974.431740][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0011,
+          [1659966974.431784][3334:3334] CHIP:DMG:                 }
+          [1659966974.431825][3334:3334] CHIP:DMG:
+          [1659966974.431862][3334:3334] CHIP:DMG:         ],
+          [1659966974.431903][3334:3334] CHIP:DMG:
+          [1659966974.431941][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659966974.431979][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659966974.432014][3334:3334] CHIP:DMG: },
+          [1659966974.432116][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659966974.432230][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659966974.432272][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute 11 is dirty
+          [1659966974.432304][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_0011 (expanded=0)
+          [1659966974.432345][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659966974.432391][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads UniqueID from the TH"
       PICS: BRBINFO.C.A0012
       verification: |
-          ./chip-tool bridgeddevicebasic read unique-id 1 3
+          ./chip-tool bridgeddevicebasic read unique-id 1 0
 
-          Verify that DUT reads UniqueID from the TH successfully on TH(all-clusters-app) Log
+          Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
-          [1656501734.253827][2673:2679] CHIP:TOO:   UniqueID: 30789FE4FCF832C9
+          Example Log:
+          [1659967013.796500][3334:3334] CHIP:IM: Received Read request
+          [1659967013.796577][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659967013.796604][3334:3334] CHIP:DMG: {
+          [1659967013.796625][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659967013.796651][3334:3334] CHIP:DMG:         [
+          [1659967013.796675][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659967013.796702][3334:3334] CHIP:DMG:                 {
+          [1659967013.796730][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659967013.796821][3334:3334] CHIP:DMG:                         Cluster = 0x28,
+          [1659967013.796854][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0012,
+          [1659967013.796883][3334:3334] CHIP:DMG:                 }
+          [1659967013.796911][3334:3334] CHIP:DMG:
+          [1659967013.796935][3334:3334] CHIP:DMG:         ],
+          [1659967013.796963][3334:3334] CHIP:DMG:
+          [1659967013.796989][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659967013.797014][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659967013.797074][3334:3334] CHIP:DMG: },
+          [1659967013.797147][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659967013.797234][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659967013.797263][3334:3334] CHIP:DMG: <RE:Run> Cluster 28, Attribute 12 is dirty
+          [1659967013.797285][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_0028 Endpoint=0 AttributeId=0x0000_0012 (expanded=0)
+          [1659967013.797315][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1659967013.797348][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true

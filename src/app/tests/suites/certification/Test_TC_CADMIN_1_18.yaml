@@ -26,9 +26,14 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Precondition: Reset DUT_CE to factory defaults"
+    - label: "Note"
       verification: |
-          verification step to be updated.
+          For DUT as comissioner  test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          Reset Devices to factory defaults
       disabled: true
 
     - label: "DUT_CR1 starts a commissioning process with TH_CE"
@@ -43,7 +48,7 @@ tests:
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On your first controller chip tool, open commissioning window
+          On your first controller chip tool, open commissioning window using BCM
 
           Below is the example when using chip tool as controller
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
@@ -98,7 +103,7 @@ tests:
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On your first controller chip tool, open commissioning window
+          On your first controller chip tool, open commissioning window using BCM
 
           Below is the example when using chip tool as controller
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
@@ -281,7 +286,7 @@ tests:
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On first controller chip tool, open commissioning window
+          On first controller chip tool, open commissioning window using BCM
 
           Below is the example when using chip tool as controller
 
@@ -369,10 +374,4 @@ tests:
           [1647863342.982460][9309:9314] CHIP:TOO:       FabricIndex: 4
           [1647863342.982512][9309:9314] CHIP:TOO:      }
           [1647863342.982738][9309:9314] CHIP:EM: Sending Standalone Ack for MessageCounter:5772016 on exchange 3310i
-      disabled: true
-
-    - label: "TH_CR2 sends command to TH_CE to read the list of Fabrics"
-      PICS: OPCREDS.C.A0001
-      verification: |
-          verification step to be updated.
       disabled: true

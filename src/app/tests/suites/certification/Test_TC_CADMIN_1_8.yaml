@@ -26,9 +26,14 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Precondition: Reset DUT_CE to factory defaults"
+    - label: "Note"
       verification: |
-          verification step to be updated.
+          For DUT as comissioner  test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          Reset Devices to factory defaults
       disabled: true
 
     - label: "DUT_CR1 starts a commissioning process with TH_CE"
@@ -42,7 +47,7 @@ tests:
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On your DUT controller open commissioning widow using BCM.
+          On your 1st controller open commissioning widow using BCM.
 
           Below is the example while using chip tool as controller,
 
@@ -110,7 +115,7 @@ tests:
       verification: |
           On the 2nd controller using chip-tool , connect to the accessory
 
-          ./chip-tool pairing onnetwork 1 20202021
+          ./chip-tool pairing onnetwork 2 20202021
 
           verify you got the following message in the TH log
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
@@ -210,7 +215,7 @@ tests:
       verification: |
           On the 2nd controller using chip-tool , connect to the accessory
 
-          ./chip-tool pairing onnetwork 1 20202021
+          ./chip-tool pairing onnetwork 2 20202021
 
           verify you got the following message in the TH log
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
@@ -221,11 +226,11 @@ tests:
     - label: "DUT_CR1 sends command to TH_CE to revoke the commissioning window"
       PICS: CADMIN.C.C02.Tx
       verification: |
-          On your DUT controller revoke commissioning
+          On your 1st controller revoke commissioning
 
           Below is the example while using chip tool as controller,
 
-          /chip-tool administratorcommissioning revoke-commissioning 2 0 --timedInteractionTimeoutMs 1000
+          /chip-tool administratorcommissioning revoke-commissioning 1 0 --timedInteractionTimeoutMs 1000
 
           CHIP:DMG: InvokeResponseMessage =
           [1650524034.111241][15422:15427] CHIP:DMG: {
@@ -266,7 +271,7 @@ tests:
           Information Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
-          Using your DUT controller, write attribute and read attribute to and from TH_CE
+          Using 1st controller, write attribute and read attribute to and from TH_CE
 
           Below is the example while using chip tool on second controller,
           ./chip-tool basic write node-label te5new 2 0
@@ -310,7 +315,7 @@ tests:
           BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On your DUT controller open commissioning widow using BCM.
+          On 1st controller open commissioning widow using BCM.
 
           Below is the example while using chip tool as controller,
 
@@ -356,7 +361,7 @@ tests:
       verification: |
           On the 2nd controller using chip-tool , connect to the accessory
 
-          ./chip-tool pairing onnetwork 1 20202021
+          ./chip-tool pairing onnetwork 2 20202021
 
           Verify you got below message
           Device commissioning completed with success
@@ -367,7 +372,7 @@ tests:
       verification: |
           On the 3rd controller using chip-tool , connect to the accessory
 
-          ./chip-tool pairing onnetwork 1 20202021
+          ./chip-tool pairing onnetwork 3 20202021
 
           verify you got the following message in the TH log
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33

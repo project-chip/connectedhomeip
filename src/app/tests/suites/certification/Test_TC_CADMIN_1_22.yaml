@@ -26,9 +26,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Precondition: Reset DUT_CE to factory defaults"
+    - label: "Precondition"
       verification: |
-          verification step to be updated.
+          Reset Devices to factory defaults
       disabled: true
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE using ECM"
@@ -123,7 +123,7 @@ tests:
           "TH_CR1 reads the window status to verify the DUT_CE window is closed"
       PICS: CADMIN.S.A0000
       verification: |
-          On TH1 controller read window status
+          On first controller, read window status
 
           ./chip-tool administratorcommissioning read window-status 1 0
 

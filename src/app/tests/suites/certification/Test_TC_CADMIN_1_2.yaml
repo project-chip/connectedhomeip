@@ -25,9 +25,14 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Precondition: Reset DUT_CE to factory defaults"
+    - label: "Note"
       verification: |
-          verification step to be updated.
+          For DUT as comissioner  test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          Reset Devices to factory defaults
       disabled: true
 
     - label: "TH_CR1 starts a commissioning process with TH_CE"
@@ -108,7 +113,7 @@ tests:
           On second Controller connect to the accessory.
 
           Below is the example when using chip tool as controller
-          ./chip-tool pairing onnetwork 1 20202021
+          ./chip-tool pairing onnetwork 2 20202021
 
           Verify you got below message
           Device commissioning completed with success
@@ -398,6 +403,7 @@ tests:
           ./chip-tool pairing onnetwork 3 20202021
 
           verify you got the following message in the TH log
+
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
           CHIP:TOO: Secure Pairing Failed
           CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
