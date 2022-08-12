@@ -30,22 +30,6 @@ public:
                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
 
 protected:
-    AttestationVerificationResult CheckPAA(const DeviceAttestationVerifier::AttestationInfo & info,
-                                           DeviceInfoForAttestation & deviceInfo, Platform::ScopedMemoryBuffer<uint8_t> & paaCert,
-                                           MutableByteSpan & paaDerBuffer, Crypto::AttestationCertVidPid & paaVidPid,
-                                           Crypto::AttestationCertVidPid & paiVidPid);
-
-    AttestationVerificationResult CheckCertTimes(const DeviceAttestationVerifier::AttestationInfo & info,
-                                                 MutableByteSpan & paaDerBuffer);
-
-    AttestationVerificationResult CheckCertChain(const DeviceAttestationVerifier::AttestationInfo & info,
-                                                 MutableByteSpan & paaDerBuffer);
-
-    AttestationVerificationResult CheckCertDeclaration(const DeviceAttestationVerifier::AttestationInfo & info,
-                                                       MutableByteSpan & paaDerBuffer, Crypto::AttestationCertVidPid & dacVidPid,
-                                                       Crypto::AttestationCertVidPid & paiVidPid,
-                                                       Crypto::AttestationCertVidPid & paaVidPid,
-                                                       DeviceInfoForAttestation & deviceInfo);
 };
 
 } // namespace Credentials

@@ -36,89 +36,6 @@ namespace Credentials {
 // As per specifications section 11.22.5.1. Constant RESP_MAX
 constexpr size_t kMaxResponseLength = 900;
 
-AttestationVerificationResult CloudDACVerifier::CheckPAA(const DeviceAttestationVerifier::AttestationInfo & info,
-                                                         DeviceInfoForAttestation & deviceInfo,
-                                                         Platform::ScopedMemoryBuffer<uint8_t> & paaCert,
-                                                         MutableByteSpan & paaDerBuffer, AttestationCertVidPid & paaVidPid,
-                                                         AttestationCertVidPid & paiVidPid)
-{
-    AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
-    MutableByteSpan akid(deviceInfo.paaSKID);
-
-    VerifyOrExit(ExtractAKIDFromX509Cert(info.paiDerBuffer, akid) == CHIP_NO_ERROR,
-                 attestationError = AttestationVerificationResult::kPaiFormatInvalid);
-
-    ChipLogProgress(Support, "CloudDACVerifier::CheckPAA skipping vid-scoped PAA check - PAARootStore disabled");
-
-exit:
-    return attestationError;
-}
-
-AttestationVerificationResult CloudDACVerifier::CheckCertTimes(const DeviceAttestationVerifier::AttestationInfo & info,
-                                                               MutableByteSpan & paaDerBuffer)
-{
-    AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
-
-#if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
-    VerifyOrExit(IsCertificateValidAtCurrentTime(info.dacDerBuffer) == CHIP_NO_ERROR,
-                 attestationError = AttestationVerificationResult::kDacExpired);
-#endif
-
-    VerifyOrExit(IsCertificateValidAtIssuance(info.dacDerBuffer, info.paiDerBuffer) == CHIP_NO_ERROR,
-                 attestationError = AttestationVerificationResult::kPaiExpired);
-
-    ChipLogProgress(Support, "CloudDACVerifier::CheckCertTimes skipping PAA expiry check - PAARootStore disabled");
-
-exit:
-    return attestationError;
-}
-
-AttestationVerificationResult CloudDACVerifier::CheckCertChain(const DeviceAttestationVerifier::AttestationInfo & info,
-                                                               MutableByteSpan & paaDerBuffer)
-{
-    ChipLogProgress(Support, "CloudDACVerifier::CheckCertChain skipping cert chain check - PAARootStore disabled");
-
-    return AttestationVerificationResult::kSuccess;
-}
-
-AttestationVerificationResult
-CloudDACVerifier::CheckCertDeclaration(const DeviceAttestationVerifier::AttestationInfo & info, MutableByteSpan & paaDerBuffer,
-                                       AttestationCertVidPid & dacVidPid, AttestationCertVidPid & paiVidPid,
-                                       AttestationCertVidPid & paaVidPid, DeviceInfoForAttestation & deviceInfo)
-{
-    AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
-
-    ByteSpan certificationDeclarationSpan;
-    ByteSpan attestationNonceSpan;
-    uint32_t timestampDeconstructed;
-    ByteSpan firmwareInfoSpan;
-    DeviceAttestationVendorReservedDeconstructor vendorReserved;
-    ByteSpan certificationDeclarationPayload;
-
-    deviceInfo.dacVendorId  = dacVidPid.mVendorId.Value();
-    deviceInfo.dacProductId = dacVidPid.mProductId.Value();
-    deviceInfo.paiVendorId  = paiVidPid.mVendorId.Value();
-    deviceInfo.paiProductId = paiVidPid.mProductId.ValueOr(0);
-    deviceInfo.paaVendorId  = paaVidPid.mVendorId.ValueOr(VendorId::NotSpecified);
-
-    VerifyOrExit(DeconstructAttestationElements(info.attestationElementsBuffer, certificationDeclarationSpan, attestationNonceSpan,
-                                                timestampDeconstructed, firmwareInfoSpan, vendorReserved) == CHIP_NO_ERROR,
-                 attestationError = AttestationVerificationResult::kAttestationElementsMalformed);
-
-    // Verify that Nonce matches with what we sent
-    VerifyOrExit(attestationNonceSpan.data_equal(info.attestationNonceBuffer),
-                 attestationError = AttestationVerificationResult::kAttestationNonceMismatch);
-
-    ChipLogProgress(Support, "CloudDACVerifier::VerifyAttestationInformation skipping CD signature check - LocalCSAStore disabled");
-    VerifyOrExit(CMS_ExtractCDContent(certificationDeclarationSpan, certificationDeclarationPayload) == CHIP_NO_ERROR,
-                 attestationError = AttestationVerificationResult::kPaaFormatInvalid);
-
-    attestationError = ValidateCertificateDeclarationPayload(certificationDeclarationPayload, firmwareInfoSpan, deviceInfo);
-    VerifyOrExit(attestationError == AttestationVerificationResult::kSuccess, attestationError = attestationError);
-exit:
-    return attestationError;
-}
-
 void CloudDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                                     Callback::Callback<OnAttestationInformationVerification> * onCompletion)
 {
@@ -143,23 +60,92 @@ void CloudDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerif
     VerifyOrExit(info.attestationElementsBuffer.size() <= kMaxResponseLength,
                  attestationError = AttestationVerificationResult::kInvalidArgument);
 
-    attestationError = CheckDacPaiVidPids(info, dacVidPid, paiVidPid);
-    VerifyOrExit(attestationError == AttestationVerificationResult::kSuccess, attestationError = attestationError);
+    // match DAC and PAI VIDs
+    {
+        VerifyOrExit(ExtractVIDPIDFromX509Cert(info.dacDerBuffer, dacVidPid) == CHIP_NO_ERROR,
+                     attestationError = AttestationVerificationResult::kDacFormatInvalid);
+        VerifyOrExit(ExtractVIDPIDFromX509Cert(info.paiDerBuffer, paiVidPid) == CHIP_NO_ERROR,
+                     attestationError = AttestationVerificationResult::kPaiFormatInvalid);
+        VerifyOrExit(paiVidPid.mVendorId.HasValue() && paiVidPid.mVendorId == dacVidPid.mVendorId,
+                     attestationError = AttestationVerificationResult::kDacVendorIdMismatch);
+        VerifyOrExit(dacVidPid.mProductId.HasValue(), attestationError = AttestationVerificationResult::kDacProductIdMismatch);
+        if (paiVidPid.mProductId.HasValue())
+        {
+            VerifyOrExit(paiVidPid.mProductId == dacVidPid.mProductId,
+                         attestationError = AttestationVerificationResult::kDacProductIdMismatch);
+        }
+    }
 
-    attestationError = CheckAttestationSignature(info);
-    VerifyOrExit(attestationError == AttestationVerificationResult::kSuccess, attestationError = attestationError);
+    {
+        P256PublicKey remoteManufacturerPubkey;
+        P256ECDSASignature deviceSignature;
 
-    attestationError = CheckPAA(info, deviceInfo, paaCert, paaDerBuffer, paaVidPid, paiVidPid);
-    VerifyOrExit(attestationError == AttestationVerificationResult::kSuccess, attestationError = attestationError);
+        VerifyOrExit(ExtractPubkeyFromX509Cert(info.dacDerBuffer, remoteManufacturerPubkey) == CHIP_NO_ERROR,
+                     attestationError = AttestationVerificationResult::kDacFormatInvalid);
 
-    attestationError = CheckCertTimes(info, paaDerBuffer);
-    VerifyOrExit(attestationError == AttestationVerificationResult::kSuccess, attestationError = attestationError);
+        // Validate overall attestation signature on attestation information
+        // SetLength will fail if signature doesn't fit
+        VerifyOrExit(deviceSignature.SetLength(info.attestationSignatureBuffer.size()) == CHIP_NO_ERROR,
+                     attestationError = AttestationVerificationResult::kAttestationSignatureInvalidFormat);
+        memcpy(deviceSignature.Bytes(), info.attestationSignatureBuffer.data(), info.attestationSignatureBuffer.size());
+        VerifyOrExit(ValidateAttestationSignature(remoteManufacturerPubkey, info.attestationElementsBuffer,
+                                                  info.attestationChallengeBuffer, deviceSignature) == CHIP_NO_ERROR,
+                     attestationError = AttestationVerificationResult::kAttestationSignatureInvalid);
+    }
 
-    attestationError = CheckCertChain(info, paaDerBuffer);
-    VerifyOrExit(attestationError == AttestationVerificationResult::kSuccess, attestationError = attestationError);
+    {
+        MutableByteSpan akid(deviceInfo.paaSKID);
 
-    attestationError = CheckCertDeclaration(info, paaDerBuffer, dacVidPid, paiVidPid, paaVidPid, deviceInfo);
-    VerifyOrExit(attestationError == AttestationVerificationResult::kSuccess, attestationError = attestationError);
+        VerifyOrExit(ExtractAKIDFromX509Cert(info.paiDerBuffer, akid) == CHIP_NO_ERROR,
+                     attestationError = AttestationVerificationResult::kPaiFormatInvalid);
+
+        ChipLogProgress(Support, "CloudDACVerifier::CheckPAA skipping vid-scoped PAA check - PAARootStore disabled");
+    }
+
+#if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
+    VerifyOrExit(IsCertificateValidAtCurrentTime(info.dacDerBuffer) == CHIP_NO_ERROR,
+                 attestationError = AttestationVerificationResult::kDacExpired);
+#endif
+
+    ChipLogProgress(Support, "CloudDACVerifier::CheckCertChain skipping cert chain check - PAARootStore disabled");
+
+    {
+        ByteSpan certificationDeclarationSpan;
+        ByteSpan attestationNonceSpan;
+        uint32_t timestampDeconstructed;
+        ByteSpan firmwareInfoSpan;
+        DeviceAttestationVendorReservedDeconstructor vendorReserved;
+        ByteSpan certificationDeclarationPayload;
+
+        deviceInfo.dacVendorId  = dacVidPid.mVendorId.Value();
+        deviceInfo.dacProductId = dacVidPid.mProductId.Value();
+        deviceInfo.paiVendorId  = paiVidPid.mVendorId.Value();
+        deviceInfo.paiProductId = paiVidPid.mProductId.ValueOr(0);
+        deviceInfo.paaVendorId  = paaVidPid.mVendorId.ValueOr(VendorId::NotSpecified);
+
+        MutableByteSpan paaSKID(deviceInfo.paaSKID);
+        VerifyOrExit(ExtractSKIDFromX509Cert(paaDerBuffer, paaSKID) == CHIP_NO_ERROR,
+                     attestationError = AttestationVerificationResult::kPaaFormatInvalid);
+        VerifyOrExit(paaSKID.size() == sizeof(deviceInfo.paaSKID),
+                     attestationError = AttestationVerificationResult::kPaaFormatInvalid);
+
+        VerifyOrExit(DeconstructAttestationElements(info.attestationElementsBuffer, certificationDeclarationSpan,
+                                                    attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan,
+                                                    vendorReserved) == CHIP_NO_ERROR,
+                     attestationError = AttestationVerificationResult::kAttestationElementsMalformed);
+
+        // Verify that Nonce matches with what we sent
+        VerifyOrExit(attestationNonceSpan.data_equal(info.attestationNonceBuffer),
+                     attestationError = AttestationVerificationResult::kAttestationNonceMismatch);
+
+        ChipLogProgress(Support,
+                        "CloudDACVerifier::VerifyAttestationInformation skipping CD signature check - LocalCSAStore disabled");
+        VerifyOrExit(CMS_ExtractCDContent(certificationDeclarationSpan, certificationDeclarationPayload) == CHIP_NO_ERROR,
+                     attestationError = AttestationVerificationResult::kPaaFormatInvalid);
+
+        attestationError = ValidateCertificateDeclarationPayload(certificationDeclarationPayload, firmwareInfoSpan, deviceInfo);
+        VerifyOrExit(attestationError == AttestationVerificationResult::kSuccess, attestationError = attestationError);
+    }
 
 exit:
     onCompletion->mCall(onCompletion->mContext, attestationError); // TODO: is this check getting done?

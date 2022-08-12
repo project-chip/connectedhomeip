@@ -45,29 +45,6 @@ public:
     DefaultDACVerifier() {}
 
 protected:
-    AttestationVerificationResult CheckDacPaiVidPids(const DeviceAttestationVerifier::AttestationInfo & info,
-                                                     Crypto::AttestationCertVidPid & dacVidPid,
-                                                     Crypto::AttestationCertVidPid & paiVidPid);
-
-    AttestationVerificationResult CheckAttestationSignature(const DeviceAttestationVerifier::AttestationInfo & info);
-
-    AttestationVerificationResult CheckPAA(const DeviceAttestationVerifier::AttestationInfo & info,
-                                           DeviceInfoForAttestation & deviceInfo, Platform::ScopedMemoryBuffer<uint8_t> & paaCert,
-                                           MutableByteSpan & paaDerBuffer, Crypto::AttestationCertVidPid & paaVidPid,
-                                           Crypto::AttestationCertVidPid & paiVidPid);
-
-    AttestationVerificationResult CheckCertTimes(const DeviceAttestationVerifier::AttestationInfo & info,
-                                                 MutableByteSpan & paaDerBuffer);
-
-    AttestationVerificationResult CheckCertChain(const DeviceAttestationVerifier::AttestationInfo & info,
-                                                 MutableByteSpan & paaDerBuffer);
-
-    AttestationVerificationResult CheckCertDeclaration(const DeviceAttestationVerifier::AttestationInfo & info,
-                                                       MutableByteSpan & paaDerBuffer, Crypto::AttestationCertVidPid & dacVidPid,
-                                                       Crypto::AttestationCertVidPid & paiVidPid,
-                                                       Crypto::AttestationCertVidPid & paaVidPid,
-                                                       DeviceInfoForAttestation & deviceInfo);
-
     const AttestationTrustStore * mAttestationTrustStore;
 };
 
