@@ -26,7 +26,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
-#include <credentials/attestation_verifier/CloudDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/android/CHIPP256KeypairBridge.h>
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -95,7 +95,7 @@ public:
 
     chip::Controller::AutoCommissioner * GetAutoCommissioner() { return &mAutoCommissioner; }
 
-    chip::Credentials::CloudDACVerifier * GetCloudDACVerifier() { return &mCloudDACVerifier; }
+    chip::Credentials::DacOnlyPartialAttestationVerifier * GetPartialDACVerifier() { return &mPartialDACVerifier; }
 
     const chip::Controller::CommissioningParameters & GetCommissioningParameters() const
     {
@@ -178,7 +178,7 @@ private:
 
     chip::Controller::AutoCommissioner mAutoCommissioner;
 
-    chip::Credentials::CloudDACVerifier mCloudDACVerifier;
+    chip::Credentials::DacOnlyPartialAttestationVerifier mPartialDACVerifier;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidOperationalCredentialsIssuerPtr opCredsIssuer) :
         mController(std::move(controller)), mOpCredsIssuer(std::move(opCredsIssuer))
