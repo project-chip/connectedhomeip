@@ -39,6 +39,11 @@
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 
+extern "C"
+{
+#include "lwip_if.h"
+}
+
 namespace chip {
 namespace Inet {
 
@@ -122,16 +127,13 @@ private:
     uint32_t mWiFiAPIdleTimeoutMS;
     uint16_t mFlags;
 
-    void DriveStationState(void);
     void OnStationConnected(void);
     void OnStationDisconnected(void);
     void ChangeWiFiStationState(WiFiStationState newState);
-    // static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
 
-    void DriveAPState(void);
-    CHIP_ERROR ConfigureWiFiAP(void);
+    static void _OnLwipEvent(struct netif *pNetIf, NetIfStatus_e status, void *pParams);
+    static void _OnIpAcquired(intptr_t arg);    CHIP_ERROR ConfigureWiFiAP(void);
     void ChangeWiFiAPState(WiFiAPState newState);
-    // static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
 
     void UpdateInternetConnectivityState(void);
     void OnStationIPv4AddressAvailable();
