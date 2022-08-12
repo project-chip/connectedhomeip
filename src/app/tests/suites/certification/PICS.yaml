@@ -592,7 +592,10 @@ PICS:
           attribute?"
       id: TSUIC.S.A0002
 
-      # Software Diagnostics cluster
+    # Software Diagnostics cluster
+    - label: "The metrics for high watermark related to memory consumption."
+      id: DGSW.S.F00
+
     - label: "Does the device implement the SoftwareFault event?"
       id: DGSW.S.E00
 
@@ -3277,6 +3280,17 @@ PICS:
     - label: "Does the device implement the CarrierDetect attribute?"
       id: DGETH.S.A0008
 
+    #Features
+    - label:
+          "Counts for the number of received and transmitted packets on the
+          ethernet interface"
+      id: DGETH.S.F00
+
+    - label:
+          "Counts for the number of errors during the reception and transmission
+          of packets on the ethernet interface."
+      id: DGETH.S.F01
+
     #Wi-Fi Network Diagnostics Cluster
     - label:
           "Counts for the number of received and transmitted packets on the
@@ -3489,6 +3503,28 @@ PICS:
       id: PSCFG.S.A0000
 
     #Thread Network Diagnostics Cluster
+    #Features
+    - label:
+          "Does the DUT(server) support the Server supports the counts for the
+          number of received and transmitted packets feature?"
+      id: DGTHREAD.S.F00
+
+    - label:
+          "Does the DUT(server) support the Server supports the counts for the
+          number of errors that have occurred during the reception and
+          transmission feature?"
+      id: DGTHREAD.S.F01
+
+    - label:
+          "Does the DUT(server) support the Server supports the counts for
+          various MLE layer happenings feature?"
+      id: DGTHREAD.S.F02
+
+    - label:
+          "Does the DUT(server) support the Server supports the counts for
+          various MAC layer happenings feature?"
+      id: DGTHREAD.S.F03
+
     #server attributes
     - label: "Does the DUT-server support the channel attribute?"
       id: DGTHREAD.S.A0000
