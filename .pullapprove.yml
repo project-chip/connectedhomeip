@@ -39,10 +39,9 @@ overrides:
     ############################################################
     #  Required status checks
     ############################################################
-#     Disabled given restyled seems broken right now
-#     - if: "'*restyle*' not in statuses.successful"
-#       status: failure
-#       explanation: "Style must be inline before reviewing can be complete"
+    - if: "'*restyle*' not in statuses.successful"
+      status: failure
+      explanation: "Style must be inline before reviewing can be complete"
 
     ############################################################
     #  Fast tracking

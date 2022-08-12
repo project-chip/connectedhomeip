@@ -98,7 +98,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
 
     mSetupPayload.version = 0;
     mSetupPayload.discriminator.SetLongValue(discriminator);
-    mSetupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
+    mSetupPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kOnNetwork);
 
     mCommissioningWindowCallback      = callback;
     mBasicCommissioningWindowCallback = nullptr;

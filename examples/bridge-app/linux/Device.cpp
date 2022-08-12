@@ -22,7 +22,7 @@
 #include <cstdio>
 #include <platform/CHIPDeviceLayer.h>
 
-using namespace chip::app::Clusters::BridgedActions;
+using namespace chip::app::Clusters::Actions;
 
 // LightingManager LightingManager::sLight;
 

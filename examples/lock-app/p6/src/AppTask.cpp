@@ -46,6 +46,7 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/P6/NetworkCommissioningDriver.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 
@@ -120,6 +121,7 @@ using namespace ::chip::System;
 using namespace P6DoorLock::LockInitParams;
 
 AppTask AppTask::sAppTask;
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 namespace {
 app::Clusters::NetworkCommissioning::Instance
@@ -137,6 +139,9 @@ static void InitServer(intptr_t context)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

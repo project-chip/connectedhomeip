@@ -39,7 +39,7 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace AccessControl
 
-namespace BridgedActions {
+namespace Actions {
 namespace Events {
 
 namespace StateChanged {
@@ -51,7 +51,7 @@ static constexpr EventId Id = 0x00000001;
 } // namespace ActionFailed
 
 } // namespace Events
-} // namespace BridgedActions
+} // namespace Actions
 
 namespace Basic {
 namespace Events {

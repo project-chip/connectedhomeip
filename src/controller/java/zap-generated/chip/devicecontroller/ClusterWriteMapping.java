@@ -286,8 +286,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("binding", writeBindingInteractionInfo);
     Map<String, InteractionInfo> writeAccessControlInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("accessControl", writeAccessControlInteractionInfo);
-    Map<String, InteractionInfo> writeBridgedActionsInteractionInfo = new LinkedHashMap<>();
-    writeAttributeMap.put("bridgedActions", writeBridgedActionsInteractionInfo);
+    Map<String, InteractionInfo> writeActionsInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("actions", writeActionsInteractionInfo);
     Map<String, InteractionInfo> writeBasicInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeBasicNodeLabelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

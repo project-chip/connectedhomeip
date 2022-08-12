@@ -62,11 +62,6 @@ Thread disabled, and it should be paired with Matter controller and get
 configuration from it. Some actions required before establishing full
 communication are described below.
 
-The example also comes with a test mode, which allows to start Thread with the
-default settings by pressing button manually. However, this mode does not
-guarantee that the device will be able to communicate with the Matter controller
-and other devices.
-
 The example can be configured to use the secure bootloader and utilize it for
 performing over-the-air Device Firmware Upgrade using Bluetooth LE.
 
@@ -226,9 +221,6 @@ states are possible:
 
 **Button 2** &mdash; Pressing the button once changes the lock state to the
 opposite one.
-
-**Button 3** &mdash; Pressing the button once starts the Thread networking in
-the test mode using the default configuration.
 
 **Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
 enables Bluetooth LE advertising for the predefined period of time (15 minutes

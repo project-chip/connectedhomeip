@@ -18,7 +18,13 @@
 
 /**
  *    @file
- *      This file defines object for a CHIP IM Invoke Command Handler
+ *      A handler for incoming Invoke interactions.
+ *
+ *      Allows adding responses to be sent in an InvokeResponse: see the various
+ *      "Add*" methods.
+ *
+ *      Allows adding the responses asynchronously.  See the documentation
+ *      for the CommandHandler::Handle class below.
  *
  */
 
@@ -77,6 +83,29 @@ public:
         virtual Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
     };
 
+    /**
+     * Class that allows asynchronous command processing before sending a
+     * response.  When such processing is desired:
+     *
+     * 1) Create a Handle initialized with the CommandHandler that delivered the
+     *    incoming command.
+     * 2) Ensure the Handle, or some Handle it's moved into via the move
+     *    constructor or move assignment operator, remains alive during the
+     *    course of the asynchronous processing.
+     * 3) Ensure that the ConcreteCommandPath involved will be known when
+     *    sending the response.
+     * 4) When ready to send the response:
+     *    * Ensure that no other Matter tasks are running in parallel (e.g. by
+     *      running on the Matter event loop or holding the Matter stack lock).
+     *    * Call Get() to get the CommandHandler.
+     *    * Check that Get() did not return null.
+     *    * Add the response to the CommandHandler via one of the Add* methods.
+     *    * Let the Handle get destroyed, or manually call Handle::Release() if
+     *      destruction of the Handle is not desirable for some reason.
+     *
+     * The Invoke Response will not be sent until all outstanding Handles have
+     * been destroyed or have had Release called.
+     */
     class Handle
     {
     public:

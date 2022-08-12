@@ -305,8 +305,6 @@ exit:
 void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion)
 {
-    ChipLogProgress(Support, "---------------------------DefaultDACVerifier::VerifyAttestationInformation");
-
     AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
 
     Platform::ScopedMemoryBuffer<uint8_t> paaCert;

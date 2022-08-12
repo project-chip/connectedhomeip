@@ -509,7 +509,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         {
             mSubscriptionId = subscriptionId;
         }
-        else if (!IsMatchingClient(subscriptionId))
+        else if (!IsMatchingSubscriptionId(subscriptionId))
         {
             err = CHIP_ERROR_INVALID_SUBSCRIPTION;
         }
@@ -838,7 +838,7 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
 
     SubscriptionId subscriptionId = 0;
     VerifyOrReturnError(subscribeResponse.GetSubscriptionId(&subscriptionId) == CHIP_NO_ERROR, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsMatchingClient(subscriptionId), CHIP_ERROR_INVALID_SUBSCRIPTION);
+    VerifyOrReturnError(IsMatchingSubscriptionId(subscriptionId), CHIP_ERROR_INVALID_SUBSCRIPTION);
     ReturnErrorOnFailure(subscribeResponse.GetMaxInterval(&mMaxInterval));
 
     ChipLogProgress(DataManagement,

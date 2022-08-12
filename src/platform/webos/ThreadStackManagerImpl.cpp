@@ -697,7 +697,7 @@ CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(A
     case ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id:
     case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id:
     case ThreadNetworkDiagnostics::Attributes::Delay::Id:
-    case ThreadNetworkDiagnostics::Attributes::ChannelMask::Id:
+    case ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::Id:
     case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
     case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id:
         err = encoder.EncodeNull();

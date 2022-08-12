@@ -89,7 +89,7 @@ bool InteractiveStartCommand::ParseCommand(char * command)
 {
     if (strcmp(command, kInteractiveModeStopCommand) == 0)
     {
-        ExecuteDeferredCleanups();
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredCleanups, 0);
         return false;
     }
 

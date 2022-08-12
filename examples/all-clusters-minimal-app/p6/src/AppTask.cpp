@@ -40,6 +40,7 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/P6/NetworkCommissioningDriver.h>
 
@@ -104,6 +105,7 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
 
 AppTask AppTask::sAppTask;
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 namespace {
 app::Clusters::NetworkCommissioning::Instance
@@ -127,6 +129,9 @@ static void InitServer(intptr_t context)
 
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

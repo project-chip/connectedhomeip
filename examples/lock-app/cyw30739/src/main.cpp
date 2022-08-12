@@ -30,6 +30,7 @@
 #endif
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <inet/EndPointStateOpenThread.h>
@@ -173,7 +174,8 @@ void InitApp(intptr_t args)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PlatformMgrImpl().AddEventHandler(EventHandler, 0);
-
+    // Print QR Code URL
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
     /* Start CHIP datamodel server */
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();

@@ -26,7 +26,6 @@
 #include "esp_log.h"
 #include "esp_spi_flash.h"
 #include "freertos/FreeRTOS.h"
-#include <DeviceInfoProviderImpl.h>
 #include <app/server/OnboardingCodesUtil.h>
 
 #define APP_TASK_NAME "APP"
@@ -39,8 +38,6 @@ namespace {
 
 QueueHandle_t sAppEventQueue;
 TaskHandle_t sAppTaskHandle;
-
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 } // namespace
 
@@ -87,8 +84,6 @@ CHIP_ERROR AppTask::Init()
 #if CONFIG_HAVE_DISPLAY
     InitDeviceDisplay();
 #endif
-
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     return err;
 }

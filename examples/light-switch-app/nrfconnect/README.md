@@ -102,11 +102,6 @@ has Thread disabled, and it should be paired with Matter controller and get
 configuration from it. Some actions required before establishing full
 communication are described below.
 
-The example also comes with a test mode, which allows to start Thread with the
-default settings by pressing button manually. However, this mode does not
-guarantee that the device will be able to communicate with the Matter controller
-and other devices.
-
 The example can be configured to use the secure bootloader and utilize it for
 performing over-the-air Device Firmware Upgrade using Bluetooth LE.
 

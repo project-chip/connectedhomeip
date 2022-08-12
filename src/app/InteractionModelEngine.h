@@ -139,6 +139,11 @@ public:
     void ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
 
     /**
+     * Tears down all active subscriptions.
+     */
+    void ShutdownAllSubscriptions();
+
+    /**
      * Expire active transactions and release related objects for the given fabric index.
      * This is used for releasing transactions that won't be closed when a fabric is removed.
      */
@@ -158,6 +163,11 @@ public:
      * Returns the handler at a particular index within the active handler list.
      */
     ReadHandler * ActiveHandlerAt(unsigned int aIndex);
+
+    /**
+     * Returns the write handler at a particular index within the active handler list.
+     */
+    WriteHandler * ActiveWriteHandlerAt(unsigned int aIndex);
 
     /**
      * The Magic number of this InteractionModelEngine, the magic number is set during Init()

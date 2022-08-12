@@ -430,6 +430,7 @@ class PayloadHeader
 {
 public:
     constexpr PayloadHeader() { SetProtocol(Protocols::NotSpecified); }
+    constexpr PayloadHeader(const PayloadHeader &) = default;
     PayloadHeader & operator=(const PayloadHeader &) = default;
 
     /** Get the Session ID from this header. */

@@ -416,7 +416,7 @@ tests:
     - label: "TH reads Delay attribute value from DUT"
       PICS: DGTHREAD.S.A003a
       command: "readAttribute"
-      attribute: "delay"
+      attribute: "Delay"
       response:
           constraints:
               type: int32u
@@ -452,7 +452,7 @@ tests:
     - label: "TH reads ChannelPage0Mask attribute value from DUT"
       PICS: DGTHREAD.S.A003c
       command: "readAttribute"
-      attribute: "ChannelMask"
+      attribute: "ChannelPage0Mask"
       response:
           constraints:
               type: octet_string
