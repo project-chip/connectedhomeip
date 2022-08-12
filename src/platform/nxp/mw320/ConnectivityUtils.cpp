@@ -388,6 +388,13 @@ CHIP_ERROR ConnectivityUtils::GetWiFiCurrentMaxRate(const char * ifname, uint64_
     return err;
 }
 
+CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    strncpy(ifname, "mlan0", bufSize);
+    return err;
+}
+
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

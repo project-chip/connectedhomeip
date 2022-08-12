@@ -48,6 +48,9 @@ static_library("mw320") {
     "MW320Config.cpp",
     "MW320Config.h",
     "NetworkProvisioningServerImpl.h",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningEthernetDriver.cpp",
+    "NetworkCommissioningWiFiDriver.cpp",
     "OTAImageProcessorImpl.cpp",
     "OTAImageProcessorImpl.h",
     "PlatformManagerImpl.cpp",
@@ -58,6 +61,10 @@ static_library("mw320") {
   ]
 
   defines = [ "MW320_LOG_ENABLED=1" ]
+  # Do Sync-connect/scan
+  defines += [ "MW320_CONNECT_SCAN_SYNC=1" ]
+  # Use ethernet/wifi interface for network commissioning. Default: WiFi
+  defines += [ "USE_ETHERNET_COMMISSION=0" ]
 
   deps = []
 
