@@ -20,7 +20,7 @@
 /**
  *    @file
  *          Provides implementations of the CHIP System Layer platform
- *          time/clock functions that are suitable for use on the Ameba platform.
+ *          time/clock functions that are suitable for use on the Beken platform.
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -73,7 +73,12 @@ CHIP_ERROR InitClock_RealTime()
     baseTime =
         Clock::Milliseconds64((static_cast<uint64_t>(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) * kMicrosecondsPerMillisecond));
 
-    return CHIP_NO_ERROR;
+    // Use CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD as the initial value of RealTime.
+    // Then the RealTime obtained from GetClock_RealTime will be always valid.
+    //
+    // TODO(19081): This is broken because it causes the platform to report
+    //              that it does have wall clock time when it actually doesn't.
+    return System::SystemClock().SetClock_RealTime(baseTime);
 }
 
 } // namespace Clock
