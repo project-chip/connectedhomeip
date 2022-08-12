@@ -31,6 +31,8 @@
 
 namespace chip {
 
+class OperationalSessionSetupPoolDelegate;
+
 struct CASESessionManagerConfig
 {
     DeviceProxyInitParams sessionInitParams;
