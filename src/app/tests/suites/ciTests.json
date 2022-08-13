@@ -35,8 +35,8 @@
     ],
     "Descriptor": ["Test_TC_DESC_1_1"],
     "EthernetNetworkDiagnostics": [
-        "Test_TC_DGETH_1_1", 
-        "Test_TC_DGETH_2_1", 
+        "Test_TC_DGETH_1_1",
+        "Test_TC_DGETH_2_1",
         "Test_TC_DGETH_2_2"
     ],
     "FlowMeasurement": ["Test_TC_FLW_1_1", "Test_TC_FLW_2_1"],
