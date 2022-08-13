@@ -561,7 +561,8 @@ private:
         MTRAttributePath * attributePath = attributeInfo.first;
         NSDictionary * attributeDataValue = attributeInfo.second;
         NSDictionary * cachedAttributeDataValue = _readCache[attributePath];
-        if (cachedAttributeDataValue && ![self _attributeDataValue:attributeDataValue isEqualToDataValue:cachedAttributeDataValue]) {
+        if (cachedAttributeDataValue
+            && ![self _attributeDataValue:attributeDataValue isEqualToDataValue:cachedAttributeDataValue]) {
             [attributesToReport addObject:cachedAttributeDataValue];
         }
 
