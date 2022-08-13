@@ -24,10 +24,6 @@ import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 assert(current_os == "freertos")
 
-if (chip_enable_openthread) {
-  import("//build_overrides/openthread.gni")
-}
-
 project_dir = "${chip_root}/examples/window-app"
 efr32_project_dir = "${project_dir}/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
