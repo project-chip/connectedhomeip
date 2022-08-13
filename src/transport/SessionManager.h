@@ -364,6 +364,15 @@ public:
 
     /**
      * @brief
+     *   Update all CASE sessions that match `node` with the provided transport peer address.
+     *
+     * @param node    Scoped node ID of the active sessions we want to update.
+     * @param addr    Transport peer address that we want to update to.
+     */
+    void UpdateAllSessionsPeerAddress(const ScopedNodeId & node, const Transport::PeerAddress & addr);
+
+    /**
+     * @brief
      *   Return the System Layer pointer used by current SessionManager.
      */
     System::Layer * SystemLayer() { return mSystemLayer; }

@@ -29,13 +29,38 @@ tests:
 
       disabled: true
 
+    - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
+      verification: |
+          NOTE:
+          To Run the event test case we need to build event commands on DUT[All-cluster-ap] terminal.Below I mention the commands for how to build for linux arm64 it depends on the DUT what we use.I provided the link for build events.
+
+          https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#trigger-switch-events
+
+
+
+
+          Here I provide cmmds for build on linux arm64
+
+          1. ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build
+
+          2../scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang build
+
+          3.  ./out/linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang/chip-all-clusters-app-fuzzing
+
+          4. ./out/linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang/chip-all-clusters-app-fuzzing $(INPUT_FILE)
+      disabled: true
+
     - label: "Set up subscription to SwitchLatched event"
       PICS: SWTCH.S.F00
       verification: |
-          On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
-          echo "{"Name":"SwitchLatched","NewPosition":3}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+          In Raspi platform to change the switch  position use the below command, Pls use equivalent command on the respective DUT.After provisioning ,open one more terminal on DUT side execute the echo command on that terminal.
 
-          ./chip-tool switch subscribe-event switch-latched 1 100 1 1
+          echo "{"Name":"SwitchLatched","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+            Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event switch-latched 1 100 1 1
 
           Verify inTH Log:
 
@@ -44,14 +69,23 @@ tests:
           [1659527630.476771][4774:4779] CHIP:TOO:   Priority: Info
           [1659527630.476799][4774:4779] CHIP:TOO:   Timestamp: 29687894
           [1659527630.476887][4774:4779] CHIP:TOO:   SwitchLatched: {
-          [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 3
+          [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 1
           [1659527630.476969][4774:4779] CHIP:TOO:    }
       disabled: true
 
     - label: "Operator sets switch to first position"
       PICS: SWTCH.S.F00
       verification: |
-          Manual operation
+          In Raspi platform to change the switch to first position use the below command, Pls use equivalent command on the respective DUT.After provisioning ,open one more terminal on DUT side execute the echo command on that terminal.
+
+
+          echo "{"Name":"SwitchLatched","NewPosition":0}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+          [1659599702.921797][7312:7312] CHIP:IN: SecureSession[0xaaaacdb77710]: MarkAsDefunct Type:2 LSID:24961
+          [1659599703.232994][7312:7321] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":0}"
+          [1659599703.233543][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 1755409b
+          [1659599703.233624][7312:7312] CHIP:-: The latching switch is moved to a new position:0
+          [1659599703.233682][7312:7312] CHIP:ZCL: SwitchServer: OnSwitchLatch
       disabled: true
 
     - label: "Read CurrentPosition attribute"
@@ -59,7 +93,7 @@ tests:
       verification: |
           ./chip-tool switch read current-position 1 1
 
-          Verify inTH Log:
+          Verify current position value inTH(chip-tool) Log:
 
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
           [1646209289.746228][2617:2622] CHIP:TOO:   current position: 0
@@ -68,7 +102,15 @@ tests:
     - label: "Operator sets switch to second position"
       PICS: SWTCH.S.F00
       verification: |
-          Manual operation
+          In Raspi platform to change the switch to second position use the below sample command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"SwitchLatched","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+          [1659600080.279936][7312:7321] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":1}"
+          [1659600080.280318][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 1755409c
+          [1659600080.280376][7312:7312] CHIP:-: The latching switch is moved to a new position:1
+          [1659600080.280412][7312:7312] CHIP:ZCL: SwitchServer: OnSwitchLatch
+          [1659600080.280503][7312:7312] CHIP:EVL: LogEvent event number: 0x0000000000020005 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Sys timestamp: 0x0000000000EB91B3
       disabled: true
 
     - label: "Read CurrentPosition attribute"
@@ -76,7 +118,7 @@ tests:
       verification: |
           ./chip-tool switch read current-position 1 1
 
-          Verify inTH Log:
+          Verify current position value inTH(chip-tool) Log:
 
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
           [1646209289.746228][2617:2622] CHIP:TOO:   current position: 1
@@ -87,17 +129,25 @@ tests:
           switch to next position - Read CurrentPosition attribute"
       PICS: SWTCH.S.F00
       verification: |
+          Raspi device doesn"t support more than 2 position ,so this step is not verifiable by using raspi device
+
+          In Raspi platform to change the switch to third position use the below sample command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"SwitchLatched","NewPosition":2}" > /tmp/chip_all_clusters_fifo<PID>  (PID of DUT)
+
+          [1659600438.058928][7312:7321] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":2}"
+          [1659600438.059436][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 1755409d
+          [1659600438.059519][7312:7312] CHIP:-: The latching switch is moved to a new position:2
+          [1659600438.059644][7312:7312] CHIP:ZCL: SwitchServer: OnSwitchLatch
+          [1659600438.059857][7312:7312] CHIP:EVL: LogEvent event number: 0x0000000000020006 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Sys timestamp: 0x0000000000F10746
+
+          In the current SDK development, Max number of positions are configured as 2, hence the current  test step should fail as its reached more than the numberof position. If the DUT supports more number of positions, then for the above command, it should increase to the next level. Below is the sample command to execute , if the DUT supports more than 2 NumberOfPositions.
+
           ./chip-tool switch read current-position 1 1
 
           Verify inTH Log:
-
-          Event (content will vary on the device)
-          [1646209167.923346][2190:2190] CHIP:DMG: StatusResponseMessage =
-          [1646209167.923415][2190:2190] CHIP:DMG: {
-          [1646209167.923472][2190:2190] CHIP:DMG:        Status = 0x0,
-          [1646209167.923533][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
-          [1646209167.923583][2190:2190] CHIP:DMG: }
-          [1646209167.923640][2190:2190] CHIP:IM: Received status response, status is 0
+          [1659600502.023560][4306:4311] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001 DataVersion: 391463069
+          [1659600502.023631][4306:4311] CHIP:TOO:   current position: 2
       disabled: true
 
     - label:
@@ -106,19 +156,47 @@ tests:
           Read CurrentPosition attribute"
       PICS: SWTCH.S.F00
       verification: |
-          verification step to be updated.
+          Raspi device doesn"t support more than 2 position ,so this step is not verifiable by using raspi device
+
+
+          In Raspi platform to change the switch to third position use the below sample command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"SwitchLatched","NewPosition":3" > /tmp/chip_all_clusters_fifo<PID>  (PID of DUT)
+
+          [1659600438.058928][7312:7321] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":3}"
+          [1659600438.059436][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 1755409d
+          [1659600438.059519][7312:7312] CHIP:-: The latching switch is moved to a new position:3
+          [1659600438.059644][7312:7312] CHIP:ZCL: SwitchServer: OnSwitchLatch
+          [1659600438.059857][7312:7312] CHIP:EVL: LogEvent event number: 0x0000000000020006 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Sys timestamp: 0x0000000000F10746
+
+          In the current SDK development, Max number of positions are configured as 2, hence the current  test step should fail as its reached more than the numberof position. If the DUT supports more number of positions, then for the above command, it should increase to the next level. Below is the sample command to execute , if the DUT supports more than 2 NumberOfPositions.
+
+          ./chip-tool switch read current-position 1 1
+
+          Verify inTH Log:
+          [1659600502.023560][4306:4311] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001 DataVersion: 391463069
+          [1659600502.023631][4306:4311] CHIP:TOO:   current position: 3
       disabled: true
 
     - label: "Operator returns switch to first position"
       PICS: SWTCH.S.F00
       verification: |
-          Event (content will vary on the device) [1646209167.923346][2190:2190] CHIP:DMG: StatusResponseMessage = [1646209167.923415][2190:2190] CHIP:DMG: { [1646209167.923472][2190:2190] CHIP:DMG: Status = 0x0, [1646209167.923533][2190:2190] CHIP:DMG: InteractionModelRevision = 1 [1646209167.923583][2190:2190] CHIP:DMG: } [1646209167.923640][2190:2190] CHIP:IM: Received status response, status is 0
+          In Raspi platform to change the switch to first position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"SwitchLatched","NewPosition":0}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+          [1659599702.921797][7312:7312] CHIP:IN: SecureSession[0xaaaacdb77710]: MarkAsDefunct Type:2 LSID:24961
+          [1659599703.232994][7312:7321] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":0}"
+          [1659599703.233543][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 1755409b
+          [1659599703.233624][7312:7312] CHIP:-: The latching switch is moved to a new position:0
+          [1659599703.233682][7312:7312] CHIP:ZCL: SwitchServer: OnSwitchLatch
       disabled: true
 
     - label: "Read CurrentPosition attribute"
       PICS: SWTCH.S.F00
       verification: |
           ./chip-tool switch read current-position 1 1
+
           Verify inTH Log:
 
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
@@ -128,17 +206,29 @@ tests:
     - label: "Set up subscription to InitialPress event"
       PICS: SWTCH.S.F01
       verification: |
-          ./chip-tool switch subscribe-event initial-press 1 100 1 1
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"InitialPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+          [1659612230.311864][7312:7321] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1659612230.312345][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 175540a4
+          [1659612230.312422][7312:7312] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1659612230.312472][7312:7312] CHIP:ZCL: SwitchServer: OnInitialPress
+
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event  initial-Press 1 100 1 1
           Verify inTH Log:
 
-          [1646209546.313236][2641:2646] CHIP:DMG: SubscribeResponseMessage =
-          [1646209546.313263][2641:2646] CHIP:DMG: {
-          [1646209546.313285][2641:2646] CHIP:DMG:        SubscriptionId = 0x463c015025bd6b74,
-          [1646209546.313314][2641:2646] CHIP:DMG:        MinIntervalFloorSeconds = 0x1,
-          [1646209546.313342][2641:2646] CHIP:DMG:        MaxIntervalCeilingSeconds = 0x2,
-          [1646209546.313367][2641:2646] CHIP:DMG:        InteractionModelRevision = 1
-          [1646209546.313389][2641:2646] CHIP:DMG: }
-          [1646209546.313421][2641:2646] CHIP:DMG: MoveToState ReadClient[0xffff700030b0]: Moving to [Subscripti]
+          [1659612272.121119][4957:4962] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1659612272.121143][4957:4962] CHIP:TOO:          Event number: 131085
+          [1659612272.121164][4957:4962] CHIP:TOO:          Priority: Info
+          [1659612272.121186][4957:4962] CHIP:TOO:          Timestamp: 27588291
+          [1659612272.121313][4957:4962] CHIP:TOO:   InitialPress: {
+          [1659612272.121347][4957:4962] CHIP:TOO:     NewPosition: 1
+          [1659612272.121369][4957:4962] CHIP:TOO:    }
       disabled: true
 
     - label: "Operator does not operate switch"
@@ -161,7 +251,16 @@ tests:
     - label: "Operator operates switch (keep it pressed)"
       PICS: SWTCH.S.F01
       verification: |
-          receive event
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"InitialPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+
+          [1659612460.072098][7312:7321] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1659612460.072562][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 175540a5
+          [1659612460.072646][7312:7312] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1659612460.072706][7312:7312] CHIP:ZCL: SwitchServer: OnInitialPress
+          [1659612460.073008][7312:7312] CHIP:EVL: Copy Event to next buffer with priority 1
       disabled: true
 
     - label: "Read CurrentPosition attribute"
@@ -177,7 +276,14 @@ tests:
     - label: "Operator does not operate switch (release switch)"
       PICS: SWTCH.S.F01
       verification: |
-          no Matter messages
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"ShortRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+          [1659685803.709724][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1659685803.710214][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7719
+          [1659685803.710304][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1659685803.710357][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
       disabled: true
 
     - label: "Read CurrentPosition attribute"
@@ -193,9 +299,23 @@ tests:
     - label: "Set up subscription to InitialPress and ShortRelease events"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
-          ./chip-tool switch subscribe-event initial-press 1 100 1 1
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
 
-          ./chip-tool switch subscribe-event short-release 1 100 1 1
+          echo "{"Name":"InitialPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+          [1659686596.526276][2530:2538] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1659686596.526734][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e771a
+          [1659686596.526820][2530:2530] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1659686596.526881][2530:2530] CHIP:ZCL: SwitchServer: OnInitialPress
+
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"ShortRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+          [1659686852.011134][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1659686852.011424][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e771b
+          [1659686852.011466][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1659686852.011490][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
       disabled: true
 
     - label: "Operator does not operate switch"
@@ -207,26 +327,88 @@ tests:
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
-          Event (content will vary on the device) [1646209167.923346][2190:2190] CHIP:DMG: StatusResponseMessage = [1646209167.923415][2190:2190] CHIP:DMG: { [1646209167.923472][2190:2190] CHIP:DMG: Status = 0x0, [1646209167.923533][2190:2190] CHIP:DMG: InteractionModelRevision = 1 [1646209167.923583][2190:2190] CHIP:DMG: } [1646209167.923640][2190:2190] CHIP:IM: Received status response, status is 0
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event  initial-Press 1 100 1 1
+
+          [1659686631.947247][3045:3050] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1659686631.947272][3045:3050] CHIP:TOO:          Event number: 23
+          [1659686631.947296][3045:3050] CHIP:TOO:          Priority: Info
+          [1659686631.947320][3045:3050] CHIP:TOO:          Timestamp: 9048822
+          [1659686631.947348][3045:3050] CHIP:TOO:   InitialPress: {
+          [1659686631.947374][3045:3050] CHIP:TOO:     NewPosition: 1
+          [1659686631.947397][3045:3050] CHIP:TOO:    }
       disabled: true
 
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
-          Event (content will vary on the device) [1646209167.923346][2190:2190] CHIP:DMG: StatusResponseMessage = [1646209167.923415][2190:2190] CHIP:DMG: { [1646209167.923472][2190:2190] CHIP:DMG: Status = 0x0, [1646209167.923533][2190:2190] CHIP:DMG: InteractionModelRevision = 1 [1646209167.923583][2190:2190] CHIP:DMG: } [1646209167.923640][2190:2190] CHIP:IM: Received status response, status is 0
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
+
+          [1659686907.770389][3061:3066] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1659686907.770413][3061:3066] CHIP:TOO:          Event number: 24
+          [1659686907.770434][3061:3066] CHIP:TOO:          Priority: Info
+          [1659686907.770456][3061:3066] CHIP:TOO:          Timestamp: 9304307
+          [1659686907.770482][3061:3066] CHIP:TOO:   ShortRelease: {
+          [1659686907.770506][3061:3066] CHIP:TOO:     PreviousPosition: 1
+          [1659686907.770528][3061:3066] CHIP:TOO:    }
       disabled: true
 
     - label:
           "Operator operates switch (keep pressed for long time, e.g. 5 seconds)"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
-          Event (content will vary on the device) [1646209167.923346][2190:2190] CHIP:DMG: StatusResponseMessage = [1646209167.923415][2190:2190] CHIP:DMG: { [1646209167.923472][2190:2190] CHIP:DMG: Status = 0x0, [1646209167.923533][2190:2190] CHIP:DMG: InteractionModelRevision = 1 [1646209167.923583][2190:2190] CHIP:DMG: } [1646209167.923640][2190:2190] CHIP:IM: Received status response, status is 0
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"InitialPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo_2530
+
+          [1659686596.526276][2530:2538] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1659686596.526734][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e771a
+          [1659686596.526820][2530:2530] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1659686596.526881][2530:2530] CHIP:ZCL: SwitchServer: OnInitialPress
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event  initial-Press 1 100 1 1
+
+          [1659692069.006090][3668:3674] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1659692069.006114][3668:3674] CHIP:TOO:          Event number: 26
+          [1659692069.006138][3668:3674] CHIP:TOO:          Priority: Info
+          [1659692069.006160][3668:3674] CHIP:TOO:          Timestamp: 14513708
+          [1659692069.006187][3668:3674] CHIP:TOO:   InitialPress: {
+          [1659692069.006211][3668:3674] CHIP:TOO:     NewPosition: 1
+          [1659692069.006233][3668:3674] CHIP:TOO:    }
       disabled: true
 
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
-          Event (content will vary on the device) [1646209167.923346][2190:2190] CHIP:DMG: StatusResponseMessage = [1646209167.923415][2190:2190] CHIP:DMG: { [1646209167.923472][2190:2190] CHIP:DMG: Status = 0x0, [1646209167.923533][2190:2190] CHIP:DMG: InteractionModelRevision = 1 [1646209167.923583][2190:2190] CHIP:DMG: } [1646209167.923640][2190:2190] CHIP:IM: Received status response, status is 0
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"ShortRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+          [1659686852.011134][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1659686852.011424][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e771b
+          [1659686852.011466][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1659686852.011490][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
+
+          [1659692123.069593][3675:3680] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1659692123.069616][3675:3680] CHIP:TOO:          Event number: 27
+          [1659692123.069639][3675:3680] CHIP:TOO:          Priority: Info
+          [1659692123.069660][3675:3680] CHIP:TOO:          Timestamp: 14562409
+          [1659692123.069687][3675:3680] CHIP:TOO:   ShortRelease: {
+          [1659692123.069711][3675:3680] CHIP:TOO:     PreviousPosition: 1
+          [1659692123.069734][3675:3680] CHIP:TOO:    }
       disabled: true
 
     - label:
@@ -234,129 +416,41 @@ tests:
           LongRelease events"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          Verify inTH Log:
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
 
-          ./chip-tool switch subscribe-event initial-press 1 100 1 1
+           echo "{"Name":"InitialPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
 
-          ./chip-tool switch subscribe-event short-release 1 100 1 1
+          [1659693098.031462][2530:2538] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1659693098.031812][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7724
+          [1659693098.031859][2530:2530] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1659693098.031888][2530:2530] CHIP:ZCL: SwitchServer: OnInitialPress
 
-          [1655272080.983330][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.983357][2922:2927] CHIP:TOO:          Event number: 2
-          [1655272080.983380][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.983402][2922:2927] CHIP:TOO:          Timestamp: 1137653
-          [1655272080.983506][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.984432][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.984461][2922:2927] CHIP:TOO:    }
-          [1655272080.984555][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.984580][2922:2927] CHIP:TOO:          Event number: 3
-          [1655272080.984602][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.984624][2922:2927] CHIP:TOO:          Timestamp: 1137671
-          [1655272080.984651][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.984676][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.984699][2922:2927] CHIP:TOO:    }
-          [1655272080.984785][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.984808][2922:2927] CHIP:TOO:          Event number: 4
-          [1655272080.984831][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.984852][2922:2927] CHIP:TOO:          Timestamp: 1137689
-          [1655272080.984879][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.984903][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.984926][2922:2927] CHIP:TOO:    }
-          [1655272080.985009][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.985033][2922:2927] CHIP:TOO:          Event number: 5
-          [1655272080.985055][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.985076][2922:2927] CHIP:TOO:          Timestamp: 1137711
-          [1655272080.985103][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.985127][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.985150][2922:2927] CHIP:TOO:    }
-          [1655272080.985233][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.985257][2922:2927] CHIP:TOO:          Event number: 6
-          [1655272080.985279][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.985300][2922:2927] CHIP:TOO:          Timestamp: 1137723
-          [1655272080.985327][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.985352][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.985374][2922:2927] CHIP:TOO:    }
-          [1655272080.985459][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.985482][2922:2927] CHIP:TOO:          Event number: 7
-          [1655272080.985504][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.985526][2922:2927] CHIP:TOO:          Timestamp: 1137739
-          [1655272080.985552][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.985576][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.985599][2922:2927] CHIP:TOO:    }
-          [1655272080.985681][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.985704][2922:2927] CHIP:TOO:          Event number: 8
-          [1655272080.985726][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.985748][2922:2927] CHIP:TOO:          Timestamp: 1137753
-          [1655272080.985774][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.985798][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.985821][2922:2927] CHIP:TOO:    }
-          [1655272080.985907][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.985931][2922:2927] CHIP:TOO:          Event number: 9
-          [1655272080.985953][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.985974][2922:2927] CHIP:TOO:          Timestamp: 1137773
-          [1655272080.986001][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.986025][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.986047][2922:2927] CHIP:TOO:    }
-          [1655272080.986134][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.986158][2922:2927] CHIP:TOO:          Event number: 10
-          [1655272080.986180][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.986202][2922:2927] CHIP:TOO:          Timestamp: 1137785
-          [1655272080.986228][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.986252][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.986274][2922:2927] CHIP:TOO:    }
-          [1655272080.986361][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.986385][2922:2927] CHIP:TOO:          Event number: 11
-          [1655272080.986407][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.986429][2922:2927] CHIP:TOO:          Timestamp: 1137801
-          [1655272080.986455][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.986479][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.986502][2922:2927] CHIP:TOO:    }
-          [1655272080.986588][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.986612][2922:2927] CHIP:TOO:          Event number: 12
-          [1655272080.986634][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.986655][2922:2927] CHIP:TOO:          Timestamp: 1137816
-          [1655272080.986682][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.986705][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.986728][2922:2927] CHIP:TOO:    }
-          [1655272080.986813][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.986836][2922:2927] CHIP:TOO:          Event number: 13
-          [1655272080.986858][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.986895][2922:2927] CHIP:TOO:          Timestamp: 1137858
-          [1655272080.986923][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.986948][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.986970][2922:2927] CHIP:TOO:    }
-          [1655272080.987056][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.987080][2922:2927] CHIP:TOO:          Event number: 14
-          [1655272080.987102][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.987123][2922:2927] CHIP:TOO:          Timestamp: 1137896
-          [1655272080.987150][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.987174][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.987196][2922:2927] CHIP:TOO:    }
-          [1655272080.987280][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.987304][2922:2927] CHIP:TOO:          Event number: 15
-          [1655272080.987326][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.987347][2922:2927] CHIP:TOO:          Timestamp: 1137899
-          [1655272080.987374][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.987398][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.987421][2922:2927] CHIP:TOO:    }
-          [1655272080.987503][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.987526][2922:2927] CHIP:TOO:          Event number: 16
-          [1655272080.987548][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.987570][2922:2927] CHIP:TOO:          Timestamp: 1137916
-          [1655272080.987597][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.987621][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.987644][2922:2927] CHIP:TOO:    }
-          [1655272080.987729][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
-          [1655272080.987752][2922:2927] CHIP:TOO:          Event number: 17
-          [1655272080.987774][2922:2927] CHIP:TOO:          Priority: Info
-          [1655272080.987796][2922:2927] CHIP:TOO:          Timestamp: 1137949
-          [1655272080.987822][2922:2927] CHIP:TOO:   ShortRelease: {
-          [1655272080.987846][2922:2927] CHIP:TOO:     PreviousPosition: 10
-          [1655272080.987869][2922:2927] CHIP:TOO:    }
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
 
+           echo "{"Name":"LongPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
 
-          ./chip-tool switch subscribe-event long-press 1 100 1 1
+          1659693130.924755][2530:2538] CHIP:-: Received payload: "{"Name":"LongPress","NewPosition":1}"
+          [1659693130.925030][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7725
+          [1659693130.925064][2530:2530] CHIP:-: The new position when the momentary switch has been pressed for a long time:1
+          [1659693130.925313][2530:2530] CHIP:ZCL: SwitchServer: OnLongPress
 
-          ./chip-tool switch subscribe-event long-release 1 100 1 1
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+           echo "{"Name":"ShortRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+          [1659693174.708920][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1659693174.709388][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7726
+          [1659693174.709479][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1659693174.709539][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
+
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT
+
+           echo "{"Name":"LongRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+          [1659693203.272969][2530:2538] CHIP:-: Received payload: "{"Name":"LongPress","NewPosition":1}"
+          [1659693203.273235][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7727
+          [1659693203.273276][2530:2530] CHIP:-: The new position when the momentary switch has been pressed for a long time:1
+          [1659693203.273300][2530:2530] CHIP:ZCL: SwitchServer: OnLongPress
       disabled: true
 
     - label: "Operator does not operate switch"
@@ -368,26 +462,83 @@ tests:
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          receive event
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event  initial-Press 1 100 1 1
+
+          [1659692507.869323][3696:3701] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1659692507.869342][3696:3701] CHIP:TOO:          Event number: 28
+          [1659692507.869361][3696:3701] CHIP:TOO:          Priority: Info
+          [1659692507.869379][3696:3701] CHIP:TOO:          Timestamp: 14905717
+          [1659692507.869402][3696:3701] CHIP:TOO:   InitialPress: {
+          [1659692507.869421][3696:3701] CHIP:TOO:     NewPosition: 1
+          [1659692507.869440][3696:3701] CHIP:TOO:    }
       disabled: true
 
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          receive event
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
+
+          [1659692890.665344][3721:3726] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1659692890.665369][3721:3726] CHIP:TOO:          Event number: 31
+          [1659692890.665392][3721:3726] CHIP:TOO:          Priority: Info
+          [1659692890.665416][3721:3726] CHIP:TOO:          Timestamp: 15332747
+          [1659692890.665444][3721:3726] CHIP:TOO:   ShortRelease: {
+          [1659692890.665470][3721:3726] CHIP:TOO:     PreviousPosition: 1
+          [1659692890.665494][3721:3726] CHIP:TOO:    }
       disabled: true
 
     - label:
           "Operator operates switch (keep pressed for long time, e.g. 5 seconds)"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          receive 2 events
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event  initial-Press 1 100 1 1
+
+          [1659692507.869323][3696:3701] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1659692507.869342][3696:3701] CHIP:TOO:          Event number: 28
+          [1659692507.869361][3696:3701] CHIP:TOO:          Priority: Info
+          [1659692507.869379][3696:3701] CHIP:TOO:          Timestamp: 14905717
+          [1659692507.869402][3696:3701] CHIP:TOO:   InitialPress: {
+          [1659692507.869421][3696:3701] CHIP:TOO:     NewPosition: 1
+          [1659692507.869440][3696:3701] CHIP:TOO:    }
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event long-Press 1 100 1 1
+
+          [1659692638.993482][3706:3712] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0002
+          [1659692638.993504][3706:3712] CHIP:TOO:          Event number: 30
+          [1659692638.993525][3706:3712] CHIP:TOO:          Priority: Info
+          [1659692638.993545][3706:3712] CHIP:TOO:          Timestamp: 15084506
+          [1659692638.993571][3706:3712] CHIP:TOO:   LongPress: {
+          [1659692638.993593][3706:3712] CHIP:TOO:     NewPosition: 1
+          [1659692638.993615][3706:3712] CHIP:TOO:    }
       disabled: true
 
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          receive event
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event long-release 1 100 1 1
+
+          [1659693001.739969][3732:3737] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0004
+          [1659693001.740012][3732:3737] CHIP:TOO:          Event number: 32
+          [1659693001.740049][3732:3737] CHIP:TOO:          Priority: Info
+          [1659693001.740087][3732:3737] CHIP:TOO:          Timestamp: 15438774
+          [1659693001.740134][3732:3737] CHIP:TOO:   LongRelease: {
+          [1659693001.740174][3732:3737] CHIP:TOO:     PreviousPosition: 1
+          [1659693001.740212][3732:3737] CHIP:TOO:    }
       disabled: true
 
     - label:
@@ -395,13 +546,43 @@ tests:
           MultiPressComplete events"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          ./chip-tool switch subscribe-event initial-press 1 100 1 1
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
 
-          ./chip-tool switch subscribe-event short-release 1 100 1 1
+          echo "{"Name":"InitialPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
 
-          ./chip-tool switch subscribe-event multi-press-ongoing 1 100 1 1
+          [1659693098.031462][2530:2538] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1659693098.031812][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7724
+          [1659693098.031859][2530:2530] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1659693098.031888][2530:2530] CHIP:ZCL: SwitchServer: OnInitialPress
 
-          ./chip-tool switch subscribe-event multi-press-complete 1 100 1 1
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"ShortRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+          [1659694387.719620][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1659694387.720095][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7729
+          [1659694387.720237][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1659694387.720304][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
+
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"MultiPressComplete","PreviousPosition":1,"TotalNumberOfPressesCounted":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+          [1659694592.347850][2530:2538] CHIP:-: Received payload: "{"Name":"MultiPressComplete","PreviousPosition":1,"TotalNumberOfPressesCounted":1}"
+          [1659694592.348389][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e772b
+          [1659694592.348481][2530:2530] CHIP:-: The new position when the momentary switch has been pressed in a multi-press sequence:1
+
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":2}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+          [1659695302.038797][2530:2538] CHIP:-: Received payload: "{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":2}"
+          [1659695302.039933][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7730
+          [1659695302.040020][2530:2530] CHIP:-: The new position when the momentary switch has been pressed in a multi-press sequence:1
+          [1659695302.040078][2530:2530] CHIP:-: 2 times the momentary switch has been pressed
+          [1659695302.040131][2530:2530] CHIP:ZCL: SwitchServer: OnMultiPressOngoing
+          [1659694592.348541][2530:2530] CHIP:-: 1 times the momentary switch has been pressed
+          [1659694592.348585][2530:2530] CHIP:ZCL: SwitchServer: OnMultiPressOngoing
       disabled: true
 
     - label: "Operator does not operate switch"
@@ -413,37 +594,147 @@ tests:
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          receive event
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-Press 1 100 1 1
+
+          [1659694345.040034][3787:3792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1659694345.040059][3787:3792] CHIP:TOO:          Event number: 37
+          [1659694345.040083][3787:3792] CHIP:TOO:          Priority: Info
+          [1659694345.040106][3787:3792] CHIP:TOO:          Timestamp: 16729153
+          [1659694345.040135][3787:3792] CHIP:TOO:   InitialPress: {
+          [1659694345.040160][3787:3792] CHIP:TOO:     NewPosition: 1
       disabled: true
 
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          receive 2 events
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
+
+          [1659694426.794832][3797:3802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1659694426.794853][3797:3802] CHIP:TOO:          Event number: 38
+          [1659694426.794873][3797:3802] CHIP:TOO:          Priority: Info
+          [1659694426.794891][3797:3802] CHIP:TOO:          Timestamp: 16840016
+          [1659694426.794914][3797:3802] CHIP:TOO:   ShortRelease: {
+          [1659694426.794934][3797:3802] CHIP:TOO:     PreviousPosition: 1
+          [1659694426.794952][3797:3802] CHIP:TOO:    }
+
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-complete 1 100 1 1
+
+
+          [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
+          [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45
+          [1659695330.923283][3912:3918] CHIP:TOO:          Priority: Info
+          [1659695330.923302][3912:3918] CHIP:TOO:          Timestamp: 17754336
+          [1659695330.923326][3912:3918] CHIP:TOO:   MultiPressComplete: {
+          [1659695330.923346][3912:3918] CHIP:TOO:     PrevioiusPosition: 1
+          [1659695330.923366][3912:3918] CHIP:TOO:     TotalNumberOfPressesCounted: 1
+          [1659695330.923385][3912:3918] CHIP:TOO:    }
       disabled: true
 
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          receive event
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
+
+          [1659695901.066563][3955:3960] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1659695901.066583][3955:3960] CHIP:TOO:          Event number: 46
+          [1659695901.066602][3955:3960] CHIP:TOO:          Priority: Info
+          [1659695901.066643][3955:3960] CHIP:TOO:          Timestamp: 18095747
+          [1659695901.066669][3955:3960] CHIP:TOO:   InitialPress: {
+          [1659695901.066689][3955:3960] CHIP:TOO:     NewPosition: 1
+          [1659695901.066708][3955:3960] CHIP:TOO:    }
       disabled: true
 
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          receive event
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
+
+          [1659694426.794832][3797:3802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1659694426.794853][3797:3802] CHIP:TOO:          Event number: 38
+          [1659694426.794873][3797:3802] CHIP:TOO:          Priority: Info
+          [1659694426.794891][3797:3802] CHIP:TOO:          Timestamp: 16840016
+          [1659694426.794914][3797:3802] CHIP:TOO:   ShortRelease: {
+          [1659694426.794934][3797:3802] CHIP:TOO:     PreviousPosition: 1
+          [1659694426.794952][3797:3802] CHIP:TOO:    }
       disabled: true
 
     - label: "Briefly after 6f, operator operates switch again (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          receive 2 events
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
+
+          [1659694345.040034][3787:3792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1659694345.040059][3787:3792] CHIP:TOO:          Event number: 37
+          [1659694345.040083][3787:3792] CHIP:TOO:          Priority: Info
+          [1659694345.040106][3787:3792] CHIP:TOO:          Timestamp: 16729153
+          [1659694345.040135][3787:3792] CHIP:TOO:   InitialPress: {
+          [1659694345.040160][3787:3792] CHIP:TOO:     NewPosition: 1
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-ongoing 1 100 1 1
+
+
+          [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
+          [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45
+          [1659695330.923283][3912:3918] CHIP:TOO:          Priority: Info
+          [1659695330.923302][3912:3918] CHIP:TOO:          Timestamp: 17754336
+          [1659695330.923326][3912:3918] CHIP:TOO:   MultiPressOngoing: {
+          [1659695330.923346][3912:3918] CHIP:TOO:     NewPosition: 1
+          [1659695330.923366][3912:3918] CHIP:TOO:     CurrentNumberOfPressesCounted: 2
+          [1659695330.923385][3912:3918] CHIP:TOO:    }
       disabled: true
 
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          receive 2 events
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
+
+          [1659696223.568247][3981:3986] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1659696223.568272][3981:3986] CHIP:TOO:          Event number: 53
+          [1659696223.568296][3981:3986] CHIP:TOO:          Priority: Info
+          [1659696223.568319][3981:3986] CHIP:TOO:          Timestamp: 18666186
+          [1659696223.568348][3981:3986] CHIP:TOO:   ShortRelease: {
+          [1659696223.568373][3981:3986] CHIP:TOO:     PreviousPosition: 1
+          [1659696223.568397][3981:3986] CHIP:TOO:    }
+
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-complete 1 100 1 1
+
+          [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
+          [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45
+          [1659695330.923283][3912:3918] CHIP:TOO:          Priority: Info
+          [1659695330.923302][3912:3918] CHIP:TOO:          Timestamp: 17754336
+          [1659695330.923326][3912:3918] CHIP:TOO:   MultiPressComplete: {
+          [1659695330.923346][3912:3918] CHIP:TOO:     PrevioiusPosition: 1
+          [1659695330.923366][3912:3918] CHIP:TOO:     TotalNumberOfPressesCounted: 2
+          [1659695330.923385][3912:3918] CHIP:TOO:    }
       disabled: true
 
     - label:
@@ -456,35 +747,148 @@ tests:
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          receive event
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
+
+          [1659695901.066563][3955:3960] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1659695901.066583][3955:3960] CHIP:TOO:          Event number: 46
+          [1659695901.066602][3955:3960] CHIP:TOO:          Priority: Info
+          [1659695901.066643][3955:3960] CHIP:TOO:          Timestamp: 18095747
+          [1659695901.066669][3955:3960] CHIP:TOO:   InitialPress: {
+          [1659695901.066689][3955:3960] CHIP:TOO:     NewPosition: 1
+          [1659695901.066708][3955:3960] CHIP:TOO:    }
       disabled: true
 
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          receive event
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
+
+          [1659694426.794832][3797:3802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1659694426.794853][3797:3802] CHIP:TOO:          Event number: 38
+          [1659694426.794873][3797:3802] CHIP:TOO:          Priority: Info
+          [1659694426.794891][3797:3802] CHIP:TOO:          Timestamp: 16840016
+          [1659694426.794914][3797:3802] CHIP:TOO:   ShortRelease: {
+          [1659694426.794934][3797:3802] CHIP:TOO:     PreviousPosition: 1
+          [1659694426.794952][3797:3802] CHIP:TOO:    }
       disabled: true
 
     - label: "Briefly after 6k, operator operates switch again (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          receive 2 events
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
+
+          [1659694345.040034][3787:3792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1659694345.040059][3787:3792] CHIP:TOO:          Event number: 37
+          [1659694345.040083][3787:3792] CHIP:TOO:          Priority: Info
+          [1659694345.040106][3787:3792] CHIP:TOO:          Timestamp: 16729153
+          [1659694345.040135][3787:3792] CHIP:TOO:   InitialPress: {
+          [1659694345.040160][3787:3792] CHIP:TOO:     NewPosition: 1
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-ongoing 1 100 1 1
+
+          [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
+          [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45
+          [1659695330.923283][3912:3918] CHIP:TOO:          Priority: Info
+          [1659695330.923302][3912:3918] CHIP:TOO:          Timestamp: 17754336
+          [1659695330.923326][3912:3918] CHIP:TOO:   MultiPressOngoing: {
+          [1659695330.923346][3912:3918] CHIP:TOO:     NewPosition: 1
+          [1659695330.923366][3912:3918] CHIP:TOO:     CurrentNumberOfPressesCounted: 2
+          [1659695330.923385][3912:3918] CHIP:TOO:    }
       disabled: true
 
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          receive event
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
+
+
+          [1659694426.794832][3797:3802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1659694426.794853][3797:3802] CHIP:TOO:          Event number: 38
+          [1659694426.794873][3797:3802] CHIP:TOO:          Priority: Info
+          [1659694426.794891][3797:3802] CHIP:TOO:          Timestamp: 16840016
+          [1659694426.794914][3797:3802] CHIP:TOO:   ShortRelease: {
+          [1659694426.794934][3797:3802] CHIP:TOO:     PreviousPosition: 1
+          [1659694426.794952][3797:3802] CHIP:TOO:    }
       disabled: true
 
     - label: "Briefly after 6m, operator operates switch again (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          receive 2 events
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
+
+          [1659694345.040034][3787:3792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1659694345.040059][3787:3792] CHIP:TOO:          Event number: 37
+          [1659694345.040083][3787:3792] CHIP:TOO:          Priority: Info
+          [1659694345.040106][3787:3792] CHIP:TOO:          Timestamp: 16729153
+          [1659694345.040135][3787:3792] CHIP:TOO:   InitialPress: {
+          [1659694345.040160][3787:3792] CHIP:TOO:     NewPosition: 1
+
+          In Raspi platform to change the switch to second position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":3}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-ongoing 1 100 1 1
+
+          [1659698336.786184][4081:4086] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
+          [1659698336.786209][4081:4086] CHIP:TOO:          Event number: 57
+          [1659698336.786233][4081:4086] CHIP:TOO:          Priority: Info
+          [1659698336.786256][4081:4086] CHIP:TOO:          Timestamp: 20718400
+          [1659698336.786287][4081:4086] CHIP:TOO:   MultiPressOngoing: {
+          [1659698336.786312][4081:4086] CHIP:TOO:     NewPosition: 1
+          [1659698336.786337][4081:4086] CHIP:TOO:     CurrentNumberOfPressesCounted: 3
+          [1659698336.786360][4081:4086] CHIP:TOO:    }
       disabled: true
 
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          receive 2 events
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
+
+          [1659696223.568247][3981:3986] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1659696223.568272][3981:3986] CHIP:TOO:          Event number: 53
+          [1659696223.568296][3981:3986] CHIP:TOO:          Priority: Info
+          [1659696223.568319][3981:3986] CHIP:TOO:          Timestamp: 18666186
+          [1659696223.568348][3981:3986] CHIP:TOO:   ShortRelease: {
+          [1659696223.568373][3981:3986] CHIP:TOO:     PreviousPosition: 1
+          [1659696223.568397][3981:3986] CHIP:TOO:    }
+
+
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-complete 1 100 1 1
+
+          [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
+          [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45
+          [1659695330.923283][3912:3918] CHIP:TOO:          Priority: Info
+          [1659695330.923302][3912:3918] CHIP:TOO:          Timestamp: 17754336
+          [1659695330.923326][3912:3918] CHIP:TOO:   MultiPressComplete: {
+          [1659695330.923346][3912:3918] CHIP:TOO:     PrevioiusPosition: 1
+          [1659695330.923366][3912:3918] CHIP:TOO:     TotalNumberOfPressesCounted: 3
+          [1659695330.923385][3912:3918] CHIP:TOO:    }
       disabled: true

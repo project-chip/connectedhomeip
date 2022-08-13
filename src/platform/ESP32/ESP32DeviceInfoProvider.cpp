@@ -95,12 +95,14 @@ bool ESP32DeviceInfoProvider::FixedLabelIteratorImpl::Next(FixedLabelType & outp
 
 CHIP_ERROR ESP32DeviceInfoProvider::SetUserLabelLength(EndpointId endpoint, size_t val)
 {
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     DefaultStorageKeyAllocator keyAlloc;
     return mStorage->SyncSetKeyValue(keyAlloc.UserLabelLengthKey(endpoint), &val, static_cast<uint16_t>(sizeof(val)));
 }
 
 CHIP_ERROR ESP32DeviceInfoProvider::GetUserLabelLength(EndpointId endpoint, size_t & val)
 {
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     DefaultStorageKeyAllocator keyAlloc;
     uint16_t len = static_cast<uint16_t>(sizeof(val));
     return mStorage->SyncGetKeyValue(keyAlloc.UserLabelLengthKey(endpoint), &val, len);
@@ -108,6 +110,7 @@ CHIP_ERROR ESP32DeviceInfoProvider::GetUserLabelLength(EndpointId endpoint, size
 
 CHIP_ERROR ESP32DeviceInfoProvider::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)
 {
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     DefaultStorageKeyAllocator keyAlloc;
     uint8_t buf[UserLabelTLVMaxSize()];
     TLV::TLVWriter writer;
@@ -125,6 +128,7 @@ CHIP_ERROR ESP32DeviceInfoProvider::SetUserLabelAt(EndpointId endpoint, size_t i
 
 CHIP_ERROR ESP32DeviceInfoProvider::DeleteUserLabelAt(EndpointId endpoint, size_t index)
 {
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     DefaultStorageKeyAllocator keyAlloc;
     return mStorage->SyncDeleteKeyValue(keyAlloc.UserLabelIndexKey(endpoint, index));
 }
@@ -146,15 +150,14 @@ ESP32DeviceInfoProvider::UserLabelIteratorImpl::UserLabelIteratorImpl(ESP32Devic
 
 bool ESP32DeviceInfoProvider::UserLabelIteratorImpl::Next(UserLabelType & output)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
+    VerifyOrReturnError(mProvider.mStorage != nullptr, false);
     VerifyOrReturnError(mIndex < mTotal, false);
 
     DefaultStorageKeyAllocator keyAlloc;
     uint8_t buf[UserLabelTLVMaxSize()];
     uint16_t len = static_cast<uint16_t>(sizeof(buf));
 
-    err = mProvider.mStorage->SyncGetKeyValue(keyAlloc.UserLabelIndexKey(mEndpoint, mIndex), buf, len);
+    CHIP_ERROR err = mProvider.mStorage->SyncGetKeyValue(keyAlloc.UserLabelIndexKey(mEndpoint, mIndex), buf, len);
     VerifyOrReturnError(err == CHIP_NO_ERROR, false);
 
     TLV::ContiguousBufferTLVReader reader;

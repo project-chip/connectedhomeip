@@ -191,27 +191,29 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
     if (mState == State::ResolvingAddress)
     {
         MoveToState(State::HasAddress);
-        err = EstablishConnection();
-        if (err != CHIP_NO_ERROR)
+        mInitParams.sessionManager->UpdateAllSessionsPeerAddress(mPeerId, addr);
+        if (!mPerformingAddressUpdate)
         {
-            DequeueConnectionCallbacks(err);
-            // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
-            return;
-        }
-    }
-    else
-    {
-        if (!mSecureSession)
-        {
-            // Nothing needs to be done here.  It's not an error to not have a
-            // secureSession.  For one thing, we could have gotten a different
-            // UpdateAddress already and that caused connections to be torn down and
-            // whatnot.
+            err = EstablishConnection();
+            if (err != CHIP_NO_ERROR)
+            {
+                DequeueConnectionCallbacks(err);
+                // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
+                return;
+            }
+            // We expect to get a callback via OnSessionEstablished or OnSessionEstablishmentError to continue
+            // the state machine forward.
             return;
         }
 
-        mSecureSession.Get().Value()->AsSecureSession()->SetPeerAddress(addr);
+        DequeueConnectionCallbacks(CHIP_NO_ERROR);
+        // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
+        return;
     }
+
+    ChipLogError(Controller, "Received UpdateDeviceData in incorrect state");
+    DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
+    // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
 CHIP_ERROR OperationalSessionSetup::EstablishConnection()
@@ -297,7 +299,7 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error)
         }
     }
 
-    releaseDelegate->ReleaseSession(peerId);
+    releaseDelegate->ReleaseSession(this);
 }
 
 void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
@@ -364,11 +366,6 @@ void OperationalSessionSetup::OnSessionReleased()
     MoveToState(State::HasAddress);
 }
 
-void OperationalSessionSetup::OnFirstMessageDeliveryFailed()
-{
-    LookupPeerAddress();
-}
-
 void OperationalSessionSetup::OnSessionHang()
 {
     Disconnect();
@@ -423,6 +420,32 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
     return Resolver::Instance().LookupNode(request, mAddressLookupHandle);
 }
 
+void OperationalSessionSetup::PerformAddressUpdate()
+{
+    if (mPerformingAddressUpdate)
+    {
+        // We are already in the middle of a lookup from a previous call to
+        // PerformAddressUpdate. In that case we will just exit right away as
+        // we are already looking to update the results from the previous lookup.
+        return;
+    }
+
+    // We must be newly-allocated to handle this address lookup, so must be in the NeedsAddress state.
+    VerifyOrDie(mState == State::NeedsAddress);
+
+    // We are doing an address lookup whether we have an active session for this peer or not.
+    mPerformingAddressUpdate = true;
+    MoveToState(State::ResolvingAddress);
+    CHIP_ERROR err = LookupPeerAddress();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "PerformAddressUpdate could not perform lookup");
+        DequeueConnectionCallbacks(err);
+        // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
+        return;
+    }
+}
+
 void OperationalSessionSetup::OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result)
 {
     UpdateDeviceData(result.address, result.mrpRemoteConfig);
@@ -438,6 +461,7 @@ void OperationalSessionSetup::OnNodeAddressResolutionFailed(const PeerId & peerI
         MoveToState(State::NeedsAddress);
     }
 
+    // No need to set mPerformingAddressUpdate to false since call below releases `this`.
     DequeueConnectionCallbacks(reason);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }

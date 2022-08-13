@@ -26,9 +26,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Precondition: Reset DUT_CE to factory defaults"
+    - label: "Precondition"
       verification: |
-          verification step to be updated.
+          Reset Devices to factory defaults
       disabled: true
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE using BCM"

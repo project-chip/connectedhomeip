@@ -26,9 +26,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Precondition: Reset DUT_CE to factory defaults"
+    - label: "Precondition"
       verification: |
-          verification step to be updated.
+          Reset Devices to factory defaults
       disabled: true
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
@@ -43,7 +43,7 @@ tests:
           timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.S.C01.Rsp
       verification: |
-          On 1st controller chip tool, open commissioning window
+          On 1st controller chip tool, open commissioning window using BCM
 
           Below is the example when using chip tool as controller
 
@@ -88,7 +88,7 @@ tests:
           On nth controller using chip tool connect to the accessory
 
 
-          ./chip-tool pairing onnetwork 1 20202021
+          ./chip-tool pairing onnetwork 2 20202021
 
           Verify you got below message
           Device commissioning completed with success
@@ -110,7 +110,7 @@ tests:
           On nth controller using chip tool connect to the accessory
 
 
-          ./chip-tool pairing onnetwork 1 20202021
+          ./chip-tool pairing onnetwork 6 20202021
 
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1649756670.402192][10794:10799] CHIP:CTL: Device returned status 5 on receiving the NOC

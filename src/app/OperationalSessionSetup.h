@@ -70,6 +70,8 @@ struct DeviceProxyInitParams
     }
 };
 
+class OperationalSessionSetup;
+
 /**
  * @brief Delegate provided when creating OperationalSessionSetup.
  *
@@ -80,10 +82,8 @@ struct DeviceProxyInitParams
 class OperationalSessionReleaseDelegate
 {
 public:
-    virtual ~OperationalSessionReleaseDelegate() = default;
-    // TODO Issue #20452: Once cleanup from #20452 takes place we can provide OperationalSessionSetup *
-    // instead of ScopedNodeId here.
-    virtual void ReleaseSession(const ScopedNodeId & peerId) = 0;
+    virtual ~OperationalSessionReleaseDelegate()                        = default;
+    virtual void ReleaseSession(OperationalSessionSetup * sessionSetup) = 0;
 };
 
 /**
@@ -202,6 +202,8 @@ public:
 
     bool IsConnecting() const { return mState == State::Connecting; }
 
+    bool IsForAddressUpdate() const { return mPerformingAddressUpdate; }
+
     /**
      * IsResolvingAddress returns true if we are doing an address resolution
      * that needs to happen before we can establish CASE.  We can be in the
@@ -219,8 +221,6 @@ public:
 
     // Called when a connection is closing. The object releases all resources associated with the connection.
     void OnSessionReleased() override;
-    // Called when a message is not acked within first retrans timer, try to refresh the peer address
-    void OnFirstMessageDeliveryFailed() override;
     // Called when a connection is hanging. Try to re-establish another session, and shift to the new session when done, the
     // original session won't be touched during the period.
     void OnSessionHang() override;
@@ -260,6 +260,8 @@ public:
      * Triggers a DNSSD lookup to find a usable peer address for this operational device.
      */
     CHIP_ERROR LookupPeerAddress();
+
+    void PerformAddressUpdate();
 
     // AddressResolve::NodeListener - notifications when dnssd finds a node IP address
     void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override;
@@ -303,6 +305,8 @@ private:
     chip::AddressResolve::NodeLookupHandle mAddressLookupHandle;
 
     ReliableMessageProtocolConfig mRemoteMRPConfig = GetDefaultMRPConfig();
+
+    bool mPerformingAddressUpdate = false;
 
     CHIP_ERROR EstablishConnection();
 

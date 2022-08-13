@@ -29,7 +29,8 @@ tests:
       verification: |
           ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify Test Harness receives the Lock Door command from the DUT on TH / lock app log:
+          Verify the " Lock Door command response" on TH(lock-app):
+
 
           [1654755271.172070][2969:2969] CHIP:DMG: InvokeRequestMessage =
           [1654755271.172131][2969:2969] CHIP:DMG: {
@@ -66,7 +67,9 @@ tests:
       PICS: DRLK.C.C01.Tx
       verification: |
           ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000
-          Verify Test Harness receives the Unlock Door command from the DUT on TH / lock app log:
+
+          Verify the " Unlock Door command response" on TH(lock-app):
+
 
           [1654755356.562412][2969:2969] CHIP:DMG: InvokeRequestMessage =
           [1654755356.562459][2969:2969] CHIP:DMG: {
@@ -104,7 +107,9 @@ tests:
       verification: |
           ./chip-tool doorlock unlock-with-timeout 60 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify Test Harness receives the Unlock with Timeout  command from the DUT on TH / lock app log:
+          Verify the " Unlock with Timeout command response" on TH(lock-app):
+
+
 
           [1654755446.175911][2969:2969] CHIP:DMG: InvokeRequestMessage =
           [1654755446.175940][2969:2969] CHIP:DMG: {
@@ -146,13 +151,47 @@ tests:
       verification: |
           ./chip-tool doorlock set-user 0 1 xxx 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify Test Harness receives the Set user command from the DUT on TH / lock app log:
+          Verify the " Set user command response" on TH(lock-app):
 
-          [1656497453.684077][25847:25853] CHIP:DMG: status = 0x00 (SUCCESS),
+          [1658398796.181348][2474:2474] CHIP:DMG: InvokeRequestMessage =
+          [1658398796.181385][2474:2474] CHIP:DMG: {
+          [1658398796.181419][2474:2474] CHIP:DMG:        suppressResponse = false,
+          [1658398796.181457][2474:2474] CHIP:DMG:        timedRequest = true,
+          [1658398796.181493][2474:2474] CHIP:DMG:        InvokeRequests =
+          [1658398796.181542][2474:2474] CHIP:DMG:        [
+          [1658398796.181578][2474:2474] CHIP:DMG:                CommandDataIB =
+          [1658398796.181618][2474:2474] CHIP:DMG:                {
+          [1658398796.181656][2474:2474] CHIP:DMG:                        CommandPathIB =
+          [1658398796.181703][2474:2474] CHIP:DMG:                        {
+          [1658398796.181750][2474:2474] CHIP:DMG:                                EndpointId = 0x1,
+          [1658398796.181800][2474:2474] CHIP:DMG:                                ClusterId = 0x101,
+          [1658398796.181848][2474:2474] CHIP:DMG:                                CommandId = 0x1a,
+          [1658398796.181892][2474:2474] CHIP:DMG:                        },
+          [1658398796.181939][2474:2474] CHIP:DMG:
+          [1658398796.181981][2474:2474] CHIP:DMG:                        CommandFields =
+          [1658398796.182026][2474:2474] CHIP:DMG:                        {
+          [1658398796.182072][2474:2474] CHIP:DMG:                                0x0 = 0,
+          [1658398796.182120][2474:2474] CHIP:DMG:                                0x1 = 2,
+          [1658398796.182171][2474:2474] CHIP:DMG:                                0x2 = "xxx",
+          [1658398796.182220][2474:2474] CHIP:DMG:                                0x3 = 6452,
+          [1658398796.182269][2474:2474] CHIP:DMG:                                0x4 = 1,
+          [1658398796.182322][2474:2474] CHIP:DMG:                                0x5 = 0,
+          [1658398796.182371][2474:2474] CHIP:DMG:                                0x6 = 0,
+          [1658398796.182419][2474:2474] CHIP:DMG:                        },
+          [1658398796.182462][2474:2474] CHIP:DMG:                },
+          [1658398796.182512][2474:2474] CHIP:DMG:
+          [1658398796.182547][2474:2474] CHIP:DMG:        ],
+          [1658398796.182594][2474:2474] CHIP:DMG:
+          [1658398796.182629][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658398796.182664][2474:2474] CHIP:DMG: },
+          [1658398796.182758][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
+          [1658398796.182809][2474:2474] CHIP:DMG: AccessControl: allowed
 
           ./chip-tool doorlock set-week-day-schedule 1 1 2  15 45 16 55 1 1
 
-          Verify Test Harness receives the Set Week Day Schedule command from the DUT on TH / lock app log:
+          Verify the " Set Week Day Schedule command response" on TH(lock-app):
+
+
 
           [1657115333.959925][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115333.959993][8804:8804] CHIP:DMG: {
@@ -195,7 +234,8 @@ tests:
       PICS: DRLK.S.F04 && DRLK.C.C0c.Tx
       verification: |
           ./chip-tool doorlock get-week-day-schedule 1 1 1 1
-          Verify Test Harness receives the Get Week Day Schedule command from the DUT on TH / lock app log:
+          Verify the " Get Week Day Schedule command response" on TH(lock-app):
+
 
 
           [1657115377.506828][8804:8804] CHIP:DMG: InvokeRequestMessage =
@@ -238,7 +278,9 @@ tests:
       verification: |
           ./chip-tool doorlock clear-week-day-schedule 1 1 1 1
 
-          Verify Test Harness receives the Clear Week Day Schedule command from the DUT on TH / lock app log:
+          Verify the " Clear Week Day Schedule command response" on TH(lock-app):
+
+
 
           [1657115416.513747][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115416.513812][8804:8804] CHIP:DMG: {
@@ -280,7 +322,8 @@ tests:
       verification: |
           ./chip-tool doorlock set-year-day-schedule 1 1 1080 2100 1 1
 
-          Verify Test Harness receives the Set Year Day Schedule command from the DUT on TH / lock app log:
+          Verify the " Set Year Day Schedule command response" on TH(lock-app):
+
 
           [1657115453.534892][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115453.534959][8804:8804] CHIP:DMG: {
@@ -323,8 +366,9 @@ tests:
       PICS: DRLK.S.F04 && DRLK.C.C0f.Tx
       verification: |
           ./chip-tool doorlock get-year-day-schedule 1 1 1 1
+          Verify the " Get Year Day Schedule command response" on TH(lock-app):
 
-          Verify Test Harness receives the Get Year Day Schedule command from the DUT on TH / lock app log:
+
 
           [1657115480.383098][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115480.383167][8804:8804] CHIP:DMG: {
@@ -366,7 +410,8 @@ tests:
       verification: |
           ./chip-tool doorlock clear-year-day-schedule 1 1 1 1
 
-          Verify Test Harness receives the Clear Year Day Schedule command from the DUT on TH / lock app log:
+          Verify the " Clear Year Day Schedule command response" on TH(lock-app):
+
 
 
           [1657115522.132250][8804:8804] CHIP:DMG: InvokeRequestMessage =
@@ -409,7 +454,8 @@ tests:
       verification: |
           ./chip-tool doorlock set-holiday-schedule 1 20 30 0 1 1
 
-          Verify Test Harness receives the Set Holiday Day Schedule command from the DUT on TH / lock app log:
+          Verify the " Set Holiday Day Schedule command response" on TH(lock-app):
+
 
           [1657115547.835987][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115547.836055][8804:8804] CHIP:DMG: {
@@ -450,8 +496,8 @@ tests:
       PICS: DRLK.S.F04 && DRLK.C.C12.Tx
       verification: |
           ./chip-tool doorlock get-holiday-schedule 1 1 1
+          Verify the " Get Holiday Day Schedule command response" on TH(lock-app):
 
-          Verify Test Harness receives the Get Holiday Day Schedule command from the DUT on TH / lock app log:
 
 
           [1655380520.601439][3411:3411] CHIP:DMG: {
@@ -488,7 +534,9 @@ tests:
       verification: |
           ./chip-tool doorlock clear-holiday-schedule 1 1 1
 
-          Verify Test Harness receives the Clear Holiday Day Schedule command from the DUT on TH / lock app log:
+          Verify the " Clear Holiday Day Schedule command response" on TH(lock-app):
+
+
 
           [1657115633.501630][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115633.501697][8804:8804] CHIP:DMG: {
@@ -527,7 +575,9 @@ tests:
       verification: |
           ./chip-tool doorlock set-user 0 2 xxx 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify Test Harness receives the Set User Door command from the DUT on TH / lock app log:
+          Verify the " Set User Day Schedule command response" on TH(lock-app):
+
+
 
           [1658398796.181348][2474:2474] CHIP:DMG: InvokeRequestMessage =
           [1658398796.181385][2474:2474] CHIP:DMG: {
@@ -574,8 +624,9 @@ tests:
       PICS: DRLK.S.F08 && DRLK.C.C1b.Tx
       verification: |
           ./chip-tool doorlock get-user 2 1 1 --timedInteractionTimeoutMs 1000
+          Verify the " Get User Day Schedule command response" on TH(lock-app):
 
-          Verify Test Harness receives the Get User command from the DUT on TH / lock app log:
+
 
           [1658398920.378963][2474:2474] CHIP:DMG:                        CommandPathIB =
           [1658398920.378994][2474:2474] CHIP:DMG:                        {
@@ -605,8 +656,9 @@ tests:
       PICS: DRLK.S.F08 && DRLK.C.C1d.Tx
       verification: |
           ./chip-tool doorlock clear-user 2 1 1 --timedInteractionTimeoutMs 1000
+          Verify the " Clear User Day Schedule command response" on TH(lock-app):
 
-          Verify Test Harness receives the Clear User command from the DUT on TH / lock app log:
+
 
           [1658399465.849095][2474:2474] CHIP:DMG:                        CommandPathIB =
           [1658399465.849133][2474:2474] CHIP:DMG:                        {
@@ -635,12 +687,14 @@ tests:
           [1658399465.849973][2474:2474] CHIP:ZCL: Successfully set the user [mEndpointId=1,index=2,adjustedIndex=1]
       disabled: true
 
-    - label: "DUT sends Set Credential command to TH"
+    - label: "DUT sends Set Credential command to TH.a"
       PICS: DRLK.S.F08 && DRLK.C.C22.Tx
       verification: |
           ./chip-tool doorlock set-credential 0 "{ "credentialType" : 1 , "credentialIndex" : 1 }" 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify Test Harness receives the Set Credential command from the DUT on TH / lock app log:
+          Verify the " Set Credential  command response" on TH(lock-app):
+
+
 
           [1658399006.369032][2474:2474] CHIP:DMG:                        CommandPathIB =
           [1658399006.369075][2474:2474] CHIP:DMG:                        {
@@ -713,8 +767,9 @@ tests:
       PICS: DRLK.S.F08 && DRLK.C.C24.Tx
       verification: |
           ./chip-tool doorlock get-credential-status  "{ "credentialType" : 1 , "credentialIndex" : 1 }" 1 1 --timedInteractionTimeoutMs 1000
+          Verify the " Get Credential  command response" on TH(lock-app):
 
-          Verify Test Harness receives the Get Credential command from the DUT on TH / lock app log:
+
 
           [1658399098.914006][2474:2474] CHIP:DMG:                        CommandPathIB =
           [1658399098.914053][2474:2474] CHIP:DMG:                        {
@@ -769,8 +824,8 @@ tests:
       PICS: DRLK.S.F08 && DRLK.C.C26.Tx
       verification: |
           ./chip-tool doorlock clear-credential  "{ "credentialType" : 1 , "credentialIndex" : 1 }" 1 1 --timedInteractionTimeoutMs 1000
+          Verify the " Clear Credential  command response" on TH(lock-app):
 
-          Verify Test Harness receives the Clear Credential command from the DUT on TH / lock app log:
 
           [1657115878.582559][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115878.582642][8804:8804] CHIP:DMG: {
