@@ -296,7 +296,6 @@
     "Thermostat": ["Test_TC_TSTAT_3_1", "Test_TC_TSTAT_3_2"],
     "ThermostatUserConfiguration": ["Test_TC_TSUIC_3_1"],
     "ThreadNetworkDiagnostics": [
-        "Test_TC_DGTHREAD_1_1",
         "Test_TC_DGTHREAD_2_5",
         "Test_TC_DGTHREAD_3_1",
         "Test_TC_DGTHREAD_3_2",
