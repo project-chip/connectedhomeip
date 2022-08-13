@@ -104,10 +104,7 @@
         "Test_TC_DLOG_3_1"
     ],
     "Descriptor": ["Test_TC_DESC_2_1", "Test_TC_DESC_2_2"],
-    "EthernetNetworkDiagnostics": [
-        "Test_TC_DGETH_3_1",
-        "Test_TC_DGETH_3_2"
-    ],
+    "EthernetNetworkDiagnostics": ["Test_TC_DGETH_3_1", "Test_TC_DGETH_3_2"],
     "GeneralCommissioning": ["Test_TC_CGEN_2_2", "Test_TC_CGEN_2_4"],
     "GeneralDiagnostics": [
         "Test_TC_DGGEN_2_2",
@@ -244,10 +241,7 @@
         "Test_TC_SC_4_9",
         "Test_TC_SC_4_10"
     ],
-    "SoftwareDiagnostics": [
-        "Test_TC_DGSW_3_1",
-        "Test_TC_DGSW_3_2"
-    ],
+    "SoftwareDiagnostics": ["Test_TC_DGSW_3_1", "Test_TC_DGSW_3_2"],
     "WiFiNetworkDiagnostics": [
         "Test_TC_DGWIFI_1_1",
         "Test_TC_DGWIFI_2_2",
@@ -333,11 +327,7 @@
         "Test_TC_FLABEL_2_1",
         "Test_TC_FLABEL_3_1"
     ],
-    "Binding": [
-        "Test_TC_BIND_2_1",
-        "Test_TC_BIND_2_2",
-        "Test_TC_BIND_2_3"
-    ],
+    "Binding": ["Test_TC_BIND_2_1", "Test_TC_BIND_2_2", "Test_TC_BIND_2_3"],
     "Scenes": [
         "Test_TC_S_1_1",
         "Test_TC_S_2_1",
