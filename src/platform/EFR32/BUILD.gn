@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/src/platform/device.gni")
