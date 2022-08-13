@@ -48,8 +48,6 @@ openthread_core_config_platform_check_file =
 openthread_project_core_config_file = "OpenThreadConfig.h"
 openthread_core_config_deps = [ "${chip_root}/examples/platform/efr32:openthread_core_config_efr32_chip_examples" ]
 
-chip_ot_lib_source_set = [ "${efr32_sdk_build_root}:ot-efr32-cert" ]
-
 chip_config_memory_management = "platform"
 
 pw_build_LINK_DEPS = [

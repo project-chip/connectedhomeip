@@ -34,6 +34,7 @@ set -x
 env
 USE_WIFI=false
 
+SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
 USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <efr32_board_name> [<Build options>]"
 
 if [ "$#" == "0" ]; then
@@ -103,6 +104,7 @@ if [ "$#" == "0" ]; then
         --additional_data_advertising
             enable Addition data advertissing and rotating device ID
         --use_ot_lib
+            use the silabs openthread library
     "
 elif [ "$#" -lt "2" ]; then
     echo "Invalid number of arguments
@@ -151,7 +153,7 @@ else
                 shift
                 ;;
             --use_ot_lib)
-                optArgs+="chip_use_ot_lib=true openthread_external_platform=\"""\" "
+                optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" "
                 shift
                 ;;
             *)

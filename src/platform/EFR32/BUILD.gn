@@ -99,12 +99,8 @@ static_library("EFR32") {
     "$dir_pw_kvs",
   ]
   if (chip_enable_openthread) {
-    public_deps += [ "${chip_root}/src/platform:ot_device_deps" ]
-
-    if (chip_use_ot_lib == false) {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/platforms:openthread_system" ]
-    }
+    public_deps +=
+        [ "${chip_root}/third_party/openthread:openthread_device_deps" ]
 
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",

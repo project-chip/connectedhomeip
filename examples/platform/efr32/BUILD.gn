@@ -46,9 +46,8 @@ source_set("openthread_core_config_efr32_chip_examples") {
 
     public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
 
-    if (chip_use_ot_lib == true) {
-      public_deps +=
-          [ "${chip_root}/third_party/silabs:openthread_core_config_efr32" ]
+    if (use_silabs_thread_lib == true) {
+      public_deps += [ "${efr32_sdk_build_root}:openthread_core_config_efr32" ]
     } else {
       public_deps += [ "${chip_root}/third_party/openthread/platforms/efr32:openthread_core_config_efr32" ]
     }

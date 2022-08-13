@@ -89,8 +89,6 @@ efr32_executable("efr32_device_tests") {
     "${chip_root}/src:tests",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support:testing",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
     "${nlunit_test_root}:nlunit-test",
   ]
@@ -98,22 +96,12 @@ efr32_executable("efr32_device_tests") {
   # OpenThread Settings
   if (chip_enable_openthread) {
     deps += [
-      "${chip_root}/src/platform:ot_device_deps",
+      "${chip_root}/third_party/openthread:openthread_device_deps",
       "${examples_plat_dir}:efr-matter-shell",
     ]
 
-    if (chip_use_ot_lib) {
-      deps += [ "${efr32_sdk_build_root}:openthread_system" ]
-    } else {
-      deps += [
-        "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-        "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-      ]
-      if (chip_openthread_ftd) {
-        deps += [ "${openthread_root}:libopenthread-cli-ftd" ]
-      } else {
-        deps += [ "$${openthread_root}:libopenthread-cli-mtd" ]
-      }
+    if (enable_openthread_cli) {
+      deps += [ "${efr32_sdk_build_root}:openthread_cli" ]
     }
   }
 
