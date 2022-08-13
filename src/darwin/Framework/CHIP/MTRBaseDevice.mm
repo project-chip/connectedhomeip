@@ -50,6 +50,7 @@ using chip::SessionHandle;
 
 NSString * const MTRAttributePathKey = @"attributePath";
 NSString * const MTRCommandPathKey = @"commandPath";
+NSString * const MTREventPathKey = @"eventPath";
 NSString * const MTRDataKey = @"data";
 NSString * const MTRErrorKey = @"error";
 NSString * const MTRTypeKey = @"type";

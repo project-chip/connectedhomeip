@@ -116,7 +116,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
-- (MTRDevice *)deviceForDeviceID:(uint64_t)deviceID;
+- (MTRDevice *)deviceForNodeID:(uint64_t)nodeID;
 - (void)removeDevice:(MTRDevice *)device;
 
 @end

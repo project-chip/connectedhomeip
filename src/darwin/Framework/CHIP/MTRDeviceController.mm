@@ -83,8 +83,8 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 @property (readonly) MTRP256KeypairBridge operationalKeypairBridge;
 @property (readonly) MTRDeviceAttestationDelegateBridge * deviceAttestationDelegateBridge;
 @property (readonly) MTRControllerFactory * factory;
-@property (readonly) NSMutableDictionary * deviceIDToDeviceMap;
-@property (readonly) os_unfair_lock deviceMapLock;
+@property (readonly) NSMutableDictionary * nodeIDToDeviceMap;
+@property (readonly) os_unfair_lock deviceMapLock; // protects nodeIDToDeviceMap
 @end
 
 @implementation MTRDeviceController
@@ -95,7 +95,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         _chipWorkQueue = queue;
         _factory = factory;
         _deviceMapLock = OS_UNFAIR_LOCK_INIT;
-        _deviceIDToDeviceMap = [NSMutableDictionary dictionary];
+        _nodeIDToDeviceMap = [NSMutableDictionary dictionary];
 
         _pairingDelegateBridge = new MTRDevicePairingDelegateBridge();
         if ([self checkForInitError:(_pairingDelegateBridge != nullptr) logMsg:kErrorPairingInit]) {
@@ -538,13 +538,13 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
                  }];
 }
 
-- (MTRDevice *)deviceForDeviceID:(uint64_t)deviceID
+- (MTRDevice *)deviceForNodeID:(uint64_t)nodeID
 {
     os_unfair_lock_lock(&_deviceMapLock);
-    MTRDevice * deviceToReturn = self.deviceIDToDeviceMap[@(deviceID)];
-    if (deviceToReturn) {
-        deviceToReturn = [[MTRDevice alloc] initWithDeviceID:deviceID deviceController:self queue:self.chipWorkQueue];
-        self.deviceIDToDeviceMap[@(deviceID)] = deviceToReturn;
+    MTRDevice * deviceToReturn = self.nodeIDToDeviceMap[@(nodeID)];
+    if (!deviceToReturn) {
+        deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID deviceController:self];
+        self.nodeIDToDeviceMap[@(nodeID)] = deviceToReturn;
     }
     os_unfair_lock_unlock(&_deviceMapLock);
 
@@ -554,11 +554,11 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 - (void)removeDevice:(MTRDevice *)device
 {
     os_unfair_lock_lock(&_deviceMapLock);
-    MTRDevice * deviceToRemove = self.deviceIDToDeviceMap[@(device.deviceID)];
+    MTRDevice * deviceToRemove = self.nodeIDToDeviceMap[@(device.nodeID)];
     if (deviceToRemove == device) {
-        self.deviceIDToDeviceMap[@(device.deviceID)] = nil;
+        self.nodeIDToDeviceMap[@(device.nodeID)] = nil;
     } else {
-        MTR_LOG_ERROR("Error: Cannot remove device %p with deviceID %llu", device, device.deviceID);
+        MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, device.nodeID);
     }
     os_unfair_lock_unlock(&_deviceMapLock);
 }
