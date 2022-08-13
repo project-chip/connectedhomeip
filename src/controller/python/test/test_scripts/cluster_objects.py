@@ -313,8 +313,8 @@ class ClusterObjectTests:
         await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
         await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
         await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
-        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
         await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=1))
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=2))
 
     @classmethod
     async def _RetryForContent(cls, request, until, retryCount=10, intervalSeconds=1):
@@ -330,6 +330,22 @@ class ClusterObjectTests:
     async def TriggerAndWaitForEvents(cls, devCtrl, req):
         await cls._TriggerEvent(devCtrl)
         await cls._RetryForContent(request=lambda: devCtrl.ReadEvent(nodeid=NODE_ID, events=req), until=lambda res: res != 0)
+
+    @classmethod
+    @base.test_case
+    async def TestGenerateUndefinedFabricScopedEventRequests(cls, devCtrl, expectEventsNum):
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
+        if isinstance(res, Clusters.TestCluster.Commands.TestEmitTestEventResponse):
+            logger.error(f"Unexpected response of type {type(res)} received.")
+            raise ValueError()
+
+    @classmethod
+    @base.test_case
+    async def TestGenerateUndefinedFabricScopedEventRequests(cls, devCtrl, expectEventsNum):
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=1))
+        if isinstance(res, Clusters.TestCluster.Commands.TestEmitTestEventResponse):
+            logger.error(f"Unexpected response of type {type(res)} received.")
+            raise ValueError()
 
     @classmethod
     @base.test_case
@@ -557,6 +573,8 @@ class ClusterObjectTests:
             await cls.TestWriteRequest(devCtrl)
             await cls.TestTimedRequest(devCtrl)
             await cls.TestTimedRequestTimeout(devCtrl)
+            await cls.TestGenerateUndefinedFabricScopedEventRequests(devCtrl)
+            await cls.TestGenerateDefinedFabricScopedEventRequests(devCtrl)
         except Exception as ex:
             logger.error(
                 f"Unexpected error occurred when running tests: {ex}")
