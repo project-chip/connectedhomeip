@@ -31,12 +31,14 @@ group("efr32_sdk") {
   public_deps = [ efr32_sdk_target ]
 }
 
-group("openthread_cli") {
-  if (use_silabs_thread_lib == false) {
-    if (chip_openthread_ftd) {
-      public_deps = [ "${sl_openthread_root}:libopenthread-cli-ftd" ]
-    } else {
-      public_deps = [ "${sl_openthread_root}:libopenthread-cli-mtd" ]
+if (chip_enable_openthread) {
+  group("openthread_cli") {
+    if (use_silabs_thread_lib == false) {
+      if (chip_openthread_ftd) {
+        public_deps = [ "${sl_openthread_root}:libopenthread-cli-ftd" ]
+      } else {
+        public_deps = [ "${sl_openthread_root}:libopenthread-cli-mtd" ]
+      }
     }
   }
 }
