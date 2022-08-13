@@ -333,6 +333,16 @@ class ClusterObjectTests:
 
     @classmethod
     @base.test_case
+    async def TestGenerateUndefinedFabricScopedEventRequests(cls, devCtrl):
+        logger.info("Running TestGenerateUndefinedFabricScopedEventRequests")
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
+        res = await devCtrl.ReadEvent(nodeid=NODE_ID, events=[
+            (1, Clusters.TestCluster.Events.TestEvent, 0),
+        ])
+        logger.info(f"return result is {res}")
+
+    @classmethod
+    @base.test_case
     async def TestReadEventRequests(cls, devCtrl, expectEventsNum):
         logger.info("1: Reading Ex Cx Ex")
         req = [
@@ -557,6 +567,7 @@ class ClusterObjectTests:
             await cls.TestWriteRequest(devCtrl)
             await cls.TestTimedRequest(devCtrl)
             await cls.TestTimedRequestTimeout(devCtrl)
+            await cls.TestGenerateUndefinedFabricScopedEventRequests(devCtrl)
         except Exception as ex:
             logger.error(
                 f"Unexpected error occurred when running tests: {ex}")
