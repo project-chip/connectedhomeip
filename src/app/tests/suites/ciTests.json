@@ -1,6 +1,12 @@
 {
-    "AccessControl": ["TestAccessControlCluster"],
+    "AccessControl": [
+        "TestAccessControlCluster",
+        "Test_TC_ACL_1_1",
+        "Test_TC_ACL_2_1",
+        "Test_TC_ACL_2_2"
+    ],
     "BooleanState": ["Test_TC_BOOL_1_1", "Test_TC_BOOL_2_1"],
+    "Binding": ["Test_TC_BIND_1_1"],
     "Actions": ["Test_TC_ACT_1_1"],
     "ColorControl": [
         "Test_TC_CC_1_1",
@@ -28,7 +34,11 @@
         "Test_TC_CNET_1_3"
     ],
     "Descriptor": ["Test_TC_DESC_1_1"],
-    "EthernetNetworkDiagnostics": ["Test_TC_DGETH_2_1", "Test_TC_DGETH_2_2"],
+    "EthernetNetworkDiagnostics": [
+        "Test_TC_DGETH_1_1", 
+        "Test_TC_DGETH_2_1", 
+        "Test_TC_DGETH_2_2"
+    ],
     "FlowMeasurement": ["Test_TC_FLW_1_1", "Test_TC_FLW_2_1"],
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_1_1", "Test_TC_DGGEN_2_1"],
@@ -128,6 +138,7 @@
         "Test_TC_TSUIC_2_2"
     ],
     "ThreadNetworkDiagnostics": [
+        "Test_TC_DGTHREAD_1_1",
         "Test_TC_DGTHREAD_2_1",
         "Test_TC_DGTHREAD_2_2",
         "Test_TC_DGTHREAD_2_3",
@@ -197,6 +208,7 @@
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": [
+        "Test_TC_DGSW_1_1",
         "Test_TC_DGSW_2_1",
         "Test_TC_DGSW_2_2",
         "Test_TC_DGSW_2_3"
@@ -206,6 +218,7 @@
         "DL_UsersAndCredentials",
         "DL_LockUnlock",
         "DL_Schedules",
+        "Test_TC_DRLK_1_1",
         "Test_TC_DRLK_2_2",
         "Test_TC_DRLK_2_3",
         "Test_TC_DRLK_2_4",
@@ -222,6 +235,7 @@
         "AccessControl",
         "BooleanState",
         "Actions",
+        "Binding",
         "ColorControl",
         "DeviceManagement",
         "Descriptor",
