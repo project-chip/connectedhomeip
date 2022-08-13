@@ -73,6 +73,8 @@ CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aE
     eventOptions.mPriority    = aEventData.GetPriorityLevel();
     eventOptions.mFabricIndex = aEventData.GetFabricIndex();
 
+    VerifyOrReturnError(eventOptions.mFabricIndex != kUndefinedFabricIndex, CHIP_NO_ERROR);
+
     //
     // Unlike attributes which have a different 'EncodeForRead' for fabric-scoped structs,
     // fabric-sensitive events don't require that since the actual omission of the event in its entirety

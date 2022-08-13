@@ -797,7 +797,7 @@ bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
 {
     Commands::TestEmitTestFabricScopedEventResponse::Type responseData;
     Events::TestFabricScopedEvent::Type event{ commandData.arg1 };
-
+    event.fabricIndex = commandData.arg1;
     if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
