@@ -55,6 +55,7 @@ enum CommissioningStage : uint8_t
     // ScanNetworks can happen anytime after kArmFailsafe.
     // However, the circ tests fail if it is earlier in the list
     kScanNetworks,
+    kNeedsNetworkCreds,
 };
 
 const char * StageToString(CommissioningStage stage);
