@@ -163,8 +163,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
             ChipLogProgress(SoftwareUpdate, "Rebooting...");
             hal_reboot();
         },
-        nullptr
-    );
+        nullptr);
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
