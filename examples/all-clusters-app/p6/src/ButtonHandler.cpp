@@ -23,22 +23,28 @@
 #include "AppTask.h"
 
 namespace {
+constexpr int kButtonCount = 2;
 
-TimerHandle_t buttonTimer; // FreeRTOS timers used for debouncing buttons
+TimerHandle_t buttonTimers[kButtonCount]; // FreeRTOS timers used for debouncing
+// buttons. Array to hold handles to
+// the created timers.
 
 } // namespace
 
 void ButtonHandler::Init(void)
 {
     GpioInit();
-
-    buttonTimer = xTimerCreate("BtnTmr",                            // Just a text name, not used by the RTOS kernel
-                               APP_BUTTON_DEBOUNCE_PERIOD_MS,       // timer period
-                               false,                               // no timer reload (==one-shot)
-                               (void *) (int) APP_LIGHT_BUTTON_IDX, // init timer id = button index
-                               TimerCallback                        // timer callback handler (all buttons use
-                                                                    // the same timer cn function)
-    );
+    // Create FreeRTOS sw timers for debouncing buttons.
+    for (uint8_t i = 0; i < kButtonCount; i++)
+    {
+        buttonTimers[i] = xTimerCreate("BtnTmr",                      // Just a text name, not used by the RTOS kernel
+                                       APP_BUTTON_DEBOUNCE_PERIOD_MS, // timer period
+                                       false,                         // no timer reload (==one-shot)
+                                       (void *) (int) i,              // init timer id = button index
+                                       TimerCallback                  // timer callback handler (all buttons use
+                                                                      // the same timer cn function)
+        );
+    }
 }
 
 void ButtonHandler::GpioInit(void)
@@ -50,19 +56,34 @@ void ButtonHandler::GpioInit(void)
     {
         printf(" cyhal_gpio_init failed for APP_LIGHT_BUTTON\r\n");
     }
-
+    result = cyhal_gpio_init(APP_FUNCTION_BUTTON, CYHAL_GPIO_DIR_INPUT, CYHAL_GPIO_DRIVE_PULLUP, CYBSP_BTN_OFF);
+    if (result != CY_RSLT_SUCCESS)
+    {
+        printf(" cyhal_gpio_init failed for APP_FUNCTION_BUTTON\r\n");
+    }
     /* Configure GPIO interrupt. */
     static cyhal_gpio_callback_data_t light_button_cbdata;
+    static cyhal_gpio_callback_data_t func_button_cbdata;
     light_button_cbdata.callback     = light_button_callback;
     light_button_cbdata.callback_arg = NULL;
     cyhal_gpio_register_callback(APP_LIGHT_BUTTON, &light_button_cbdata);
+    func_button_cbdata.callback     = func_button_callback;
+    func_button_cbdata.callback_arg = NULL;
+    cyhal_gpio_register_callback(APP_FUNCTION_BUTTON, &func_button_cbdata);
     cyhal_gpio_enable_event(APP_LIGHT_BUTTON, CYHAL_GPIO_IRQ_FALL, GPIO_INTERRUPT_PRIORITY, true);
+    cyhal_gpio_enable_event(APP_FUNCTION_BUTTON, CYHAL_GPIO_IRQ_FALL, GPIO_INTERRUPT_PRIORITY, true);
 }
 
 void ButtonHandler::light_button_callback(void * handler_arg, cyhal_gpio_event_t event)
 {
     portBASE_TYPE taskWoken = pdFALSE;
-    xTimerStartFromISR(buttonTimer, &taskWoken);
+    xTimerStartFromISR(buttonTimers[APP_LIGHT_BUTTON_IDX], &taskWoken);
+}
+
+void ButtonHandler::func_button_callback(void * handler_arg, cyhal_gpio_event_t event)
+{
+    portBASE_TYPE taskWoken = pdFALSE;
+    xTimerStartFromISR(buttonTimers[APP_FUNCTION_BUTTON_IDX], &taskWoken);
 }
 
 void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
@@ -77,11 +98,16 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
     case APP_LIGHT_BUTTON_IDX:
         buttonevent = cyhal_gpio_read(APP_LIGHT_BUTTON);
         break;
-
+    case APP_FUNCTION_BUTTON_IDX:
+        buttonevent = cyhal_gpio_read(APP_FUNCTION_BUTTON);
+        break;
     default:
         P6_LOG("Unhandled TimerID: %d", timerId);
         break;
     }
 
-    GetAppTask().ButtonEventHandler(timerId, (buttonevent) ? APP_BUTTON_PRESSED : APP_BUTTON_RELEASED);
+    if (buttonevent)
+    {
+        GetAppTask().ButtonEventHandler(timerId, APP_BUTTON_PRESSED);
+    }
 }

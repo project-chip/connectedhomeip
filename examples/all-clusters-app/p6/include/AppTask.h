@@ -54,8 +54,22 @@ private:
     CHIP_ERROR Init();
 
     static AppTask sAppTask;
+    void CancelTimer(void);
     void DispatchEvent(AppEvent * event);
+    static void FunctionTimerEventHandler(AppEvent * event);
+    static void FunctionHandler(AppEvent * event);
+    static void TimerEventHandler(TimerHandle_t timer);
     static void OnOffUpdateClusterState(intptr_t context);
+    void StartTimer(uint32_t aTimeoutMs);
+
+    enum class Function
+    {
+        kNoneSelected = 0,
+        kFactoryReset = 1,
+        kInvalid
+    };
+    Function mFunction        = Function::kNoneSelected;
+    bool mFunctionTimerActive = false;
 };
 
 inline AppTask & GetAppTask(void)
