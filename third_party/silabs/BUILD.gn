@@ -33,7 +33,7 @@ group("efr32_sdk") {
 
 if (chip_enable_openthread) {
   group("openthread_cli") {
-    if (use_silabs_thread_lib == false) {
+    if (!use_silabs_thread_lib) {
       if (chip_openthread_ftd) {
         public_deps = [ "${sl_openthread_root}:libopenthread-cli-ftd" ]
       } else {
@@ -151,7 +151,7 @@ if (use_silabs_thread_lib) {
 
     # selected thread device type FTD or MTD
     XTD = "ftd"
-    if (chip_openthread_ftd == false) {
+    if (!chip_openthread_ftd) {
       XTD = "mtd"
     }
 

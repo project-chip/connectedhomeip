@@ -201,13 +201,9 @@ efr32_executable("lock_app") {
   # OpenThread Settings
   if (chip_enable_openthread) {
     deps += [
-      "${chip_root}/third_party/openthread:openthread_device_deps",
+      "${chip_root}/third_party/openthread:openthread",
       "${examples_plat_dir}:efr-matter-shell",
     ]
-
-    if (enable_openthread_cli) {
-      deps += [ "${efr32_sdk_build_root}:openthread_cli" ]
-    }
   }
 
   if (chip_enable_ota_requestor) {

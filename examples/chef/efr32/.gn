@@ -25,7 +25,5 @@ default_args = {
   target_cpu = "arm"
   target_os = "freertos"
   chip_openthread_ftd = true
-  openthread_external_platform =
-      "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"
   import("//args.gni")
 }

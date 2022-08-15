@@ -95,13 +95,9 @@ efr32_executable("efr32_device_tests") {
   # OpenThread Settings
   if (chip_enable_openthread) {
     deps += [
-      "${chip_root}/third_party/openthread:openthread_device_deps",
+      "${chip_root}/third_party/openthread:openthread",
       "${examples_plat_dir}:efr-matter-shell",
     ]
-
-    if (enable_openthread_cli) {
-      deps += [ "${efr32_sdk_build_root}:openthread_cli" ]
-    }
   }
 
   deps += pw_build_LINK_DEPS
