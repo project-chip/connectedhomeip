@@ -1,7 +1,6 @@
 {{> header}}
 
 #import <Foundation/Foundation.h>
-#import <os/lock.h>
 
 #import "MTRClusters.h"
 #import "MTRDevice.h"

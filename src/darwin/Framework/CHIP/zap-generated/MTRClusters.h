@@ -39,12 +39,12 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)identifyWithParams:(MTRIdentifyClusterIdentifyParams *)params
-            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
          completionHandler:(StatusCompletion)completionHandler;
 - (void)triggerEffectWithParams:(MTRIdentifyClusterTriggerEffectParams *)params
-                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeIdentifyTimeWithParams:(MTRReadParams * _Nullable)params;
@@ -82,35 +82,35 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)addGroupWithParams:(MTRGroupsClusterAddGroupParams *)params
-            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
          completionHandler:
              (void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 - (void)viewGroupWithParams:(MTRGroupsClusterViewGroupParams *)params
-             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:
               (void (^)(MTRGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 - (void)getGroupMembershipWithParams:(MTRGroupsClusterGetGroupMembershipParams *)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(void (^)(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler;
 - (void)removeGroupWithParams:(MTRGroupsClusterRemoveGroupParams *)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:
                 (void (^)(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 - (void)removeAllGroupsWithParams:(MTRGroupsClusterRemoveAllGroupsParams * _Nullable)params
-                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(StatusCompletion)completionHandler;
 - (void)removeAllGroupsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(StatusCompletion)completionHandler;
 - (void)addGroupIfIdentifyingWithParams:(MTRGroupsClusterAddGroupIfIdentifyingParams *)params
-                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                       completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeNameSupportWithParams:(MTRReadParams * _Nullable)params;
@@ -141,52 +141,52 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)addSceneWithParams:(MTRScenesClusterAddSceneParams *)params
-            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
          completionHandler:
              (void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 - (void)viewSceneWithParams:(MTRScenesClusterViewSceneParams *)params
-             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:
               (void (^)(MTRScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 - (void)removeSceneWithParams:(MTRScenesClusterRemoveSceneParams *)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:
                 (void (^)(MTRScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 - (void)removeAllScenesWithParams:(MTRScenesClusterRemoveAllScenesParams *)params
-                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(void (^)(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable data,
                                       NSError * _Nullable error))completionHandler;
 - (void)storeSceneWithParams:(MTRScenesClusterStoreSceneParams *)params
-              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
            completionHandler:
                (void (^)(MTRScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 - (void)recallSceneWithParams:(MTRScenesClusterRecallSceneParams *)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
 - (void)getSceneMembershipWithParams:(MTRScenesClusterGetSceneMembershipParams *)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(void (^)(MTRScenesClusterGetSceneMembershipResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler;
 - (void)enhancedAddSceneWithParams:(MTRScenesClusterEnhancedAddSceneParams *)params
-                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                  completionHandler:(void (^)(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler;
 - (void)enhancedViewSceneWithParams:(MTRScenesClusterEnhancedViewSceneParams *)params
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                   completionHandler:(void (^)(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data,
                                         NSError * _Nullable error))completionHandler;
 - (void)copySceneWithParams:(MTRScenesClusterCopySceneParams *)params
-             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:
               (void (^)(MTRScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 
@@ -228,40 +228,40 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)offWithParams:(MTROnOffClusterOffParams * _Nullable)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(StatusCompletion)completionHandler;
 - (void)offWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
 - (void)onWithParams:(MTROnOffClusterOnParams * _Nullable)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(StatusCompletion)completionHandler;
 - (void)onWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
            completionHandler:(StatusCompletion)completionHandler;
 - (void)toggleWithParams:(MTROnOffClusterToggleParams * _Nullable)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(StatusCompletion)completionHandler;
 - (void)toggleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completionHandler:(StatusCompletion)completionHandler;
 - (void)offWithEffectWithParams:(MTROnOffClusterOffWithEffectParams *)params
-                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(StatusCompletion)completionHandler;
 - (void)onWithRecallGlobalSceneWithParams:(MTROnOffClusterOnWithRecallGlobalSceneParams * _Nullable)params
-                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                         completionHandler:(StatusCompletion)completionHandler;
 - (void)onWithRecallGlobalSceneWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                 completionHandler:(StatusCompletion)completionHandler;
 - (void)onWithTimedOffWithParams:(MTROnOffClusterOnWithTimedOffParams *)params
-                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeOnOffWithParams:(MTRReadParams * _Nullable)params;
@@ -349,40 +349,40 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)moveToLevelWithParams:(MTRLevelControlClusterMoveToLevelParams *)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
 - (void)moveWithParams:(MTRLevelControlClusterMoveParams *)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(StatusCompletion)completionHandler;
 - (void)stepWithParams:(MTRLevelControlClusterStepParams *)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(StatusCompletion)completionHandler;
 - (void)stopWithParams:(MTRLevelControlClusterStopParams *)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(StatusCompletion)completionHandler;
 - (void)moveToLevelWithOnOffWithParams:(MTRLevelControlClusterMoveToLevelWithOnOffParams *)params
-                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(StatusCompletion)completionHandler;
 - (void)moveWithOnOffWithParams:(MTRLevelControlClusterMoveWithOnOffParams *)params
-                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(StatusCompletion)completionHandler;
 - (void)stepWithOnOffWithParams:(MTRLevelControlClusterStepWithOnOffParams *)params
-                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(StatusCompletion)completionHandler;
 - (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams *)params
-                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(StatusCompletion)completionHandler;
 - (void)moveToClosestFrequencyWithParams:(MTRLevelControlClusterMoveToClosestFrequencyParams *)params
-                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                        completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentLevelWithParams:(MTRReadParams * _Nullable)params;
@@ -657,52 +657,52 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)instantActionWithParams:(MTRActionsClusterInstantActionParams *)params
-                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(StatusCompletion)completionHandler;
 - (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params
-                               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                             completionHandler:(StatusCompletion)completionHandler;
 - (void)startActionWithParams:(MTRActionsClusterStartActionParams *)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
 - (void)startActionWithDurationWithParams:(MTRActionsClusterStartActionWithDurationParams *)params
-                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                         completionHandler:(StatusCompletion)completionHandler;
 - (void)stopActionWithParams:(MTRActionsClusterStopActionParams *)params
-              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
            completionHandler:(StatusCompletion)completionHandler;
 - (void)pauseActionWithParams:(MTRActionsClusterPauseActionParams *)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
 - (void)pauseActionWithDurationWithParams:(MTRActionsClusterPauseActionWithDurationParams *)params
-                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                         completionHandler:(StatusCompletion)completionHandler;
 - (void)resumeActionWithParams:(MTRActionsClusterResumeActionParams *)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(StatusCompletion)completionHandler;
 - (void)enableActionWithParams:(MTRActionsClusterEnableActionParams *)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(StatusCompletion)completionHandler;
 - (void)enableActionWithDurationWithParams:(MTRActionsClusterEnableActionWithDurationParams *)params
-                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                          completionHandler:(StatusCompletion)completionHandler;
 - (void)disableActionWithParams:(MTRActionsClusterDisableActionParams *)params
-                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(StatusCompletion)completionHandler;
 - (void)disableActionWithDurationWithParams:(MTRActionsClusterDisableActionWithDurationParams *)params
-                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                           completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeActionListWithParams:(MTRReadParams * _Nullable)params;
@@ -737,8 +737,8 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)mfgSpecificPingWithParams:(MTRBasicClusterMfgSpecificPingParams * _Nullable)params
-                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(StatusCompletion)completionHandler;
 - (void)mfgSpecificPingWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
@@ -825,18 +825,18 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)queryImageWithParams:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
-              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
            completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                  NSError * _Nullable error))completionHandler;
 - (void)applyUpdateRequestWithParams:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler;
 - (void)notifyUpdateAppliedWithParams:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
-                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params;
@@ -865,8 +865,8 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)announceOtaProviderWithParams:(MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
-                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeDefaultOtaProvidersWithParams:(MTRReadParams * _Nullable)params;
@@ -1129,18 +1129,18 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)armFailSafeWithParams:(MTRGeneralCommissioningClusterArmFailSafeParams *)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data,
                                   NSError * _Nullable error))completionHandler;
 - (void)setRegulatoryConfigWithParams:(MTRGeneralCommissioningClusterSetRegulatoryConfigParams *)params
-                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(void (^)(MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler;
 - (void)commissioningCompleteWithParams:(MTRGeneralCommissioningClusterCommissioningCompleteParams * _Nullable)params
-                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                       completionHandler:
                           (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
                               NSError * _Nullable error))completionHandler;
@@ -1191,33 +1191,33 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)scanNetworksWithParams:(MTRNetworkCommissioningClusterScanNetworksParams * _Nullable)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler;
 - (void)addOrUpdateWiFiNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams *)params
-                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                        completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                              NSError * _Nullable error))completionHandler;
 - (void)addOrUpdateThreadNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams *)params
-                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                          completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                                NSError * _Nullable error))completionHandler;
 - (void)removeNetworkWithParams:(MTRNetworkCommissioningClusterRemoveNetworkParams *)params
-                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler;
 - (void)connectNetworkWithParams:(MTRNetworkCommissioningClusterConnectNetworkParams *)params
-                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(void (^)(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler;
 - (void)reorderNetworkWithParams:(MTRNetworkCommissioningClusterReorderNetworkParams *)params
-                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler;
 
@@ -1268,8 +1268,8 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)retrieveLogsRequestWithParams:(MTRDiagnosticLogsClusterRetrieveLogsRequestParams *)params
-                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler;
 
@@ -1299,8 +1299,8 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)testEventTriggerWithParams:(MTRGeneralDiagnosticsClusterTestEventTriggerParams *)params
-                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                  completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeNetworkInterfacesWithParams:(MTRReadParams * _Nullable)params;
@@ -1347,8 +1347,8 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)resetWatermarksWithParams:(MTRSoftwareDiagnosticsClusterResetWatermarksParams * _Nullable)params
-                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(StatusCompletion)completionHandler;
 - (void)resetWatermarksWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
@@ -1388,8 +1388,8 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)resetCountsWithParams:(MTRThreadNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
@@ -1547,8 +1547,8 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)resetCountsWithParams:(MTRWiFiNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
@@ -1606,8 +1606,8 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)resetCountsWithParams:(MTREthernetNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
@@ -1748,16 +1748,16 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)openCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenCommissioningWindowParams *)params
-                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                         completionHandler:(StatusCompletion)completionHandler;
 - (void)openBasicCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams *)params
-                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                              completionHandler:(StatusCompletion)completionHandler;
 - (void)revokeCommissioningWithParams:(MTRAdministratorCommissioningClusterRevokeCommissioningParams * _Nullable)params
-                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(StatusCompletion)completionHandler;
 - (void)revokeCommissioningWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
@@ -1795,43 +1795,43 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)attestationRequestWithParams:(MTROperationalCredentialsClusterAttestationRequestParams *)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler;
 - (void)certificateChainRequestWithParams:(MTROperationalCredentialsClusterCertificateChainRequestParams *)params
-                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                         completionHandler:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
                                               NSError * _Nullable error))completionHandler;
 - (void)CSRRequestWithParams:(MTROperationalCredentialsClusterCSRRequestParams *)params
-              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
            completionHandler:(void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data,
                                  NSError * _Nullable error))completionHandler;
 - (void)addNOCWithParams:(MTROperationalCredentialsClusterAddNOCParams *)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                               NSError * _Nullable error))completionHandler;
 - (void)updateNOCWithParams:(MTROperationalCredentialsClusterUpdateNOCParams *)params
-             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler;
 - (void)updateFabricLabelWithParams:(MTROperationalCredentialsClusterUpdateFabricLabelParams *)params
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                   completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                         NSError * _Nullable error))completionHandler;
 - (void)removeFabricWithParams:(MTROperationalCredentialsClusterRemoveFabricParams *)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler;
 - (void)addTrustedRootCertificateWithParams:(MTROperationalCredentialsClusterAddTrustedRootCertificateParams *)params
-                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                           completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeNOCsWithParams:(MTRReadParams * _Nullable)params;
@@ -1872,21 +1872,21 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)keySetWriteWithParams:(MTRGroupKeyManagementClusterKeySetWriteParams *)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
 - (void)keySetReadWithParams:(MTRGroupKeyManagementClusterKeySetReadParams *)params
-              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
            completionHandler:(void (^)(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,
                                  NSError * _Nullable error))completionHandler;
 - (void)keySetRemoveWithParams:(MTRGroupKeyManagementClusterKeySetRemoveParams *)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(StatusCompletion)completionHandler;
 - (void)keySetReadAllIndicesWithParams:(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams *)params
-                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler;
 
@@ -2015,8 +2015,8 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)changeToModeWithParams:(MTRModeSelectClusterChangeToModeParams *)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params;
@@ -2067,82 +2067,82 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)lockDoorWithParams:(MTRDoorLockClusterLockDoorParams * _Nullable)params
-            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
          completionHandler:(StatusCompletion)completionHandler;
 - (void)unlockDoorWithParams:(MTRDoorLockClusterUnlockDoorParams * _Nullable)params
-              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
            completionHandler:(StatusCompletion)completionHandler;
 - (void)unlockWithTimeoutWithParams:(MTRDoorLockClusterUnlockWithTimeoutParams *)params
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                   completionHandler:(StatusCompletion)completionHandler;
 - (void)setWeekDayScheduleWithParams:(MTRDoorLockClusterSetWeekDayScheduleParams *)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(StatusCompletion)completionHandler;
 - (void)getWeekDayScheduleWithParams:(MTRDoorLockClusterGetWeekDayScheduleParams *)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(void (^)(MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler;
 - (void)clearWeekDayScheduleWithParams:(MTRDoorLockClusterClearWeekDayScheduleParams *)params
-                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(StatusCompletion)completionHandler;
 - (void)setYearDayScheduleWithParams:(MTRDoorLockClusterSetYearDayScheduleParams *)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(StatusCompletion)completionHandler;
 - (void)getYearDayScheduleWithParams:(MTRDoorLockClusterGetYearDayScheduleParams *)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(void (^)(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler;
 - (void)clearYearDayScheduleWithParams:(MTRDoorLockClusterClearYearDayScheduleParams *)params
-                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(StatusCompletion)completionHandler;
 - (void)setHolidayScheduleWithParams:(MTRDoorLockClusterSetHolidayScheduleParams *)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(StatusCompletion)completionHandler;
 - (void)getHolidayScheduleWithParams:(MTRDoorLockClusterGetHolidayScheduleParams *)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(void (^)(MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler;
 - (void)clearHolidayScheduleWithParams:(MTRDoorLockClusterClearHolidayScheduleParams *)params
-                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(StatusCompletion)completionHandler;
 - (void)setUserWithParams:(MTRDoorLockClusterSetUserParams *)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(StatusCompletion)completionHandler;
 - (void)getUserWithParams:(MTRDoorLockClusterGetUserParams *)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:
             (void (^)(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 - (void)clearUserWithParams:(MTRDoorLockClusterClearUserParams *)params
-             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(StatusCompletion)completionHandler;
 - (void)setCredentialWithParams:(MTRDoorLockClusterSetCredentialParams *)params
-                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(void (^)(MTRDoorLockClusterSetCredentialResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler;
 - (void)getCredentialStatusWithParams:(MTRDoorLockClusterGetCredentialStatusParams *)params
-                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(void (^)(MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler;
 - (void)clearCredentialWithParams:(MTRDoorLockClusterClearCredentialParams *)params
-                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeLockStateWithParams:(MTRReadParams * _Nullable)params;
@@ -2333,41 +2333,41 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)upOrOpenWithParams:(MTRWindowCoveringClusterUpOrOpenParams * _Nullable)params
-            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
          completionHandler:(StatusCompletion)completionHandler;
 - (void)upOrOpenWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                  completionHandler:(StatusCompletion)completionHandler;
 - (void)downOrCloseWithParams:(MTRWindowCoveringClusterDownOrCloseParams * _Nullable)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
 - (void)downOrCloseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completionHandler:(StatusCompletion)completionHandler;
 - (void)stopMotionWithParams:(MTRWindowCoveringClusterStopMotionParams * _Nullable)params
-              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
            completionHandler:(StatusCompletion)completionHandler;
 - (void)stopMotionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completionHandler:(StatusCompletion)completionHandler;
 - (void)goToLiftValueWithParams:(MTRWindowCoveringClusterGoToLiftValueParams *)params
-                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(StatusCompletion)completionHandler;
 - (void)goToLiftPercentageWithParams:(MTRWindowCoveringClusterGoToLiftPercentageParams *)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(StatusCompletion)completionHandler;
 - (void)goToTiltValueWithParams:(MTRWindowCoveringClusterGoToTiltValueParams *)params
-                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(StatusCompletion)completionHandler;
 - (void)goToTiltPercentageWithParams:(MTRWindowCoveringClusterGoToTiltPercentageParams *)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeTypeWithParams:(MTRReadParams * _Nullable)params;
@@ -2445,12 +2445,12 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)barrierControlGoToPercentWithParams:(MTRBarrierControlClusterBarrierControlGoToPercentParams *)params
-                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                           completionHandler:(StatusCompletion)completionHandler;
 - (void)barrierControlStopWithParams:(MTRBarrierControlClusterBarrierControlStopParams * _Nullable)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(StatusCompletion)completionHandler;
 - (void)barrierControlStopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
@@ -2623,21 +2623,21 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)setpointRaiseLowerWithParams:(MTRThermostatClusterSetpointRaiseLowerParams *)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(StatusCompletion)completionHandler;
 - (void)setWeeklyScheduleWithParams:(MTRThermostatClusterSetWeeklyScheduleParams *)params
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                   completionHandler:(StatusCompletion)completionHandler;
 - (void)getWeeklyScheduleWithParams:(MTRThermostatClusterGetWeeklyScheduleParams *)params
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                   completionHandler:(void (^)(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
                                         NSError * _Nullable error))completionHandler;
 - (void)clearWeeklyScheduleWithParams:(MTRThermostatClusterClearWeeklyScheduleParams * _Nullable)params
-                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(StatusCompletion)completionHandler;
 - (void)clearWeeklyScheduleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
@@ -3025,80 +3025,80 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)moveToHueWithParams:(MTRColorControlClusterMoveToHueParams *)params
-             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(StatusCompletion)completionHandler;
 - (void)moveHueWithParams:(MTRColorControlClusterMoveHueParams *)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(StatusCompletion)completionHandler;
 - (void)stepHueWithParams:(MTRColorControlClusterStepHueParams *)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(StatusCompletion)completionHandler;
 - (void)moveToSaturationWithParams:(MTRColorControlClusterMoveToSaturationParams *)params
-                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                  completionHandler:(StatusCompletion)completionHandler;
 - (void)moveSaturationWithParams:(MTRColorControlClusterMoveSaturationParams *)params
-                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(StatusCompletion)completionHandler;
 - (void)stepSaturationWithParams:(MTRColorControlClusterStepSaturationParams *)params
-                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(StatusCompletion)completionHandler;
 - (void)moveToHueAndSaturationWithParams:(MTRColorControlClusterMoveToHueAndSaturationParams *)params
-                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                        completionHandler:(StatusCompletion)completionHandler;
 - (void)moveToColorWithParams:(MTRColorControlClusterMoveToColorParams *)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
 - (void)moveColorWithParams:(MTRColorControlClusterMoveColorParams *)params
-             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(StatusCompletion)completionHandler;
 - (void)stepColorWithParams:(MTRColorControlClusterStepColorParams *)params
-             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(StatusCompletion)completionHandler;
 - (void)moveToColorTemperatureWithParams:(MTRColorControlClusterMoveToColorTemperatureParams *)params
-                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                        completionHandler:(StatusCompletion)completionHandler;
 - (void)enhancedMoveToHueWithParams:(MTRColorControlClusterEnhancedMoveToHueParams *)params
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                   completionHandler:(StatusCompletion)completionHandler;
 - (void)enhancedMoveHueWithParams:(MTRColorControlClusterEnhancedMoveHueParams *)params
-                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(StatusCompletion)completionHandler;
 - (void)enhancedStepHueWithParams:(MTRColorControlClusterEnhancedStepHueParams *)params
-                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(StatusCompletion)completionHandler;
 - (void)enhancedMoveToHueAndSaturationWithParams:(MTRColorControlClusterEnhancedMoveToHueAndSaturationParams *)params
-                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                completionHandler:(StatusCompletion)completionHandler;
 - (void)colorLoopSetWithParams:(MTRColorControlClusterColorLoopSetParams *)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(StatusCompletion)completionHandler;
 - (void)stopMoveStepWithParams:(MTRColorControlClusterStopMoveStepParams *)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(StatusCompletion)completionHandler;
 - (void)moveColorTemperatureWithParams:(MTRColorControlClusterMoveColorTemperatureParams *)params
-                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(StatusCompletion)completionHandler;
 - (void)stepColorTemperatureWithParams:(MTRColorControlClusterStepColorTemperatureParams *)params
-                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                      completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentHueWithParams:(MTRReadParams * _Nullable)params;
@@ -3698,17 +3698,17 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)changeChannelWithParams:(MTRChannelClusterChangeChannelParams *)params
-                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler;
 - (void)changeChannelByNumberWithParams:(MTRChannelClusterChangeChannelByNumberParams *)params
-                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                       completionHandler:(StatusCompletion)completionHandler;
 - (void)skipChannelWithParams:(MTRChannelClusterSkipChannelParams *)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeChannelListWithParams:(MTRReadParams * _Nullable)params;
@@ -3743,8 +3743,8 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)navigateTargetWithParams:(MTRTargetNavigatorClusterNavigateTargetParams *)params
-                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler;
 
@@ -3778,8 +3778,8 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)playWithParams:(MTRMediaPlaybackClusterPlayParams * _Nullable)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:
             (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 - (void)playWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -3787,8 +3787,8 @@ NS_ASSUME_NONNULL_BEGIN
              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler;
 - (void)pauseWithParams:(MTRMediaPlaybackClusterPauseParams * _Nullable)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:
             (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 - (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -3796,8 +3796,8 @@ NS_ASSUME_NONNULL_BEGIN
               completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler;
 - (void)stopPlaybackWithParams:(MTRMediaPlaybackClusterStopPlaybackParams * _Nullable)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler;
 - (void)stopPlaybackWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -3805,8 +3805,8 @@ NS_ASSUME_NONNULL_BEGIN
                      completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler;
 - (void)startOverWithParams:(MTRMediaPlaybackClusterStartOverParams * _Nullable)params
-             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler;
 - (void)startOverWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -3814,8 +3814,8 @@ NS_ASSUME_NONNULL_BEGIN
                   completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                         NSError * _Nullable error))completionHandler;
 - (void)previousWithParams:(MTRMediaPlaybackClusterPreviousParams * _Nullable)params
-            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
          completionHandler:
              (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 - (void)previousWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -3823,8 +3823,8 @@ NS_ASSUME_NONNULL_BEGIN
                  completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler;
 - (void)nextWithParams:(MTRMediaPlaybackClusterNextParams * _Nullable)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:
             (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 - (void)nextWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -3832,8 +3832,8 @@ NS_ASSUME_NONNULL_BEGIN
              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler;
 - (void)rewindWithParams:(MTRMediaPlaybackClusterRewindParams * _Nullable)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:
             (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 - (void)rewindWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -3841,8 +3841,8 @@ NS_ASSUME_NONNULL_BEGIN
                completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler;
 - (void)fastForwardWithParams:(MTRMediaPlaybackClusterFastForwardParams * _Nullable)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                   NSError * _Nullable error))completionHandler;
 - (void)fastForwardWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -3850,18 +3850,18 @@ NS_ASSUME_NONNULL_BEGIN
                     completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler;
 - (void)skipForwardWithParams:(MTRMediaPlaybackClusterSkipForwardParams *)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                   NSError * _Nullable error))completionHandler;
 - (void)skipBackwardWithParams:(MTRMediaPlaybackClusterSkipBackwardParams *)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler;
 - (void)seekWithParams:(MTRMediaPlaybackClusterSeekParams *)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:
             (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 
@@ -3905,26 +3905,26 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)selectInputWithParams:(MTRMediaInputClusterSelectInputParams *)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
 - (void)showInputStatusWithParams:(MTRMediaInputClusterShowInputStatusParams * _Nullable)params
-                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(StatusCompletion)completionHandler;
 - (void)showInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(StatusCompletion)completionHandler;
 - (void)hideInputStatusWithParams:(MTRMediaInputClusterHideInputStatusParams * _Nullable)params
-                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                 completionHandler:(StatusCompletion)completionHandler;
 - (void)hideInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(StatusCompletion)completionHandler;
 - (void)renameInputWithParams:(MTRMediaInputClusterRenameInputParams *)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeInputListWithParams:(MTRReadParams * _Nullable)params;
@@ -3957,8 +3957,8 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)sleepWithParams:(MTRLowPowerClusterSleepParams * _Nullable)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(StatusCompletion)completionHandler;
 - (void)sleepWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
@@ -3990,8 +3990,8 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)sendKeyWithParams:(MTRKeypadInputClusterSendKeyParams *)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:
             (void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 
@@ -4021,13 +4021,13 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)launchContentWithParams:(MTRContentLauncherClusterLaunchContentParams *)params
-                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
               completionHandler:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler;
 - (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params
-             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler;
 
@@ -4066,12 +4066,12 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)selectOutputWithParams:(MTRAudioOutputClusterSelectOutputParams *)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(StatusCompletion)completionHandler;
 - (void)renameOutputWithParams:(MTRAudioOutputClusterRenameOutputParams *)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeOutputListWithParams:(MTRReadParams * _Nullable)params;
@@ -4104,18 +4104,18 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
-             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
           completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler;
 - (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                               NSError * _Nullable error))completionHandler;
 - (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                               NSError * _Nullable error))completionHandler;
 
@@ -4195,17 +4195,17 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)getSetupPINWithParams:(MTRAccountLoginClusterGetSetupPINParams *)params
-               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
                                   NSError * _Nullable error))completionHandler;
 - (void)loginWithParams:(MTRAccountLoginClusterLoginParams *)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(StatusCompletion)completionHandler;
 - (void)logoutWithParams:(MTRAccountLoginClusterLogoutParams * _Nullable)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(StatusCompletion)completionHandler;
 - (void)logoutWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
@@ -4237,15 +4237,15 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)getProfileInfoCommandWithParams:(MTRElectricalMeasurementClusterGetProfileInfoCommandParams * _Nullable)params
-                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                       completionHandler:(StatusCompletion)completionHandler;
 - (void)getProfileInfoCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                               completionHandler:(StatusCompletion)completionHandler;
 - (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params
-                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                              completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementTypeWithParams:(MTRReadParams * _Nullable)params;
@@ -4570,22 +4570,22 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)testWithParams:(MTRTestClusterClusterTestParams * _Nullable)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(StatusCompletion)completionHandler;
 - (void)testWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
              completionHandler:(StatusCompletion)completionHandler;
 - (void)testNotHandledWithParams:(MTRTestClusterClusterTestNotHandledParams * _Nullable)params
-                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(StatusCompletion)completionHandler;
 - (void)testNotHandledWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completionHandler:(StatusCompletion)completionHandler;
 - (void)testSpecificWithParams:(MTRTestClusterClusterTestSpecificParams * _Nullable)params
-                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
              completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler;
 - (void)testSpecificWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -4593,104 +4593,109 @@ NS_ASSUME_NONNULL_BEGIN
                      completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler;
 - (void)testUnknownCommandWithParams:(MTRTestClusterClusterTestUnknownCommandParams * _Nullable)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(StatusCompletion)completionHandler;
 - (void)testUnknownCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completionHandler:(StatusCompletion)completionHandler;
 - (void)testAddArgumentsWithParams:(MTRTestClusterClusterTestAddArgumentsParams *)params
-                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                  completionHandler:(void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler;
 - (void)testSimpleArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleArgumentRequestParams *)params
-                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                           completionHandler:(void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completionHandler;
 - (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterClusterTestStructArrayArgumentRequestParams *)params
-                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                completionHandler:
                                    (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler;
 - (void)testStructArgumentRequestWithParams:(MTRTestClusterClusterTestStructArgumentRequestParams *)params
-                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                           completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completionHandler;
 - (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructArgumentRequestParams *)params
-                                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                 completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                       NSError * _Nullable error))completionHandler;
 - (void)testListStructArgumentRequestWithParams:(MTRTestClusterClusterTestListStructArgumentRequestParams *)params
-                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                               completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                     NSError * _Nullable error))completionHandler;
 - (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterClusterTestListInt8UArgumentRequestParams *)params
-                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                              completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                    NSError * _Nullable error))completionHandler;
 - (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructListArgumentRequestParams *)params
-                                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                       expectedValues:
+                                           (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                     completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                           NSError * _Nullable error))completionHandler;
 - (void)testListNestedStructListArgumentRequestWithParams:
             (MTRTestClusterClusterTestListNestedStructListArgumentRequestParams *)params
-                                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                           expectedValues:
+                                               (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                         completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                               NSError * _Nullable error))completionHandler;
 - (void)testListInt8UReverseRequestWithParams:(MTRTestClusterClusterTestListInt8UReverseRequestParams *)params
-                               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                             completionHandler:(void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler;
 - (void)testEnumsRequestWithParams:(MTRTestClusterClusterTestEnumsRequestParams *)params
-                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                  completionHandler:(void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler;
 - (void)testNullableOptionalRequestWithParams:(MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
-                               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                             completionHandler:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler;
 - (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
-                                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                      expectedValues:
+                                          (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                    completionHandler:
                                        (void (^)(MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler;
 - (void)simpleStructEchoRequestWithParams:(MTRTestClusterClusterSimpleStructEchoRequestParams *)params
-                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                         completionHandler:(void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data,
                                               NSError * _Nullable error))completionHandler;
 - (void)timedInvokeRequestWithParams:(MTRTestClusterClusterTimedInvokeRequestParams * _Nullable)params
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(StatusCompletion)completionHandler;
 - (void)timedInvokeRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completionHandler:(StatusCompletion)completionHandler;
 - (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
-                                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                     expectedValues:
+                                         (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params
-                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                          completionHandler:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
                                                NSError * _Nullable error))completionHandler;
 - (void)testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
-                                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries
-                                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                        expectedValues:
+                                            (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                      completionHandler:
                                          (void (^)(
                                              MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
