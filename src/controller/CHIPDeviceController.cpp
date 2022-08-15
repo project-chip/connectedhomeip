@@ -353,34 +353,6 @@ void DeviceController::Shutdown()
     mDeviceDiscoveryDelegate = nullptr;
 }
 
-CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
-{
-    ChipLogProgress(Controller, "Force close session for node 0x%" PRIx64, nodeId);
-
-    if (SessionMgr()->MarkSessionsAsDefunct(GetPeerScopedId(nodeId), MakeOptional(Transport::SecureSession::Type::kCASE)))
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    OperationalSessionSetup * proxy = mSystemState->CASESessionMgr()->FindExistingSessionSetup(GetPeerScopedId(nodeId));
-    if (proxy == nullptr)
-    {
-        ChipLogProgress(Controller, "Attempted to close a session that does not exist.");
-        return CHIP_NO_ERROR;
-    }
-
-    if (proxy->IsConnecting())
-    {
-        ChipLogError(Controller, "Attempting to disconnect while connection in progress");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    // TODO: logic here is unclear. Possible states are "uninitialized, needs address, initialized"
-    // and disconnecting in those states is unclear (especially for needds-address).
-    ChipLogProgress(Controller, "Disconnect attempt while not in connected/connecting state");
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DeviceController::GetPeerAddressAndPort(NodeId peerId, Inet::IPAddress & addr, uint16_t & port)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);

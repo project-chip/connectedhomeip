@@ -296,24 +296,6 @@ public:
     OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }
 
     /**
-     * TODO(#21885): This needs to be removed. This currently is not disconnecting anything.
-     *
-     * DEPRECATED - DO NOT USE or if you use please request review on why/how to
-     * officially support such an API.
-     *
-     * This was added to support the 'reuse session' logic in cirque integration
-     * tests however since that is the only client, the correct update is to
-     * use 'ConnectDevice' and wait for connect success/failure inside the CI
-     * logic. The current code does not do that because python was not set up
-     * to wait for timeouts on success/fail, hence this temporary method.
-     *
-     * TODO(andy31415): update cirque test and remove this method.
-     *
-     * Returns success if a session with the given peer does not exist yet.
-     */
-    CHIP_ERROR DisconnectDevice(NodeId nodeId);
-
-    /**
      * @brief
      *   Reconfigures a new set of operational credentials to be used with this
      *   controller given ControllerInitParams state.
