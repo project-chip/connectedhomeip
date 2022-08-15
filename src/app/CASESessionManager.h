@@ -78,6 +78,8 @@ public:
     void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
+    // TODO(#21885): Once this is no longer called from `DisconnectDevice` this can become a private method and
+    // we can remove the default for forAddressUpdate.
     OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId, bool forAddressUpdate = false) const;
 
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
