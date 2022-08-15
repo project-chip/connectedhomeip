@@ -809,7 +809,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         VerifyOrDie(sessionMgr != nullptr);
 
         sessionMgr->ForEachMatchingSession(self->_cppCommissioner->GetPeerScopedId(nodeID), [](auto * session) {
-            if (session->IsActiveSession() && session->GetSecureSessionType() == Transport::SecureSession::Type::kCASE) {
+            if (session->IsActiveSession() && session->GetSecureSessionType() == chip::Transport::SecureSession::Type::kCASE) {
                 session->MarkAsDefunct();
             }
         });
