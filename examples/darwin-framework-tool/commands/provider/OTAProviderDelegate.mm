@@ -40,9 +40,11 @@ constexpr uint8_t kUpdateTokenLen = 32;
     return self;
 }
 
-- (void)handleQueryImage:(MTROtaSoftwareUpdateProviderClusterQueryImageParams * _Nonnull)params
-       completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                             NSError * _Nullable error))completionHandler
+- (void)handleQueryImageForNodeID:(NSNumber * _Nonnull)nodeID
+                       controller:(MTRDeviceController * _Nonnull)controller
+                           params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams * _Nonnull)params
+                completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler
 {
     NSError * error;
 
@@ -102,9 +104,12 @@ constexpr uint8_t kUpdateTokenLen = 32;
     completionHandler(_selectedCandidate, error);
 }
 
-- (void)handleApplyUpdateRequest:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * _Nonnull)params
-               completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler
+- (void)handleApplyUpdateRequestForNodeID:(NSNumber * _Nonnull)nodeID
+                               controller:(MTRDeviceController * _Nonnull)controller
+                                   params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * _Nonnull)params
+                        completionHandler:
+                            (void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                NSError * _Nullable error))completionHandler
 {
     MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * applyUpdateResponseParams =
         [[MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
@@ -112,15 +117,19 @@ constexpr uint8_t kUpdateTokenLen = 32;
     completionHandler(applyUpdateResponseParams, nil);
 }
 
-- (void)handleNotifyUpdateApplied:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * _Nonnull)params
-                completionHandler:(StatusCompletion _Nonnull)completionHandler
+- (void)handleNotifyUpdateAppliedForNodeID:(NSNumber * _Nonnull)nodeID
+                                controller:(MTRDeviceController * _Nonnull)controller
+                                    params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * _Nonnull)params
+                         completionHandler:(StatusCompletion _Nonnull)completionHandler
 {
     completionHandler(nil);
 }
 
-- (void)handleBDXTransferSessionBegin:(NSString * _Nonnull)fileDesignator
-                               offset:(NSNumber * _Nonnull)offset
-                    completionHandler:(void (^)(NSError * error))completionHandler
+- (void)handleBDXTransferSessionBeginForNodeID:(NSNumber * _Nonnull)nodeID
+                                    controller:(MTRDeviceController * _Nonnull)controller
+                                fileDesignator:(NSString * _Nonnull)fileDesignator
+                                        offset:(NSNumber * _Nonnull)offset
+                             completionHandler:(void (^)(NSError * error))completionHandler
 {
     NSLog(@"BDX TransferSession begin with %@ (offset: %@)", fileDesignator, offset);
 
@@ -161,7 +170,9 @@ constexpr uint8_t kUpdateTokenLen = 32;
     completionHandler(nil);
 }
 
-- (void)handleBDXTransferSessionEnd:(NSError * _Nullable)error
+- (void)handleBDXTransferSessionEndForNodeID:(NSNumber * _Nonnull)nodeID
+                                  controller:(MTRDeviceController * _Nonnull)controller
+                                       error:(NSError * _Nullable)error
 {
     NSLog(@"BDX TransferSession end with error: %@", error);
     _mFileHandle = nil;
@@ -169,10 +180,12 @@ constexpr uint8_t kUpdateTokenLen = 32;
     _mFileEndOffset = nil;
 }
 
-- (void)handleBDXQuery:(NSNumber * _Nonnull)blockSize
-            blockIndex:(NSNumber * _Nonnull)blockIndex
-           bytesToSkip:(NSNumber * _Nonnull)bytesToSkip
-     completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler
+- (void)handleBDXQueryForNodeID:(NSNumber * _Nonnull)nodeID
+                     controller:(MTRDeviceController * _Nonnull)controller
+                      blockSize:(NSNumber * _Nonnull)blockSize
+                     blockIndex:(NSNumber * _Nonnull)blockIndex
+                    bytesToSkip:(NSNumber * _Nonnull)bytesToSkip
+              completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler
 {
     NSLog(@"BDX Query received blockSize: %@, blockIndex: %@", blockSize, blockIndex);
 
