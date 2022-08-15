@@ -50,6 +50,7 @@ Ameba
 amebad
 AmebaD
 amebaiot
+AmebaZ
 amebaz2
 AmebaZ2
 announcementReason
