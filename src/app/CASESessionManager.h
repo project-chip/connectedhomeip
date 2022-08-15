@@ -26,6 +26,7 @@
 #include <lib/support/Pool.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/SessionDelegate.h>
+#include <transport/SessionUpdateDelegate.h>
 
 #include <lib/dnssd/ResolverProxy.h>
 
@@ -45,11 +46,17 @@ struct CASESessionManagerConfig
  * 4. During session establishment, trigger node ID resolution (if needed), and update the DNS-SD cache (if resolution is
  * successful)
  */
-class CASESessionManager : public OperationalSessionReleaseDelegate
+class CASESessionManager : public OperationalSessionReleaseDelegate, public SessionUpdateDelegate
 {
 public:
     CASESessionManager() = default;
-    virtual ~CASESessionManager() {}
+    virtual ~CASESessionManager()
+    {
+        if (mConfig.sessionInitParams.Validate() == CHIP_NO_ERROR)
+        {
+            mConfig.sessionInitParams.exchangeMgr->GetReliableMessageMgr()->RegisterSessionUpdateDelegate(nullptr);
+        }
+    }
 
     CHIP_ERROR Init(chip::System::Layer * systemLayer, const CASESessionManagerConfig & params);
     void Shutdown() {}
@@ -71,9 +78,9 @@ public:
     void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId) const;
+    OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId, bool forAddressUpdate = false) const;
 
-    void ReleaseSession(const ScopedNodeId & peerId) override;
+    void ReleaseSession(const ScopedNodeId & peerId);
 
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
@@ -89,10 +96,14 @@ public:
      */
     CHIP_ERROR GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr);
 
+    //////////// OperationalSessionReleaseDelegate Implementation ///////////////
+    void ReleaseSession(OperationalSessionSetup * device) override;
+
+    //////////// SessionUpdateDelegate Implementation ///////////////
+    void UpdatePeerAddress(ScopedNodeId peerId) override;
+
 private:
     Optional<SessionHandle> FindExistingSession(const ScopedNodeId & peerId) const;
-
-    void ReleaseSession(OperationalSessionSetup * device) const;
 
     CASESessionManagerConfig mConfig;
 };

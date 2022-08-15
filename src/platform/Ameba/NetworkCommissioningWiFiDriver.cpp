@@ -92,6 +92,7 @@ Status AmebaWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, 
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
     VerifyOrReturnError(ssid.size() <= sizeof(mStagingNetwork.ssid), Status::kOutOfRange);
 
+    mStagingNetwork = {};
     memcpy(mStagingNetwork.credentials, credentials.data(), credentials.size());
     mStagingNetwork.credentialsLen = static_cast<decltype(mStagingNetwork.credentialsLen)>(credentials.size());
 
@@ -108,6 +109,7 @@ Status AmebaWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outD
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
 
     // Use empty ssid for representing invalid network
+    mStagingNetwork         = {};
     mStagingNetwork.ssidLen = 0;
     return Status::kSuccess;
 }

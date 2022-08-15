@@ -69,6 +69,7 @@ public:
     static void TestWriteRoundtripWithClusterObjectsVersionMismatch(nlTestSuite * apSuite, void * apContext);
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     static void TestWriteHandlerReceiveInvalidMessage(nlTestSuite * apSuite, void * apContext);
+    static void TestWriteHandlerInvalidateFabric(nlTestSuite * apSuite, void * apContext);
 #endif
 private:
     static void AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient);
@@ -626,6 +627,56 @@ void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * a
     ctx.CreateSessionAliceToBob();
     ctx.CreateSessionBobToAlice();
 }
+
+// This test is to create Chunked write requests, we drop the message since the 3rd message, then remove fabrics for client and
+// handler, the corresponding client and handler would be released as well.
+void TestWriteInteraction::TestWriteHandlerInvalidateFabric(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    app::AttributePathParams attributePath(2, 3, 4);
+
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    TestWriteClientCallback writeCallback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+                                 static_cast<uint16_t>(900) /* reserved buffer size */);
+
+    ByteSpan list[5];
+
+    err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 5));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.GetLoopback().mDroppedMessageCount              = 0;
+    ctx.GetLoopback().mSentMessageCount                 = 0;
+    ctx.GetLoopback().mNumMessagesToDrop                = 1;
+    ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 2;
+    err                                                 = writeClient.SendWriteRequest(sessionHandle);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 1);
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 3);
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
+
+    ctx.GetFabricTable().Delete(ctx.GetAliceFabricIndex());
+    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
+    engine->Shutdown();
+    ctx.ExpireSessionAliceToBob();
+    ctx.ExpireSessionBobToAlice();
+    ctx.CreateAliceFabric();
+    ctx.CreateSessionAliceToBob();
+    ctx.CreateSessionBobToAlice();
+}
+
 #endif
 
 // Write Client sends a write request, receives an unexpected message type, sends a status response to that.
@@ -917,6 +968,7 @@ const nlTest sTests[] =
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjectsVersionMismatch", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMismatch),
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         NL_TEST_DEF("TestWriteHandlerReceiveInvalidMessage", chip::app::TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage),
+        NL_TEST_DEF("TestWriteHandlerInvalidateFabric", chip::app::TestWriteInteraction::TestWriteHandlerInvalidateFabric),
 #endif
         NL_TEST_DEF("TestWriteInvalidMessage1", chip::app::TestWriteInteraction::TestWriteInvalidMessage1),
         NL_TEST_DEF("TestWriteInvalidMessage2", chip::app::TestWriteInteraction::TestWriteInvalidMessage2),

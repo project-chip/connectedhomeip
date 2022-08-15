@@ -262,6 +262,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET_ZEPHYR=1",
         "CHIP_DEVICE_LAYER_TARGET=Zephyr",
       ]
+    } else if (chip_device_platform == "beken") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_BEKEN=1",
+        "CHIP_DEVICE_LAYER_TARGET=Beken",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
     }
 
     if (chip_device_config_device_software_version_string != "") {
@@ -431,6 +437,8 @@ if (chip_device_platform != "none") {
       _platform_target = "nxp/mw320"
     } else if (chip_device_platform == "zephyr") {
       _platform_target = "Zephyr"
+    } else if (chip_device_platform == "beken") {
+      _platform_target = "Beken"
     } else {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }

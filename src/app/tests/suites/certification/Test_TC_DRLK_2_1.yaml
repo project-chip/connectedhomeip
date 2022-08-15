@@ -28,7 +28,8 @@ tests:
       PICS: DRLK.S.A0000
       verification: |
           ./chip-tool doorlock read lock-state 1 1
-          On TH, verify the LockState value as 1
+
+          Verify " LockState " on the TH(Chip-tool) Log:
 
           [1654673735.820302][3247:3252] CHIP:DMG:        SuppressResponse = true,
           [1654673735.820328][3247:3252] CHIP:DMG:        InteractionModelRevision = 1
@@ -41,7 +42,9 @@ tests:
       PICS: DRLK.S.A0000
       verification: |
           ./chip-tool doorlock write-by-id 0 2 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+
+          Verify " DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
+
 
           [1653634536.813984][2885:2890] CHIP:DMG:                        StatusIB =
           [1653634536.814041][2885:2890] CHIP:DMG:                        {
@@ -61,7 +64,8 @@ tests:
       PICS: DRLK.S.A0000
       verification: |
           ./chip-tool doorlock read lock-state 1 1
-          On TH, verify the LockState value as 1
+
+          Verify " LockState " on the TH(Chip-tool) Log:
 
           [1654673735.820302][3247:3252] CHIP:DMG:        SuppressResponse = true,
           [1654673735.820328][3247:3252] CHIP:DMG:        InteractionModelRevision = 1
@@ -75,7 +79,7 @@ tests:
       verification: |
           ./chip-tool doorlock lock-door 1 1  --timedInteractionTimeoutMs 1000
 
-          On TH, verify DUT responds with status code as SUCCESS
+          Verify "DUT performs the door lock action" on the TH(Chip-tool) Log:
 
           [1658987280.291023][2735:2740] CHIP:DMG:                                CommandPathIB =
           [1658987280.291057][2735:2740] CHIP:DMG:                                {
@@ -103,7 +107,7 @@ tests:
 
           ./chip-tool doorlock read lock-state 1 1
 
-          On TH, verify the LockState value as 1
+          Verify " LockState " on the TH(Chip-tool) Log:
 
           [1658987339.087658][2748:2753] CHIP:DMG:
           [1658987339.087687][2748:2753] CHIP:DMG:        SuppressResponse = true,
@@ -118,7 +122,7 @@ tests:
       verification: |
           ./chip-tool doorlock  unlock-door 1 1  --timedInteractionTimeoutMs 100
 
-          On TH, verify DUT responds with status code as SUCCESS
+          Verify "DUT performs the door unlock action" on the TH(Chip-tool) Log:
 
           [1658987468.977061][2765:2770] CHIP:DMG:                                CommandPathIB =
           [1658987468.977098][2765:2770] CHIP:DMG:                                {
@@ -144,7 +148,7 @@ tests:
 
           ./chip-tool doorlock read lock-state 1 1
 
-          On TH, verify the LockState value as 2
+          Verify " LockState " on the TH(Chip-tool) Log:
 
           [1658987519.223710][2773:2778] CHIP:DMG:
           [1658987519.223741][2773:2778] CHIP:DMG:        SuppressResponse = true,
@@ -166,7 +170,8 @@ tests:
       PICS: DRLK.S.A0001
       verification: |
           ./chip-tool doorlock read lock-type 1 1
-          On TH, verify the LockType value as 0
+
+          Verify " LockType " on the TH(Chip-tool) Log:
 
           [1654674031.529115][3262:3268] CHIP:DMG:        SuppressResponse = true,
           [1654674031.529142][3262:3268] CHIP:DMG:        InteractionModelRevision = 1
@@ -178,7 +183,8 @@ tests:
     - label: "TH writes LockType attribute as 10"
       verification: |
           ./chip-tool doorlock write-by-id 1 10 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+
+          Verify "DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1653634731.595327][2943:2948] CHIP:DMG:                        StatusIB =
           [1653634731.595374][2943:2948] CHIP:DMG:                        {
@@ -197,7 +203,7 @@ tests:
     - label: "TH reads LockType attribute from DUT"
       verification: |
           ./chip-tool doorlock read lock-type 1 1
-          On TH, verify the LockType value as 0
+          Verify " LockType " on the TH(Chip-tool) Log:
 
           [1654674031.529115][3262:3268] CHIP:DMG:        SuppressResponse = true,
           [1654674031.529142][3262:3268] CHIP:DMG:        InteractionModelRevision = 1
@@ -210,7 +216,7 @@ tests:
       PICS: DRLK.S.A0002
       verification: |
           ./chip-tool doorlock read actuator-enabled 1 1
-          On TH, verify the ActuatorEnabled value as TRUE
+          Verify " ActuatorEnabled " on the TH(Chip-tool) Log:
 
           [1654674122.634081][3275:3280] CHIP:DMG:        SuppressResponse = true,
           [1654674122.634110][3275:3280] CHIP:DMG:        InteractionModelRevision = 1
@@ -222,7 +228,8 @@ tests:
     - label: "TH writes ActuatorEnabled attribute as 0"
       verification: |
           ./chip-tool doorlock write-by-id 2 0 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+
+          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1654674810.194674][3309:3314] CHIP:DMG:                        StatusIB =
           [1654674810.194720][3309:3314] CHIP:DMG:                        {
@@ -237,7 +244,8 @@ tests:
     - label: "TH reads ActuatorEnabled attribute from DUT"
       verification: |
           ./chip-tool doorlock read actuator-enabled 1 1
-          On TH, verify the ActuatorEnabled value as TRUE
+
+          Verify " ActuatorEnabled " on the TH(Chip-tool) Log:
 
           [1654674122.634081][3275:3280] CHIP:DMG:        SuppressResponse = true,
           [1654674122.634110][3275:3280] CHIP:DMG:        InteractionModelRevision = 1
@@ -250,7 +258,8 @@ tests:
       PICS: DRLK.S.F05 && DRLK.S.A0003
       verification: |
           ./chip-tool doorlock read door-state 1 1
-          On TH, verify the DoorState value as 0
+
+          Verify "  DoorState " on the TH(Chip-tool) Log:
 
           [1654674869.818923][3316:3321] CHIP:DMG:        SuppressResponse = true,
           [1654674869.818964][3316:3321] CHIP:DMG:        InteractionModelRevision = 1
@@ -262,7 +271,8 @@ tests:
     - label: "TH writes DoorState attribute as 1"
       verification: |
           ./chip-tool doorlock write-by-id 3 1 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+
+          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1654674934.736017][3324:3330] CHIP:DMG:                        StatusIB =
           [1654674934.736062][3324:3330] CHIP:DMG:                        {
@@ -281,13 +291,14 @@ tests:
     - label: "TH reads DoorState attribute from DUT"
       verification: |
           ./chip-tool doorlock read door-state 1 1
-          On TH, verify the DoorState value as 0
+
+          Verify "  DoorState " on the TH(Chip-tool) Log:
 
           [1654674869.818923][3316:3321] CHIP:DMG:        SuppressResponse = true,
           [1654674869.818964][3316:3321] CHIP:DMG:        InteractionModelRevision = 1
-          [1654674869.819002][3316:3321] CHIP:DMG: }
-          [1654674869.819192][3316:3321] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0003 DataVersion: 3738767914
-          [1654674869.819322][3316:3321] CHIP:TOO:   DoorState: 0
+          [1659354792.817953][18100:18105] CHIP:DMG: }
+          [1659354792.818130][18100:18105] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0003 DataVersion: 1502189726
+          [1659354792.818229][18100:18105] CHIP:TOO:   DoorState: 1
       disabled: true
 
     - label: "TH reads DoorOpenEvents attribute from DUT"
@@ -297,7 +308,7 @@ tests:
 
           ./chip-tool doorlock read door-open-events 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "  DoorOpenEvents " on the TH(Chip-tool) Log:
 
           [1654675019.286903][3337:3342] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1654675019.286939][3337:3342] CHIP:DMG:                                },
@@ -319,7 +330,7 @@ tests:
 
           ./chip-tool doorlock write-by-id 4 10 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify " DUT sends SUCCESS response " on the TH(Chip-tool) Log:
 
           [1653376891.000044][2941:2946] CHIP:DMG:                        }
           [1653376891.000211][2941:2946] CHIP:DMG:
@@ -343,7 +354,7 @@ tests:
 
           ./chip-tool doorlock read door-open-events 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "  DoorOpenEvents " on the TH(Chip-tool) Log:
 
           [1654675019.286903][3337:3342] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1654675019.286939][3337:3342] CHIP:DMG:                                },
@@ -365,7 +376,7 @@ tests:
 
            ./chip-tool doorlock read door-closed-events 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "  DoorClosedEvents " on the TH(Chip-tool) Log:
 
           [1654675103.637778][3346:3351] CHIP:DMG:                                StatusIB =
           [1654675103.637816][3346:3351] CHIP:DMG:                                {
@@ -389,7 +400,7 @@ tests:
 
           ./chip-tool doorlock write-by-id 5 11 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
           [1654675152.592730][3355:3360] CHIP:DMG:                        StatusIB =
           [1654675152.592863][3355:3360] CHIP:DMG:                        {
@@ -410,7 +421,7 @@ tests:
 
           ./chip-tool doorlock read door-closed-events 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "  DoorClosedEvents " on the TH(Chip-tool) Log:
 
           [1654675103.637778][3346:3351] CHIP:DMG:                                StatusIB =
           [1654675103.637816][3346:3351] CHIP:DMG:                                {
@@ -434,7 +445,7 @@ tests:
 
           ./chip-tool doorlock read open-period 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "  OpenPeriod  " on the TH(Chip-tool) Log:
 
           [1653377163.004837][3008:3013] CHIP:DMG:                                StatusIB =
           [1653377163.004887][3008:3013] CHIP:DMG:                                {
@@ -460,7 +471,7 @@ tests:
 
           ./chip-tool doorlock write-by-id 6 2 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
           [1653635643.566677][3165:3170] CHIP:DMG:                        StatusIB =
           [1653635643.566722][3165:3170] CHIP:DMG:                        {
@@ -482,7 +493,7 @@ tests:
 
           ./chip-tool doorlock read open-period 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "  OpenPeriod  " on the TH(Chip-tool) Log:
 
           [1653377163.004837][3008:3013] CHIP:DMG:                                StatusIB =
           [1653377163.004887][3008:3013] CHIP:DMG:                                {
@@ -505,7 +516,8 @@ tests:
       PICS: DRLK.S.F08 && DRLK.S.A0011
       verification: |
           ./chip-tool doorlock read  number-of-total-users-supported 1 1
-          On TH, verify the  NumberOfTotalUsersSupported value as 10
+
+          Verify " NumberOfTotal UsersSupported " on the TH(Chip-tool) Log:
 
           [1654679552.707358][3548:3553] CHIP:DMG:        SuppressResponse = true,
           [1654679552.707396][3548:3553] CHIP:DMG:        InteractionModelRevision = 1
@@ -517,7 +529,8 @@ tests:
     - label: "TH writes NumberOfTotal UsersSupported attribute as 20"
       verification: |
           ./chip-tool doorlock write-by-id 17 20 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+
+          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1653635760.210005][3203:3208] CHIP:DMG:                        StatusIB =
           [1653635760.210051][3203:3208] CHIP:DMG:                        {
@@ -531,7 +544,8 @@ tests:
     - label: "TH reads NumberOfTotal UsersSupported attribute from DUT"
       verification: |
           ./chip-tool doorlock read  number-of-total-users-supported 1 1
-          On TH, verify the  NumberOfTotalUsersSupported value as 10
+
+          Verify " NumberOfTotal UsersSupported " on the TH(Chip-tool) Log:
 
           [1654679552.707358][3548:3553] CHIP:DMG:        SuppressResponse = true,
           [1654679552.707396][3548:3553] CHIP:DMG:        InteractionModelRevision = 1
@@ -544,7 +558,8 @@ tests:
       PICS: DRLK.S.F00 && DRLK.S.A0012
       verification: |
           ./chip-tool doorlock read number-of-pinusers-supported 1 1
-          On TH, verify the NumberOfPINUsersSupported value as 10
+
+          Verify "NumberOfPINUsersSupported " on the TH(Chip-tool) Log:
 
           [1654679648.080728][3557:3562] CHIP:DMG:        SuppressResponse = true,
           [1654679648.080765][3557:3562] CHIP:DMG:        InteractionModelRevision = 1
@@ -556,7 +571,8 @@ tests:
     - label: "TH writes NumberOfPINUsersSupported attribute as 25"
       verification: |
           ./chip-tool doorlock write-by-id 18 25 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+
+          Verify "DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
 
           [1653635935.885575][3265:3270] CHIP:DMG:                        StatusIB =
           [1653635935.885605][3265:3270] CHIP:DMG:                        {
@@ -569,7 +585,8 @@ tests:
     - label: "TH reads NumberOfPINUsersSupported attribute from DUT"
       verification: |
           ./chip-tool doorlock read number-of-pinusers-supported 1 1
-          On TH, verify the NumberOfPINUsersSupported value as 10
+
+          Verify "NumberOfPINUsersSupported " on the TH(Chip-tool) Log:
 
           [1654679648.080728][3557:3562] CHIP:DMG:        SuppressResponse = true,
           [1654679648.080765][3557:3562] CHIP:DMG:        InteractionModelRevision = 1
@@ -582,7 +599,8 @@ tests:
       PICS: DRLK.S.F01 && DRLK.S.A0013
       verification: |
           ./chip-tool doorlock read number-of-rfidusers-supported 1 1
-          On TH, verify the NumberOfRFIDUsersSupported value as 10
+
+          Verify "NumberOfRFID UsersSupported " on the TH(Chip-tool) Log:
 
           [1654679746.726086][3567:3572] CHIP:DMG:        SuppressResponse = true,
           [1654679746.726122][3567:3572] CHIP:DMG:        InteractionModelRevision = 1
@@ -594,7 +612,8 @@ tests:
     - label: "TH writes NumberOfRFID UsersSupported attribute as 30"
       verification: |
           ./chip-tool doorlock write-by-id 19 30 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+
+          Verify "DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
 
           [1653636030.425594][3289:3294] CHIP:DMG:                        StatusIB =
           [1653636030.425635][3289:3294] CHIP:DMG:                        {
@@ -607,7 +626,8 @@ tests:
     - label: "TH reads NumberOfRFID UsersSupported attribute from DUT"
       verification: |
           ./chip-tool doorlock read number-of-rfidusers-supported 1 1
-          On TH, verify the NumberOfRFIDUsersSupported value as 10
+
+          Verify "NumberOfRFID UsersSupported " on the TH(Chip-tool) Log:
 
           [1654679746.726086][3567:3572] CHIP:DMG:        SuppressResponse = true,
           [1654679746.726122][3567:3572] CHIP:DMG:        InteractionModelRevision = 1
@@ -621,7 +641,8 @@ tests:
       PICS: DRLK.S.F04 && DRLK.S.A0014
       verification: |
           ./chip-tool doorlock read  number-of-week-day-schedules-supported-per-user 1 1
-          On TH, verify the NumberOfWeekDaySchedulesSupportedPerUser value as 10
+
+          Verify " NumberOfWeekDaysSchedulesSupporterUser " on the TH(Chip-tool) Log:
 
           [1654679824.730432][3578:3583] CHIP:DMG:        SuppressResponse = true,
           [1654679824.730470][3578:3583] CHIP:DMG:        InteractionModelRevision = 1
@@ -634,7 +655,8 @@ tests:
           "TH writes NumberOfWeekDaySchedules SupportedPerUser attribute as 31"
       verification: |
           ./chip-tool doorlock write-by-id 20 31 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+
+          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1653636148.975037][3319:3324] CHIP:DMG:                        StatusIB =
           [1653636148.975072][3319:3324] CHIP:DMG:                        {
@@ -649,7 +671,8 @@ tests:
           "TH reads NumberOfWeekDaySchedules SupportedPerUser attribute from DUT"
       verification: |
           ./chip-tool doorlock read  number-of-week-day-schedules-supported-per-user 1 1
-          On TH, verify the NumberOfWeekDaySchedulesSupportedPerUser value as 10
+
+          Verify " NumberOfWeekDaysSchedulesSupporterUser " on the TH(Chip-tool) Log:
 
           [1654679824.730432][3578:3583] CHIP:DMG:        SuppressResponse = true,
           [1654679824.730470][3578:3583] CHIP:DMG:        InteractionModelRevision = 1
@@ -660,10 +683,11 @@ tests:
 
     - label:
           "TH reads NumberOfYearDay SchedulesSupportedPeruser attribute from DUT"
-      PICS: DRLK.S.F04 && DRLK.S.A0015
+      PICS: DRLK.S.F10 && DRLK.S.A0015
       verification: |
           ./chip-tool doorlock read number-of-year-day-schedules-supported-per-user 1 1
-          On TH, verify the NumberOfYearDaySchedulesSupportedPerUser value as 10
+
+          Verify " NumberOfYearDaySchedulesSupportedPeruser " on the TH(Chip-tool) Log:
 
 
           [1654679926.699808][3597:3602] CHIP:DMG:        SuppressResponse = true,
@@ -677,7 +701,9 @@ tests:
           "TH writes NumberOfYearDay SchedulesSupportedPerUser attribute as 35"
       verification: |
           ./chip-tool doorlock write-by-id 21 35 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+
+          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
+
           [1653636277.664432][3339:3344] CHIP:DMG:                        StatusIB =
           [1653636277.664473][3339:3344] CHIP:DMG:                        {
           [1653636277.664507][3339:3344] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
@@ -691,7 +717,8 @@ tests:
           "TH reads NumberOfYearDay SchedulesSupportedPerUser attribute from DUT"
       verification: |
           ./chip-tool doorlock read number-of-year-day-schedules-supported-per-user 1 1
-          On TH, verify the NumberOfYearDaySchedulesSupportedPerUser value as 10
+
+          Verify " NumberOfYearDaySchedulesSupportedPeruser " on the TH(Chip-tool) Log:
 
 
           [1654679926.699808][3597:3602] CHIP:DMG:        SuppressResponse = true,
@@ -702,10 +729,11 @@ tests:
       disabled: true
 
     - label: "TH reads NumberOfHoliDay SchedulesSupported attribute from DUT"
-      PICS: DRLK.S.F04 && DRLK.S.A0016
+      PICS: DRLK.S.F11 && DRLK.S.A0016
       verification: |
           ./chip-tool doorlock read number-of-holiday-schedules-supported 1 1
-          On TH, verify the NumberOfHolidaySchedulesSupported value  as 10
+
+          Verify " NumberOfHoliDaySchedulesSupported " on the TH(Chip-tool) Log:
 
           [1654680009.422218][3611:3616] CHIP:DMG:        SuppressResponse = true,
           [1654680009.422246][3611:3616] CHIP:DMG:        InteractionModelRevision = 1
@@ -717,7 +745,7 @@ tests:
     - label: "TH writes NumberOfHoliday SchedulesSupported attribute as 36"
       verification: |
           ./chip-tool doorlock write-by-id 22 36 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+          Verify " DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
 
           [1654680084.923185][3619:3624] CHIP:DMG:                        StatusIB =
           [1654680084.923237][3619:3624] CHIP:DMG:                        {
@@ -733,7 +761,7 @@ tests:
     - label: "TH reads NumberOfHoliday SchedulesSupported attribute from DUT"
       verification: |
           ./chip-tool doorlock read number-of-holiday-schedules-supported 1 1
-          On TH, verify the NumberOfHolidaySchedulesSupported value as 10
+          Verify " NumberOfHoliDaySchedulesSupported " on the TH(Chip-tool) Log:
 
           [1654680009.422218][3611:3616] CHIP:DMG:        SuppressResponse = true,
           [1654680009.422246][3611:3616] CHIP:DMG:        InteractionModelRevision = 1
@@ -746,7 +774,7 @@ tests:
       PICS: DRLK.S.F00 && DRLK.S.A0017
       verification: |
           ./chip-tool doorlock read  max-pincode-length 1 1
-          On TH, verify the MaxPINCodeLength value as 8
+          Verify "  MaxPINCodeLength " on the TH(Chip-tool) Log:
 
           [1654680165.814980][3630:3635] CHIP:DMG:
           [1654680165.815012][3630:3635] CHIP:DMG:        SuppressResponse = true,
@@ -759,7 +787,7 @@ tests:
     - label: "TH writes MaxPINCodeLength attribute as 85"
       verification: |
           ./chip-tool doorlock write-by-id 23 85 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+          Verify " DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
 
           [1653636463.990965][3391:3396] CHIP:DMG:                        StatusIB =
           [1653636463.991004][3391:3396] CHIP:DMG:                        {
@@ -773,7 +801,7 @@ tests:
     - label: "TH reads MaxPINCodeLength attribute from DUT"
       verification: |
           ./chip-tool doorlock read  max-pincode-length 1 1
-          On TH, verify the MaxPINCodeLength value as 8
+          Verify "  MaxPINCodeLength " on the TH(Chip-tool) Log:
 
           [1654680165.814980][3630:3635] CHIP:DMG:
           [1654680165.815012][3630:3635] CHIP:DMG:        SuppressResponse = true,
@@ -787,7 +815,7 @@ tests:
       PICS: DRLK.S.F00 && DRLK.S.A0018
       verification: |
           ./chip-tool doorlock read min-pincode-length 1 1
-          On TH, verify the MinPINCodeLength value as 6
+          Verify "  MinPINCodeLength " on the TH(Chip-tool) Log:
 
           [1654680280.327216][3639:3644] CHIP:DMG:        SuppressResponse = true,
           [1654680280.327241][3639:3644] CHIP:DMG:        InteractionModelRevision = 1
@@ -799,7 +827,7 @@ tests:
     - label: "TH writes MinPINCodeLength attribute as 63"
       verification: |
           ./chip-tool doorlock write-by-id 24 63 1 1
-          On TH, verify DUT responds with status code as(UNSUPPORTED_WRITE)
+          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1653636555.069388][3409:3414] CHIP:DMG:                        StatusIB =
           [1653636555.069431][3409:3414] CHIP:DMG:                        {
@@ -814,7 +842,7 @@ tests:
     - label: "TH reads MinPINCodeLength attribute from DUT"
       verification: |
           ./chip-tool doorlock read min-pincode-length 1 1
-          On TH, verify the MinPINCodeLength value as 6
+          Verify "  MinPINCodeLength " on the TH(Chip-tool) Log:
 
           [1654680280.327216][3639:3644] CHIP:DMG:        SuppressResponse = true,
           [1654680280.327241][3639:3644] CHIP:DMG:        InteractionModelRevision = 1
@@ -827,7 +855,7 @@ tests:
       PICS: DRLK.S.F01 && DRLK.S.A0019
       verification: |
           ./chip-tool doorlock read  max-rfidcode-length 1 1
-          On TH, verify the MaxRFIDCodeLength value as 20
+          Verify "  MaxRFIDCodeLength " on the TH(Chip-tool) Log:
 
           [1654680386.044531][3650:3655] CHIP:DMG:        SuppressResponse = true,
           [1654680386.044564][3650:3655] CHIP:DMG:        InteractionModelRevision = 1
@@ -839,7 +867,7 @@ tests:
     - label: "TH writes MaxRFIDCodeLength attribute as 46"
       verification: |
           ./chip-tool doorlock write-by-id 25 46 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+          Verify " DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
 
           [1653636648.222617][3428:3433] CHIP:DMG:
           [1653636648.222661][3428:3433] CHIP:DMG:                        StatusIB =
@@ -855,7 +883,7 @@ tests:
     - label: "TH reads MaxRFIDCodeLength attribute from DUT"
       verification: |
           ./chip-tool doorlock read  max-rfidcode-length 1 1
-          On TH, verify the MaxRFIDCodeLength value as 20
+          Verify " MaxRFIDCodeLength " on the TH(Chip-tool) Log:
 
           [1654680386.044531][3650:3655] CHIP:DMG:        SuppressResponse = true,
           [1654680386.044564][3650:3655] CHIP:DMG:        InteractionModelRevision = 1
@@ -868,7 +896,7 @@ tests:
       PICS: DRLK.S.F01 && DRLK.S.A001a
       verification: |
           ./chip-tool doorlock read min-rfidcode-length 1 1
-          On TH, verify the MinRFIDCodeLength value as 10
+          Verify " MinRFIDCodeLength " on the TH(Chip-tool) Log:
 
           [1654680510.153261][3668:3673] CHIP:DMG:        SuppressResponse = true,
           [1654680510.153298][3668:3673] CHIP:DMG:        InteractionModelRevision = 1
@@ -880,7 +908,7 @@ tests:
     - label: "TH writes MinRFIDCodeLength attribute as 17"
       verification: |
           ./chip-tool doorlock write-by-id 26 17 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+          Verify "DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
 
           [1654680561.429054][3676:3681] CHIP:DMG:                        StatusIB =
           [1654680561.429096][3676:3681] CHIP:DMG:                        {
@@ -895,7 +923,7 @@ tests:
     - label: "TH reads MinRFIDCodeLength attribute from DUT"
       verification: |
           ./chip-tool doorlock read min-rfidcode-length 1 1
-          On TH, verify the MinRFIDCodeLength value as 10
+          Verify "  MinRFIDCodeLength " on the TH(Chip-tool) Log:
 
           [1654680510.153261][3668:3673] CHIP:DMG:        SuppressResponse = true,
           [1654680510.153298][3668:3673] CHIP:DMG:        InteractionModelRevision = 1
@@ -908,7 +936,8 @@ tests:
       PICS: DRLK.S.F08 && DRLK.S.A001b
       verification: |
           ./chip-tool doorlock read credential-rules-support 1 1
-          On TH, verify the  CredentialRulesSupport value as 1
+
+          Verify " Credential RulesSupport " on the TH(Chip-tool) Log:
 
           [1654680805.922076][3692:3697] CHIP:DMG:        SuppressResponse = true,
           [1654680805.922118][3692:3697] CHIP:DMG:        InteractionModelRevision = 1
@@ -920,7 +949,8 @@ tests:
     - label: "TH writes Credential RulesSupport attribute as bit 0 is set to 1"
       verification: |
           ./chip-tool doorlock write-by-id 27 1 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+
+          Verify "DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1653636825.034667][3467:3472] CHIP:DMG:
           [1653636825.034712][3467:3472] CHIP:DMG:                        StatusIB =
@@ -936,7 +966,8 @@ tests:
     - label: "TH reads Credential RulesSupport attribute from DUT"
       verification: |
           ./chip-tool doorlock read credential-rules-support 1 1
-          On TH, verify the  CredentialRulesSupport value as 1
+
+          Verify " Credential RulesSupport " on the TH(Chip-tool) Log:
 
           [1654680805.922076][3692:3697] CHIP:DMG:        SuppressResponse = true,
           [1654680805.922118][3692:3697] CHIP:DMG:        InteractionModelRevision = 1
@@ -951,7 +982,8 @@ tests:
       PICS: DRLK.S.A0021
       verification: |
           ./chip-tool doorlock read language 1 1
-          On TH, verify the  Language value as en
+
+          Verify " Language " on the TH(Chip-tool) Log:
 
           [1654680885.954478][3700:3705] CHIP:DMG:        SuppressResponse = true,
           [1654680885.954512][3700:3705] CHIP:DMG:        InteractionModelRevision = 1
@@ -963,7 +995,7 @@ tests:
     - label: "TH writes Language attribute as fr"
       verification: |
           ./chip-tool doorlock write language fr 1 1
-          On TH, verify DUT responds with status code as (SUCCESS)
+          Verify "DUT sends SUCCESS response " on the TH(Chip-tool) Log:
 
           [1654680959.481870][3711:3716] CHIP:DMG:                        StatusIB =
           [1654680959.481910][3711:3716] CHIP:DMG:                        {
@@ -981,7 +1013,7 @@ tests:
     - label: "TH reads Language attribute from DUT"
       verification: |
           ./chip-tool doorlock read language 1 1
-          On TH, verify the  Language value as fr
+          Verify " Language " on the TH(Chip-tool) Log:
 
           [1654681045.720848][3721:3726] CHIP:DMG:        SuppressResponse = true,
           [1654681045.720882][3721:3726] CHIP:DMG:        InteractionModelRevision = 1
@@ -999,7 +1031,7 @@ tests:
 
           ./chip-tool doorlock read ledsettings 1  1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify " LEDSettings " on the TH(Chip-tool) Log:
 
           [1654681074.956471][3728:3733] CHIP:DMG:                                StatusIB =
           [1654681074.956514][3728:3733] CHIP:DMG:                                {
@@ -1019,7 +1051,7 @@ tests:
 
           ./chip-tool doorlock write ledsettings 1 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify " DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
 
           [[1653636933.733579][3485:3490] CHIP:DMG:                                StatusIB =
           [1653636933.733614][3485:3490] CHIP:DMG:                                {
@@ -1039,7 +1071,7 @@ tests:
 
           ./chip-tool doorlock read ledsettings 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify " LEDSettings " on the TH(Chip-tool) Log:
 
           [1654681074.956471][3728:3733] CHIP:DMG:                                StatusIB =
           [1654681074.956514][3728:3733] CHIP:DMG:                                {
@@ -1059,7 +1091,7 @@ tests:
       PICS: DRLK.S.A0023
       verification: |
           ./chip-tool doorlock read  auto-relock-time 1 1
-          On TH, verify the  AutoRelockTime value as 60
+          Verify " AutoRelockTime " on the TH(Chip-tool) Log:
 
           [1654681151.469284][3736:3741] CHIP:DMG:        SuppressResponse = true,
           [1654681151.469317][3736:3741] CHIP:DMG:        InteractionModelRevision = 1
@@ -1071,7 +1103,7 @@ tests:
     - label: "TH writes AutoRelockTime attribute as 180 seconds"
       verification: |
           ./chip-tool doorlock write auto-relock-time 180 1 1
-          On TH, verify DUT responds with status code as (SUCCESS)
+          Verify " DUT sends SUCCESS response " on the TH(Chip-tool) Log:
 
           [1654681228.902110][3744:3749] CHIP:DMG:                        StatusIB =
           [1654681228.902166][3744:3749] CHIP:DMG:                        {
@@ -1089,7 +1121,7 @@ tests:
     - label: "TH reads AutoRelockTime attribute from DUT"
       verification: |
           ./chip-tool doorlock read  auto-relock-time 1 1
-          On TH, verify the  AutoRelockTime value as 180
+          Verify " AutoRelockTime " on the TH(Chip-tool) Log:
 
           [1654681283.157135][3754:3759] CHIP:DMG:        SuppressResponse = true,
           [1654681283.157160][3754:3759] CHIP:DMG:        InteractionModelRevision = 1
@@ -1104,7 +1136,7 @@ tests:
       PICS: DRLK.S.A0024
       verification: |
           ./chip-tool doorlock read sound-volume 1 1
-          On TH, verify the  SoundVolume value as 0
+          Verify " SoundVolume " on the TH(Chip-tool) Log:
 
           [1654681357.022476][3768:3773] CHIP:DMG:        SuppressResponse = true,
           [1654681357.022511][3768:3773] CHIP:DMG:        InteractionModelRevision = 1
@@ -1116,7 +1148,7 @@ tests:
     - label: "TH writes SoundVolume attribute as 3"
       verification: |
           ./chip-tool doorlock write sound-volume 3 1 1
-          On TH, verify DUT responds with status code as (SUCCESS)
+          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
           [1654681412.367916][3782:3787] CHIP:DMG:                        StatusIB =
           [1654681412.367963][3782:3787] CHIP:DMG:                        {
@@ -1131,7 +1163,7 @@ tests:
     - label: "TH reads SoundVolume attribute from DUT"
       verification: |
           ./chip-tool doorlock read sound-volume 1 1
-          On TH, verify the  SoundVolume value as 3
+          Verify " SoundVolume " on the TH(Chip-tool) Log:
 
           [1654681449.086921][3789:3794] CHIP:DMG:        SuppressResponse = true,
           [1654681449.086958][3789:3794] CHIP:DMG:        InteractionModelRevision = 1
@@ -1144,7 +1176,7 @@ tests:
       PICS: DRLK.S.A0026
       verification: |
           ./chip-tool doorlock read supported-operating-modes 1 1
-          On TH, verify the  SupportedOperatingModes value as 65526
+          Verify " SupportedOperatingModes " on the TH(Chip-tool) Log:
 
           [1654681500.464948][3797:3802] CHIP:DMG:        SuppressResponse = true,
           [1654681500.464974][3797:3802] CHIP:DMG:        InteractionModelRevision = 1
@@ -1156,7 +1188,7 @@ tests:
     - label: "TH writes Supported OperatingModes attribute as bit 0 is set to 0"
       verification: |
           ./chip-tool doorlock write-by-id 38 0 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1653637108.039160][3522:3527] CHIP:DMG:                        StatusIB =
           [1653637108.039205][3522:3527] CHIP:DMG:                        {
@@ -1171,7 +1203,7 @@ tests:
     - label: "TH reads Supported OperatingModes attribute from DUT"
       verification: |
           ./chip-tool doorlock read supported-operating-modes 1 1
-          On TH, verify the  SupportedOperatingModes value as 65526
+          Verify " SupportedOperatingModes " on the TH(Chip-tool) Log:
 
           [1654681500.464948][3797:3802] CHIP:DMG:        SuppressResponse = true,
           [1654681500.464974][3797:3802] CHIP:DMG:        InteractionModelRevision = 1
@@ -1186,7 +1218,7 @@ tests:
       PICS: DRLK.S.A0025
       verification: |
           ./chip-tool doorlock read operating-mode 1 1
-          On TH, verify the  OperatingMode value as 0
+          Verify "OperatingMode " on the TH(Chip-tool) Log:
 
 
           [1654681628.413702][3817:3822] CHIP:DMG:        SuppressResponse = true,
@@ -1201,7 +1233,7 @@ tests:
           value is present in SupportedOperatingModes"
       verification: |
           ./chip-tool doorlock write operating-mode 0 1 1
-          On TH, verify DUT responds with status code as (SUCCESS)
+          Verify "DUT sends SUCCESS response " on the TH(Chip-tool) Log:
 
           [1654681685.239429][3833:3838] CHIP:DMG:                        StatusIB =
           [1654681685.239464][3833:3838] CHIP:DMG:                        {
@@ -1219,7 +1251,7 @@ tests:
           and the new value is present in Supported OperatingModes"
       verification: |
           ./chip-tool doorlock write operating-mode 3 1 1
-          On TH, verify DUT responds with status code as (SUCCESS)
+          Verify "OperatingMode response " on the TH(Chip-tool) Log:
 
 
           [1654681685.239429][3833:3838] CHIP:DMG:                        StatusIB =
@@ -1236,7 +1268,7 @@ tests:
     - label: "TH reads OperatingMode attribute from DUT"
       verification: |
           ./chip-tool doorlock read operating-mode 1 1
-          On TH, verify the  OperatingMode value as 3
+          Verify "OperatingMode " on the TH(Chip-tool) Log:
 
           [1654681926.819078][3864:3870] CHIP:DMG:        SuppressResponse = true,
           [1654681926.819124][3864:3870] CHIP:DMG:        InteractionModelRevision = 1
@@ -1252,7 +1284,7 @@ tests:
 
           ./chip-tool doorlock read default-configuration-register 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "Default ConfigurationRegister " on the TH(Chip-tool) Log:
 
           [1654682006.877169][3876:3881] CHIP:DMG:                                StatusIB =
           [1654682006.877222][3876:3881] CHIP:DMG:                                {
@@ -1277,7 +1309,7 @@ tests:
 
           ./chip-tool doorlock write-by-id 39 1 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
 
           [1653637348.333879][3570:3575] CHIP:DMG:                        StatusIB =
           [1653637348.333920][3570:3575] CHIP:DMG:                        {
@@ -1295,7 +1327,7 @@ tests:
 
           ./chip-tool doorlock read default-configuration-register 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "Default ConfigurationRegister " on the TH(Chip-tool) Log:
 
           [1654682006.877169][3876:3881] CHIP:DMG:                                StatusIB =
           [1654682006.877222][3876:3881] CHIP:DMG:                                {
@@ -1321,7 +1353,7 @@ tests:
 
           ./chip-tool doorlock read enable-local-programming 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "EnableLocalProgramming " on the TH(Chip-tool) Log:
 
           [1654682107.524282][3886:3891] CHIP:DMG:                                {
           [1654682107.524320][3886:3891] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
@@ -1338,9 +1370,9 @@ tests:
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write enable-local-programming 0 1 1
+          ./chip-tool doorlock write 40 0 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1653637444.331118][3599:3604] CHIP:DMG:                        StatusIB =
           [1653637444.331165][3599:3604] CHIP:DMG:                        {
@@ -1359,7 +1391,7 @@ tests:
 
           ./chip-tool doorlock read enable-local-programming 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "EnableLocalProgramming " on the TH(Chip-tool) Log:
 
           [1654682107.524282][3886:3891] CHIP:DMG:                                {
           [1654682107.524320][3886:3891] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
@@ -1376,7 +1408,8 @@ tests:
       PICS: DRLK.S.A0029
       verification: |
           ./chip-tool doorlock read enable-one-touch-locking 1 1
-          On TH, verify the EnableOneTouchLocking value as FALSE
+
+          Verify "EnableOneTouchLocking " on the TH(Chip-tool) Log:
 
           [1654682200.857783][3895:3900] CHIP:DMG:        SuppressResponse = true,
           [1654682200.857809][3895:3900] CHIP:DMG:        InteractionModelRevision = 1
@@ -1389,7 +1422,7 @@ tests:
       PICS: DRLK.S.A0029
       verification: |
           ./chip-tool doorlock write enable-one-touch-locking 1 1 1
-          On TH, verify DUT responds with status code as (SUCCESS)
+          Verify "DUT send the success response" on the TH(Chip-tool) Log:
 
           [1654682241.954790][3903:3908] CHIP:DMG:                        StatusIB =
           [1654682241.954869][3903:3908] CHIP:DMG:                        {
@@ -1405,7 +1438,7 @@ tests:
     - label: "TH reads EnableOneTouchLocking attribute from DUT"
       verification: |
           ./chip-tool doorlock read enable-one-touch-locking 1 1
-          On TH, verify the EnableOneTouchLocking value as TRUE
+          Verify "EnableOneTouchLocking " on the TH(Chip-tool) Log:
 
           [1654682289.946247][3914:3919] CHIP:DMG:        SuppressResponse = true,
           [1654682289.946294][3914:3919] CHIP:DMG:        InteractionModelRevision = 1
@@ -1421,7 +1454,7 @@ tests:
 
           ./chip-tool doorlock read enable-inside-status-led 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "EnableInsideStatusLED" on the TH(Chip-tool) Log:
 
           [1654682333.059815][3921:3926] CHIP:DMG:                                StatusIB =
           [1654682333.059848][3921:3926] CHIP:DMG:                                {
@@ -1443,7 +1476,7 @@ tests:
 
           ./chip-tool doorlock write-by-id 42 1 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "DUT send the success response" on the TH(Chip-tool) Log:
 
           [1653386385.348368][3801:3806] CHIP:DMG:                        StatusIB =
           [1653386385.348419][3801:3806] CHIP:DMG:                        {
@@ -1461,7 +1494,7 @@ tests:
 
           ./chip-tool doorlock read enable-inside-status-led 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "EnableInsideStatusLED" on the TH(Chip-tool) Log:
 
           [1654682333.059815][3921:3926] CHIP:DMG:                                StatusIB =
           [1654682333.059848][3921:3926] CHIP:DMG:                                {
@@ -1481,7 +1514,7 @@ tests:
       verification: |
           ./chip-tool doorlock read enable-privacy-mode-button 1 1
 
-          On TH, verify the  EnablePrivacyModeButton value as FALSE
+          Verify " EnablePrivacyModeButton" on the TH(Chip-tool) Log:
 
           [1654682475.460532][3931:3936] CHIP:DMG:        SuppressResponse = true,
           [1654682475.460586][3931:3936] CHIP:DMG:        InteractionModelRevision = 1
@@ -1494,7 +1527,8 @@ tests:
       PICS: DRLK.S.A002b
       verification: |
           ./chip-tool doorlock write enable-privacy-mode-button 1 1 1
-          On TH, verify DUT responds with status code as (SUCCESS)
+
+          Verify " DUT send the success response" on the TH(Chip-tool) Log:
 
           [1654682528.961800][3939:3944] CHIP:DMG:                        StatusIB =
           [1654682528.961832][3939:3944] CHIP:DMG:                        {
@@ -1511,7 +1545,8 @@ tests:
     - label: "TH reads EnablePrivacyModeButton attribute from DUT"
       verification: |
           ./chip-tool doorlock read enable-privacy-mode-button 1 1
-          On TH, verify the  EnablePrivacyModeButton value as TRUE
+
+          Verify " EnablePrivacyModeButton" on the TH(Chip-tool) Log:
 
           [1654682565.141153][3948:3953] CHIP:DMG:        SuppressResponse = true,
           [1654682565.141195][3948:3953] CHIP:DMG:        InteractionModelRevision = 1
@@ -1529,7 +1564,7 @@ tests:
 
           ./chip-tool doorlock read local-programming-features 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "  LocalProgrammingFeatures" on the TH(Chip-tool) Log:
 
           [1658987637.292491][2794:2799] CHIP:DMG:                                StatusIB =
           [1658987637.292530][2794:2799] CHIP:DMG:                                {
@@ -1549,13 +1584,13 @@ tests:
       disabled: true
 
     - label: "TH reads LocalProgrammingFeatures attribute from DUT"
-      PICS: DRLK.S.A002c && DRLK.S.A0028
+      PICS: DRLK.S.A002c && DRLK.S.A0028 && DRLK.S.A002c
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read local-programming-features 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "  LocalProgrammingFeatures" on the TH(Chip-tool) Log:
 
           [1658987637.292491][2794:2799] CHIP:DMG:                                StatusIB =
           [1658987637.292530][2794:2799] CHIP:DMG:                                {
@@ -1583,7 +1618,7 @@ tests:
 
           ./chip-tool doorlock write-by-id 44 0 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "  LocalProgrammingFeatures" on the TH(Chip-tool) Log:
 
           [1658987893.199449][2822:2827] CHIP:DMG:                        StatusIB =
           [1658987893.199501][2822:2827] CHIP:DMG:                        {
@@ -1607,7 +1642,7 @@ tests:
 
           ./chip-tool doorlock write enable-local-programming 0 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify " EnableLocalProgramming" on the TH(Chip-tool) Log:
 
           [1658988052.124227][2834:2839] CHIP:DMG:                        StatusIB =
           [1658988052.124259][2834:2839] CHIP:DMG:                        {
@@ -1627,7 +1662,7 @@ tests:
 
           ./chip-tool doorlock read local-programming-features 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "  LocalProgrammingFeatures" on the TH(Chip-tool) Log:
 
           [1658987637.292491][2794:2799] CHIP:DMG:                                StatusIB =
           [1658987637.292530][2794:2799] CHIP:DMG:                                {
@@ -1653,7 +1688,7 @@ tests:
 
           ./chip-tool doorlock write enable-local-programming 1 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify " EnableLocalProgramming" on the TH(Chip-tool) Log:
 
           [1658988136.125747][2845:2850] CHIP:DMG:                        StatusIB =
           [1658988136.125781][2845:2850] CHIP:DMG:                        {
@@ -1674,7 +1709,7 @@ tests:
 
           ./chip-tool doorlock read local-programming-features 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "  LocalProgrammingFeatures" on the TH(Chip-tool) Log:
 
           [1658987637.292491][2794:2799] CHIP:DMG:                                StatusIB =
           [1658987637.292530][2794:2799] CHIP:DMG:                                {
@@ -1702,7 +1737,7 @@ tests:
 
           ./chip-tool doorlock write-by-id 44 2 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "  DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
           [1658988308.728071][2866:2871] CHIP:DMG:                        StatusIB =
           [1658988308.728110][2866:2871] CHIP:DMG:                        {
@@ -1728,7 +1763,7 @@ tests:
 
           ./chip-tool doorlock write-by-id 44 3 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify " DUT sends an UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1658988387.295252][2874:2879] CHIP:DMG:                        StatusIB =
           [1658988387.295294][2874:2879] CHIP:DMG:                        {
@@ -1751,7 +1786,8 @@ tests:
       PICS: DRLK.S.F00 || DRLK.S.F01 && DRLK.S.A0030
       verification: |
           ./chip-tool doorlock read   wrong-code-entry-limit 1 1
-          On TH, verify the WrongCodeEntryLimit value as 3
+
+          Verify " WrongCodeEntry Limit" on the TH(Chip-tool) Log:
 
           [1654682697.191640][3970:3975] CHIP:DMG:        SuppressResponse = true,
           [1654682697.191686][3970:3975] CHIP:DMG:        InteractionModelRevision = 1
@@ -1763,7 +1799,8 @@ tests:
     - label: "TH writes WrongCodeEntryLimit attribute as 8"
       verification: |
           ./chip-tool doorlock write wrong-code-entry-limit 8 1 1
-          On TH, verify DUT responds with status code as (SUCCESS)
+
+          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
           [1654682751.960343][3981:3987] CHIP:DMG:                        StatusIB =
           [1654682751.960389][3981:3987] CHIP:DMG:                        {
@@ -1779,7 +1816,8 @@ tests:
     - label: "TH reads WrongCode EntryLimit attribute"
       verification: |
           ./chip-tool doorlock read   wrong-code-entry-limit 1 1
-          On TH, verify the WrongCodeEntryLimit value as 8
+
+          Verify " WrongCodeEntry Limit" on the TH(Chip-tool) Log:
 
           [1654682801.226369][3989:3994] CHIP:DMG:        SuppressResponse = true,
           [1654682801.226394][3989:3994] CHIP:DMG:        InteractionModelRevision = 1
@@ -1795,7 +1833,7 @@ tests:
       verification: |
           ./chip-tool doorlock read user-code-temporary-disable-time 1 1
 
-          On TH, verify the UserCodeTemporaryDisableTime value as 10
+          Verify " UserCodeTemporary Disable" on the TH(Chip-tool) Log:
 
           [1654682846.758616][3996:4001] CHIP:DMG:        SuppressResponse = true,
           [1654682846.758658][3996:4001] CHIP:DMG:        InteractionModelRevision = 1
@@ -1807,7 +1845,8 @@ tests:
     - label: "TH writes UserCodeTemporaryDisableTime attribute as 120"
       verification: |
           ./chip-tool doorlock write user-code-temporary-disable-time 120 1 1
-          On TH, verify DUT responds with status code as (SUCCESS)
+
+          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
           [1654682895.502869][4011:4016] CHIP:DMG:                        StatusIB =
           [1654682895.502946][4011:4016] CHIP:DMG:                        {
@@ -1824,7 +1863,8 @@ tests:
     - label: "TH reads UserCodeTemporary DisableTime attribute"
       verification: |
           ./chip-tool doorlock read user-code-temporary-disable-time 1 1
-          On TH, verify the UserCodeTemporaryDisableTime value as 120
+
+          Verify " UserCodeTemporary Disable" on the TH(Chip-tool) Log:
 
           [1654682975.285821][4032:4037] CHIP:DMG:        SuppressResponse = true,
           [1654682975.285867][4032:4037] CHIP:DMG:        InteractionModelRevision = 1
@@ -1837,7 +1877,8 @@ tests:
       PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033
       verification: |
           ./chip-tool doorlock read require-pinfor-remote-operation 1 1
-          On TH, verify the RequirePINforRemoteOperation value as FALSE
+
+          Verify " RequirePINfor RemoteOperation" on the TH(Chip-tool) Log:
 
           [1656335145.428166][4073:4078] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0033 DataVersion: 542587181
           [1656335145.428293][4073:4078] CHIP:TOO:   RequirePINforRemoteOperation: FALSE
@@ -1847,7 +1888,7 @@ tests:
     - label: "TH writes RequirePINfor RemoteOperation attribute as true"
       verification: |
           ./chip-tool doorlock write require-pinfor-remote-operation 1 1 1
-          On TH, verify DUT responds with status code as (SUCCESS)
+          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
           [1655211439.627206][18643:18648] CHIP:DMG: ReportDataMessage =
           [1655211439.627269][18643:18648] CHIP:DMG: {
@@ -1884,7 +1925,7 @@ tests:
       verification: |
           ./chip-tool doorlock read require-pinfor-remote-operation 1 1
 
-          On TH, verify the RequirePINforRemoteOperation value as TRUE
+          Verify " RequirePINfor RemoteOperation" on the TH(Chip-tool) Log:
 
           [1656335583.516419][4104:4109] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0033 DataVersion: 542587182
           [1656335583.516511][4104:4109] CHIP:TOO:   RequirePINforRemoteOperation: TRUE
@@ -1900,7 +1941,7 @@ tests:
 
           ./chip-tool doorlock read expiring-user-timeout 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify " ExpiringUserTimeOut" on the TH(Chip-tool) Log:
 
           [1654683235.889077][4073:4078] CHIP:DMG:                                StatusIB =
           [1654683235.889118][4073:4078] CHIP:DMG:                                {
@@ -1920,7 +1961,7 @@ tests:
 
           ./chip-tool doorlock write-by-id 53 10 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify "DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1653386652.024354][3831:3836] CHIP:DMG:                        StatusIB =
           [1653386652.024390][3831:3836] CHIP:DMG:                        {
@@ -1938,7 +1979,7 @@ tests:
 
            ./chip-tool doorlock read expiring-user-timeout 1 1
 
-          On TH, verify DUT responds with status code as(UNSUPPORTED_ATTRIBUTE)
+          Verify " ExpiringUserTimeOut" on the TH(Chip-tool) Log:
 
           [1654683235.889077][4073:4078] CHIP:DMG:                                StatusIB =
           [1654683235.889118][4073:4078] CHIP:DMG:                                {
@@ -1957,7 +1998,7 @@ tests:
       verification: |
           ./chip-tool doorlock read number-of-credentials-supported-per-user 1 1
 
-          On TH, verify the  NumberOfCredentialsSupportedPerUseron value as 5
+          Verify " NumberOfCredentials SupportedPerUser" on the TH(Chip-tool) Log:
 
           [1654683489.274961][4132:4137] CHIP:DMG:        SuppressResponse = true,
           [1654683489.275002][4132:4137] CHIP:DMG:        InteractionModelRevision = 1
@@ -1969,7 +2010,7 @@ tests:
     - label: "TH writes NumberOfCredentials SupportedPerUser attribute as 85"
       verification: |
           ./chip-tool doorlock  write-by-id 28 10 1 1
-          On TH, verify DUT responds with status code as (UNSUPPORTED_WRITE)
+          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1654683627.680196][4148:4153] CHIP:DMG:                        StatusIB =
           [1654683627.680252][4148:4153] CHIP:DMG:                        {
@@ -1986,7 +2027,7 @@ tests:
     - label: "TH reads NumberOfCredentials SupportedPerUser attribute from DUT"
       verification: |
           ./chip-tool doorlock read number-of-credentials-supported-per-user 1 1
-          On TH, verify the  NumberOfCredentialsSupportedPerUseron value  as 5
+          Verify " NumberOfCredentials SupportedPerUser" on the TH(Chip-tool) Log:
 
           [1654683489.274961][4132:4137] CHIP:DMG:        SuppressResponse = true,
           [1654683489.275002][4132:4137] CHIP:DMG:        InteractionModelRevision = 1

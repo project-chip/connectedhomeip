@@ -39,6 +39,7 @@ IGNORE: Set[str] = {
     '/darwin/',
     '/platform/Ameba/',
     '/platform/android/',
+    '/platform/Beken/',
     '/platform/CYW30739/',
     '/platform/Darwin/',
     '/platform/EFR32/',

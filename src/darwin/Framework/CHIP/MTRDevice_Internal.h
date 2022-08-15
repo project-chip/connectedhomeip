@@ -27,19 +27,14 @@ NS_ASSUME_NONNULL_BEGIN
 typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 
 @interface MTRDevice ()
-- (instancetype)initWithDeviceID:(uint64_t)deviceID
-                deviceController:(MTRDeviceController *)deviceController
-                           queue:(dispatch_queue_t)queue;
-
-// Called to run commands with a live underlying connection
-- (void)connectAndPerformAsync:(MTRDevicePerformAsyncBlock)asyncBlock;
+- (instancetype)initWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController;
 
 // Called from MTRClusters for writes and commands
 - (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
 
 @property (nonatomic, readonly, strong, nonnull) MTRDeviceController * deviceController;
-@property (nonatomic, readonly) uint64_t deviceID;
+@property (nonatomic, readonly) uint64_t nodeID;
 
 @end
 

@@ -35,7 +35,7 @@ tests:
       verification: |
           ./chip-tool  operationalcredentials read current-fabric-index 1 0
 
-          On TH, Verify DUT Responds  to CurrentFabricIndex attribute of operationalCredential cluster  as 1
+          On TH(Chiptool), verify  CurrentFabricIndex attribute of operationalCredential cluster  as 1
 
           [1657283596.149202][2284:2289] CHIP:DMG:                                {
           [1657283596.149247][2284:2289] CHIP:DMG:                                        Endpoint = 0x0,
@@ -67,8 +67,8 @@ tests:
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
 
+          On TH(Chiptool), Verify  AccessControl cluster AccessControlExtensionChanged event value is an empty list
 
-          Verify in TH log:
           848.856174][2311:2316] CHIP:EM: Removed CHIP MessageCounter:265690133 from RetransTable on exchange 23190i
           [1657283848.856239][2311:2316] CHIP:DMG: ReportDataMessage =
           [1657283848.856278][2311:2316] CHIP:DMG: {
@@ -87,7 +87,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"1718"}]" 1 0
-          Verify in TH log:
+          On TH(Chiptool), Verify  AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element
 
           217.510779][2371:2376] CHIP:DMG:                        AttributePathIB =
           [1657284217.510818][2371:2376] CHIP:DMG:                        {
@@ -135,7 +135,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
-          Verify in TH log:
+          On TH(Chiptool), Verify  AccessControlExtensionChanged containing 1 element
 
           [1657618132.685459][8992:8998] CHIP:DMG:
           [1657618132.685495][8992:8998] CHIP:DMG:        SuppressResponse = true,
@@ -165,7 +165,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
-          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element
+          On TH(Chiptool) , Verify   Successfully extension attribute list containg one element
           7284747.131523][2411:2416] CHIP:DMG:                        StatusIB =
           [1657284747.131568][2411:2416] CHIP:DMG:                        {
           [1657284747.131618][2411:2416] CHIP:DMG:                                status = 0x00 (SUCCESS),
@@ -205,7 +205,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
-          On TH , Verify DUT  Responds  Successfully to extension attribute with a value is list of AccessControlExtensionChanged containing at least 2 new elements
+          On TH(Chiptool) , Verify  AccessControlExtensionChanged containing at least 2 new elements.
 
 
           [1657618237.140162][9007:9012] CHIP:DMG: }
@@ -262,7 +262,7 @@ tests:
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"}]" 1 0
 
-          On TH , Verify DUT  Responds  Successfully to extension attribute .
+          On TH(Chiptool) , Verify AccessControl cluster Extension attribute value is list of AccessControlExtensionStruct containing 1 element Data, exceeds maximum length.
 
           1657287642.551842][9699:9704] CHIP:DMG: WriteResponseMessage =
           [1657287642.551872][9699:9704] CHIP:DMG: {
@@ -317,7 +317,7 @@ tests:
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
 
-          On TH , Verify DUT  Responds  Successfully
+          On TH(Chiptool) , Verify AccessControl cluster AccessControlExtensionChanged containing at least 1 new element, and MUST NOT contain an added event for the extension with data that is too large
 
           [1657618374.299423][9024:9029] CHIP:DMG: }
           [1657618374.299739][9024:9029] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
@@ -388,7 +388,7 @@ tests:
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"1718"},{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
 
-          On TH , Verify DUT  Responds  Successfully to extension attribute
+          On TH(Chiptool) , Verify AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 2 elements Returns 0x87 (CONSTRAINT_ERROR)-as there are more than 1 entry
 
 
           1657289068.797364][9823:9828] CHIP:DMG: WriteResponseMessage =
@@ -460,8 +460,8 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
-          On TH , Verify DUT  Responds  Successfully
-
+          On TH(Chiptool) , Verify AccessControl cluster AccessControlExtensionChanged event
+          containing at least 1 new element, and MUST NOT contain an added event for the second extension
           [1657618501.560311][9050:9055] CHIP:DMG: }
           [1657618501.560653][9050:9055] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
           [1657618501.560682][9050:9055] CHIP:TOO:         Event number: 86
@@ -570,7 +570,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool accesscontrol write extension "[]" 1 0
-          On TH , Verify DUT  Responds  Successfully
+          On TH(Chiptool) , Verify  AccessControl cluster Extension attribute, value is an empty list
 
           7625][1521:1526] CHIP:DMG:                AttributeStatusIB =
           [1657692723.227673][1521:1526] CHIP:DMG:                {
@@ -604,7 +604,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
-          On TH , Verify DUT  Responds  Successfully
+          On TH(Chiptool) , Verify  AccessControl cluster AccessControlExtensionChanged event containing at least 1 new element
 
           [1657618604.091599][9063:9068] CHIP:DMG: }
           [1657618604.091929][9063:9068] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001

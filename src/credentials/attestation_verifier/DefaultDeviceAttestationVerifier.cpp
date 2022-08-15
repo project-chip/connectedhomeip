@@ -230,12 +230,6 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
                  attestationError = AttestationVerificationResult::kDacExpired);
 #endif
 
-    VerifyOrExit(IsCertificateValidAtIssuance(info.dacDerBuffer, info.paiDerBuffer) == CHIP_NO_ERROR,
-                 attestationError = AttestationVerificationResult::kPaiExpired);
-
-    VerifyOrExit(IsCertificateValidAtIssuance(info.dacDerBuffer, paaDerBuffer) == CHIP_NO_ERROR,
-                 attestationError = AttestationVerificationResult::kPaaExpired);
-
     CertificateChainValidationResult chainValidationResult;
     VerifyOrExit(ValidateCertificateChain(paaDerBuffer.data(), paaDerBuffer.size(), info.paiDerBuffer.data(),
                                           info.paiDerBuffer.size(), info.dacDerBuffer.data(), info.dacDerBuffer.size(),

@@ -37,7 +37,7 @@ tests:
       PICS: ACL.S.A0000
       verification: |
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 4, "authMode": 2, "subjects": [112233], "targets": null}]" 1 0
-          On TH, VERIFY DUT Responds Successfully.
+          On TH(Chiptool), verify AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element
 
           [1656589077.991761][3452:3457] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1656589077.991838][3452:3457] CHIP:DMG: WriteResponseMessage =
@@ -90,7 +90,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read acl 1 0
 
-          On TH, VERIFY DUT Responds Successfully.
+          On TH(Chiptool), verify AccessControl cluster ACL attribute Returns UNSUPPORTED_ACCESS (0x7e)
           [1656589294.730359][3469:3474] CHIP:DMG: ReportDataMessage =
           [1656589294.730409][3469:3474] CHIP:DMG: {
           [1656589294.730449][3469:3474] CHIP:DMG:        AttributeReportIBs =
@@ -133,7 +133,7 @@ tests:
       PICS: ACL.S.A0000
       verification: |
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}]" 1 0
-          On TH, VERIFY DUT Responds Successfully.
+          On TH(Chiptool), verify  AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element Returns Unsupported Access
 
           [1656589843.696435][3518:3523] CHIP:DMG: WriteResponseMessage =
           [1656589843.696471][3518:3523] CHIP:DMG: {
@@ -186,7 +186,7 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol read  extension 1 0
-          On TH, VERIFY DUT Responds Successfully.
+          On TH(Chiptool), verify  AccessControl cluster Extension attribute Returns UNSUPPORTED_ACCESS (0x7e)
           [1656590048.181895][3536:3541] CHIP:DMG: ReportDataMessage =
           [1656590048.181938][3536:3541] CHIP:DMG: {
           [1656590048.181973][3536:3541] CHIP:DMG:        AttributeReportIBs =
@@ -226,8 +226,8 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol write extension [] 1 0
-          On TH , Verify DUT  Responds  Successfully with  extension attribute value is an empty list.
-
+          On TH(Chiptool) , Verify the  Successfully with  extension attribute value is an empty list Returns
+          UNSUPPORTED_ACCESS (0x7e)
           [1656592607.144276][3897:3903] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1656592607.144341][3897:3903] CHIP:DMG: WriteResponseMessage =
           [1656592607.144378][3897:3903] CHIP:DMG: {
@@ -254,7 +254,7 @@ tests:
       PICS: ACL.S.A0002
       verification: |
           ./chip-tool accesscontrol read subjects-per-access-control-entry 1 0
-          On TH, verify DUT responds with value 4 or greater as  subjects-per-access-control-entry.
+          On TH(Chiptool), verify with value 4 or greater as  subjects-per-access-control-entry.
 
           [1656592739.107798][3916:3921] CHIP:DMG: ReportDataMessage =
           [1656592739.107828][3916:3921] CHIP:DMG: {
@@ -293,7 +293,7 @@ tests:
       PICS: ACL.S.A0003
       verification: |
           ./chip-tool accesscontrol read targets-per-access-control-entry 1 0
-          On TH, verify DUT responds with value 3 or greater as   TargetsPerAccessControlEntry
+          On TH(Chiptool), verify with value 3 or greater as   TargetsPerAccessControlEntry
           [1656593266.074720][3943:3948] CHIP:DMG: ReportDataMessage =
           [1656593266.074748][3943:3948] CHIP:DMG: {
           [1656593266.074769][3943:3948] CHIP:DMG:        AttributeReportIBs =
@@ -332,7 +332,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read access-control-entries-per-fabric 1 0
 
-          On TH, verify DUT responds with value 3  or greater as AccessControlEntriesPerFabric.
+          On TH(Chiptool), verify with value 3  or greater as AccessControlEntriesPerFabric.
           [1656593406.902865][3956:3961] CHIP:DMG: ReportDataMessage =
           [1656593406.902902][3956:3961] CHIP:DMG: {
           [1656593406.902931][3956:3961] CHIP:DMG:        AttributeReportIBs =
@@ -370,9 +370,8 @@ tests:
           AccessControlEntryChanged event"
       PICS: ACL.S.E00
       verification: |
-          ./chip-tool accesscontrol read-event access-control-entry-changed 1 0
-          Verify in TH log
-
+          ./chip-tool accesscontrol read-event access-control-entry-changed 1
+          On TH(Chiptool), Verify  AccessControl cluster AccessControlEntryChanged event Returns UNSUPPORTED_ACCESS (0x7e)
           [1656593588.305232][3979:3984] CHIP:DMG:                                },
           [1656593588.305269][3979:3984] CHIP:DMG:
           [1656593588.305299][3979:3984] CHIP:DMG:                                StatusIB =
@@ -401,7 +400,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool accesscontrol read-event  access-control-extension-changed 1 0
-          On TH, verify DUT Responds S uccessfully
+          On TH(Chiptool), verify AccessControl cluster AccessControlExtensionChanged event Returns UNSUPPORTED_ACCESS (0x7e)
           [1656593726.387025][3990:3995] CHIP:DMG:
           [1656593726.387048][3990:3995] CHIP:DMG:                EventReportIB =
           [1656593726.387078][3990:3995] CHIP:DMG:                {

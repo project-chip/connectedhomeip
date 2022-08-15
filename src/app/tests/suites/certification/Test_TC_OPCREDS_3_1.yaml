@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    12.3.1. [TC-OPCREDS-3.1] Attribute-NOCs, TrustedRootCertificates list
+    3.2.1. [TC-OPCREDS-3.1] Attribute-NOCs, TrustedRootCertificates list
     validation [DUT-Server]
 
 PICS:
@@ -31,6 +31,12 @@ tests:
           the following steps)"
       PICS: OPCREDS.S.A0000
       verification: |
+          On both DUT and TH side
+          sudo rm -rf /tmp/chip_*
+      disabled: true
+
+    - label: "Start the commissioning process of DUT by TH1 on a first Fabric"
+      verification: |
           DUT side:
           sudo ./chip-all-clusters-app --wifi
 
@@ -40,24 +46,27 @@ tests:
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
 
-    - label: "Start the commissioning process of DUT by TH1 on a first Fabric"
-      verification: |
-          ./chip-tool generalcommissioning arm-fail-safe 500 600 1 0
-
-          Verify the ErrorCode as "OK"(0) in TH log
-
-          [1655469679.636495][13173:13178] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
-          [1655469679.636600][13173:13178] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
-          [1655469679.636738][13173:13178] CHIP:TOO:   ArmFailSafeResponse: {
-          [1655469679.636817][13173:13178] CHIP:TOO:     errorCode: 0
-          [1655469679.636876][13173:13178] CHIP:TOO:     debugText:
-          [1655469679.636930][13173:13178] CHIP:TOO:    }
-      disabled: true
-
     - label:
           "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
           field set to 900"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
+      verification: |
+          ./chip-tool generalcommissioning arm-fail-safe 900 600 1 0
+
+
+          Verify the ErrorCode as "OK"(0) in TH log
+          [1659676500.031926][2475:2480] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1659676500.047646][2475:2480] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1659676500.055459][2475:2480] CHIP:TOO:   ArmFailSafeResponse: {
+          [1659676500.055613][2475:2480] CHIP:TOO:     errorCode: 0
+          [1659676500.055669][2475:2480] CHIP:TOO:     debugText:
+          [1659676500.055719][2475:2480] CHIP:TOO:    }
+          [1659676500.055806][2475:2480] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1659676500.055920][2475:2480] CHIP:EM: Sending Standalone Ack for MessageCounter:225116044 on exchange 37810i
+      disabled: true
+
+    - label: "TH1 sends SetRegulatoryConfig command to the DUT"
+      PICS: CGEN.S.C02.Rsp && CGEN.S.C03.Tx
       verification: |
           ./chip-tool generalcommissioning set-regulatory-config 0 new 0 1 0
 
@@ -71,8 +80,8 @@ tests:
           [1658223287.237205][5570:5575] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH1 sends SetRegulatoryConfig command to the DUT"
-      PICS: CGEN.S.C02.Rsp && CGEN.S.C03.Tx
+    - label: "TH1 sends AttestationRequest command to DUT"
+      PICS: OPCREDS.S.C00.Rsp && OPCREDS.S.C01.Tx
       verification: |
           To get attestation nonce give below command
            echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom)
@@ -91,8 +100,10 @@ tests:
           [1658223434.719135][5712:5717] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH1 sends AttestationRequest command to DUT"
-      PICS: OPCREDS.S.C00.Rsp && OPCREDS.S.C01.Tx
+    - label:
+          "TH1 sends CertificateChainRequest Command to DUT for the PAI and
+          saves the certififate as PAICert"
+      PICS: OPCREDS.S.C02.Rsp && OPCREDS.S.C03.Tx
       verification: |
           ./chip-tool operationalcredentials certificate-chain-request 2 1 0
 
@@ -112,8 +123,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends CertificateChainRequest Command to DUT for the PAI and
-          saves the certififate as PAICert"
+          "TH1 sends CertificateChainRequest Command to DUT for the DAC and
+          saves the certififate as DACCert"
       PICS: OPCREDS.S.C02.Rsp && OPCREDS.S.C03.Tx
       verification: |
           ./chip-tool operationalcredentials certificate-chain-request 1 1 0
@@ -133,10 +144,8 @@ tests:
           308201E73082018EA003020102020869CDF10DE9E54ED1300A06082A8648CE3D040302303D3125302306035504030C1C4D6174746572204465762050414920307846464631206E6F2050494431143012060A2B0601040182A27C02010C04464646313020170D3232303230353030303030305A180F39393939313233313233353935395A30533125302306035504030C1C4D61747465722044657620444143203078464646312F30783830303131143012060A2B0601040182A27C02010C044646463131143012060A2B0601040182A27C02020C04383030313059301306072A8648CE3D020106082A8648CE3D03010703420004463AC69342910A0E5588FC6FF56BB63E62ECCECB148F7D4EB03EE552601415767D16A5C663F793E49123260B8297A7CD7E7CFC7B316B39D98E90D29377738E82A360305E300C0603551D130101FF04023000300E0603551D0F0101FF040403020780301D0603551D0E0416041488DDE7B300382932CFF734C04624810F44168A6F301F0603551D2304183016801463540E47F64B1C38D13884A462D16C195D8FFB3C300A06082A8648CE3D040302
       disabled: true
 
-    - label:
-          "TH1 sends CertificateChainRequest Command to DUT for the DAC and
-          saves the certififate as DACCert"
-      PICS: OPCREDS.S.C02.Rsp && OPCREDS.S.C03.Tx
+    - label: "TH1 Sends CSRRequest command with a random 32-byte nonce"
+      PICS: OPCREDS.S.C04.Rsp
       verification: |
           To get SCR Nonce give below command 2 times
           echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom)
@@ -156,12 +165,6 @@ tests:
 
           Example:
           EB731B40B20501AF32C468AA522948F7848D3AEDFA24D9A879575B4A265886C97109EE0DE1ECEB969B1A7F98F127DB4C275292B986BF8DA56EF7B16DA8EC8ABE
-      disabled: true
-
-    - label: "TH1 Sends CSRRequest command with a random 32-byte nonce"
-      PICS: OPCREDS.S.C04.Rsp
-      verification: |
-          verification step to be updated.
       disabled: true
 
     - label: "TH1 validates the attestation response"

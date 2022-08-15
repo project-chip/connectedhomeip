@@ -882,6 +882,7 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     if (tlvReader.Next() != CHIP_END_OF_TLV)
     {
         SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(4), tlvReader));
+        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(mRemoteMRPConfig);
     }
 
     ChipLogDetail(SecureChannel, "Peer assigned session session ID %d", responderSessionId);
@@ -1066,6 +1067,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     if (tlvReader.Next() != CHIP_END_OF_TLV)
     {
         SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(kTag_Sigma2_ResponderMRPParams), tlvReader));
+        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(mRemoteMRPConfig);
     }
 
 exit:
@@ -1655,6 +1657,7 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
     if (err == CHIP_NO_ERROR && tlvReader.GetTag() == ContextTag(kInitiatorMRPParamsTag))
     {
         ReturnErrorOnFailure(DecodeMRPParametersIfPresent(TLV::ContextTag(kInitiatorMRPParamsTag), tlvReader));
+        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(mRemoteMRPConfig);
         err = tlvReader.Next();
     }
 

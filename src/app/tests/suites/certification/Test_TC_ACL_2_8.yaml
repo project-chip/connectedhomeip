@@ -39,7 +39,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read current-fabric-index 1 0
 
-          On TH1, Verify DUT Responds  to CurrentFabricIndex attribute of operationalCredential cluster  as 1
+          On TH(Chiptool)1, verify  CurrentFabricIndex attribute of operationalCredential cluster  as 1
 
           [1656588171.078880][3260:3265] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 1776815488
           [1656588171.078952][3260:3265] CHIP:TOO:   CurrentFabricIndex: 1
@@ -50,7 +50,7 @@ tests:
           "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin
           node ID N2"
       verification: |
-          Open a commissioning window on TH1 using below command
+          Open a commissioning window On TH(Chiptool)1 using below command
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 180 1  0 --timedInteractionTimeoutMs 1000
 
@@ -88,7 +88,7 @@ tests:
 
 
 
-          Commission TH2 to DUT using below command
+          CommissiOn TH(Chiptool)2 to DUT using below command
 
           ./chip-tool pairing onnetwork 2 20202021 --commissioner-nodeid 223344  --commissioner-name beta
 
@@ -101,7 +101,7 @@ tests:
           CurrentFabricIndex attribute"
       verification: |
           ./chip-tool  operationalcredentials read current-fabric-index 2 0 --commissioner-nodeid 223344 --commissioner-name beta
-
+          On TH(Chiptool)2, verify  CurrentFabricIndex attribute of operationalCredential cluster  as 2
 
           1658747098.843523][3024:3029] CHIP:DMG:                 },
           [1658747098.843552][3024:3029] CHIP:DMG:
@@ -125,7 +125,7 @@ tests:
       PICS: ACL.S.A0000
       verification: |
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233,1111], "targets":null}]" 1 0
-          On TH1, VERIFY DUT Responds Successfully.
+          On TH(Chiptool)1, verify AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element
 
           [1657286416.461279][4737:4742] CHIP:DMG: {
           [1657286416.461307][4737:4742] CHIP:DMG:         AttributeStatusIBs =
@@ -179,7 +179,8 @@ tests:
       PICS: ACL.S.A0000
       verification: |
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [223344,2222], "targets":null}]" 2 0  --commissioner-nodeid 223344 --commissioner-name beta
-          On TH2, VERIFY DUT Responds Successfully.
+          On TH(Chiptool)2, verify AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 1 element
+
 
           [1658747124.117113][3031:3036] CHIP:DMG: {
           [1658747124.117163][3031:3036] CHIP:DMG:         AttributeStatusIBs =
@@ -232,7 +233,7 @@ tests:
       verification: |
           ./chip-tool  accesscontrol  read  acl 1 0
 
-          On TH1, VERIFY DUT Responds Successfully.
+          On TH(Chiptool)1, verify AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F2
           [1657286432.997319][4745:4751] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 3308562949
           [1657286432.997655][4745:4751] CHIP:TOO:   ACL: 1 entries
           [1657286432.997727][4745:4751] CHIP:TOO:     [1]: {
@@ -251,7 +252,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read acl 2 0 --commissioner-name beta --commissioner-nodeid 223344
 
-          On TH2, VERIFY DUT Responds Successfully.
+          On TH(Chiptool)2, verify  AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
           [1657286742.977222][18111:18116] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 3308562953
           [1657286742.977287][18111:18116] CHIP:TOO:   ACL: 1 entries
           [1657286742.977344][18111:18116] CHIP:TOO:     [1]: {
@@ -271,7 +272,7 @@ tests:
       PICS: ACL.S.E00
       verification: |
           ./chip-tool  accesscontrol  read-event  access-control-entry-changed  1 0
-          On TH1, VERIFY DUT Responds Successfully.
+          On TH(Chiptool)1, verify AccessControl cluster AccessControlEntryChanged containing 3 elements, and MUST NOT contain any element with FabricIndex F2
 
 
           [1657286873.948408][4767:4772] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
@@ -337,7 +338,7 @@ tests:
       PICS: ACL.S.E00
       verification: |
           ./chip-tool  accesscontrol  read-event  access-control-entry-changed  2 0 --commissioner-name beta --commissioner-nodeid 223344
-          On TH2, VERIFY DUT Responds Successfully.
+          On TH(Chiptool)2, verify AccessControl cluster AccessControlEntryChanged containing 3 elements, and MUST NOT contain any element with FabricIndex F1
 
 
 

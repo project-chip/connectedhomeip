@@ -330,3 +330,8 @@ tests:
       verification: |
           verification step to be updated.
       disabled: true
+
+    - label: ""
+      verification: |
+          verification step to be updated.
+      disabled: true

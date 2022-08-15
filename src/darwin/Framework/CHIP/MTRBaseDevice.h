@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *                MTRAttributePathKey : MTRAttributePath object. Included for attribute value.
  *                MTRCommandPathKey : MTRCommandPath object. Included for command response.
+ *                MTREventPathKey : MTREventPath object. Included for event value.
  *                MTRErrorKey : NSError object. Included to indicate an error.
  *                MTRDataKey: Data-value NSDictionary object.
  *                              Included when there is data and when there is no error.
@@ -67,11 +68,18 @@ NS_ASSUME_NONNULL_BEGIN
  *                MTRDataKey : Data-value NSDictionary object.
  */
 typedef void (^MTRDeviceResponseHandler)(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error);
+
+/**
+ * Handler for -subscribeWithQueue: attribute and event reports
+ *
+ * @param values This array contains MTRAttributeReport objects for attribute reports, and MTREventReport objects for event reports
+ */
 typedef void (^MTRDeviceReportHandler)(NSArray * values);
 typedef void (^MTRDeviceErrorHandler)(NSError * error);
 
 extern NSString * const MTRAttributePathKey;
 extern NSString * const MTRCommandPathKey;
+extern NSString * const MTREventPathKey;
 extern NSString * const MTRDataKey;
 extern NSString * const MTRErrorKey;
 extern NSString * const MTRTypeKey;
