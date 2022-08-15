@@ -207,7 +207,6 @@ efr32_executable("lighting_app") {
       "${chip_root}/third_party/openthread:openthread",
       "${examples_plat_dir}:efr-matter-shell",
     ]
-
   }
 
   if (chip_enable_ota_requestor) {
