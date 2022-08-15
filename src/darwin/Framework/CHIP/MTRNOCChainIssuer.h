@@ -26,12 +26,12 @@ NS_ASSUME_NONNULL_BEGIN
 @required
 
 /**
- * @brief When a MTRNOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
+ * @brief When a MTRNOCChainIssuer is set for the MTRDeviceController, then onNOCChainGenerationNeeded will be
  * called when the NOC CSR needs to be signed. This allows for custom credentials issuer
  * implementations, for example, when a proprietary cloud API will perform the CSR signing.
 
  * The commissioning workflow will stop upon the onNOCChainGenerationNeeded callback and
- * resume once onNOCChainGeneration is called.
+ * resume once onNOCChainGenerationComplete is called
 
  * The following fields MUST be passed to onNOCChainGenerationComplete with non-nil values:
  * rootCertificate, intermediateCertificate, operationalCertificate.
@@ -41,7 +41,11 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * All csr and attestation fields are provided to allow for custom attestestation checks.
  */
-- (void)onNOCChainGenerationNeeded:(CSRInfo *)csrInfo attestationInfo:(AttestationInfo *)attestationInfo;
+- (void)onNOCChainGenerationNeeded:(CSRInfo *)csrInfo
+                   attestationInfo:(AttestationInfo *)attestationInfo
+      onNOCChainGenerationComplete:(NSNumber * (^)(NSData * operationalCertificate, NSData * intermediateCertificate,
+                                       NSData * rootCertificate, NSData * ipk,
+                                       NSNumber * adminSubject))onNOCChainGenerationComplete;
 
 @end
 

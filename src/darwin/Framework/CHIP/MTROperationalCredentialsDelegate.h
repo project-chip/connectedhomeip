@@ -64,7 +64,13 @@ public:
         return mCppCommissioner == nullptr ? chip::NullOptional : mCppCommissioner->GetCommissioningParameters();
     }
 
-    void SetNocChainIssuer(id<MTRNOCChainIssuer> nocChainIssuer) { mNocChainIssuer = nocChainIssuer; }
+    void setChipWorkQueue(dispatch_queue_t chipWorkQueue) { mChipWorkQueue = chipWorkQueue; }
+
+    void SetNocChainIssuer(id<MTRNOCChainIssuer> nocChainIssuer, dispatch_queue_t nocChainIssuerQueue)
+    {
+        mNocChainIssuer = nocChainIssuer;
+        mNocChainIssuerQueue = nocChainIssuerQueue;
+    }
 
     CHIP_ERROR NOCChainGenerated(CHIP_ERROR status, const chip::ByteSpan & noc, const chip::ByteSpan & icac,
         const chip::ByteSpan & rcac, chip::Optional<chip::Crypto::AesCcm128KeySpan> ipk, chip::Optional<chip::NodeId> adminSubject);
@@ -111,6 +117,21 @@ private:
         chip::FabricId fabricId, const chip::CATValues & cats, const chip::Crypto::P256PublicKey & pubkey,
         chip::MutableByteSpan & noc);
 
+    /**
+     * When a NOCChainIssuer is set, then onNOCChainGenerationNeeded will be called when the NOC CSR needs to be
+     * signed. This allows for custom credentials issuer implementations, for example, when a proprietary cloud API will perform the
+     * CSR signing. The commissioning workflow will stop upon the onNOCChainGenerationNeeded callback and resume once
+     * onNOCChainGenerationComplete is called.
+     *
+     * Caller must pass a non-nil value for the rootCertificate, intermediateCertificate, operationalCertificate
+     * If ipk and adminSubject are non nil, then they will be used in the AddNOC command sent to the commissionee. If they are not
+     * populated, then the values provided in the MTRDeviceController initialization will be used.
+     *
+     * @return error code (0 is no error)
+     */
+    NSNumber * onNOCChainGenerationComplete(MTROperationalCredentialsDelegate * thisDelegate, NSData * operationalCertificate,
+        NSData * intermediateCertificate, NSData * rootCertificate, NSData * _Nullable ipk, NSNumber * _Nullable adminSubject);
+
     CHIP_ERROR CallbackGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
         const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
         const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion);
@@ -140,6 +161,8 @@ private:
 
     chip::Controller::DeviceCommissioner * mCppCommissioner = nullptr;
     id<MTRNOCChainIssuer> _Nullable mNocChainIssuer;
+    dispatch_queue_t _Nullable mNocChainIssuerQueue;
+    dispatch_queue_t _Nullable mChipWorkQueue;
     chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * mOnNOCCompletionCallback = nullptr;
 };
 

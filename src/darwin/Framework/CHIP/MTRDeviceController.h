@@ -121,39 +121,14 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 /**
- * Set the Delegate for the Device Pairing  as well as the Queue on which the Delegate callbacks will be triggered
+ * Sets this MTRDeviceController to use the given issuer for issuing operational certs. By default, the MTRDeviceController uses an
+ * internal issuer.
  *
- * @param[in] delegate The delegate the pairing process should use
+ * @param[in] nocChainIssuer the NOC Chain issuer to use for issuer operational certs
  *
  * @param[in] queue The queue on which the callbacks will be delivered
  */
-
-/**
- * Sets this MTRDeviceController to use the given issuer for issuing operational certs. By default, the MTRDeviceController uses an
- * internal, OperationalCredentialsDelegate (see MTROperationalCredentialsDelegate)
- *
- * @param[in] nocChainIssuer the NOC Chain issuer to use for issuer operational certs
- */
-- (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer;
-
-/**
- * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be called when the NOC CSR needs to be
- * signed. This allows for custom credentials issuer implementations, for example, when a proprietary cloud API will perform the CSR
- * signing. The commissioning workflow will stop upon the onNOCChainGenerationNeeded callback and resume once onNOCChainGeneration
- * is called.
- *
- * Caller must pass a non-nil value for the rootCertificate, intermediateCertificate, operationalCertificate
- * If ipk and adminSubject are non nil, then they will be used in the AddNOC command sent to the commissionee. If they are not
- * populated, then the values provided in the ChipDeviceController initialization will be used.
- *
- * @return error code (0 is no error)
- */
-- (NSNumber *)onNOCChainGenerationComplete:(NSData *)operationalCertificate
-                   intermediateCertificate:(NSData *)intermediateCertificate
-                           rootCertificate:(NSData *)rootCertificate
-                                       ipk:(NSData *)ipk
-                              adminSubject:(NSNumber *)adminSubject
-                                     error:(NSError * __autoreleasing *)error;
+- (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer queue:(dispatch_queue_t)queue;
 
 /**
  * Shutdown the controller. Calls to shutdown after the first one are NO-OPs.
