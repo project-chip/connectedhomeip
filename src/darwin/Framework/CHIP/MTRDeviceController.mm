@@ -805,8 +805,11 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
             return;
         }
 
-        // TODO: This is a hack and needs to go away or use some sane API.
-        self->_cppCommissioner->DisconnectDevice(nodeID);
+        auto sessionMgr = self->_cppCommissioner->SessionMgr();
+        VerifyOrDie(sessionMgr != nullptr);
+
+        sessionMgr->MarkSessionsAsDefunct(
+            self->_cppCommissioner->GetPeerScopedId(nodeID), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
     });
 }
 @end

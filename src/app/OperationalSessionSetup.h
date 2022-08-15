@@ -140,19 +140,29 @@ private:
  * application code does incorrectly hold onto this information so do not follow those incorrect
  * implementations as an example.
  */
-// TODO: OnDeviceConnected should not return ExchangeManager. Application should have this already. This
-// was provided initially to keep code churn down during a large refactor of OnDeviceConnected.
 typedef void (*OnDeviceConnected)(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
 typedef void (*OnDeviceConnectionFailure)(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
 /**
- * Represents a connection path to a device that is in an operational state.
+ * Object used to either establish a connection to peer or performing address lookup to a peer.
  *
- * Handles the lifetime of communicating with such a device:
- *    - Discover the device using DNSSD (find out what IP address to use and what
- *      communication parameters are appropriate for it)
- *    - Establish a secure channel to it via CASE
- *    - Expose to consumers the secure session for talking to the device.
+ * OperationalSessionSetup is capable of either:
+ *    1. Establishing a CASE session connection to a peer. Upon success or failure, the OnDeviceConnected or
+ *       OnDeviceConnectionFailure callback will be called to notify the caller the results of trying to
+ *       estblish a CASE session. Some additional details about the steps to establish a connection are:
+ *          - Discover the device using DNSSD (find out what IP address to use and what
+ *            communication parameters are appropriate for it)
+ *          - Establish a secure channel to it via CASE
+ *          - Expose to consumers the secure session for talking to the device via OnDeviceConnected
+ *            callback.
+ *    2. Performing an address lookup for given a scoped nodeid. On success, it will call into
+ *       SessionManager to update the addresses for all matching sessions in the session table.
+ *
+ * OperationalSessionSetup has a very limited lifetime. Once it has completed its purpose outlined above,
+ * it will use `releaseDelegate` to release itself.
+ *
+ * It is possible to determine which of the two purposes the OperationalSessionSetup is for by calling
+ * IsForAddressUpdate().
  */
 class DLL_EXPORT OperationalSessionSetup : public SessionDelegate,
                                            public SessionEstablishmentDelegate,
@@ -198,20 +208,9 @@ public:
      */
     void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    bool IsConnected() const { return mState == State::SecureConnected; }
-
     bool IsConnecting() const { return mState == State::Connecting; }
 
     bool IsForAddressUpdate() const { return mPerformingAddressUpdate; }
-
-    /**
-     * IsResolvingAddress returns true if we are doing an address resolution
-     * that needs to happen before we can establish CASE.  We can be in the
-     * middle of doing address updates at other times too (e.g. when we are
-     * IsConnected()), but those will not cause a true return from
-     * IsResolvingAddress().
-     */
-    bool IsResolvingAddress() const { return mState == State::ResolvingAddress; }
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablished(const SessionHandle & session) override;
@@ -221,18 +220,8 @@ public:
 
     // Called when a connection is closing. The object releases all resources associated with the connection.
     void OnSessionReleased() override;
-    // Called when a connection is hanging. Try to re-establish another session, and shift to the new session when done, the
-    // original session won't be touched during the period.
-    void OnSessionHang() override;
-
-    /**
-     *  Mark any open session with the device as expired.
-     */
-    void Disconnect();
 
     ScopedNodeId GetPeerId() const { return mPeerId; }
-
-    Transport::PeerAddress GetPeerAddress() const { return mDeviceAddress; }
 
     static Transport::PeerAddress ToPeerAddress(const Dnssd::ResolvedNodeData & nodeData)
     {
@@ -255,11 +244,6 @@ public:
      * @brief Get the fabricIndex
      */
     FabricIndex GetFabricIndex() const { return mPeerId.GetFabricIndex(); }
-
-    /**
-     * Triggers a DNSSD lookup to find a usable peer address for this operational device.
-     */
-    CHIP_ERROR LookupPeerAddress();
 
     void PerformAddressUpdate();
 
@@ -331,8 +315,16 @@ private:
      * If error == CHIP_NO_ERROR, only success callbacks are invoked.
      * Otherwise, only failure callbacks are invoked.
      *
+     * This uses mReleaseDelegate to release ourselves (aka `this`). As a
+     * result any caller should return right away without touching `this`.
+     *
      */
     void DequeueConnectionCallbacks(CHIP_ERROR error);
+
+    /**
+     * Triggers a DNSSD lookup to find a usable peer address.
+     */
+    CHIP_ERROR LookupPeerAddress();
 
     /**
      * This function will set new IP address, port and MRP retransmission intervals of the device.

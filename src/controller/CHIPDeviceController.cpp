@@ -353,41 +353,6 @@ void DeviceController::Shutdown()
     mDeviceDiscoveryDelegate = nullptr;
 }
 
-void DeviceController::ReleaseOperationalDevice(NodeId remoteNodeId)
-{
-    VerifyOrReturn(mState == State::Initialized && mFabricIndex != kUndefinedFabricIndex,
-                   ChipLogError(Controller, "ReleaseOperationalDevice was called in incorrect state"));
-    mSystemState->CASESessionMgr()->ReleaseSession(GetPeerScopedId(remoteNodeId));
-}
-
-CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
-{
-    ChipLogProgress(Controller, "Force close session for node 0x%" PRIx64, nodeId);
-
-    if (SessionMgr()->MarkSessionsAsDefunct(GetPeerScopedId(nodeId), MakeOptional(Transport::SecureSession::Type::kCASE)))
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    OperationalSessionSetup * proxy = mSystemState->CASESessionMgr()->FindExistingSessionSetup(GetPeerScopedId(nodeId));
-    if (proxy == nullptr)
-    {
-        ChipLogProgress(Controller, "Attempted to close a session that does not exist.");
-        return CHIP_NO_ERROR;
-    }
-
-    if (proxy->IsConnecting())
-    {
-        ChipLogError(Controller, "Attempting to disconnect while connection in progress");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    // TODO: logic here is unclear. Possible states are "uninitialized, needs address, initialized"
-    // and disconnecting in those states is unclear (especially for needds-address).
-    ChipLogProgress(Controller, "Disconnect attempt while not in connected/connecting state");
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DeviceController::GetPeerAddressAndPort(NodeId peerId, Inet::IPAddress & addr, uint16_t & port)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
@@ -1664,7 +1629,6 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const Scope
     {
         commissioner->CommissioningStageComplete(error);
     }
-    commissioner->mSystemState->CASESessionMgr()->ReleaseSession(peerId);
 }
 
 // ClusterStateCache::Callback impl
@@ -2286,13 +2250,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kFindOperational: {
-        CHIP_ERROR err = UpdateDevice(proxy->GetDeviceId());
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Controller, "Unable to proceed to operational discovery\n");
-            CommissioningStageComplete(err);
-            return;
-        }
+        // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
+        auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
+                                                               &mOnDeviceConnectionFailureCallback);
     }
     break;
     case CommissioningStage::kSendComplete: {
@@ -2310,31 +2271,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kSecurePairing:
         break;
     }
-}
-
-CHIP_ERROR DeviceController::UpdateDevice(NodeId peerNodeId)
-{
-    VerifyOrReturnError(mState == State::Initialized && mFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INCORRECT_STATE);
-
-    OperationalSessionSetup * sessionSetup = GetDeviceSession(GetPeerScopedId(peerNodeId));
-    VerifyOrReturnError(sessionSetup != nullptr, CHIP_ERROR_NOT_FOUND);
-
-    return sessionSetup->LookupPeerAddress();
-}
-
-OperationalSessionSetup * DeviceController::GetDeviceSession(const ScopedNodeId & peerId)
-{
-    return mSystemState->CASESessionMgr()->FindExistingSessionSetup(peerId);
-}
-
-OperationalSessionSetup * DeviceCommissioner::GetDeviceSession(const ScopedNodeId & peerId)
-{
-    mSystemState->CASESessionMgr()->FindOrEstablishSession(peerId, &mOnDeviceConnectedCallback,
-                                                           &mOnDeviceConnectionFailureCallback);
-
-    // If there is an OperationalSessionSetup for this peerId now the call to the
-    // superclass will return it.
-    return DeviceController::GetDeviceSession(peerId);
 }
 
 CHIP_ERROR DeviceController::GetCompressedFabricIdBytes(MutableByteSpan & outBytes) const
