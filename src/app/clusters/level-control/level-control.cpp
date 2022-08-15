@@ -1070,14 +1070,14 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         if (useOnLevel)
         {
             // If OnLevel is defined, don't revert to stored level.
-            moveToLevelHandler(endpoint, Commands::MoveToLevelWithOnOff::Id, minimumLevelAllowedForTheDevice,
-                               currentOnOffTransitionTime, 0xFF, 0xFF, INVALID_STORED_LEVEL);
+            moveToLevelHandler(endpoint, Commands::MoveToLevelWithOnOff::Id, minimumLevelAllowedForTheDevice, transitionTime,
+                              0xFF, 0xFF, INVALID_STORED_LEVEL);
         }
         else
         {
             // If OnLevel is not defined, set the CurrentLevel to the stored level.
-            moveToLevelHandler(endpoint, Commands::MoveToLevelWithOnOff::Id, minimumLevelAllowedForTheDevice,
-                               currentOnOffTransitionTime, 0xFF, 0xFF, temporaryCurrentLevelCache);
+            moveToLevelHandler(endpoint, Commands::MoveToLevelWithOnOff::Id, minimumLevelAllowedForTheDevice, transitionTime,
+                              0xFF, 0xFF, temporaryCurrentLevelCache.Value());
         }
     }
 }
