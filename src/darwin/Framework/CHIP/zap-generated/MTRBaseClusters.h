@@ -22472,9 +22472,9 @@ typedef NS_ENUM(uint8_t, MTRAdministratorCommissioningCommissioningWindowStatus)
 };
 
 typedef NS_ENUM(uint8_t, MTRAdministratorCommissioningStatusCode) {
-    MTRAdministratorCommissioningStatusCodeBusy = 0x01,
-    MTRAdministratorCommissioningStatusCodePAKEParameterError = 0x02,
-    MTRAdministratorCommissioningStatusCodeWindowNotOpen = 0x03,
+    MTRAdministratorCommissioningStatusCodeBusy = 0x02,
+    MTRAdministratorCommissioningStatusCodePAKEParameterError = 0x03,
+    MTRAdministratorCommissioningStatusCodeWindowNotOpen = 0x04,
 };
 
 typedef NS_ENUM(uint8_t, MTROperationalCredentialsOperationalCertStatus) {

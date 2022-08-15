@@ -6711,7 +6711,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::AdminFabricIndex::Id: {

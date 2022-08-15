@@ -1192,12 +1192,12 @@ server cluster AdministratorCommissioning = 60 {
   }
 
   enum StatusCode : ENUM8 {
-    kBusy = 1;
-    kPAKEParameterError = 2;
-    kWindowNotOpen = 3;
+    kBusy = 2;
+    kPAKEParameterError = 3;
+    kWindowNotOpen = 4;
   }
 
-  readonly attribute int8u windowStatus = 0;
+  readonly attribute CommissioningWindowStatus windowStatus = 0;
   readonly attribute nullable fabric_idx adminFabricIndex = 1;
   readonly attribute nullable int16u adminVendorId = 2;
   readonly attribute bitmap32 featureMap = 65532;
