@@ -352,7 +352,7 @@ public:
     /**
      * @brief
      *   Marks all active sessions that match provided arguments as defunct.
-     * 
+     *
      * TODO(#21885): This needs to be removed. This was added to reduce code churn
      * on PR that was a large refactor.
      *
