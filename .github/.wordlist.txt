@@ -46,8 +46,11 @@ algs
 alloc
 AlarmCode
 Ameba
+AmebaD
 amebad
 amebaiot
+AmebaZ2
+amebaz2
 announcementReason
 AnnounceOTAProvider
 AnnounceOtaProviderRequest
