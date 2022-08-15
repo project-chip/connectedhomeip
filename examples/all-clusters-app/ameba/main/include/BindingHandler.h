@@ -20,6 +20,7 @@
 
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "app-common/zap-generated/ids/Commands.h"
+#include "app-common/zap-generated/ids/Attributes.h"
 #include "lib/core/CHIPError.h"
 
 CHIP_ERROR InitBindingHandler();
@@ -28,8 +29,10 @@ void BindingWorkerFunction(intptr_t context);
 
 struct BindingCommandData
 {
+    chip::AttributeId attributeId;
     chip::EndpointId localEndpointId = 1;
     chip::CommandId commandId;
     chip::ClusterId clusterId;
     bool isGroup = false;
+    bool isReadAttribute = false;
 };

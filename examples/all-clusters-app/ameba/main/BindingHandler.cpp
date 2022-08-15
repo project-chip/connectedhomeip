@@ -21,6 +21,7 @@
 #include "app/clusters/bindings/BindingManager.h"
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
+#include "controller/ReadInteraction.h"
 #include "platform/CHIPDeviceLayer.h"
 #include <app/clusters/bindings/bindings.h>
 #include <lib/support/CodeUtils.h>
@@ -41,6 +42,7 @@ using Shell::streamer_printf;
 
 Engine sShellSwitchSubCommands;
 Engine sShellSwitchOnOffSubCommands;
+Engine sShellSwitchOnOffReadSubCommands;
 
 Engine sShellSwitchGroupsSubCommands;
 Engine sShellSwitchGroupsOnOffSubCommands;
@@ -49,6 +51,48 @@ Engine sShellSwitchBindingSubCommands;
 #endif // defined(ENABLE_CHIP_SHELL)
 
 namespace {
+
+void ProcessOnOffUnicastBindingRead(AttributeId attributeId, const EmberBindingTableEntry & binding,
+                                       OperationalDeviceProxy * peer_device)
+{
+    auto onSuccess = [](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        ChipLogProgress(NotSpecified, "Read OnOff attribute succeeds");
+    };
+
+    auto onFailure = [](const ConcreteDataAttributePath * attributePath, CHIP_ERROR error) {
+        ChipLogError(NotSpecified, "Read OnOff attribute failed: %" CHIP_ERROR_FORMAT, error.Format());
+    };
+
+    VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
+
+    switch (attributeId)
+    {
+    case Clusters::OnOff::Attributes::OnOff::Id:
+        Controller::ReadAttribute<Clusters::OnOff::Attributes::OnOff::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         onSuccess, onFailure);
+        break;
+
+    case Clusters::OnOff::Attributes::GlobalSceneControl::Id:
+        Controller::ReadAttribute<Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         onSuccess, onFailure);
+        break;
+
+    case Clusters::OnOff::Attributes::OnTime::Id:
+        Controller::ReadAttribute<Clusters::OnOff::Attributes::OnTime::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         onSuccess, onFailure);
+        break;
+
+    case Clusters::OnOff::Attributes::OffWaitTime::Id:
+        Controller::ReadAttribute<Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         onSuccess, onFailure);
+        break;
+
+    case Clusters::OnOff::Attributes::StartUpOnOff::Id:
+        Controller::ReadAttribute<Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         onSuccess, onFailure);
+        break;
+    }
+}
 
 void ProcessOnOffUnicastBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding,
                                        OperationalDeviceProxy * peer_device)
@@ -62,24 +106,44 @@ void ProcessOnOffUnicastBindingCommand(CommandId commandId, const EmberBindingTa
     };
 
     VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
+
+    Clusters::OnOff::Commands::Toggle::Type toggleCommand;
+    Clusters::OnOff::Commands::On::Type onCommand;
+    Clusters::OnOff::Commands::Off::Type offCommand;
+    Clusters::OnOff::Commands::OffWithEffect::Type offwitheffectCommand;
+    Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type onwithrecallglobalsceneCommand;
+    Clusters::OnOff::Commands::OnWithTimedOff::Type onwithtimedoffCommand;
+
     switch (commandId)
     {
     case Clusters::OnOff::Commands::Toggle::Id:
-        Clusters::OnOff::Commands::Toggle::Type toggleCommand;
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          toggleCommand, onSuccess, onFailure);
         break;
 
     case Clusters::OnOff::Commands::On::Id:
-        Clusters::OnOff::Commands::On::Type onCommand;
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          onCommand, onSuccess, onFailure);
         break;
 
     case Clusters::OnOff::Commands::Off::Id:
-        Clusters::OnOff::Commands::Off::Type offCommand;
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          offCommand, onSuccess, onFailure);
+        break;
+
+    case Clusters::OnOff::Commands::OffWithEffect::Id:
+        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         offwitheffectCommand, onSuccess, onFailure);
+        break;
+
+    case Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id:
+        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         onwithrecallglobalsceneCommand, onSuccess, onFailure);
+        break;
+
+    case Clusters::OnOff::Commands::OnWithTimedOff::Id:
+        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         onwithtimedoffCommand, onSuccess, onFailure);
         break;
     }
 }
@@ -88,22 +152,37 @@ void ProcessOnOffGroupBindingCommand(CommandId commandId, const EmberBindingTabl
 {
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
 
+    Clusters::OnOff::Commands::Toggle::Type toggleCommand;
+    Clusters::OnOff::Commands::On::Type onCommand;
+    Clusters::OnOff::Commands::Off::Type offCommand;
+    Clusters::OnOff::Commands::OffWithEffect::Type offwitheffectCommand;
+    Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type onwithrecallglobalsceneCommand;
+    Clusters::OnOff::Commands::OnWithTimedOff::Type onwithtimedoffCommand;
+
     switch (commandId)
     {
     case Clusters::OnOff::Commands::Toggle::Id:
-        Clusters::OnOff::Commands::Toggle::Type toggleCommand;
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand);
         break;
 
     case Clusters::OnOff::Commands::On::Id:
-        Clusters::OnOff::Commands::On::Type onCommand;
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onCommand);
-
         break;
 
     case Clusters::OnOff::Commands::Off::Id:
-        Clusters::OnOff::Commands::Off::Type offCommand;
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offCommand);
+        break;
+
+    case Clusters::OnOff::Commands::OffWithEffect::Id:
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offwitheffectCommand);
+        break;
+
+    case Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id:
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onwithrecallglobalsceneCommand);
+        break;
+
+    case Clusters::OnOff::Commands::OnWithTimedOff::Id:
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onwithtimedoffCommand);
         break;
     }
 }
@@ -113,22 +192,38 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
     BindingCommandData * data = static_cast<BindingCommandData *>(context);
 
-    if (binding.type == EMBER_MULTICAST_BINDING && data->isGroup)
+    if (data->isReadAttribute)
     {
-        switch (data->clusterId)
+        // It should always enter here if isReadAttribute is true
+        if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup)
         {
-        case Clusters::OnOff::Id:
-            ProcessOnOffGroupBindingCommand(data->commandId, binding);
-            break;
+            switch (data->clusterId)
+            {
+            case Clusters::OnOff::Id:
+                ProcessOnOffUnicastBindingRead(data->attributeId, binding, peer_device);
+                break;
+            }
         }
     }
-    else if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup)
+    else
     {
-        switch (data->clusterId)
+        if (binding.type == EMBER_MULTICAST_BINDING && data->isGroup)
         {
-        case Clusters::OnOff::Id:
-            ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device);
-            break;
+            switch (data->clusterId)
+            {
+            case Clusters::OnOff::Id:
+                ProcessOnOffGroupBindingCommand(data->commandId, binding);
+                break;
+            }
+        }
+        else if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup)
+        {
+            switch (data->clusterId)
+            {
+            case Clusters::OnOff::Id:
+                ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device);
+                break;
+            }
         }
     }
 }
@@ -216,6 +311,107 @@ CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
     data->clusterId           = Clusters::OnOff::Id;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OffWithEffectSwitchCommandHandler(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::OnOff::Commands::OffWithEffect::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OnWithRecallGlobalSceneSwitchCommandHandler(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OnWithTimedOffSwitchCommandHandler(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::OnOff::Commands::OnWithTimedOff::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OnOffReadHelpHandler(int argc, char ** argv)
+{
+    sShellSwitchOnOffReadSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OnOffRead(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        return OnOffReadHelpHandler(argc, argv);
+    }
+
+    return sShellSwitchOnOffReadSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR OnOffReadOnOff(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::OnOff::Attributes::OnOff::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+    data->isReadAttribute     = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OnOffReadGlobalSceneControl(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::OnOff::Attributes::GlobalSceneControl::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+    data->isReadAttribute     = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OnOffReadOnTime(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::OnOff::Attributes::OnTime::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+    data->isReadAttribute     = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OnOffReadOffWaitTime(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::OnOff::Attributes::OffWaitTime::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+    data->isReadAttribute     = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OnOffReadStartUpOnOff(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::OnOff::Attributes::StartUpOnOff::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+    data->isReadAttribute     = true;
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
@@ -345,6 +541,39 @@ CHIP_ERROR GroupToggleSwitchCommandHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR GroupOffWithEffectSwitchCommandHandler(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::OnOff::Commands::OffWithEffect::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupOnWithRecallGlobalSceneSwitchCommandHandler(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupOnWithTimedOffSwitchCommandHandler(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::OnOff::Commands::OnWithTimedOff::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
 /**
  * @brief configures switch matter shell
  *
@@ -362,19 +591,36 @@ static void RegisterSwitchCommands()
     static const shell_command_t sSwitchOnOffSubCommands[] = {
         { &OnOffHelpHandler, "help", "Usage : switch ononff <subcommand>" },
         { &OnSwitchCommandHandler, "on", "Sends on command to bound lighting app" },
+        { &OnOffRead, "read", "Usage : switch read <attribute>" },
         { &OffSwitchCommandHandler, "off", "Sends off command to bound lighting app" },
-        { &ToggleSwitchCommandHandler, "toggle", "Sends toggle command to bound lighting app" }
+        { &ToggleSwitchCommandHandler, "toggle", "Sends toggle command to bound lighting app" },
+        { &OffWithEffectSwitchCommandHandler, "offWE", "Sends off-with-effect command to bound lighting app" },
+        { &OnWithRecallGlobalSceneSwitchCommandHandler, "onWRGS", "Sends on-with-recall-global-scene command to bound lighting app" },
+        { &OnWithTimedOffSwitchCommandHandler, "onWTO", "Sends on-with-timed-off command to bound lighting app" }
     };
 
-    static const shell_command_t sSwitchGroupsSubCommands[] = { { &GroupsHelpHandler, "help", "Usage: switch groups <subcommand>" },
-                                                                { &GroupsOnOffSwitchCommandHandler, "onoff",
-                                                                  "Usage: switch groups onoff <subcommand>" } };
+    static const shell_command_t sSwitchOnOffReadSubCommands[] = {
+        { &OnOffReadHelpHandler, "help", "Usage : switch ononff read <attribute>" },
+        { &OnOffReadOnOff, "onoff", "Read onoff attribute" },
+        { &OnOffReadGlobalSceneControl, "GSC", "Read GlobalSceneControl attribute" },
+        { &OnOffReadOnTime, "ontime", "Read ontime attribute" },
+        { &OnOffReadOffWaitTime, "offwaittime", "Read offwaittime attribute" },
+        { &OnOffReadStartUpOnOff, "SOO", "Read startuponoff attribute" },
+    };
+
+    static const shell_command_t sSwitchGroupsSubCommands[] = { 
+        { &GroupsHelpHandler, "help", "Usage: switch groups <subcommand>" },
+        { &GroupsOnOffSwitchCommandHandler, "onoff", "Usage: switch groups onoff <subcommand>" } 
+    };
 
     static const shell_command_t sSwitchGroupsOnOffSubCommands[] = {
         { &GroupsOnOffHelpHandler, "help", "Usage: switch groups onoff <subcommand>" },
         { &GroupOnSwitchCommandHandler, "on", "Sends on command to bound group" },
         { &GroupOffSwitchCommandHandler, "off", "Sends off command to bound group" },
-        { &GroupToggleSwitchCommandHandler, "toggle", "Sends toggle command to group" }
+        { &GroupToggleSwitchCommandHandler, "toggle", "Sends toggle command to group" },
+        { &GroupOffWithEffectSwitchCommandHandler, "offWE", "Sends off-with-effect command to group" },
+        { &GroupOnWithRecallGlobalSceneSwitchCommandHandler, "onWRGS", "Sends on-with-recall-global-scene command to group" },
+        { &GroupOnWithTimedOffSwitchCommandHandler, "onWTO", "Sends on-with-timed-off command to group" }
     };
 
     static const shell_command_t sSwitchBindingSubCommands[] = {
@@ -388,6 +634,7 @@ static void RegisterSwitchCommands()
 
     sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwitchGroupsOnOffSubCommands, ArraySize(sSwitchGroupsOnOffSubCommands));
     sShellSwitchOnOffSubCommands.RegisterCommands(sSwitchOnOffSubCommands, ArraySize(sSwitchOnOffSubCommands));
+    sShellSwitchOnOffReadSubCommands.RegisterCommands(sSwitchOnOffReadSubCommands, ArraySize(sSwitchOnOffReadSubCommands));
     sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, ArraySize(sSwitchGroupsSubCommands));
     sShellSwitchBindingSubCommands.RegisterCommands(sSwitchBindingSubCommands, ArraySize(sSwitchBindingSubCommands));
     sShellSwitchSubCommands.RegisterCommands(sSwitchSubCommands, ArraySize(sSwitchSubCommands));
