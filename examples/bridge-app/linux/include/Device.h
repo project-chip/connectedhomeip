@@ -18,230 +18,58 @@
 
 #pragma once
 
-#include <app/util/attribute-storage.h>
+#include <lib/support/Span.h>
 
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <functional>
-#include <vector>
+#include "Clusters.h"
 
+// Device types for dynamic endpoints: TODO Need a generated file from ZAP to define these!
+// (taken from chip-devices.xml)
+#define DEVICE_TYPE_BRIDGED_NODE 0x0013
+// (taken from lo-devices.xml)
+#define DEVICE_TYPE_LO_ON_OFF_LIGHT 0x0100
+// (taken from lo-devices.xml)
+#define DEVICE_TYPE_LO_ON_OFF_LIGHT_SWITCH 0x0103
+// (taken from chip-devices.xml)
+#define DEVICE_TYPE_ROOT_NODE 0x0016
+// (taken from chip-devices.xml)
+#define DEVICE_TYPE_BRIDGE 0x000e
+
+// Device Version for dynamic endpoints:
+#define DEVICE_VERSION_DEFAULT 1
+
+// This represents a single logical device occupying one endpoint. A composed device consists of multiple
+// Device objects that reference a tree.
 class Device
 {
 public:
-    static const int kDeviceNameSize = 32;
+    Device(chip::Span<chip::DataVersion> dataVersions, chip::Span<EmberAfCluster> clusters, chip::Span<ClusterImpl *> clusterImpl,
+           const chip::Span<const EmberAfDeviceType> & deviceTypeList, chip::EndpointId parentId);
+    ~Device() = default;
 
-    enum Changed_t
-    {
-        kChanged_Reachable = 1u << 0,
-        kChanged_Location  = 1u << 1,
-        kChanged_Name      = 1u << 2,
-        kChanged_Last      = kChanged_Name,
-    } Changed;
+    const chip::Span<chip::DataVersion> & versions() { return mDataVersions; }
+    const chip::Span<const EmberAfDeviceType> & deviceTypes() { return mDeviceTypeList; }
+    const EmberAfEndpointType * endpointType() { return &mEndpointType; }
+    const chip::Span<ClusterImpl *> & clusters() { return mClusterImpl; }
 
-    Device(const char * szDeviceName, std::string szLocation);
-    virtual ~Device() {}
+    void SetEndpointId(chip::EndpointId id);
+    chip::EndpointId GetEndpointId() { return mEndpointId; }
+    chip::EndpointId GetParentEndpointId() { return mParentEndpointId; }
 
-    bool IsReachable();
-    void SetReachable(bool aReachable);
-    void SetName(const char * szDeviceName);
-    void SetLocation(std::string szLocation);
-    inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
-    inline chip::EndpointId GetEndpointId() { return mEndpointId; };
-    inline void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; };
-    inline chip::EndpointId GetParentEndpointId() { return mParentEndpointId; };
-    inline char * GetName() { return mName; };
-    inline std::string GetLocation() { return mLocation; };
-    inline std::string GetZone() { return mZone; };
-    inline void SetZone(std::string zone) { mZone = zone; };
+    const char * GetName();
+    void SetName(const char * name);
 
 private:
-    virtual void HandleDeviceChange(Device * device, Device::Changed_t changeMask) = 0;
-
-protected:
-    bool mReachable;
-    char mName[kDeviceNameSize];
-    std::string mLocation;
-    chip::EndpointId mEndpointId;
     chip::EndpointId mParentEndpointId;
-    std::string mZone;
-};
-
-class DeviceOnOff : public Device
-{
-public:
-    enum Changed_t
-    {
-        kChanged_OnOff = kChanged_Last << 1,
-    } Changed;
-
-    DeviceOnOff(const char * szDeviceName, std::string szLocation);
-
-    bool IsOn();
-    void SetOnOff(bool aOn);
-    void Toggle();
-
-    using DeviceCallback_fn = std::function<void(DeviceOnOff *, DeviceOnOff::Changed_t)>;
-    void SetChangeCallback(DeviceCallback_fn aChanged_CB);
-
-private:
-    void HandleDeviceChange(Device * device, Device::Changed_t changeMask);
-
-private:
-    bool mOn;
-    DeviceCallback_fn mChanged_CB;
-};
-
-class DeviceSwitch : public Device
-{
-public:
-    enum Changed_t
-    {
-        kChanged_NumberOfPositions = kChanged_Last << 1,
-        kChanged_CurrentPosition   = kChanged_Last << 2,
-        kChanged_MultiPressMax     = kChanged_Last << 3,
-    } Changed;
-
-    DeviceSwitch(const char * szDeviceName, std::string szLocation, uint32_t aFeatureMap);
-
-    void SetNumberOfPositions(uint8_t aNumberOfPositions);
-    void SetCurrentPosition(uint8_t aCurrentPosition);
-    void SetMultiPressMax(uint8_t aMultiPressMax);
-
-    inline uint8_t GetNumberOfPositions() { return mNumberOfPositions; };
-    inline uint8_t GetCurrentPosition() { return mCurrentPosition; };
-    inline uint8_t GetMultiPressMax() { return mMultiPressMax; };
-    inline uint32_t GetFeatureMap() { return mFeatureMap; };
-
-    using DeviceCallback_fn = std::function<void(DeviceSwitch *, DeviceSwitch::Changed_t)>;
-    void SetChangeCallback(DeviceCallback_fn aChanged_CB);
-
-private:
-    void HandleDeviceChange(Device * device, Device::Changed_t changeMask);
-
-private:
-    uint8_t mNumberOfPositions;
-    uint8_t mCurrentPosition;
-    uint8_t mMultiPressMax;
-    uint32_t mFeatureMap;
-    DeviceCallback_fn mChanged_CB;
-};
-
-class DeviceTempSensor : public Device
-{
-public:
-    enum Changed_t
-    {
-        kChanged_MeasurementValue = kChanged_Last << 1,
-    } Changed;
-
-    DeviceTempSensor(const char * szDeviceName, std::string szLocation, int16_t min, int16_t max, int16_t measuredValue);
-
-    inline int16_t GetMeasuredValue() { return mMeasurement; };
-    void SetMeasuredValue(int16_t measurement);
-
-    using DeviceCallback_fn = std::function<void(DeviceTempSensor *, DeviceTempSensor::Changed_t)>;
-    void SetChangeCallback(DeviceCallback_fn aChanged_CB);
-
-    const int16_t mMin;
-    const int16_t mMax;
-
-private:
-    void HandleDeviceChange(Device * device, Device::Changed_t changeMask);
-
-private:
-    int16_t mMeasurement;
-    DeviceCallback_fn mChanged_CB;
-};
-
-class ComposedDevice : public Device
-{
-public:
-    ComposedDevice(const char * szDeviceName, std::string szLocation) : Device(szDeviceName, szLocation){};
-
-    using DeviceCallback_fn = std::function<void(ComposedDevice *, ComposedDevice::Changed_t)>;
-
-    void SetChangeCallback(DeviceCallback_fn aChanged_CB);
-
-private:
-    void HandleDeviceChange(Device * device, Device::Changed_t changeMask);
-
-private:
-    DeviceCallback_fn mChanged_CB;
-};
-
-class DevicePowerSource : public Device
-{
-public:
-    enum Changed_t
-    {
-        kChanged_BatLevel    = kChanged_Last << 1,
-        kChanged_Description = kChanged_Last << 2,
-    } Changed;
-
-    DevicePowerSource(const char * szDeviceName, std::string szLocation, uint32_t aFeatureMap) :
-        Device(szDeviceName, szLocation), mFeatureMap(aFeatureMap){};
-
-    using DeviceCallback_fn = std::function<void(DevicePowerSource *, DevicePowerSource::Changed_t)>;
-    void SetChangeCallback(DeviceCallback_fn aChanged_CB) { mChanged_CB = aChanged_CB; }
-
-    void SetBatChargeLevel(uint8_t aBatChargeLevel);
-    void SetDescription(std::string aDescription);
-
-    inline uint32_t GetFeatureMap() { return mFeatureMap; };
-    inline uint8_t GetBatChargeLevel() { return mBatChargeLevel; };
-    inline uint8_t GetOrder() { return mOrder; };
-    inline uint8_t GetStatus() { return mStatus; };
-    inline std::string GetDescription() { return mDescription; };
-
-private:
-    void HandleDeviceChange(Device * device, Device::Changed_t changeMask);
-
-private:
-    uint8_t mBatChargeLevel  = 0;
-    uint8_t mOrder           = 0;
-    uint8_t mStatus          = 0;
-    std::string mDescription = "Primary Battery";
-    uint32_t mFeatureMap;
-    DeviceCallback_fn mChanged_CB;
-};
-
-class EndpointListInfo
-{
-public:
-    EndpointListInfo(uint16_t endpointListId, std::string name, chip::app::Clusters::Actions::EndpointListTypeEnum type);
-    EndpointListInfo(uint16_t endpointListId, std::string name, chip::app::Clusters::Actions::EndpointListTypeEnum type,
-                     chip::EndpointId endpointId);
-    void AddEndpointId(chip::EndpointId endpointId);
-    inline uint16_t GetEndpointListId() { return mEndpointListId; };
-    std::string GetName() { return mName; };
-    inline chip::app::Clusters::Actions::EndpointListTypeEnum GetType() { return mType; };
-    inline chip::EndpointId * GetEndpointListData() { return mEndpoints.data(); };
-    inline size_t GetEndpointListSize() { return mEndpoints.size(); };
-
-private:
-    uint16_t mEndpointListId = static_cast<uint16_t>(0);
-    std::string mName;
-    chip::app::Clusters::Actions::EndpointListTypeEnum mType = static_cast<chip::app::Clusters::Actions::EndpointListTypeEnum>(0);
-    std::vector<chip::EndpointId> mEndpoints;
-};
-
-class Room
-{
-public:
-    Room(std::string name, uint16_t endpointListId, chip::app::Clusters::Actions::EndpointListTypeEnum type, bool isVisible);
-    inline void setIsVisible(bool isVisible) { mIsVisible = isVisible; };
-    inline bool getIsVisible() { return mIsVisible; };
-    inline void setName(std::string name) { mName = name; };
-    inline std::string getName() { return mName; };
-    inline chip::app::Clusters::Actions::EndpointListTypeEnum getType() { return mType; };
-    inline uint16_t getEndpointListId() { return mEndpointListId; };
-
-private:
-    bool mIsVisible;
-    std::string mName;
-    uint16_t mEndpointListId;
-    chip::app::Clusters::Actions::EndpointListTypeEnum mType;
+    chip::EndpointId mEndpointId;
+    chip::Span<chip::DataVersion> mDataVersions;
+    chip::Span<EmberAfCluster> mClusters;
+    chip::Span<ClusterImpl *> mClusterImpl;
+    chip::Span<const EmberAfDeviceType> mDeviceTypeList;
+    EmberAfEndpointType mEndpointType;
+    const char * mDeviceName = "";
 };
 
 class Action
@@ -268,3 +96,7 @@ private:
     uint16_t mSupportedCommands;
     bool mIsVisible;
 };
+
+int AddDeviceEndpoint(Device * dev);
+int RemoveDeviceEndpoint(Device * dev);
+Device * FindDeviceEndpoint(chip::EndpointId id);
