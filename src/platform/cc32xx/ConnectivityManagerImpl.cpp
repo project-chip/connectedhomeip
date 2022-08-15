@@ -66,7 +66,7 @@ using namespace ::chip::System;
 using namespace ::chip::TLV;
 
 extern "C" void cc32xxLog(const char * aFormat, ...);
-static struct netif *m_pNetIf = NULL;
+static struct netif * m_pNetIf = NULL;
 
 namespace chip {
 namespace DeviceLayer {
@@ -193,14 +193,14 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 }
 
 // ==================== ConnectivityManager Private Methods ====================
-void ConnectivityManagerImpl::_OnLwipEvent(struct netif *pNetIf, NetIfStatus_e status, void *pParams)
+void ConnectivityManagerImpl::_OnLwipEvent(struct netif * pNetIf, NetIfStatus_e status, void * pParams)
 {
-    switch(status)
+    switch (status)
     {
-        case E_NETIF_STATUS_IP_ACQUIRED:
-            PlatformMgr().ScheduleWork(_OnIpAcquired);
+    case E_NETIF_STATUS_IP_ACQUIRED:
+        PlatformMgr().ScheduleWork(_OnIpAcquired);
         break;
-        default:
+    default:
         break;
     }
 }
@@ -210,8 +210,6 @@ void ConnectivityManagerImpl::_OnIpAcquired(intptr_t arg)
     cc32xxLog("ConnectivityManagerImpl::OnIpAcquired() : Start DNS Server");
     chip::app::DnssdServer::Instance().StartServer();
 }
-
-
 
 void ConnectivityManagerImpl::OnStationConnected()
 {

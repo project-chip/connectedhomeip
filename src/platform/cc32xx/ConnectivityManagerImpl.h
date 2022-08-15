@@ -39,8 +39,7 @@
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 
-extern "C"
-{
+extern "C" {
 #include "lwip_if.h"
 }
 
@@ -131,8 +130,9 @@ private:
     void OnStationDisconnected(void);
     void ChangeWiFiStationState(WiFiStationState newState);
 
-    static void _OnLwipEvent(struct netif *pNetIf, NetIfStatus_e status, void *pParams);
-    static void _OnIpAcquired(intptr_t arg);    CHIP_ERROR ConfigureWiFiAP(void);
+    static void _OnLwipEvent(struct netif * pNetIf, NetIfStatus_e status, void * pParams);
+    static void _OnIpAcquired(intptr_t arg);
+    CHIP_ERROR ConfigureWiFiAP(void);
     void ChangeWiFiAPState(WiFiAPState newState);
 
     void UpdateInternetConnectivityState(void);

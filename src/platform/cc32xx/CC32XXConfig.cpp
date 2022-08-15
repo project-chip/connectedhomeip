@@ -344,7 +344,6 @@ CHIP_ERROR CC32XXConfig::ReadConfigValue(Key key, bool & val)
     uint8_t localVal;
     cc32xxLog("[%s] %s", __FUNCTION__, key.key);
 
-
     ret = ReadConfigValueBin(key, &localVal, sizeof(localVal), ignore);
 
     // reference CC32XXConfig::WriteConfigValue(Key key, bool val) for storage of boolean values
@@ -373,7 +372,6 @@ CHIP_ERROR CC32XXConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize,
 CHIP_ERROR CC32XXConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     cc32xxLog("[%s] %s", __FUNCTION__, key.key);
-
 
     CC32XXKVSEntry * pEntry = pList->GetEntryByKey(key.key);
 
