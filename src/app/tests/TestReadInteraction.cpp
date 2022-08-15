@@ -3772,7 +3772,7 @@ void TestReadInteraction::TestShutdownSubscription(nlTestSuite * apSuite, void *
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
-        engine->ShutdownSubscription(readClient.GetFabricIndex(), readClient.GetPeerNodeId(),
+        engine->ShutdownSubscription(chip::ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()),
                                      readClient.GetSubscriptionId().Value());
         NL_TEST_ASSERT(apSuite, readClient.IsIdle());
     }

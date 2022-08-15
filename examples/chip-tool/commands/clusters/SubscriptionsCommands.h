@@ -38,7 +38,7 @@ public:
     CHIP_ERROR RunCommand() override
     {
         CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->ShutdownSubscription(
-            CurrentCommissioner().GetFabricIndex(), mNodeId, mSubscriptionId);
+            chip::ScopedNodeId(mNodeId, CurrentCommissioner().GetFabricIndex()), mSubscriptionId);
         SetCommandExitStatus(err);
         return CHIP_NO_ERROR;
     }
