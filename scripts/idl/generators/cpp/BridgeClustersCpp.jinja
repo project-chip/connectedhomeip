@@ -71,7 +71,7 @@ struct {{cluster.name}}Cluster : public CommonCluster
   {%-   endfor %}
 
 
-  static constexpr chip::ClusterId kClusterId = ZCL_{{cluster.name | cameltoconst}}_CLUSTER_ID;
+  static constexpr chip::ClusterId kClusterId = {{cluster.code}};
 
   chip::ClusterId GetClusterId() override { return kClusterId; }
 
@@ -198,7 +198,7 @@ struct ClusterInfo
 {% for cluster in clusters %}
 {%-   if cluster | dynamicCluster(idl) %}
   {
-    ZCL_{{cluster.name | cameltoconst}}_CLUSTER_ID,
+    {{cluster.code}},
     "{{cluster.name}}",
     sizeof({{cluster.name}}Cluster),
     [](void *mem) -> CommonCluster* {
@@ -229,7 +229,7 @@ struct AttrInfo
 {%-   if cluster | dynamicCluster(idl) %}
 
 {%-      for attr in cluster.attributes %}
-  {ZCL_{{cluster.name | cameltoconst}}_CLUSTER_ID, {{attr.definition.code}}, "{{attr.definition.name | capitalcase}}" },
+  { {{cluster.code}}, {{attr.definition.code}}, "{{attr.definition.name | capitalcase}}" },
 {%-      endfor  %}
 
 {%-   endif %}

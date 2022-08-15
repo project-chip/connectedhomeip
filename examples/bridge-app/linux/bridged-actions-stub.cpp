@@ -84,17 +84,11 @@ CHIP_ERROR ActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, Att
     CHIP_ERROR err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         for (auto & room : gRooms)
         {
-<<<<<<< HEAD
-            Actions::Structs::EndpointListStruct::Type endpointListStruct = {
-                info.GetEndpointListId(), CharSpan::fromCharString(info.GetName().c_str()), info.GetType(),
-                DataModel::List<chip::EndpointId>(info.GetEndpointListData(), info.GetEndpointListSize())
-=======
             if (room.GetEndpointListSize() == 0)
                 continue;
-            BridgedActions::Structs::EndpointListStruct::Type endpointListStruct = {
+            Actions::Structs::EndpointListStruct::Type endpointListStruct = {
                 room.GetEndpointListId(), CharSpan::fromCharString(room.GetName().c_str()), room.GetType(),
                 DataModel::List<chip::EndpointId>(room.GetEndpointListData(), room.GetEndpointListSize())
->>>>>>> ebb974a33 (Update bridge app)
             };
             ReturnErrorOnFailure(encoder.Encode(endpointListStruct));
         }

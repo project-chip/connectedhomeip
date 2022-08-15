@@ -28,12 +28,13 @@
 
 #include <functional>
 
-static constexpr uint16_t ZCL_DESCRIPTOR_CLUSTER_REVISION           = 1;
-static constexpr uint16_t ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_REVISION = 1;
-static constexpr uint16_t ZCL_FIXED_LABEL_CLUSTER_REVISION          = 1;
-static constexpr uint16_t ZCL_ON_OFF_CLUSTER_REVISION               = 4;
-static constexpr uint16_t ZCL_SWITCH_CLUSTER_REVISION               = 1;
-static constexpr uint16_t ZCL_LEVEL_CONTROL_CLUSTER_REVISION        = 1;
+static constexpr uint16_t ZCL_DESCRIPTOR_CLUSTER_REVISION              = 1;
+static constexpr uint16_t ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_REVISION    = 1;
+static constexpr uint16_t ZCL_FIXED_LABEL_CLUSTER_REVISION             = 1;
+static constexpr uint16_t ZCL_ON_OFF_CLUSTER_REVISION                  = 4;
+static constexpr uint16_t ZCL_SWITCH_CLUSTER_REVISION                  = 1;
+static constexpr uint16_t ZCL_LEVEL_CONTROL_CLUSTER_REVISION           = 1;
+static constexpr uint16_t ZCL_TEMPERATURE_MEASUREMENT_CLUSTER_REVISION = 1;
 
 // This is the interface to cluster implementations, providing access to manipulate attributes.
 class ClusterImpl

@@ -27,8 +27,21 @@ Device::Device(chip::Span<chip::DataVersion> dataVersions, chip::Span<EmberAfClu
                chip::EndpointId parentId) :
     mParentEndpointId(parentId),
     mDataVersions(dataVersions), mClusters(clusters), mClusterImpl(clusterImpl), mDeviceTypeList(deviceTypeList)
+{}
+
+void Device::SetEndpointId(chip::EndpointId id)
 {
     mEndpointId = id;
     for (auto * c : mClusterImpl)
         c->SetEndpointId(id);
+}
+
+const char * Device::GetName()
+{
+    return mDeviceName;
+}
+
+void Device::SetName(const char * name)
+{
+    mDeviceName = name;
 }

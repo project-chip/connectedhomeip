@@ -26,7 +26,7 @@ public:
     Room() = default;
     void SetName(std::string name) { mName = name; }
     const std::string & GetName() { return mName; }
-    chip::app::Clusters::BridgedActions::EndpointListTypeEnum GetType() { return mType; };
+    chip::app::Clusters::Actions::EndpointListTypeEnum GetType() { return mType; };
     uint16_t GetEndpointListId() { return mEndpointListId; };
     chip::EndpointId * GetEndpointListData() { return mEndpoints.data(); };
     size_t GetEndpointListSize() { return mEndpoints.size(); };
@@ -42,7 +42,7 @@ public:
 private:
     std::string mName;
     uint16_t mEndpointListId = 0;
-    chip::app::Clusters::BridgedActions::EndpointListTypeEnum mType;
+    chip::app::Clusters::Actions::EndpointListTypeEnum mType;
     std::vector<chip::EndpointId> mEndpoints;
 };
 

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <lib/support/Span.h>
+#include <app-common/app-common/zap-generated/cluster-enums.h>
 
 #include <stdbool.h>
 #include <stdint.h>
