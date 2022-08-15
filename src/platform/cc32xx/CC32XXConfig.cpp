@@ -342,7 +342,7 @@ CHIP_ERROR CC32XXConfig::ReadConfigValue(Key key, bool & val)
     CHIP_ERROR ret;
     size_t ignore;
     uint8_t localVal;
-    cc32xxLog("[%s]", __FUNCTION__);
+    cc32xxLog("[%s] %s", __FUNCTION__, key.key);
 
     ret = ReadConfigValueBin(key, &localVal, sizeof(localVal), ignore);
 
@@ -371,7 +371,7 @@ CHIP_ERROR CC32XXConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize,
 
 CHIP_ERROR CC32XXConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    cc32xxLog("[%s]", __FUNCTION__);
+    cc32xxLog("[%s] %s", __FUNCTION__, key.key);
 
     CC32XXKVSEntry * pEntry = pList->GetEntryByKey(key.key);
 
@@ -411,6 +411,7 @@ CHIP_ERROR CC32XXConfig::WriteConfigValueStr(Key key, const char * str, size_t s
 CHIP_ERROR CC32XXConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
     cc32xxLog("[%s]", __FUNCTION__);
+
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     err            = pList->AddEntryByKey(key.key, data, (uint16_t) dataLen);
     return err;
@@ -418,7 +419,8 @@ CHIP_ERROR CC32XXConfig::WriteConfigValueBin(Key key, const uint8_t * data, size
 
 CHIP_ERROR CC32XXConfig::ClearConfigValue(Key key)
 {
-    cc32xxLog("[%s]", __FUNCTION__);
+    cc32xxLog("[%s] %s", __FUNCTION__, key.key);
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     pList->DeleteEntryByKey(key.key);
     return err;
@@ -426,7 +428,8 @@ CHIP_ERROR CC32XXConfig::ClearConfigValue(Key key)
 
 bool CC32XXConfig::ConfigValueExists(Key key)
 {
-    cc32xxLog("[%s]", __FUNCTION__);
+    cc32xxLog("[%s] %s", __FUNCTION__, key.key);
+
     bool ret                = false;
     CC32XXKVSEntry * pEntry = pList->GetEntryByKey(key.key);
     if (pEntry)
@@ -436,7 +439,8 @@ bool CC32XXConfig::ConfigValueExists(Key key)
 
 CHIP_ERROR CC32XXConfig::FactoryResetConfig()
 {
-    cc32xxLog("[%s]", __FUNCTION__);
+    cc32xxLog("[%s] ", __FUNCTION__);
+
     while (1)
         ;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -445,7 +449,8 @@ CHIP_ERROR CC32XXConfig::FactoryResetConfig()
 
 void CC32XXConfig::RunConfigUnitTest()
 {
-    cc32xxLog("[%s]", __FUNCTION__);
+    cc32xxLog("[%s] ", __FUNCTION__);
+
     // Run common unit test.
     ::chip::DeviceLayer::Internal::RunConfigUnitTest<CC32XXConfig>();
 }
