@@ -484,6 +484,7 @@ void DefaultOTARequestor::OnConnectionFailure(void * context, const ScopedNodeId
 {
     DefaultOTARequestor * requestorCore = static_cast<DefaultOTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
+    requestorCore->mSessionHolder.Release();
 
     ChipLogError(SoftwareUpdate, "Failed to connect to node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                  ChipLogValueX64(peerId.GetNodeId()), error.Format());

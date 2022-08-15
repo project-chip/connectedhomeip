@@ -453,12 +453,17 @@ ChipError::StorageType pychip_DeviceController_SetWiFiCredentials(const char * s
 
 ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
-    devCtrl->SessionMgr()->ForEachMatchingSession(ScopedNodeId(nodeid, devCtrl->GetFabricIndex()), [](auto * session) {
-        if (session->IsActiveSession())
-        {
-            session->MarkAsDefunct();
-        }
-    });
+    //
+    // Since we permit multiple controllers per fabric and each is associated with a unique fabric index, closing a session
+    // requires us to do so across all controllers on the same logical fabric.
+    //
+    devCtrl->SessionMgr()->ForEachMatchingSessionOnLogicalFabric(ScopedNodeId(nodeid, devCtrl->GetFabricIndex()),
+                                                                 [](auto * session) {
+                                                                     if (session->IsActiveSession())
+                                                                     {
+                                                                         session->MarkAsDefunct();
+                                                                     }
+                                                                 });
 
     return CHIP_NO_ERROR.AsInteger();
 }

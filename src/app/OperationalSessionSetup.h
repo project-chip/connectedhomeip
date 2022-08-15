@@ -155,11 +155,11 @@ typedef void (*OnDeviceConnectionFailure)(void * context, const ScopedNodeId & p
  *          - Establish a secure channel to it via CASE
  *          - Expose to consumers the secure session for talking to the device via OnDeviceConnected
  *            callback.
- *    2. Peforming an address lookup. Upon success, it will notify the SessionManager of the
- *       result of the address.
+ *    2. Performing an address lookup for given a scoped nodeid. On success, it will call into
+ *       SessionManager to update the addresses for all matching sessions in the session table.
  *
- * OperationalSessionSetup has a very limited lifetime, once it has completed its purpose outlined above it
- * will use `releaseDelegate` to release itself.
+ * OperationalSessionSetup has a very limited lifetime. Once it has completed its purpose outlined above,
+ * it will use `releaseDelegate` to release itself.
  *
  * It is possible to determine which of the two purposes the OperationalSessionSetup is for by calling
  * IsForAddressUpdate().

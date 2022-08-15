@@ -267,6 +267,8 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error)
     //
     while (failureReady.mNext != &failureReady)
     {
+        // We expect that we only have callbacks if we are not performing just address update.
+        VerifyOrDie(!mPerformingAddressUpdate);
         Callback::Callback<OnDeviceConnectionFailure> * cb =
             Callback::Callback<OnDeviceConnectionFailure>::FromCancelable(failureReady.mNext);
 
@@ -278,11 +280,10 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error)
         }
     }
 
-    // One noteworthy comment is that in the case where IsForAddressUpdate() is true, there are no callbacks.
-    // As a result, the two while loops in this function never run. This is an important detail because in
-    // the case we are performing a lookup we will not have SessionHandle.
     while (successReady.mNext != &successReady)
     {
+        // We expect that we only have callbacks if we are not performing just address update.
+        VerifyOrDie(!mPerformingAddressUpdate);
         Callback::Callback<OnDeviceConnected> * cb = Callback::Callback<OnDeviceConnected>::FromCancelable(successReady.mNext);
 
         cb->Cancel();
