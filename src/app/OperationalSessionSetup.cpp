@@ -125,10 +125,11 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
         isConnected = AttachToExistingSecureSession();
         if (!isConnected)
         {
-            // We should really be in State::HasAddress since in the same call
-            // we move to State::HasAddress we then moved to State::Connecting
-            // or call DequeueConnectionCallbacks with an error thus releasing
-            // ourselve.
+            // We should not actually every be in be in State::HasAddress. This
+            // is because in the same call that we moved to State::HasAddress
+            // we either move to State::Connecting or call
+            // DequeueConnectionCallbacks with an error thus releasing
+            // ourselves before any call would reach this section of code.
             err = CHIP_ERROR_INCORRECT_STATE;
         }
 
