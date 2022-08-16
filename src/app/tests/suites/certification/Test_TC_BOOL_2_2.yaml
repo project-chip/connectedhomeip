@@ -66,12 +66,14 @@ tests:
     - label: "Set up subscription to StateChange event"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
+          Need an SDK implementation required
+
           Run the below command to start interactive mode
           ./chip-tool interactive start
 
           Subscribe the event using below command in Interactive mode. Once the event occurs, TH(chip-tool) get the subscription message.
 
-          booleanstate subscribe-by-id 0x0 1 100 2 1
+          booleanstate subscribe-event state-change 1 100 1 1 --is-urgent true
       disabled: true
 
     - label: "Bring the DUT into a state so StateValue is FALSE"
