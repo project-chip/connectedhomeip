@@ -54,7 +54,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
        if (attributeId == LevelControl::Attributes::CurrentLevel::Id)
        {
           action_type = LightingManager::MOVE_TO_LEVEL; 
-       } 
+       }
 
        LightMgr().InitiateActionLight(AppEvent::kEventType_Light, action_type, endpoint, *value);
     }

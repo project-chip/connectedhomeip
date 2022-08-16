@@ -68,11 +68,6 @@ void LightingManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Ca
     mActionCompleted_CB = aActionCompleted_CB;
 }
 
-void LightingManager::SetLightCallbacks(Callback_fn_set_light aChangeLight_CB)
-{
-    mChangeLight_CB = aChangeLight_CB;
-}
-
 bool LightingManager::IsActionInProgress()
 {
     return (mState == kState_OffInitiated || mState == kState_OnInitiated);
@@ -140,15 +135,19 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
 bool LightingManager::InitiateActionLight(int32_t aActor, Action_t aAction, uint16_t endpoint, uint8_t value)
 {
     bool action_initiated = false;
-    bool onoff_complete = (mState == kState_OnCompleted || mState == kState_OffCompleted);
-    bool led_action = ((aAction == MOVE_TO_LEVEL) || (aAction == MOVE_TO_HUE) || (aAction == MOVE_TO_SAT));
 
-    if (onoff_complete && led_action)
+    switch(aAction)
     {
-        action_initiated = true;
-        mChangeLight_CB(aAction, endpoint, value);
+        case MOVE_TO_LEVEL:
+        case MOVE_TO_HUE:
+        case MOVE_TO_SAT:
+            action_initiated = true;
+            GetAppTask().PostLightControlActionRequest(aActor, aAction, value);
+            break;
+        default:
+            break;
     }
-    
+
     return action_initiated;
 }
 

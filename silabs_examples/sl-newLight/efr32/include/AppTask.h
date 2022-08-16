@@ -47,6 +47,7 @@ public:
     static void AppTaskMain(void * pvParameter);
 
     void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
+    void PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint8_t value);
     void PostEvent(const AppEvent * event);
 
     void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction);
@@ -58,7 +59,6 @@ private:
 
     static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(LightingManager::Action_t aAction);
-    static void ActionChangeLight(LightingManager::Action_t aAction, uint16_t endpoint, uint8_t value);
 
     void CancelTimer(void);
 
@@ -67,6 +67,7 @@ private:
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
     static void LightActionEventHandler(AppEvent * aEvent);
+    static void LightControlEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
     static void UpdateClusterState(intptr_t context);

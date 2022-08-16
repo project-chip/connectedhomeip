@@ -35,46 +35,49 @@
 
 #include "sl_simple_rgb_pwm_led.h"
 
+#define PWM_FREQUENCY           10000
+#define PWM_MAX_VALUE           100
+#define PWM_RESOLUTION_LEVELS   100
+#define LED_RGB_INITIAL_STATE   1
+#define LED_RGB_POLARITY        0U
+/* Max and min level as defined in "appclusters.pdf" section 1.6.5. */
 #define ATTRIBUTE_LEVEL_MAX     254
+#define ATTRIBUTE_LEVEL_MIN     1
 // Default Saturation in the cluster is zero.
 #define INITIAL_SATURATION      0.0f
 // Default Hue in the color control cluster is zero.
 #define INITIAL_HUE             0
-#define INITIAL_RGB             0
-
-#define LED_ENDPOINT_DEFAULT    1
-#define LED_RGB_INITIAL_STATE   1
-#define LED_RGB_POLARITY        0U
-#define PWM_FREQUENCY           10000
-#define PWM_MAX_VALUE           100
-#define PWM_RESOLUTION_LEVELS   100
+#define INITIAL_RGB             PWM_MAX_VALUE
 
 
 // RGB PWM Led instance with preset parameters.
 extern const sl_led_rgb_pwm_t sl_led_rgb_pwm;
 
+struct ColorElements
+{
+    uint8_t red_value;
+    uint8_t green_value;
+    uint8_t blue_value;
+};
 
 class LEDWidgetRGB : public LEDWidget
 {
 public:
     static void InitGpioRGB();
     void Init(const sl_led_rgb_pwm_t* led);
-    void Set(bool state);
-    void Set(bool state, uint16_t led_endpoint);
-    void SetLevel(uint8_t level, uint16_t led_endpoint);
-    void GetLevel(uint8_t rgb[], uint32_t size);
-    void SetHue(uint8_t hue, uint16_t led_endpoint);
-    void SetSaturation(uint8_t sat, uint16_t led_endpoint);
-    void SetColor(uint8_t hue, uint8_t saturation, uint16_t led_endpoint);
-    void SetColor(uint8_t* rgb, uint16_t led_endpoint);
+    void SetLevel(uint8_t level);
+    void GetLevel(ColorElements* rgb);
+    void SetHue(uint8_t hue);
+    void SetSaturation(uint8_t sat);
+    void SetColor(uint8_t hue, float saturation, uint8_t level);
+    void SetColorRGB(ColorElements* rgb);
 
-private:    
-    void HueToRGB(uint16_t hue, float saturation, uint8_t* rgb, uint8_t max_value);
-    void SetRGB(uint8_t* rgb, uint16_t led_endpoint, bool memorize);
-    
-    uint16_t current_hue_;
-    uint8_t current_rgb_[3];
-    float current_saturation_;
+private:
+    void HueToRGB(uint16_t hue, float saturation, uint8_t value, ColorElements* rgb, uint8_t max_value);
+
+    uint16_t                current_hue_;
+    uint8_t                 current_level_;
+    float                   current_saturation_;
     const sl_led_rgb_pwm_t* led_rgb_;
-    uint32_t level_resolution_;    
+    uint32_t                level_resolution_;
 };

@@ -145,21 +145,17 @@ void LEDWidgetRGB::Init(const sl_led_rgb_pwm_t* led)
     /* 1. Initialize the value of class variables. */
     sl_simple_rgb_pwm_led_context_t* led_context;
     led_context = reinterpret_cast<sl_simple_rgb_pwm_led_context_t*>(led->led_common.context);
-    this->level_resolution_ = led_context->resolution;
-    this->current_hue_ = INITIAL_HUE;
-    this->current_saturation_ = INITIAL_SATURATION;
-    this->led_rgb_ = led;  
 
-    /* 2. Set the RGB values to INITIAL_RGB. This does not affect the driver. */
-    for (uint8_t i = 0; i < 3; i++)
-    {
-        this->current_rgb_[i] = INITIAL_RGB;
-    } 
+    this->level_resolution_     =   led_context->resolution;
+    this->current_hue_          =   INITIAL_HUE;
+    this->current_level_        =   INITIAL_RGB;
+    this->current_saturation_   =   INITIAL_SATURATION;
+    this->led_rgb_              =   led;  
 
-    /* 3. Initialize the value of the base class member variables. */
+    /* 2. Initialize the value of the base class member variables. */
     LEDWidget::Init(&(led->led_common));
 
-    /* 4. Turn on the RGB LED pins. */
+    /* 3. Turn on the RGB LED pins. */
     GPIO_PinOutSet(gpioPortJ, 14);
     GPIO_PinOutSet(gpioPortI, 0);
     GPIO_PinOutSet(gpioPortI, 1);
@@ -168,167 +164,149 @@ void LEDWidgetRGB::Init(const sl_led_rgb_pwm_t* led)
 }
 
 
-void LEDWidgetRGB::Set(bool state)
+void LEDWidgetRGB::SetLevel(uint8_t level)
 {
-    this->Set(state, LED_ENDPOINT_DEFAULT);
-}
-
-
-void LEDWidgetRGB::Set(bool state, uint16_t led_endpoint)
-{
-    uint8_t rgb[3] = {0, 0, 0};
-    bool save_values = false;
-
-    if (state == true)
+    /* 1. Check if the input value is correct. */
+    if (level > ATTRIBUTE_LEVEL_MAX)
     {
-        save_values = true;
-        bool turned_on = false;
-
-        for (int i = 0; i < 3; i++)
-        {
-            if (this->current_rgb_[i] > 1)
-            {
-                turned_on = true;
-            }
-        }
-
-        if (turned_on == true) 
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                rgb[i] = current_rgb_[i];
-            }
-        }
-        else 
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                rgb[i] = PWM_MAX_VALUE;
-            }
-        }
+        EFR32_LOG(" Error in led_widget_rgb.cpp. The level received is too great.");
+        this->current_level_ = PWM_MAX_VALUE;
     }
-
-    this->SetRGB(rgb, led_endpoint, save_values);
-}
-
-
-void LEDWidgetRGB::SetLevel(uint8_t level, uint16_t led_endpoint)
-{
-    if(led_endpoint == 1)
+    else
     {
-        /* 1. Adjust the color level. */
         // The Levelcontrol cluster takes values from 0 to 254.
-        // However, the PWM driver accepts values from 0 to 100.
-        // See appclusters, section 1.6.6.1.
-        uint8_t adjusted_level = (level * PWM_MAX_VALUE) / ATTRIBUTE_LEVEL_MAX;
-
-        /* 2. Set the colors. */
-        uint8_t rgb[3] = {adjusted_level, adjusted_level, adjusted_level};
-        this->SetRGB(rgb, led_endpoint, true);
+        // However, the PWM driver is sensitive to values from 0 to 100.
+        // For more information, see "appclusters.pdf", section 1.6.6.1.
+        this->current_level_ = (level * PWM_MAX_VALUE) / ATTRIBUTE_LEVEL_MAX;
     }
+
+    /* 2. Update the color. */
+    this->SetColor(this->current_hue_, this->current_saturation_, this->current_level_);
 }
 
 
-void LEDWidgetRGB::GetLevel(uint8_t* rgb, uint32_t size)
+void LEDWidgetRGB::GetLevel(ColorElements* rgb)
 {
-    /* 1. Create a buffer and assign it to the pointer. */
-    if (rgb == nullptr || rgb == NULL || size < 3)
+    /* 1. Check if the argument struct is not null. */
+    if (rgb == nullptr)
     {
-        EFR32_LOG(" Error in led_widget_rgb.cpp. Array refused.");
-        return; 
-    } 
+        EFR32_LOG(" Error in led_widget_rgb.cpp. Argument struct is null.");
+        return;
+    }
 
     /* 2. Get the current RGB value from the driver. */
-    uint16_t red = 0;
-    uint16_t green = 0;
-    uint16_t blue = 0;
-    void* led_rgb_context = this->led_rgb_->led_common.context;
-    this->led_rgb_->get_rgb_color(led_rgb_context, &red, &green, &blue);
+    uint16_t red    = 0;
+    uint16_t green  = 0;
+    uint16_t blue   = 0;
+    this->led_rgb_->get_rgb_color(this->led_rgb_->led_common.context, &red, &green, &blue);
 
-    /* 3. Assign the colors in the array. */
-    rgb[0] = static_cast<uint8_t>(red);
-    rgb[1] = static_cast<uint8_t>(green);
-    rgb[2] = static_cast<uint8_t>(blue);
+    /* 3. Verify that the colors are in-bound. */
+    if (red > PWM_MAX_VALUE)
+    {
+        EFR32_LOG(" In led_widget_rgb.cpp. get_rgb_color() returned red value of %d.", red);
+        red = PWM_MAX_VALUE;
+    }
+    if(green > PWM_MAX_VALUE)
+    {
+        EFR32_LOG(" In led_widget_rgb.cpp. get_rgb_color() returned green value of %d.", green);
+        green = PWM_MAX_VALUE;
+    }
+    if(blue > PWM_MAX_VALUE)
+    {
+        EFR32_LOG(" In led_widget_rgb.cpp. get_rgb_color() returned blue value of %d.", blue);
+        blue = PWM_MAX_VALUE;
+    }
+
+    /* 4. Assign the colors to the argument struct. */
+    rgb->red_value      =   static_cast<uint8_t>(red);
+    rgb->green_value    =   static_cast<uint8_t>(green);
+    rgb->blue_value     =   static_cast<uint8_t>(blue);
 }
 
 
-void LEDWidgetRGB::SetHue(uint8_t hue, uint16_t led_endpoint)
+void LEDWidgetRGB::SetHue(uint8_t hue)
 {
     // Hue takes a value [0, 360] and is expressed in degrees.
     // See appclusters, section 3.2.7.1.
     this->current_hue_ = static_cast<uint16_t>((hue * 360) / ATTRIBUTE_LEVEL_MAX);
-    this->SetColor(this->current_hue_, this->current_saturation_, led_endpoint); 
+    this->SetColor(this->current_hue_, this->current_saturation_, this->current_level_); 
 }
 
 
-void LEDWidgetRGB::SetSaturation(uint8_t sat, uint16_t led_endpoint)
+void LEDWidgetRGB::SetSaturation(uint8_t sat)
 {
     // Saturation takes a value [0, 1] representing a percentage.
     // The Color Control cluster accepts saturation values 0 to 254.
     // See appclusters, section 3.2.7.2.
     this->current_saturation_ = sat/254.0;
-    this->SetColor(this->current_hue_, this->current_saturation_, led_endpoint);
+    this->SetColor(this->current_hue_, this->current_saturation_, this->current_level_);
 }
 
 
-void LEDWidgetRGB::SetColor(uint8_t* rgb, uint16_t led_endpoint)
-{
-   /* 1. Set the color values. */
-    this->SetRGB(rgb, led_endpoint, true);
-}
-
-
-void LEDWidgetRGB::SetColor(uint8_t hue, uint8_t saturation, uint16_t led_endpoint)
+void LEDWidgetRGB::SetColor(uint8_t hue, float saturation, uint8_t level)
 {
     /* 1. Convert the hue and saturation input to RGB values. (HSV to RGB conversion) */
-    uint8_t rgb[3] = {0, 0, 0};
-    HueToRGB(this->current_hue_, this->current_saturation_, rgb, PWM_MAX_VALUE);
+    ColorElements rgb = 
+    {
+        .red_value      = 0,
+        .green_value    = 0,
+        .blue_value     = 0
+    };
 
-    /* 2. Update the LEDs RGB values. */
-    this->SetRGB(rgb, led_endpoint, true);
+    HueToRGB(hue, saturation, level, &rgb, PWM_MAX_VALUE);
+
+    /* 2. Set the color values. */
+    this->SetColorRGB(&rgb);
 }
 
 
-void LEDWidgetRGB::SetRGB(uint8_t* rgb, uint16_t led_endpoint, bool memorize)
+void LEDWidgetRGB::SetColorRGB(ColorElements* rgb)
 {
-    /* 1. Call the PWM driver to set the new values. */
-    void* led_rgb_context = this->led_rgb_->led_common.context;
-    this->led_rgb_->set_rgb_color(led_rgb_context, rgb[0], rgb[1], rgb[2]);
-
-    /* 2. Save the current RGB values. */
-    if (memorize == true)
+    /* 1. Verify that the struct argument is not null. */
+    if (rgb == nullptr)
     {
-        memcpy(this->current_rgb_, rgb, sizeof(this->current_rgb_));
+        EFR32_LOG(" Error in led_widget_rgb.cpp. Argument struct is null.");
+        return;
     }
+
+    /* 2. Call the PWM driver to set the new values. */
+    this->led_rgb_->set_rgb_color(this->led_rgb_->led_common.context, rgb->red_value, rgb->green_value, rgb->blue_value);
 }
 
 
 /**
  * @note This code is based on the HSV to RGB mathematical formula
- *       which was retrieved from: https://en.wikipedia.org/wiki/HSL_and_HSV 
+ *       which was retrieved from: https://en.wikipedia.org/wiki/HSL_and_HSV
  */
-void LEDWidgetRGB::HueToRGB(uint16_t hue, float saturation, uint8_t* rgb, uint8_t max_value)
+void LEDWidgetRGB::HueToRGB(uint16_t hue, float saturation, uint8_t value, ColorElements* rgb, uint8_t max_value)
 {
-    /* 1. Normalize the values. */
+    /* 1. Verify that the struct argument is not null. */
+    if (rgb == nullptr)
+    {
+        EFR32_LOG(" Error in led_widget_rgb.cpp. Struct argument is null.");
+        return;
+    }
+
+    /* 2. Normalize the values. */
     uint16_t hue_degrees = hue;
     float saturation_decimal = saturation;
-    float hsv_value = 1.0;
+    float hsv_value =  static_cast<float>(value) / 100.0;
 
     if (hue_degrees == 360)
     {
         hue_degrees = 0;
-    } 
+    }
 
-    /* 2. Calculate the formula parameters. */
-    float chroma = hsv_value * saturation_decimal;
-    float hue_prime = hue_degrees / 60.0;
-    float hue_modulo = fmod(hue_prime, 2.0);
-    float hue_diff = hue_modulo - 1.0;
-    float hue_abs = fabs(hue_diff);
-    float median_value = chroma * (1.0 - hue_abs);
-    float m = hsv_value - chroma;
+    /* 3. Calculate the formula parameters. */
+    float chroma        =   hsv_value * saturation_decimal;
+    float hue_prime     =   hue_degrees / 60.0;
+    float hue_modulo    =   fmod(hue_prime, 2.0);
+    float hue_diff      =   hue_modulo - 1.0;
+    float hue_abs       =   fabs(hue_diff);
+    float median_value  =   chroma * (1.0 - hue_abs);
+    float m             =   hsv_value - chroma;
 
-    /* 3. Determine the points R', G' and B'. */
+    /* 4. Determine the points R', G' and B'. */
     float r_prime, g_prime, b_prime = 0;
 
     if ( hue_degrees < 60 ) 
@@ -368,8 +346,8 @@ void LEDWidgetRGB::HueToRGB(uint16_t hue, float saturation, uint8_t* rgb, uint8_
         b_prime = median_value;
     }
 
-    /* 4. Calculate the final values of RGB. */
-    rgb[0] = (uint8_t) ( (r_prime + m) * max_value );
-    rgb[1] = (uint8_t) ( (g_prime + m) * max_value );
-    rgb[2] = (uint8_t) ( (b_prime + m) * max_value );
+    /* 5. Calculate the final values of RGB. */
+    rgb->red_value      =   static_cast<uint8_t>( (r_prime + m) * max_value );
+    rgb->green_value    =   static_cast<uint8_t>( (g_prime + m) * max_value );
+    rgb->blue_value     =   static_cast<uint8_t>( (b_prime + m) * max_value );
 }

@@ -61,9 +61,7 @@ public:
 
     typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
     typedef void (*Callback_fn_completed)(Action_t);
-    typedef void (*Callback_fn_set_light)(Action_t, uint16_t endpoint, uint8_t value);
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
-    void SetLightCallbacks(Callback_fn_set_light aChangeLight_CB);
 
 private:
     friend LightingManager & LightMgr(void);
@@ -71,7 +69,6 @@ private:
 
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
-    Callback_fn_set_light mChangeLight_CB;
 
     bool mAutoTurnOff;
     uint32_t mAutoTurnOffDuration;

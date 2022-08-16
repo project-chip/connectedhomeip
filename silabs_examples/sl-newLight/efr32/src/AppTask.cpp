@@ -282,7 +282,6 @@ CHIP_ERROR AppTask::Init()
     }
 
     LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
-    LightMgr().SetLightCallbacks(ActionChangeLight);
 
     // Initialize LEDs
     LEDWidget::InitGpio();
@@ -447,6 +446,37 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
         {
             EFR32_LOG("Action is already in progress or active.");
         }
+    }
+}
+
+
+void AppTask::LightControlEventHandler(AppEvent * aEvent)
+{
+    /* 1. Unpack the AppEvent */
+    uint8_t light_action = aEvent->LightControlEvent.Action;
+    uint8_t value = aEvent->LightControlEvent.Value;
+
+    /* 2. Excute the control command. */
+    if (light_action == LightingManager::MOVE_TO_LEVEL)
+    {
+#ifdef RGB_LED_ENABLED
+        sLightLED.SetLevel(value);
+#endif //RGB_LED_ENABLED
+        EFR32_LOG("Level set to: %d.", value);
+    }
+    else if (light_action == LightingManager::MOVE_TO_HUE)
+    {
+#ifdef RGB_LED_ENABLED
+        sLightLED.SetHue(value);
+#endif //RGB_LED_ENABLED
+        EFR32_LOG("Light LED hue set.");
+    }
+    else if (light_action == LightingManager::MOVE_TO_SAT)
+    {
+#ifdef RGB_LED_ENABLED
+        sLightLED.SetSaturation(value);
+#endif //RGB_LED_ENABLED
+        EFR32_LOG("Light LED saturation set.");
     }
 }
 
@@ -640,29 +670,6 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     }
 }
 
-void AppTask::ActionChangeLight(LightingManager::Action_t aAction, uint16_t endpoint, uint8_t value)
-{
-#ifdef RGB_LED_ENABLED
-    if (aAction == LightingManager::MOVE_TO_LEVEL)
-    {
-        sLightLED.SetLevel(value, endpoint);
-        EFR32_LOG("Light LED Level set to: %d.", value);
-    }
-    else if (aAction == LightingManager::MOVE_TO_HUE)
-    {
-        sLightLED.SetHue(value, endpoint);
-        EFR32_LOG("Light LED hue set.");
-    }
-    else if (aAction == LightingManager::MOVE_TO_SAT)
-    {
-        sLightLED.SetSaturation(value, endpoint);
-        EFR32_LOG("Light LED saturation set.");
-    }
-#else 
-    EFR32_LOG(" Level Control and Color control are unavailable on your board.");
-#endif //RGB_LED_ENABLED
-}
-
 void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction)
 {
     AppEvent event;
@@ -671,6 +678,17 @@ void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t a
     event.LightEvent.Action = aAction;
     event.Handler           = LightActionEventHandler;
     PostEvent(&event);
+}
+
+void AppTask::PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint8_t value)
+{
+    AppEvent light_event                    = {};
+    light_event.Type                        = AppEvent::kEventType_Light;
+    light_event.LightControlEvent.Actor     = aActor;
+    light_event.LightControlEvent.Action    = aAction;
+    light_event.LightControlEvent.Value     = value;
+    light_event.Handler                     = LightControlEventHandler;
+    PostEvent(&light_event);
 }
 
 void AppTask::PostEvent(const AppEvent * aEvent)
