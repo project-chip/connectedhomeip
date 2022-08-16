@@ -2,11 +2,11 @@
     "name": "CHIP Python templates",
     "version": "chip-v1",
     "helpers": [
-        "../../../../src/app/zap-templates/partials/helper.js",
-        "../../../../src/app/zap-templates/common/StringHelper.js",
-        "../../../../src/app/zap-templates/templates/app/helper.js",
-        "../../../../src/app/zap-templates/templates/chip/helper.js",
-        "helper.js"
+        "partials/helper.js",
+        "common/StringHelper.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "controller/python/templates/helper.js"
     ],
     "override": "../../../../src/app/zap-templates/common/override.js",
     "partials": [
