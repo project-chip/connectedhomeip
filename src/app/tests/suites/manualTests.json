@@ -38,8 +38,6 @@
     "Groups": [
         "TestGroupDemoCommand",
         "TestGroupDemoConfig",
-        "Test_TC_G_1_1",
-        "Test_TC_G_2_1",
         "Test_TC_G_2_2",
         "Test_TC_G_2_3",
         "Test_TC_G_3_1",
@@ -69,7 +67,6 @@
         "Test_TC_DA_1_7"
     ],
     "DeviceManagement": [
-        "Test_TC_OPCREDS_1_2",
         "Test_TC_BINFO_2_2",
         "Test_TC_BINFO_2_4",
         "Test_TC_OPCREDS_3_1",
@@ -98,7 +95,6 @@
         "Test_TC_CNET_4_22"
     ],
     "DiagnosticsLogs": [
-        "Test_TC_DLOG_1_1",
         "Test_TC_DLOG_2_1",
         "Test_TC_DLOG_2_2",
         "Test_TC_DLOG_3_1"
@@ -112,7 +108,7 @@
         "Test_TC_DGGEN_3_1"
     ],
     "Identify": ["Test_TC_I_3_1", "Test_TC_I_3_2"],
-    "IlluminanceMeasurement": ["Test_TC_ILL_2_2", "Test_TC_ILL_3_1"],
+    "IlluminanceMeasurement": ["Test_TC_ILL_3_1"],
     "InteractionDataModel": [
         "Test_TC_IDM_1_1",
         "Test_TC_IDM_1_2",
@@ -212,11 +208,7 @@
         "Test_TC_SU_4_1",
         "Test_TC_SU_4_2"
     ],
-    "PowerSourceConfiguration": [
-        "Test_TC_PSCFG_2_1",
-        "Test_TC_PSCFG_2_2",
-        "Test_TC_PSCFG_3_1"
-    ],
+    "PowerSourceConfiguration": ["Test_TC_PSCFG_2_2", "Test_TC_PSCFG_3_1"],
     "SecureChannel": [
         "Test_TC_SC_1_1",
         "Test_TC_SC_1_2",
@@ -243,7 +235,6 @@
     ],
     "SoftwareDiagnostics": ["Test_TC_DGSW_3_1", "Test_TC_DGSW_3_2"],
     "WiFiNetworkDiagnostics": [
-        "Test_TC_DGWIFI_1_1",
         "Test_TC_DGWIFI_2_2",
         "Test_TC_DGWIFI_3_1",
         "Test_TC_DGWIFI_3_2"
@@ -257,7 +248,7 @@
         "Test_TC_OCC_3_1",
         "Test_TC_OCC_3_2"
     ],
-    "PressureMeasurement": ["Test_TC_PRS_2_2", "Test_TC_PRS_3_1"],
+    "PressureMeasurement": ["Test_TC_PRS_3_1"],
     "PowerSource": ["Test_TC_PS_2_2", "Test_TC_PS_3_1"],
     "BooleanState": ["Test_TC_BOOL_2_2", "Test_TC_BOOL_3_1"],
     "ColorControl": [
@@ -283,11 +274,7 @@
         "Test_TC_DRLK_3_2",
         "Test_TC_DRLK_3_3"
     ],
-    "LocalizationConfiguration": [
-        "Test_TC_LCFG_1_1",
-        "Test_TC_LCFG_2_1",
-        "Test_TC_LCFG_3_1"
-    ],
+    "LocalizationConfiguration": ["Test_TC_LCFG_2_1", "Test_TC_LCFG_3_1"],
     "LevelControl": ["Test_TC_LVL_2_3", "Test_TC_LVL_7_1", "Test_TC_LVL_8_1"],
     "OnOff": ["Test_TC_OO_2_3", "Test_TC_OO_3_1", "Test_TC_OO_3_2"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2", "Test_TC_RH_3_1"],
@@ -310,22 +297,16 @@
         "Test_TC_ACT_3_2"
     ],
     "TimeFormatLocalization": [
-        "Test_TC_LTIME_1_1",
         "Test_TC_LTIME_1_2",
         "Test_TC_LTIME_2_1",
         "Test_TC_LTIME_3_1"
     ],
     "UnitLocalization": [
-        "Test_TC_LUNIT_1_1",
         "Test_TC_LUNIT_1_2",
         "Test_TC_LUNIT_2_1",
         "Test_TC_LUNIT_3_1"
     ],
-    "FixedLabel": [
-        "Test_TC_FLABEL_1_1",
-        "Test_TC_FLABEL_2_1",
-        "Test_TC_FLABEL_3_1"
-    ],
+    "FixedLabel": ["Test_TC_FLABEL_3_1"],
     "Binding": ["Test_TC_BIND_2_1", "Test_TC_BIND_2_2", "Test_TC_BIND_2_3"],
     "Scenes": [
         "Test_TC_S_1_1",
@@ -345,7 +326,7 @@
         "Test_TC_ACL_2_9",
         "Test_TC_ACL_2_10"
     ],
-    "UserLabel": ["Test_TC_ULABEL_2_1", "Test_TC_ULABEL_3_1"],
+    "UserLabel": ["Test_TC_ULABEL_3_1"],
     "BridgedDeviceBasicInformation": [
         "Test_TC_BRBINFO_1_1",
         "Test_TC_BRBINFO_2_1",

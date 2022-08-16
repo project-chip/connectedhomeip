@@ -29,6 +29,7 @@
         "Test_TC_CC_8_1"
     ],
     "DeviceManagement": [
+        "Test_TC_OPCREDS_1_2",
         "Test_TC_BINFO_1_1",
         "Test_TC_BINFO_2_1",
         "Test_TC_CNET_1_3"
@@ -39,7 +40,9 @@
         "Test_TC_DGETH_2_1",
         "Test_TC_DGETH_2_2"
     ],
+    "DiagnosticsLogs": ["Test_TC_DLOG_1_1"],
     "FlowMeasurement": ["Test_TC_FLW_1_1", "Test_TC_FLW_2_1"],
+    "FixedLabel": ["Test_TC_FLABEL_1_1", "Test_TC_FLABEL_2_1"],
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_1_1", "Test_TC_DGGEN_2_1"],
     "Identify": [
@@ -48,7 +51,11 @@
         "Test_TC_I_2_2",
         "Test_TC_I_2_3"
     ],
-    "IlluminanceMeasurement": ["Test_TC_ILL_1_1", "Test_TC_ILL_2_1"],
+    "IlluminanceMeasurement": [
+        "Test_TC_ILL_1_1",
+        "Test_TC_ILL_2_1",
+        "Test_TC_ILL_2_2"
+    ],
     "OccupancySensing": ["Test_TC_OCC_1_1", "Test_TC_OCC_2_1"],
     "LevelControl": [
         "Test_TC_LVL_1_1",
@@ -59,8 +66,12 @@
         "Test_TC_LVL_5_1",
         "Test_TC_LVL_6_1"
     ],
+    "LocalizationConfiguration": ["Test_TC_LCFG_1_1"],
+    "TimeFormatLocalization": ["Test_TC_LTIME_1_1"],
+    "UnitLocalization": ["Test_TC_LUNIT_1_1"],
     "UserLabel": [
         "Test_TC_ULABEL_1_1",
+        "Test_TC_ULABEL_2_1",
         "Test_TC_ULABEL_2_2",
         "Test_TC_ULABEL_2_3",
         "Test_TC_ULABEL_2_4"
@@ -114,7 +125,11 @@
         "Test_TC_OO_2_4"
     ],
     "PowerSource": ["Test_TC_PS_1_1", "Test_TC_PS_2_1"],
-    "PressureMeasurement": ["Test_TC_PRS_1_1", "Test_TC_PRS_2_1"],
+    "PressureMeasurement": [
+        "Test_TC_PRS_1_1",
+        "Test_TC_PRS_2_1",
+        "Test_TC_PRS_2_2"
+    ],
     "PumpConfigurationControl": [
         "Test_TC_PCC_1_1",
         "Test_TC_PCC_2_1",
@@ -122,7 +137,7 @@
         "Test_TC_PCC_2_3",
         "Test_TC_PCC_2_4"
     ],
-    "PowerSourceConfiguration": ["Test_TC_PSCFG_1_1"],
+    "PowerSourceConfiguration": ["Test_TC_PSCFG_1_1", "Test_TC_PSCFG_2_1"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_1_1", "Test_TC_RH_2_1"],
     "SecureChannel": ["Test_TC_SC_4_2"],
     "Switch": ["Test_TC_SWTCH_1_1", "Test_TC_SWTCH_2_1"],
@@ -144,7 +159,11 @@
         "Test_TC_DGTHREAD_2_3",
         "Test_TC_DGTHREAD_2_4"
     ],
-    "WiFiNetworkDiagnostics": ["Test_TC_DGWIFI_2_1", "Test_TC_DGWIFI_2_3"],
+    "WiFiNetworkDiagnostics": [
+        "Test_TC_DGWIFI_1_1",
+        "Test_TC_DGWIFI_2_1",
+        "Test_TC_DGWIFI_2_3"
+    ],
     "WindowCovering": [
         "Test_TC_WNCV_1_1",
         "Test_TC_WNCV_2_1",
@@ -229,7 +248,9 @@
     "Groups": [
         "TestGroupMessaging",
         "TestGroupsCluster",
-        "TestGroupKeyManagementCluster"
+        "TestGroupKeyManagementCluster",
+        "Test_TC_G_1_1",
+        "Test_TC_G_2_1"
     ],
     "collection": [
         "AccessControl",
@@ -239,13 +260,18 @@
         "ColorControl",
         "DeviceManagement",
         "Descriptor",
+        "DiagnosticsLogs",
         "EthernetNetworkDiagnostics",
         "FlowMeasurement",
+        "FixedLabel",
         "GeneralCommissioning",
         "GeneralDiagnostics",
         "Identify",
         "IlluminanceMeasurement",
         "LevelControl",
+        "LocalizationConfiguration",
+        "UnitLocalization",
+        "TimeFormatLocalization",
         "MediaControl",
         "ModeSelect",
         "MultipleFabrics",
