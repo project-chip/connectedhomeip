@@ -125,7 +125,11 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
         isConnected = AttachToExistingSecureSession();
         if (!isConnected)
         {
-            err = EstablishConnection();
+            // We should really be in State::HasAddress since in the same call
+            // we move to State::HasAddress we then moved to State::Connecting
+            // or call DequeueConnectionCallbacks with an error thus releasing
+            // ourselve.
+            err = CHIP_ERROR_INCORRECT_STATE;
         }
 
         break;
@@ -179,13 +183,11 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
     CHIP_ERROR err = CHIP_NO_ERROR;
     mDeviceAddress = addr;
 
-    mRemoteMRPConfig = config;
-
     // Initialize CASE session state with any MRP parameters that DNS-SD has provided.
     // It can be overridden by CASE session protocol messages that include MRP parameters.
     if (mCASEClient)
     {
-        mCASEClient->SetRemoteMRPIntervals(mRemoteMRPConfig);
+        mCASEClient->SetRemoteMRPIntervals(config);
     }
 
     if (mState == State::ResolvingAddress)
@@ -194,7 +196,7 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
         mInitParams.sessionManager->UpdateAllSessionsPeerAddress(mPeerId, addr);
         if (!mPerformingAddressUpdate)
         {
-            err = EstablishConnection();
+            err = EstablishConnection(config);
             if (err != CHIP_NO_ERROR)
             {
                 DequeueConnectionCallbacks(err);
@@ -216,14 +218,14 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
-CHIP_ERROR OperationalSessionSetup::EstablishConnection()
+CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ReliableMessageProtocolConfig & config)
 {
     mCASEClient = mInitParams.clientPool->Allocate(CASEClientInitParams{
         mInitParams.sessionManager, mInitParams.sessionResumptionStorage, mInitParams.certificateValidityPolicy,
         mInitParams.exchangeMgr, mFabricTable, mInitParams.groupDataProvider, mInitParams.mrpLocalConfig });
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
 
-    CHIP_ERROR err = mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mRemoteMRPConfig, this);
+    CHIP_ERROR err = mCASEClient->EstablishSession(mPeerId, mDeviceAddress, config, this);
     if (err != CHIP_NO_ERROR)
     {
         CleanupCASEClient();
@@ -334,7 +336,10 @@ void OperationalSessionSetup::CleanupCASEClient()
 
 void OperationalSessionSetup::OnSessionReleased()
 {
-    MoveToState(State::HasAddress);
+    // This is unlikely to be called since within the same call that we get SessionHandle we
+    // then call DequeueConnectionCallbacks which releases `this`. If this is called, and we
+    // we have any callbacks we will just send an error.
+    DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
 }
 
 OperationalSessionSetup::~OperationalSessionSetup()
