@@ -19,6 +19,7 @@ name:
 
 PICS:
     - CADMIN.C
+    - CADMIN.C.C00.Tx
 
 config:
     nodeId: 0x12344321
