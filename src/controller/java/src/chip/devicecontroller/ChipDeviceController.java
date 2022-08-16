@@ -188,14 +188,6 @@ public class ChipDeviceController {
     commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials);
   }
 
-  public void pauseCommissioning() {
-    pauseCommissioning(deviceControllerPtr);
-  }
-
-  public void resumeCommissioning() {
-    resumeCommissioning(deviceControllerPtr);
-  }
-
   /**
    * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
    * called when the NOC CSR needs to be signed. This allows for custom credentials issuer
@@ -669,10 +661,6 @@ public class ChipDeviceController {
       OpenCommissioningCallback callback);
 
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
-
-  private native void pauseCommissioning(long deviceControllerPtr);
-
-  private native void resumeCommissioning(long deviceControllerPtr);
 
   private native void setUseJavaCallbackForNOCRequest(
       long deviceControllerPtr, boolean useCallback);

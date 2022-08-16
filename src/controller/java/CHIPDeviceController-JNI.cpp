@@ -513,26 +513,6 @@ JNI_METHOD(void, establishPaseConnectionByAddress)
     }
 }
 
-JNI_METHOD(void, pauseCommissioning)
-(JNIEnv * env, jobject self, jlong handle)
-{
-    ChipLogProgress(Controller, "pauseCommissioning() called");
-    chip::DeviceLayer::StackLock lock;
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-
-    wrapper->GetAutoCommissioner()->PauseCommissioning();
-}
-
-JNI_METHOD(void, resumeCommissioning)
-(JNIEnv * env, jobject self, jlong handle)
-{
-    ChipLogProgress(Controller, "resumeCommissioning() called");
-    chip::DeviceLayer::StackLock lock;
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-
-    wrapper->GetAutoCommissioner()->ResumeCommissioning();
-}
-
 JNI_METHOD(void, setUseJavaCallbackForNOCRequest)
 (JNIEnv * env, jobject self, jlong handle, jboolean useCallback)
 {

@@ -1833,13 +1833,15 @@ void DeviceCommissioner::OnScanNetworksFailure(void * context, CHIP_ERROR error)
     ChipLogProgress(Controller, "Received ScanNetworks failure response %" CHIP_ERROR_FORMAT, error.Format());
 
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+
+    // advance to the kNeedsNetworkCreds waiting step
+    // clear error so that we don't abort the commissioning when ScanNetworks fails
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+
     if (commissioner->GetPairingDelegate() != nullptr)
     {
         commissioner->GetPairingDelegate()->OnScanNetworksFailure(error);
     }
-    // need to advance to next step
-    // clear error so that we don't abort the commissioning when ScanNetworks fails
-    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
 }
 
 void DeviceCommissioner::OnScanNetworksResponse(void * context,
@@ -1853,12 +1855,23 @@ void DeviceCommissioner::OnScanNetworksResponse(void * context,
                                                : "none provided"));
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
+    // advance to the kNeedsNetworkCreds waiting step
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+
     if (commissioner->GetPairingDelegate() != nullptr)
     {
         commissioner->GetPairingDelegate()->OnScanNetworksSuccess(data);
     }
+}
+
+CHIP_ERROR DeviceCommissioner::NetworkCredentialsReady()
+{
+    ReturnErrorCodeIf(mCommissioningStage != CommissioningStage::kNeedsNetworkCreds, CHIP_ERROR_INCORRECT_STATE);
+
     // need to advance to next step
-    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+    CommissioningStageComplete(CHIP_NO_ERROR);
+
+    return CHIP_NO_ERROR;
 }
 
 void DeviceCommissioner::OnNetworkConfigResponse(void * context,
@@ -1998,6 +2011,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         request.breadcrumb.Emplace(breadcrumb);
         SendCommand<NetworkCommissioningCluster>(proxy, request, OnScanNetworksResponse, OnScanNetworksFailure, endpoint, timeout);
+        break;
+    }
+    case CommissioningStage::kNeedsNetworkCreds: {
+        // nothing to do, the OnScanNetworksSuccess and OnScanNetworksFailure callbacks provide indication to the
+        // DevicePairingDelegate that network credentials are needed.
         break;
     }
     case CommissioningStage::kConfigRegulatory: {

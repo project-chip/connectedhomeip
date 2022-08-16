@@ -547,6 +547,20 @@ public:
     CommissioningStageComplete(CHIP_ERROR err,
                                CommissioningDelegate::CommissioningReport report = CommissioningDelegate::CommissioningReport());
 
+    /**
+     * @brief
+     *   This function is called by the DevicePairingDelegate to indicate that network credentials have been set
+     * on the CommissioningParameters of the CommissioningDelegate using CommissioningDelegate.SetCommissioningParameters().
+     * As a result, commissioning can advance to the next stage.
+     *
+     * The DevicePairingDelegate may call this method from the OnScanNetworksSuccess and OnScanNetworksFailure callbacks,
+     * or it may call this method after obtaining network credentials using asyncronous methods (prompting user, cloud API call,
+     * etc).
+     *
+     * @return CHIP_ERROR   The return status. Returns CHIP_ERROR_INCORRECT_STATE if not in the correct state (kNeedsNetworkCreds).
+     */
+    CHIP_ERROR NetworkCredentialsReady();
+
 #if CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     /**
