@@ -68,20 +68,29 @@ void ReadClient::ClearActiveSubscriptionState()
 
 void ReadClient::StopResubscription()
 {
-
     CancelLivenessCheckTimer();
     CancelResubscribeTimer();
-    mpCallback.OnDeallocatePaths(std::move(mReadPrepareParams));
+
+    // Only deallocate the paths if they are not already deallocated.
+    if (mReadPrepareParams.mpAttributePathParamsList != nullptr || mReadPrepareParams.mpEventPathParamsList != nullptr ||
+        mReadPrepareParams.mpDataVersionFilterList != nullptr)
+    {
+        mpCallback.OnDeallocatePaths(std::move(mReadPrepareParams));
+        // Make sure we will never try to free those pointers again.
+        mReadPrepareParams.mpAttributePathParamsList    = nullptr;
+        mReadPrepareParams.mAttributePathParamsListSize = 0;
+        mReadPrepareParams.mpEventPathParamsList        = nullptr;
+        mReadPrepareParams.mEventPathParamsListSize     = 0;
+        mReadPrepareParams.mpDataVersionFilterList      = nullptr;
+        mReadPrepareParams.mDataVersionFilterListSize   = 0;
+    }
 }
 
 ReadClient::~ReadClient()
 {
+    Close(CHIP_NO_ERROR, /* allowResubscription = */ false, /* allowOnDone = */ false);
     if (IsSubscriptionType())
     {
-        CancelLivenessCheckTimer();
-        CancelResubscribeTimer();
-
-        //
         // Only remove ourselves from the engine's tracker list if we still continue to have a valid pointer to it.
         // This won't be the case if the engine shut down before this destructor was called (in which case, mpImEngine
         // will point to null)
@@ -141,7 +150,7 @@ CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscripti
     return CHIP_NO_ERROR;
 }
 
-void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
+void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription, bool allowOnDone)
 {
     if (IsReadType())
     {
@@ -181,7 +190,10 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
         StopResubscription();
     }
 
-    mpCallback.OnDone(this);
+    if (allowOnDone)
+    {
+        mpCallback.OnDone(this);
+    }
 }
 
 const char * ReadClient::GetStateStr() const
