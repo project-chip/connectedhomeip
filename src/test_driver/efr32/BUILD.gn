@@ -88,21 +88,15 @@ efr32_executable("efr32_device_tests") {
     "${chip_root}/src:tests",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support:testing",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  if (chip_openthread_ftd) {
+  # OpenThread Settings
+  if (chip_enable_openthread) {
     deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
-    ]
-  } else {
-    deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+      "${chip_root}/third_party/openthread:openthread",
+      "${examples_plat_dir}:efr-matter-shell",
     ]
   }
 

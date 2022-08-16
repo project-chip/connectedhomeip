@@ -57,7 +57,7 @@ extern "C" {
 #define COVER_LIFT_TILT_TIMEOUT 500
 #endif
 
-void efr32LogInit(void);
+void efr32InitLog(void);
 
 void efr32Log(const char * aFormat, ...);
 #define EFR32_LOG(...) efr32Log(__VA_ARGS__);
