@@ -176,7 +176,7 @@ efr32_executable("template_app") {
 
   deps = [
     ":sdk",
-    "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/silabs_examples/template/template_DataModel_config",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]

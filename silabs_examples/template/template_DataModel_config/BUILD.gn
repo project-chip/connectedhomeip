@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
-chip_data_model("sl_template") {
+chip_data_model("template_DataModel_config") {
   zap_file = "sl_template.zap"
 
   zap_pregenerated_dir = "${chip_root}/zzz_generated/sl_template/zap-generated"

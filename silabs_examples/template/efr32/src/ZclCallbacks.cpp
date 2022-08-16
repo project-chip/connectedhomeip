@@ -34,17 +34,25 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                                        uint8_t * value)
 {
     ClusterId clusterId     = attributePath.mClusterId;
-    // AttributeId attributeId = attributePath.mAttributeId;
+    AttributeId attributeId = attributePath.mAttributeId;
+
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
-
     // Template TODO, fill with cluster configuration
-    // switch (clusterId)
-    // {
-    //     case :
-    //     default :
-
-    // }
+    switch (clusterId)
+    {
+        case OnOff::Id:
+            ChipLogProgress(Zcl, " OnOff command received with attribute ID: " ChipLogFormatMEI 
+            " Type: %u, Value: %u, length %u", ChipLogValueMEI(attributeId), type, *value, size);
+            break;
+        case LevelControl::Id:
+            ChipLogProgress(Zcl, " LevelControl command received with attribute ID: " ChipLogFormatMEI 
+            " Type: %u, Value: %u, length %u", ChipLogValueMEI(attributeId), type, *value, size);
+            break;
+        default :
+            ChipLogProgress(Zcl, " A cluster command was received with attribute ID: " ChipLogFormatMEI 
+            " Type: %u, Value: %u, length %u", ChipLogValueMEI(attributeId), type, *value, size);
+    }
 }
 
 /** @brief OnOff Cluster Init
