@@ -204,21 +204,9 @@ efr32_executable("lighting_app") {
   # OpenThread Settings
   if (chip_enable_openthread) {
     deps += [
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+      "${chip_root}/third_party/openthread:openthread",
       "${examples_plat_dir}:efr-matter-shell",
     ]
-    if (chip_openthread_ftd) {
-      deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
-      ]
-    } else {
-      deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
-      ]
-    }
   }
 
   if (chip_enable_ota_requestor) {

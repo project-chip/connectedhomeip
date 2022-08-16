@@ -74,7 +74,7 @@ def make_chip_root_safe_directory() -> None:
     subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', CHIP_ROOT])
 
 
-def checkout_modules(modules: list, shallow: bool, force: bool) -> None:
+def checkout_modules(modules: list, shallow: bool, force: bool, recursive: bool) -> None:
     names = [module.name.replace('submodule "', '').replace('"', '') for module in modules]
     names = ', '.join(names)
     logging.info(f'Checking out: {names}')
@@ -82,6 +82,7 @@ def checkout_modules(modules: list, shallow: bool, force: bool) -> None:
     cmd = ['git', '-C', CHIP_ROOT, 'submodule', 'update', '--init']
     cmd += ['--depth', '1'] if shallow else []
     cmd += ['--force'] if force else []
+    cmd += ['--recursive'] if recursive else []
     cmd += [module.path for module in modules]
 
     subprocess.check_call(cmd)
@@ -109,6 +110,7 @@ def main():
     parser.add_argument('--force', action='store_true', help='Perform action despite of warnings')
     parser.add_argument('--deinit-unmatched', action='store_true',
                         help='Deinitialize submodules for non-matching platforms')
+    parser.add_argument('--recursive', action='store_true', help='Recursive init of the listed submodules')
     args = parser.parse_args()
 
     modules = list(load_module_info())
@@ -117,7 +119,7 @@ def main():
     unmatched_modules = [m for m in modules if not module_matches_platforms(m, selected_platforms)]
 
     make_chip_root_safe_directory()
-    checkout_modules(selected_modules, args.shallow, args.force)
+    checkout_modules(selected_modules, args.shallow, args.force, args.recursive)
 
     if args.deinit_unmatched:
         deinit_modules(unmatched_modules, args.force)
