@@ -1710,7 +1710,7 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
             <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
@@ -1726,7 +1726,27 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Scenes" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireAttribute>SCENE_COUNT</requireAttribute>
+                <requireAttribute>CURRENT_SCENE</requireAttribute>
+                <requireAttribute>CURRENT_GROUP</requireAttribute>
+                <requireAttribute>SCENE_VALID</requireAttribute>
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+            </include>
+            <include cluster="Thermostat" client="true" server="false" clientLocked="true" serverLocked="true"></include>
             <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true"></include>
