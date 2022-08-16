@@ -1,10 +1,10 @@
-# Matter EFR32 Colored Lighting Application
+# Matter EFR32 Color Lighting Application
 
 A lighting app with color control and level control.
 
 <hr>
 
--   [Matter EFR32 Colored Lighting Application](#matter-EFR32-colored-lighting-application)
+-   [Matter EFR32 Color Lighting Application](#matter-EFR32-color-lighting-application)
     -   [Introduction](#introduction)
     -   [Running the application](#running-the-application)
         -   [Material](#material)
@@ -112,11 +112,11 @@ are using "Silabs Matter Raspberry Pi Image" as an OTBR.
     ```
 
 If you don't know what values of Hue and Saturation you need, look-up "HSV to
-RGB color conversion" online. Note that "Value" is **always** 100%.
+RGB color conversion" online. Note that "Value" is the current level/intensity.
 
 For more information about levelcontrol and colorcontrol commands, please refer
 to "appclusters.pdf" Section 1.6. and 3.2., respectively.
 
-###### Last modified August 1st, 2022.
+###### Last modified August 4th, 2022.
 
 [1]: ../../../examples/lighting-app/efr32/README.md
