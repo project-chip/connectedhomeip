@@ -27,8 +27,9 @@
 
     1. [How to Flash a Silicon Labs Device](general/FLASH_SILABS_DEVICE.md)
     2. [How to Find Your Raspberry Pi](general/FIND_RASPI.md)
-    3. [Silicon Labs Matter Commit Hashes](general/COMMIT_HASHES.md) <br><br>
-
+    3. [Silicon Labs Matter Commit Hashes](general/COMMIT_HASHES.md)
+    4. [OTA Software Update](general/OTA_SOFTWARE_UPDATE.md) <br><br>
+ 
 5. Frequently Asked Questions (FAQ)
     - [Thread FAQ](thread/FAQ.md)
     - [Wifi FAQ](wifi/FAQ.md)
