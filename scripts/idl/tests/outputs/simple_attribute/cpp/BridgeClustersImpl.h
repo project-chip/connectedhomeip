@@ -9,7 +9,7 @@ struct MyClusterCluster : public CommonCluster
 {
 
 
-  static constexpr chip::ClusterId kClusterId = ZCL_MY_CLUSTER_CLUSTER_ID;
+  static constexpr chip::ClusterId kClusterId = 123;
 
   chip::ClusterId GetClusterId() override { return kClusterId; }
 
@@ -104,7 +104,7 @@ struct ClusterInfo
 } static const kKnownClusters[] = {
 
   {
-    ZCL_MY_CLUSTER_CLUSTER_ID,
+    123,
     "MyCluster",
     sizeof(MyClusterCluster),
     [](void *mem) -> CommonCluster* {
@@ -127,7 +127,7 @@ struct AttrInfo
   const char *name;
 } static const kKnownAttributes[] = {
 
-  {ZCL_MY_CLUSTER_CLUSTER_ID, 1, "ClusterAttr" },
+  { 123, 1, "ClusterAttr" },
   
 };
 

@@ -9,7 +9,7 @@ struct FirstCluster : public CommonCluster
 {
 
 
-  static constexpr chip::ClusterId kClusterId = ZCL_FIRST_CLUSTER_ID;
+  static constexpr chip::ClusterId kClusterId = 1;
 
   chip::ClusterId GetClusterId() override { return kClusterId; }
 
@@ -98,7 +98,7 @@ struct SecondCluster : public CommonCluster
 {
 
 
-  static constexpr chip::ClusterId kClusterId = ZCL_SECOND_CLUSTER_ID;
+  static constexpr chip::ClusterId kClusterId = 2;
 
   chip::ClusterId GetClusterId() override { return kClusterId; }
 
@@ -187,7 +187,7 @@ struct ThirdCluster : public CommonCluster
 {
 
 
-  static constexpr chip::ClusterId kClusterId = ZCL_THIRD_CLUSTER_ID;
+  static constexpr chip::ClusterId kClusterId = 3;
 
   chip::ClusterId GetClusterId() override { return kClusterId; }
 
@@ -282,7 +282,7 @@ struct ClusterInfo
 } static const kKnownClusters[] = {
 
   {
-    ZCL_FIRST_CLUSTER_ID,
+    1,
     "First",
     sizeof(FirstCluster),
     [](void *mem) -> CommonCluster* {
@@ -290,7 +290,7 @@ struct ClusterInfo
     },
   },
   {
-    ZCL_SECOND_CLUSTER_ID,
+    2,
     "Second",
     sizeof(SecondCluster),
     [](void *mem) -> CommonCluster* {
@@ -298,7 +298,7 @@ struct ClusterInfo
     },
   },
   {
-    ZCL_THIRD_CLUSTER_ID,
+    3,
     "Third",
     sizeof(ThirdCluster),
     [](void *mem) -> CommonCluster* {
@@ -325,9 +325,9 @@ struct AttrInfo
   const char *name;
 } static const kKnownAttributes[] = {
 
-  {ZCL_FIRST_CLUSTER_ID, 1, "SomeInteger" },
-  {ZCL_SECOND_CLUSTER_ID, 123, "SomeBytes" },
-  {ZCL_THIRD_CLUSTER_ID, 10, "SomeEnum" },
+  { 1, 1, "SomeInteger" },
+  { 2, 123, "SomeBytes" },
+  { 3, 10, "SomeEnum" },
   
 };
 
