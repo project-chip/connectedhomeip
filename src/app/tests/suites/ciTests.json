@@ -6,7 +6,7 @@
         "Test_TC_ACL_2_2"
     ],
     "BooleanState": [
-        "Test_TC_BOOL_1_1", 
+        "Test_TC_BOOL_1_1",
         "Test_TC_BOOL_2_1"
     ],
     "Binding": [
@@ -53,7 +53,7 @@
         "Test_TC_DLOG_1_1"
     ],
     "FlowMeasurement": [
-        "Test_TC_FLW_1_1", 
+        "Test_TC_FLW_1_1",
         "Test_TC_FLW_2_1"
     ],
     "FixedLabel": [
@@ -61,11 +61,11 @@
         "Test_TC_FLABEL_2_1"
     ],
     "GeneralCommissioning": [
-        "Test_TC_CGEN_1_1", 
+        "Test_TC_CGEN_1_1",
         "Test_TC_CGEN_2_1"
     ],
     "GeneralDiagnostics": [
-        "Test_TC_DGGEN_1_1", 
+        "Test_TC_DGGEN_1_1",
         "Test_TC_DGGEN_2_1"
     ],
     "Identify": [
@@ -75,12 +75,12 @@
         "Test_TC_I_2_3"
     ],
     "IlluminanceMeasurement": [
-        "Test_TC_ILL_1_1", 
+        "Test_TC_ILL_1_1",
         "Test_TC_ILL_2_1",
         "Test_TC_ILL_2_2"
     ],
     "OccupancySensing": [
-        "Test_TC_OCC_1_1", 
+        "Test_TC_OCC_1_1",
         "Test_TC_OCC_2_1"
     ],
     "LevelControl": [
@@ -158,11 +158,11 @@
         "Test_TC_OO_2_4"
     ],
     "PowerSource": [
-        "Test_TC_PS_1_1", 
+        "Test_TC_PS_1_1",
         "Test_TC_PS_2_1"
     ],
     "PressureMeasurement": [
-        "Test_TC_PRS_1_1", 
+        "Test_TC_PRS_1_1",
         "Test_TC_PRS_2_1",
         "Test_TC_PRS_2_2"
     ],
@@ -185,11 +185,11 @@
         "Test_TC_SC_4_2"
     ],
     "Switch": [
-        "Test_TC_SWTCH_1_1", 
+        "Test_TC_SWTCH_1_1",
         "Test_TC_SWTCH_2_1"
     ],
     "TemperatureMeasurement": [
-        "Test_TC_TMP_1_1", 
+        "Test_TC_TMP_1_1",
         "Test_TC_TMP_2_1"
     ],
     "Thermostat": [
