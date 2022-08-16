@@ -2908,8 +2908,19 @@ private:
 | Cluster TimeSynchronization                                         | 0x0038 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * SetUtcTime                                                        |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * UTCTime                                                           | 0x0000 |
+| * Granularity                                                       | 0x0001 |
+| * TimeSource                                                        | 0x0002 |
+| * TrustedTimeNodeId                                                 | 0x0003 |
+| * DefaultNtp                                                        | 0x0004 |
+| * TimeZone                                                          | 0x0005 |
+| * DstOffset                                                         | 0x0006 |
+| * LocalTime                                                         | 0x0007 |
+| * TimeZoneDatabase                                                  | 0x0008 |
+| * NtpServerPort                                                     | 0x0009 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -2918,6 +2929,38 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command SetUtcTime
+ */
+class TimeSynchronizationSetUtcTime : public ClusterCommand
+{
+public:
+    TimeSynchronizationSetUtcTime(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-utc-time", credsIssuerConfig)
+    {
+        AddArgument("UtcTime", 0, UINT64_MAX, &mRequest.utcTime);
+        AddArgument("Granularity", 0, UINT8_MAX, &mRequest.granularity);
+        AddArgument("TimeSource", 0, UINT8_MAX, &mRequest.timeSource);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000038, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000038, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TimeSynchronization::Commands::SetUtcTime::Type mRequest;
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster BridgedDeviceBasic                                          | 0x0039 |
@@ -9780,18 +9823,49 @@ void registerClusterTimeSynchronization(Commands & commands, CredentialIssuerCom
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),            //
+        make_unique<TimeSynchronizationSetUtcTime>(credsIssuerConfig), //
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                   //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "utctime", Attributes::UTCTime::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "granularity", Attributes::Granularity::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "time-source", Attributes::TimeSource::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "trusted-time-node-id", Attributes::TrustedTimeNodeId::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "default-ntp", Attributes::DefaultNtp::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "time-zone", Attributes::TimeZone::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "dst-offset", Attributes::DstOffset::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "local-time", Attributes::LocalTime::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "time-zone-database", Attributes::TimeZoneDatabase::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "ntp-server-port", Attributes::NtpServerPort::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::NodeId>>>(
+            Id, "trusted-time-node-id", 0, UINT64_MAX, Attributes::TrustedTimeNodeId::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::CharSpan>>>(Id, "default-ntp", Attributes::DefaultNtp::Id,
+                                                                                    credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::Type>>>(
+            Id, "time-zone", Attributes::TimeZone::Id, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::Type>>>(
+            Id, "dst-offset", Attributes::DstOffset::Id, credsIssuerConfig),                                                    //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "utctime", Attributes::UTCTime::Id, credsIssuerConfig),                             //
+        make_unique<SubscribeAttribute>(Id, "granularity", Attributes::Granularity::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "time-source", Attributes::TimeSource::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "trusted-time-node-id", Attributes::TrustedTimeNodeId::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "default-ntp", Attributes::DefaultNtp::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "time-zone", Attributes::TimeZone::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "dst-offset", Attributes::DstOffset::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "local-time", Attributes::LocalTime::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "time-zone-database", Attributes::TimeZoneDatabase::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "ntp-server-port", Attributes::NtpServerPort::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

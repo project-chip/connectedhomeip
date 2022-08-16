@@ -9908,9 +9908,237 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace EthernetNetworkDiagnostics
 namespace TimeSynchronization {
+namespace Structs {
+namespace DstOffsetType {
+enum class Fields
+{
+    kOffset        = 0,
+    kValidStarting = 1,
+    kValidUntil    = 2,
+};
+
+struct Type
+{
+public:
+    int32_t offset         = static_cast<int32_t>(0);
+    uint64_t validStarting = static_cast<uint64_t>(0);
+    uint64_t validUntil    = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DstOffsetType
+namespace TimeZoneType {
+enum class Fields
+{
+    kOffset  = 0,
+    kValidAt = 1,
+    kName    = 2,
+};
+
+struct Type
+{
+public:
+    int32_t offset   = static_cast<int32_t>(0);
+    uint64_t validAt = static_cast<uint64_t>(0);
+    Optional<chip::CharSpan> name;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TimeZoneType
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SetUtcTime {
+struct Type;
+struct DecodableType;
+} // namespace SetUtcTime
+
+} // namespace Commands
+
+namespace Commands {
+namespace SetUtcTime {
+enum class Fields
+{
+    kUtcTime     = 0,
+    kGranularity = 1,
+    kTimeSource  = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetUtcTime::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    uint64_t utcTime            = static_cast<uint64_t>(0);
+    GranularityEnum granularity = static_cast<GranularityEnum>(0);
+    Optional<TimeSourceEnum> timeSource;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetUtcTime::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    uint64_t utcTime            = static_cast<uint64_t>(0);
+    GranularityEnum granularity = static_cast<GranularityEnum>(0);
+    Optional<TimeSourceEnum> timeSource;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetUtcTime
+} // namespace Commands
 
 namespace Attributes {
 
+namespace UTCTime {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UTCTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UTCTime
+namespace Granularity {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TimeSynchronization::GranularityEnum;
+    using DecodableType    = chip::app::Clusters::TimeSynchronization::GranularityEnum;
+    using DecodableArgType = chip::app::Clusters::TimeSynchronization::GranularityEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Granularity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Granularity
+namespace TimeSource {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TimeSynchronization::TimeSourceEnum;
+    using DecodableType    = chip::app::Clusters::TimeSynchronization::TimeSourceEnum;
+    using DecodableArgType = chip::app::Clusters::TimeSynchronization::TimeSourceEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TimeSource::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TimeSource
+namespace TrustedTimeNodeId {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::NodeId>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::NodeId>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::NodeId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TrustedTimeNodeId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TrustedTimeNodeId
+namespace DefaultNtp {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultNtp::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 128; }
+};
+} // namespace DefaultNtp
+namespace TimeZone {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TimeZone::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TimeZone
+namespace DstOffset {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DstOffset::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DstOffset
+namespace LocalTime {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LocalTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LocalTime
+namespace TimeZoneDatabase {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TimeZoneDatabase::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TimeZoneDatabase
+namespace NtpServerPort {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NtpServerPort::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NtpServerPort
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -9950,6 +10178,18 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::UTCTime::TypeInfo::DecodableType UTCTime;
+        Attributes::Granularity::TypeInfo::DecodableType granularity =
+            static_cast<chip::app::Clusters::TimeSynchronization::GranularityEnum>(0);
+        Attributes::TimeSource::TypeInfo::DecodableType timeSource =
+            static_cast<chip::app::Clusters::TimeSynchronization::TimeSourceEnum>(0);
+        Attributes::TrustedTimeNodeId::TypeInfo::DecodableType trustedTimeNodeId;
+        Attributes::DefaultNtp::TypeInfo::DecodableType defaultNtp;
+        Attributes::TimeZone::TypeInfo::DecodableType timeZone;
+        Attributes::DstOffset::TypeInfo::DecodableType dstOffset;
+        Attributes::LocalTime::TypeInfo::DecodableType localTime;
+        Attributes::TimeZoneDatabase::TypeInfo::DecodableType timeZoneDatabase = static_cast<bool>(0);
+        Attributes::NtpServerPort::TypeInfo::DecodableType ntpServerPort;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

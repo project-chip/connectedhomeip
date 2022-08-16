@@ -2943,6 +2943,41 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+@implementation MTRTimeSynchronizationClusterSetUtcTimeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _utcTime = @(0);
+
+        _granularity = @(0);
+
+        _timeSource = nil;
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTimeSynchronizationClusterSetUtcTimeParams alloc] init];
+
+    other.utcTime = self.utcTime;
+    other.granularity = self.granularity;
+    other.timeSource = self.timeSource;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: utcTime:%@; granularity:%@; timeSource:%@; >",
+                                             NSStringFromClass([self class]), _utcTime, _granularity, _timeSource];
+    return descriptionString;
+}
+
+@end
 @implementation MTRAdministratorCommissioningClusterOpenCommissioningWindowParams
 - (instancetype)init
 {

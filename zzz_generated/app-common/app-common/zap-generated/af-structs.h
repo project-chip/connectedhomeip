@@ -278,6 +278,14 @@ typedef struct _DlCredential
     uint16_t CredentialIndex;
 } DlCredential;
 
+// Struct for DstOffsetType
+typedef struct _DstOffsetType
+{
+    int32_t Offset;
+    uint64_t ValidStarting;
+    uint64_t ValidUntil;
+} DstOffsetType;
+
 // Struct for EndpointListStruct
 typedef struct _EndpointListStruct
 {
@@ -547,6 +555,14 @@ typedef struct _ThreadMetrics
     uint32_t StackFreeMinimum;
     uint32_t StackSize;
 } ThreadMetrics;
+
+// Struct for TimeZoneType
+typedef struct _TimeZoneType
+{
+    int32_t Offset;
+    uint64_t ValidAt;
+    chip::CharSpan Name;
+} TimeZoneType;
 
 // Struct for WiFiInterfaceScanResult
 typedef struct _WiFiInterfaceScanResult
