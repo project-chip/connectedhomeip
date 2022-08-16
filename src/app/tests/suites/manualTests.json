@@ -208,10 +208,7 @@
         "Test_TC_SU_4_1",
         "Test_TC_SU_4_2"
     ],
-    "PowerSourceConfiguration": [
-        "Test_TC_PSCFG_2_2",
-        "Test_TC_PSCFG_3_1"
-    ],
+    "PowerSourceConfiguration": ["Test_TC_PSCFG_2_2", "Test_TC_PSCFG_3_1"],
     "SecureChannel": [
         "Test_TC_SC_1_1",
         "Test_TC_SC_1_2",
@@ -277,10 +274,7 @@
         "Test_TC_DRLK_3_2",
         "Test_TC_DRLK_3_3"
     ],
-    "LocalizationConfiguration": [
-        "Test_TC_LCFG_2_1",
-        "Test_TC_LCFG_3_1"
-    ],
+    "LocalizationConfiguration": ["Test_TC_LCFG_2_1", "Test_TC_LCFG_3_1"],
     "LevelControl": ["Test_TC_LVL_2_3", "Test_TC_LVL_7_1", "Test_TC_LVL_8_1"],
     "OnOff": ["Test_TC_OO_2_3", "Test_TC_OO_3_1", "Test_TC_OO_3_2"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2", "Test_TC_RH_3_1"],
@@ -313,9 +307,7 @@
         "Test_TC_LUNIT_2_1",
         "Test_TC_LUNIT_3_1"
     ],
-    "FixedLabel": [
-        "Test_TC_FLABEL_3_1"
-    ],
+    "FixedLabel": ["Test_TC_FLABEL_3_1"],
     "Binding": ["Test_TC_BIND_2_1", "Test_TC_BIND_2_2", "Test_TC_BIND_2_3"],
     "Scenes": [
         "Test_TC_S_1_1",
