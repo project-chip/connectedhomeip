@@ -63,17 +63,17 @@ public class ChipDeviceController {
   }
 
   /**
-   * Sets this DeviceController to use the given issuer for issuing operational certs and
-   * verifying the DAC. By default, the DeviceController uses an internal, OperationalCredentialsDelegate
-   * (see AndroidOperationalCredentialsIssuer).
+   * Sets this DeviceController to use the given issuer for issuing operational certs and verifying
+   * the DAC. By default, the DeviceController uses an internal, OperationalCredentialsDelegate (see
+   * AndroidOperationalCredentialsIssuer).
    *
-   * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
+   * <p>When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
    * called when the NOC CSR needs to be signed and DAC verified. This allows for custom credentials
    * issuer and DAC verifier implementations, for example, when a proprietary cloud API will perform
    * DAC verification and the CSR signing.
    *
-   * <p>When a NOCChainIssuer is set for this controller, the PartialDACVerifier will be used
-   * rather than the DefaultDACVerifier.
+   * <p>When a NOCChainIssuer is set for this controller, the PartialDACVerifier will be used rather
+   * than the DefaultDACVerifier.
    *
    * @param issuer
    */
@@ -700,9 +700,9 @@ public class ChipDeviceController {
   public interface NOCChainIssuer {
     /**
      * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
-     * called when the DAC chain must be verified and NOC chain needs to be issued from a CSR. This allows for custom credentials
-     * issuer and DAC verifier implementations, for example, when a proprietary cloud API will perform
-     * DAC verification and the NOC chain issuance from CSR.
+     * called when the DAC chain must be verified and NOC chain needs to be issued from a CSR. This
+     * allows for custom credentials issuer and DAC verifier implementations, for example, when a
+     * proprietary cloud API will perform DAC verification and the NOC chain issuance from CSR.
      *
      * <p>When a NOCChainIssuer is set for this controller, the PartialDACVerifier will be used
      * rather than the DefaultDACVerifier.
@@ -729,9 +729,10 @@ public class ChipDeviceController {
    * WiFi or Thread network scan during commissioning in the the default CommissioningDelegate used
    * by the ChipDeviceCommissioner.
    *
-   * When the callbacks onScanNetworksFailure or onScanNetworksSuccess are invoked, the commissioning
-   * flow has reached the kNeedsNetworkCreds and will wait to advance until this device controller's
-   * updateCommissioningNetworkCredentials method is called with the desired network credentials set.
+   * <p>When the callbacks onScanNetworksFailure or onScanNetworksSuccess are invoked, the
+   * commissioning flow has reached the kNeedsNetworkCreds and will wait to advance until this
+   * device controller's updateCommissioningNetworkCredentials method is called with the desired
+   * network credentials set.
    */
   public interface ScanNetworksListener {
     /** Notifies when scan networks call fails. */
