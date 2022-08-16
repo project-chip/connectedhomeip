@@ -1281,23 +1281,11 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
+            <include cluster="Binding" client="false" server="false" clientLocked="true" serverLocked="false">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
-                <requireCommand>AddGroup</requireCommand>
-                <requireCommand>AddGroupResponse</requireCommand>
-                <requireCommand>ViewGroup</requireCommand>
-                <requireCommand>ViewGroupResponse</requireCommand>
-                <requireCommand>GetGroupMembership</requireCommand>
-                <requireCommand>GetGroupMembershipResponse</requireCommand>
-                <requireCommand>RemoveGroup</requireCommand>
-                <requireCommand>RemoveGroupResponse</requireCommand>
-                <requireCommand>RemoveAllGroups</requireCommand>
-                <requireCommand>AddGroupIfIdentifying</requireCommand>
-            </include>
-            <include cluster="Illuminance Measurement" client="false" server="true" clientLocked="false" serverLocked="true">
+            <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Illuminance Measurement" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>ILLUM_MEASURED_VALUE</requireAttribute>
                 <requireAttribute>ILLUM_MIN_MEASURED_VALUE</requireAttribute>
                 <requireAttribute>ILLUM_MAX_MEASURED_VALUE</requireAttribute>
