@@ -24,8 +24,8 @@ namespace Credentials {
 /**
  * @brief
  *   This class is based upon the DefaultDACVerifier but has all checks removed which require
- * local availability of public keys that are not available from the commissionee, such as the
- * PAA public key and the CSA keys used to sign the Certification Declaration (CD).
+ * local availability of trust anchors that are not available from the commissionee, such as the
+ * PAA root certificates and the CSA keys used to sign the Certification Declaration (CD).
  *
  *   This class should only be used in conjunction with an OperationalCredentialsDelegate
  * which performs the removed checks. For example, an OperationalCredentialsDelegate implementation
