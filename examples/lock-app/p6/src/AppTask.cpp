@@ -76,8 +76,7 @@ using namespace ::chip::System;
 
 #endif
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT 3000
-#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
+#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 5000
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
@@ -448,27 +447,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * event)
         return;
     }
 
-    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
-    // initiate factory reset
-    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kStartBleAdv)
-    {
-        P6_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
-
-        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
-        // cancel, if required.
-        sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
-
-        sAppTask.mFunction = Function::kFactoryReset;
-
-        // Turn off all LEDs before starting blink to make sure blink is
-        // co-ordinated.
-        sStatusLED.Set(false);
-        sLockLED.Set(false);
-
-        sStatusLED.Blink(500);
-        sLockLED.Blink(500);
-    }
-    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kFactoryReset)
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kFactoryReset)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = Function::kNoneSelected;
@@ -482,28 +461,25 @@ void AppTask::FunctionHandler(AppEvent * event)
     {
         return;
     }
-    // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
-    // FACTORY_RESET_TRIGGER_TIMEOUT) To initiate factory reset: press the
-    // APP_FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT +
-    // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT All LEDs start blinking after
-    // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
-    // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
-    // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (event->ButtonEvent.Action == APP_BUTTON_RELEASED)
+
+    if (event->ButtonEvent.Action == APP_BUTTON_PRESSED)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kNoneSelected)
         {
-            sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
-            sAppTask.mFunction = Function::kStartBleAdv;
-        }
-    }
-    else
-    {
-        // If the button was released before factory reset got initiated, start Thread Network
-        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kStartBleAdv)
-        {
-            sAppTask.CancelTimer();
-            sAppTask.mFunction = Function::kNoneSelected;
+            P6_LOG("Factory Reset Triggered. Press button again within %us to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT / 1000);
+            // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
+            // cancel, if required.
+            sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+
+            sAppTask.mFunction = Function::kFactoryReset;
+
+            // Turn off all LEDs before starting blink to make sure blink is
+            // co-ordinated.
+            sStatusLED.Set(false);
+            sLockLED.Set(false);
+
+            sStatusLED.Blink(500);
+            sLockLED.Blink(500);
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kFactoryReset)
         {
@@ -612,10 +588,31 @@ void AppTask::PostEvent(const AppEvent * event)
 {
     if (sAppEventQueue != NULL)
     {
-        if (!xQueueSend(sAppEventQueue, event, 1))
+        BaseType_t status;
+        if (xPortIsInsideInterrupt())
         {
-            P6_LOG("Failed to post event to app task event queue");
+            BaseType_t higherPrioTaskWoken = pdFALSE;
+            status                         = xQueueSendFromISR(sAppEventQueue, event, &higherPrioTaskWoken);
+
+#ifdef portYIELD_FROM_ISR
+            portYIELD_FROM_ISR(higherPrioTaskWoken);
+#elif portEND_SWITCHING_ISR // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+            portEND_SWITCHING_ISR(higherPrioTaskWoken);
+#else                       // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+#error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
+#endif // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
         }
+        else
+        {
+            status = xQueueSend(sAppEventQueue, event, 1);
+        }
+
+        if (!status)
+            P6_LOG("Failed to post event to app task event queue");
+    }
+    else
+    {
+        P6_LOG("Event Queue is NULL should never happen");
     }
 }
 

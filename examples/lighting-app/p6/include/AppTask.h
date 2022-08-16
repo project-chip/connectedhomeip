@@ -74,11 +74,8 @@ private:
 
     enum class Function
     {
-        kNoneSelected   = 0,
-        kSoftwareUpdate = 0,
-        kStartBleAdv    = 1,
-        kFactoryReset   = 2,
-
+        kNoneSelected = 0,
+        kFactoryReset = 1,
         kInvalid
     };
 
