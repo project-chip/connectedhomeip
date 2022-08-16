@@ -238,13 +238,6 @@ CHIP_ERROR Efr32PsaOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabric
     error = mPendingKeypair->Create(id, EFR32OpaqueKeyUsages::ECDSA_P256_SHA256);
     if (error != CHIP_NO_ERROR)
     {
-        // Try deleting and recreating this key since keys don't get wiped on factory erase yet
-        mPendingKeypair->Delete();
-        error = mPendingKeypair->Create(id, EFR32OpaqueKeyUsages::ECDSA_P256_SHA256);
-    }
-
-    if (error != CHIP_NO_ERROR)
-    {
         ResetPendingKey();
         return error;
     }
