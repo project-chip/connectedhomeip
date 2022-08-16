@@ -43,7 +43,7 @@ namespace Messaging {
  *      destructor or Release() is invoked.
  *
  *   2. If you send a message successfully that doesn't require a response, invoking Get() on the holder there-after will return
- * nullptr.
+ *      nullptr.
  *
  *   3. If you send a message successfully that does require a response, invoking Get() on the holder will return a valid
  *      pointer until the response is received.
