@@ -12,18 +12,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Flash an P6 device.
+"""Flash an Infineon PSoC6 device.
 
 This is layered so that a caller can perform individual operations
 through an `Flasher` instance, or operations according to a command line.
 For `Flasher`, see the class documentation. For the parse_command()
 interface or standalone execution:
 
-usage: p6_firmware_utils.py [-h] [--verbose] [--erase] [--application FILE]
+usage: psoc6_firmware_utils.py [-h] [--verbose] [--erase] [--application FILE]
                                [--verify_application] [--reset] [--skip_reset]
                                [--device DEVICE]
 
-Flash P6 device
+Flash PSoC6 device
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -77,14 +77,14 @@ P6_OPTIONS = {
         },
         'device': {
             'help': 'Device family or platform to target',
-            'default': 'P6',
+            'default': 'PSoC6',
             'alias': ['-d'],
             'argparse': {
                 'metavar': 'DEVICE'
             },
         },
         'sdk_path': {
-            'help': 'Path to p6 sdk',
+            'help': 'Path to psoc6 sdk',
             'default': 'third_party/infineon/psoc6/psoc6_sdk',
             'alias': ['-p'],
             'argparse': {
@@ -96,7 +96,7 @@ P6_OPTIONS = {
 
 
 class Flasher(firmware_utils.Flasher):
-    """Manage P6 flashing."""
+    """Manage PSoC6 flashing."""
 
     def __init__(self, **options):
         super().__init__(platform='PSOC6', module=__name__, **options)

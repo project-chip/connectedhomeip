@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,8 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Root directory for CYW30739 SDK.
-  cyw30739_sdk_build_root =
-      "//third_party/connectedhomeip/third_party/infineon/cyw30739_sdk"
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${build_root}/toolchain/arm_gcc/arm_toolchain.gni")
+
+arm_toolchain("psoc6_lock_app") {
+  toolchain_args = {
+    current_os = "freertos"
+    import("${chip_root}/examples/lock-app/infineon/psoc6/args.gni")
+  }
 }

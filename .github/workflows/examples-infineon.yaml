@@ -121,6 +121,36 @@ jobs:
                       out/artifacts/infineon-psoc6-light/chip-psoc6-lighting-example.out \
                       /tmp/bloat_reports/
 
+            - name: Build example CYW30739 Apps
+              timeout-minutes: 30
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                      --target-glob 'cyw30739-cyw930739m2evb_01-{light,lock,ota-requestor-no-progress-logging}' \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                    "
+            - name: Get light size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 cyw930739m2evb_01 light \
+                    out/artifacts/cyw30739-cyw930739m2evb_01-light/chip-cyw30739-lighting-example.elf \
+                    /tmp/bloat_reports/
+            - name: Get lock size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 cyw930739m2evb_01 lock \
+                    out/artifacts/cyw30739-cyw930739m2evb_01-lock/chip-cyw30739-lock-example.elf \
+                    /tmp/bloat_reports/
+            - name: Get ota-requestor size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 cyw930739m2evb_01 ota-requestor-no-progress-logging \
+                    out/artifacts/cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging/chip-cyw30739-ota-requestor-example.elf \
+                    /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}

@@ -30,7 +30,6 @@ ALL_PLATFORMS = set([
     'bl602',
     'cc13x2_26x2',
     'cc32xx',
-    'cyw30739',
     'darwin',
     'efr32',
     'esp32',

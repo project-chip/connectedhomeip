@@ -24,9 +24,9 @@ The PSoC6 clusters example provides a baseline demonstration of a Cluster
 control device, built using Matter and the Infineon Modustoolbox SDK. It can be
 controlled by Matter controller over Wi-Fi network.
 
-The P6 device can be commissioned over Bluetooth Low Energy where the device and
-the Matter controller will exchange security information with the Rendezvous
-procedure. Wi-Fi Network credentials are then provided to the P6 device which
+The PSoC6 device can be commissioned over Bluetooth Low Energy where the device
+and the Matter controller will exchange security information with the Rendezvous
+procedure. Wi-Fi Network credentials are then provided to the PSoC6 device which
 will then join the network.
 
 <a name="building"></a>
@@ -36,8 +36,8 @@ will then join the network.
 -   [Modustoolbox Software](https://www.cypress.com/products/modustoolbox)
 
     Refer to `integrations/docker/images/chip-build-infineon/Dockerfile` or
-    `scripts/examples/gn_p6_example.sh` for downloading the Software and related
-    tools.
+    `scripts/examples/gn_psoc6_example.sh` for downloading the Software and
+    related tools.
 
 -   Install some additional tools (likely already present for Matter
     developers):
@@ -84,7 +84,7 @@ Commissioning can be carried out using BLE.
 
 ### Setting up Chip tool
 
-Once P6 is up and running, we need to set up chip-tool on Raspberry Pi 4 to
+Once PSoC6 is up and running, we need to set up chip-tool on Raspberry Pi 4 to
 perform commissioning and cluster control.
 
 -   Set up python controller.
@@ -125,6 +125,6 @@ commands. These power cycle the BlueTooth hardware and disable BR/EDR mode.
 
 ## OTA Software Update
 
-For the description of Software Update process with infineon P6 example
+For the description of Software Update process with infineon PSoC6 example
 applications see
-[Infineon P6 OTA Software Update](../../../docs/guides/infineon_p6_software_update.md)
+[Infineon PSoC6 OTA Software Update](../../../../docs/guides/infineon_psoc6_software_update.md)
