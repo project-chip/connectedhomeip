@@ -631,6 +631,11 @@ public:
     CHIP_ERROR IssueNOCChain(const ByteSpan & NOCSRElements, NodeId nodeId,
                              chip::Callback::Callback<OnNOCChainGeneration> * callback);
 
+    void SetDeviceAttestationVerifier(Credentials::DeviceAttestationVerifier * deviceAttestationVerifier)
+    {
+        mDeviceAttestationVerifier = deviceAttestationVerifier;
+    }
+
 private:
     DevicePairingDelegate * mPairingDelegate;
 

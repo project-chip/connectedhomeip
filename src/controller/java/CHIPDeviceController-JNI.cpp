@@ -541,6 +541,17 @@ JNI_METHOD(void, setUseJavaCallbackForNOCRequest)
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     wrapper->GetAndroidOperationalCredentialsIssuer()->SetUseJavaCallbackForNOCRequest(useCallback);
+
+    if (useCallback)
+    {
+        // if we are assigning a callback, then make the device commissioner delegate verification to the cloud
+        wrapper->Controller()->SetDeviceAttestationVerifier(wrapper->GetPartialDACVerifier());
+    }
+    else
+    {
+        // if we are setting callback to null, then make the device commissioner use the default verifier
+        wrapper->Controller()->SetDeviceAttestationVerifier(GetDeviceAttestationVerifier());
+    }
 }
 
 JNI_METHOD(void, updateCommissioningNetworkCredentials)
