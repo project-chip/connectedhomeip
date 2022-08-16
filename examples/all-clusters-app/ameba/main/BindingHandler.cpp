@@ -52,7 +52,7 @@ Engine sShellSwitchBindingSubCommands;
 
 namespace {
 
-void ProcessOnOffUnicastBindingRead(AttributeId attributeId, const EmberBindingTableEntry & binding,
+void ProcessOnOffUnicastBindingRead(BindingCommandData * data, const EmberBindingTableEntry & binding,
                                        OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
@@ -65,7 +65,7 @@ void ProcessOnOffUnicastBindingRead(AttributeId attributeId, const EmberBindingT
 
     VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
 
-    switch (attributeId)
+    switch (data->attributeId)
     {
     case Clusters::OnOff::Attributes::OnOff::Id:
         Controller::ReadAttribute<Clusters::OnOff::Attributes::OnOff::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
@@ -94,7 +94,7 @@ void ProcessOnOffUnicastBindingRead(AttributeId attributeId, const EmberBindingT
     }
 }
 
-void ProcessOnOffUnicastBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding,
+void ProcessOnOffUnicastBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding,
                                        OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
@@ -114,7 +114,7 @@ void ProcessOnOffUnicastBindingCommand(CommandId commandId, const EmberBindingTa
     Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type onwithrecallglobalsceneCommand;
     Clusters::OnOff::Commands::OnWithTimedOff::Type onwithtimedoffCommand;
 
-    switch (commandId)
+    switch (data->commandId)
     {
     case Clusters::OnOff::Commands::Toggle::Id:
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
@@ -132,6 +132,8 @@ void ProcessOnOffUnicastBindingCommand(CommandId commandId, const EmberBindingTa
         break;
 
     case Clusters::OnOff::Commands::OffWithEffect::Id:
+        offwitheffectCommand.effectId = static_cast<EmberAfOnOffEffectIdentifier>(data->args[0]);
+        offwitheffectCommand.effectVariant = static_cast<EmberAfOnOffDelayedAllOffEffectVariant>(data->args[1]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          offwitheffectCommand, onSuccess, onFailure);
         break;
@@ -142,13 +144,16 @@ void ProcessOnOffUnicastBindingCommand(CommandId commandId, const EmberBindingTa
         break;
 
     case Clusters::OnOff::Commands::OnWithTimedOff::Id:
+        onwithtimedoffCommand.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(data->args[0]);
+        onwithtimedoffCommand.onTime = static_cast<uint16_t>(data->args[1]);
+        onwithtimedoffCommand.offWaitTime = static_cast<uint16_t>(data->args[2]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          onwithtimedoffCommand, onSuccess, onFailure);
         break;
     }
 }
 
-void ProcessOnOffGroupBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding)
+void ProcessOnOffGroupBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding)
 {
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
 
@@ -159,7 +164,7 @@ void ProcessOnOffGroupBindingCommand(CommandId commandId, const EmberBindingTabl
     Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type onwithrecallglobalsceneCommand;
     Clusters::OnOff::Commands::OnWithTimedOff::Type onwithtimedoffCommand;
 
-    switch (commandId)
+    switch (data->commandId)
     {
     case Clusters::OnOff::Commands::Toggle::Id:
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand);
@@ -200,7 +205,7 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
             switch (data->clusterId)
             {
             case Clusters::OnOff::Id:
-                ProcessOnOffUnicastBindingRead(data->attributeId, binding, peer_device);
+                ProcessOnOffUnicastBindingRead(data, binding, peer_device);
                 break;
             }
         }
@@ -212,7 +217,7 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
             switch (data->clusterId)
             {
             case Clusters::OnOff::Id:
-                ProcessOnOffGroupBindingCommand(data->commandId, binding);
+                ProcessOnOffGroupBindingCommand(data, binding);
                 break;
             }
         }
@@ -221,7 +226,7 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
             switch (data->clusterId)
             {
             case Clusters::OnOff::Id:
-                ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device);
+                ProcessOnOffUnicastBindingCommand(data, binding, peer_device);
                 break;
             }
         }
@@ -318,9 +323,16 @@ CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR OffWithEffectSwitchCommandHandler(int argc, char ** argv)
 {
+    if (argc != 2)
+    {
+        return OnOffHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::OnOff::Commands::OffWithEffect::Id;
     data->clusterId           = Clusters::OnOff::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
@@ -338,9 +350,17 @@ CHIP_ERROR OnWithRecallGlobalSceneSwitchCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR OnWithTimedOffSwitchCommandHandler(int argc, char ** argv)
 {
+    if (argc != 3)
+    {
+        return OnOffHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::OnOff::Commands::OnWithTimedOff::Id;
     data->clusterId           = Clusters::OnOff::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
@@ -589,14 +609,14 @@ static void RegisterSwitchCommands()
     };
 
     static const shell_command_t sSwitchOnOffSubCommands[] = {
-        { &OnOffHelpHandler, "help", "Usage : switch ononff <subcommand>" },
-        { &OnSwitchCommandHandler, "on", "Sends on command to bound lighting app" },
-        { &OnOffRead, "read", "Usage : switch read <attribute>" },
-        { &OffSwitchCommandHandler, "off", "Sends off command to bound lighting app" },
-        { &ToggleSwitchCommandHandler, "toggle", "Sends toggle command to bound lighting app" },
-        { &OffWithEffectSwitchCommandHandler, "offWE", "Sends off-with-effect command to bound lighting app" },
-        { &OnWithRecallGlobalSceneSwitchCommandHandler, "onWRGS", "Sends on-with-recall-global-scene command to bound lighting app" },
-        { &OnWithTimedOffSwitchCommandHandler, "onWTO", "Sends on-with-timed-off command to bound lighting app" }
+        { &OnOffHelpHandler, "help", "Usage: switch ononff <subcommand>" },
+        { &OnSwitchCommandHandler, "on", "on Usage: switch onoff on" },
+        { &OnOffRead, "read", "Usage : switch read <attributeId>" },
+        { &OffSwitchCommandHandler, "off", "off Usage: switch onoff off" },
+        { &ToggleSwitchCommandHandler, "toggle", "toggle Usage: switch onoff toggle" },
+        { &OffWithEffectSwitchCommandHandler, "offWE", "off-with-effect Usage: switch onoff offWE <EffectId> <EffectVariant>" },
+        { &OnWithRecallGlobalSceneSwitchCommandHandler, "onWRGS", "on-with-recall-global-scene Usage: switch onoff onWRGS" },
+        { &OnWithTimedOffSwitchCommandHandler, "onWTO", "on-with-timed-off Usage: switch onoff onWTO <OnOffControl> <OnTime> <OffWaitTime>" }
     };
 
     static const shell_command_t sSwitchOnOffReadSubCommands[] = {
