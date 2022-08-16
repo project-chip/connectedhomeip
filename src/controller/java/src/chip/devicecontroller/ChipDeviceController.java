@@ -700,7 +700,7 @@ public class ChipDeviceController {
   public interface NOCChainIssuer {
     /**
      * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
-     * called when the NOC CSR needs to be signed and DAC verified. This allows for custom credentials 
+     * called when the DAC chain must be verified and NOC chain needs to be issued from a CSR. This allows for custom credentials 
      * issuer and DAC verifier implementations, for example, when a proprietary cloud API will perform 
      * DAC verification and the CSR signing.
      * 
