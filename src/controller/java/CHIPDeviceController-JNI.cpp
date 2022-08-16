@@ -524,7 +524,9 @@ JNI_METHOD(void, setUseJavaCallbackForNOCRequest)
 
     if (useCallback)
     {
-        // if we are assigning a callback, then make the device commissioner delegate verification to the cloud
+        // if we are assigning a callback, then make the device commissioner delegate verification to the
+        // PartialDACVerifier so that DAC chain and CD validation can be performed by custom code
+        // triggered by ChipDeviceController.NOCChainIssuer.onNOCChainGenerationNeeded().
         wrapper->Controller()->SetDeviceAttestationVerifier(wrapper->GetPartialDACVerifier());
     }
     else
@@ -553,6 +555,17 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
     {
         ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+
+    // Only invoke NetworkCredentialsReady when called in response to NetworkScan result
+    if (wrapper->Controller()->GetCommissioningStage() == CommissioningStage::kNeedsNetworkCreds)
+    {
+        err = wrapper->Controller()->NetworkCredentialsReady();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "NetworkCredentialsReady failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        }
     }
 }
 

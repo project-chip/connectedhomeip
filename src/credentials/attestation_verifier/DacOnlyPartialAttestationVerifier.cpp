@@ -36,6 +36,10 @@ namespace Credentials {
 // As per specifications section 11.22.5.1. Constant RESP_MAX
 constexpr size_t kMaxResponseLength = 900;
 
+/**
+ * The implementation should track DefaultDACVerifier::VerifyAttestationInformation but with the checks
+ * disabled that are outlined at the top of DacOnlyPartialAttestationVerifier.h.
+ */
 void PartialDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion)
 {
@@ -144,7 +148,7 @@ void PartialDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
     }
 
 exit:
-    onCompletion->mCall(onCompletion->mContext, attestationError); // TODO: is this check getting done?
+    onCompletion->mCall(onCompletion->mContext, attestationError);
 }
 
 } // namespace Credentials
