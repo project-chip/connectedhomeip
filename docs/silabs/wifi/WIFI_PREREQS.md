@@ -31,9 +31,12 @@ follows:
     commission and control the device)
 -   Kits/Boards:
     -   SLWSTK6000B Wireless Starter Kit main board
-    -   BRD4161A/BRD4186C daughter boards are supported
+    -   BRD4161A/BRD4163A/BRD4164A/BRD4186C/BRD4187C daughter boards are supported
           - [SLWRB4161A](https://www.silabs.com/development-tools/wireless/zigbee/slwrb4161a-efr32mg12-radio-board)
+          - [SLWRB4163A](https://www.silabs.com/development-tools/wireless/zigbee/slwrb4163a-efr32mg12-radio-board)
+          - [SLWRB4164A](https://www.silabs.com/development-tools/wireless/zigbee/slwrb4164a-efr32mg12-radio-board)
           - [XG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board)
+          - [XG24-RB4187C](https://www.silabs.com/development-tools/wireless/xg24-rb4187c-efr32xg24-wireless-gecko-radio-board)
         > BLE and Matter code run here
     -   Wi-Fi Dev Kit, either
         [RS9116X-SB-EVK1](https://www.silabs.com/development-tools/wireless/wi-fi/rs9116x-sb-evk-development-kit)

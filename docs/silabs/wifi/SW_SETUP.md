@@ -15,27 +15,26 @@ Virtual Machine to clone the repository and run bootstrap to prepare to build th
 
 1. To download the
    [SiliconLabs Matter codebase](https://github.com/SiliconLabs/matter.git) run
-   the following commands. Create a working directory - we will name it `matter`
-   as part of this example flow:
+   the following commands. Create a working directory named `git`:
 
-    > `$ mkdir matter`
+    > `$ mkdir git`
 
-    > `$ cd matter`
+    > `$ cd git`
 
-    > `$ MATTER_WORKDIR=pwd` &emsp;&emsp; --> We will use $MATTER_WORKDIR later
+    > `$ MATTER_WORKDIR=git` &emsp;&emsp; --> We will use $MATTER_WORKDIR later
 
     > `$ git clone https://github.com/SiliconLabs/matter.git`
 
 2. Bootstrapping:
 
-    > `$ cd connectedhomeip`
+    > `$ cd matter`
 
-    > `$ git submodule update --init --recursive`
+    > `$ ./scripts/checkout_submodules.py --shallow --recursive --platform efr32`
 
     > `$ . scripts/bootstrap.sh`
 
-    Create a directory where binaries will be updated/compiled. We will call it
-    `out` in this example:
+    Create a directory where binaries will be updated/compiled called
+    `out`:
 
     > `$ mkdir out`
 
@@ -54,14 +53,14 @@ Build command for WF200:
 
 Run the following:
 
-> `$ cd connectedhomeip`
+> `$ cd matter`
 
 > `$ <appropriate_build_command_from_above>`
 
 The generated software can be found in `out/rs911x_xxx/BRD4161A/*.out` for the
 RS9116 and in `out/wf200_xxx/BRD4161A/*.out` for the WF200.
 
-This is what you will burn onto the EFR32.
+This is what you will flash onto the EFR32.
 
 ## Compiling the ChipTool
 
@@ -69,21 +68,21 @@ In order to control the Wi-Fi Matter Accessory Device you will have to compile a
 
 If you have not cloned this repository, you can run the following commands to clone the repository and set it up to build the ChipTool from source.
 
-1. Run the following commands on a terminal where you will run chip-tool:
+1. Run the following commands on a terminal where you will run chip-tool (if not already performed above in Software Setup section):
 
-    > `$ mkdir matter`
+    > `$ mkdir git`
 
-    > `$ cd matter`
+    > `$ cd git`
 
-    > `$ MATTER_WORKDIR=pwd` &emsp;&emsp; --> We will use $MATTER_WORKDIR later
+    > `$ MATTER_WORKDIR=git` &emsp;&emsp; --> We will use $MATTER_WORKDIR later
 
     > `$ git clone https://github.com/SiliconLabs/matter.git`
 
-2. Bootstrapping:
+2. Bootstrapping (if not already performed above in Software Setup section):
 
-    > `$ cd connectedhomeip`
+    > `$ cd matter`
 
-    > `$ git submodule update --init --recursive`
+    > `$ git submodule update --init`
 
     > `$ . scripts/bootstrap.sh`
 

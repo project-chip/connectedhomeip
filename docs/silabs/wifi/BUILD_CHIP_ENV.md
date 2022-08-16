@@ -35,27 +35,26 @@ Update the latest packages by typing following commands in terminal:
 
 -   Check out Matter codebase from GitHub:
 
-    -   Create a working directory - we will name it `matter` as part of this
-        example:
+    -   Create a working directory. In this example it is named `git`:
 
-        > `$ mkdir matter`
+        > `$ mkdir git`
 
-        > `$ cd matter`
+        > `$ cd git`
 
-        > `$ MATTER_WORKDIR=pwd`
+        > `$ MATTER_WORKDIR=git`
 
             --> We will use $MATTER_WORKDIR later
 
     -   Download the
-        [Matter codebase](https://github.com/project-chip/connectedhomeip.git)
+        [Matter codebase](https://github.com/SiliconLabs/matter.git)
         from here as follows:
-        > `$ git clone https://github.com/project-chip/connectedhomeip.git`
+        > `$ git clone https://github.com/SiliconLabs/matter.git`
 
 -   Sync submodules by running the following commands:
 
-    > `$ cd connectedhomeip`
+    > `$ cd matter`
 
-    > `$ git submodule update --init --recursive`
+    > `$ ./scripts/checkout_submodules.py --shallow --recursive --platform efr32`
 
 -   Environment Builds
 
@@ -65,7 +64,7 @@ Update the latest packages by typing following commands in terminal:
         > `$ mkdir out`
 
 -   **[Optional:** Increasing stack size **]** <br> &emsp; Navigate to
-    `matter/connectedhomeip` and open the file in the path
+    `git/matter` and open the file in the path
     `examples/lighting-app/efr32/include/FreeRTOSConfig.h`. Find the macro:
     \``configMINIMAL_STACK_SIZE`\`, and change the macro value from `140` to
     **`320`**.
@@ -85,7 +84,7 @@ Build command for WF200:
 
 Run the following:
 
-> `$ cd connectedhomeip`
+> `$ cd matter`
 
 > `$ <appropriate_build_command_from_above>`
 
@@ -96,7 +95,7 @@ Run the following:
 
 The generated software can be found in `out/rs911x_xxx/BRD4161A/*.out`.
 
-This is what you will burn into the EFR32.
+This is what you will flash into the EFR32.
 
 <br>
 
@@ -105,7 +104,7 @@ This is what you will burn into the EFR32.
 -   Build the ChipTool on a laptop which has Wi-Fi and Bluetooth LE
 -   Run the following commands:
 
-    > `$ cd $MATTER_WORKDIR/connectedhomeip` <br>
+    > `$ cd $MATTER_WORKDIR/matter` <br>
 
     > `$ ./scripts/examples/gn_build_example.sh examples/chip-tool out/standalone`
 

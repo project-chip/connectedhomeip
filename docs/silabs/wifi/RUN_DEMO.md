@@ -72,12 +72,10 @@
 > Linux or Raspberry Pi
 
 1. Get the SSID and PSK of the Wi-Fi network (WPA2 - Security) you are connected
-   to
-2. Position the hardware near the laptop as the BLE antenna on the BRD4161A is
-   slightly weak
-3. Run the following:
+   to.
+2. Run the following:
 
-    > `$ cd $MATTER_WORKDIR/connectedhomeip`
+    > `$ cd $MATTER_WORKDIR/matter`
 
     ### Commissioning Command:
 
@@ -87,26 +85,26 @@
     > '\$SSID' is a placeholder for your Wi-Fi SSID and '\$PSK' is a placeholder
     > for the password of your Wi-Fi network.
 
-4. Turning **on** the LED on the EFR32MG12: <br> &emsp;
+4. To turn **on** the LED on the EFR32MG12: <br> &emsp;
    `$ out/standalone/chip-tool onoff on 1122 1`
-5. Turning **off** the LED on the EFR32MG12: <br> &emsp;
+5. To turn **off** the LED on the EFR32MG12: <br> &emsp;
    `$ out/standalone/chip-tool onoff off 1122 1`
 
 > If there are any failures, run the following command and then re-run the
 > ChipTool command: `$ rm -rf /tmp/chip_*`
 
-> If you are having difficulty getting the Chip-Tool to commission the device successfully it may be because you have more than one network interface available to the Chip-Tool. The device on which you are running the Chip-Tool must be on the same Wi-Fi network as your RS9116 or WF200 and there cannot be another network interface on the device that is running the Chip-Tool. For instance if you have an Ethernet connection as well as a Wi-Fi connection, you need to unplug the Ethernet connection and try running the Chip-Tool as in step #3 above.
+> If you are having difficulty getting the Chip-Tool to commission the device successfully, it may be because you have more than one network interface available to the Chip-Tool. The device on which you are running the Chip-Tool must be on the same Wi-Fi network as your RS9116 or WF200 and there cannot be another network interface on the device that is running the Chip-Tool. For instance, if you have an Ethernet connection as well as a Wi-Fi connection, you need to unplug the Ethernet connection and try running the Chip-Tool as in step #3 above.
 
 > As the device remembers the Access Point credentials given for commissioning,
 > if you want to run the demo multiple times, do a factory reset by pressing the
 > BTN0 on EFR32 MG12 for about 6-7 seconds. The LED0 and LED1
-> flashes 3 times and the QR code appears again on the LCD screen.
+> will flash 3 times and the QR code will appear again on the LCD screen.
 
 <br>
 
 The commissioning command mentioned above does the following:
 
--   ChipTool scans BLE and located the Silicon Labs device that uses the specified
+-   ChipTool scans BLE and locates the Silicon Labs device that uses the specified
     discriminator
 -   Sends the Wi-Fi SSID and Passkey
 -   The Silicon Labs device will join the Wi-Fi network and get an IPv4 address. It

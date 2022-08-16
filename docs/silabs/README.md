@@ -23,26 +23,30 @@
        [Running Matter Demo over Wifi using Android](wifi/WIFI_ANDROID.md)
        <br><br>
 
-4. Reference Guides
+4. Development using VS Code
+
+    1. [Setting up environment](dev/vscode/SETUP.md)
+    2. [Running tasks](dev/vscode/TASKS.md)
+        1. [Build](dev/vscode/BUILD.md)
+        2. [Flash](dev/vscode/FLASH.md)
+        3. [Debug](dev/vscode/DEBUG.md)
+         <!-- TODO: [Logs](dev/vscode/LOGS.md) --> <br><br>
+
+5. Reference Guides
 
     1. [How to Flash a Silicon Labs Device](general/FLASH_SILABS_DEVICE.md)
     2. [How to Find Your Raspberry Pi](general/FIND_RASPI.md)
     3. [Silicon Labs Matter Commit Hashes](general/COMMIT_HASHES.md)
     4. [OTA Software Update](general/OTA_SOFTWARE_UPDATE.md) <br><br>
- 
-5. Frequently Asked Questions (FAQ)
+
+6. Frequently Asked Questions (FAQ) / Troubleshooting
+
     - [Thread FAQ](thread/FAQ.md)
     - [Wifi FAQ](wifi/FAQ.md)
 
 <!--
 (WIP)
-Matter Setup for Development
-Download Silicon Labs Matter Repo
-Setup VSCode
-Create a new sample application
-Build ( 1 task)
-Debug (1 task)
-Edit
+Configure
 ZAP (Standalone) (1 task)
 Pin Tool (Studio) (1 task)
 BLE Configurator (Studio) (1 task)

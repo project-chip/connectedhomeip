@@ -36,10 +36,10 @@ local machine. To clone the repo use the following command:
 
 > `$ git clone https://github.com/SiliconLabs/matter.git`
 
-Once you have cloned the repo, enter the repo and sync all the submodules with
+Once you have cloned the repo, enter the repo and sync all the necessary submodules with
 the following command:
 
-> `$ cd matter` <br> `$ git submodule update --init --recursive`
+> `$ cd matter` <br> `$ ./scripts/checkout_submodules.py --shallow --recursive --platform efr32`
 
 <br>
 

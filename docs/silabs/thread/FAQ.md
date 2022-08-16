@@ -4,7 +4,7 @@
 
 -   Why are the `mattertool` commands not working after all the steps?
 
-    -   You should check if the Radio Co-Processor (RCP) image was build and/or
+    -   You should check if the Radio Co-Processor (RCP) image was built and/or
         flashed correctly to the device
     -   Make sure you see a QR code on the display of the Matter Accessory
         Device (MAD)
@@ -25,5 +25,7 @@
 
 <br>
 
-----
-[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)
+---
+
+[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) |
+[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

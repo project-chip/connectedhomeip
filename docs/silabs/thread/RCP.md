@@ -46,7 +46,7 @@ local machine. To clone the repo use the following command:
 Once you have cloned the repo, enter the repo and sync all the submodules with
 the following command:
 
-> `$ cd ot-efr32` <br> > `$ git submodule update --init --recursive`
+> `$ cd ot-efr32` <br> > `$ git submodule update --init`
 
 After updating the submodules you can check out the correct branch or commit hash
 for the system. Check the current branch and commit hash used here:

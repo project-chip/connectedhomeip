@@ -1,17 +1,17 @@
 # Matter over Wi-Fi Demo Overview
 
 This document walks through the steps to build the Matter Lighting-app project using
-EFR32 BRD4161A + RS911X and EFR32 BRD4161A + WF200. Silicon Labs has two
-families of Wi-Fi adapters (1. RS911X 2. WF200). Both are supported in this Wi-Fi
+EFR32 BRD4161A, BRD4163A, or BRD4164A + RS911X and EFR32 BRD4161A, BRD4163A, or BRD4164A + WF200. 
+Silicon Labs has two families of Wi-Fi adapters (1. RS911X 2. WF200). Both are supported in this Wi-Fi
 port of Matter.
 
 ## Step 1: Matter Wi-Fi Prerequisites
 
-Before you being running the Matter Wi-Fi demo or developing for Wi-Fi you will want to make sure that you have all the required hardware and software for each use case. T
+Before you being running the Matter Wi-Fi demo or developing for Wi-Fi you will want to make sure that you have all the required hardware and software for each use case.
 
 1. [Matter Wi-Fi Prerequisites](WIFI_PREREQS.md) 
 
-   This page goes through the hardware and software (host side) required for the demo. Make sure you have all the necessary hardware and software available before continuing.
+   This page goes through the hardware and software (host side) required for the demo. 
 
 ## Step 2: Building the Chip-Tool for Wi-Fi
 

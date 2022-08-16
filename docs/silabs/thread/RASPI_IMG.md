@@ -44,6 +44,8 @@ used to flash the image to a micro SD card.
 The Raspberry Pi should be connected to a network - this could be Ethernet or a
 Wi-Fi network.
 
+> NOTE: If you cannot connect your Rasberry Pi to a network over Wifi or Ethernet you do have the option to connect a monitor and keyboard the the Raspberry Pi and interact with it that way. In this case you do not need to connect your Raspberry Pi to a network as you can interface with it directly as you would with any computer running Ubuntu Linux.
+
 The preference here is to use Ethernet, however if you are using Wi-Fi for your connection to the Raspberry Pi, please see [Connecting Raspberry Pi to Wi-Fi](https://www.raspberrypi.com/documentation/computers/configuration.html#configuring-networking) for instructions on how to connect your Raspberry Pi to a Wi-Fi network.
 
 Once you have connected your Raspberry Pi to the network, you will want to connect to your Raspberry Pi over SSH. In order to do this you will need the IP address of your Raspberry Pi. Please see the [Finding Your Raspberry Pi page](../general/FIND_RASPI.md) for
