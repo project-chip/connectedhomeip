@@ -1785,7 +1785,7 @@ limitations under the License.
                 <requireCommand>GetSceneMembership</requireCommand>
                 <requireCommand>GetSceneMembershipResponse</requireCommand>
             </include>
-            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="false">
+            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false">
                 <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
                 <requireCommand>AddGroup</requireCommand>
                 <requireCommand>AddGroupResponse</requireCommand>
