@@ -27,7 +27,7 @@ jobs:
               uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
               with:
                   token: ${{ secrets.MATTER_PAT }}
-                  branch: sve
+                  branch: sve-2
                   labels: |
                       sve cherry pick
                   reviewers: |
