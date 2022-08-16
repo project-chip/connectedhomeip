@@ -132,7 +132,7 @@ public:
      * @retval #CHIP_ERROR_KEY_NOT_FOUND If the subscription is not found.
      * @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR ShutdownSubscription(SubscriptionId aSubscriptionId);
+    CHIP_ERROR ShutdownSubscription(const ScopedNodeId & aPeerNodeId, SubscriptionId aSubscriptionId);
 
     /**
      * Tears down active subscriptions for a given peer node ID.
