@@ -578,6 +578,17 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     }
 }
 
+- (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
+{
+    for (MTRDeviceController * existing in _controllers) {
+        if ([existing fabricIndex] == fabricIndex) {
+            return existing;
+        }
+    }
+
+    return nil;
+}
+
 - (MTRPersistentStorageDelegateBridge *)storageDelegateBridge
 {
     return _persistentStorageDelegateBridge;

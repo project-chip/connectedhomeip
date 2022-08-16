@@ -23,6 +23,8 @@
 
 #import "MTRControllerFactory.h"
 
+#include <lib/core/DataModelTypes.h>
+
 class MTRPersistentStorageDelegateBridge;
 
 namespace chip {
@@ -39,6 +41,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRControllerFactory (InternalMethods)
 
 - (void)controllerShuttingDown:(MTRDeviceController *)controller;
+
+/**
+ * Find a running controller, if any, for the given fabric index.
+ */
+- (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex;
 
 @property (readonly) MTRPersistentStorageDelegateBridge * storageDelegateBridge;
 @property (readonly) chip::Credentials::GroupDataProvider * groupData;

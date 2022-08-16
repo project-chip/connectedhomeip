@@ -262,10 +262,6 @@ public class ChipDeviceController {
     releaseOperationalDevicePointer(devicePtr);
   }
 
-  public boolean disconnectDevice(long deviceId) {
-    return disconnectDevice(deviceControllerPtr, deviceId);
-  }
-
   public void onConnectDeviceComplete() {
     completionListener.onConnectDeviceComplete();
   }
@@ -635,8 +631,6 @@ public class ChipDeviceController {
       long deviceControllerPtr, long deviceId, long callbackHandle);
 
   private native void releaseOperationalDevicePointer(long devicePtr);
-
-  private native boolean disconnectDevice(long deviceControllerPtr, long deviceId);
 
   private native void deleteDeviceController(long deviceControllerPtr);
 

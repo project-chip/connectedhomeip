@@ -145,8 +145,6 @@ public:
 
     uint32_t GetKeyId(void) { return keyid; }
 
-    CHIP_ERROR CreateOperationalKey(FabricIndex fabricIdx);
-
 private:
     uint32_t keyid;
     P256PublicKeyHSM mPublicKeyHSM;

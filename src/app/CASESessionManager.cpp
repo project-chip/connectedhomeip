@@ -56,11 +56,6 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
     session->Connect(onConnection, onFailure);
 }
 
-void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)
-{
-    ReleaseSession(FindExistingSessionSetup(peerId));
-}
-
 void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
 {
     mConfig.sessionSetupPool->ReleaseAllSessionSetupsForFabric(fabricIndex);

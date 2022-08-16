@@ -4,6 +4,9 @@ The Python CHIP Controller is a tool that allows to commission a Matter device
 into the network and to communicate with it using the Zigbee Cluster Library
 (ZCL) messages.
 
+> The chip-device-ctrl tool will be deprecated, and will be replaced by
+> chip-repl. Continue reading to see how to do the same thing with chip-repl.
+
 <hr>
 
 -   [Source files](#source)
@@ -192,6 +195,8 @@ set the credentials to the controller by executing the following command:
 chip-device-ctrl > set-pairing-wifi-credential TESTSSID P455W4RD
 ```
 
+**REPL Command**: `devCtrl.SetWiFiCredentials(<ssid>, <password>)`
+
 ### Step 5: Commission the Matter accessory device over Bluetooth LE
 
 The controller uses a 12-bit value called **discriminator** to discern between
@@ -221,6 +226,9 @@ with the following assumptions for the Matter accessory device:
 ```
 chip-device-ctrl > connect -ble 3840 20202021 1234
 ```
+
+**REPL Command:**
+`devCtrl.ConnectBLE(<discriminator>, <setup pincode>, <temporary node id>)`
 
 You can skip the last parameter, the Node ID, in the command. If you skip it,
 the controller will assign it randomly. In that case, note down the Node ID,
@@ -258,12 +266,18 @@ state:
 chip-device-ctrl > zcl OnOff Toggle 1234 1 0
 ```
 
+**REPL Command:**
+`await devCtrl.SendCommand(1234, 1, Clusters.OnOff.Commands.Toggle())`
+
 To change the brightness of the LED, use the following command, with the level
 value somewhere between 0 and 255.
 
 ```
 chip-device-ctrl > zcl LevelControl MoveToLevel 1234 1 0 level=50
 ```
+
+**REPL Command:**
+`await devCtrl.SendCommand(1234, 1, LevelControl.Commands.MoveToLevel(level=50, transitionTime=Null, optionsMask=0, optionsOverride=0))`
 
 ### Step 7: Read basic information out of the accessory.
 
@@ -278,8 +292,13 @@ chip-device-ctrl > zclread Basic ProductName 1234 1 0
 chip-device-ctrl > zclread Basic SoftwareVersion 1234 1 0
 ```
 
+**REPL Command:**
+`await devCtrl.ReadAttribute(1234, [(1, Clusters.Basic.Attributes.VendorName)])`
+
 > Use the `zcl ? Basic` command to list all available commands for Basic
 > Cluster.
+>
+> In REPL, you can type `Clusters.Basic.Attributes.` and then use the TAB key.
 
 <hr>
 
@@ -288,6 +307,8 @@ chip-device-ctrl > zclread Basic SoftwareVersion 1234 1 0
 ## List of commands
 
 ### `ble-adapter-print`
+
+> BLE adapter operations is not yet supported in REPL
 
 Print the available Bluetooth adapters on device. Takes no arguments:
 
@@ -298,6 +319,8 @@ chip-device-ctrl > ble-adapter-print
 
 ### `ble-debug-log`
 
+> BLE adapter operations is not yet supported in REPL
+
 Enable the Bluetooth LE debug logs.
 
 ```
@@ -305,6 +328,8 @@ chip-device-ctrl > ble-debug-log 1
 ```
 
 ### `ble-scan [-t <timeout>] [identifier]`
+
+> BLE adapter operations is not yet supported in REPL
 
 Start a scan action to search for valid CHIP devices over Bluetooth LE (for at
 most _timeout_ seconds). Stop when the device is matching the identifier or the
@@ -336,6 +361,9 @@ device commissioning procedure to configure the device with a Thread interface.
 chip-device-ctrl > set-pairing-thread-credential 0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8
 ```
 
+**REPL Commands:**
+`devCtrl.SetThreadOperationalDataset(bytes.FromHex("0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8"))`
+
 ### `set-pairing-wifi-credential <ssid> <credentials>`
 
 Provides the controller with Wi-Fi network credentials that will be used in the
@@ -344,6 +372,8 @@ device commissioning procedure to configure the device with a Wi-Fi interface.
 ```
 chip-device-ctrl > set-pairing-wifi-credential TESTSSID P455W4RD
 ```
+
+**REPL Commands:** `devCtrl.SetWiFiCredentials('TESTSSID', 'P455W4RD')`
 
 ### `connect -ip <address> <SetUpPinCode> [<nodeid>]`
 
@@ -356,6 +386,9 @@ persisted by controller / device.
 
 If no nodeid given, a random Node ID will be used.
 
+**REPL Commands:**
+`devCtrl.CommissionIP(b'<ip address>', <setup pin code>, <nodeid>)`
+
 ### `connect -ble <discriminator> <SetUpPinCode> [<nodeid>]`
 
 Do key exchange and establish a secure session between controller and device
@@ -367,12 +400,19 @@ persisted by controller / device.
 
 If no nodeid given, a random Node ID will be used.
 
+**REPL Commands:**
+`devCtrl.ConnectBLE(<discriminator>, <setup pin code>, <nodeid>)`
+
 ### `close-session <nodeid>`
 
 If case there exists an open session (PASE or CASE) to the device with a given
 Node ID, mark it as expired.
 
+**REPL Commands:** `devCtrl.CloseSession(<nodeid>)`
+
 ### `discover`
+
+> To be implemented in REPL
 
 Discover available Matter accessory devices:
 
@@ -382,6 +422,8 @@ chip-device-ctrl > discover -all
 
 ### `resolve <node_id>`
 
+> To be implemented in REPL
+
 Resolve DNS-SD name corresponding with the given Node ID and update address of
 the node in the device controller:
 
@@ -390,6 +432,8 @@ chip-device-ctrl > resolve 1234
 ```
 
 ### `setup-payload generate [-v <Vendor ID>] [-p <Product ID>] [-cf <Custom Flow>] [-dc <Discovery Capabilities>] [-dv <Discriminator Value>] [-ps <Passcode>]`
+
+> To be implemented in REPL
 
 Print the generated Onboarding Payload Contents in human-readable (Manual
 Pairing Code) and machine-readable (QR Code) format:
@@ -401,6 +445,8 @@ SetupQRCode: [MT:YNJV7VSC00CMVH7SR00]
 ```
 
 ### `setup-payload parse-manual <manual-pairing-code>`
+
+> To be implemented in REPL
 
 Print the commissioning information encoded in the Manual Pairing Code:
 
@@ -416,6 +462,8 @@ SetUpPINCode: 20202021
 ```
 
 ### `setup-payload parse-qr <qr-code>`
+
+> To be implemented in REPL
 
 Print the commissioning information encoded in the QR Code payload:
 
@@ -450,6 +498,14 @@ example, `networkId=hex:0123456789abcdef` (for
 `['T', 'e', 's', 't', 0x00]`).
 
 For boolean type, use `key=True` or `key=False`.
+
+**REPL Commands:**
+
+```python
+# await devCtrl.SendCommand(<nodeid>, <endpoint>, Clusters.<cluster>.Commands.<command>(<arguments>))
+# e.g.
+await devCtrl.SendCommand(12344321, 1, Clusters.LevelControl.Commands.MoveWithOnOff(moveMode=1, rate=2, optionsMask=0, optionsOverride=0))
+```
 
 ### `zcl ?`
 
@@ -499,6 +555,10 @@ WakeOnLan
 WindowCovering
 ```
 
+**REPL Commands**
+
+Type `Clusters.` and hit TAB
+
 ### `zcl ? <Cluster>`
 
 List available commands in cluster. For example, for _Basic_ cluster:
@@ -525,12 +585,24 @@ LocalConfigDisabled
 ClusterRevision
 ```
 
+**REPL Commands**
+
+Type `Clusters.(cluster name).Commands.` and hit TAB
+
 ### `zclread <Cluster> <Attribute> <NodeId> <EndpointId> <GroupId> [arguments]`
 
 Read the value of ZCL attribute. For example:
 
 ```
 chip-device-ctrl > zclread Basic VendorName 1234 1 0
+```
+
+**REPL Commands**
+
+```python
+# devCtrl.ReadAttribute(<nodeid>, [(<endpoint id>, Clusters.<cluster>.Attributes.<attribute>)])
+# e.g.
+await devCtrl.ReadAttribute(1234, [(1, Clusters.Basic.Attributes.VendorName)])
 ```
 
 ### `zclwrite <cluster> <attribute> <nodeid> <endpoint> <groupid> <value>`
@@ -547,12 +619,31 @@ chip-device-ctrl > zclwrite TestCluster CharString 1 1 0 233233
 Note: The format of the value is the same as the format of argument values for
 ZCL cluster commands.
 
+**REPL Commands**
+
+```python
+# devCtrl.WriteAttribute(<nodeid>, [(<endpointid>, Clusters.<cluster>.Attributes.<attribute>(value=<attribute value>))])
+# e.g.
+await devCtrl.WriteAttribute(1, [(1, Clusters.TestCluster.Attributes.Int8u(value=1))])
+await devCtrl.WriteAttribute(1, [(1, Clusters.TestCluster.Attributes.Boolean(value=True))])
+await devCtrl.WriteAttribute(1, [(1, Clusters.TestCluster.Attributes.OctetString(value=b'123123\x00'))])
+await devCtrl.WriteAttribute(1, [(1, Clusters.TestCluster.Attributes.CharString(value='233233'))])
+```
+
 ### `zclsubscribe <Cluster> <Attribute> <Nodeid> <Endpoint> <MinInterval> <MaxInterval>`
 
 Configure ZCL attribute reporting settings. For example:
 
 ```
 chip-device-ctrl > zclsubscribe OccupancySensing Occupancy 1234 1 10 20
+```
+
+**REPL Commands**
+
+```python
+# devCtrl.ReadAttribute(<nodeid>, [(<endpoint>, Clusters.<cluster>.Attributes.<attribute>)], reportInterval=(<min interval>, <max interval>))
+# e.g.
+await devCtrl.ReadAttribute(1, [(1, Clusters.OccupancySensing.Attributes.Occupancy)], reportInterval=(10, 20))
 ```
 
 ### `zclsubscribe -shutdown <subscription id>`
@@ -583,3 +674,12 @@ chip-device-ctrl > zclsubscribe OnOff OnOff 1 1 10 20
 ```
 
 The subscription id is `0xdeadbeefcafe` in this case
+
+**REPL Commands**
+
+```python
+# SubscriptionTransaction.Shutdown()
+# e.g.
+sub = await devCtrl.ReadAttribute(1, [(1, Clusters.OccupancySensing.Attributes.Occupancy)], reportInterval=(10, 20))
+sub.Shutdown()
+```

@@ -1602,10 +1602,7 @@ limitations under the License.
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
             <include cluster="Door Lock" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Alarms" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Poll Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Electrical Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Time" client="false" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Time Synchronization" client="false" server="false" clientLocked="false" serverLocked="false"></include>
         </clusters>
     </deviceType>
@@ -1791,7 +1788,6 @@ limitations under the License.
             <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Time" client="false" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -1850,14 +1846,12 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Alarms" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Thermostat User Interface Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Fan Control" client="false" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
-            <include cluster="Time" client="false" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -2180,9 +2174,6 @@ limitations under the License.
                 <requireCommand>RemoveGroupResponse</requireCommand>
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
-            </include>
-            <include cluster="IAS Zone" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireCommand>ZoneEnrollResponse</requireCommand>
             </include>
             <include cluster="Level Control" client="true" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>

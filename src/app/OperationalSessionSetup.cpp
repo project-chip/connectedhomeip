@@ -261,20 +261,14 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error)
     mConnectionFailure.DequeueAll(failureReady);
     mConnectionSuccess.DequeueAll(successReady);
 
-    // TODO Issue #20452: For now we need to make a copy of member fields inside `this` before calling any of the
-    // callbacks since the callbacks themselves can potentially release `this` OperationalSessionSetup.
-    auto * exchangeMgr = mInitParams.exchangeMgr;
-    auto sessionHandle = mSecureSession.Get();
-    auto peerId        = mPeerId;
-    VerifyOrDie(mReleaseDelegate != nullptr);
-    auto * releaseDelegate = mReleaseDelegate;
-
     //
     // If we encountered no error, go ahead and call all success callbacks. Otherwise,
     // call the failure callbacks.
     //
     while (failureReady.mNext != &failureReady)
     {
+        // We expect that we only have callbacks if we are not performing just address update.
+        VerifyOrDie(!mPerformingAddressUpdate);
         Callback::Callback<OnDeviceConnectionFailure> * cb =
             Callback::Callback<OnDeviceConnectionFailure>::FromCancelable(failureReady.mNext);
 
@@ -282,37 +276,34 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error)
 
         if (error != CHIP_NO_ERROR)
         {
-            cb->mCall(cb->mContext, peerId, error);
+            cb->mCall(cb->mContext, mPeerId, error);
         }
     }
 
     while (successReady.mNext != &successReady)
     {
+        // We expect that we only have callbacks if we are not performing just address update.
+        VerifyOrDie(!mPerformingAddressUpdate);
         Callback::Callback<OnDeviceConnected> * cb = Callback::Callback<OnDeviceConnected>::FromCancelable(successReady.mNext);
 
         cb->Cancel();
         if (error == CHIP_NO_ERROR)
         {
-            // We know that we for sure have the SessionHandle in the successful case.
+            auto * exchangeMgr = mInitParams.exchangeMgr;
             VerifyOrDie(exchangeMgr);
-            cb->mCall(cb->mContext, *exchangeMgr, sessionHandle.Value());
+            // We know that we for sure have the SessionHandle in the successful case.
+            auto optionalSessionHandle = mSecureSession.Get();
+            cb->mCall(cb->mContext, *exchangeMgr, optionalSessionHandle.Value());
         }
     }
-
-    releaseDelegate->ReleaseSession(this);
+    VerifyOrDie(mReleaseDelegate != nullptr);
+    mReleaseDelegate->ReleaseSession(this);
 }
 
 void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
 {
     VerifyOrReturn(mState != State::Uninitialized && mState != State::NeedsAddress,
                    ChipLogError(Controller, "HandleCASEConnectionFailure was called while the device was not initialized"));
-
-    //
-    // We don't need to reset the state all the way back to NeedsAddress since all that transpired
-    // was just CASE connection failure. So let's re-use the cached address to re-do CASE again
-    // if need-be.
-    //
-    MoveToState(State::HasAddress);
 
     DequeueConnectionCallbacks(error);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
@@ -332,26 +323,6 @@ void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
-void OperationalSessionSetup::Disconnect()
-{
-    VerifyOrReturn(mState == State::SecureConnected);
-
-    if (mSecureSession)
-    {
-        //
-        // Mark the session as defunct to signal that we no longer want to use this
-        // session anymore for further interactions to this peer. However, if we receive
-        // messages back from that peer on the defunct session, it will bring it back into an active
-        // state again.
-        //
-        mSecureSession.Get().Value()->AsSecureSession()->MarkAsDefunct();
-    }
-
-    mSecureSession.Release();
-
-    MoveToState(State::HasAddress);
-}
-
 void OperationalSessionSetup::CleanupCASEClient()
 {
     if (mCASEClient)
@@ -364,11 +335,6 @@ void OperationalSessionSetup::CleanupCASEClient()
 void OperationalSessionSetup::OnSessionReleased()
 {
     MoveToState(State::HasAddress);
-}
-
-void OperationalSessionSetup::OnSessionHang()
-{
-    Disconnect();
 }
 
 OperationalSessionSetup::~OperationalSessionSetup()
@@ -456,12 +422,7 @@ void OperationalSessionSetup::OnNodeAddressResolutionFailed(const PeerId & peerI
     ChipLogError(Discovery, "OperationalSessionSetup[%u:" ChipLogFormatX64 "]: operational discovery failed: %" CHIP_ERROR_FORMAT,
                  mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()), reason.Format());
 
-    if (IsResolvingAddress())
-    {
-        MoveToState(State::NeedsAddress);
-    }
-
-    // No need to set mPerformingAddressUpdate to false since call below releases `this`.
+    // No need to modify any variables in `this` since call below releases `this`.
     DequeueConnectionCallbacks(reason);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }

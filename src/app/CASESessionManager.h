@@ -78,10 +78,6 @@ public:
     void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId, bool forAddressUpdate = false) const;
-
-    void ReleaseSession(const ScopedNodeId & peerId);
-
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
     void ReleaseAllSessions();
@@ -103,6 +99,8 @@ public:
     void UpdatePeerAddress(ScopedNodeId peerId) override;
 
 private:
+    OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId, bool forAddressUpdate = false) const;
+
     Optional<SessionHandle> FindExistingSession(const ScopedNodeId & peerId) const;
 
     CASESessionManagerConfig mConfig;
