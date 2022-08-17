@@ -107,21 +107,11 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0012</deviceId>
         <clusters lockOthers="true">
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>IDENTIFY_TIME</requireAttribute>
-                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
-                <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
-            </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
                 <requireAttribute>SERVER_LIST</requireAttribute>
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
-            </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
-                <requireAttribute>BINDING</requireAttribute>
             </include>
             <include cluster="OTA Software Update Requestor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="OTA Software Update Provider" client="true" server="false" clientLocked="true" serverLocked="true"></include>
