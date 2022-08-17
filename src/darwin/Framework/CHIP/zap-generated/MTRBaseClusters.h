@@ -22465,6 +22465,34 @@ typedef NS_ENUM(uint8_t, MTREthernetNetworkDiagnosticsPHYRateType) {
     MTREthernetNetworkDiagnosticsPHYRateType400G = 0x09,
 };
 
+typedef NS_ENUM(uint8_t, MTRTimeSynchronizationGranularity) {
+    MTRTimeSynchronizationGranularityNoTimeGranularity = 0x00,
+    MTRTimeSynchronizationGranularityMinutesGranularity = 0x01,
+    MTRTimeSynchronizationGranularitySecondsGranularity = 0x02,
+    MTRTimeSynchronizationGranularityMillisecondsGranularity = 0x03,
+    MTRTimeSynchronizationGranularityMicrosecondsGranularity = 0x04,
+};
+
+typedef NS_ENUM(uint8_t, MTRTimeSynchronizationTimeSource) {
+    MTRTimeSynchronizationTimeSourceNone = 0x00,
+    MTRTimeSynchronizationTimeSourceUnknown = 0x01,
+    MTRTimeSynchronizationTimeSourceAdmin = 0x02,
+    MTRTimeSynchronizationTimeSourceNodeTimeCluster = 0x03,
+    MTRTimeSynchronizationTimeSourceNonFabricSntp = 0x04,
+    MTRTimeSynchronizationTimeSourceNonFabricNtp = 0x05,
+    MTRTimeSynchronizationTimeSourceFabricSntp = 0x06,
+    MTRTimeSynchronizationTimeSourceFabricNtp = 0x07,
+    MTRTimeSynchronizationTimeSourceMixedNtp = 0x08,
+    MTRTimeSynchronizationTimeSourceNonFabricSntpNts = 0x09,
+    MTRTimeSynchronizationTimeSourceNonFabricNtpNts = 0x0A,
+    MTRTimeSynchronizationTimeSourceFabricSntpNts = 0x0B,
+    MTRTimeSynchronizationTimeSourceFabricNtpNts = 0x0C,
+    MTRTimeSynchronizationTimeSourceMixedNtpNts = 0x0D,
+    MTRTimeSynchronizationTimeSourceCloudSource = 0x0E,
+    MTRTimeSynchronizationTimeSourcePtp = 0x0F,
+    MTRTimeSynchronizationTimeSourceGnss = 0x10,
+};
+
 typedef NS_ENUM(uint8_t, MTRAdministratorCommissioningCommissioningWindowStatus) {
     MTRAdministratorCommissioningCommissioningWindowStatusWindowNotOpen = 0x00,
     MTRAdministratorCommissioningCommissioningWindowStatusEnhancedWindowOpen = 0x01,

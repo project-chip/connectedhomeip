@@ -1637,10 +1637,10 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
+            <include cluster="Binding" client="false" server="false" clientLocked="true" serverLocked="false">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes" client="false" server="false" clientLocked="true" serverLocked="false">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -1660,7 +1660,7 @@ limitations under the License.
                 <requireCommand>GetSceneMembership</requireCommand>
                 <requireCommand>GetSceneMembershipResponse</requireCommand>
             </include>
-            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false">
                 <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
                 <requireCommand>AddGroup</requireCommand>
                 <requireCommand>AddGroupResponse</requireCommand>
@@ -1674,11 +1674,12 @@ limitations under the License.
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
             <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+	    <include cluster="Time Synchronization" client="false" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Thermostat User Interface Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Fan Control" client="false" server="false" clientLocked="false" serverLocked="false"></include>
-            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
-            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="false"></include>
-            <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Fan Control" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
