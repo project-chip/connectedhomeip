@@ -42,7 +42,7 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
                                                  chip::Optional<std::vector<uint8_t>> spake2pSalt, uint32_t spake2pIterationCount,
                                                  chip::Optional<uint32_t> setupPasscode, uint16_t discriminator)
 {
-    VerifyOrReturnError(mIsInitialized == false, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mIsInitialized == false, CHIP_ERROR_WELL_UNINITIALIZED);
 
     if (discriminator > chip::kMaxDiscriminatorValue)
     {
@@ -174,21 +174,21 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
 
 CHIP_ERROR LinuxCommissionableDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
-    VerifyOrReturnError(mIsInitialized == true, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mIsInitialized == true, CHIP_ERROR_WELL_UNINITIALIZED);
     setupDiscriminator = mDiscriminator;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR LinuxCommissionableDataProvider::GetSpake2pIterationCount(uint32_t & iterationCount)
 {
-    VerifyOrReturnError(mIsInitialized == true, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mIsInitialized == true, CHIP_ERROR_WELL_UNINITIALIZED);
     iterationCount = mPaseIterationCount;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR LinuxCommissionableDataProvider::GetSpake2pSalt(chip::MutableByteSpan & saltBuf)
 {
-    VerifyOrReturnError(mIsInitialized == true, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mIsInitialized == true, CHIP_ERROR_WELL_UNINITIALIZED);
 
     VerifyOrReturnError(saltBuf.size() >= kSpake2p_Max_PBKDF_Salt_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(saltBuf.data(), mPaseSalt.data(), mPaseSalt.size());
@@ -199,7 +199,7 @@ CHIP_ERROR LinuxCommissionableDataProvider::GetSpake2pSalt(chip::MutableByteSpan
 
 CHIP_ERROR LinuxCommissionableDataProvider::GetSpake2pVerifier(chip::MutableByteSpan & verifierBuf, size_t & outVerifierLen)
 {
-    VerifyOrReturnError(mIsInitialized == true, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mIsInitialized == true, CHIP_ERROR_WELL_UNINITIALIZED);
 
     // By now, serialized verifier from Init should be correct size
     VerifyOrReturnError(mSerializedPaseVerifier.size() == kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INTERNAL);
@@ -214,7 +214,7 @@ CHIP_ERROR LinuxCommissionableDataProvider::GetSpake2pVerifier(chip::MutableByte
 
 CHIP_ERROR LinuxCommissionableDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
 {
-    VerifyOrReturnError(mIsInitialized == true, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mIsInitialized == true, CHIP_ERROR_WELL_UNINITIALIZED);
 
     // Pretend not implemented if we don't have a passcode value externally set
     if (!mSetupPasscode.HasValue())

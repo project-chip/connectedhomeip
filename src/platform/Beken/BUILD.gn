@@ -1,0 +1,62 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+assert(chip_device_platform == "beken")
+
+static_library("Beken") {
+  sources = [
+    "../SingletonConfigurationManager.cpp",
+    "BLEManagerImpl.cpp",
+    "BLEManagerImpl.h",
+    "BekenConfig.cpp",
+    "BekenConfig.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "CHIPMem-Platform.cpp",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+
+    #"DeviceInfoProviderImpl.cpp",
+    #"DeviceInfoProviderImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "Logging.cpp",
+    "LwIPCoreLock.cpp",
+    "NetworkCommissioningWiFiDriver.cpp",
+    "OTAImageProcessorImpl.cpp",
+    "OTAImageProcessorImpl.h",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "SystemPlatformConfig.h",
+    "SystemTimeSupport.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/dnssd:platform_header",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/platform:platform_base",
+  ]
+}

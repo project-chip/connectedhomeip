@@ -27,13 +27,13 @@
 #if ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER))
 
 #if ENABLE_HSM_SPAKE_VERIFIER
-const uint32_t w0in_id_v = 0x2347;
-const uint32_t Lin_id_v  = 0x2348;
+const uint32_t w0in_id_v = 0x7D200001;
+const uint32_t Lin_id_v  = 0x7D200002;
 #endif
 
 #if ENABLE_HSM_SPAKE_PROVER
-const uint32_t w0in_id_p = 0x2349;
-const uint32_t w1in_id_p = 0x2350;
+const uint32_t w0in_id_p = 0x7D200003;
+const uint32_t w1in_id_p = 0x7D200004;
 #endif
 
 void Spake2p_Finish_HSM(hsm_pake_context_t * phsm_pake_context)
@@ -71,7 +71,7 @@ CHIP_ERROR create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE role, hsm_pake
     uint8_t create_crypto_obj = 1;
 #endif
 
-    ChipLogProgress(Crypto, "Using Object Id --> %d \n", spakeObjectId);
+    ChipLogProgress(Crypto, "SE05x: Using Object Id --> %d", spakeObjectId);
 
     if (spakeObjectId != 0)
     {
@@ -124,7 +124,7 @@ CHIP_ERROR Spake2p_ComputeRoundOne_HSM(hsm_pake_context_t * phsm_pake_context, c
 {
     SE05x_CryptoObjectID_t spakeObjectId = phsm_pake_context->spake_objId;
 
-    ChipLogProgress(Crypto, "Using HSM for spake2p ComputeRoundOne \n");
+    ChipLogProgress(Crypto, "SE05x: Using HSM for spake2p ComputeRoundOne");
 
     VerifyOrReturnError(out != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_len != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -156,7 +156,7 @@ CHIP_ERROR Spake2p_ComputeRoundTwo_HSM(hsm_pake_context_t * phsm_pake_context, c
     VerifyOrReturnError(pKeyKe != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(pkeyKeLen != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ChipLogProgress(Crypto, "Using HSM for spake2p ComputeRoundTwo \n");
+    ChipLogProgress(Crypto, "SE05x: Using HSM for spake2p ComputeRoundTwo");
 
     const uint8_t * const pab = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER) ? NULL : in;
     const size_t pab_len      = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER) ? 0 : in_len;
@@ -178,7 +178,7 @@ CHIP_ERROR Spake2p_KeyConfirm_HSM(hsm_pake_context_t * phsm_pake_context, chip::
     VerifyOrReturnError(in != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
-    ChipLogProgress(Crypto, "Using HSM for spake2p KeyConfirm \n");
+    ChipLogProgress(Crypto, "SE05x: Using HSM for spake2p KeyConfirm");
 
     uint8_t presult                            = 0;
     const SE05x_CryptoObjectID_t spakeObjectId = phsm_pake_context->spake_objId;
@@ -251,7 +251,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
         VerifyOrReturnError(peer_identity != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    ChipLogProgress(Crypto, "HSM - BeginVerifier \n");
+    ChipLogProgress(Crypto, "SE05x: HSM - BeginVerifier");
 
     ReturnErrorOnFailure(FELoad(w0in, w0in_len, w0));
     ReturnErrorOnFailure(FEWrite(w0, w0in_mod, w0in_mod_len));
@@ -309,7 +309,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
 
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::INIT, CHIP_ERROR_INTERNAL);
 
-    ChipLogProgress(Crypto, "HSM - BeginProver \n");
+    ChipLogProgress(Crypto, "SE05x: HSM - BeginProver");
 
     ReturnErrorOnFailure(FELoad(w0in, w0in_len, w0));
     ReturnErrorOnFailure(FEWrite(w0, w0in_mod, w0in_mod_len));

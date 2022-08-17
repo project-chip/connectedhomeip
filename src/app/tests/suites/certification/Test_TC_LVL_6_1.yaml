@@ -103,6 +103,16 @@ tests:
               - name: "ms"
                 value: 5000
 
+    - label: "Sends stop command to DUT"
+      PICS: LVL.S.C03.Rsp
+      command: "Stop"
+      arguments:
+          values:
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
     - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
       command: "UserPrompt"
@@ -113,16 +123,6 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
-    - label: "Sends stop command to DUT"
-      PICS: LVL.S.C03.Rsp
-      command: "Stop"
-      arguments:
-          values:
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
 
     - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.C03.Rsp && LVL.S.A0000

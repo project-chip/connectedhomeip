@@ -151,6 +151,8 @@ void InitApp(intptr_t args)
     /* Start CHIP datamodel server */
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = [] { ThreadStackMgr().LockThreadStack(); };
     nativeParams.unlockCb              = [] { ThreadStackMgr().UnlockThreadStack(); };
@@ -159,8 +161,6 @@ void InitApp(intptr_t args)
     chip::Server::GetInstance().Init(initParams);
 
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     LightMgr().Init();
     LightMgr().SetCallbacks(LightManagerCallback, nullptr);

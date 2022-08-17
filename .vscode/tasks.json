@@ -331,6 +331,7 @@
                 "android-arm64-chip-tvserver",
                 "android-x64-chip-tool",
                 "android-x86-chip-tool",
+                "bl602-light",
                 "efr32-brd4161a-light",
                 "efr32-brd4163a-light",
                 "efr32-brd4164a-light",

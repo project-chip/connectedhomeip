@@ -97,15 +97,10 @@ static_library("EFR32") {
     "$dir_pw_checksum",
     "$dir_pw_kvs",
   ]
-
   if (chip_enable_openthread) {
-    if (chip_openthread_ftd) {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
-    } else {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
-    }
+    public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
+
+    deps += [ "${chip_root}/third_party/silabs:openthread_cli" ]
 
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",

@@ -53,7 +53,7 @@ void ButtonHandler::GpioInit(void)
     result = cyhal_gpio_init(APP_LIGHT_BUTTON, CYHAL_GPIO_DIR_INPUT, CYHAL_GPIO_DRIVE_PULLUP, CYBSP_BTN_OFF);
     if (result != CY_RSLT_SUCCESS)
     {
-        printf(" cyhal_gpio_init failed for APP_LOCK_BUTTON\r\n");
+        printf(" cyhal_gpio_init failed for APP_LIGHT_BUTTON\r\n");
     }
     result = cyhal_gpio_init(APP_FUNCTION_BUTTON, CYHAL_GPIO_DIR_INPUT, CYHAL_GPIO_DRIVE_PULLUP, CYBSP_BTN_OFF);
     if (result != CY_RSLT_SUCCESS)
@@ -98,5 +98,8 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
     {
         buttonevent = cyhal_gpio_read(APP_LIGHT_BUTTON);
     }
-    GetAppTask().ButtonEventHandler(timerId, (buttonevent) ? APP_BUTTON_PRESSED : APP_BUTTON_RELEASED);
+    if (buttonevent)
+    {
+        GetAppTask().ButtonEventHandler(timerId, APP_BUTTON_PRESSED);
+    }
 }

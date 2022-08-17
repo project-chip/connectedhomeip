@@ -21,7 +21,7 @@ PICS:
 config:
     nodeId: 0x12344321
     cluster: "On/Off"
-    timeout: 350
+    timeout: 400
     endpoint: 1
 
 tests:

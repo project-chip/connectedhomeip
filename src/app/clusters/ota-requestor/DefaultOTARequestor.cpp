@@ -386,8 +386,15 @@ void DefaultOTARequestor::DisconnectFromProvider()
         return;
     }
 
-    auto providerNodeId = GetProviderScopedId();
-    mServer->GetSecureSessionManager().MarkSessionsAsDefunct(providerNodeId, MakeOptional(Transport::SecureSession::Type::kCASE));
+    auto optionalSessionHandle = mSessionHolder.Get();
+    if (optionalSessionHandle.HasValue())
+    {
+        if (optionalSessionHandle.Value()->IsActiveSession())
+        {
+            optionalSessionHandle.Value()->AsSecureSession()->MarkAsDefunct();
+        }
+    }
+    mSessionHolder.Release();
 }
 
 // Requestor is directed to cancel image update in progress. All the Requestor state is
@@ -419,6 +426,7 @@ void DefaultOTARequestor::OnConnected(void * context, Messaging::ExchangeManager
 {
     DefaultOTARequestor * requestorCore = static_cast<DefaultOTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
+    requestorCore->mSessionHolder.Grab(sessionHandle);
 
     switch (requestorCore->mOnConnectedAction)
     {
@@ -476,6 +484,7 @@ void DefaultOTARequestor::OnConnectionFailure(void * context, const ScopedNodeId
 {
     DefaultOTARequestor * requestorCore = static_cast<DefaultOTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
+    requestorCore->mSessionHolder.Release();
 
     ChipLogError(SoftwareUpdate, "Failed to connect to node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                  ChipLogValueX64(peerId.GetNodeId()), error.Format());

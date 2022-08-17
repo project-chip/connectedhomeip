@@ -27,7 +27,7 @@ import chip.native
 import chip.FabricAdmin
 from chip.utils import CommissioningBuildingBlocks
 import builtins
-from typing import Optional
+from typing import Optional, List, Tuple
 from dataclasses import dataclass, field
 from dataclasses import asdict as dataclass_asdict
 import re
@@ -126,7 +126,7 @@ class MatterTestConfig:
     admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
     global_test_params: dict = field(default_factory=dict)
     # List of explicit tests to run by name. If empty, all tests will run
-    tests: list[str] = field(default_factory=list)
+    tests: List[str] = field(default_factory=list)
 
     commissioning_method: str = None
     discriminator: int = None
@@ -321,7 +321,7 @@ def int_from_manual_code(s: str) -> int:
     return int(s, 10)
 
 
-def int_named_arg(s: str) -> tuple[str, int]:
+def int_named_arg(s: str) -> Tuple[str, int]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
     match = re.match(regex, s)
     if not match:
@@ -335,7 +335,7 @@ def int_named_arg(s: str) -> tuple[str, int]:
     return (name, value)
 
 
-def str_named_arg(s: str) -> tuple[str, str]:
+def str_named_arg(s: str) -> Tuple[str, str]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
@@ -344,7 +344,7 @@ def str_named_arg(s: str) -> tuple[str, str]:
     return (match.group("name"), match.group("value"))
 
 
-def float_named_arg(s: str) -> tuple[str, float]:
+def float_named_arg(s: str) -> Tuple[str, float]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
@@ -356,7 +356,7 @@ def float_named_arg(s: str) -> tuple[str, float]:
     return (name, value)
 
 
-def json_named_arg(s: str) -> tuple[str, object]:
+def json_named_arg(s: str) -> Tuple[str, object]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
@@ -368,7 +368,7 @@ def json_named_arg(s: str) -> tuple[str, object]:
     return (name, value)
 
 
-def bool_named_arg(s: str) -> tuple[str, bool]:
+def bool_named_arg(s: str) -> Tuple[str, bool]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
     match = re.match(regex, s.lower())
     if not match:
@@ -383,7 +383,7 @@ def bool_named_arg(s: str) -> tuple[str, bool]:
     return (name, value)
 
 
-def bytes_as_hex_named_arg(s: str) -> tuple[str, bytes]:
+def bytes_as_hex_named_arg(s: str) -> Tuple[str, bytes]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
     match = re.match(regex, s)
     if not match:
@@ -510,7 +510,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     return config
 
 
-def parse_matter_test_args(argv: list[str]) -> MatterTestConfig:
+def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")

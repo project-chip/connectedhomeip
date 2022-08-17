@@ -168,15 +168,15 @@ public:
      * transaction (i.e. was preceded by a Timed Request).  If we reach here,
      * the timer verification has already been done.
      */
-    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                      System::PacketBufferHandle && payload, bool isTimedInvoke);
+    void OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                System::PacketBufferHandle && payload, bool isTimedInvoke);
     CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus);
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
-    CHIP_ERROR ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
+    Protocols::InteractionModel::Status ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
     CHIP_ERROR PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct = true);
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     CHIP_ERROR PrepareStatus(const ConcreteCommandPath & aCommandPath);
@@ -279,13 +279,7 @@ private:
     friend class CommandHandler::Handle;
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                 System::PacketBufferHandle && payload) override
-    {
-        //
-        // We shouldn't be receiving any further messages on this exchange.
-        //
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+                                 System::PacketBufferHandle && payload) override;
 
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override
     {
@@ -356,13 +350,13 @@ private:
      * ProcessCommandDataIB is only called when a unicast invoke command request is received
      * It requires the endpointId in its command path to be able to dispatch the command
      */
-    CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement);
+    Protocols::InteractionModel::Status ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement);
 
     /**
      * ProcessGroupCommandDataIB is only called when a group invoke command request is received
      * It doesn't need the endpointId in it's command path since it uses the GroupId in message metadata to find it
      */
-    CHIP_ERROR ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
+    Protocols::InteractionModel::Status ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
     CHIP_ERROR SendCommandResponse();
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 

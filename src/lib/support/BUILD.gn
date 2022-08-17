@@ -100,6 +100,7 @@ static_library("support") {
     "CHIPPlatformMemory.h",
     "CodeUtils.h",
     "DLLUtil.h",
+    "DefaultStorageKeyAllocator.h",
     "Defer.h",
     "ErrorStr.cpp",
     "ErrorStr.h",

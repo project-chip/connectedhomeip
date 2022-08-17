@@ -65,6 +65,13 @@ public:
         mBufferedReadAdapter(*this)
     {}
 
+    ~TypedReadAttributeCallback()
+    {
+        // Ensure we release the ReadClient before we tear down anything else,
+        // so it can call our OnDeallocatePaths properly.
+        mReadClient = nullptr;
+    }
+
     app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
 
     void AdoptReadClient(Platform::UniquePtr<app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
@@ -179,6 +186,13 @@ public:
         mOnError(aOnError), mOnDone(aOnDone), mOnSubscriptionEstablished(aOnSubscriptionEstablished),
         mOnResubscriptionAttempt(aOnResubscriptionAttempt)
     {}
+
+    ~TypedReadEventCallback()
+    {
+        // Ensure we release the ReadClient before we tear down anything else,
+        // so it can call our OnDeallocatePaths properly.
+        mReadClient = nullptr;
+    }
 
     void AdoptReadClient(Platform::UniquePtr<app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
 

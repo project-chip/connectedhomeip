@@ -918,9 +918,9 @@ enum class CommissioningWindowStatus : uint8_t
 // Enum for StatusCode
 enum class StatusCode : uint8_t
 {
-    kBusy               = 0x01,
-    kPAKEParameterError = 0x02,
-    kWindowNotOpen      = 0x03,
+    kBusy               = 0x02,
+    kPAKEParameterError = 0x03,
+    kWindowNotOpen      = 0x04,
     kUnknownEnumValue   = 0,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM

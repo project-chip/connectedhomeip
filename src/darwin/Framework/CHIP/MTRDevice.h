@@ -23,41 +23,61 @@ NS_ASSUME_NONNULL_BEGIN
 @class MTRDeviceController;
 @class MTRAsyncCallbackWorkQueue;
 
-@protocol MTRDeviceSubscriptionDelegate;
+typedef NS_ENUM(NSUInteger, MTRDeviceState) {
+    MTRDeviceStateUnknown = 0,
+    MTRDeviceStateReachable = 1,
+    MTRDeviceStateUnreachable = 2
+};
+
+@protocol MTRDeviceDelegate;
 
 @interface MTRDevice : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
+ * TODO: Document usage better
+ *
  * Directly instantiate a MTRDevice with a MTRDeviceController as a shim.
  *
  * All device-specific information would be stored on the device controller, and
  * retrieved when performing actions using a combination of MTRBaseDevice
  * and MTRAsyncCallbackQueue.
  */
-+ (instancetype)deviceWithDeviceID:(uint64_t)deviceID deviceController:(MTRDeviceController *)deviceController;
++ (instancetype)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController;
 
 /**
- * Subscribe to receive attribute reports for everything (all endpoints, all
- * clusters, all attributes, all events) on the device.
+ * The current state of the device.
  *
- * The subscriber provides a delegate object conforming to MTRDeviceSubscriptionDelegate
+ * The three states:
+ *   MTRDeviceStateUnknkown
+ *      Unable to determine the state of the device at the moment.
+ *
+ *   MTRDeviceStateReachable
+ *      Communication with the device is expected to succeed.
+ *
+ *   MTRDeviceStateUnreachable
+ *      The device is currently unreachable.
  */
-- (void)subscribeWithDelegate:(id<MTRDeviceSubscriptionDelegate>)delegate
-                        queue:(dispatch_queue_t)queue
-                  minInterval:(uint16_t)minInterval
-                  maxInterval:(uint16_t)maxInterval
-                       params:(MTRSubscribeParams * _Nullable)params;
+@property (nonatomic, readonly) MTRDeviceState state;
+
+/**
+ * Set the delegate to receive asynchronous callbacks about the device.
+ *
+ * The delegate will be called on the provided queue, for attribute reports, event reports, and device state changes.
+ */
+- (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 /**
  * Read attribute in a designated attribute path
  *
+ * TODO: Need to document that this returns "the system's best guess" of attribute values.
+ *
  * @return a data-value dictionary of the attribute as described in MTRDeviceResponseHandler
  */
-- (NSDictionary<NSString *, id> *)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                                                    clusterId:(NSNumber * _Nullable)clusterId
-                                                  attributeId:(NSNumber * _Nullable)attributeId
+- (NSDictionary<NSString *, id> *)readAttributeWithEndpointID:(NSNumber *)endpointID
+                                                    clusterID:(NSNumber *)clusterID
+                                                  attributeID:(NSNumber *)attributeID
                                                        params:(MTRReadParams * _Nullable)params;
 
 /**
@@ -66,20 +86,25 @@ NS_ASSUME_NONNULL_BEGIN
  * @param value       A data-value NSDictionary object as described in
  *                    MTRDeviceResponseHandler.
  *
- * @param expectedValueIntervalMs  interval that the write value is assumed to hold true before actual interaction happens. This
- * value will be clamped to timeoutMs.
+ * @param expectedValueInterval  maximum interval in milliseconds during which reads of the attribute will return the value being
+ * written. This value will be clamped to timeoutMs
  *
- * @param timeoutMs   timeout in milliseconds for timed write, or nil.
+ * TODO: document that -readAttribute... will return the expected value for the [endpoint,cluster,attribute] until one of the
+ * following:
+ *  1. Another write for the same attribute happens.
+ *  2. expectedValueIntervalMs (clamped) expires. Need to figure out phrasing here.
+ *  3. We succeed at writing the attribute.
+ *  4. We fail at writing the attribute and give up on the write
  *
- *                    Received values are an NSArray object with response-value element as described in
- *                    readAttributeWithEndpointId:clusterId:attributeId:clientQueue:completion:.
+ * @param timeout   timeout in milliseconds for timed write, or nil.
+ * TODO: make timeout arguments uniform
  */
-- (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
-                           clusterId:(NSNumber *)clusterId
-                         attributeId:(NSNumber *)attributeId
+- (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                         attributeID:(NSNumber *)attributeID
                                value:(id)value
-               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   timedWriteTimeout:(NSNumber * _Nullable)timeoutMs;
+               expectedValueInterval:(NSNumber *)expectedValueInterval
+                   timedWriteTimeout:(NSNumber * _Nullable)timeout;
 
 /**
  * Invoke a command with a designated command path
@@ -92,61 +117,55 @@ NS_ASSUME_NONNULL_BEGIN
  * @param expectedValues  array of dictionaries containing the expected values in the same format as
  *                       attribute read completion handler. Requires MTRAttributePathKey values.
  *                       See MTRDeviceResponseHandler definition for dictionary details.
+ * TODO: document better the expectedValues is how this command is expected to change attributes when read, and that the next
+ * readAttribute will get these values
  *
- * @param expectedValueIntervalMs  interval that the write value is assumed to hold true before actual interaction happens. This
- * value will be clamped to timeoutMs.
+ * @param expectedValueInterval  maximum interval in milliseconds during which reads of the attribute will return the value being
+ * written. This value will be clamped to timeout
  *
- * @param timeoutMs   timeout in milliseconds for timed invoke, or nil.
+ * @param timeout   timeout in milliseconds for timed invoke, or nil.
  *
  * @param completion  response handler will receive either values or error.
  */
-- (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
-                          clusterId:(NSNumber *)clusterId
-                          commandId:(NSNumber *)commandId
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
                       commandFields:(id)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
-              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                 timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion;
 
 @end
 
-@protocol MTRDeviceSubscriptionDelegate <NSObject>
+@protocol MTRDeviceDelegate <NSObject>
 @required
 /**
- * subscriptionEstablished
+ * device:stateChanged:
  *
- * Called once the subscription is established.  This will
- * be _after_ the first (priming) call to both report callbacks.
+ * @param state The current state of the device
  */
-- (void)subscriptionEstablished;
+- (void)device:(MTRDevice *)device stateChanged:(MTRDeviceState)state;
 
 /**
- * subscriptionReceivedAttributeReport:
+ * device:receivedAttributeReport:
  *
  * Notifies delegate of attribute reports from the MTRDevice
  *
  * @param attributeReport  An array of response-value objects as described in MTRDeviceResponseHandler
  */
-- (void)subscriptionReceivedAttributeReport:(NSArray *)attributeReport;
+- (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
 
 /**
  * subscriptionReceivedEventReport:
  *
  * Notifies delegate of event reports from the MTRDevice
  *
- * @param eventReport  An array of MTREventReport objects
+ * @param eventReport  An array of response-value objects as described in MTRDeviceResponseHandler
  */
-- (void)subscriptionReceivedEventReport:(NSArray *)eventReport;
+- (void)device:(MTRDevice *)device receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
 
-/**
- * subscriptionEndedWithError:
- *
- * Called any time there is an error for the
- * entire subscription (with a non-nil "error"), and terminate the subscription
- */
-- (void)subscriptionEndedWithError:(NSError *)error;
 @end
 
 NS_ASSUME_NONNULL_END

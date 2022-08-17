@@ -104,6 +104,7 @@ string(APPEND CHIP_GN_ARGS "ameba_cc = \"arm-none-eabi-gcc\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cxx = \"arm-none-eabi-c++\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cpu = \"ameba\"\n")
 string(APPEND CHIP_GN_ARGS "chip_inet_config_enable_ipv4 = false\n")
+string(APPEND CHIP_GN_ARGS "chip_use_transitional_commissionable_data_provider = false\n")
 
 # Enable persistent storage audit
 if (matter_enable_persistentstorage_audit)

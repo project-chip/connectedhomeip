@@ -1648,7 +1648,7 @@ static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext
     using namespace TestCerts;
 
     HeapChecker heapChecker(inSuite);
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     struct ValidationTestCase
     {
@@ -1661,31 +1661,35 @@ static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext
 
     // clang-format off
     static ValidationTestCase sValidationTestCases[] = {
-        // root                                 ica                                       leaf                                           Expected Error              Expected Validation Result
-        // ===================================================================================================================================================================================================================
-        {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF1_8000_Cert,             sTestCert_DAC_FFF1_8000_0000_Cert,             CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
-        {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF1_8000_Cert,             sTestCert_DAC_FFF1_8000_0000_Cert,             CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
-        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_NoPID_Cert,            sTestCert_DAC_FFF2_8002_0017_Cert,             CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
-        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_NoPID_FB_Cert,         sTestCert_DAC_FFF2_8003_0018_FB_Cert,          CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
-        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8004_FB_Cert,          sTestCert_DAC_FFF2_8004_001C_FB_Cert,          CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        // root                                 ica                                        leaf                                             Expected Error              Expected Validation Result
+        // ======================================================================================================================================================================================================================
+        {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF1_8000_Cert,              sTestCert_DAC_FFF1_8000_0000_Cert,               CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF1_8000_Cert,              sTestCert_DAC_FFF1_8000_0000_Cert,               CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_NoPID_Cert,             sTestCert_DAC_FFF2_8002_0017_Cert,               CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_NoPID_FB_Cert,          sTestCert_DAC_FFF2_8003_0018_FB_Cert,            CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8004_FB_Cert,           sTestCert_DAC_FFF2_8004_001C_FB_Cert,            CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
         // Valid cases with PAA, PAI, DAC time validity in the past or future:
-        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8004_FB_Cert,          sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert,   CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
-        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8004_FB_Cert,          sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert, CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
-        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8005_ValInPast_Cert,   sTestCert_DAC_FFF2_8005_0022_ValInPast_Cert,   CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
-        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8005_ValInFuture_Cert, sTestCert_DAC_FFF2_8005_0023_ValInFuture_Cert, CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
-        {  sTestCert_PAA_FFF2_ValInPast_Cert,   sTestCert_PAI_FFF2_8006_ValInPast_Cert,   sTestCert_DAC_FFF2_8006_0024_ValInPast_Cert,   CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
-        {  sTestCert_PAA_FFF2_ValInFuture_Cert, sTestCert_PAI_FFF2_8006_ValInFuture_Cert, sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert, CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8004_FB_Cert,           sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert,     CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8004_FB_Cert,           sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert,   CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8005_ValInPast_Cert,    sTestCert_DAC_FFF2_8005_0022_ValInPast_Cert,     CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8005_ValInFuture_Cert,  sTestCert_DAC_FFF2_8005_0023_ValInFuture_Cert,   CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_FFF2_ValInPast_Cert,   sTestCert_PAI_FFF2_8006_ValInPast_Cert,    sTestCert_DAC_FFF2_8006_0024_ValInPast_Cert,     CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_FFF2_ValInFuture_Cert, sTestCert_PAI_FFF2_8006_ValInFuture_Cert,  sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert,   CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
         // Error cases with invalid (empty Span) inputs:
-        {  ByteSpan(),                          sTestCert_PAI_FFF1_8000_Cert,             sTestCert_DAC_FFF1_8000_0000_Cert,             CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kRootArgumentInvalid },
-        {  sTestCert_PAA_FFF1_Cert,             ByteSpan(),                               sTestCert_DAC_FFF1_8000_0000_Cert,             CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kICAArgumentInvalid  },
-        {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF1_8000_Cert,             ByteSpan(),                                    CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kLeafArgumentInvalid },
+        {  ByteSpan(),                          sTestCert_PAI_FFF1_8000_Cert,              sTestCert_DAC_FFF1_8000_0000_Cert,               CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kRootArgumentInvalid },
+        {  sTestCert_PAA_FFF1_Cert,             ByteSpan(),                                sTestCert_DAC_FFF1_8000_0000_Cert,               CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kICAArgumentInvalid  },
+        {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF1_8000_Cert,              ByteSpan(),                                      CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kLeafArgumentInvalid },
         // Error cases with wrong certificate chaining:
-        {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF2_NoPID_Cert,            sTestCert_DAC_FFF1_8000_0000_Cert,             CHIP_ERROR_CERT_NOT_TRUSTED, CertificateChainValidationResult::kChainInvalid        },
-        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF1_8000_Cert,             sTestCert_DAC_FFF1_8000_0000_Cert,             CHIP_ERROR_CERT_NOT_TRUSTED, CertificateChainValidationResult::kChainInvalid        },
-        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAA_FFF1_Cert,                  sTestCert_DAC_FFF1_8000_0000_Cert,             CHIP_ERROR_CERT_NOT_TRUSTED, CertificateChainValidationResult::kChainInvalid        },
+        {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF2_NoPID_Cert,             sTestCert_DAC_FFF1_8000_0000_Cert,               CHIP_ERROR_CERT_NOT_TRUSTED, CertificateChainValidationResult::kChainInvalid        },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF1_8000_Cert,              sTestCert_DAC_FFF1_8000_0000_Cert,               CHIP_ERROR_CERT_NOT_TRUSTED, CertificateChainValidationResult::kChainInvalid        },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAA_FFF1_Cert,                   sTestCert_DAC_FFF1_8000_0000_Cert,               CHIP_ERROR_CERT_NOT_TRUSTED, CertificateChainValidationResult::kChainInvalid        },
         // Error cases with PAA, PAI, DAC time validity in the past or future.
         // In all cases either PAA or PAI was invalid with respect to DAC's notBefore time:
-
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8004_FB_Cert,           sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_Cert, CHIP_ERROR_CERT_NOT_TRUSTED, CertificateChainValidationResult::kChainInvalid        },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8005_Val1SecBefore_Cert,sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_Cert, CHIP_ERROR_CERT_NOT_TRUSTED, CertificateChainValidationResult::kChainInvalid        },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8005_ValInFuture_Cert,  sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_Cert, CHIP_ERROR_CERT_NOT_TRUSTED, CertificateChainValidationResult::kChainInvalid        },
+        {  sTestCert_PAA_FFF2_ValInPast_Cert,   sTestCert_PAI_FFF2_8006_ValInPast_Cert,    sTestCert_DAC_FFF2_8006_0034_ValInFuture_Cert,   CHIP_ERROR_CERT_NOT_TRUSTED, CertificateChainValidationResult::kChainInvalid        },
+        {  sTestCert_PAA_FFF2_ValInFuture_Cert, sTestCert_PAI_FFF2_8006_ValInFuture_Cert,  sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_Cert, CHIP_ERROR_CERT_NOT_TRUSTED, CertificateChainValidationResult::kChainInvalid        },
     };
     // clang-format on
 
@@ -1707,40 +1711,41 @@ static void TestX509_IssuingTimestampValidation(nlTestSuite * inSuite, void * in
     HeapChecker heapChecker(inSuite);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ByteSpan rcacDer;
-    err = GetTestCert(TestCert::kRoot01, TestCertLoadFlags::kDERForm, rcacDer);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    struct ValidationTestCase
+    {
+        ByteSpan refCert;
+        ByteSpan evaluatedCert;
+        CHIP_ERROR expectedError;
+    };
 
-    ByteSpan icacDer;
-    err = GetTestCert(TestCert::kICA01, TestCertLoadFlags::kDERForm, icacDer);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    // clang-format off
+    static ValidationTestCase sValidationTestCases[] = {
+        // Reference Certificate                            Evaluated Certificate                          Expected Error
+        // ================================================================================================================================
+        {  sTestCert_DAC_FFF1_8000_0000_Cert,               sTestCert_PAA_FFF1_Cert,                       CHIP_NO_ERROR                 },
+        {  sTestCert_DAC_FFF1_8000_0000_Cert,               sTestCert_PAI_FFF1_8000_Cert,                  CHIP_NO_ERROR                 },
+        {  sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert,     sTestCert_PAA_NoVID_Cert,                      CHIP_NO_ERROR                 },
+        {  sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert,   sTestCert_PAI_FFF2_8004_FB_Cert,               CHIP_NO_ERROR                 },
+        {  sTestCert_DAC_FFF2_8005_0023_ValInFuture_Cert,   sTestCert_PAI_FFF2_8005_ValInFuture_Cert,      CHIP_NO_ERROR                 },
+        {  sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert,   sTestCert_PAA_FFF2_ValInFuture_Cert,           CHIP_NO_ERROR                 },
+        {  sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_Cert, sTestCert_PAI_FFF2_8005_Val1SecBefore_Cert,    CHIP_NO_ERROR                 },
+        // Error cases with invalid (empty Span) inputs:
+        {  sTestCert_DAC_FFF1_8000_0000_Cert,               ByteSpan(),                                    CHIP_ERROR_INVALID_ARGUMENT   },
+        {  ByteSpan(),                                      sTestCert_PAA_FFF1_Cert,                       CHIP_ERROR_INVALID_ARGUMENT   },
+        // Error cases with not yet valid certificate:
+        {  sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_Cert, sTestCert_PAI_FFF2_8004_FB_Cert,               CHIP_ERROR_CERT_EXPIRED       },
+        {  sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_Cert, sTestCert_PAI_FFF2_8004_FB_Cert,               CHIP_ERROR_CERT_EXPIRED       },
+        {  sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_Cert, sTestCert_PAA_NoVID_Cert,                      CHIP_ERROR_CERT_EXPIRED       },
+        {  sTestCert_PAI_FFF2_8004_FB_Cert,                 sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert, CHIP_ERROR_CERT_EXPIRED       },
+        {  sTestCert_DAC_FFF2_8006_0034_ValInFuture_Cert,   sTestCert_PAI_FFF2_8006_ValInPast_Cert,        CHIP_ERROR_CERT_EXPIRED       },
+    };
+    // clang-format on
 
-    ByteSpan nocDer;
-    err = GetTestCert(TestCert::kNode01_01, TestCertLoadFlags::kDERForm, nocDer);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = IsCertificateValidAtIssuance(icacDer, nocDer);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = IsCertificateValidAtIssuance(rcacDer, nocDer);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = IsCertificateValidAtIssuance(sTestCert_PAI_FFF1_8000_Cert, sTestCert_DAC_FFF1_8000_0004_Cert);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = IsCertificateValidAtIssuance(sTestCert_PAA_FFF1_Cert, sTestCert_DAC_FFF1_8000_0004_Cert);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = IsCertificateValidAtIssuance(sTestCert_PAA_FFF1_Cert, sTestCert_PAI_FFF1_8000_Cert);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    // Certificate Expired Case
-    err = IsCertificateValidAtIssuance(icacDer, sTestCert_DAC_FFF1_8000_0004_Cert);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_EXPIRED);
-
-    // Certificate Expired Case
-    err = IsCertificateValidAtIssuance(rcacDer, sTestCert_DAC_FFF1_8000_0004_Cert);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_EXPIRED);
+    for (auto & testCase : sValidationTestCases)
+    {
+        err = IsCertificateValidAtIssuance(testCase.refCert, testCase.evaluatedCert);
+        NL_TEST_ASSERT(inSuite, err == testCase.expectedError);
+    }
 
 #if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
     // test certificate validity (this one contains validity until year 9999 so it will not fail soon)

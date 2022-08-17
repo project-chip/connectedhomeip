@@ -20,37 +20,49 @@
 @end
 
 @implementation MTRTestOTAProvider
-- (void)handleQueryImage:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
-       completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                             NSError * _Nullable error))completionHandler
+- (void)handleQueryImageForNodeID:(NSNumber *)nodeID
+                       controller:(MTRDeviceController *)controller
+                           params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
+                completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler
 {
 }
 
-- (void)handleApplyUpdateRequest:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-               completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler
+- (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
+                               controller:(MTRDeviceController *)controller
+                                   params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+                        completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler
 {
 }
 
-- (void)handleNotifyUpdateApplied:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
-                completionHandler:(StatusCompletion)completionHandler
+- (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
+                                controller:(MTRDeviceController *)controller
+                                    params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+                         completionHandler:(StatusCompletion)completionHandler
 {
 }
 
-- (void)handleBDXTransferSessionBegin:(NSString * _Nonnull)fileDesignator
-                               offset:(NSNumber * _Nonnull)offset
-                    completionHandler:(void (^)(NSError * error))completionHandler
+- (void)handleBDXTransferSessionBeginForNodeID:(NSNumber * _Nonnull)nodeID
+                                    controller:(MTRDeviceController * _Nonnull)controller
+                                fileDesignator:(NSString * _Nonnull)fileDesignator
+                                        offset:(NSNumber * _Nonnull)offset
+                             completionHandler:(void (^)(NSError * error))completionHandler
 {
 }
 
-- (void)handleBDXTransferSessionEnd:(NSError * _Nullable)error
+- (void)handleBDXTransferSessionEndForNodeID:(NSNumber * _Nonnull)nodeID
+                                  controller:(MTRDeviceController * _Nonnull)controller
+                                       error:(NSError * _Nullable)error
 {
 }
 
-- (void)handleBDXQuery:(NSNumber * _Nonnull)blockSize
-            blockIndex:(NSNumber * _Nonnull)blockIndex
-           bytesToSkip:(NSNumber * _Nonnull)bytesToSkip
-     completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler
+- (void)handleBDXQueryForNodeID:(NSNumber * _Nonnull)nodeID
+                     controller:(MTRDeviceController * _Nonnull)controller
+                      blockSize:(NSNumber * _Nonnull)blockSize
+                     blockIndex:(NSNumber * _Nonnull)blockIndex
+                    bytesToSkip:(NSNumber * _Nonnull)bytesToSkip
+              completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler
 {
 }
 

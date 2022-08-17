@@ -32,7 +32,7 @@ public:
 
     virtual void Release(OperationalSessionSetup * device) = 0;
 
-    virtual OperationalSessionSetup * FindSessionSetup(ScopedNodeId peerId) = 0;
+    virtual OperationalSessionSetup * FindSessionSetup(ScopedNodeId peerId, bool forAddressUpdate) = 0;
 
     virtual void ReleaseAllSessionSetupsForFabric(FabricIndex fabricIndex) = 0;
 
@@ -55,11 +55,11 @@ public:
 
     void Release(OperationalSessionSetup * device) override { mSessionSetupPool.ReleaseObject(device); }
 
-    OperationalSessionSetup * FindSessionSetup(ScopedNodeId peerId) override
+    OperationalSessionSetup * FindSessionSetup(ScopedNodeId peerId, bool forAddressUpdate) override
     {
         OperationalSessionSetup * foundDevice = nullptr;
         mSessionSetupPool.ForEachActiveObject([&](auto * activeSetup) {
-            if (activeSetup->GetPeerId() == peerId)
+            if (activeSetup->GetPeerId() == peerId && activeSetup->IsForAddressUpdate() == forAddressUpdate)
             {
                 foundDevice = activeSetup;
                 return Loop::Break;
