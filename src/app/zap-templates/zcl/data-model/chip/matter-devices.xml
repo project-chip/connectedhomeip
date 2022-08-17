@@ -1441,7 +1441,7 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0850</deviceId>
         <clusters lockOthers="true">
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Identify" client="true" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
@@ -1454,27 +1454,14 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
-                <requireCommand>AddGroup</requireCommand>
-                <requireCommand>AddGroupResponse</requireCommand>
-                <requireCommand>ViewGroup</requireCommand>
-                <requireCommand>ViewGroupResponse</requireCommand>
-                <requireCommand>GetGroupMembership</requireCommand>
-                <requireCommand>GetGroupMembershipResponse</requireCommand>
-                <requireCommand>RemoveGroup</requireCommand>
-                <requireCommand>RemoveGroupResponse</requireCommand>
-                <requireCommand>RemoveAllGroups</requireCommand>
-                <requireCommand>AddGroupIfIdentifying</requireCommand>
-            </include>
-            <include cluster="Scenes" client="true" server="false" clientLocked="true" serverLocked="true">
-            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Scenes" client="false" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Level Control" client="true" server="false" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Color Control" client="true" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Level Control" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Color Control" client="false" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
