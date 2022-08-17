@@ -19,6 +19,7 @@ name:
 
 PICS:
     - CADMIN.C
+    - CADMIN.C.C01.Tx
 
 config:
     nodeId: 0x12344321
@@ -115,7 +116,7 @@ tests:
       verification: |
           On the 2nd controller using chip-tool , connect to the accessory
 
-          ./chip-tool pairing onnetwork 2 20202021
+          ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
 
           verify you got the following message in the TH log
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
@@ -215,7 +216,7 @@ tests:
       verification: |
           On the 2nd controller using chip-tool , connect to the accessory
 
-          ./chip-tool pairing onnetwork 2 20202021
+          ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
 
           verify you got the following message in the TH log
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
@@ -361,7 +362,7 @@ tests:
       verification: |
           On the 2nd controller using chip-tool , connect to the accessory
 
-          ./chip-tool pairing onnetwork 2 20202021
+          ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
 
           Verify you got below message
           Device commissioning completed with success
@@ -372,7 +373,7 @@ tests:
       verification: |
           On the 3rd controller using chip-tool , connect to the accessory
 
-          ./chip-tool pairing onnetwork 3 20202021
+          ./chip-tool pairing onnetwork 3 20202021 --commissioner-name gamma
 
           verify you got the following message in the TH log
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33

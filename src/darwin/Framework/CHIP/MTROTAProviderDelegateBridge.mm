@@ -16,6 +16,7 @@
  */
 
 #import "MTROTAProviderDelegateBridge.h"
+#import "MTRControllerFactory_Internal.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 
@@ -33,6 +34,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace chip::bdx;
+using Protocols::InteractionModel::Status;
 
 // TODO Expose a method onto the delegate to make that configurable.
 constexpr uint32_t kMaxBdxBlockSize = 1024;
@@ -118,6 +120,8 @@ private:
 
     CHIP_ERROR OnTransferSessionBegin(TransferSession::OutputEvent & event)
     {
+        VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
         uint16_t fdl = 0;
         auto fd = mTransfer.GetFileDesignator(fdl);
         VerifyOrReturnError(fdl <= bdx::kMaxFileDesignatorLen, CHIP_ERROR_INVALID_ARGUMENT);
@@ -145,9 +149,17 @@ private:
             });
         };
 
+        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+        auto nodeId = @(mNodeId.Value());
+
         auto strongDelegate = mDelegate;
         dispatch_async(mWorkQueue, ^{
-            [strongDelegate handleBDXTransferSessionBegin:fileDesignator offset:offset completionHandler:completionHandler];
+            [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
+                                                        controller:controller
+                                                    fileDesignator:fileDesignator
+                                                            offset:offset
+                                                 completionHandler:completionHandler];
         });
 
         return CHIP_NO_ERROR;
@@ -155,6 +167,9 @@ private:
 
     CHIP_ERROR OnTransferSessionEnd(TransferSession::OutputEvent & event)
     {
+        VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
         CHIP_ERROR error = CHIP_NO_ERROR;
         if (event.EventType == TransferSession::OutputEventType::kTransferTimeout) {
             error = CHIP_ERROR_TIMEOUT;
@@ -162,9 +177,15 @@ private:
             error = CHIP_ERROR_INTERNAL;
         }
 
+        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+        auto nodeId = @(mNodeId.Value());
+
         auto strongDelegate = mDelegate;
         dispatch_async(mWorkQueue, ^{
-            [strongDelegate handleBDXTransferSessionEnd:[MTRError errorForCHIPErrorCode:error]];
+            [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId
+                                                      controller:controller
+                                                           error:[MTRError errorForCHIPErrorCode:error]];
         });
 
         ResetState();
@@ -173,6 +194,9 @@ private:
 
     CHIP_ERROR OnBlockQuery(TransferSession::OutputEvent & event)
     {
+        VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
         auto blockSize = @(mTransfer.GetTransferBlockSize());
         auto blockIndex = @(mTransfer.GetNextBlockNum());
 
@@ -203,12 +227,18 @@ private:
 
         // TODO Handle MaxLength
 
+        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+        auto nodeId = @(mNodeId.Value());
+
         auto strongDelegate = mDelegate;
         dispatch_async(mWorkQueue, ^{
-            [strongDelegate handleBDXQuery:blockSize
-                                blockIndex:blockIndex
-                               bytesToSkip:bytesToSkip
-                         completionHandler:completionHandler];
+            [strongDelegate handleBDXQueryForNodeID:nodeId
+                                         controller:controller
+                                          blockSize:blockSize
+                                         blockIndex:blockIndex
+                                        bytesToSkip:bytesToSkip
+                                  completionHandler:completionHandler];
         });
 
         return CHIP_NO_ERROR;
@@ -321,9 +351,44 @@ CHIP_ERROR MTROTAProviderDelegateBridge::Init(System::Layer * systemLayer, Messa
 
 void MTROTAProviderDelegateBridge::Shutdown() { gOtaSender.Shutdown(); }
 
+namespace {
+// Return false if we could not get peer node info (a running controller for
+// the fabric and a node id).  In that case we will have already added an
+// error status to the CommandHandler.
+//
+// Otherwise set outNodeId and outController to values that identify the source
+// node for the command.
+bool GetPeerNodeInfo(CommandHandler * commandHandler, const ConcreteCommandPath & commandPath, NodeId * outNodeId,
+    MTRDeviceController * __autoreleasing _Nonnull * _Nonnull outController)
+{
+    auto desc = commandHandler->GetSubjectDescriptor();
+    if (desc.authMode != Access::AuthMode::kCase) {
+        commandHandler->AddStatus(commandPath, Status::Failure);
+        return false;
+    }
+
+    auto * controller =
+        [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:commandHandler->GetAccessingFabricIndex()];
+    if (controller == nil) {
+        commandHandler->AddStatus(commandPath, Status::Failure);
+        return false;
+    }
+
+    *outController = controller;
+    *outNodeId = desc.subject;
+    return true;
+}
+} // anonymous namespace
+
 void MTROTAProviderDelegateBridge::HandleQueryImage(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const Commands::QueryImage::DecodableType & commandData)
 {
+    NodeId nodeId;
+    MTRDeviceController * controller;
+    if (!GetPeerNodeInfo(commandObj, commandPath, &nodeId, &controller)) {
+        return;
+    }
+
     auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterQueryImageParams alloc] init];
     CHIP_ERROR err = ConvertToQueryImageParams(commandData, commandParams);
     if (err != CHIP_NO_ERROR) {
@@ -384,13 +449,22 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleQueryImage:commandParams completionHandler:completionHandler];
+        [strongDelegate handleQueryImageForNodeID:@(nodeId)
+                                       controller:controller
+                                           params:commandParams
+                                completionHandler:completionHandler];
     });
 }
 
 void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::ApplyUpdateRequest::DecodableType & commandData)
 {
+    NodeId nodeId;
+    MTRDeviceController * controller;
+    if (!GetPeerNodeInfo(commandObj, commandPath, &nodeId, &controller)) {
+        return;
+    }
+
     // Make sure to hold on to the command handler and command path to be used in the completion block
     __block CommandHandler::Handle handle(commandObj);
     __block ConcreteCommandPath cachedCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
@@ -413,13 +487,22 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleApplyUpdateRequest:commandParams completionHandler:completionHandler];
+        [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
+                                               controller:controller
+                                                   params:commandParams
+                                        completionHandler:completionHandler];
     });
 }
 
 void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::NotifyUpdateApplied::DecodableType & commandData)
 {
+    NodeId nodeId;
+    MTRDeviceController * controller;
+    if (!GetPeerNodeInfo(commandObj, commandPath, &nodeId, &controller)) {
+        return;
+    }
+
     // Make sure to hold on to the command handler and command path to be used in the completion block
     __block CommandHandler::Handle handle(commandObj);
     __block ConcreteCommandPath cachedCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
@@ -439,7 +522,10 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleNotifyUpdateApplied:commandParams completionHandler:completionHandler];
+        [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
+                                                controller:controller
+                                                    params:commandParams
+                                         completionHandler:completionHandler];
     });
 }
 

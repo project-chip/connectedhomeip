@@ -26,7 +26,11 @@ config:
 tests:
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
-          verification step to be updated.
+          DUT
+          sudo ./chip-all-clusters-app
+
+          TH1
+          ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
       disabled: true
 
     - label:
@@ -35,29 +39,15 @@ tests:
       verification: |
           ./chip-tool  operationalcredentials read current-fabric-index 1 0
 
-          On TH(Chiptool), verify  CurrentFabricIndex attribute of operationalCredential cluster  as 1
+          On TH1(Chiptool), verify  CurrentFabricIndex attribute of operationalCredential cluster  as 1
 
-          [1657283596.149202][2284:2289] CHIP:DMG:                                {
-          [1657283596.149247][2284:2289] CHIP:DMG:                                        Endpoint = 0x0,
-          [1657283596.149293][2284:2289] CHIP:DMG:                                        Cluster = 0x3e,
-          [1657283596.149340][2284:2289] CHIP:DMG:                                        Attribute = 0x0000_0005,
-          [1657283596.149384][2284:2289] CHIP:DMG:                                }
-          [1657283596.149430][2284:2289] CHIP:DMG:
-          [1657283596.149479][2284:2289] CHIP:DMG:                                Data = 1,
-          [1657283596.149520][2284:2289] CHIP:DMG:                        },
-          [1657283596.149565][2284:2289] CHIP:DMG:
-          [1657283596.149602][2284:2289] CHIP:DMG:                },
-          [1657283596.149643][2284:2289] CHIP:DMG:
-          [1657283596.149674][2284:2289] CHIP:DMG:        ],
-          [1657283596.149714][2284:2289] CHIP:DMG:
+
           [1657283596.149747][2284:2289] CHIP:DMG:        SuppressResponse = true,
           [1657283596.149781][2284:2289] CHIP:DMG:        InteractionModelRevision = 1
           [1657283596.149813][2284:2289] CHIP:DMG: }
           [1657283596.150010][2284:2289] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 485742003
           [1657283596.152307][2284:2289] CHIP:TOO:   CurrentFabricIndex: 1
           [1657283596.152411][2284:2289] CHIP:EM: Sending Standalone Ack for MessageCounter:50620552 on exchange 25474i
-          [1657283596.152498][2284:2289] CHIP:IN: Prepared secure message 0xffffab7ed958 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 25474i with MessageCounter:219007987.
-          [1657283596.152548][2284
       disabled: true
 
     - label:
@@ -67,7 +57,7 @@ tests:
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
 
-          On TH(Chiptool), Verify  AccessControl cluster AccessControlExtensionChanged event value is an empty list
+          On TH1(Chiptool), Verify  AccessControl cluster AccessControlExtensionChanged event value is an empty list
 
           848.856174][2311:2316] CHIP:EM: Removed CHIP MessageCounter:265690133 from RetransTable on exchange 23190i
           [1657283848.856239][2311:2316] CHIP:DMG: ReportDataMessage =
@@ -87,7 +77,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"1718"}]" 1 0
-          On TH(Chiptool), Verify  AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element
+          On TH1(Chiptool), Verify  AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element
 
           217.510779][2371:2376] CHIP:DMG:                        AttributePathIB =
           [1657284217.510818][2371:2376] CHIP:DMG:                        {
@@ -135,7 +125,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
-          On TH(Chiptool), Verify  AccessControlExtensionChanged containing 1 element
+          On TH1(Chiptool), Verify  AccessControlExtensionChanged containing 1 element
 
           [1657618132.685459][8992:8998] CHIP:DMG:
           [1657618132.685495][8992:8998] CHIP:DMG:        SuppressResponse = true,
@@ -165,7 +155,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
-          On TH(Chiptool) , Verify   Successfully extension attribute list containg one element
+          On TH1(Chiptool) , Verify   Successfully extension attribute list containg one element
           7284747.131523][2411:2416] CHIP:DMG:                        StatusIB =
           [1657284747.131568][2411:2416] CHIP:DMG:                        {
           [1657284747.131618][2411:2416] CHIP:DMG:                                status = 0x00 (SUCCESS),
@@ -205,7 +195,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
-          On TH(Chiptool) , Verify  AccessControlExtensionChanged containing at least 2 new elements.
+          On TH1(Chiptool) , Verify  AccessControlExtensionChanged containing at least 2 new elements.
 
 
           [1657618237.140162][9007:9012] CHIP:DMG: }
@@ -262,37 +252,10 @@ tests:
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"}]" 1 0
 
-          On TH(Chiptool) , Verify AccessControl cluster Extension attribute value is list of AccessControlExtensionStruct containing 1 element Data, exceeds maximum length.
+          On TH1(Chiptool) , Verify AccessControl cluster Extension attribute value is list of AccessControlExtensionStruct containing 1 element Data, exceeds maximum length.
 
-          1657287642.551842][9699:9704] CHIP:DMG: WriteResponseMessage =
-          [1657287642.551872][9699:9704] CHIP:DMG: {
-          [1657287642.551901][9699:9704] CHIP:DMG:        AttributeStatusIBs =
-          [1657287642.551940][9699:9704] CHIP:DMG:        [
-          [1657287642.551973][9699:9704] CHIP:DMG:                AttributeStatusIB =
-          [1657287642.552012][9699:9704] CHIP:DMG:                {
-          [1657287642.552061][9699:9704] CHIP:DMG:                        AttributePathIB =
-          [1657287642.552116][9699:9704] CHIP:DMG:                        {
-          [1657287642.552156][9699:9704] CHIP:DMG:                                Endpoint = 0x0,
-          [1657287642.552197][9699:9704] CHIP:DMG:                                Cluster = 0x1f,
-          [1657287642.552290][9699:9704] CHIP:DMG:                                Attribute = 0x0000_0001,
-          [1657287642.552331][9699:9704] CHIP:DMG:                        }
-          [1657287642.552375][9699:9704] CHIP:DMG:
-          [1657287642.552409][9699:9704] CHIP:DMG:                        StatusIB =
-          [1657287642.552447][9699:9704] CHIP:DMG:                        {
-          [1657287642.552488][9699:9704] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1657287642.552526][9699:9704] CHIP:DMG:                        },
-          [1657287642.552564][9699:9704] CHIP:DMG:
-          [1657287642.552598][9699:9704] CHIP:DMG:                },
-          [1657287642.552641][9699:9704] CHIP:DMG:
-          [1657287642.552671][9699:9704] CHIP:DMG:                AttributeStatusIB =
-          [1657287642.552704][9699:9704] CHIP:DMG:                {
-          [1657287642.552741][9699:9704] CHIP:DMG:                        AttributePathIB =
-          [1657287642.552797][9699:9704] CHIP:DMG:                        {
-          [1657287642.552836][9699:9704] CHIP:DMG:                                Endpoint = 0x0,
-          [1657287642.552882][9699:9704] CHIP:DMG:                                Cluster = 0x1f,
-          [1657287642.552922][9699:9704] CHIP:DMG:                                Attribute = 0x0000_0001,
-          [1657287642.552962][9699:9704] CHIP:DMG:                                ListIndex = Null,
-          [1657287642.552999][9699:9704] CHIP:DMG:                        }
+
+
           [1657287642.553045][9699:9704] CHIP:DMG:
           [1657287642.553083][9699:9704] CHIP:DMG:                        StatusIB =
           [1657287642.553121][9699:9704] CHIP:DMG:                        {
@@ -317,7 +280,7 @@ tests:
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
 
-          On TH(Chiptool) , Verify AccessControl cluster AccessControlExtensionChanged containing at least 1 new element, and MUST NOT contain an added event for the extension with data that is too large
+          On TH1(Chiptool) , Verify AccessControl cluster AccessControlExtensionChanged containing at least 1 new element, and MUST NOT contain an added event for the extension with data that is too large
 
           [1657618374.299423][9024:9029] CHIP:DMG: }
           [1657618374.299739][9024:9029] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
@@ -388,55 +351,10 @@ tests:
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"1718"},{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
 
-          On TH(Chiptool) , Verify AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 2 elements Returns 0x87 (CONSTRAINT_ERROR)-as there are more than 1 entry
+          On TH1(Chiptool) , Verify AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 2 elements Returns 0x87 (CONSTRAINT_ERROR)-as there are more than 1 entry
 
 
-          1657289068.797364][9823:9828] CHIP:DMG: WriteResponseMessage =
-          [1657289068.797394][9823:9828] CHIP:DMG: {
-          [1657289068.797419][9823:9828] CHIP:DMG:        AttributeStatusIBs =
-          [1657289068.797455][9823:9828] CHIP:DMG:        [
-          [1657289068.797482][9823:9828] CHIP:DMG:                AttributeStatusIB =
-          [1657289068.797515][9823:9828] CHIP:DMG:                {
-          [1657289068.797550][9823:9828] CHIP:DMG:                        AttributePathIB =
-          [1657289068.797590][9823:9828] CHIP:DMG:                        {
-          [1657289068.797632][9823:9828] CHIP:DMG:                                Endpoint = 0x0,
-          [1657289068.797673][9823:9828] CHIP:DMG:                                Cluster = 0x1f,
-          [1657289068.797716][9823:9828] CHIP:DMG:                                Attribute = 0x0000_0001,
-          [1657289068.797754][9823:9828] CHIP:DMG:                        }
-          [1657289068.797798][9823:9828] CHIP:DMG:
-          [1657289068.797835][9823:9828] CHIP:DMG:                        StatusIB =
-          [1657289068.797875][9823:9828] CHIP:DMG:                        {
-          [1657289068.797914][9823:9828] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1657289068.797952][9823:9828] CHIP:DMG:                        },
-          [1657289068.797991][9823:9828] CHIP:DMG:
-          [1657289068.798025][9823:9828] CHIP:DMG:                },
-          [1657289068.798071][9823:9828] CHIP:DMG:
-          [1657289068.798104][9823:9828] CHIP:DMG:                AttributeStatusIB =
-          [1657289068.798139][9823:9828] CHIP:DMG:                {
-          [1657289068.798173][9823:9828] CHIP:DMG:                        AttributePathIB =
-          [1657289068.798211][9823:9828] CHIP:DMG:                        {
-          [1657289068.798250][9823:9828] CHIP:DMG:                                Endpoint = 0x0,
-          [1657289068.798291][9823:9828] CHIP:DMG:                                Cluster = 0x1f,
-          [1657289068.798332][9823:9828] CHIP:DMG:                                Attribute = 0x0000_0001,
-          [1657289068.798372][9823:9828] CHIP:DMG:                                ListIndex = Null,
-          [1657289068.798410][9823:9828] CHIP:DMG:                        }
-          [1657289068.798453][9823:9828] CHIP:DMG:
-          [1657289068.798489][9823:9828] CHIP:DMG:                        StatusIB =
-          [1657289068.798527][9823:9828] CHIP:DMG:                        {
-          [1657289068.798565][9823:9828] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1657289068.798603][9823:9828] CHIP:DMG:                        },
-          [1657289068.798640][9823:9828] CHIP:DMG:
-          [1657289068.798671][9823:9828] CHIP:DMG:                },
-          [1657289068.798709][9823:9828] CHIP:DMG:
-          [1657289068.798734][9823:9828] CHIP:DMG:                AttributeStatusIB =
-          [1657289068.798762][9823:9828] CHIP:DMG:                {
-          [1657289068.798791][9823:9828] CHIP:DMG:                        AttributePathIB =
-          [1657289068.798819][9823:9828] CHIP:DMG:                        {
-          [1657289068.798857][9823:9828] CHIP:DMG:                                Endpoint = 0x0,
-          [1657289068.798895][9823:9828] CHIP:DMG:                                Cluster = 0x1f,
-          [1657289068.798930][9823:9828] CHIP:DMG:                                Attribute = 0x0000_0001,
-          [1657289068.798964][9823:9828] CHIP:DMG:                                ListIndex = Null,
-          [1657289068.798997][9823:9828] CHIP:DMG:                        }
+
           [1657289068.799030][9823:9828] CHIP:DMG:
           [1657289068.799061][9823:9828] CHIP:DMG:                        StatusIB =
           [1657289068.799093][9823:9828] CHIP:DMG:                        {
@@ -460,7 +378,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
-          On TH(Chiptool) , Verify AccessControl cluster AccessControlExtensionChanged event
+          On TH1(Chiptool) , Verify AccessControl cluster AccessControlExtensionChanged event
           containing at least 1 new element, and MUST NOT contain an added event for the second extension
           [1657618501.560311][9050:9055] CHIP:DMG: }
           [1657618501.560653][9050:9055] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
@@ -570,7 +488,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool accesscontrol write extension "[]" 1 0
-          On TH(Chiptool) , Verify  AccessControl cluster Extension attribute, value is an empty list
+          On TH1(Chiptool) , Verify  AccessControl cluster Extension attribute, value is an empty list
 
           7625][1521:1526] CHIP:DMG:                AttributeStatusIB =
           [1657692723.227673][1521:1526] CHIP:DMG:                {
@@ -604,7 +522,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
-          On TH(Chiptool) , Verify  AccessControl cluster AccessControlExtensionChanged event containing at least 1 new element
+          On TH1(Chiptool) , Verify  AccessControl cluster AccessControlExtensionChanged event containing at least 1 new element
 
           [1657618604.091599][9063:9068] CHIP:DMG: }
           [1657618604.091929][9063:9068] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001

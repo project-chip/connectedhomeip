@@ -28,50 +28,68 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MTROTAProviderDelegate <NSObject>
 @required
 /**
- * Notify the delegate when query image command is received
- *
+ * Notify the delegate when the query image command is received from some node.
+ * The controller identifies the fabric the node is on, and the nodeID
+ * identifies the node within that fabric.
  */
-- (void)handleQueryImage:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
-       completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                             NSError * _Nullable error))completionHandler;
+- (void)handleQueryImageForNodeID:(NSNumber *)nodeID
+                       controller:(MTRDeviceController *)controller
+                           params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
+                completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler;
 
 /**
- * Notify the delegate when apply update request command is received
- *
+ * Notify the delegate when the apply update request command is received from
+ * some node.  The controller identifies the fabric the node is on, and the
+ * nodeID identifies the node within that fabric.
  */
-- (void)handleApplyUpdateRequest:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-               completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler;
+- (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
+                               controller:(MTRDeviceController *)controller
+                                   params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+                        completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler;
 
 /**
- * Notify the delegate when notify update applied command is received
- *
+ * Notify the delegate when the notify update applied command is received from
+ * some node.  The controller identifies the fabric the node is on, and the
+ * nodeID identifies the node within that fabric.
  */
-- (void)handleNotifyUpdateApplied:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
-                completionHandler:(StatusCompletion)completionHandler;
+- (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
+                                controller:(MTRDeviceController *)controller
+                                    params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+                         completionHandler:(StatusCompletion)completionHandler;
 
 /**
- * Notify the delegate when a BDX Session starts
- *
+ * Notify the delegate when a BDX Session starts for some node.  The controller
+ * identifies the fabric the node is on, and the nodeID identifies the node
+ * within that fabric.
  */
-- (void)handleBDXTransferSessionBegin:(NSString * _Nonnull)fileDesignator
-                               offset:(NSNumber * _Nonnull)offset
-                    completionHandler:(void (^)(NSError * error))completionHandler;
+- (void)handleBDXTransferSessionBeginForNodeID:(NSNumber *)nodeID
+                                    controller:(MTRDeviceController *)controller
+                                fileDesignator:(NSString *)fileDesignator
+                                        offset:(NSNumber *)offset
+                             completionHandler:(void (^)(NSError * error))completionHandler;
 
 /**
- * Notify the delegate when a BDX Session ends
- *
+ * Notify the delegate when a BDX Session ends for some node.  The controller
+ * identifies the fabric the node is on, and the nodeID identifies the node
+ * within that fabric.
  */
-- (void)handleBDXTransferSessionEnd:(NSError * _Nullable)error;
+- (void)handleBDXTransferSessionEndForNodeID:(NSNumber *)nodeID
+                                  controller:(MTRDeviceController *)controller
+                                       error:(NSError * _Nullable)error;
 
 /**
- * Notify the delegate when a BDX Query message has been received
- *
+ * Notify the delegate when a BDX Query message has been received for some node.
+ * The controller identifies the fabric the node is on, and the nodeID
+ * identifies the node within that fabric.
  */
-- (void)handleBDXQuery:(NSNumber * _Nonnull)blockSize
-            blockIndex:(NSNumber * _Nonnull)blockIndex
-           bytesToSkip:(NSNumber * _Nonnull)bytesToSkip
-     completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler;
+- (void)handleBDXQueryForNodeID:(NSNumber *)nodeID
+                     controller:(MTRDeviceController *)controller
+                      blockSize:(NSNumber *)blockSize
+                     blockIndex:(NSNumber *)blockIndex
+                    bytesToSkip:(NSNumber *)bytesToSkip
+              completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler;
 @end
 
 NS_ASSUME_NONNULL_END

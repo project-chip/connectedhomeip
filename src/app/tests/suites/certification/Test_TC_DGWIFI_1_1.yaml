@@ -11,94 +11,124 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.1.1. [TC-DGWIFI-1.1] Global Attributes [DUT as Server]
+name: 53.1.1. [TC-DGWIFI-1.1] Global Attributes [DUT as Server]
 
 PICS:
     - DGWIFI.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "WiFi Network Diagnostics"
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
-          ./chip-tool pairing ble-wifi NODEID SSID PASSWD 20202021 3840 (commissioner side)
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "TH reads the ClusterRevision from DUT"
-      verification: |
-          ./chip-tool wifinetworkdiagnostics read cluster-revision 1 0
-
-          Verify " ClusterRevision " on the TH(Chip-tool) Log:
-
-          [1651834623.658618][3910:3916] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFFD DataVersion: 2858283115
-          [1651834623.658776][3910:3916] CHIP:TOO:   ClusterRevision: 1
-      disabled: true
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
     - label: "TH reads the FeatureMap from DUT"
-      verification: |
-          ./chip-tool wifinetworkdiagnostics read feature-map 1 0
+      PICS: DGWIFI.S.F00 || DGWIFI.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              minValue: 0
+              maxValue: 3
 
-          Verify " Featuremap " on the TH(Chip-tool) Log:
+    - label: "TH reads AttributeList from DUT"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3, 4, 65528, 65529, 65531, 65532, 65533]
 
-          [1651834671.432383][3919:3924] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFFC DataVersion: 2858283115
-          [1651834671.432466][3919:3924] CHIP:TOO:   FeatureMap: 3
-      disabled: true
+    - label:
+          "TH reads Feature dependent(DGWIFI.S.F00) attributes in attributeList
+          from DUT"
+      PICS: DGWIFI.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [6, 7, 8, 9, 10]
 
-    - label: "TH reads AttribubteList from DUT"
-      verification: |
-          ./chip-tool wifinetworkdiagnostics read attribute-list 1 0
+    - label:
+          "TH reads Feature dependent(DGWIFI.S.F01) attributes in attributeList
+          from DUT"
+      PICS: DGWIFI.S.F01
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [5, 12]
 
-          Verify " AttributeList " on the TH(Chip-tool) Log:
-
-          [1651834734.844051][3928:3933] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFFB DataVersion: 2858283115
-          [1651834734.844159][3928:3933] CHIP:TOO:   AttributeList: 18 entries
-          [1651834734.844193][3928:3933] CHIP:TOO:     [1]: 0
-          [1651834734.844218][3928:3933] CHIP:TOO:     [2]: 1
-          [1651834734.844240][3928:3933] CHIP:TOO:     [3]: 2
-          [1651834734.844264][3928:3933] CHIP:TOO:     [4]: 3
-          [1651834734.844287][3928:3933] CHIP:TOO:     [5]: 4
-          [1651834734.844311][3928:3933] CHIP:TOO:     [6]: 5
-          [1651834734.844335][3928:3933] CHIP:TOO:     [7]: 6
-          [1651834734.844358][3928:3933] CHIP:TOO:     [8]: 7
-          [1651834734.844382][3928:3933] CHIP:TOO:     [9]: 8
-          [1651834734.844403][3928:3933] CHIP:TOO:     [10]: 9
-          [1651834734.844427][3928:3933] CHIP:TOO:     [11]: 10
-          [1651834734.844451][3928:3933] CHIP:TOO:     [12]: 11
-          [1651834734.844475][3928:3933] CHIP:TOO:     [13]: 12
-          [1651834734.844499][3928:3933] CHIP:TOO:     [14]: 65528
-          [1651834734.844523][3928:3933] CHIP:TOO:     [15]: 65529
-          [1651834734.844548][3928:3933] CHIP:TOO:     [16]: 65531
-          [1651834734.844571][3928:3933] CHIP:TOO:     [17]: 65532
-          [1651834734.844596][3928:3933] CHIP:TOO:     [18]: 65533
-      disabled: true
+    - label:
+          "TH reads optional attribute (CurrentMaxRate) in AttributeList from
+          DUT"
+      PICS: DGWIFI.S.A000b
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [11]
 
     - label: "TH reads AcceptedCommandList from DUT"
-      verification: |
-          ./chip-tool wifinetworkdiagnostics read accepted-command-list 1 0
+      PICS: " !DGWIFI.S.F01 "
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-          Verify " AcceptedCommandList " on the TH(Chip-tool) Log:
-
-          [1651788161.332422][241228:241233] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFF9 DataVersion: 3097381936
-          [1651788161.332475][241228:241233] CHIP:TOO:   AcceptedCommandList: 1 entries
-          [1651788161.332500][241228:241233] CHIP:TOO:     [1]: 0
-      disabled: true
+    - label:
+          "TH reads Feature dependent(DGWIFI.S.F01) command in
+          AcceptedCommandList from DUT"
+      PICS: DGWIFI.S.F01
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
 
     - label: "TH reads GeneratedCommandList from DUT"
-      verification: |
-          ./chip-tool wifinetworkdiagnostics read generated-command-list 1 0
-
-          Verify " GeneratedCommandList " on the TH(Chip-tool) Log:
-
-          [1651788208.608429][241239:241244] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFF8 DataVersion: 3097381936
-          [1651788208.608490][241239:241244] CHIP:TOO:   GeneratedCommandList: 0 entries
-      disabled: true
-
-    - label: "TH reads EventList from DUT"
-      verification: |
-          (Out of scope for v1.0)
-      disabled: true
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

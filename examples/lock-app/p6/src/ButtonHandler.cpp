@@ -97,5 +97,9 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
     {
         buttonevent = cyhal_gpio_read(APP_LOCK_BUTTON);
     }
-    GetAppTask().ButtonEventHandler(timerId, (buttonevent) ? APP_BUTTON_PRESSED : APP_BUTTON_RELEASED);
+
+    if (buttonevent)
+    {
+        GetAppTask().ButtonEventHandler(timerId, APP_BUTTON_PRESSED);
+    }
 }

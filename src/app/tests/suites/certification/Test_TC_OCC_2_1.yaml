@@ -59,7 +59,7 @@ tests:
           constraints:
               type: bitmap8
               minValue: 1
-              maxValue: 273
+              maxValue: 7
 
     - label: "Reads optional attribute: PIROccupiedToUnoccupiedDelay"
       PICS: OCC.S.A0010

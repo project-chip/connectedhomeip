@@ -24,6 +24,9 @@ declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = "${chip_root}/third_party/silabs/gecko_sdk"
   sdk_support_root = "${chip_root}/third_party/silabs/matter_support"
+
+  #Build openthread with prebuilt silabs lib
+  use_silabs_thread_lib = false
   enable_openthread_cli = true
   kvs_max_entries = 75
 

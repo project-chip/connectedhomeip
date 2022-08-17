@@ -50,6 +50,7 @@ using chip::SessionHandle;
 
 NSString * const MTRAttributePathKey = @"attributePath";
 NSString * const MTRCommandPathKey = @"commandPath";
+NSString * const MTREventPathKey = @"eventPath";
 NSString * const MTRDataKey = @"data";
 NSString * const MTRErrorKey = @"error";
 NSString * const MTRTypeKey = @"type";
@@ -297,6 +298,13 @@ public:
         , mBufferedReadAdapter(*this)
         , mOnDoneHandler(onDoneHandler)
     {
+    }
+
+    ~SubscriptionCallback()
+    {
+        // Ensure we release the ReadClient before we tear down anything else,
+        // so it can call our OnDeallocatePaths properly.
+        mReadClient = nullptr;
     }
 
     BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
@@ -765,6 +773,13 @@ public:
         , mOnSubscriptionEstablished(aOnSubscriptionEstablished)
         , mBufferedReadAdapter(*this)
     {
+    }
+
+    ~BufferedReadAttributeCallback()
+    {
+        // Ensure we release the ReadClient before we tear down anything else,
+        // so it can call our OnDeallocatePaths properly.
+        mReadClient = nullptr;
     }
 
     app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }

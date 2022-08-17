@@ -68,6 +68,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithPath:(const chip::app::ConcreteDataAttributePath &)path;
 @end
 
+@interface MTREventPath ()
+- (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path;
+@end
+
 @interface MTRCommandPath ()
 - (instancetype)initWithPath:(const chip::app::ConcreteCommandPath &)path;
 @end

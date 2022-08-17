@@ -78,7 +78,8 @@
 	platforms = qpg
 [submodule "third_party/openthread/ot-efr32"]
 	path = third_party/openthread/ot-efr32
-	url = https://github.com/openthread/ot-efr32.git
+	url = https://github.com/SiliconLabs/ot-efr32.git
+	branch  = matter_sve
 	platforms = efr32
 [submodule "third_party/openthread/ot-ifx"]
 	path = third_party/openthread/ot-ifx

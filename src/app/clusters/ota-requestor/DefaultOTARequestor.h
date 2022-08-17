@@ -331,6 +331,7 @@ private:
     // persistent storage (if available), used for sending the NotifyApplied message, and then cleared. This will ensure determinism
     // in the OTARequestorDriver on reboot.
     Optional<ProviderLocationType> mProviderLocation;
+    SessionHolder mSessionHolder;
 };
 
 } // namespace chip
