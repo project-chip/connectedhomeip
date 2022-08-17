@@ -34,7 +34,7 @@ chip_detail_logging = false
 chip_build_tests = false
 chip_progress_logging = true
 chip_access_control_policy_logging_verbosity = 2
-chip_enable_schema_check = true
+enable_im_pretty_print = true
 
 chip_mdns = "minimal"
 mbedtls_target = "${chip_root}/third_party/nxp/mw320_sdk:mbedtls"
