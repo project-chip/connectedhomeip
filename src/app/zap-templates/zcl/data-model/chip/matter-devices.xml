@@ -1468,39 +1468,17 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000B</deviceId>
         <clusters lockOthers="true">
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>IDENTIFY_TIME</requireAttribute>
-                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
-                <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
-            </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
                 <requireAttribute>SERVER_LIST</requireAttribute>
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Scenes" client="true" server="false" clientLocked="true" serverLocked="true">
-            </include>
-            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
-                <requireCommand>AddGroup</requireCommand>
-                <requireCommand>AddGroupResponse</requireCommand>
-                <requireCommand>ViewGroup</requireCommand>
-                <requireCommand>ViewGroupResponse</requireCommand>
-                <requireCommand>GetGroupMembership</requireCommand>
-                <requireCommand>GetGroupMembershipResponse</requireCommand>
-                <requireCommand>RemoveGroup</requireCommand>
-                <requireCommand>RemoveGroupResponse</requireCommand>
-                <requireCommand>RemoveAllGroups</requireCommand>
-                <requireCommand>AddGroupIfIdentifying</requireCommand>
-            </include>
             <include cluster="Door Lock" client="true" server="false" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Time Synchronization" client="false" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Time Synchronization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
