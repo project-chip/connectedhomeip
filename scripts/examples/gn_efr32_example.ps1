@@ -199,7 +199,8 @@ try {
     $Global:BOARD = ""
     $Global:optArgs = ""
     $Global:USE_WIFI = $false
-
+    $env:Path = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine)
+    
     check_args $args
     . "$Global:PROJECT_ROOT_DIR\scripts\bootstrap.ps1"
     generate_binaries

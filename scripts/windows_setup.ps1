@@ -27,6 +27,11 @@ Cflags: -I${includedir} '
 ###########################################################################################
 function clean_up_env() {
 
+    $path = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine)
+    $path = ($path.Split(';') | Where-Object { $_ -ne "$Global:PROJECT_ROOT_DIR\dependencies\bin" }) -join ';'
+    $path = ($path.Split(';') | Where-Object { $_ -ne "$Global:PROJECT_ROOT_DIR\dependencies" }) -join ';'
+    [Environment]::SetEnvironmentVariable("Path", $path , "Machine")
+
     if (Test-Path env:PKG_CONFIG_PATH) { 
 
         Remove-Item Env:\PKG_CONFIG_PATH  
@@ -61,14 +66,14 @@ function install_dependencies() {
             (New-Object Net.WebClient).DownloadFile($pkgConfigUrl, $pkgConfigDownloadFolder)
         }
         catch {
-            { "Net.WebClient.DownloadFile Object method exited with error code $LASTEXITCODE" }
+            { "Net.WebClient.DownloadFile Object method exited with error code $LastExitCode" }
         }
 
         try {
             Expand-Archive -LiteralPath $pkgConfigDownloadFolder -DestinationPath $binFolderPath -Force | Out-Null
         }
         catch {
-            { "error code $LASTEXITCODE" }
+            { "error code $LastExitCode" }
             
         }
 
@@ -80,14 +85,14 @@ function install_dependencies() {
             (New-Object Net.WebClient).DownloadFile($glibUrl, $glibDownloadFolder)
         }
         catch {
-            { "Net.WebClient.DownloadFile Object method exited with error code $LASTEXITCODE" }
+            { "Net.WebClient.DownloadFile Object method exited with error code $LastExitCode" }
         }
         
         try {
             Expand-Archive -LiteralPath $glibDownloadFolder -DestinationPath $binFolderPath -Force | Out-Null
         }
         catch {
-            { "error code $LASTEXITCODE" }
+            { "error code $LastExitCode" }
         }
         
 
@@ -98,14 +103,14 @@ function install_dependencies() {
             (New-Object Net.WebClient).DownloadFile($getTextRuntimeUrl, $getTextRuntimeDownloadFolder)
         }
         catch {
-            { "Net.WebClient.DownloadFile Object method exited with error code $LASTEXITCODE" }
+            { "Net.WebClient.DownloadFile Object method exited with error code $LastExitCode" }
         }
 
         try {
             Expand-Archive -LiteralPath $getTextRuntimeDownloadFolder -DestinationPath $binFolderPath -Force | Out-Null
         }
         catch {
-            { "error code $LASTEXITCODE" }
+            { "error code $LastExitCode" }
         }
 
 
@@ -116,14 +121,14 @@ function install_dependencies() {
             (New-Object Net.WebClient).DownloadFile($ninjaDownloadUrl, $ninjaDownloadFolder)
         }
         catch {
-            { "Net.WebClient.DownloadFile Object method exited with error code $LASTEXITCODE" }
+            { "Net.WebClient.DownloadFile Object method exited with error code $LastExitCode" }
         }
 
         try {
             Expand-Archive -LiteralPath $ninjaDownloadFolder -DestinationPath $binFolderPath -Force | Out-Null
         }
         catch {
-            { "error code $LASTEXITCODE" }
+            { "error code $LastExitCode" }
         }
     }
     if (!(Test-Path -Path "$binFolderPath\gn.exe" -PathType Leaf)) {
@@ -132,37 +137,39 @@ function install_dependencies() {
             (New-Object Net.WebClient).DownloadFile($gnDownloadUrl, $gnDownloadFolder)
         }
         catch {
-            { "Net.WebClient.DownloadFile Object method exited with error code $LASTEXITCODE" }
+            { "Net.WebClient.DownloadFile Object method exited with error code $LastExitCode" }
         }
 
         try {
             Expand-Archive -LiteralPath $gnDownloadFolder -DestinationPath $binFolderPath -Force | Out-Null
         }
         catch {
-            { "error code $LASTEXITCODE" }
+            { "error code $LastExitCode" }
         }
     }        
     $a = ""
     $b = ""
-
+    $env:Path = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine)
+    
     foreach ($loc in ($env:Path -split ";")) {
 
         if ($loc -eq "$Global:PROJECT_ROOT_DIR\dependencies\bin" -and $a -ne "true") {
             $a = "true"
-            $env:Path += "$binFolderPath\bin;" 
+           
         }
         if ($loc -eq "$Global:PROJECT_ROOT_DIR\dependencies" -and $b -ne "true") {
             $b = "true"
-            $env:Path += "$binFolderPath;" 
+         
         }  
        
     }
     if ($a -ne "true") {
-        $env:Path += "$binFolderPath\bin;"  
+        $env:Path = "$binFolderPath\bin;" + "$env:Path" 
     }
     if ($b -ne "true") {
-        $env:Path += "$binFolderPath;"  
+        $env:Path = "$binFolderPath;" + "$env:Path"
     }
+    [Environment]::SetEnvironmentVariable("Path", $env:Path , "Machine")
 
 }
 
@@ -192,24 +199,25 @@ function install_openssl() {
 
             generate_pc_file $opensslInstallPath
         }
-        $env:PKG_CONFIG_PATH += "$Global:PROJECT_ROOT_DIR\dependencies\pkg_config;" 
+        [System.Environment]::SetEnvironmentVariable('PKG_CONFIG_PATH', "$Global:PROJECT_ROOT_DIR\dependencies\pkg_config;", "Machine")
         return
     }
     try {
         (New-Object Net.WebClient).DownloadFile($openssl_install_url, $opensslDownloadFolder)
     }
     catch {
-        { "Net.WebClient.DownloadFile Object method exited with error code $LASTEXITCODE" }
+        { "Net.WebClient.DownloadFile Object method exited with error code $LastExitCode" }
     }
     try {
         & $opensslDownloadFolder /passive InstallAllUsers=0 PrependPath=1 Include_test=0 TargetDir=$opensslInstallPath | Out-Null
     }
     catch {
-        { "Openssl installer exited with error code $LASTEXITCODE" }
+        { "Openssl installer exited with error code $LastExitCode" }
     }
 
     generate_pc_file $opensslInstallPath
-    $env:PKG_CONFIG_PATH += "$Global:PROJECT_ROOT_DIR\dependencies\pkg_config;" 
+    [System.Environment]::SetEnvironmentVariable('PKG_CONFIG_PATH', "$Global:PROJECT_ROOT_DIR\dependencies\pkg_config;", "Machine")
+  
 
 }
 
@@ -217,18 +225,23 @@ function setup() {
 
     New-Item -Path "$Global:PROJECT_ROOT_DIR\dependencies" -ItemType Directory -ErrorAction SilentlyContinue > $null
     New-Item -Path "$Global:PROJECT_ROOT_DIR\dependencies\pkg_config" -ItemType Directory -ErrorAction SilentlyContinue > $null
-    New-Item -Path Env:\PKG_CONFIG_PATH -Value "$PKG_CONFIG_PATH" -ErrorAction SilentlyContinue > $null
+  
 }
 
 
 try {
+
+    $Global:PROJECT_ROOT_DIR = (Split-Path -Path $PSScriptRoot)
+
     if ($($args[0]) -eq "--setup") {
+        
         setup
         install_dependencies
         install_openssl
-        
+        $env:path -split ";"
     }
     elseif ($($args[0]) -eq "--cleanup") {
+
         clean_up_env
     }
     else {

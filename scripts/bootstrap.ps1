@@ -1,11 +1,4 @@
-$_PW_BANNER = "
 
- ▒█████▄   █▓  ▄███▒  ▒█    ▒█ ░▓████▒ ░▓████▒ ▒▓████▄
-  ▒█░  █░ ░█▒ ██▒ ▀█▒ ▒█░ █ ▒█  ▒█   ▀  ▒█   ▀  ▒█  ▀█▌
-  ▒█▄▄▄█░ ░█▒ █▓░ ▄▄░ ▒█░ █ ▒█  ▒███    ▒███    ░█   █▌
-  ▒█▀     ░█░ ▓█   █▓ ░█░ █ ▒█  ▒█   ▄  ▒█   ▄  ░█  ▄█▌
-  ▒█      ░█░ ░▓███▀   ▒█▓▀▓█░ ░▓████▒ ░▓████▒ ▒▓████▀
-"
 ###########################################################################################
 #  function: Invoke-CmdScript                                                             #
 #  Purpose: when a batch file is invoked within a powershell script, it is started in a   #
@@ -309,6 +302,7 @@ function bootstrap_or_activate($arguments) {
     check_for_git
     if ($BOOTSTRAP_NAME -eq "bootstrap.ps1" -Or $directoryInfo.count -eq 0) {
         try {
+            git config --system core.longpaths true
             git submodule update --init
         }
         catch {
@@ -316,18 +310,7 @@ function bootstrap_or_activate($arguments) {
         }
     }
 
-    "
-        █
-        █
-    ▄   █   ▄                                 █     ▌
-    ▀▀█████▀▀     ▄▓▀▀▀▄,▄▀▀▀▀▄   ╓▄▀▀▀▀▄█  ▀▀█▀▀▀▀▀█▀▀  ,▄▀▀▀▀▄    ▄▀▀
-  ▀█▄       ▄█▀   █     █     █  ▐▌      █    █     █   .█▄▄▄▄▄▄█⌐ ▐▌
-    ▀█▄   ▄█▀     █     █     █  ▐▌      █    █     █    █         ▐▌
- ▄██▀▀█   █▀▀██▄  █     █     █   ╙▀▄▄▄Φ▀█    ▀▄▄   ▀▄▄   ▀▄▄▄▄▀^  ▐▌
-▀▀    █   █    ▀▀
 
-
-"
     New-Item -Path Env:\PW_PROJECT_ROOT -Value "$Global:PROJECT_ROOT_DIR" -ErrorAction SilentlyContinue > $null
     New-Item -Path Env:\PW_ROOT -Value "$Global:PROJECT_ROOT_DIR\third_party\pigweed\repo" -ErrorAction SilentlyContinue > $null
     New-Item -Path Env:\PW_ACTIVATE_SKIP_CHECKS -Value '1' -ErrorAction SilentlyContinue > $null
@@ -356,7 +339,6 @@ function bootstrap_or_activate($arguments) {
 
 try {
       
-    $_PW_BANNER_FUNC = "_pw_banner"
     bootstrap_or_activate $args
 }
 catch {
