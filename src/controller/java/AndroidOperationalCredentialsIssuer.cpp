@@ -205,7 +205,6 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
 
     P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
-    // TODO: verify signed by DAC creds?
     ChipLogProgress(chipTool, "VerifyCertificateSigningRequest");
 
     jobject csrInfo;
