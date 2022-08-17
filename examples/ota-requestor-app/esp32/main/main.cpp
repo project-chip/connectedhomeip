@@ -103,10 +103,10 @@ void OTAEventsHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
             ChipLogProgress(DeviceLayer, "OTA image apply in progress");
             break;
         case DeviceLayer::kOtaApplyComplete:
-            ChipLogProgress(DeviceLayer, "OTA image apply in progress");
+            ChipLogProgress(DeviceLayer, "OTA image apply complete");
             break;
         case DeviceLayer::kOtaApplyFailed:
-            ChipLogProgress(DeviceLayer, "OTA image apply in progress");
+            ChipLogProgress(DeviceLayer, "OTA image apply failed");
             break;
         default:
             break;
