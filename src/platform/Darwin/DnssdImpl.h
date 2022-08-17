@@ -20,6 +20,8 @@
 #include <dns_sd.h>
 #include <lib/dnssd/platform/Dnssd.h>
 
+#include "DnssdHostNameRegistrar.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -30,6 +32,7 @@ namespace Dnssd {
 enum class ContextType
 {
     Register,
+    RegisterRecord,
     Browse,
     Resolve,
 };
@@ -93,6 +96,7 @@ struct RegisterContext : public GenericContext
     DnssdPublishCallback callback;
     std::string mType;
     std::string mInstanceName;
+    HostNameRegistrar mHostNameRegistrar;
 
     RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext);
     virtual ~RegisterContext() {}
@@ -101,6 +105,17 @@ struct RegisterContext : public GenericContext
     void DispatchSuccess() override;
 
     bool matches(const char * sType) { return mType.compare(sType) == 0; }
+};
+
+struct RegisterRecordContext : public GenericContext
+{
+    RegisterContext * mRegisterContext;
+
+    RegisterRecordContext(RegisterContext * context);
+    virtual ~RegisterRecordContext(){};
+
+    void DispatchFailure(DNSServiceErrorType err) override;
+    void DispatchSuccess() override;
 };
 
 struct BrowseContext : public GenericContext
