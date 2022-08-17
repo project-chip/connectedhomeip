@@ -60,12 +60,29 @@ extern "C" {
 #include "lcd.h"
 #endif
 
+
+/****************************************************************
+ * Common Hal board initilization for Rs9116 and WF200
+ * For Rs9116 - called from common SAPI
+ * For WF200  - called from init_efrPlatform
+ ****************************************************************/
+void rsi_hal_board_init(void)
+{
+    sl_wfx_host_gpio_init();
+    sl_wfx_host_init_bus();
+    sl_wfx_host_reset_chip();
+}
+
 void initAntenna(void);
 
 void init_efrPlatform(void)
 {
     sl_system_init();
     sl_mbedtls_init();
+
+#ifdef WF200_WIFI
+    rsi_hal_board_init();
+#endif /* WF200_WIFI */
 
 #if DISPLAY_ENABLED
     initLCD();
