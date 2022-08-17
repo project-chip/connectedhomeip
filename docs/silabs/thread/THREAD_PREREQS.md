@@ -19,6 +19,7 @@
     > Make sure Git is installed on the local machine that will be used to flash
     > the devices so that the necessary repositories can be cloned locally and
     > used as needed.
+1. If you are using an EFR32MG2x device you will require a bootloader to run the demo applications. When you flash your application image be sure to include a bootloader as well (if one is not already present). Bootloader images are provided on the [Matter Artifacts page](../general/ARTIFACTS.md).
 
 <br>
 

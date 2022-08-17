@@ -64,6 +64,7 @@ follows:
 -   Raspberry Pi imager tool (optional): To flash an operating system or Raspberry Pi image on the SD card of the Raspberry Pi if you are using one to run the ChipTool.  Note: The ChipTool may also be compiled and run on a Linux machine or Mac. [Download](https://www.raspberrypi.com/software/)
 -   Upgrade firmware on RS9116 EVK:
     [Reference](http://draft-docs.suds.silabs.net/rs9116-wiseconnect/2.5/wifibt-wc-getting-started-with-pc/update-evk-firmware)
+- If you are using an EFR32MG2x device you will require a bootloader to run the demo applications. When you flash your application image be sure to include a bootloader as well (if one is not already present). Bootloader images are provided on the [Matter Artifacts page](../general/ARTIFACTS.md).
 
 <br>
 

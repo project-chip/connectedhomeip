@@ -60,7 +60,7 @@ Build the GBL file for the update image and note its size
            451176 Jul 19 16:39 out/lighting-app/BRD4186A/chip-efr32-lighting-example.gbl
 
 
--   Flash the application image, bootloader (pre-built BRD4186C bootloader binary from https://github.com/SiliconLabs/sdk_support/tree/main/matter/efr32/bootloader_binaries), erase the flash.
+-   Flash the application image, bootloader (pre-built BRD4186C bootloader binary from the [Matter Artifacts page](./ARTIFACTS.md). Erase the flash.
 
 ![Erase Flash](./images/ApplicationUploadEraseFlash.png)
 

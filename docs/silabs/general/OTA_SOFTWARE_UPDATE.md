@@ -23,9 +23,8 @@ is controlled by the `chip_enable_ota_requestor` compile flag.
     using the external flash select the "external SPI" bootloader type
     configured with a single slot of at least 1000 KB. For the bootloader using
     the internal flash see the Internal Storage Bootloader section below.
-    Pre-built binaries for some configurations are available here:
-    [bootloader_binaries](https://github.com/SiliconLabs/sdk_support/tree/main/matter/efr32/bootloader_binaries)
-
+    Pre-built binaries for some configurations are available on the [Matter Artifacts page](./ARTIFACTS.md).
+ 
 -   Using the commander tool, upload the bootloader to the device running the
     application.
 
