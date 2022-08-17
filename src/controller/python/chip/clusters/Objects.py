@@ -9955,6 +9955,16 @@ class TimeSynchronization(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
+                ClusterObjectFieldDescriptor(Label="UTCTime", Tag=0x00000000, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="granularity", Tag=0x00000001, Type=TimeSynchronization.Enums.GranularityEnum),
+                ClusterObjectFieldDescriptor(Label="timeSource", Tag=0x00000002, Type=typing.Optional[TimeSynchronization.Enums.TimeSourceEnum]),
+                ClusterObjectFieldDescriptor(Label="trustedTimeNodeId", Tag=0x00000003, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="defaultNtp", Tag=0x00000004, Type=typing.Union[None, Nullable, str]),
+                ClusterObjectFieldDescriptor(Label="timeZone", Tag=0x00000005, Type=typing.Optional[typing.List[TimeSynchronization.Structs.TimeZoneType]]),
+                ClusterObjectFieldDescriptor(Label="dstOffset", Tag=0x00000006, Type=typing.Optional[typing.List[TimeSynchronization.Structs.DstOffsetType]]),
+                ClusterObjectFieldDescriptor(Label="localTime", Tag=0x00000007, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="timeZoneDatabase", Tag=0x00000008, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="ntpServerPort", Tag=0x00000009, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -9962,16 +9972,265 @@ class TimeSynchronization(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    UTCTime: 'typing.Union[Nullable, uint]' = None
+    granularity: 'TimeSynchronization.Enums.GranularityEnum' = None
+    timeSource: 'typing.Optional[TimeSynchronization.Enums.TimeSourceEnum]' = None
+    trustedTimeNodeId: 'typing.Union[Nullable, uint]' = None
+    defaultNtp: 'typing.Union[None, Nullable, str]' = None
+    timeZone: 'typing.Optional[typing.List[TimeSynchronization.Structs.TimeZoneType]]' = None
+    dstOffset: 'typing.Optional[typing.List[TimeSynchronization.Structs.DstOffsetType]]' = None
+    localTime: 'typing.Union[None, Nullable, uint]' = None
+    timeZoneDatabase: 'typing.Optional[bool]' = None
+    ntpServerPort: 'typing.Union[None, Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
 
+    class Enums:
+        class GranularityEnum(IntEnum):
+            kNoTimeGranularity = 0x00
+            kMinutesGranularity = 0x01
+            kSecondsGranularity = 0x02
+            kMillisecondsGranularity = 0x03
+            kMicrosecondsGranularity = 0x04
 
+        class TimeSourceEnum(IntEnum):
+            kNone = 0x00
+            kUnknown = 0x01
+            kAdmin = 0x02
+            kNodeTimeCluster = 0x03
+            kNonFabricSntp = 0x04
+            kNonFabricNtp = 0x05
+            kFabricSntp = 0x06
+            kFabricNtp = 0x07
+            kMixedNtp = 0x08
+            kNonFabricSntpNts = 0x09
+            kNonFabricNtpNts = 0x0A
+            kFabricSntpNts = 0x0B
+            kFabricNtpNts = 0x0C
+            kMixedNtpNts = 0x0D
+            kCloudSource = 0x0E
+            kPtp = 0x0F
+            kGnss = 0x10
+
+
+    class Structs:
+        @dataclass
+        class DstOffsetType(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="offset", Tag=0, Type=int),
+                            ClusterObjectFieldDescriptor(Label="validStarting", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="validUntil", Tag=2, Type=uint),
+                    ])
+
+            offset: 'int' = 0
+            validStarting: 'uint' = 0
+            validUntil: 'uint' = 0
+
+        @dataclass
+        class TimeZoneType(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="offset", Tag=0, Type=int),
+                            ClusterObjectFieldDescriptor(Label="validAt", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="name", Tag=2, Type=typing.Optional[str]),
+                    ])
+
+            offset: 'int' = 0
+            validAt: 'uint' = 0
+            name: 'typing.Optional[str]' = None
+
+
+
+    class Commands:
+        @dataclass
+        class SetUtcTime(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0038
+            command_id: typing.ClassVar[int] = 0x0000
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="utcTime", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="granularity", Tag=1, Type=TimeSynchronization.Enums.GranularityEnum),
+                            ClusterObjectFieldDescriptor(Label="timeSource", Tag=2, Type=typing.Optional[TimeSynchronization.Enums.TimeSourceEnum]),
+                    ])
+
+            utcTime: 'uint' = 0
+            granularity: 'TimeSynchronization.Enums.GranularityEnum' = 0
+            timeSource: 'typing.Optional[TimeSynchronization.Enums.TimeSourceEnum]' = None
 
 
     class Attributes:
+        @dataclass
+        class UTCTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
+        class Granularity(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=TimeSynchronization.Enums.GranularityEnum)
+
+            value: 'TimeSynchronization.Enums.GranularityEnum' = 0
+
+        @dataclass
+        class TimeSource(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[TimeSynchronization.Enums.TimeSourceEnum])
+
+            value: 'typing.Optional[TimeSynchronization.Enums.TimeSourceEnum]' = None
+
+        @dataclass
+        class TrustedTimeNodeId(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
+        class DefaultNtp(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, str])
+
+            value: 'typing.Union[None, Nullable, str]' = None
+
+        @dataclass
+        class TimeZone(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[TimeSynchronization.Structs.TimeZoneType]])
+
+            value: 'typing.Optional[typing.List[TimeSynchronization.Structs.TimeZoneType]]' = None
+
+        @dataclass
+        class DstOffset(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[TimeSynchronization.Structs.DstOffsetType]])
+
+            value: 'typing.Optional[typing.List[TimeSynchronization.Structs.DstOffsetType]]' = None
+
+        @dataclass
+        class LocalTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class TimeZoneDatabase(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000008
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class NtpServerPort(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty

@@ -96,6 +96,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TestCluster::St
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Actions::Structs::EndpointListStruct::Type & request,
                         Json::Value & value);
 
@@ -241,6 +245,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::SoftwareDiagnos
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::Type & request);
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type & request,
                         Json::Value & value);

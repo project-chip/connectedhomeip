@@ -973,6 +973,49 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnost
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::GranularityEnum val)
+{
+    using EnumType = TimeSynchronization::GranularityEnum;
+    switch (val)
+    {
+    case EnumType::kNoTimeGranularity:
+    case EnumType::kMinutesGranularity:
+    case EnumType::kSecondsGranularity:
+    case EnumType::kMillisecondsGranularity:
+    case EnumType::kMicrosecondsGranularity:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::TimeSourceEnum val)
+{
+    using EnumType = TimeSynchronization::TimeSourceEnum;
+    switch (val)
+    {
+    case EnumType::kNone:
+    case EnumType::kUnknown:
+    case EnumType::kAdmin:
+    case EnumType::kNodeTimeCluster:
+    case EnumType::kNonFabricSntp:
+    case EnumType::kNonFabricNtp:
+    case EnumType::kFabricSntp:
+    case EnumType::kFabricNtp:
+    case EnumType::kMixedNtp:
+    case EnumType::kNonFabricSntpNts:
+    case EnumType::kNonFabricNtpNts:
+    case EnumType::kFabricSntpNts:
+    case EnumType::kFabricNtpNts:
+    case EnumType::kMixedNtpNts:
+    case EnumType::kCloudSource:
+    case EnumType::kPtp:
+    case EnumType::kGnss:
+        return val;
+    default:
+        return static_cast<EnumType>(17);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(AdministratorCommissioning::CommissioningWindowStatus val)
 {
     using EnumType = AdministratorCommissioning::CommissioningWindowStatus;
