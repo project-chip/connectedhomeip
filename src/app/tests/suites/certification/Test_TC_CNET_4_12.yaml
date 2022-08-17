@@ -176,6 +176,8 @@ tests:
           fail-safe and is  expected to cause  the changes of  configuration
           to  NetworkCommissi  oning cluster done  so far to be  reverted."
       verification: |
+          Mark as not applicable and proceed to next step
+
           ./chip-tool generalcommissioning arm-fail-safe 0 1 22 0
 
           Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
@@ -193,13 +195,15 @@ tests:
           "TH ensures it can communicate on PIXIT.CNET.THRE AD_1ST_OPERATI
           ONALDATASET"
       verification: |
-          verification step to be updated.
+          Mark as not applicable and proceed to next step
       disabled: true
 
     - label:
           "TH discovers and connects to DUT on the PIXIT.CNET.THRE
           AD_1ST_OPERATI ONALDATASET operational network"
       verification: |
+          Mark as not applicable and proceed to next step
+
           ./chip-tool networkcommissioning read networks 22 0
 
           Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
@@ -209,7 +213,7 @@ tests:
           "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
           to 900"
       verification: |
-          verification step to be updated.
+          Mark as not applicable and proceed to next step
       disabled: true
 
     - label:
@@ -217,7 +221,7 @@ tests:
           th_xpan and Breadcrumb field set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
-          verification step to be updated.
+          Mark as not applicable and proceed to next step
       disabled: true
 
     - label:
@@ -226,7 +230,7 @@ tests:
           ONALDATASET and Breadcrumb field set to 1"
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
-          verification step to be updated.
+          Mark as not applicable and proceed to next step
       disabled: true
 
     - label:
@@ -235,14 +239,14 @@ tests:
           and Breadcrumb field set to 3"
       PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
       verification: |
-          verification step to be updated.
+          Mark as not applicable and proceed to next step
       disabled: true
 
     - label:
           "TH discovers and  connects to DUT  on
           the  PIXIT.CNET.THRE  AD_2ND_OPERATI  ONALDATASET  operational  network"
       verification: |
-          verification step to be updated.
+          Mark as not applicable and proceed to next step
       disabled: true
 
     - label:
@@ -250,16 +254,16 @@ tests:
           the  General  Commissioning  cluster of the DUT"
       PICS: CNET.S.C06.Rsp
       verification: |
-          verification step to be updated.
+          Mark as not applicable and proceed to next step
       disabled: true
 
     - label: "TH sends the  CommissioningCo  mplete command  to the DUT"
       verification: |
-          verification step to be updated.
+          Mark as not applicable and proceed to next step
       disabled: true
 
     - label: "TH reads  Networks  attribute from the  DUT"
       PICS: CNET.S.A0001
       verification: |
-          verification step to be updated.
+          Mark as not applicable and proceed to next step
       disabled: true

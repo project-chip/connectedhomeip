@@ -29,7 +29,7 @@ tests:
           DUT
           sudo ./chip-all-clusters-app
 
-          TH
+          TH1
           ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
       disabled: true
 
@@ -39,7 +39,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read current-fabric-index 1 0
 
-          On TH(Chiptool)1, verify  CurrentFabricIndex attribute of operationalCredential cluster  as 1
+          On TH1(Chiptool), verify  CurrentFabricIndex attribute of operationalCredential cluster  as 1
 
           [1656588171.078880][3260:3265] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 1776815488
           [1656588171.078952][3260:3265] CHIP:TOO:   CurrentFabricIndex: 1
@@ -50,7 +50,7 @@ tests:
           "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin
           node ID N2"
       verification: |
-          Open a commissioning window On TH(Chiptool)1 using below command
+          Open a commissioning window On TH1(Chiptool)1using below command
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 180 1  0 --timedInteractionTimeoutMs 1000
 
@@ -101,7 +101,7 @@ tests:
           CurrentFabricIndex attribute"
       verification: |
           ./chip-tool  operationalcredentials read current-fabric-index 2 0 --commissioner-nodeid 223344 --commissioner-name beta
-          On TH(Chiptool)2, verify  CurrentFabricIndex attribute of operationalCredential cluster  as 2
+          On TH2(Chiptool),verify  CurrentFabricIndex attribute of operationalCredential cluster  as 2
 
           1658747098.843523][3024:3029] CHIP:DMG:                 },
           [1658747098.843552][3024:3029] CHIP:DMG:
@@ -124,8 +124,8 @@ tests:
           field: [N1, 1111] Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233,1111], "targets":null}]" 1 0
-          On TH(Chiptool)1, verify AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element
+          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233,1111], "targets":null}]" 1 0
+          On TH1(Chiptool), verify AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element
 
           [1657286416.461279][4737:4742] CHIP:DMG: {
           [1657286416.461307][4737:4742] CHIP:DMG:         AttributeStatusIBs =
@@ -178,8 +178,8 @@ tests:
           field: [N2, 2222] Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [223344,2222], "targets":null}]" 2 0  --commissioner-nodeid 223344 --commissioner-name beta
-          On TH(Chiptool)2, verify AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 1 element
+          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [223344,2222], "targets":null}]" 2 0  --commissioner-nodeid 223344 --commissioner-name beta
+          On TH2(Chiptool), verify AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 1 element
 
 
           [1658747124.117113][3031:3036] CHIP:DMG: {
@@ -233,7 +233,7 @@ tests:
       verification: |
           ./chip-tool  accesscontrol  read  acl 1 0
 
-          On TH(Chiptool)1, verify AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F2
+          On TH1(Chiptool), verify AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F2
           [1657286432.997319][4745:4751] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 3308562949
           [1657286432.997655][4745:4751] CHIP:TOO:   ACL: 1 entries
           [1657286432.997727][4745:4751] CHIP:TOO:     [1]: {
@@ -252,7 +252,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read acl 2 0 --commissioner-name beta --commissioner-nodeid 223344
 
-          On TH(Chiptool)2, verify  AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
+          On TH2(Chiptool), verify  AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
           [1657286742.977222][18111:18116] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 3308562953
           [1657286742.977287][18111:18116] CHIP:TOO:   ACL: 1 entries
           [1657286742.977344][18111:18116] CHIP:TOO:     [1]: {
@@ -272,7 +272,7 @@ tests:
       PICS: ACL.S.E00
       verification: |
           ./chip-tool  accesscontrol  read-event  access-control-entry-changed  1 0
-          On TH(Chiptool)1, verify AccessControl cluster AccessControlEntryChanged containing 3 elements, and MUST NOT contain any element with FabricIndex F2
+          On TH1(Chiptool), verify AccessControl cluster AccessControlEntryChanged containing 3 elements, and MUST NOT contain any element with FabricIndex F2
 
 
           [1657286873.948408][4767:4772] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
@@ -338,29 +338,10 @@ tests:
       PICS: ACL.S.E00
       verification: |
           ./chip-tool  accesscontrol  read-event  access-control-entry-changed  2 0 --commissioner-name beta --commissioner-nodeid 223344
-          On TH(Chiptool)2, verify AccessControl cluster AccessControlEntryChanged containing 3 elements, and MUST NOT contain any element with FabricIndex F1
+          On TH2(Chiptool), verify AccessControl cluster AccessControlEntryChanged containing 3 elements, and MUST NOT contain any element with FabricIndex F1
 
 
 
-          [1657287207.040351][18332:18337] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
-          [1657287207.040361][18332:18337] CHIP:TOO:          Event number: 4
-          [1657287207.040369][18332:18337] CHIP:TOO:          Priority: Info
-          [1657287207.040376][18332:18337] CHIP:TOO:          Timestamp: 31805127
-          [1657287207.040425][18332:18337] CHIP:TOO:   AccessControlEntryChanged: {
-          [1657287207.040440][18332:18337] CHIP:TOO:     AdminNodeID: null
-          [1657287207.040451][18332:18337] CHIP:TOO:     AdminPasscodeID: 0
-          [1657287207.040460][18332:18337] CHIP:TOO:     ChangeType: 1
-          [1657287207.040467][18332:18337] CHIP:TOO:     LatestValue: {
-          [1657287207.040474][18332:18337] CHIP:TOO:       Privilege: 5
-          [1657287207.040482][18332:18337] CHIP:TOO:       AuthMode: 2
-          [1657287207.040492][18332:18337] CHIP:TOO:       Subjects: 1 entries
-          [1657287207.040502][18332:18337] CHIP:TOO:         [1]: 223344
-          [1657287207.040510][18332:18337] CHIP:TOO:       Targets: null
-          [1657287207.040518][18332:18337] CHIP:TOO:       FabricIndex: 2
-          [1657287207.040526][18332:18337] CHIP:TOO:      }
-          [1657287207.040533][18332:18337] CHIP:TOO:     AdminFabricIndex: 2
-          [1657287207.040540][18332:18337] CHIP:TOO:    }
-          [1657287207.040612][18332:18337] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
           [1657287207.040619][18332:18337] CHIP:TOO:          Event number: 7
           [1657287207.040624][18332:18337] CHIP:TOO:          Priority: Info
           [1657287207.040630][18332:18337] CHIP:TOO:          Timestamp: 31903266
