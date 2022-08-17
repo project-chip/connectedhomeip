@@ -287,6 +287,13 @@ enum ActivityChange
 enum OtaState
 {
     kOtaSpaceAvailable = 0,
+    kOtaDownloadInProgress,
+    kOtaDownloadComplete,
+    kOtaDownloadFailed,
+    kOtaDownloadAborted,
+    kOtaApplyInProgress,
+    kOtaApplyComplete,
+    kOtaApplyFailed,
 };
 
 inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
