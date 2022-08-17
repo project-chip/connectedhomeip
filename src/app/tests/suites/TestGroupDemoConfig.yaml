@@ -31,7 +31,6 @@ config:
     endpoint: 0
 
 tests:
-
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -59,14 +58,12 @@ tests:
                         EpochStartTime2: 1110002,
                     }
 
-
     - label: "Write Group Keys (endpoint 0)"
       cluster: "Group Key Management"
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
-          value:
-              [{ FabricIndex: 0, GroupId: 0x0101, GroupKeySetID: 0x01a1 }]
+          value: [{ FabricIndex: 0, GroupId: 0x0101, GroupKeySetID: 0x01a1 }]
 
     - label: "Add Group 1 (endpoint 1)"
       cluster: "Groups"
@@ -84,7 +81,6 @@ tests:
                 value: 0
               - name: "groupId"
                 value: 0x0101
-
 
     - label: "Install ACLs"
       cluster: "Access Control"
@@ -109,4 +105,3 @@ tests:
                       Targets: null,
                   },
               ]
-
