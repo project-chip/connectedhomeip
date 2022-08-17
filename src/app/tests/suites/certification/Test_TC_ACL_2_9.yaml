@@ -27,7 +27,7 @@ tests:
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
           DUT
-          sudo ./chip-all-clusters-app 
+          sudo ./chip-all-clusters-app
 
           TH1
           ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
@@ -230,7 +230,7 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol write extension [] 1 0
-          On TH1(Chiptool) , Verify the  Successfully with  extension attribute value is an empty list which Returns 
+          On TH1(Chiptool) , Verify the  Successfully with  extension attribute value is an empty list which Returns
           UNSUPPORTED_ACCESS (0x7e)
           [1656592607.144276][3897:3903] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1656592607.144341][3897:3903] CHIP:DMG: WriteResponseMessage =
@@ -374,7 +374,7 @@ tests:
           AccessControlEntryChanged event"
       PICS: ACL.S.E00
       verification: |
-          ./chip-tool accesscontrol read-event access-control-entry-changed 1 
+          ./chip-tool accesscontrol read-event access-control-entry-changed 1
           On TH1(Chiptool), Verify  AccessControl cluster AccessControlEntryChanged event Returns UNSUPPORTED_ACCESS (0x7e)
           [1656593588.305232][3979:3984] CHIP:DMG:                                },
           [1656593588.305269][3979:3984] CHIP:DMG:

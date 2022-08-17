@@ -185,7 +185,7 @@ tests:
 
     - label: "TH reads GeneratedCommandList from DUT"
       verification: |
-          ( WiFi) 
+          ( WiFi)
           ./chip-tool networkcommissioning read generated-command-list 1 0
 
 
@@ -209,7 +209,7 @@ tests:
           [1660315548.937327][32333:32338] CHIP:TOO:   GeneratedCommandList: 0 entries
 
 
-           ( Thread ) 
+           ( Thread )
           ./chip-tool networkcommissioning read generated-command-list 51 0
 
 

@@ -27,7 +27,7 @@ tests:
     - label: "TH1 fully commissions the DUT"
       verification: |
           "DUT side:
-          sudo ./chip-all-clusters-app --wifi 
+          sudo ./chip-all-clusters-app --wifi
 
           TH side:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
@@ -78,7 +78,7 @@ tests:
           [1658736631.224352][4080:4085] CHIP:DMG: ICR moving to [ResponseRe]
           [1658736631.224399][4080:4085] CHIP:DMG: InvokeResponseMessage =
           [1658736631.224425][4080:4085] CHIP:DMG: {
-          [1658736631.224450][4080:4085] CHIP:DMG:         suppressResponse = false, 
+          [1658736631.224450][4080:4085] CHIP:DMG:         suppressResponse = false,
           [1658736631.224476][4080:4085] CHIP:DMG:         InvokeResponseIBs =
           [1658736631.224506][4080:4085] CHIP:DMG:         [
           [1658736631.224531][4080:4085] CHIP:DMG:                 InvokeResponseIB =
@@ -91,18 +91,18 @@ tests:
           [1658736631.224776][4080:4085] CHIP:DMG:                                         ClusterId = 0x3e,
           [1658736631.224807][4080:4085] CHIP:DMG:                                         CommandId = 0x7,
           [1658736631.224843][4080:4085] CHIP:DMG:                                 },
-          [1658736631.224876][4080:4085] CHIP:DMG:                                 
+          [1658736631.224876][4080:4085] CHIP:DMG:
           [1658736631.224906][4080:4085] CHIP:DMG:                                 StatusIB =
           [1658736631.224940][4080:4085] CHIP:DMG:                                 {
           [1658736631.224977][4080:4085] CHIP:DMG:                                         status = 0xca (FAILSAFE_REQUIRED),
           [1658736631.225012][4080:4085] CHIP:DMG:                                 },
-          [1658736631.225046][4080:4085] CHIP:DMG:                                 
+          [1658736631.225046][4080:4085] CHIP:DMG:
           [1658736631.225075][4080:4085] CHIP:DMG:                         },
-          [1658736631.225109][4080:4085] CHIP:DMG:                         
+          [1658736631.225109][4080:4085] CHIP:DMG:
           [1658736631.225134][4080:4085] CHIP:DMG:                 },
-          [1658736631.225165][4080:4085] CHIP:DMG:                 
+          [1658736631.225165][4080:4085] CHIP:DMG:
           [1658736631.225189][4080:4085] CHIP:DMG:         ],
-          [1658736631.225218][4080:4085] CHIP:DMG:         
+          [1658736631.225218][4080:4085] CHIP:DMG:
           [1658736631.225243][4080:4085] CHIP:DMG:         InteractionModelRevision = 1
           [1658736631.225271][4080:4085] CHIP:DMG: },
           [1658736631.225332][4080:4085] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_0007 Status=0xca
@@ -122,7 +122,7 @@ tests:
           [1658736675.488329][4129:4134] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1658736675.488401][4129:4134] CHIP:TOO:   ArmFailSafeResponse: {
           [1658736675.488441][4129:4134] CHIP:TOO:     errorCode: 0
-          [1658736675.488471][4129:4134] CHIP:TOO:     debugText: 
+          [1658736675.488471][4129:4134] CHIP:TOO:     debugText:
           [1658736675.488496][4129:4134] CHIP:TOO:    }
       disabled: true
 

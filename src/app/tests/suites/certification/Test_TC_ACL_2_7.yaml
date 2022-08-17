@@ -27,7 +27,7 @@ tests:
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
           DUT
-          sudo ./chip-all-clusters-app 
+          sudo ./chip-all-clusters-app
 
           TH1
           ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
@@ -49,7 +49,7 @@ tests:
           "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin
           node ID N2"
       verification: |
-          Open a commissioning window On TH1(Chiptool)using below command 
+          Open a commissioning window On TH1(Chiptool)using below command
 
           ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3841
           [1657186324.710951][10820:10825] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
@@ -85,7 +85,7 @@ tests:
           ./chip-tool accesscontrol write extension "[{"data":"1718"}]" 1 0
 
           On TH1(Chiptool),Verify  Successfully to extension attribute list containg one element .
-           
+
 
           657893593.975649][4116:4121] CHIP:DMG:                {
           [1657893593.975678][4116:4121] CHIP:DMG:                        AttributePathIB =
@@ -147,14 +147,14 @@ tests:
           [1657894672.480427][2433:2438] CHIP:DMG:                                 Cluster = 0x1f,
           [1657894672.480476][2433:2438] CHIP:DMG:                                 Attribute = 0x0000_0001,
           [1657894672.480521][2433:2438] CHIP:DMG:                         }
-          [1657894672.480570][2433:2438] CHIP:DMG:                                 
+          [1657894672.480570][2433:2438] CHIP:DMG:
           [1657894672.480612][2433:2438] CHIP:DMG:                         StatusIB =
           [1657894672.480657][2433:2438] CHIP:DMG:                         {
           [1657894672.480700][2433:2438] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657894672.480745][2433:2438] CHIP:DMG:                         },
-          [1657894672.480789][2433:2438] CHIP:DMG:                         
+          [1657894672.480789][2433:2438] CHIP:DMG:
           [1657894672.480826][2433:2438] CHIP:DMG:                 },
-          [1657894672.480877][2433:2438] CHIP:DMG:                 
+          [1657894672.480877][2433:2438] CHIP:DMG:
           [1657894672.480911][2433:2438] CHIP:DMG:                 AttributeStatusIB =
           [1657894672.480949][2433:2438] CHIP:DMG:                 {
           [1657894672.480986][2433:2438] CHIP:DMG:                         AttributePathIB =
@@ -164,16 +164,16 @@ tests:
           [1657894672.481168][2433:2438] CHIP:DMG:                                 Attribute = 0x0000_0001,
           [1657894672.481214][2433:2438] CHIP:DMG:                                 ListIndex = Null,
           [1657894672.481258][2433:2438] CHIP:DMG:                         }
-          [1657894672.481306][2433:2438] CHIP:DMG:                                 
+          [1657894672.481306][2433:2438] CHIP:DMG:
           [1657894672.481347][2433:2438] CHIP:DMG:                         StatusIB =
           [1657894672.481390][2433:2438] CHIP:DMG:                         {
           [1657894672.481433][2433:2438] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657894672.481482][2433:2438] CHIP:DMG:                         },
-          [1657894672.481526][2433:2438] CHIP:DMG:                         
+          [1657894672.481526][2433:2438] CHIP:DMG:
           [1657894672.481562][2433:2438] CHIP:DMG:                 },
-          [1657894672.481605][2433:2438] CHIP:DMG:                 
+          [1657894672.481605][2433:2438] CHIP:DMG:
           [1657894672.481639][2433:2438] CHIP:DMG:         ],
-          [1657894672.481686][2433:2438] CHIP:DMG:         
+          [1657894672.481686][2433:2438] CHIP:DMG:
           [1657894672.481720][2433:2438] CHIP:DMG:         InteractionModelRevision = 1
           [1657894672.481754][2433:2438] CHIP:DMG: }
       disabled: true
@@ -183,7 +183,7 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol read extension 1 0
-          On TH1(Chiptool) ,verify AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F2 
+          On TH1(Chiptool) ,verify AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F2
 
           [1657187433.621369][10890:10895] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 3415499944
           [1657187433.621422][10890:10895] CHIP:TOO:   Extension: 1 entries
@@ -199,7 +199,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read extension 2 0
 
-          On TH2(Chiptool), Verify AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1 
+          On TH2(Chiptool), Verify AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
           [1658327214.683199][2749:2754] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 2953114587
           [1658327214.683283][2749:2754] CHIP:TOO:   Extension: 1 entries
           [1658327214.683348][2749:2754] CHIP:TOO:     [1]: {
@@ -214,7 +214,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
-          On TH1(Chiptool) , Verify AccessControlExtensionChanged containing 1 element, and MUST NOT contain an element with FabricIndex F2 
+          On TH1(Chiptool) , Verify AccessControlExtensionChanged containing 1 element, and MUST NOT contain an element with FabricIndex F2
 
           [1658327494.282263][2810:2815] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
           [1658327494.282295][2810:2815] CHIP:TOO:          Event number: 5
@@ -237,7 +237,7 @@ tests:
           AccessControlExtensionChanged event"
       PICS: ACL.S.E01
       verification: |
-          ./chip-tool accesscontrol read-event access-control-extension-changed  2 
+          ./chip-tool accesscontrol read-event access-control-extension-changed  2
           On TH2(Chiptool) , Verify AccessControlExtensionChanged containing 1 element, and MUST NOT contain an element with FabricIndex F1
           [1658327551.622018][4295:4300] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
           [1658327551.622043][4295:4300] CHIP:TOO:          Event number: 6

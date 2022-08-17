@@ -45,7 +45,7 @@ tests:
           [1656652012.060820][2763:2768] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 4209633606
           [1656652012.063135][2763:2768] CHIP:TOO:   CurrentFabricIndex: 1
           [1656652012.063267][2763:2768] CHIP:EM: Sending Standalone Ack for MessageCounter:205308569 on exchange 52625i
-          [1656652012.063360][2763:2768] CHIP:IN: Prepared secure message 0xffff7b7ed958 to 0x0000000000000001 (1)  
+          [1656652012.063360][2763:2768] CHIP:IN: Prepared secure message 0xffff7b7ed958 to 0x0000000000000001 (1)
           of type 0x10 and protocolId (0, 0) on exchange 52625i with MessageCounter:187919921.
       disabled: true
 
@@ -105,14 +105,14 @@ tests:
           [1658323877.661568][2502:2507] CHIP:DMG:                                 Cluster = 0x1f,
           [1658323877.661657][2502:2507] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1658323877.661744][2502:2507] CHIP:DMG:                         }
-          [1658323877.661838][2502:2507] CHIP:DMG:                                 
+          [1658323877.661838][2502:2507] CHIP:DMG:
           [1658323877.661920][2502:2507] CHIP:DMG:                         StatusIB =
           [1658323877.662004][2502:2507] CHIP:DMG:                         {
           [1658323877.662084][2502:2507] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1658323877.662167][2502:2507] CHIP:DMG:                         },
-          [1658323877.662243][2502:2507] CHIP:DMG:                         
+          [1658323877.662243][2502:2507] CHIP:DMG:
           [1658323877.662309][2502:2507] CHIP:DMG:                 },
-          [1658323877.662398][2502:2507] CHIP:DMG:                 
+          [1658323877.662398][2502:2507] CHIP:DMG:
           [1658323877.662458][2502:2507] CHIP:DMG:                 AttributeStatusIB =
           [1658323877.662527][2502:2507] CHIP:DMG:                 {
           [1658323877.662590][2502:2507] CHIP:DMG:                         AttributePathIB =
@@ -122,14 +122,14 @@ tests:
           [1658323877.662939][2502:2507] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1658323877.663079][2502:2507] CHIP:DMG:                                 ListIndex = Null,
           [1658323877.663151][2502:2507] CHIP:DMG:                         }
-          [1658323877.663228][2502:2507] CHIP:DMG:                                 
+          [1658323877.663228][2502:2507] CHIP:DMG:
           [1658323877.663298][2502:2507] CHIP:DMG:                         StatusIB =
           [1658323877.663364][2502:2507] CHIP:DMG:                         {
           [1658323877.663428][2502:2507] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1658323877.663500][2502:2507] CHIP:DMG:                         },
-          [1658323877.663566][2502:2507] CHIP:DMG:                         
+          [1658323877.663566][2502:2507] CHIP:DMG:
           [1658323877.663624][2502:2507] CHIP:DMG:                 },
-          [1658323877.663703][2502:2507] CHIP:DMG:                 
+          [1658323877.663703][2502:2507] CHIP:DMG:
           [1658323877.663754][2502:2507] CHIP:DMG:                 AttributeStatusIB =
           [1658323877.663814][2502:2507] CHIP:DMG:                 {
           [1658323877.663871][2502:2507] CHIP:DMG:                         AttributePathIB =
@@ -139,14 +139,14 @@ tests:
           [1658323877.664147][2502:2507] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1658323877.664214][2502:2507] CHIP:DMG:                                 ListIndex = Null,
           [1658323877.664278][2502:2507] CHIP:DMG:                         }
-          [1658323877.664350][2502:2507] CHIP:DMG:                                 
+          [1658323877.664350][2502:2507] CHIP:DMG:
           [1658323877.664414][2502:2507] CHIP:DMG:                         StatusIB =
           [1658323877.664477][2502:2507] CHIP:DMG:                         {
           [1658323877.664541][2502:2507] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1658323877.664606][2502:2507] CHIP:DMG:                         },
-          [1658323877.664670][2502:2507] CHIP:DMG:                         
+          [1658323877.664670][2502:2507] CHIP:DMG:
           [1658323877.664727][2502:2507] CHIP:DMG:                 },
-          [1658323877.664800][2502:2507] CHIP:DMG:                 
+          [1658323877.664800][2502:2507] CHIP:DMG:
           [1658323877.664850][2502:2507] CHIP:DMG:                 AttributeStatusIB =
           [1658323877.664910][2502:2507] CHIP:DMG:                 {
           [1658323877.664967][2502:2507] CHIP:DMG:                         AttributePathIB =
@@ -156,16 +156,16 @@ tests:
           [1658323877.665240][2502:2507] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1658323877.665313][2502:2507] CHIP:DMG:                                 ListIndex = Null,
           [1658323877.665384][2502:2507] CHIP:DMG:                         }
-          [1658323877.665453][2502:2507] CHIP:DMG:                                 
+          [1658323877.665453][2502:2507] CHIP:DMG:
           [1658323877.665515][2502:2507] CHIP:DMG:                         StatusIB =
           [1658323877.665577][2502:2507] CHIP:DMG:                         {
           [1658323877.665643][2502:2507] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1658323877.665708][2502:2507] CHIP:DMG:                         },
-          [1658323877.665771][2502:2507] CHIP:DMG:                         
+          [1658323877.665771][2502:2507] CHIP:DMG:
           [1658323877.665828][2502:2507] CHIP:DMG:                 },
-          [1658323877.665889][2502:2507] CHIP:DMG:                 
+          [1658323877.665889][2502:2507] CHIP:DMG:
           [1658323877.665938][2502:2507] CHIP:DMG:         ],
-          [1658323877.666020][2502:2507] CHIP:DMG:         
+          [1658323877.666020][2502:2507] CHIP:DMG:
           [1658323877.666070][2502:2507] CHIP:DMG:         InteractionModelRevision = 1
           [1658323877.666119][2502:2507] CHIP:DMG: }
           [1658323877.666433][2502:2507] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -313,7 +313,7 @@ tests:
       PICS: ACL.S.A0000
       verification: |
           ./chip-tool accesscontrol read acl 1 0
-          On TH1(Chiptool), Verify Successfully AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 3 elements 
+          On TH1(Chiptool), Verify Successfully AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 3 elements
           9800.959293][4892:4897] CHIP:DMG:
           [1658229800.959325][4892:4897] CHIP:DMG:        ],
           [1658229800.959399][4892:4897] CHIP:DMG:
@@ -686,7 +686,7 @@ tests:
           Group (3) Subjects field: [555, 666, 777, 888] Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, 
+          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
           { "privilege": 1, "authMode": 2, "subjects":  [111, 222, 333, 444], "targets": null},
           { "privilege": 3, "authMode": 3, "subjects":  [555, 666, 777, 888], "targets": null}]" 1 0
           On TH1(Chiptool) , Verify   Successfully to acl attribute  value is list of AccessControlEntryStruct containing 3 elements as Target Null.
@@ -925,7 +925,7 @@ tests:
           (2) AuthMode field: CASE (2) Subjects field: null Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, 
+          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
           { "privilege": 2, "authMode": 2, "subjects": null, "targets": null}]" 1 0
           On TH1(Chiptool), Verify  Successfully that  acl attribute with a  value is list of AccessControlEntryStruct containing 2 elements as Subject and Target as null
           [1656507439.868495][3249:3254] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -1394,7 +1394,7 @@ tests:
           AccessControlEntriesPerFabric attribute"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol read access-control-entries-per-fabric 1 0 
+          ./chip-tool accesscontrol read access-control-entries-per-fabric 1 0
           On TH1(Chiptool), verify with value 3  or greater as AccessControlEntriesPerFabric.
 
           [1656594850.964909][4043:4048] CHIP:DMG:        AttributeReportIBs =
@@ -1785,7 +1785,7 @@ tests:
 
 
 
-          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using 
+          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Privilege  for second element path Returns CONSTRAINT_ERROR (0x87)
 
           [1658476127.774933][3171:3176] CHIP:EM: Removed CHIP MessageCounter:240294498 from RetransTable on exchange 6954i
@@ -1864,7 +1864,7 @@ tests:
           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
            { "privilege": 3, "authMode": 4, "subjects": [], "targets":null}]" 1 0
 
-          On TH(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using 
+          On TH(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Authmode  for second element path Returns CONSTRAINT_ERROR (0x87)
           [1658476412.664216][3192:3197] CHIP:DMG: WriteResponseMessage =
           [1658476412.664247][3192:3197] CHIP:DMG: {
@@ -1939,7 +1939,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
            { "privilege": 3, "authMode": 2, "subjects": [0], "targets":null}]" 1 0
-          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using 
+          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Subject Field  for second element path Returns CONSTRAINT_ERROR (0x87)
           [1658476622.665126][3229:3234] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1658476622.665195][3229:3234] CHIP:DMG: WriteResponseMessage =
@@ -2016,7 +2016,7 @@ tests:
           { "privilege": 3, "authMode": 2, "subjects": [18446744073709551615], "targets":null}]" 1 0
 
 
-          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using 
+          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Subject Field  for second element path Returns CONSTRAINT_ERROR (0x87)
           1658476861.356730][3250:3255] CHIP:DMG: {
           [1658476861.356767][3250:3255] CHIP:DMG:        AttributeStatusIBs =
@@ -2089,7 +2089,7 @@ tests:
       PICS: ACL.S.A0000
       verification: |
           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": [18446744060824649728], "targets": null}]" 1 0
-          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using 
+          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Subject Field  for second element path Returns CONSTRAINT_ERROR (0x87)
           8477037.056167][3264:3269] CHIP:DMG:                {
           [1658477037.056200][3264:3269] CHIP:DMG:                        AttributePathIB =
@@ -2161,7 +2161,7 @@ tests:
           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
           { "privilege": 3, "authMode": 2, "subjects": [18446744073709486080], "targets":null}]" 1 0
 
-          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using 
+          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Subject Field  for second element path Returns CONSTRAINT_ERROR (0x87)
           658477229.869987][3634:3640] CHIP:EM: Removed CHIP MessageCounter:189477251 from RetransTable on exchange 22058i
           [1658477229.870031][3634:3640] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -2234,7 +2234,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": null, "endpoint": null, "deviceType": null }]}]" 1 0
 
-          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using 
+          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Target Field  for second element path Returns CONSTRAINT_ERROR (0x87)
           1658477371.966712][3679:3684] CHIP:EM: Removed CHIP MessageCounter:138419251 from RetransTable on exchange 40076i
           [1658477371.966756][3679:3684] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -2310,7 +2310,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": 4294967295, "endpoint": null, "deviceType": null }]}]" 1 0
 
-          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using 
+          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Target Field  for second element path Returns CONSTRAINT_ERROR (0x87)
           [1657617852.177018][8933:8938] CHIP:DMG: WriteResponseMessage =
           [1657617852.177055][8933:8938] CHIP:DMG: {
@@ -2384,7 +2384,7 @@ tests:
       PICS: ACL.S.A0000
       verification: |
           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": null, "endpoint": 65535, "deviceType": null }]}]" 1 0
-          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using 
+          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Target field  for second element path Returns CONSTRAINT_ERROR (0x87)
           [1657617920.044059][8948:8953] CHIP:DMG: {
           [1657617920.044085][8948:8953] CHIP:DMG:        AttributeStatusIBs =
@@ -2457,7 +2457,7 @@ tests:
       PICS: ACL.S.A0000
       verification: |
           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": null, "endpoint": null, "deviceType": 4294967295 }]}]" 1 0
-          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using 
+          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Target field   for second element path Returns CONSTRAINT_ERROR (0x87)
 
 
@@ -2533,7 +2533,7 @@ tests:
       PICS: ACL.S.A0000
       verification: |
           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": null, "endpoint": 22, "deviceType": 33 }]}]" 1 0
-          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using 
+          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Target field  for second element path Returns CONSTRAINT_ERROR (0x87)
           [1658477583.616961][3701:3706] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1658477583.617072][3701:3706] CHIP:DMG: WriteResponseMessage =
@@ -2609,7 +2609,7 @@ tests:
       PICS: ACL.S.A0000
       verification: |
           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": 11, "endpoint": 22, "deviceType": 33 }]}]" 1 0
-          On TH1(Chiptool) , Verify   Successfully   AccessControlEntryStruct containing 2 elements using 
+          On TH1(Chiptool) , Verify   Successfully   AccessControlEntryStruct containing 2 elements using
           Invalid Target field  for second element path Returns CONSTRAINT_ERROR (0x87)
           [1658477662.415412][3710:3715] CHIP:EM: Removed CHIP MessageCounter:35384027 from RetransTable on exchange 6953i
           [1658477662.415452][3710:3715] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -2699,16 +2699,16 @@ tests:
           [1660632377.411388][3241:3246] CHIP:DMG:                                 Cluster = 0x1f,
           [1660632377.411423][3241:3246] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1660632377.411456][3241:3246] CHIP:DMG:                         }
-          [1660632377.411496][3241:3246] CHIP:DMG:                                 
+          [1660632377.411496][3241:3246] CHIP:DMG:
           [1660632377.411528][3241:3246] CHIP:DMG:                         StatusIB =
           [1660632377.411563][3241:3246] CHIP:DMG:                         {
           [1660632377.411596][3241:3246] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1660632377.411628][3241:3246] CHIP:DMG:                         },
-          [1660632377.411687][3241:3246] CHIP:DMG:                         
+          [1660632377.411687][3241:3246] CHIP:DMG:
           [1660632377.411717][3241:3246] CHIP:DMG:                 },
-          [1660632377.411748][3241:3246] CHIP:DMG:                 
+          [1660632377.411748][3241:3246] CHIP:DMG:
           [1660632377.411775][3241:3246] CHIP:DMG:         ],
-          [1660632377.411804][3241:3246] CHIP:DMG:         
+          [1660632377.411804][3241:3246] CHIP:DMG:
           [1660632377.411828][3241:3246] CHIP:DMG:         InteractionModelRevision = 1
           [1660632377.411851][3241:3246] CHIP:DMG: }
           [1660632377.411922][3241:3246] CHIP:DMG: WriteClient moving to [AwaitingDe]

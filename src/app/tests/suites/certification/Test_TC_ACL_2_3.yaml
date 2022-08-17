@@ -162,7 +162,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
 
-          On TH1(Chiptool) , Verify  AccessControl cluster Extension attribute, contains the list of AccessControlExtensionStruct containing 1 element  .                             
+          On TH1(Chiptool) , Verify  AccessControl cluster Extension attribute, contains the list of AccessControlExtensionStruct containing 1 element  .
 
 
           [1656416899.781899][3814:3819] CHIP:DMG: WriteResponseMessage =
@@ -335,7 +335,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read extension 1 0
           On TH1(Chiptool) , Verify AccessControlExtensionStructcontaining 1 element                                                                     1.struct
-          Data field: 
+          Data field:
           D_OK_FULL  :"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003148656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E0018"
 
 
@@ -628,7 +628,7 @@ tests:
           ./chip-tool accesscontrol read extension 1 0
 
           On TH1(Chiptool) , Verify Successfully the list of AccessControlExtensionStruct containing 1 element.
-            
+
 
           1657279968.695899][9221:9226] CHIP:DMG: ReportDataMessage =
           [1657279968.695931][9221:9226] CHIP:DMG: {
