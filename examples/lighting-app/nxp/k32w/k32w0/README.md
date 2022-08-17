@@ -169,19 +169,22 @@ will be initiated.
 
 ### Identify cluster LED state
 
-The Identify cluster server supports two identification commands: **Identify** and **TriggerEffect**. These commands allow a user to identify a particular device. For these commands, the **LED D3** is used.
+The Identify cluster server supports two identification commands: **Identify**
+and **TriggerEffect**. These commands allow a user to identify a particular
+device. For these commands, the **LED D3** is used.
 
-The **Identify command** will use the **LED D3** to flash with a period of 0.5 seconds.
+The **Identify command** will use the **LED D3** to flash with a period of 0.5
+seconds.
 
-The **TriggerEffect command** will use the **LED D3** with the following effects:
+The **TriggerEffect command** will use the **LED D3** with the following
+effects:
 
-* _Blink_ &mdash; flash with a 1 second period for 2 seconds
-* _Breathe_ &mdash; flash with a 1 second period for 15 seconds
-* _Okay_ &mdash; flash with a 1 second period for 4 seconds
-* _Channel change_ &mdash; same as Blink
-* _Finish effect_ &mdash; complete current effect sequence and terminate
-* _Stop effect_ &mdash; terminate as soon as possible
-
+-   _Blink_ &mdash; flash with a 1 second period for 2 seconds
+-   _Breathe_ &mdash; flash with a 1 second period for 15 seconds
+-   _Okay_ &mdash; flash with a 1 second period for 4 seconds
+-   _Channel change_ &mdash; same as Blink
+-   _Finish effect_ &mdash; complete current effect sequence and terminate
+-   _Stop effect_ &mdash; terminate as soon as possible
 
 <a name="building"></a>
 
