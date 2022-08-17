@@ -24,8 +24,8 @@
 #include "AppEvent.h"
 #include "LightingManager.h"
 
-#include <platform/CHIPDeviceLayer.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include "FreeRTOS.h"
 #include "timers.h"
@@ -51,9 +51,9 @@ public:
     void UpdateDeviceState(void);
 
     // Identify cluster callbacks.
-    static void OnIdentifyStart(Identify* identify);
-    static void OnIdentifyStop(Identify* identify);
-    static void OnTriggerEffect(Identify* identify);
+    static void OnIdentifyStart(Identify * identify);
+    static void OnIdentifyStop(Identify * identify);
+    static void OnTriggerEffect(Identify * identify);
     static void OnTriggerEffectComplete(chip::System::Layer * systemLayer, void * appState);
 
 private:
@@ -103,7 +103,7 @@ private:
         kFunction_FactoryReset,
         kFunctionTurnOnTurnOff,
         kFunction_Identify,
-		kFunction_TriggerEffect,
+        kFunction_TriggerEffect,
 
         kFunction_Invalid
     } Function;

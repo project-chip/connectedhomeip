@@ -179,7 +179,7 @@ void MatterIdentifyClusterServerAttributeChangedCallback(const app::ConcreteAttr
                 /* finish identify process */
                 if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT == identify->mCurrentEffectIdentifier && identifyTime > 0)
                 {
-                	Clusters::Identify::Attributes::IdentifyTime::Set(endpoint, 1);
+                    Clusters::Identify::Attributes::IdentifyTime::Set(endpoint, 1);
                 }
                 /* stop identify process */
                 if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT == identify->mCurrentEffectIdentifier && identifyTime > 0)
