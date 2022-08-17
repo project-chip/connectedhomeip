@@ -1762,7 +1762,7 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Binding" client="false" server="false" clientLocked="true" serverLocked="false">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
             <include cluster="Scenes" client="false" server="false" clientLocked="true" serverLocked="false">
@@ -1799,7 +1799,7 @@ limitations under the License.
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
             <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-	    <include cluster="Time Synchronization" client="true" server="true" clientLocked="true" serverLocked="true"></include>
+	    <include cluster="Time Synchronization" client="false" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Thermostat User Interface Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Fan Control" client="false" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="false" serverLocked="true"></include>
