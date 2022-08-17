@@ -39,7 +39,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-temp-physical-min-mireds 1 1
 
-          Verify in TH(all-clusters-app) log:
+
+          Verify response contains an ColorTempPhysicalMinMireds in  TH(all-clusters-app)  Logs:
           [1658215472.478274][3413:3413] CHIP:IM: Received Read request
           [1658215472.478456][3413:3413] CHIP:DMG: ReadRequestMessage =
           [1658215472.478527][3413:3413] CHIP:DMG: {
@@ -67,7 +68,8 @@ tests:
 
           ./chip-tool colorcontrol read color-temp-physical-max-mireds 1 1
 
-          Verify in TH(all-clusters-app) log:
+
+          Verify response contains an ColorTempPhysicalMaxMireds in  TH(all-clusters-app)  Logs:
           [1658215497.166720][3413:3413] CHIP:IM: Received Read request
           [1658215497.166886][3413:3413] CHIP:DMG: ReadRequestMessage =
           [1658215497.166949][3413:3413] CHIP:DMG: {
@@ -98,7 +100,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol move-to-color-temperature 150 300 0 0 1 1
 
-          Verify in TH(all-clusters-app) log:
+
+          Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
           [1657911906.102478][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657911906.102603][2977:2977] CHIP:DMG: {
           [1657911906.102633][2977:2977] CHIP:DMG:        suppressResponse = false,
@@ -139,22 +142,23 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-temperature 1 1
 
-          Verify in TH(all-clusters-app) log:
+
+          Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
           [1659955633.975562][2718:2718] CHIP:DMG: ReadRequestMessage =
           [1659955633.975617][2718:2718] CHIP:DMG: {
-          [1659955633.975650][2718:2718] CHIP:DMG: 	AttributePathIBs =
-          [1659955633.975689][2718:2718] CHIP:DMG: 	[
-          [1659955633.975738][2718:2718] CHIP:DMG: 		AttributePathIB =
-          [1659955633.975779][2718:2718] CHIP:DMG: 		{
-          [1659955633.975834][2718:2718] CHIP:DMG: 			Endpoint = 0x1,
-          [1659955633.975894][2718:2718] CHIP:DMG: 			Cluster = 0x300,
-          [1659955633.975941][2718:2718] CHIP:DMG: 			Attribute = 0x0000_0007,
-          [1659955633.975998][2718:2718] CHIP:DMG: 		}
+          [1659955633.975650][2718:2718] CHIP:DMG:         AttributePathIBs =
+          [1659955633.975689][2718:2718] CHIP:DMG:         [
+          [1659955633.975738][2718:2718] CHIP:DMG:                 AttributePathIB =
+          [1659955633.975779][2718:2718] CHIP:DMG:                 {
+          [1659955633.975834][2718:2718] CHIP:DMG:                         Endpoint = 0x1,
+          [1659955633.975894][2718:2718] CHIP:DMG:                         Cluster = 0x300,
+          [1659955633.975941][2718:2718] CHIP:DMG:                         Attribute = 0x0000_0007,
+          [1659955633.975998][2718:2718] CHIP:DMG:                 }
           [1659955633.976040][2718:2718] CHIP:DMG:
-          [1659955633.976090][2718:2718] CHIP:DMG: 	],
+          [1659955633.976090][2718:2718] CHIP:DMG:         ],
           [1659955633.976132][2718:2718] CHIP:DMG:
-          [1659955633.976183][2718:2718] CHIP:DMG: 	isFabricFiltered = true,
-          [1659955633.976221][2718:2718] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659955633.976183][2718:2718] CHIP:DMG:         isFabricFiltered = true,
+          [1659955633.976221][2718:2718] CHIP:DMG:         InteractionModelRevision = 1
           [1659955633.976268][2718:2718] CHIP:DMG: },
           [1659955633.976388][2718:2718] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1659955633.976525][2718:2718] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
@@ -170,37 +174,39 @@ tests:
           ./chip-tool colorcontrol move-color-temperature 1 16319 0 65279 0 0 1 1
 
 
-          Verify in TH(all-clusters-app) log:
+
+
+          Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
 
           [1659955779.460043][2718:2718] CHIP:DMG: InvokeRequestMessage =
           [1659955779.460071][2718:2718] CHIP:DMG: {
-          [1659955779.460095][2718:2718] CHIP:DMG: 	suppressResponse = false,
-          [1659955779.460122][2718:2718] CHIP:DMG: 	timedRequest = false,
-          [1659955779.460147][2718:2718] CHIP:DMG: 	InvokeRequests =
-          [1659955779.460178][2718:2718] CHIP:DMG: 	[
-          [1659955779.460202][2718:2718] CHIP:DMG: 		CommandDataIB =
-          [1659955779.460230][2718:2718] CHIP:DMG: 		{
-          [1659955779.460263][2718:2718] CHIP:DMG: 			CommandPathIB =
-          [1659955779.460300][2718:2718] CHIP:DMG: 			{
-          [1659955779.460334][2718:2718] CHIP:DMG: 				EndpointId = 0x1,
-          [1659955779.460372][2718:2718] CHIP:DMG: 				ClusterId = 0x300,
-          [1659955779.460409][2718:2718] CHIP:DMG: 				CommandId = 0x4b,
-          [1659955779.460444][2718:2718] CHIP:DMG: 			},
+          [1659955779.460095][2718:2718] CHIP:DMG:         suppressResponse = false,
+          [1659955779.460122][2718:2718] CHIP:DMG:         timedRequest = false,
+          [1659955779.460147][2718:2718] CHIP:DMG:         InvokeRequests =
+          [1659955779.460178][2718:2718] CHIP:DMG:         [
+          [1659955779.460202][2718:2718] CHIP:DMG:                 CommandDataIB =
+          [1659955779.460230][2718:2718] CHIP:DMG:                 {
+          [1659955779.460263][2718:2718] CHIP:DMG:                         CommandPathIB =
+          [1659955779.460300][2718:2718] CHIP:DMG:                         {
+          [1659955779.460334][2718:2718] CHIP:DMG:                                 EndpointId = 0x1,
+          [1659955779.460372][2718:2718] CHIP:DMG:                                 ClusterId = 0x300,
+          [1659955779.460409][2718:2718] CHIP:DMG:                                 CommandId = 0x4b,
+          [1659955779.460444][2718:2718] CHIP:DMG:                         },
           [1659955779.460477][2718:2718] CHIP:DMG:
-          [1659955779.460504][2718:2718] CHIP:DMG: 			CommandFields =
-          [1659955779.460539][2718:2718] CHIP:DMG: 			{
-          [1659955779.460572][2718:2718] CHIP:DMG: 				0x0 = 1,
-          [1659955779.460608][2718:2718] CHIP:DMG: 				0x1 = 16319,
-          [1659955779.460646][2718:2718] CHIP:DMG: 				0x2 = 0,
-          [1659955779.460683][2718:2718] CHIP:DMG: 				0x3 = 65279,
-          [1659955779.460717][2718:2718] CHIP:DMG: 				0x4 = 0,
-          [1659955779.460755][2718:2718] CHIP:DMG: 				0x5 = 0,
-          [1659955779.460791][2718:2718] CHIP:DMG: 			},
-          [1659955779.460820][2718:2718] CHIP:DMG: 		},
+          [1659955779.460504][2718:2718] CHIP:DMG:                         CommandFields =
+          [1659955779.460539][2718:2718] CHIP:DMG:                         {
+          [1659955779.460572][2718:2718] CHIP:DMG:                                 0x0 = 1,
+          [1659955779.460608][2718:2718] CHIP:DMG:                                 0x1 = 16319,
+          [1659955779.460646][2718:2718] CHIP:DMG:                                 0x2 = 0,
+          [1659955779.460683][2718:2718] CHIP:DMG:                                 0x3 = 65279,
+          [1659955779.460717][2718:2718] CHIP:DMG:                                 0x4 = 0,
+          [1659955779.460755][2718:2718] CHIP:DMG:                                 0x5 = 0,
+          [1659955779.460791][2718:2718] CHIP:DMG:                         },
+          [1659955779.460820][2718:2718] CHIP:DMG:                 },
           [1659955779.460851][2718:2718] CHIP:DMG:
-          [1659955779.460875][2718:2718] CHIP:DMG: 	],
+          [1659955779.460875][2718:2718] CHIP:DMG:         ],
           [1659955779.460907][2718:2718] CHIP:DMG:
-          [1659955779.460931][2718:2718] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659955779.460931][2718:2718] CHIP:DMG:         InteractionModelRevision = 1
           [1659955779.460954][2718:2718] CHIP:DMG: },
           [1659955779.461068][2718:2718] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=o
           [1659955779.461110][2718:2718] CHIP:DMG: AccessControl: allowed
@@ -218,22 +224,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-temperature 1 1
 
-          Verify in TH(all-clusters-app) log:
+
+
+          Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
           [1659955633.975562][2718:2718] CHIP:DMG: ReadRequestMessage =
           [1659955633.975617][2718:2718] CHIP:DMG: {
-          [1659955633.975650][2718:2718] CHIP:DMG: 	AttributePathIBs =
-          [1659955633.975689][2718:2718] CHIP:DMG: 	[
-          [1659955633.975738][2718:2718] CHIP:DMG: 		AttributePathIB =
-          [1659955633.975779][2718:2718] CHIP:DMG: 		{
-          [1659955633.975834][2718:2718] CHIP:DMG: 			Endpoint = 0x1,
-          [1659955633.975894][2718:2718] CHIP:DMG: 			Cluster = 0x300,
-          [1659955633.975941][2718:2718] CHIP:DMG: 			Attribute = 0x0000_0007,
-          [1659955633.975998][2718:2718] CHIP:DMG: 		}
+          [1659955633.975650][2718:2718] CHIP:DMG:         AttributePathIBs =
+          [1659955633.975689][2718:2718] CHIP:DMG:         [
+          [1659955633.975738][2718:2718] CHIP:DMG:                 AttributePathIB =
+          [1659955633.975779][2718:2718] CHIP:DMG:                 {
+          [1659955633.975834][2718:2718] CHIP:DMG:                         Endpoint = 0x1,
+          [1659955633.975894][2718:2718] CHIP:DMG:                         Cluster = 0x300,
+          [1659955633.975941][2718:2718] CHIP:DMG:                         Attribute = 0x0000_0007,
+          [1659955633.975998][2718:2718] CHIP:DMG:                 }
           [1659955633.976040][2718:2718] CHIP:DMG:
-          [1659955633.976090][2718:2718] CHIP:DMG: 	],
+          [1659955633.976090][2718:2718] CHIP:DMG:         ],
           [1659955633.976132][2718:2718] CHIP:DMG:
-          [1659955633.976183][2718:2718] CHIP:DMG: 	isFabricFiltered = true,
-          [1659955633.976221][2718:2718] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659955633.976183][2718:2718] CHIP:DMG:         isFabricFiltered = true,
+          [1659955633.976221][2718:2718] CHIP:DMG:         InteractionModelRevision = 1
           [1659955633.976268][2718:2718] CHIP:DMG: },
           [1659955633.976388][2718:2718] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1659955633.976525][2718:2718] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
@@ -248,7 +256,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol step-color-temperature 1 32639 200 0 65279 0 0 1 1
 
-          Verify in TH(all-clusters-app) log:
+
+
+          Verify the all fields are within their allowed bounds in CommandFields on  TH(all-clusters-app)  Logs:
 
           [1659955888.144223][2718:2718] CHIP:DMG: InvokeRequestMessage =
           [1659955888.144251][2718:2718] CHIP:DMG: {
@@ -294,11 +304,10 @@ tests:
     - label:
           "DUT reads ColorTemperatureMired attribute from TH (potentially
           multiple times)"
-      PICS: CC.C.C4c.Rsp && CC.C.A0007
+      PICS: CC.C.C4c.Rsp & CC.C.A0007
       verification: |
           ./chip-tool colorcontrol read color-temperature 1 1
-
-          Verify in TH(all-clusters-app) log:
+          Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
           [1659955633.975562][2718:2718] CHIP:DMG: ReadRequestMessage =
           [1659955633.975617][2718:2718] CHIP:DMG: {
           [1659955633.975650][2718:2718] CHIP:DMG:         AttributePathIBs =
@@ -327,7 +336,8 @@ tests:
       PICS: CC.C.C47.Rsp
       verification: |
           ./chip-tool colorcontrol stop-move-step 0 0 1 1
-          Verify in TH(all-clusters-app) log:
+
+          Verify the all fields are within their allowed bounds in CommandFields on  TH(all-clusters-app)  Logs:
 
 
           [1659955999.857777][2718:2718] CHIP:DMG: InvokeRequestMessage =
@@ -373,7 +383,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-temperature 1 1
 
-          Verify in TH(all-clusters-app) log:
+          Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
           [1659955633.975562][2718:2718] CHIP:DMG: ReadRequestMessage =
           [1659955633.975617][2718:2718] CHIP:DMG: {
           [1659955633.975650][2718:2718] CHIP:DMG:         AttributePathIBs =
@@ -396,4 +406,14 @@ tests:
           [1659955633.976610][2718:2718] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0007 (expanded=0)
           [1659955633.976650][2718:2718] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
           [1659955633.976696][2718:2718] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label: ""
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label: ""
+      verification: |
+          verification step to be updated.
       disabled: true

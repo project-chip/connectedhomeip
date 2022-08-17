@@ -26,7 +26,11 @@ config:
 tests:
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
-          verification step to be updated.
+          DUT
+          sudo ./chip-all-clusters-app
+
+          TH1
+          ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
       disabled: true
 
     - label:
@@ -35,7 +39,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials  read  current-fabric-index 1 0
 
-          On TH(Chiptool), verify CurrentFabricIndex attribute of operationalCredential cluster  as 1
+          On TH1(Chiptool), verify CurrentFabricIndex attribute of operationalCredential cluster  as 1
 
 
           [1656581567.459433][2846:2851] CHIP:EM: Removed CHIP MessageCounter:147498618 from RetransTable on exchange 16019i
@@ -77,7 +81,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol  read-event access-control-entry-changed 1 0
 
-          On TH(Chiptool) , Verify AccessControl cluster AccessControlEntryChanged event  containing 1 element
+          On TH1(Chiptool) , Verify AccessControl cluster AccessControlEntryChanged event  containing 1 element
 
 
           [[1657618697.392815][9079:9084] CHIP:DMG:
@@ -148,9 +152,9 @@ tests:
           AuthMode field: Group (3) Subjects field: null Targets field: null"
       PICS: ACL.S.E00
       verification: |
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
-          {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects": [], "targets":null}]" 1 0
-          On TH(Chiptool) , Verify AccessControl cluster AccessControlEntryChanged event  containing 2 elements
+          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
+          { "privilege": 3, "authMode": 3, "subjects": [], "targets":null}]" 1 0
+          On TH1(Chiptool) , Verify AccessControl cluster AccessControlEntryChanged event  containing 2 elements
 
           [[1657545728.526415][3928:3933] CHIP:DMG: WriteResponseMessage =
           [1657545728.526460][3928:3933] CHIP:DMG: {
@@ -219,7 +223,7 @@ tests:
       verification: |
           ./chip-tool  accesscontrol  read-event  access-control-entry-changed  1 0
 
-          On TH(Chiptool) , Verify AccessControl cluster AccessControlEntryChanged event   containing at least 3 new elements
+          On TH1(Chiptool) , Verify AccessControl cluster AccessControlEntryChanged event   containing at least 3 new elements
 
           [1657618772.535125][9091:9096] CHIP:DMG:
           [1657618772.535162][9091:9096] CHIP:DMG:        SuppressResponse = true,
@@ -305,8 +309,8 @@ tests:
           (3) AuthMode field: Group (3) Subjects field: null Targets field: null"
       PICS: ACL.S.E00
       verification: |
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects": null, "targets":null}]" 1 0
-          On TH(Chiptool)  ,verify AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements
+          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 3, "subjects": null, "targets":null}]" 1 0
+          On TH1(Chiptool)  ,verify AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements
 
           58813102.344539][2489:2494] CHIP:EM: Removed CHIP MessageCounter:131488146 from RetransTable on exchange 37188i
           [1658813102.344581][2489:2494] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -379,7 +383,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read-event access-control-entry-changed 1 0
 
-          On TH(Chiptool) , Verify AccessControl cluster AccessControlEntryChanged event containing
+          On TH1(Chiptool) , Verify AccessControl cluster AccessControlEntryChanged event containing
            at least 3 new elements and MUST NOT contain an added event for the third entry
 
           1658813186.871698][2504:2509] CHIP:DMG:        ],

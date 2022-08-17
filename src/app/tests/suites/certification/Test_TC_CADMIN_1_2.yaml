@@ -114,7 +114,7 @@ tests:
           On second Controller connect to the accessory.
 
           Below is the example when using chip tool as controller
-          ./chip-tool pairing onnetwork 2 20202021
+          ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
 
           Verify you got below message
           Device commissioning completed with success
@@ -147,7 +147,7 @@ tests:
           On the 2nd controller write attribute and read attribute to and from TH_CE
 
           Below is the example while using chip tool on second controller,
-          ./chip-tool basic write  node-label te5new 2 0
+          ./chip-tool basic write  node-label te5new 2 0 --commissioner-name beta
 
           CHIP:DMG: WriteResponseMessage =
           [1649245940.788522][10110:10115] CHIP:DMG: {
@@ -177,7 +177,7 @@ tests:
 
 
           Verify read attribute returns the updated value written
-          ./chip-tool basic read node-label 1 0
+          ./chip-tool basic read node-label 1 0 --commissioner-name beta
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
           [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te5new
           [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
@@ -190,7 +190,7 @@ tests:
           On second controller controller read fabricList
 
           Below is the example while using chip tool on second controller,
-          ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0
+          ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0 --commissioner-name beta
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 3229397217
           [1650277071.834099][40790:40795] CHIP:TOO:   Fabrics: 2 entries
@@ -265,7 +265,7 @@ tests:
 
 
           Below is the example while using chip tool on second controller,
-          ./chip-tool basic write node-label te5new 2 0
+          ./chip-tool basic write node-label te5new 2 0 --commissioner-name beta
 
           CHIP:DMG: WriteResponseMessage =
           [1649245940.788522][10110:10115] CHIP:DMG: {
@@ -295,7 +295,7 @@ tests:
 
           Verify read attribute returns the updated value written
 
-          ./chip-tool basic read node-label 2 0
+          ./chip-tool basic read node-label 2 0 --commissioner-name beta
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
           [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te5new
           [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
@@ -315,7 +315,7 @@ tests:
           On second controller using chip-tool open commissioning widow using BCM.
 
           Below is the example while using chip tool on second controller,
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000  --commissioner-name beta
 
 
           CHIP:DMG: InvokeResponseMessage =
@@ -359,7 +359,7 @@ tests:
           On second controller using chip-tool run revoke command
 
           Below is the example while using chip tool on second controller,
-          ./chip-tool administratorcommissioning revoke-commissioning 2 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning revoke-commissioning 2 0 --timedInteractionTimeoutMs 1000 --commissioner-name beta
 
 
           CHIP:DMG: InvokeResponseMessage =
@@ -401,7 +401,7 @@ tests:
       PICS: CADMIN.C
       verification: |
           1. On third controller, using chip-tool connect to the accessory. Connect attempt should fail, i.e
-          ./chip-tool pairing onnetwork 3 20202021
+          ./chip-tool pairing onnetwork 3 20202021 --commissioner-name gamma
 
           verify you got the following message in the TH log
 
@@ -418,7 +418,7 @@ tests:
           On second controller, write attribute and read attribute to and from TH_CE
 
           Below is the example while using chip tool on second controller,
-          ./chip-tool basic write node-label te5new 2 0
+          ./chip-tool basic write node-label te5new 2 0 --commissioner-name beta
 
           CHIP:DMG: WriteResponseMessage =
           [1649245940.788522][10110:10115] CHIP:DMG: {
@@ -447,7 +447,7 @@ tests:
           [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
           Verify read attribute returns the updated value written
-          ./chip-tool basic read node-label 2 0
+          ./chip-tool basic read node-label 2 0 --commissioner-name beta
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
           [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te5new
           [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
@@ -461,7 +461,7 @@ tests:
           On second controller using chip-tool open commissioning widow using BCM.
 
           Below is the example while using chip tool on second controller,
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 180 2 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 180 2 0 --timedInteractionTimeoutMs 1000 --commissioner-name beta
 
 
           CHIP:DMG: InvokeResponseMessage =
@@ -511,7 +511,7 @@ tests:
           On second controller using chip-tool open commissioning widow using BCM.
 
           Below is the example while using chip tool on second controller,
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000 --commissioner-name beta
 
 
           CHIP:DMG: InvokeResponseMessage =
