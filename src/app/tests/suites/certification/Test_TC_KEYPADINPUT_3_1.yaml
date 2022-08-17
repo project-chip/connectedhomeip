@@ -15,6 +15,9 @@
 
 name: 3.3.1. [TC-KEYPADINPUT-3.1] Send Key Command Verification (DUT as Client)
 
+PICS:
+    - KEYPADINPUT.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
