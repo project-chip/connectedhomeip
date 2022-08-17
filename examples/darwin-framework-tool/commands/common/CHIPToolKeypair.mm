@@ -17,6 +17,7 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
 @property (nonatomic) chip::Crypto::P256Keypair mIssuer;
 @property (nonatomic) NSData * ipk;
 @property (atomic) uint32_t mNow;
+@property (nonatomic, readonly) SecKeyRef mPublicKey;
 @end
 
 @implementation CHIPToolKeypair
@@ -46,16 +47,19 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
 
 - (SecKeyRef)publicKey
 {
-    chip::Crypto::P256PublicKey publicKey = _mKeyPair.Pubkey();
-    NSData * publicKeyNSData = [NSData dataWithBytes:publicKey.Bytes() length:publicKey.Length()];
-    NSDictionary * attributes = @{
-        (__bridge NSString *) kSecAttrKeyClass : (__bridge NSString *) kSecAttrKeyClassPublic,
-        (NSString *) kSecAttrKeyType : (NSString *) kSecAttrKeyTypeECSECPrimeRandom,
-        (NSString *) kSecAttrKeySizeInBits : @Public_KeySize,
-        (NSString *) kSecAttrLabel : kCHIPToolKeychainLabel,
-        (NSString *) kSecAttrApplicationTag : @CHIPPlugin_CAKeyTag,
-    };
-    return SecKeyCreateWithData((__bridge CFDataRef) publicKeyNSData, (__bridge CFDictionaryRef) attributes, nullptr);
+    if (_mPublicKey == nil) {
+        chip::Crypto::P256PublicKey publicKey = _mKeyPair.Pubkey();
+        NSData * publicKeyNSData = [NSData dataWithBytes:publicKey.Bytes() length:publicKey.Length()];
+        NSDictionary * attributes = @{
+            (__bridge NSString *) kSecAttrKeyClass : (__bridge NSString *) kSecAttrKeyClassPublic,
+            (NSString *) kSecAttrKeyType : (NSString *) kSecAttrKeyTypeECSECPrimeRandom,
+            (NSString *) kSecAttrKeySizeInBits : @Public_KeySize,
+            (NSString *) kSecAttrLabel : kCHIPToolKeychainLabel,
+            (NSString *) kSecAttrApplicationTag : @CHIPPlugin_CAKeyTag,
+        };
+        _mPublicKey = SecKeyCreateWithData((__bridge CFDataRef) publicKeyNSData, (__bridge CFDictionaryRef) attributes, nullptr);
+    }
+    return _mPublicKey;
 }
 
 - (CHIP_ERROR)Deserialize:(chip::Crypto::P256SerializedKeypair &)input
@@ -134,6 +138,13 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
     memcpy(serializedKey.Bytes(), [value bytes], [value length]);
     serializedKey.SetLength([value length]);
     return CHIP_NO_ERROR;
+}
+
+- (void)dealloc
+{
+    if (_mPublicKey) {
+        CFRelease(_mPublicKey);
+    }
 }
 
 @end

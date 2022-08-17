@@ -45,7 +45,7 @@ tests:
     - label: "Verify that the DUT sends AttestationRequest Command to TH"
       PICS: OPCREDS.C.C00.Tx
       verification: |
-          Verify the DUT send AttestationRequest Command to TH(all-clusters-app)
+          Verify that  the DUT send AttestationRequest Command to TH(all-clusters-app)
 
           [1657778307.595402][8192:8197] CHIP:CTL: Commissioning stage next step: "SendDACCertificateRequest" -> "SendAttestationRequest"
           [1657778307.595466][8192:8197] CHIP:CTL: Performing next commissioning step "SendAttestationRequest"
@@ -288,7 +288,7 @@ tests:
     - label: "Verify that the DUT sends CertificateChainRequest Command to TH"
       PICS: OPCREDS.C.C02.Tx
       verification: |
-          Verify DUT send CertificateChainRequest Command to TH (all-clusters-app)
+          Verify that the DUT send CertificateChainRequest Command to TH (all-clusters-app)
 
           [1657778306.864918][8192:8197] CHIP:CTL: Sending Certificate Chain request to 0xffff78000b60 device
           [1657778306.865059][8192:8197] CHIP:DMG: ICR moving to [AddingComm]
@@ -419,7 +419,7 @@ tests:
     - label: "Verify that the DUT Sends CSRRequest command to TH"
       PICS: OPCREDS.C.C04.Tx
       verification: |
-          Verify the DUT send CSRRequest command to TH (all-clusters-app)
+          Verify that the DUT send CSRRequest command to TH (all-clusters-app)
 
           [1657778307.949847][8192:8197] CHIP:CTL: Sending CSR request to 0xffff78000b60 device
           [1657778307.949923][8192:8197] CHIP:DMG: ICR moving to [AddingComm]
@@ -563,7 +563,7 @@ tests:
     - label: "Verify that the DUT sends AddTrustedRootCertificate command to TH"
       PICS: OPCREDS.C.C0b.Tx
       verification: |
-          Verify the DUT send AddTrustedRootCertificate command to TH (all-clusters-app)
+          Verify that the DUT send AddTrustedRootCertificate command to TH (all-clusters-app)
 
           [1657778308.179742][8192:8197] CHIP:CTL: Performing next commissioning step "SendTrustedRootCert"
           [1657778308.179769][8192:8197] CHIP:CTL: Sending root certificate to the device
@@ -683,7 +683,7 @@ tests:
     - label: "Verify that DUT sends the AddNOC Command to TH"
       PICS: OPCREDS.C.C06.Tx
       verification: |
-          Verify the DUT send AddNOC command to TH (all-clusters-app)
+          Verify that the DUT send AddNOC command to TH (all-clusters-app)
 
 
           [1657778308.374786][8192:8197] CHIP:CTL: Performing next commissioning step "SendNOC"
@@ -856,25 +856,67 @@ tests:
           "Extract the following FabricDescriptorStruct values from TH
           RootPublicKey VendorID FabricID NodeID Label"
       verification: |
-          "./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0 --trace_decode 1
 
-          Verify the following on TH (all-clusters-app)
+          Verify that the following on TH (all-clusters-app)
           1. RootPublicKey
           2. VendorID
           3. FabricID
           4. NodeID
           5. Label
 
-          [1651572032.170920][3815:3820] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2018783041
-          [1651572032.171031][3815:3820] CHIP:TOO:   Fabrics: 1 entries
-          [1651572032.171179][3815:3820] CHIP:TOO:     [1]: {
-          [1651572032.171223][3815:3820] CHIP:TOO:       RootPublicKey: 0412894491026CDACAC117D232D252EF827691D378BCCC9E8E717E6C70B3D36E4C5430FDF26B783EC579506D3E748BABFBC6D400302C72CD5BD40B152AA303724B
-          [1651572032.171262][3815:3820] CHIP:TOO:       VendorId: 65521
-          [1651572032.171296][3815:3820] CHIP:TOO:       FabricId: 1
-          [1651572032.171328][3815:3820] CHIP:TOO:       NodeId: 1
-          [1651572032.171360][3815:3820] CHIP:TOO:       Label: NodeOpeCredits1
-          [1651572032.171393][3815:3820] CHIP:TOO:       FabricIndex: 1
-          [1651572032.171427][3815:3820] CHIP:TOO:      }
+          [1660204922.048005][5770:5770] CHIP:DMG: ReportDataMessage =
+          [1660204922.048056][5770:5770] CHIP:DMG: {
+          [1660204922.048088][5770:5770] CHIP:DMG:         AttributeReportIBs =
+          [1660204922.048132][5770:5770] CHIP:DMG:         [
+          [1660204922.048168][5770:5770] CHIP:DMG:                 AttributeReportIB =
+          [1660204922.048219][5770:5770] CHIP:DMG:                 {
+          [1660204922.048273][5770:5770] CHIP:DMG:                         AttributeDataIB =
+          [1660204922.048324][5770:5770] CHIP:DMG:                         {
+          [1660204922.048383][5770:5770] CHIP:DMG:                                 DataVersion = 0x831524ff,
+          [1660204922.048431][5770:5770] CHIP:DMG:                                 AttributePathIB =
+          [1660204922.048492][5770:5770] CHIP:DMG:                                 {
+          [1660204922.048543][5770:5770] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660204922.048610][5770:5770] CHIP:DMG:                                         Cluster = 0x3e,
+          [1660204922.048674][5770:5770] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1660204922.048727][5770:5770] CHIP:DMG:                                 }
+          [1660204922.048790][5770:5770] CHIP:DMG:
+          [1660204922.048843][5770:5770] CHIP:DMG:                                 Data = [
+          [1660204922.048902][5770:5770] CHIP:DMG:
+          [1660204922.048970][5770:5770] CHIP:DMG:                                 ],
+          [1660204922.049017][5770:5770] CHIP:DMG:                         },
+          [1660204922.049066][5770:5770] CHIP:DMG:
+          [1660204922.049118][5770:5770] CHIP:DMG:                 },
+          [1660204922.049193][5770:5770] CHIP:DMG:
+          [1660204922.049229][5770:5770] CHIP:DMG:                 AttributeReportIB =
+          [1660204922.049295][5770:5770] CHIP:DMG:                 {
+          [1660204922.049337][5770:5770] CHIP:DMG:                         AttributeDataIB =
+          [1660204922.049398][5770:5770] CHIP:DMG:                         {
+          [1660204922.049451][5770:5770] CHIP:DMG:                                 DataVersion = 0x831524ff,
+          [1660204922.049515][5770:5770] CHIP:DMG:                                 AttributePathIB =
+          [1660204922.049579][5770:5770] CHIP:DMG:                                 {
+          [1660204922.049634][5770:5770] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660204922.049700][5770:5770] CHIP:DMG:                                         Cluster = 0x3e,
+          [1660204922.049753][5770:5770] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1660204922.049822][5770:5770] CHIP:DMG:                                         ListIndex = Null,
+          [1660204922.049889][5770:5770] CHIP:DMG:                                 }
+          [1660204922.049941][5770:5770] CHIP:DMG:
+          [1660204922.050000][5770:5770] CHIP:DMG:                                 Data =
+          [1660204922.050053][5770:5770] CHIP:DMG:                                 {
+          [1660204922.050116][5770:5770] CHIP:DMG:                                         0x1 = [
+          [1660204922.050196][5770:5770] CHIP:DMG:                                                         0x4, 0xe1, 0x84, 0xff, 0xff, 0x4d, 0x13, 0xdb, 0xcf, 0x38, 0x4a, 0x26, 0xa5, 0x96, 0x16, 0x99, 0xf6, 0xba, 0x71, 0xa9, 0x5e, 0xf4, 0xc5, 0x7f, 0x53, 0x28, 0xbe, 0x2f, 0x4a, 0x6c, 0x6c, 0x31, 0xd7, 0x1d, 0x43, 0xb9, 0x30, 0x1a, 0x1f, 0x82, 0x25, 0x54, 0x7a, 0x7f, 0xc4, 0x4d, 0x99, 0x81, 0x8b, 0x45, 0x48, 0xd3, 0x5d, 0x4f, 0xdb, 0xf1, 0x79, 0x29, 0x9b, 0x8e, 0xd0, 0x1b, 0x98, 0x6e, 0xd5,
+          [1660204922.050271][5770:5770] CHIP:DMG:                                         ] (65 bytes)
+          [1660204922.050324][5770:5770] CHIP:DMG:                                         0x2 = 65521,
+          [1660204922.050396][5770:5770] CHIP:DMG:                                         0x3 = 1,
+          [1660204922.050453][5770:5770] CHIP:DMG:                                         0x4 = 1,
+          [1660204922.050522][5770:5770] CHIP:DMG:                                         0x5 = "" (0 chars),
+          [1660204922.050590][5770:5770] CHIP:DMG:                                         0xfe = 1,
+          [1660204922.050641][5770:5770] CHIP:DMG:                                 },
+          [1660204922.050704][5770:5770] CHIP:DMG:                         },
+          [1660204922.050760][5770:5770] CHIP:DMG:
+          [1660204922.050812][5770:5770] CHIP:DMG:                 },
+          [1660204922.050877][5770:5770] CHIP:DMG:
+          [1660204922.050912][5770:5770] CHIP:DMG:         ],
       disabled: true
 
     - label:
@@ -886,7 +928,7 @@ tests:
           certificate,Verify that the size of Label has a maximum value of 32
           bytes."
       verification: |
-          Verify the following  on TH (all-clusters-app) log
+          Verify that the following  on TH (all-clusters-app) log
 
           1. Verify RootPublicKey is within 65 octstr in below log
           2. Verify NodeID is same as chip-node-id
@@ -894,16 +936,58 @@ tests:
           4. Verify the FabricID is same as matter-fabric-id
           5. Verify the size of Label is maximum of 32 bytes
 
-
-          [1651572032.171031][3815:3820] CHIP:TOO:   Fabrics: 1 entries
-          [1651572032.171179][3815:3820] CHIP:TOO:     [1]: {
-          [1651572032.171223][3815:3820] CHIP:TOO:       RootPublicKey: 0412894491026CDACAC117D232D252EF827691D378BCCC9E8E717E6C70B3D36E4C5430FDF26B783EC579506D3E748BABFBC6D400302C72CD5BD40B152AA303724B
-          [1651572032.171262][3815:3820] CHIP:TOO:       VendorId: 65521
-          [1651572032.171296][3815:3820] CHIP:TOO:       FabricId: 1
-          [1651572032.171328][3815:3820] CHIP:TOO:       NodeId: 1
-          [1651572032.171360][3815:3820] CHIP:TOO:       Label: NodeOpeCredits1
-          [1651572032.171393][3815:3820] CHIP:TOO:       FabricIndex: 1
-          [1651572032.171427][3815:3820] CHIP:TOO:      }
+          [1660204922.048005][5770:5770] CHIP:DMG: ReportDataMessage =
+          [1660204922.048056][5770:5770] CHIP:DMG: {
+          [1660204922.048088][5770:5770] CHIP:DMG:         AttributeReportIBs =
+          [1660204922.048132][5770:5770] CHIP:DMG:         [
+          [1660204922.048168][5770:5770] CHIP:DMG:                 AttributeReportIB =
+          [1660204922.048219][5770:5770] CHIP:DMG:                 {
+          [1660204922.048273][5770:5770] CHIP:DMG:                         AttributeDataIB =
+          [1660204922.048324][5770:5770] CHIP:DMG:                         {
+          [1660204922.048383][5770:5770] CHIP:DMG:                                 DataVersion = 0x831524ff,
+          [1660204922.048431][5770:5770] CHIP:DMG:                                 AttributePathIB =
+          [1660204922.048492][5770:5770] CHIP:DMG:                                 {
+          [1660204922.048543][5770:5770] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660204922.048610][5770:5770] CHIP:DMG:                                         Cluster = 0x3e,
+          [1660204922.048674][5770:5770] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1660204922.048727][5770:5770] CHIP:DMG:                                 }
+          [1660204922.048790][5770:5770] CHIP:DMG:
+          [1660204922.048843][5770:5770] CHIP:DMG:                                 Data = [
+          [1660204922.048902][5770:5770] CHIP:DMG:
+          [1660204922.048970][5770:5770] CHIP:DMG:                                 ],
+          [1660204922.049017][5770:5770] CHIP:DMG:                         },
+          [1660204922.049066][5770:5770] CHIP:DMG:
+          [1660204922.049118][5770:5770] CHIP:DMG:                 },
+          [1660204922.049193][5770:5770] CHIP:DMG:
+          [1660204922.049229][5770:5770] CHIP:DMG:                 AttributeReportIB =
+          [1660204922.049295][5770:5770] CHIP:DMG:                 {
+          [1660204922.049337][5770:5770] CHIP:DMG:                         AttributeDataIB =
+          [1660204922.049398][5770:5770] CHIP:DMG:                         {
+          [1660204922.049451][5770:5770] CHIP:DMG:                                 DataVersion = 0x831524ff,
+          [1660204922.049515][5770:5770] CHIP:DMG:                                 AttributePathIB =
+          [1660204922.049579][5770:5770] CHIP:DMG:                                 {
+          [1660204922.049634][5770:5770] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660204922.049700][5770:5770] CHIP:DMG:                                         Cluster = 0x3e,
+          [1660204922.049753][5770:5770] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1660204922.049822][5770:5770] CHIP:DMG:                                         ListIndex = Null,
+          [1660204922.049889][5770:5770] CHIP:DMG:                                 }
+          [1660204922.049941][5770:5770] CHIP:DMG:
+          [1660204922.050000][5770:5770] CHIP:DMG:                                 Data =
+          [1660204922.050053][5770:5770] CHIP:DMG:                                 {
+          [1660204922.050116][5770:5770] CHIP:DMG:                                         0x1 = [
+          [1660204922.050196][5770:5770] CHIP:DMG:                                                         0x4, 0xe1, 0x84, 0xff, 0xff, 0x4d, 0x13, 0xdb, 0xcf, 0x38, 0x4a, 0x26, 0xa5, 0x96, 0x16, 0x99, 0xf6, 0xba, 0x71, 0xa9, 0x5e, 0xf4, 0xc5, 0x7f, 0x53, 0x28, 0xbe, 0x2f, 0x4a, 0x6c, 0x6c, 0x31, 0xd7, 0x1d, 0x43, 0xb9, 0x30, 0x1a, 0x1f, 0x82, 0x25, 0x54, 0x7a, 0x7f, 0xc4, 0x4d, 0x99, 0x81, 0x8b, 0x45, 0x48, 0xd3, 0x5d, 0x4f, 0xdb, 0xf1, 0x79, 0x29, 0x9b, 0x8e, 0xd0, 0x1b, 0x98, 0x6e, 0xd5,
+          [1660204922.050271][5770:5770] CHIP:DMG:                                         ] (65 bytes)
+          [1660204922.050324][5770:5770] CHIP:DMG:                                         0x2 = 65521,
+          [1660204922.050396][5770:5770] CHIP:DMG:                                         0x3 = 1,
+          [1660204922.050453][5770:5770] CHIP:DMG:                                         0x4 = 1,
+          [1660204922.050522][5770:5770] CHIP:DMG:                                         0x5 = "" (0 chars),
+          [1660204922.050590][5770:5770] CHIP:DMG:                                         0xfe = 1,
+          [1660204922.050641][5770:5770] CHIP:DMG:                                 },
+          [1660204922.050704][5770:5770] CHIP:DMG:                         },
+          [1660204922.050760][5770:5770] CHIP:DMG:
+          [1660204922.050812][5770:5770] CHIP:DMG:                 },
+          [1660204922.050877][5770:5770] CHIP:DMG:
+          [1660204922.050912][5770:5770] CHIP:DMG:         ],
       disabled: true
 
     - label:
@@ -916,7 +1000,7 @@ tests:
     - label: "DUT sends UpdateNOC to TH"
       PICS: OPCREDS.C.C07.Tx
       verification: |
-          Verify  UpdateNOC Command is received in TH (all-clusters-app)
+          During commissioning, Verify that UpdateNOC Command is received in TH (all-clusters-app)
 
           [1655968444.113753][21387:21392] CHIP:CTL: Performing next commissioning step "SendNOC"
           [1655968444.113880][21387:21392] CHIP:DMG: ICR moving to [AddingComm]
@@ -1056,13 +1140,40 @@ tests:
 
           Verify NOCResponse in TH (all-clusters-app)
 
-          [1655316452.670075][7173:7178] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1655316452.670169][7173:7178] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          [1655316452.670297][7173:7178] CHIP:TOO:   NOCResponse: {
-          [1655316452.670373][7173:7178] CHIP:TOO:     statusCode: 0
-          [1655316452.670432][7173:7178] CHIP:TOO:     fabricIndex: 1
-          [1655316452.670531][7173:7178] CHIP:TOO:    }
-          [1655316452.670618][7173:7178] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1659967865.181663][3334:3334] CHIP:EM: Handling via exchange: 16044r, Delegate: 0xaaaad1123fa0
+          [1659967865.181734][3334:3334] CHIP:DMG: InvokeRequestMessage =
+          [1659967865.181761][3334:3334] CHIP:DMG: {
+          [1659967865.181784][3334:3334] CHIP:DMG: 	suppressResponse = false,
+          [1659967865.181810][3334:3334] CHIP:DMG: 	timedRequest = false,
+          [1659967865.181834][3334:3334] CHIP:DMG: 	InvokeRequests =
+          [1659967865.181865][3334:3334] CHIP:DMG: 	[
+          [1659967865.181889][3334:3334] CHIP:DMG: 		CommandDataIB =
+          [1659967865.181916][3334:3334] CHIP:DMG: 		{
+          [1659967865.181942][3334:3334] CHIP:DMG: 			CommandPathIB =
+          [1659967865.181978][3334:3334] CHIP:DMG: 			{
+          [1659967865.182009][3334:3334] CHIP:DMG: 				EndpointId = 0x0,
+          [1659967865.182045][3334:3334] CHIP:DMG: 				ClusterId = 0x3e,
+          [1659967865.182080][3334:3334] CHIP:DMG: 				CommandId = 0x9,
+          [1659967865.182113][3334:3334] CHIP:DMG: 			},
+          [1659967865.182141][3334:3334] CHIP:DMG:
+          [1659967865.182167][3334:3334] CHIP:DMG: 			CommandFields =
+          [1659967865.182197][3334:3334] CHIP:DMG: 			{
+          [1659967865.182231][3334:3334] CHIP:DMG: 				0x0 = "node1" (5 chars),
+          [1659967865.182263][3334:3334] CHIP:DMG: 			},
+          [1659967865.182291][3334:3334] CHIP:DMG: 		},
+          [1659967865.182324][3334:3334] CHIP:DMG:
+          [1659967865.182348][3334:3334] CHIP:DMG: 	],
+          [1659967865.182377][3334:3334] CHIP:DMG:
+          [1659967865.182401][3334:3334] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659967865.182424][3334:3334] CHIP:DMG: },
+          [1659967865.182488][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003E e=0 p=a
+          [1659967865.182522][3334:3334] CHIP:DMG: AccessControl: allowed
+          [1659967865.182552][3334:3334] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003E Command=0x0000_0009
+          [1659967865.182587][3334:3334] CHIP:ZCL: OpCreds: Received an UpdateFabricLabel command
+          [1659967865.182805][3334:3334] CHIP:DL: writing settings to file (/tmp/chip_kvs-RDr4XQ)
+          [1659967865.183865][3334:3334] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1659967865.183920][3334:3334] CHIP:FP: Metadata for Fabric 0x1 persisted to storage.
+          [1659967865.183948][3334:3334] CHIP:DMG: Endpoint 0, Cluster 0x0000_003E update version to 39a0c735
       disabled: true
 
     - label: "DUT reads SupportedFabrics from TH"
@@ -1070,11 +1181,31 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read supported-fabrics 1 0
 
-          Verify that the DUT reads the SupportedFabrics from TH successfully.
+          Verify that the DUT reads the SupportedFabrics from TH (all-clusters-app) successfully.
 
-          [1655316487.845378][7181:7186] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0002 DataVersion: 3651051950
-          [1655316487.845462][7181:7186] CHIP:TOO:   SupportedFabrics: 16
-          [1655316487.845588][7181:7186] CHIP:EM: Sending Standalone Ack for MessageCounter:78617313 on exchange 56287i
+          [1659967890.544053][3334:3334] CHIP:IM: Received Read request
+          [1659967890.544136][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659967890.544164][3334:3334] CHIP:DMG: {
+          [1659967890.544187][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659967890.544221][3334:3334] CHIP:DMG:         [
+          [1659967890.544241][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659967890.544270][3334:3334] CHIP:DMG:                 {
+          [1659967890.544302][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659967890.544332][3334:3334] CHIP:DMG:                         Cluster = 0x3e,
+          [1659967890.544365][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1659967890.544395][3334:3334] CHIP:DMG:                 }
+          [1659967890.544426][3334:3334] CHIP:DMG:
+          [1659967890.544452][3334:3334] CHIP:DMG:         ],
+          [1659967890.544480][3334:3334] CHIP:DMG:
+          [1659967890.544507][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659967890.544532][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659967890.544555][3334:3334] CHIP:DMG: },
+          [1659967890.544630][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659967890.544728][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659967890.544761][3334:3334] CHIP:DMG: <RE:Run> Cluster 3e, Attribute 2 is dirty
+          [1659967890.544782][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_003E Endpoint=0 AttributeId=0x0000_0002 (expanded=0)
+          [1659967890.544811][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003E e=0 p=v
+          [1659967890.544844][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads CommissionedFabrics attribute from TH"
@@ -1082,11 +1213,31 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read commissioned-fabrics 1 0
 
-          Verify that the DUT reads the CommissionedFabrics from TH successfully.
+          Verify that the DUT reads the CommissionedFabrics from TH (all-clusters-app) successfully.
 
-          [1655316495.313955][7187:7192] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0003 DataVersion: 3651051950
-          [1655316495.314037][7187:7192] CHIP:TOO:   CommissionedFabrics: 1
-          [1655316495.314170][7187:7192] CHIP:EM: Sending Standalone Ack for MessageCounter:13722116 on exchange 6110i
+          [1659967918.458246][3334:3334] CHIP:IM: Received Read request
+          [1659967918.458324][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659967918.458351][3334:3334] CHIP:DMG: {
+          [1659967918.458373][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659967918.458407][3334:3334] CHIP:DMG:         [
+          [1659967918.458431][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659967918.458458][3334:3334] CHIP:DMG:                 {
+          [1659967918.458486][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659967918.458518][3334:3334] CHIP:DMG:                         Cluster = 0x3e,
+          [1659967918.458552][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659967918.458584][3334:3334] CHIP:DMG:                 }
+          [1659967918.458614][3334:3334] CHIP:DMG:
+          [1659967918.458642][3334:3334] CHIP:DMG:         ],
+          [1659967918.458669][3334:3334] CHIP:DMG:
+          [1659967918.458695][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659967918.458720][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659967918.458743][3334:3334] CHIP:DMG: },
+          [1659967918.458816][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659967918.458899][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659967918.458928][3334:3334] CHIP:DMG: <RE:Run> Cluster 3e, Attribute 3 is dirty
+          [1659967918.458949][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_003E Endpoint=0 AttributeId=0x0000_0003 (expanded=0)
+          [1659967918.458976][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003E e=0 p=v
+          [1659967918.459009][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads TrustedRootCertificates attribute from TH"
@@ -1094,10 +1245,31 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read trusted-root-certificates 1 0
 
-          Verify that the DUT reads the TrustedRootCertificates from TH successfully.
+          Verify that the DUT reads the TrustedRootCertificates from TH  (all-clusters-app) successfully.
 
-          [1655316503.653605][7193:7198] CHIP:TOO:   TrustedRootCertificates: 1 entries
-          [1655316503.653652][7193:7198] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A3706241400182407012408013009410482DB6829DFFB76F87C61AE4B18A1DA046222539D9F633684D76E1351BABBB97A53ED21117ACCD40F83874596D293C1605E002523447C0586B8F17221813CB5F9370A3501290118240260300414E9EF7AE4B0B01FDB3568AFEE69B0C5D79799D8BC300514E9EF7AE4B0B01FDB3568AFEE69B0C5D79799D8BC18300B40D7FC04831BFBAD7E0F9BD062203B2AA8CA50938D53A0A76E386B74D3684471BCB5C771D97B2CDEE4BF74934F435B91C282E387D4CA07716A3BF725C3357D3D4318
+          [1659967942.659638][3334:3334] CHIP:IM: Received Read request
+          [1659967942.659730][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659967942.659762][3334:3334] CHIP:DMG: {
+          [1659967942.659789][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659967942.659821][3334:3334] CHIP:DMG:         [
+          [1659967942.659851][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659967942.659885][3334:3334] CHIP:DMG:                 {
+          [1659967942.659920][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659967942.659963][3334:3334] CHIP:DMG:                         Cluster = 0x3e,
+          [1659967942.660001][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0004,
+          [1659967942.660036][3334:3334] CHIP:DMG:                 }
+          [1659967942.660070][3334:3334] CHIP:DMG:
+          [1659967942.660101][3334:3334] CHIP:DMG:         ],
+          [1659967942.660135][3334:3334] CHIP:DMG:
+          [1659967942.660167][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659967942.660198][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659967942.660226][3334:3334] CHIP:DMG: },
+          [1659967942.660315][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659967942.660412][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659967942.660448][3334:3334] CHIP:DMG: <RE:Run> Cluster 3e, Attribute 4 is dirty
+          [1659967942.660474][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_003E Endpoint=0 AttributeId=0x0000_0004 (expanded=0)
+          [1659967942.660507][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003E e=0 p=v
+          [1659967942.660546][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads CurrentFabricIndex attribute from TH"
@@ -1105,11 +1277,31 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read   current-fabric-index   1 0
 
-          Verify that the DUT reads the CurrentFabricIndex from TH successfully.
+          Verify that the DUT reads the CurrentFabricIndex from TH (all-clusters-app) successfully.
 
-          [1655316862.478703][7251:7256] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 3651051950
-          [1655316862.478763][7251:7256] CHIP:TOO:   CurrentFabricIndex: 1
-          [1655316862.478857][7251:7256] CHIP:EM: Sending Standalone Ack for MessageCounter:87254680 on exchange 22379i
+          [1659967963.094283][3334:3334] CHIP:IM: Received Read request
+          [1659967963.094362][3334:3334] CHIP:DMG: ReadRequestMessage =
+          [1659967963.094389][3334:3334] CHIP:DMG: {
+          [1659967963.094411][3334:3334] CHIP:DMG:         AttributePathIBs =
+          [1659967963.094437][3334:3334] CHIP:DMG:         [
+          [1659967963.094461][3334:3334] CHIP:DMG:                 AttributePathIB =
+          [1659967963.094492][3334:3334] CHIP:DMG:                 {
+          [1659967963.094519][3334:3334] CHIP:DMG:                         Endpoint = 0x0,
+          [1659967963.094550][3334:3334] CHIP:DMG:                         Cluster = 0x3e,
+          [1659967963.094581][3334:3334] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659967963.094609][3334:3334] CHIP:DMG:                 }
+          [1659967963.094636][3334:3334] CHIP:DMG:
+          [1659967963.094661][3334:3334] CHIP:DMG:         ],
+          [1659967963.094689][3334:3334] CHIP:DMG:
+          [1659967963.094715][3334:3334] CHIP:DMG:         isFabricFiltered = true,
+          [1659967963.094740][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659967963.094762][3334:3334] CHIP:DMG: },
+          [1659967963.094837][3334:3334] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659967963.094920][3334:3334] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659967963.094949][3334:3334] CHIP:DMG: <RE:Run> Cluster 3e, Attribute 5 is dirty
+          [1659967963.094971][3334:3334] CHIP:DMG: Reading attribute: Cluster=0x0000_003E Endpoint=0 AttributeId=0x0000_0005 (expanded=0)
+          [1659967963.094999][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003E e=0 p=v
+          [1659967963.095031][3334:3334] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT sends RemoveFabric command to TH"
@@ -1117,12 +1309,36 @@ tests:
       verification: |
           ./chip-tool operationalcredentials remove-fabric 1 1 0
 
-          Verify that the TH receives RemoveFabric Command
+          Verify that the TH receives RemoveFabric Command on TH(all-clusters-app) Log
 
-          [1655316917.074630][7259:7264] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1655316917.074679][7259:7264] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          [1655316917.074741][7259:7264] CHIP:TOO:   NOCResponse: {
-          [1655316917.074779][7259:7264] CHIP:TOO:     statusCode: 0
-          [1655316917.074805][7259:7264] CHIP:TOO:     fabricIndex: 1
-          [1655316917.074829][7259:7264] CHIP:TOO:    }
+          [1659967993.178748][3334:3334] CHIP:DMG: InvokeRequestMessage =
+          [1659967993.178776][3334:3334] CHIP:DMG: {
+          [1659967993.178799][3334:3334] CHIP:DMG:         suppressResponse = false,
+          [1659967993.178825][3334:3334] CHIP:DMG:         timedRequest = false,
+          [1659967993.178849][3334:3334] CHIP:DMG:         InvokeRequests =
+          [1659967993.178878][3334:3334] CHIP:DMG:         [
+          [1659967993.178902][3334:3334] CHIP:DMG:                 CommandDataIB =
+          [1659967993.178929][3334:3334] CHIP:DMG:                 {
+          [1659967993.178954][3334:3334] CHIP:DMG:                         CommandPathIB =
+          [1659967993.178990][3334:3334] CHIP:DMG:                         {
+          [1659967993.179022][3334:3334] CHIP:DMG:                                 EndpointId = 0x0,
+          [1659967993.179058][3334:3334] CHIP:DMG:                                 ClusterId = 0x3e,
+          [1659967993.179093][3334:3334] CHIP:DMG:                                 CommandId = 0xa,
+          [1659967993.179123][3334:3334] CHIP:DMG:                         },
+          [1659967993.179155][3334:3334] CHIP:DMG:
+          [1659967993.179183][3334:3334] CHIP:DMG:                         CommandFields =
+          [1659967993.179214][3334:3334] CHIP:DMG:                         {
+          [1659967993.179245][3334:3334] CHIP:DMG:                                 0x0 = 1,
+          [1659967993.179278][3334:3334] CHIP:DMG:                         },
+          [1659967993.179307][3334:3334] CHIP:DMG:                 },
+          [1659967993.179338][3334:3334] CHIP:DMG:
+          [1659967993.179361][3334:3334] CHIP:DMG:         ],
+          [1659967993.179390][3334:3334] CHIP:DMG:
+          [1659967993.179414][3334:3334] CHIP:DMG:         InteractionModelRevision = 1
+          [1659967993.179439][3334:3334] CHIP:DMG: },
+          [1659967993.179502][3334:3334] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003E e=0 p=a
+          [1659967993.179537][3334:3334] CHIP:DMG: AccessControl: allowed
+          [1659967993.179565][3334:3334] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000A
+          [1659967993.179597][3334:3334] CHIP:ZCL: OpCreds: Received a RemoveFabric Command for FabricIndex 0x1
+          [1659967993.179620][3334:3334] CHIP:EM: Sending Standalone Ack for MessageCounter:213803348 on exchange 39998r
       disabled: true

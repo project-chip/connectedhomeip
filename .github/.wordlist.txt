@@ -22,6 +22,7 @@ acdbc
 ACKed
 ACL
 ACLs
+actdiag
 AdapterAddress
 AdapterName
 adb
@@ -42,12 +43,16 @@ AdvSendAdvert
 AE
 aef
 AES
+AlarmCode
 algs
 alloc
-AlarmCode
 Ameba
 amebad
+AmebaD
 amebaiot
+AmebaZ
+amebaz2
+AmebaZ2
 announcementReason
 AnnounceOTAProvider
 AnnounceOtaProviderRequest
@@ -78,6 +83,9 @@ argc
 args
 argv
 armeabi
+armino
+Armino
+ARMINO
 ARMmbed
 armv
 ASAN
@@ -126,6 +134,7 @@ BDX
 BDXDownloader
 BeagleBone
 befc
+BEKEN
 betaprogram
 BinaryInputBasic
 Binfmt
@@ -139,6 +148,7 @@ BLEManagerImpl
 BlePlatformDelegate
 Blinls
 bloaty
+blockdiag
 blocklist
 blockquote
 bluetoothd
@@ -226,6 +236,7 @@ ChlorineConcentrationMeasurement
 ChlorodibromomethaneConcentrationMeasurement
 ChloroformConcentrationMeasurement
 chmod
+chown
 chrpath
 CIPD
 CircleCI
@@ -377,6 +388,7 @@ DeviceCommissioner
 DeviceCommon
 DeviceController
 DeviceId
+DeviceInstanceInfoProvider
 DeviceLayer
 DeviceNetworkProvisioningDelegate
 DeviceNetworkProvisioningDelegateImpl
@@ -491,6 +503,7 @@ EthyleneOxideConcentrationMeasurement
 EvalCode
 EvalCodeWithName
 EvalFrameDefault
+EVB
 evk
 exceptfds
 ExchangeContext
@@ -559,7 +572,6 @@ GenericThreadStackManagerImpl
 GenericWiFiConfigurationManagerImpl
 GetDeviceId
 GetDeviceInfo
-DeviceInstanceInfoProvider
 GetDns
 GetIP
 getManualTests
@@ -865,6 +877,7 @@ multilib
 Multiprotocol
 multithreaded
 mutexes
+mv
 MX
 mydir
 MyPASSWORD
@@ -911,6 +924,7 @@ nullptr
 NUM
 NVM
 NVS
+nwdiag
 nwk
 NXP
 objcopy
@@ -1127,6 +1141,7 @@ rsn
 RSSI
 RST
 rsync
+rtd
 RTL
 rtld
 RTOS
@@ -1160,6 +1175,7 @@ semver
 SendButton
 SendNewInputEvent
 sendto
+seqdiag
 SERIALDEVICE
 SerialNumber
 ServiceId
@@ -1174,6 +1190,7 @@ SetRequestorInstance
 SetUpPINCode
 SetupQRCode
 sexualized
+sfv
 SHA
 ShadeConfiguration
 showDocumentation
@@ -1204,6 +1221,7 @@ SoftwareVersion
 softwareVersionStr
 SoftwareVersionString
 softwareVersionValid
+sphinxcontrib
 SPI
 spiflash
 spinel
@@ -1234,9 +1252,9 @@ subfolder
 submodule
 submodules
 subprocess
-substeps
 SubscribeResponse
 SubscriptionId
+substeps
 subtype
 sudo
 SulfateConcentrationMeasurement
@@ -1463,6 +1481,7 @@ xFFFF
 xfffff
 xFFFFFFEFFFFFFFFF
 xtensa
+xvzf
 xwayland
 xyz
 xz
@@ -1483,6 +1502,7 @@ zclsubscribe
 zclwrite
 ZephyrConfig
 zephyrproject
+zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread

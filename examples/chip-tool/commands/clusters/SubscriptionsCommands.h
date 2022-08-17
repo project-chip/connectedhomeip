@@ -30,12 +30,15 @@ public:
         CHIPCommand("shutdown-one", credsIssuerConfig, "Shut down a single subscription, identified by its subscription id.")
     {
         AddArgument("subscription-id", 0, UINT64_MAX, &mSubscriptionId);
+        AddArgument("node-id", 0, UINT64_MAX, &mNodeId,
+                    "The node id, scoped to the commissioner name the command is running under.");
     }
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override
     {
-        CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->ShutdownSubscription(mSubscriptionId);
+        CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->ShutdownSubscription(
+            chip::ScopedNodeId(mNodeId, CurrentCommissioner().GetFabricIndex()), mSubscriptionId);
         SetCommandExitStatus(err);
         return CHIP_NO_ERROR;
     }
@@ -43,6 +46,7 @@ public:
 
 private:
     chip::SubscriptionId mSubscriptionId;
+    chip::NodeId mNodeId;
 };
 
 class ShutdownSubscriptionsForNode : public CHIPCommand

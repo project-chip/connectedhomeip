@@ -49,7 +49,7 @@ ALL_PLATFORMS = set([
 Module = namedtuple('Module', 'name path platforms')
 
 
-def load_module_info() -> list:
+def load_module_info() -> None:
     config = configparser.ConfigParser()
     config.read(os.path.join(CHIP_ROOT, '.gitmodules'))
 
@@ -69,17 +69,32 @@ def module_matches_platforms(module: Module, platforms: set) -> bool:
     return bool(platforms & module.platforms)
 
 
-def checkout_modules(modules: list, shallow: bool) -> None:
+def make_chip_root_safe_directory() -> None:
+    # ensure no errors regarding ownership in the directory. Newer GIT seems to require this:
+    subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', CHIP_ROOT])
+
+
+def checkout_modules(modules: list, shallow: bool, force: bool, recursive: bool) -> None:
     names = [module.name.replace('submodule "', '').replace('"', '') for module in modules]
     names = ', '.join(names)
     logging.info(f'Checking out: {names}')
 
-    # ensure no errors regarding ownership in the directory. Newer GIT seems to
-    # require this:
-    subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', CHIP_ROOT])
-
     cmd = ['git', '-C', CHIP_ROOT, 'submodule', 'update', '--init']
     cmd += ['--depth', '1'] if shallow else []
+    cmd += ['--force'] if force else []
+    cmd += ['--recursive'] if recursive else []
+    cmd += [module.path for module in modules]
+
+    subprocess.check_call(cmd)
+
+
+def deinit_modules(modules: list, force: bool) -> None:
+    names = [module.name.replace('submodule "', '').replace('"', '') for module in modules]
+    names = ', '.join(names)
+    logging.info(f'Deinitializing: {names}')
+
+    cmd = ['git', '-C', CHIP_ROOT, 'submodule', 'deinit']
+    cmd += ['--force'] if force else []
     cmd += [module.path for module in modules]
 
     subprocess.check_call(cmd)
@@ -92,13 +107,22 @@ def main():
     parser.add_argument('--shallow', action='store_true', help='Fetch submodules without history')
     parser.add_argument('--platform', nargs='+', choices=ALL_PLATFORMS, default=[],
                         help='Process submodules for specific platforms only')
+    parser.add_argument('--force', action='store_true', help='Perform action despite of warnings')
+    parser.add_argument('--deinit-unmatched', action='store_true',
+                        help='Deinitialize submodules for non-matching platforms')
+    parser.add_argument('--recursive', action='store_true', help='Recursive init of the listed submodules')
     args = parser.parse_args()
 
-    modules = load_module_info()
+    modules = list(load_module_info())
     selected_platforms = set(args.platform)
     selected_modules = [m for m in modules if module_matches_platforms(m, selected_platforms)]
+    unmatched_modules = [m for m in modules if not module_matches_platforms(m, selected_platforms)]
 
-    checkout_modules(selected_modules, args.shallow)
+    make_chip_root_safe_directory()
+    checkout_modules(selected_modules, args.shallow, args.force, args.recursive)
+
+    if args.deinit_unmatched:
+        deinit_modules(unmatched_modules, args.force)
 
 
 if __name__ == '__main__':

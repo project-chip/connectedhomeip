@@ -48,8 +48,6 @@ extern int WiFi_init();
 extern void DisplayBanner();
 }
 
-/* Application Version and Naming*/
-
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
@@ -171,9 +169,6 @@ int AppTask::Init()
     // QR code will be used with CHIP Tool
     PLAT_LOG("Print Onboarding Codes");
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kOnNetwork));
-
-    PLAT_LOG("Start DNS Server");
-    chip::app::DnssdServer::Instance().StartServer();
 
     return 0;
 }

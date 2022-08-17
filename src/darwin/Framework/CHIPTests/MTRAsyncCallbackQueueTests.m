@@ -19,7 +19,7 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
-#import "MTRAsyncCallbackWorkQueue_Internal.h"
+#import "MTRAsyncCallbackWorkQueue.h"
 
 @interface MTRAsyncCallbackQueueTests : XCTestCase
 
@@ -62,10 +62,8 @@
         [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
     __block int counter = 0;
     MTRAsyncCallbackReadyHandler readyHandler1 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
-        NSLog(@"Item 1 called with counter %d", counter);
         sleep(1);
         counter++;
-        NSLog(@"Item 1 woke after sleep with counter %d", counter);
         [workItem1 endWork];
     };
     workItem1.readyHandler = readyHandler1;
@@ -77,7 +75,6 @@
         [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
     MTRAsyncCallbackReadyHandler readyHandler2 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
         // expect this to have waited until workItem1's sleep(1) finished and incremented counter
-        NSLog(@"Item 2 called with counter %d", counter);
         if (counter == 1) {
             [expectation fulfill];
         }
@@ -88,9 +85,7 @@
     };
     [workQueue enqueueWorkItem:workItem2];
 
-    NSLog(@"2Items start wait %@", [NSDate date]);
     [self waitForExpectationsWithTimeout:5 handler:nil];
-    NSLog(@"2Items finished wait %@", [NSDate date]);
 
     // see that workItem1 only ran once
     XCTAssertEqual(counter, 1);
@@ -106,10 +101,8 @@
         [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
     __block int counter = 0;
     MTRAsyncCallbackReadyHandler readyHandler1 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
-        NSLog(@"Item 1 called with counter %d retryCount %lu", counter, (unsigned long) retryCount);
         sleep(1);
         counter++;
-        NSLog(@"Item 1 woke after sleep with counter %d", counter);
 
         if (retryCount) {
             // only end after retried once
@@ -127,7 +120,6 @@
         [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
     MTRAsyncCallbackReadyHandler readyHandler2 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
         // expect this to have waited until workItem1's sleep(1) finished and incremented counter twice
-        NSLog(@"Item 2 called with counter %d", counter);
         if (counter == 2) {
             [expectation fulfill];
         }
@@ -138,9 +130,7 @@
     };
     [workQueue enqueueWorkItem:workItem2];
 
-    NSLog(@"2Items start wait %@", [NSDate date]);
     [self waitForExpectationsWithTimeout:5 handler:nil];
-    NSLog(@"2Items finished wait %@", [NSDate date]);
 
     // see that workItem1 ran twice after the retry
     XCTAssertEqual(counter, 2);

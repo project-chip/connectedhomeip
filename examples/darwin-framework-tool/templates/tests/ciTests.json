@@ -1,0 +1,25 @@
+{
+    "include": "../../../../src/app/tests/suites/ciTests.json",
+    "disable": [
+        "Test_TC_SC_4_2",
+        "TestClusterComplexTypes",
+        "TestEvents",
+        "TestDiscovery",
+        "TestGroupMessaging",
+        "Test_TC_DGTHREAD_2_1",
+        "Test_TC_DGTHREAD_2_2",
+        "Test_TC_DGTHREAD_2_3",
+        "Test_TC_DGTHREAD_2_4",
+        "Test_TC_CC_7_2",
+        "Test_TC_CC_6_2",
+        "Test_TC_CC_6_3",
+        "Test_TC_CC_8_1",
+        "Test_TC_APPLAUNCHER_3_7",
+        "Test_TC_APPLAUNCHER_3_8",
+        "Test_TC_APPLAUNCHER_3_9",
+        "Test_TC_BINFO_2_1",
+        "Test_TC_SWTCH_2_1",
+        "Test_TC_G_2_1",
+        "Test_TC_FLABEL_2_1"
+    ]
+}

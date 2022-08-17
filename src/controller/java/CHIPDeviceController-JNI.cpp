@@ -513,26 +513,6 @@ JNI_METHOD(void, establishPaseConnectionByAddress)
     }
 }
 
-JNI_METHOD(void, pauseCommissioning)
-(JNIEnv * env, jobject self, jlong handle)
-{
-    ChipLogProgress(Controller, "pauseCommissioning() called");
-    chip::DeviceLayer::StackLock lock;
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-
-    wrapper->GetAutoCommissioner()->PauseCommissioning();
-}
-
-JNI_METHOD(void, resumeCommissioning)
-(JNIEnv * env, jobject self, jlong handle)
-{
-    ChipLogProgress(Controller, "resumeCommissioning() called");
-    chip::DeviceLayer::StackLock lock;
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-
-    wrapper->GetAutoCommissioner()->ResumeCommissioning();
-}
-
 JNI_METHOD(void, setUseJavaCallbackForNOCRequest)
 (JNIEnv * env, jobject self, jlong handle, jboolean useCallback)
 {
@@ -541,6 +521,19 @@ JNI_METHOD(void, setUseJavaCallbackForNOCRequest)
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     wrapper->GetAndroidOperationalCredentialsIssuer()->SetUseJavaCallbackForNOCRequest(useCallback);
+
+    if (useCallback)
+    {
+        // if we are assigning a callback, then make the device commissioner delegate verification to the
+        // PartialDACVerifier so that DAC chain and CD validation can be performed by custom code
+        // triggered by ChipDeviceController.NOCChainIssuer.onNOCChainGenerationNeeded().
+        wrapper->Controller()->SetDeviceAttestationVerifier(wrapper->GetPartialDACVerifier());
+    }
+    else
+    {
+        // if we are setting callback to null, then make the device commissioner use the default verifier
+        wrapper->Controller()->SetDeviceAttestationVerifier(GetDeviceAttestationVerifier());
+    }
 }
 
 JNI_METHOD(void, updateCommissioningNetworkCredentials)
@@ -562,6 +555,17 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
     {
         ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+
+    // Only invoke NetworkCredentialsReady when called in response to NetworkScan result
+    if (wrapper->Controller()->GetCommissioningStage() == CommissioningStage::kNeedsNetworkCreds)
+    {
+        err = wrapper->Controller()->NetworkCredentialsReady();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "NetworkCredentialsReady failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        }
     }
 }
 
@@ -681,15 +685,6 @@ JNI_METHOD(void, releaseOperationalDevicePointer)(JNIEnv * env, jobject self, jl
     }
 }
 
-JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
-{
-    chip::DeviceLayer::StackLock lock;
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-
-    ChipLogProgress(Controller, "disconnectDevice() called with deviceId");
-    wrapper->Controller()->ReleaseOperationalDevice(deviceId);
-}
-
 JNI_METHOD(void, shutdownSubscriptions)(JNIEnv * env, jobject self, jlong handle, jlong devicePtr)
 {
     chip::DeviceLayer::StackLock lock;
@@ -785,20 +780,6 @@ JNI_METHOD(jlong, getCompressedFabricId)(JNIEnv * env, jobject self, jlong handl
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     return wrapper->Controller()->GetCompressedFabricId();
-}
-
-JNI_METHOD(void, updateDevice)(JNIEnv * env, jobject self, jlong handle, jlong fabricId, jlong deviceId)
-{
-    chip::DeviceLayer::StackLock lock;
-
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-
-    CHIP_ERROR err = wrapper->Controller()->UpdateDevice(static_cast<chip::NodeId>(deviceId));
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed to update device");
-        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
-    }
 }
 
 JNI_METHOD(void, discoverCommissionableNodes)(JNIEnv * env, jobject self, jlong handle)

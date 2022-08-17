@@ -993,6 +993,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 {
     app::DataModel::Nullable<uint8_t> resolvedLevel;
     app::DataModel::Nullable<uint8_t> temporaryCurrentLevelCache;
+    app::DataModel::Nullable<uint16_t> transitionTime;
 
     uint16_t currentOnOffTransitionTime;
     EmberAfStatus status;
@@ -1059,17 +1060,15 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
             emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
             return;
         }
+        transitionTime.SetNonNull(currentOnOffTransitionTime);
     }
     else
     {
-        currentOnOffTransitionTime = 0xFFFF;
+        transitionTime.SetNull();
     }
 #else
-    currentOnOffTransitionTime = 0xFFFF;
+    transitionTime.SetNull();
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
-
-    app::DataModel::Nullable<uint16_t> transitionTime;
-    transitionTime.SetNonNull(currentOnOffTransitionTime);
 
     if (newValue)
     {

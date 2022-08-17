@@ -111,6 +111,7 @@ static EFR32OpaqueKeyId opaque_key_id_from_psa(mbedtls_svc_key_id_t id)
 
 EFR32OpaqueKeypair::EFR32OpaqueKeypair()
 {
+    psa_crypto_init();
     // Avoid having a reference to PSA datatypes in the signature of this class
     mContext = MemoryCalloc(1, sizeof(mbedtls_svc_key_id_t));
 }
@@ -125,16 +126,15 @@ EFR32OpaqueKeypair::~EFR32OpaqueKeypair()
     }
 }
 
-CHIP_ERROR EFR32OpaqueKeypair::Load(EFR32OpaqueKeyId key_id)
+CHIP_ERROR EFR32OpaqueKeypair::Load(EFR32OpaqueKeyId opaque_id)
 {
-    CHIP_ERROR error    = CHIP_NO_ERROR;
-    psa_status_t status = PSA_ERROR_BAD_STATE;
+    CHIP_ERROR error            = CHIP_NO_ERROR;
+    psa_status_t status         = PSA_ERROR_BAD_STATE;
+    mbedtls_svc_key_id_t key_id = 0;
 
-    VerifyOrExit(key_id != kEFR32OpaqueKeyIdVolatile, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(is_opaque_key_valid(key_id), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(opaque_id != kEFR32OpaqueKeyIdVolatile, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(is_opaque_key_valid(opaque_id), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mContext, error = CHIP_ERROR_INCORRECT_STATE);
-
-    psa_crypto_init();
 
     // If the object contains a volatile key, clean it up before reusing the object storage
     if (mHasKey && !mIsPersistent)
@@ -142,7 +142,9 @@ CHIP_ERROR EFR32OpaqueKeypair::Load(EFR32OpaqueKeyId key_id)
         Delete();
     }
 
-    status = psa_export_public_key(psa_key_id_from_opaque(key_id), mPubkeyRef, mPubkeySize, &mPubkeyLength);
+    key_id = psa_key_id_from_opaque(opaque_id);
+
+    status = psa_export_public_key(key_id, mPubkeyRef, mPubkeySize, &mPubkeyLength);
 
     if (status == PSA_ERROR_DOES_NOT_EXIST)
     {
@@ -156,7 +158,7 @@ CHIP_ERROR EFR32OpaqueKeypair::Load(EFR32OpaqueKeyId key_id)
     });
 
     // Store the key ID and mark the key as valid
-    *(mbedtls_svc_key_id_t *) mContext = psa_key_id_from_opaque(key_id);
+    *(mbedtls_svc_key_id_t *) mContext = key_id;
     mHasKey                            = true;
     mIsPersistent                      = true;
 
@@ -169,27 +171,40 @@ exit:
     return error;
 }
 
-CHIP_ERROR EFR32OpaqueKeypair::Create(EFR32OpaqueKeyId key_id, EFR32OpaqueKeyUsages usage)
+CHIP_ERROR EFR32OpaqueKeypair::Create(EFR32OpaqueKeyId opaque_id, EFR32OpaqueKeyUsages usage)
 {
-    CHIP_ERROR error          = CHIP_NO_ERROR;
-    psa_status_t status       = PSA_ERROR_BAD_STATE;
-    psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
+    CHIP_ERROR error            = CHIP_NO_ERROR;
+    psa_status_t status         = PSA_ERROR_BAD_STATE;
+    psa_key_attributes_t attr   = PSA_KEY_ATTRIBUTES_INIT;
+    mbedtls_svc_key_id_t key_id = 0;
 
-    VerifyOrExit(is_opaque_key_valid(key_id), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(is_opaque_key_valid(opaque_id), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mContext, error = CHIP_ERROR_INCORRECT_STATE);
 
-    psa_crypto_init();
-
-    if (key_id == kEFR32OpaqueKeyIdVolatile)
+    if (opaque_id == kEFR32OpaqueKeyIdVolatile)
     {
         psa_set_key_lifetime(
             &attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_VOLATILE, PSA_CRYPTO_LOCATION_FOR_DEVICE));
     }
     else
     {
+        psa_key_handle_t key_handle;
+
+        key_id = psa_key_id_from_opaque(opaque_id);
+
+        // Check if the key already exists
+        int ret = psa_open_key(key_id, &key_handle);
+        if (PSA_SUCCESS == ret)
+        {
+            // WARNING: Existing key! This is caused by a problem in the key store.
+            // The key must be destroyed, otherwhise the device won't recover.
+            ChipLogError(Crypto, "WARNING: PSA key recycled: %d / %ld", opaque_id, key_id);
+            psa_destroy_key(key_id);
+        }
+
+        psa_set_key_id(&attr, key_id);
         psa_set_key_lifetime(
             &attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT, PSA_CRYPTO_LOCATION_FOR_DEVICE));
-        psa_set_key_id(&attr, psa_key_id_from_opaque(key_id));
     }
 
     switch (usage)
@@ -209,21 +224,20 @@ CHIP_ERROR EFR32OpaqueKeypair::Create(EFR32OpaqueKeyId key_id, EFR32OpaqueKeyUsa
         break;
     }
 
-    status = psa_generate_key(&attr, (mbedtls_svc_key_id_t *) mContext);
+    status = psa_generate_key(&attr, &key_id);
     VerifyOrExit(status == PSA_SUCCESS, {
         _log_PSA_error(status);
         error = CHIP_ERROR_INTERNAL;
     });
 
     // Export the public key
-    status = psa_export_public_key(*(mbedtls_svc_key_id_t *) mContext, mPubkeyRef, mPubkeySize, &mPubkeyLength);
-
-    if (status != PSA_SUCCESS)
+    status = psa_export_public_key(key_id, mPubkeyRef, mPubkeySize, &mPubkeyLength);
+    if (PSA_SUCCESS != status)
     {
         _log_PSA_error(status);
         // Key generation succeeded, but pubkey export did not. To avoid
         // memory leaks, delete the generated key before returning the error
-        psa_destroy_key(*(mbedtls_svc_key_id_t *) mContext);
+        psa_destroy_key(key_id);
         error = CHIP_ERROR_INTERNAL;
         goto exit;
     }
@@ -234,10 +248,16 @@ CHIP_ERROR EFR32OpaqueKeypair::Create(EFR32OpaqueKeyId key_id, EFR32OpaqueKeyUsa
 
 exit:
     psa_reset_key_attributes(&attr);
-
-    if (error != CHIP_NO_ERROR && mContext)
+    if (mContext)
     {
-        *(mbedtls_svc_key_id_t *) mContext = 0;
+        if (CHIP_NO_ERROR == error)
+        {
+            *(mbedtls_svc_key_id_t *) mContext = key_id;
+        }
+        else
+        {
+            *(mbedtls_svc_key_id_t *) mContext = 0;
+        }
     }
     return error;
 }
@@ -281,6 +301,7 @@ CHIP_ERROR EFR32OpaqueKeypair::Sign(const uint8_t * msg, size_t msg_len, uint8_t
     CHIP_ERROR error    = CHIP_NO_ERROR;
     psa_status_t status = PSA_ERROR_BAD_STATE;
 
+    VerifyOrExit(mContext, error = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mHasKey, error = CHIP_ERROR_INCORRECT_STATE);
 
     status = psa_sign_message(*(mbedtls_svc_key_id_t *) mContext, PSA_ALG_ECDSA(PSA_ALG_SHA_256), msg, msg_len, output, output_size,

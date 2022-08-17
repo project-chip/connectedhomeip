@@ -16,12 +16,14 @@
  */
 #pragma once
 
-#include <app/ConcreteAttributePath.h>
-#include <app/util/basic-types.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/GroupId.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 namespace chip {
@@ -93,11 +95,11 @@ public:
     }
     const char * FabricKeyset(chip::FabricIndex fabric, uint16_t keyset) { return Format("f/%x/k/%x", fabric, keyset); }
 
-    const char * AttributeValue(const app::ConcreteAttributePath & aPath)
+    const char * AttributeValue(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId)
     {
         // Needs at most 26 chars: 6 for "g/a///", 4 for the endpoint id, 8 each
         // for the cluster and attribute ids.
-        return Format("g/a/%x/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+        return Format("g/a/%x/%" PRIx32 "/%" PRIx32, endpointId, clusterId, attributeId);
     }
 
     // TODO: Should store fabric-specific parts of the binding list under keys

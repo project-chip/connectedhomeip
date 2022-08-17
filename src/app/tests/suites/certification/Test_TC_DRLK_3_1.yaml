@@ -29,7 +29,7 @@ tests:
       verification: |
           ./chip-tool doorlock read lock-state 1 1
 
-          Verify   DUT reads LockState from the TH on TH / lock app log:
+          Verify the " LockState response" on TH(lock-app):
 
           [1658396085.236841][2474:2474] CHIP:DMG: ReadRequestMessage =
           [1658396085.236875][2474:2474] CHIP:DMG: {
@@ -60,7 +60,7 @@ tests:
       verification: |
           ./chip-tool doorlock read lock-type 1 1
 
-          Verify   DUT reads LockType from the TH on TH / lock app log:
+          Verify the " LockType response" on TH(lock-app):
 
           [1658396151.006061][2474:2474] CHIP:DMG: ReadRequestMessage =
           [1658396151.006101][2474:2474] CHIP:DMG: {
@@ -91,7 +91,7 @@ tests:
       verification: |
           ./chip-tool doorlock read actuator-enabled 1 1
 
-          Verify   DUT reads ActuatorEnabled from the TH on TH / lock app log:
+          Verify the " ActuatorEnabled response" on TH(lock-app):
 
           [1658396183.485143][2474:2474] CHIP:DMG: ReadRequestMessage =
           [1658396183.485180][2474:2474] CHIP:DMG: {
@@ -122,7 +122,7 @@ tests:
       verification: |
           ./chip-tool doorlock read door-state 1 1
 
-          Verify   DUT reads DoorState from the TH on TH / lock app log:
+          Verify the " DoorState response" on TH(lock-app):
 
 
           [1658396220.948165][2474:2474] CHIP:DMG: ReadRequestMessage =
@@ -156,7 +156,7 @@ tests:
 
           ./chip-tool doorlock read door-open-events 1 1
 
-          Verify   DUT reads DoorOpenEvents from the TH on TH / lock app log:
+          Verify the " DoorOpenEvents response" on TH(lock-app):
 
 
           [1658396275.165657][2474:2474] CHIP:DMG: ReadRequestMessage =
@@ -185,7 +185,7 @@ tests:
 
            ./chip-tool doorlock read door-closed-events 1 1
 
-          Verify   DUT reads DoorClosedEvents from the TH on TH / lock app log:
+          Verify the " DoorClosedEvents response" on TH(lock-app):
 
 
           [1658396372.169968][2474:2474] CHIP:DMG: ReadRequestMessage =
@@ -214,7 +214,7 @@ tests:
 
           ./chip-tool doorlock read open-period 1 1
 
-          Verify   DUT reads OpenPeriod from the TH on TH / lock app log:
+          Verify the " OpenPeriod response" on TH(lock-app):
 
 
           [1658396440.655877][2474:2474] CHIP:IM: Received Read request
@@ -243,7 +243,7 @@ tests:
           ./chip-tool doorlock read  number-of-total-users-supported 1 1
 
 
-          Verify   DUT reads NumberofTotalUsers from the TH on TH / lock app log:
+          Verify the " NumberofTotalUsers response" on TH(lock-app):
 
           [1658396514.220665][2474:2474] CHIP:IM: Received Read request
           [1658396514.220755][2474:2474] CHIP:DMG: ReadRequestMessage =
@@ -275,7 +275,7 @@ tests:
       verification: |
           ./chip-tool doorlock read number-of-pinusers-supported 1 1
 
-          Verify   DUT reads NumberofPINUsers from the TH on TH / lock app log:
+          Verify the " NumberofPINUsers Supported response" on TH(lock-app):
 
 
           [1658396558.156859][2474:2474] CHIP:IM: Received Read request
@@ -308,7 +308,7 @@ tests:
       verification: |
           ./chip-tool doorlock read number-of-rfidusers-supported 1 1
 
-          Verify   DUT reads NumberofRFIDUsersSupported from the TH on TH / lock app log:
+          Verify the " NumberofRFIDUsersSupported response" on TH(lock-app):
 
 
           [1658396603.146106][2474:2474] CHIP:IM: Received Read request
@@ -341,7 +341,7 @@ tests:
       verification: |
           ./chip-tool doorlock read  number-of-week-day-schedules-supported-per-user 1 1
 
-          Verify   DUT reads NumberofWeekDaysSchedulesSupported  from the TH on TH / lock app log:
+          Verify the " NumberofWeekDaysSchedulesSupported response" on TH(lock-app):
 
           [1658396646.712226][2474:2474] CHIP:IM: Received Read request
           [1658396646.712332][2474:2474] CHIP:DMG: ReadRequestMessage =
@@ -373,7 +373,7 @@ tests:
       verification: |
           ./chip-tool doorlock read number-of-year-day-schedules-supported-per-user 1 1
 
-          Verify DUT reads NumberofYearDaysSchedulesSupported  from the TH on TH / lock app log:
+          Verify the " NumberofYearDaysSchedulesSupported response" on TH(lock-app):
 
           [1658396684.635487][2474:2474] CHIP:IM: Received Read request
           [1658396684.635603][2474:2474] CHIP:DMG: ReadRequestMessage =
@@ -405,7 +405,7 @@ tests:
       verification: |
           ./chip-tool doorlock read number-of-holiday-schedules-supported 1 1
 
-          Verify DUT reads NumberofHolidaySchedulesSupported  from the TH on TH / lock app log:
+          Verify the " NumberofHolidaySchedulesSupported response" on TH(lock-app):
 
 
           [1658396723.251493][2474:2474] CHIP:IM: Received Read request
@@ -438,7 +438,7 @@ tests:
       verification: |
           ./chip-tool doorlock read  max-pincode-length 1 1
 
-          Verify DUT reads MaxPINCodeLength  from the TH on TH / lock app log:
+          Verify the " MaxPINCodeLength response" on TH(lock-app):
 
           [1658396788.539408][2474:2474] CHIP:IM: Received Read request
           [1658396788.539498][2474:2474] CHIP:DMG: ReadRequestMessage =
@@ -470,32 +470,27 @@ tests:
       verification: |
           ./chip-tool doorlock read  min-pincode-length 1 1
 
-          Verify DUT reads MinPINCodeLength  from the TH on TH / lock app log:
+          Verify the " MinPINCodeLength response" on TH(lock-app):
 
-
-          [1658396826.199813][2474:2474] CHIP:IM: Received Read request
-          [1658396826.199923][2474:2474] CHIP:DMG: ReadRequestMessage =
-          [1658396826.199959][2474:2474] CHIP:DMG: {
-          [1658396826.199995][2474:2474] CHIP:DMG:        AttributePathIBs =
-          [1658396826.200026][2474:2474] CHIP:DMG:        [
-          [1658396826.200054][2474:2474] CHIP:DMG:                AttributePathIB =
-          [1658396826.200104][2474:2474] CHIP:DMG:                {
-          [1658396826.200140][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
-          [1658396826.200189][2474:2474] CHIP:DMG:                        Cluster = 0x101,
-          [1658396826.200235][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0018,
-          [1658396826.200272][2474:2474] CHIP:DMG:                }
-          [1658396826.200316][2474:2474] CHIP:DMG:
-          [1658396826.200347][2474:2474] CHIP:DMG:        ],
-          [1658396826.200389][2474:2474] CHIP:DMG:
-          [1658396826.200421][2474:2474] CHIP:DMG:        isFabricFiltered = true,
-          [1658396826.200463][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
-          [1658396826.200492][2474:2474] CHIP:DMG: },
-          [1658396826.200594][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1658396826.200712][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1658396826.200756][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 18 is dirty
-          [1658396826.200780][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0018 (expanded=0)
-          [1658396826.200813][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
-          [1658396826.200849][2474:2474] CHIP:DMG: AccessControl: allowed
+          [1659617377.367323][5361:5361] CHIP:IM: Received Read request
+          [1659617377.367422][5361:5361] CHIP:DMG: ReadRequestMessage =
+          [1659617377.367454][5361:5361] CHIP:DMG: {
+          [1659617377.367481][5361:5361] CHIP:DMG:        AttributePathIBs =
+          [1659617377.367513][5361:5361] CHIP:DMG:        [
+          [1659617377.367542][5361:5361] CHIP:DMG:                AttributePathIB =
+          [1659617377.367575][5361:5361] CHIP:DMG:                {
+          [1659617377.367609][5361:5361] CHIP:DMG:                        Endpoint = 0x1,
+          [1659617377.367651][5361:5361] CHIP:DMG:                        Cluster = 0x101,
+          [1659617377.367690][5361:5361] CHIP:DMG:                        Attribute = 0x0000_0018,
+          [1659617377.367726][5361:5361] CHIP:DMG:                }
+          [1659617377.367760][5361:5361] CHIP:DMG:
+          [1659617377.367791][5361:5361] CHIP:DMG:        ],
+          [1659617377.367825][5361:5361] CHIP:DMG:
+          [1659617377.367856][5361:5361] CHIP:DMG:        isFabricFiltered = true,
+          [1659617377.367887][5361:5361] CHIP:DMG:        InteractionModelRevision = 1
+          [1659617377.367915][5361:5361] CHIP:DMG: },
+          [1659617377.368004][5361:5361] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659617377.368111][5361:5361] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0
       disabled: true
 
     - label: "DUT reads MaxRFIDCodedLength from the TH."
@@ -503,7 +498,7 @@ tests:
       verification: |
           ./chip-tool doorlock read  max-rfidcode-length 1 1
 
-          Verify DUT reads MaxRFIDCodeLength  from the TH on TH / lock app log:
+          Verify the " MaxRFIDCodeLength response" on TH(lock-app):
 
 
           [1658396857.935901][2474:2474] CHIP:IM: Received Read request
@@ -536,7 +531,7 @@ tests:
       verification: |
           ./chip-tool doorlock read  min-rfidcode-length 1 1
 
-          Verify DUT reads MinRFIDCodeLength  from the TH on TH / lock app log:
+          Verify the " MinRFIDCodeLength response" on TH(lock-app):
 
 
           [1658396897.419273][2474:2474] CHIP:IM: Received Read request
@@ -569,7 +564,7 @@ tests:
       verification: |
           ./chip-tool doorlock read credential-rules-support 1 1
 
-          Verify DUT reads CredentialRulesSupport  from the TH on TH / lock app log:
+          Verify the " CredentialRulesSupport response" on TH(lock-app):
 
 
           [1658396928.746032][2474:2474] CHIP:IM: Received Read request
@@ -602,7 +597,7 @@ tests:
       verification: |
           ./chip-tool doorlock read language  1 1
 
-          Verify DUT reads Language  from the TH on TH / lock app log:
+          Verify the " Language response" on TH(lock-app):
 
 
           [1658396957.776405][2474:2474] CHIP:IM: Received Read request
@@ -637,7 +632,7 @@ tests:
 
           ./chip-tool doorlock read ledsettings 1 1
 
-          Verify DUT reads LEDSettings  from the TH on TH / lock app log:
+          Verify the " LEDSettings response" on TH(lock-app):
 
 
           [1658396991.974233][2474:2474] CHIP:IM: Received Read request
@@ -665,7 +660,7 @@ tests:
       verification: |
           ./chip-tool doorlock read  auto-relock-time 1 1
 
-          Verify DUT reads AutoRelockTime  from the TH on TH / lock app log:
+          Verify the " AutoRelockTime response" on TH(lock-app):
 
           [1658397055.576504][2474:2474] CHIP:IM: Received Read request
           [1658397055.576666][2474:2474] CHIP:DMG: ReadRequestMessage =
@@ -697,7 +692,7 @@ tests:
       verification: |
           ./chip-tool doorlock read sound-volume 1 1
 
-          Verify DUT reads SoundVolume  from the TH on TH / lock app log:
+          Verify the " SoundVolume response" on TH(lock-app):
 
           [1658397087.000491][2474:2474] CHIP:IM: Received Read request
           [1658397087.000600][2474:2474] CHIP:DMG: ReadRequestMessage =
@@ -729,7 +724,7 @@ tests:
       verification: |
           ./chip-tool doorlock read operating-mode 1 1
 
-          Verify DUT reads OperatingMode  from the TH on TH / lock app log:
+          Verify the " OperatingMode response" on TH(lock-app):
 
 
           [1658397117.082297][2474:2474] CHIP:IM: Received Read request
@@ -762,7 +757,7 @@ tests:
       verification: |
           ./chip-tool doorlock read supported-operating-modes 1 1
 
-          Verify DUT reads SupportedOperatingModes  from the TH on TH / lock app log:
+          Verify the " SupportedOperatingModes response" on TH(lock-app):
 
 
           [1658397177.691320][2474:2474] CHIP:IM: Received Read request
@@ -795,9 +790,7 @@ tests:
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read default-configuration-register 1 1
-
-          Verify DUT reads DefaultConfigurationRegister  from the TH on TH / lock app log:
+          Verify the " DefaultConfigurationRegister response" on TH(lock-app):
 
           [1658397211.423665][2474:2474] CHIP:IM: Received Read request
           [1658397211.423769][2474:2474] CHIP:DMG: ReadRequestMessage =
@@ -825,8 +818,7 @@ tests:
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read enable-local-programming 1 1
-
-          Verify DUT reads  EnableLocalProgramming  from the TH on TH / lock app log:
+          Verify the " EnableLocalProgramming response" on TH(lock-app):
 
 
           [1658397282.356078][2474:2474] CHIP:IM: Received Read request
@@ -855,7 +847,7 @@ tests:
           ./chip-tool doorlock read enable-one-touch-locking 1 1
 
 
-          Verify DUT reads  EnableOneTouchLocking  from the TH on TH / lock app log:
+          Verify the " EnableOneTouchLocking response" on TH(lock-app):
 
           [1658397340.678069][2474:2474] CHIP:IM: Received Read request
           [1658397340.678177][2474:2474] CHIP:DMG: ReadRequestMessage =
@@ -889,7 +881,7 @@ tests:
 
           ./chip-tool doorlock read enable-inside-status-led 1 1
 
-          Verify DUT reads  EnableInsideStatusLED  from the TH on TH / lock app log:
+          Verify the " EnableInsideStatusLED response" on TH(lock-app):
 
 
           [1658397372.051159][2474:2474] CHIP:IM: Received Read request
@@ -917,7 +909,7 @@ tests:
       verification: |
           ./chip-tool doorlock read enable-privacy-mode-button 1 1
 
-          Verify DUT reads  EnablePrivacyModeButton  from the TH on TH / lock app log:
+          Verify the " EnablePrivacyModeButton response" on TH(lock-app):
 
 
           [1658397429.117175][2474:2474] CHIP:IM: Received Read request
@@ -952,7 +944,7 @@ tests:
 
            ./chip-tool doorlock read  local-programming-features 1 1
 
-          Verify DUT reads  LocalProgrammingFeatures  from the TH on TH / lock app log:
+          Verify the " LocalProgrammingFeatures response" on TH(lock-app):
 
 
           [1658397475.940127][2474:2474] CHIP:IM: Received Read request
@@ -980,7 +972,7 @@ tests:
       verification: |
           ./chip-tool doorlock read   wrong-code-entry-limit 1 1
 
-          Verify DUT reads  WrongCodeEntryLimit  from the TH on TH / lock app log:
+          Verify the " WrongCodeEntryLimit response" on TH(lock-app):
 
           [1658397556.997182][2474:2474] CHIP:IM: Received Read request
           [1658397556.997294][2474:2474] CHIP:DMG: ReadRequestMessage =
@@ -1012,7 +1004,7 @@ tests:
       verification: |
           ./chip-tool doorlock read user-code-temporary-disable-time 1 1
 
-          Verify DUT reads  UserCodedTemporaryDisableTime  from the TH on TH / lock app log:
+          Verify the " UserCodedTemporaryDisableTime response" on TH(lock-app):
 
 
           [1658397634.527661][2474:2474] CHIP:IM: Received Read request
@@ -1047,7 +1039,7 @@ tests:
 
           ./chip-tool doorlock read send-pinover-the-air 1 1
 
-          Verify DUT reads   SendPINOverTheAir  from TH on TH / lock app log:
+          Verify the " SendPINOverTheAir response" on TH(lock-app):
 
 
 
@@ -1076,7 +1068,7 @@ tests:
       verification: |
           ./chip-tool doorlock read require-pinfor-remote-operation 1 1
 
-          Verify DUT reads  RequirePINForRemoteOperation  from the TH on TH / lock app log:
+          Verify the " RequirePINForRemoteOperation response" on TH(lock-app):
 
 
           [1658397733.214110][2474:2474] CHIP:IM: Received Read request
@@ -1111,8 +1103,7 @@ tests:
 
           ./chip-tool doorlock read expiring-user-timeout 1 1
 
-          Verify DUT reads  ExpiringUserTimeOut  from the TH on TH / lock app log:
-
+          Verify the " ExpiringUserTimeOut response" on TH(lock-app):
 
           [1658397771.129301][2474:2474] CHIP:IM: Received Read request
           [1658397771.129390][2474:2474] CHIP:DMG: ReadRequestMessage =
@@ -1139,7 +1130,7 @@ tests:
       verification: |
           ./chip-tool doorlock read number-of-credentials-supported-per-user 1 1
 
-          Verify DUT reads  NumberOfCredentialsSupportedPerUser  from the TH on TH / lock app log:
+          Verify the " NumberOfCredentialsSupportedPerUser response" on TH(lock-app):
 
           [1658397824.221419][2474:2474] CHIP:IM: Received Read request
           [1658397824.221545][2474:2474] CHIP:DMG: ReadRequestMessage =

@@ -34,7 +34,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol color-loop-set 15 0 0 30 160 0 0 1 1
 
-          Verify in TH(all-clusters-app) log:
+          Verify success response in TH(all-clusters-app) Log:
           [1657912387.432732][3126:3126] CHIP:DMG: InvokeRequestMessage =
           [1657912387.432781][3126:3126] CHIP:DMG: {
           [1657912387.432823][3126:3126] CHIP:DMG:        suppressResponse = false,
@@ -76,7 +76,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-loop-active 1 1
 
-          Verify in TH(all-clusters-app) log:
+          Verify response contains a value consistent  in  TH(all-clusters-app)  Logs:
           [1657912416.547714][3126:3126] CHIP:IM: Received Read request
           [1657912416.547842][3126:3126] CHIP:DMG: ReadRequestMessage =
           [1657912416.547890][3126:3126] CHIP:DMG: {
@@ -108,7 +108,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-loop-direction 1 1
 
-          Verify in TH(all-clusters-app) log:
+          Verify response contains a value consistent  in  TH(all-clusters-app)  Logs:
           [1657912446.661818][3126:3126] CHIP:IM: Received Read request
           [1657912446.661940][3126:3126] CHIP:DMG: ReadRequestMessage =
           [1657912446.661989][3126:3126] CHIP:DMG: {
@@ -139,8 +139,7 @@ tests:
       PICS: CC.C.A4004
       verification: |
           ./chip-tool colorcontrol read color-loop-time 1 1
-
-          Verify in TH(all-clusters-app) log:
+          Verify response contains a value consistent  in  TH(all-clusters-app)  Logs:
           [1657912469.590293][3126:3126] CHIP:IM: Received Read request
           [1657912469.590419][3126:3126] CHIP:DMG: ReadRequestMessage =
           [1657912469.590466][3126:3126] CHIP:DMG: {
@@ -171,8 +170,7 @@ tests:
       PICS: CC.C.A4005
       verification: |
           ./chip-tool colorcontrol read color-loop-start-enhanced-hue 1 1
-
-          Verify in TH(all-clusters-app) log:
+          Verify response contains a value consistent  in  TH(all-clusters-app)  Logs:
           [1657912490.104534][3126:3126] CHIP:IM: Received Read request
           [1657912490.104664][3126:3126] CHIP:DMG: ReadRequestMessage =
           [1657912490.104713][3126:3126] CHIP:DMG: {
@@ -205,23 +203,22 @@ tests:
       PICS: CC.C.A4000
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
-
-          Verify in TH(all-clusters-app) log:
+          Verify response contains a value consistent  in  TH(all-clusters-app)  Logs:
           [1659960576.917953][2718:2718] CHIP:DMG: ReadRequestMessage =
           [1659960576.917989][2718:2718] CHIP:DMG: {
-          [1659960576.918016][2718:2718] CHIP:DMG: 	AttributePathIBs =
-          [1659960576.918051][2718:2718] CHIP:DMG: 	[
-          [1659960576.918084][2718:2718] CHIP:DMG: 		AttributePathIB =
-          [1659960576.918121][2718:2718] CHIP:DMG: 		{
-          [1659960576.918159][2718:2718] CHIP:DMG: 			Endpoint = 0x1,
-          [1659960576.918206][2718:2718] CHIP:DMG: 			Cluster = 0x300,
-          [1659960576.918249][2718:2718] CHIP:DMG: 			Attribute = 0x0000_4000,
-          [1659960576.918287][2718:2718] CHIP:DMG: 		}
+          [1659960576.918016][2718:2718] CHIP:DMG:         AttributePathIBs =
+          [1659960576.918051][2718:2718] CHIP:DMG:         [
+          [1659960576.918084][2718:2718] CHIP:DMG:                 AttributePathIB =
+          [1659960576.918121][2718:2718] CHIP:DMG:                 {
+          [1659960576.918159][2718:2718] CHIP:DMG:                         Endpoint = 0x1,
+          [1659960576.918206][2718:2718] CHIP:DMG:                         Cluster = 0x300,
+          [1659960576.918249][2718:2718] CHIP:DMG:                         Attribute = 0x0000_4000,
+          [1659960576.918287][2718:2718] CHIP:DMG:                 }
           [1659960576.918325][2718:2718] CHIP:DMG:
-          [1659960576.918359][2718:2718] CHIP:DMG: 	],
+          [1659960576.918359][2718:2718] CHIP:DMG:         ],
           [1659960576.918397][2718:2718] CHIP:DMG:
-          [1659960576.918432][2718:2718] CHIP:DMG: 	isFabricFiltered = true,
-          [1659960576.918466][2718:2718] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659960576.918432][2718:2718] CHIP:DMG:         isFabricFiltered = true,
+          [1659960576.918466][2718:2718] CHIP:DMG:         InteractionModelRevision = 1
           [1659960576.918498][2718:2718] CHIP:DMG: },
           [1659960576.918604][2718:2718] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1659960576.918724][2718:2718] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
@@ -233,7 +230,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-loop-active 1 1
 
-          Verify in TH(all-clusters-app) log:
+          Verify response contains a Color Loop activated  in  TH(all-clusters-app)  Logs:
 
           [1657912750.645121][3126:3126] CHIP:IM: Received Read request
           [1657912750.645210][3126:3126] CHIP:DMG: ReadRequestMessage =
@@ -262,7 +259,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-loop-stored-enhanced-hue 1 1
 
-          Verify in TH(all-clusters-app) log:
+          Verify response contains a value same as EnhencedCurrentHue in  TH(all-clusters-app)  Logs:
           [1657912783.463733][3126:3126] CHIP:IM: Received Read request
           [1657912783.463816][3126:3126] CHIP:DMG: ReadRequestMessage =
           [1657912783.463844][3126:3126] CHIP:DMG: {
@@ -290,8 +287,7 @@ tests:
       PICS: CC.C.A4000
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
-
-          Verify in TH(all-clusters-app) log:
+          Verify response contains EnhencedCurrentHue value in  TH(all-clusters-app)  Logs:
           [1657912801.027600][3126:3126] CHIP:IM: Received Read request
           [1657912801.027717][3126:3126] CHIP:DMG: ReadRequestMessage =
           [1657912801.027761][3126:3126] CHIP:DMG: {
@@ -321,7 +317,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
-          Verify in TH(all-clusters-app) log:
+          Verify response contains EnhencedCurrentHue value in  TH(all-clusters-app)  Logs:
           [1657912801.027600][3126:3126] CHIP:IM: Received Read request
           [1657912801.027717][3126:3126] CHIP:DMG: ReadRequestMessage =
           [1657912801.027761][3126:3126] CHIP:DMG: {
@@ -351,7 +347,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol color-loop-set 1 0 0 0 0 0 0 1 1
 
-          Verify in TH(all-clusters-app) log:
+          Verify success response in TH(all-clusters-app) Log:
 
           [1657912615.862118][3126:3126] CHIP:DMG: InvokeRequestMessage =
           [1657912615.862168][3126:3126] CHIP:DMG: {
@@ -394,7 +390,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-loop-active 1 1
 
-          Verify in TH(all-clusters-app) log:
+          Verify response contains a ColorLoop value in  TH(all-clusters-app)  Logs:
           [1657912416.547714][3126:3126] CHIP:IM: Received Read request
           [1657912416.547842][3126:3126] CHIP:DMG: ReadRequestMessage =
           [1657912416.547890][3126:3126] CHIP:DMG: {
@@ -426,7 +422,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
-          Verify in TH(all-clusters-app) log:
+
+          Verify response contains a ColorLoop value in  TH(all-clusters-app)  Logs:
           [1657912801.027600][3126:3126] CHIP:IM: Received Read request
           [1657912801.027717][3126:3126] CHIP:DMG: ReadRequestMessage =
           [1657912801.027761][3126:3126] CHIP:DMG: {

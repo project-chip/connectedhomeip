@@ -119,6 +119,8 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     SuccessOrExit(MapConfigError(esp_err));
     esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_COUNTERS_NAMESPACE_PARTITION);
     SuccessOrExit(MapConfigError(esp_err));
+    esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_KVS_NAMESPACE_PARTITION);
+    SuccessOrExit(MapConfigError(esp_err));
 #endif
 
     // Force initialization of NVS namespaces if they doesn't already exist.

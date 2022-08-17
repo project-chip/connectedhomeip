@@ -36,7 +36,7 @@ namespace chip {
 void LaunchShell()
 {
     chip::Shell::Engine::Root().Init();
-    xTaskCreate(&MatterShellTask, "matter_shell", 2048, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(MatterShellTask, "matter_shell", 2048, NULL, tskIDLE_PRIORITY + 1, NULL);
 }
 
 } // namespace chip
