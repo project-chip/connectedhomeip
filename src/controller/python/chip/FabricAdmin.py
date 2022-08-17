@@ -43,7 +43,7 @@ class FabricAdmin:
         return chip.native.GetLibraryHandle()
 
     @classmethod
-    def Logger(cls):
+    def logger(cls):
         return logging.getLogger('FabricAdmin')
 
     def __init__(self, certificateAuthority: CertificateAuthority, vendorId: int, fabricId: int = 1):
@@ -68,7 +68,7 @@ class FabricAdmin:
         self._fabricId = fabricId
         self._certificateAuthority = certificateAuthority
 
-        self.Logger().warning(f"New FabricAdmin: FabricId: 0x{self._fabricId:016X}, VendorId = 0x{self.vendorId:04X}")
+        self.logger().warning(f"New FabricAdmin: FabricId: 0x{self._fabricId:016X}, VendorId = 0x{self.vendorId:04X}")
 
         self._isActive = True
         self._activeControllers = []
@@ -100,7 +100,7 @@ class FabricAdmin:
             if (nodeId in nodeIdList):
                 raise RuntimeError(f"Provided NodeId {nodeId} collides with an existing controller instance!")
 
-        self.Logger().warning(
+        self.logger().warning(
             f"Allocating new controller with CaIndex: {self._certificateAuthority.caIndex}, FabricId: 0x{self._fabricId:016X}, NodeId: 0x{nodeId:016X}")
 
         controller = ChipDeviceCtrl.ChipDeviceController(

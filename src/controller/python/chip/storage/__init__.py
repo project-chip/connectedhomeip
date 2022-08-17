@@ -92,7 +92,7 @@ class PersistentStorage:
         and can be passed into C++ logic that needs an instance of that interface.
     '''
     @classmethod
-    def Logger(cls):
+    def logger(cls):
         return logging.getLogger('PersistentStorage')
 
     def __init__(self, path: str = None, jsonData: Dict = None):
@@ -109,9 +109,9 @@ class PersistentStorage:
             raise ValueError("Can't provide both a valid path and jsonData")
 
         if (path is not None):
-            self.Logger().warn(f"Initializing persistent storage from file: {path}")
+            self.logger().warn(f"Initializing persistent storage from file: {path}")
         else:
-            self.Logger().warn(f"Initializing persistent storage from dict")
+            self.logger().warn(f"Initializing persistent storage from dict")
 
         self._handle = chip.native.GetLibraryHandle()
         self._isActive = True
@@ -125,7 +125,7 @@ class PersistentStorage:
                 self._file.seek(0)
 
                 if (size != 0):
-                    self.Logger().warn(f"Loading configuration from {path}...")
+                    self.logger().warn(f"Loading configuration from {path}...")
                     self._jsonData = json.load(self._file)
                 else:
                     self._jsonData = {}
@@ -164,7 +164,7 @@ class PersistentStorage:
         ''' Commits the cached JSON configuration to file (if one was provided in the constructor).
             Otherwise, this is a no-op.
         '''
-        self.Logger().info("Committing...")
+        self.logger().info("Committing...")
 
         if (self._path is None):
             return
@@ -186,7 +186,7 @@ class PersistentStorage:
     def SetReplKey(self, key: str, value):
         ''' Set a REPL key to a specific value. Creates the key if one doesn't exist already.
         '''
-        self.Logger().info(f"SetReplKey: {key} = {value}")
+        self.logger().info(f"SetReplKey: {key} = {value}")
 
         if (key is None or key == ''):
             raise ValueError("Invalid Key")
@@ -210,7 +210,7 @@ class PersistentStorage:
     def SetSdkKey(self, key: str, value: bytes):
         ''' Set an SDK key to a specific value. Creates the key if one doesn't exist already.
         '''
-        self.Logger().info(f"SetSdkKey: {key} = {value}")
+        self.logger().info(f"SetSdkKey: {key} = {value}")
 
         if (key is None or key == ''):
             raise ValueError("Invalid Key")
@@ -234,7 +234,7 @@ class PersistentStorage:
     def DeleteSdkKey(self, key: str):
         ''' Deletes an SDK key if one exists.
         '''
-        self.Logger().info(f"DeleteSdkKey: {key}")
+        self.logger().info(f"DeleteSdkKey: {key}")
 
         del(self._jsonData['sdk-config'][key])
         self.Commit()

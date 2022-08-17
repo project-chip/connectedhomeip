@@ -35,8 +35,8 @@ from chip.storage import PersistentStorage
 
 
 class CertificateAuthority:
-    '''  This represents a Root Certificate Authority (CA) as identified by a globally unique public key (Root PK). This manages
-         a set of FabricAdmin objects, each administering a fabric identified by a unique FabricId scoped to the Root PK of the CA.
+    '''  This represents an operational Root Certificate Authority (CA) with a root key key pair with associated public key (i.e "Root PK") . This manages
+         a set of FabricAdmin objects, each administering a fabric identified by a unique FabricId scoped to it.
 
          Each CertificateAuthority instance is tied to a 'CA index' that is used to look-up the list of fabrics already setup previously
          in the provided PersistentStorage object.
@@ -53,7 +53,7 @@ class CertificateAuthority:
         return chip.native.GetLibraryHandle()
 
     @classmethod
-    def Logger(cls):
+    def logger(cls):
         return logging.getLogger('CertificateAuthority')
 
     def __init__(self, chipStack: ChipStack.ChipStack, caIndex: int, persistentStorage: PersistentStorage = None):
@@ -66,7 +66,7 @@ class CertificateAuthority:
                 persistentStorage:  An optional reference to a PersistentStorage object. If one is provided, it will pick that over
                                     the default PersistentStorage object retrieved from the chipStack.
         '''
-        self.Logger().warning(f"New CertificateAuthority at index {caIndex}")
+        self.logger().warning(f"New CertificateAuthority at index {caIndex}")
 
         self._chipStack = chipStack
         self._caIndex = caIndex
@@ -103,7 +103,7 @@ class CertificateAuthority:
         if (not(self._isActive)):
             raise RuntimeError("Object isn't active")
 
-        self.Logger().warning("Loading fabric admins from storage...")
+        self.logger().warning("Loading fabric admins from storage...")
 
         caList = self._persistentStorage.GetReplKey(key='caList')
         if (str(self._caIndex) not in caList):
@@ -147,7 +147,7 @@ class CertificateAuthority:
         return fabricAdmin
 
     def Shutdown(self):
-        ''' Shuts down all active FabricAdmin objects managed this CertificateAuthority before
+        ''' Shuts down all active FabricAdmin objects managed by this CertificateAuthority before
             shutting itself down.
 
             You cannot interact with this object there-after.
@@ -193,7 +193,7 @@ class CertificateAuthorityManager:
         return chip.native.GetLibraryHandle()
 
     @classmethod
-    def Logger(cls):
+    def logger(cls):
         return logging.getLogger('CertificateAuthorityManager')
 
     def __init__(self, chipStack: ChipStack.ChipStack, persistentStorage: PersistentStorage = None):
@@ -230,7 +230,7 @@ class CertificateAuthorityManager:
         if (not(self._isActive)):
             raise RuntimeError("Object is not active")
 
-        self.Logger().warning("Loading certificate authorities from storage...")
+        self.logger().warning("Loading certificate authorities from storage...")
 
         #
         # Persist details to storage (read modify write).
