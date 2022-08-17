@@ -243,9 +243,10 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     }
     ESP_LOGI(TAG, "Applying, Boot partition set offset:0x%x", imageProcessor->mOTAUpdatePartition->address);
 
+    PostOTAStateChangeEvent(DeviceLayer::kOtaApplyComplete);
+
     // HandleApply is called after delayed action time seconds are elapsed, so it would be safe to schedule the restart
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(2 * 1000), HandleRestart, nullptr);
-    PostOTAStateChangeEvent(DeviceLayer::kOtaApplyComplete);
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
