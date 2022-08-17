@@ -153,6 +153,9 @@
 // Commands for cluster: Ethernet Network Diagnostics
 #define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
 
+// Commands for cluster: Time Synchronization
+#define ZCL_SET_UTC_TIME_COMMAND_ID (0x00)
+
 // Commands for cluster: AdministratorCommissioning
 #define ZCL_OPEN_COMMISSIONING_WINDOW_COMMAND_ID (0x00)
 #define ZCL_OPEN_BASIC_COMMISSIONING_WINDOW_COMMAND_ID (0x01)
