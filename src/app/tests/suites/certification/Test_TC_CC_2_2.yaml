@@ -39,7 +39,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read current-hue 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint8 in  TH(all-clusters-app)  Logs:
 
           [1657908705.581609][2861:2861] CHIP:IM: Received Read request
           [1657908705.581752][2861:2861] CHIP:DMG: ReadRequestMessage =
@@ -72,7 +72,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint8 in  TH(all-clusters-app)  Logs:
 
           [1657908593.710273][2861:2861] CHIP:IM: Received Read request
           [1657908593.710359][2861:2861] CHIP:DMG: ReadRequestMessage =
@@ -103,7 +103,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read remaining-time 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
 
           [1657908803.102070][2933:2933] CHIP:IM: Received Read request
           [1657908803.102154][2933:2933] CHIP:DMG: ReadRequestMessage =
@@ -136,7 +136,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read current-x 1 1
 
-          Verify on TH(all-clusters-app)  log:
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
 
           [1657908856.780574][2933:2933] CHIP:IM: Received Read request
           [1657908856.780702][2933:2933] CHIP:DMG: ReadRequestMessage =
@@ -169,7 +169,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read current-y 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           [1657909305.413625][2933:2933] CHIP:IM: Received Read request
           [1657909305.413743][2933:2933] CHIP:DMG: ReadRequestMessage =
@@ -204,7 +205,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read drift-compensation 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an enum8 in  TH(all-clusters-app)  Logs:
+
 
           [1657909433.948649][2933:2933] CHIP:IM: Received Read request
           [1657909433.948766][2933:2933] CHIP:DMG: ReadRequestMessage =
@@ -239,7 +241,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read compensation-text 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains a string in  TH(all-clusters-app)  Logs:
+
 
           [1657909470.827379][2933:2933] CHIP:IM: Received Read request
           [1657909470.827505][2933:2933] CHIP:DMG: ReadRequestMessage =
@@ -273,7 +277,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-temperature 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           [1657909522.420348][2977:2977] CHIP:IM: Received Read request
           [1657909522.420471][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -306,7 +311,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-mode 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an enum8 in  TH(all-clusters-app)  Logs:
+
 
           [1657909555.028998][2977:2977] CHIP:IM: Received Read request
           [1657909555.029124][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -339,7 +346,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read options 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an bitmap8 in  TH(all-clusters-app)  Logs:
+
 
           [1657909576.774655][2977:2977] CHIP:IM: Received Read request
           [1657909576.774796][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -372,7 +381,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           [1657909627.086489][2977:2977] CHIP:IM: Received Read request
           [1657909627.086602][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -405,7 +415,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-color-mode 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an enum8 in  TH(all-clusters-app)  Logs:
+
 
           [1657909652.217887][2977:2977] CHIP:IM: Received Read request
           [1657909652.218015][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -438,7 +450,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-loop-active 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint8 in  TH(all-clusters-app)  Logs:
+
 
           [1657909711.352753][2977:2977] CHIP:IM: Received Read request
           [1657909711.352915][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -471,7 +485,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-loop-direction 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint8 in  TH(all-clusters-app)  Logs:
 
           [1657909741.232136][2977:2977] CHIP:IM: Received Read request
           [1657909741.232261][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -504,7 +518,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-loop-time 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
 
           [1657909771.649273][2977:2977] CHIP:IM: Received Read request
           [1657909771.649413][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -539,7 +554,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-loop-start-enhanced-hue 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           [1657909997.529812][2977:2977] CHIP:IM: Received Read request
           [1657909997.530002][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -574,7 +591,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-loop-stored-enhanced-hue 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           [1657910020.977065][2977:2977] CHIP:IM: Received Read request
           [1657910020.977155][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -607,7 +626,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-capabilities 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an map16 in  TH(all-clusters-app)  Logs:
+
 
           [1657910072.897195][2977:2977] CHIP:IM: Received Read request
           [1657910072.897323][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -642,7 +663,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-temp-physical-min-mireds  1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           [1657910109.902989][2977:2977] CHIP:IM: Received Read request
           [1657910109.903095][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -677,7 +700,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-temp-physical-max-mireds 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           [1657910176.514563][2977:2977] CHIP:IM: Received Read request
           [1657910176.514690][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -712,7 +737,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read couple-color-temp-to-level-min-mireds 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           [1657910205.278279][2977:2977] CHIP:IM: Received Read request
           [1657910205.278421][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -747,7 +774,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read start-up-color-temperature-mireds 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           [1657910246.097315][2977:2977] CHIP:IM: Received Read request
           [1657910246.097460][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -780,7 +808,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read number-of-primaries 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint8 in  TH(all-clusters-app)  Logs:
+
 
           [1657910445.890552][2977:2977] CHIP:IM: Received Read request
           [1657910445.890635][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -813,7 +842,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read  primary1x 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           [1657910568.808716][2977:2977] CHIP:IM: Received Read request
           [1657910568.808876][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -846,7 +877,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read  primary1y 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           [1657910588.961223][2977:2977] CHIP:IM: Received Read request
           [1657910588.961366][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -879,7 +912,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary1intensity 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint8 in  TH(all-clusters-app)  Logs:
+
 
           [1657910622.925613][2977:2977] CHIP:IM: Received Read request
           [1657910622.925739][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -912,7 +947,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary2x 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           [1657910659.885682][2977:2977] CHIP:IM: Received Read request
           [1657910659.885821][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -945,7 +982,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary2y 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           [1657910687.168648][2977:2977] CHIP:IM: Received Read request
           [1657910687.168754][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -978,7 +1017,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary2intensity 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint8 in  TH(all-clusters-app)  Logs:
+
 
           [1657910837.125032][2977:2977] CHIP:IM: Received Read request
           [1657910837.125157][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -1011,7 +1051,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary3x 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
           CHIP:DMG: {
@@ -1036,7 +1077,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary3y 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1062,7 +1104,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary3intensity 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint8 in  TH(all-clusters-app)  Logs:
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1088,7 +1130,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary4x 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1114,7 +1158,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary4y 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1140,7 +1186,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary4intensity 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint8 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1166,7 +1213,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary5x 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1192,7 +1239,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary5y 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1218,7 +1266,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary5intensity 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint8 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1244,7 +1294,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary6x 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1270,7 +1321,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary6y 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1296,7 +1348,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary6intensity 1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint8 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1322,7 +1376,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read white-point-x   1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1348,7 +1404,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read white-point-y 1 1
 
-          Verify on TH(all-clusters-app) log:
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1375,7 +1432,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-rx   1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1402,7 +1461,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-ry   1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1430,7 +1491,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-rintensity   1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint8 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1457,7 +1520,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-gx   1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1484,7 +1549,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-gy   1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1512,7 +1579,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-gintensity   1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint8 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1539,7 +1608,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-bx   1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1566,7 +1637,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-by   1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =
@@ -1594,7 +1667,9 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-bintensity   1 1
 
-          Verify on TH(all-clusters-app) log:
+
+          Verify response contains an uint8 in  TH(all-clusters-app)  Logs:
+
 
           CHIP:IM: Received Read request
           CHIP:DMG: ReadRequestMessage =

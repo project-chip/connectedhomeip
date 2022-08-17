@@ -34,7 +34,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol move-to-hue 1 0 300 0 0 1 1
 
-          Verify on TH(all-clusters-app) Log
+          Verify success response in TH(all-clusters-app) Log:
 
           [1657911287.814194][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657911287.814246][2977:2977] CHIP:DMG: {
@@ -76,8 +76,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read current-hue 1  1
 
-          Verify on TH(all-clusters-app) Log
-
+          Verify response contains a CurrentHue value in  TH(all-clusters-app)  Logs:
           [1657911327.184763][2977:2977] CHIP:IM: Received Read request
           [1657911327.184901][2977:2977] CHIP:DMG: ReadRequestMessage =
           [1657911327.184952][2977:2977] CHIP:DMG: {
@@ -109,7 +108,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol move-hue 1 10 0 0 1 1
 
-          Verify on TH(all-clusters-app) log
+          Verify success response in TH(all-clusters-app) Log:
 
           [1657911357.567908][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657911357.567957][2977:2977] CHIP:DMG: {
@@ -149,7 +148,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read current-hue 1  1
 
-          Verify on TH(all-clusters-app) log
+
+          Verify response contains a CurrentHue value in  TH(all-clusters-app)  Logs:
 
           [1657911381.312873][2977:2977] CHIP:IM: Received Read request
           [1657911381.312995][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -182,7 +182,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol step-hue 1 10 200 0 0 1 1
 
-          Verify on TH(all-clusters-app) log
+
+          Verify success response in TH(all-clusters-app) Log:
 
           [1657911412.480684][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657911412.480741][2977:2977] CHIP:DMG: {
@@ -223,7 +224,8 @@ tests:
       PICS: CC.C.C02.Rsp && CC.C.A0000
       verification: |
           ./chip-tool colorcontrol read current-hue 1  1
-          Verify on TH(all-clusters-app) Log
+
+          Verify response contains a CurrentHue value in  TH(all-clusters-app)  Logs:
 
           [1657911437.116353][2977:2977] CHIP:IM: Received Read request
           [1657911437.116480][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -255,7 +257,8 @@ tests:
       PICS: CC.C.C47.Rsp
       verification: |
           ./chip-tool colorcontrol stop-move-step 0 0 1 1
-          Verify on TH(all-clusters-app) log
+
+          Verify success response in TH(all-clusters-app) Log:
 
           [1657911457.334435][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657911457.334464][2977:2977] CHIP:DMG: {
@@ -292,8 +295,8 @@ tests:
       PICS: CC.C.C47.Rsp && CC.C.A0000
       verification: |
           ./chip-tool colorcontrol read current-hue 1  1
-          Verify on TH(all-clusters-app) Log
 
+          Verify response contains a CurrentHue value in  TH(all-clusters-app)  Logs:
           [1657911437.116353][2977:2977] CHIP:IM: Received Read request
           [1657911437.116480][2977:2977] CHIP:DMG: ReadRequestMessage =
           [1657911437.116528][2977:2977] CHIP:DMG: {

@@ -34,7 +34,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol enhanced-move-to-hue 1000 3 200 0 0 1 1
 
-          Verify in TH(all-clusters-app) log:
+          Verify success response in TH(all-clusters-app) Log:
           [1657912045.703432][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657912045.703462][2977:2977] CHIP:DMG: {
           [1657912045.703485][2977:2977] CHIP:DMG:        suppressResponse = false,
@@ -76,7 +76,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
-          Verify in TH(all-clusters-app) log:
+
+          Verify response contains a EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
           [1657912064.296156][2977:2977] CHIP:IM: Received Read request
           [1657912064.296261][2977:2977] CHIP:DMG: ReadRequestMessage =
           [1657912064.296295][2977:2977] CHIP:DMG: {
@@ -108,7 +109,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol enhanced-move-hue 0 100 0 0 1 1
 
-          Verify in TH(all-clusters-app) log:
+
+          Verify success response in TH(all-clusters-app) Log:
 
           [1657912085.345044][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657912085.345072][2977:2977] CHIP:DMG: {
@@ -149,7 +151,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
-          Verify in TH(all-clusters-app) log:
+          Verify response contains a EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
           [1657912064.296156][2977:2977] CHIP:IM: Received Read request
           [1657912064.296261][2977:2977] CHIP:DMG: ReadRequestMessage =
           [1657912064.296295][2977:2977] CHIP:DMG: {
@@ -181,7 +183,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol enhanced-step-hue 1 1000 200 0 0 1 1
 
-          Verify in TH(all-clusters-app) log:
+          Verify success response in TH(all-clusters-app) Log:
           [1657912123.677693][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657912123.677720][2977:2977] CHIP:DMG: {
           [1657912123.677742][2977:2977] CHIP:DMG:        suppressResponse = false,
@@ -223,7 +225,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
-          Verify in TH(all-clusters-app) log:
+          Verify response contains a EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
           [1657912064.296156][2977:2977] CHIP:IM: Received Read request
           [1657912064.296261][2977:2977] CHIP:DMG: ReadRequestMessage =
           [1657912064.296295][2977:2977] CHIP:DMG: {
@@ -255,7 +257,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol enhanced-move-to-hue-and-saturation 2500 100 200 0 0 1 1
 
-          Verify in TH(all-clusters-app) log:
+
+          Verify success response in TH(all-clusters-app) Log:
           [1657912153.500024][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657912153.500080][2977:2977] CHIP:DMG: {
           [1657912153.500108][2977:2977] CHIP:DMG:        suppressResponse = false,
@@ -297,7 +300,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
-          Verify in TH(all-clusters-app) log:
+
+          Verify response contains a EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
           [1657912064.296156][2977:2977] CHIP:IM: Received Read request
           [1657912064.296261][2977:2977] CHIP:DMG: ReadRequestMessage =
           [1657912064.296295][2977:2977] CHIP:DMG: {
@@ -329,7 +333,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol stop-move-step 0 0 1 1
 
-          Verify in TH(all-clusters-app) log:
+
+          Verify success response in TH(all-clusters-app) Log:
           [1657912172.988756][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657912172.988782][2977:2977] CHIP:DMG: {
           [1657912172.988805][2977:2977] CHIP:DMG:        suppressResponse = false,
@@ -367,7 +372,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
-          Verify in TH(all-clusters-app) log:
+
+          Verify response contains a EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
           [1657912064.296156][2977:2977] CHIP:IM: Received Read request
           [1657912064.296261][2977:2977] CHIP:DMG: ReadRequestMessage =
           [1657912064.296295][2977:2977] CHIP:DMG: {
