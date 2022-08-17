@@ -58,7 +58,7 @@ tests:
               contains: [0, 15, 17]
 
     - label:
-          "Read the optonal attribute(StartUpCurrentLevel and RemainingTime) in
+          "Read the optional attribute(StartUpCurrentLevel and RemainingTime) in
           AttributeList"
       PICS: LVL.S.F01
       command: "readAttribute"
@@ -69,7 +69,7 @@ tests:
               contains: [1, 16384]
 
     - label:
-          "Read the optonal attribute(CurrentFrequency, MinFrequency and
+          "Read the optional attribute(CurrentFrequency, MinFrequency and
           MinFrequency) in AttributeList"
       PICS: LVL.S.F02
       command: "readAttribute"
@@ -79,7 +79,7 @@ tests:
               type: list
               contains: [4, 5, 6]
 
-    - label: "Read the optonal attribute(MinLevel) in AttributeList"
+    - label: "Read the optional attribute(MinLevel) in AttributeList"
       PICS: LVL.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
@@ -88,7 +88,7 @@ tests:
               type: list
               contains: [2]
 
-    - label: "Read the optonal attribute(MaxLevel) in AttributeList"
+    - label: "Read the optional attribute(MaxLevel) in AttributeList"
       PICS: LVL.S.A0003
       command: "readAttribute"
       attribute: "AttributeList"
@@ -97,7 +97,7 @@ tests:
               type: list
               contains: [3]
 
-    - label: "Read the optonal attribute(OnOffTransitionTime) in AttributeList"
+    - label: "Read the optional attribute(OnOffTransitionTime) in AttributeList"
       PICS: LVL.S.A0010
       command: "readAttribute"
       attribute: "AttributeList"
@@ -106,7 +106,7 @@ tests:
               type: list
               contains: [16]
 
-    - label: "Read the optonal attribute(OnTransitionTime) in AttributeList"
+    - label: "Read the optional attribute(OnTransitionTime) in AttributeList"
       PICS: LVL.S.A0012
       command: "readAttribute"
       attribute: "AttributeList"
@@ -115,7 +115,7 @@ tests:
               type: list
               contains: [18]
 
-    - label: "Read the optonal attribute(OffTransitionTime) in AttributeList"
+    - label: "Read the optional attribute(OffTransitionTime) in AttributeList"
       PICS: LVL.S.A0013
       command: "readAttribute"
       attribute: "AttributeList"
@@ -124,7 +124,7 @@ tests:
               type: list
               contains: [19]
 
-    - label: "Read the optonal attribute(DefaultMoveRate) in AttributeList"
+    - label: "Read the optional attribute(DefaultMoveRate) in AttributeList"
       PICS: LVL.S.A0014
       command: "readAttribute"
       attribute: "AttributeList"

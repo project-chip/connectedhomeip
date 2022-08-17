@@ -1783,6 +1783,9 @@ PICS:
       id: LTIME.C.A0000.24HR
 
     #Unit Localization Cluster
+    - label: "Does the device implement different units of temperature ?"
+      id: LUNIT.S.F00
+
     - label: "Does the DUT (Server) support TemperatureUnit attribute?"
       id: LUNIT.S.A0000
 

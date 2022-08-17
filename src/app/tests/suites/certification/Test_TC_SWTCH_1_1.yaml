@@ -31,78 +31,19 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the global attribute: FeatureMap"
+    - label:
+          "Read FeatureMap  attribute and Check values of flags in this
+          FeatureMap"
+      PICS:
+          (SWTCH.S.F00 || SWTCH.S.F01 || SWTCH.S.F02 || SWTCH.S.F03 ||
+          SWTCH.S.F04)
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          saveAs: FeatureMapValue
-
-    #bitwise check is not implemented in yaml framework
-    - label: "Check values of flags in this FeatureMap"
-      verification: |
-          LS is set to 1; MS, MSR, MSL,
-          MSM are all set to 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && SWTCH.S.F00
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Check values of flags in this FeatureMap"
-      verification: |
-          LS is set to 0; MS is set to 1
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && SWTCH.S.F01
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Check values of flags in this FeatureMap"
-      verification: |
-          LS is set to 0; MS, MSR are set to 1
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && SWTCH.S.F02
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Check values of flags in this FeatureMap"
-      verification: |
-          LS is set to 0; MS, MSR, MSL are all set to 1
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && SWTCH.S.F03
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Check values of flags in this FeatureMap"
-      verification: |
-          LS is set to 0; MS, MSR, MSM are all set to 1
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && SWTCH.S.F04
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+          constraints:
+              type: bitmap32
+              minValue: 0
+              maxValue: 31
 
     - label: "read the global attribute: ClusterRevision"
       command: "readAttribute"
