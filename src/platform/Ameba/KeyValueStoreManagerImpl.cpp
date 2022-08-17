@@ -52,19 +52,25 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     if (read_bytes_size)
     {
         ret = getPref_bin_new(key, key, (uint8_t *) value, value_size, read_bytes_size);
-        switch (ret)
-        {
-        case 0:
-            return CHIP_NO_ERROR;
-        case -6:
-            return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-        case -7:
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        case -8:
-            return CHIP_ERROR_BUFFER_TOO_SMALL;
-        default:
-            break;
-        }
+    }
+    else 
+    {
+        size_t *dummy_read_bytes_size = (size_t *) pvPortMalloc(sizeof(size_t));
+        ret = getPref_bin_new(key, key, (uint8_t *) value, value_size, dummy_read_bytes_size);
+        vPortFree(dummy_read_bytes_size);
+    }
+    switch (ret)
+    {
+    case 0:
+        return CHIP_NO_ERROR;
+    case -6:
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    case -7:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    case -8:
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    default:
+        break;
     }
 
     return CHIP_ERROR_INTERNAL;
