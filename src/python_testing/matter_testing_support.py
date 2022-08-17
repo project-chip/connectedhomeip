@@ -124,6 +124,7 @@ class MatterTestConfig:
     ble_interface_id: int = None
 
     admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
+    case_admin_subject: int = None
     global_test_params: dict = field(default_factory=dict)
     # List of explicit tests to run by name. If empty, all tests will run
     tests: List[str] = field(default_factory=list)
@@ -477,6 +478,13 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
             return False
         config.commissionee_ip_address_just_for_testing = args.ip_addr
 
+    if args.case_admin_subject is None:
+        # Use controller node ID as CASE admin subject during commissioning if nothing provided
+        config.case_admin_subject = config.controller_node_id
+    else:
+        # If a CASE admin subject is provided, then use that
+        config.case_admin_subject = args.case_admin_subject
+
     return True
 
 
@@ -569,6 +577,8 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
 
     commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=_DEFAULT_ADMIN_VENDOR_ID,
                                   metavar="VENDOR_ID", help="VendorID to use during commissioning (default 0x%04X)" % _DEFAULT_ADMIN_VENDOR_ID)
+    commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
+                                  metavar="CASE_ADMIN_SUBJECT", help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
 
     code_group = parser.add_mutually_exclusive_group(required=False)
 
@@ -685,6 +695,7 @@ def default_matter_test_main(argv=None):
     test_config.user_params["matter_stack"] = stash_globally(stack)
 
     # TODO: Steer to right FabricAdmin!
+    # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
     default_controller = stack.certificate_authorities[0].adminList[0].NewController(nodeId=matter_test_config.controller_node_id,
                                                                                      paaTrustStorePath=str(matter_test_config.paa_trust_store_path))
     test_config.user_params["default_controller"] = stash_globally(default_controller)
