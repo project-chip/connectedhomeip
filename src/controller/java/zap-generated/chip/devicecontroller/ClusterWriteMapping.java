@@ -2837,6 +2837,8 @@ public class ClusterWriteMapping {
         "writeNullableRangeRestrictedInt16sAttribute",
         writeTestClusterNullableRangeRestrictedInt16sAttributeInteractionInfo);
     writeAttributeMap.put("testCluster", writeTestClusterInteractionInfo);
+    Map<String, InteractionInfo> writeFaultInjectionInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("faultInjection", writeFaultInjectionInteractionInfo);
     return writeAttributeMap;
   }
 }

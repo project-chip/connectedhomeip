@@ -1209,3 +1209,9 @@
 #define ZCL_NULLABLE_RANGE_RESTRICTED_INT8S_ATTRIBUTE_ID (0x4027)
 #define ZCL_NULLABLE_RANGE_RESTRICTED_INT16_U_ATTRIBUTE_ID (0x4028)
 #define ZCL_NULLABLE_RANGE_RESTRICTED_INT16_S_ATTRIBUTE_ID (0x4029)
+
+// Attribute ids for cluster: Fault Injection
+
+// Client attributes
+
+// Server attributes
