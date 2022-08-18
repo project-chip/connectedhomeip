@@ -118,6 +118,14 @@ CHIP_ERROR RequestorCanConsentHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR SetPeriodicQueryTimeoutHandler(int argc, char ** argv)
+{
+    VerifyOrReturnError(argc == 1, CHIP_ERROR_INVALID_ARGUMENT);
+    gRequestorUser.SetPeriodicQueryTimeout(strtoul(argv[0], NULL, 0));
+    gRequestorUser.RekickPeriodicQueryTimer();
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR OTARequestorHandler(int argc, char ** argv)
 {
     if (argc == 0)
@@ -147,6 +155,9 @@ void OTARequestorCommands::Register()
         { &RequestorCanConsentHandler, "requestorCanConsent",
           "Set requestorCanConsent for QueryImageCommand\n"
           "Usage: OTARequestor requestorCanConsent <true/false>" },
+        { &SetPeriodicQueryTimeoutHandler, "PeriodicQueryTimeout",
+          "Set timeout for querying the OTA provider for an update\n"
+          "Usage: OTARequestor PeriodicQueryTimeout <seconds>" },
 
     };
 
