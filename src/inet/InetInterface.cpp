@@ -47,12 +47,19 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <unistd.h>
+
 #ifdef HAVE_SYS_SOCKIO_H
 #include <sys/sockio.h>
 #endif /* HAVE_SYS_SOCKIO_H */
+
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
+
+#if __linux__
+#include <linux/if_addr.h>
+#endif
+
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
@@ -152,6 +159,11 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
 {
     // Only 64 bits prefix are supported
     return 64;
+}
+
+BitFlags<InterfaceAddressIterator::Flags> InterfaceAddressIterator::GetFlags()
+{
+    return BitFlags<InterfaceAddressIterator::Flags>();
 }
 
 #endif
@@ -405,7 +417,12 @@ CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr) const
     return CHIP_NO_ERROR;
 }
 
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+BitFlags<InterfaceAddressIterator::Flags> InterfaceAddressIterator::GetFlags()
+{
+    return BitFlags<InterfaceAddressIterator::Flags>();
+}
+
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
@@ -897,6 +914,45 @@ CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr) const
     return (found) ? CHIP_NO_ERROR : INET_ERROR_ADDRESS_NOT_FOUND;
 }
 
+BitFlags<InterfaceAddressIterator::Flags> InterfaceAddressIterator::GetFlags()
+{
+    BitFlags<InterfaceAddressIterator::Flags> flags;
+
+#if __linux__
+    if (!HasCurrent())
+    {
+        return flags;
+    }
+
+    if (mCurAddr->ifa_flags & IFA_F_OPTIMISTIC)
+    {
+        flags.Set(InterfaceAddressIterator::Flags::kNotFinal);
+    }
+
+    if (mCurAddr->ifa_flags & IFA_F_DADFAILED)
+    {
+        flags.Set(InterfaceAddressIterator::Flags::kNotFinal);
+    }
+
+    if (mCurAddr->ifa_flags & IFA_F_TENTATIVE)
+    {
+        flags.Set(InterfaceAddressIterator::Flags::kNotFinal);
+    }
+
+    if (mCurAddr->ifa_flags & IFA_F_TEMPORARY)
+    {
+        flags.Set(InterfaceAddressIterator::Flags::kTemporary);
+    }
+
+    if (mCurAddr->ifa_flags & IFA_F_DEPRECATED)
+    {
+        flags.Set(InterfaceAddressIterator::Flags::kDeprecated);
+    }
+#endif
+
+    return flags;
+}
+
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
@@ -1119,6 +1175,11 @@ CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr) const
     *llAddr = IPAddress(*ip6_addr);
 
     return CHIP_NO_ERROR;
+}
+
+BitFlags<InterfaceAddressIterator::Flags> InterfaceAddressIterator::GetFlags()
+{
+    return BitFlags<InterfaceAddressIterator::Flags>();
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF

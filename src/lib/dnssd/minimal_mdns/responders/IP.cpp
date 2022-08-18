@@ -21,12 +21,20 @@
 namespace mdns {
 namespace Minimal {
 
+using namespace chip::Inet;
+
 void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                                     const ResponseConfiguration & configuration)
 {
-    chip::Inet::IPAddress addr;
-    for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
+    IPAddress addr;
+    for (InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
+        if (it.GetFlags().HasAny(InterfaceAddressIterator::Flags::kNotFinal, InterfaceAddressIterator::Flags::kTemporary,
+                                 InterfaceAddressIterator::Flags::kDeprecated))
+        {
+            continue;
+        }
+
         if ((it.GetInterfaceId() == source->Interface) && (it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv4())
         {
             IPResourceRecord record(GetQName(), addr);
@@ -39,14 +47,20 @@ void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, Res
 void IPv6Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                                     const ResponseConfiguration & configuration)
 {
-    for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
+    for (InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
         if (it.GetInterfaceId() != source->Interface)
         {
             continue;
         }
 
-        chip::Inet::IPAddress addr;
+        if (it.GetFlags().HasAny(InterfaceAddressIterator::Flags::kNotFinal, InterfaceAddressIterator::Flags::kTemporary,
+                                 InterfaceAddressIterator::Flags::kDeprecated))
+        {
+            continue;
+        }
+
+        IPAddress addr;
         if ((it.GetInterfaceId() == source->Interface) && (it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv6())
         {
             IPResourceRecord record(GetQName(), addr);

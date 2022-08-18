@@ -390,6 +390,13 @@ protected:
 class DLL_EXPORT InterfaceAddressIterator
 {
 public:
+    enum class Flags : uint8_t
+    {
+        kNotFinal   = (1 << 0), // Not yet valid: Optimistic/DAD failed/tentative
+        kTemporary  = (1 << 1), // IFA_F_TEMPORARY on linux
+        kDeprecated = (1 << 2), // IFA_F_DEPRECATED on linux
+    };
+
     /**
      * Constructs an InterfaceAddressIterator object.
      *
@@ -519,6 +526,13 @@ public:
      *          if the iterator is not positioned on an interface address.
      */
     bool HasBroadcastAddress();
+
+    /**
+     * Fetch the flags for the given interface address.
+     *
+     * Note: not all implementations may support all flags.
+     */
+    BitFlags<Flags> GetFlags();
 
 private:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
