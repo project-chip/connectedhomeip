@@ -21,6 +21,8 @@ from configparser import ConfigParser
 import click
 import typing
 import re
+from os.path import exists
+import logging
 
 
 def convert_ini_to_json(ini_dir: str, json_path: str):
@@ -32,39 +34,55 @@ def convert_ini_to_json(ini_dir: str, json_path: str):
     """
     python_json_store = {}
 
-    python_json_store['repl-config'] = {
-        'fabricAdmins': {
-            '1': {
-                'fabricId': 1,
-                'vendorId': 65521
-            },
-            '2': {
-                'fabricId': 2,
-                'vendorId': 65521
-            },
-            '3': {
-                'fabricId': 3,
-                'vendorId': 65521
-            }
-        }
-    }
+    ini_file_paths = ['/chip_tool_config.alpha.ini', '/chip_tool_config.beta.ini', '/chip_tool_config.gamma.ini']
+    counter = 1
 
-    python_json_store['sdk-config'] = {}
-
-    load_ini_into_dict(ini_file=ini_dir + '/chip_tool_config.alpha.ini',
-                       json_dict=python_json_store['sdk-config'], replace_suffix='1')
-    load_ini_into_dict(ini_file=ini_dir + '/chip_tool_config.beta.ini',
-                       json_dict=python_json_store['sdk-config'], replace_suffix='2')
-    load_ini_into_dict(ini_file=ini_dir + '/chip_tool_config.gamma.ini',
-                       json_dict=python_json_store['sdk-config'], replace_suffix='3')
+    for path in ini_file_paths:
+        full_path = ini_dir + path
+        if (exists(full_path)):
+            logging.critical(f"Found chip tool INI file at: {full_path} - Converting...")
+            create_repl_config_from_init(ini_file=full_path,
+                                         json_dict=python_json_store, replace_suffix=str(counter))
+        counter = counter + 1
 
     json_file = open(json_path, 'w')
     json.dump(python_json_store, json_file, ensure_ascii=True, indent=4)
 
 
+def create_repl_config_from_init(ini_file: str, json_dict: typing.Dict, replace_suffix: str):
+    ''' This updates a provided JSON dictionary to create a REPL compliant configuration store that
+        contains the correct 'repl-config' and 'sdk-config' keys built from the provided chip-tool
+        INI file that contains the root public keys. The INI file will typically be named
+        with the word 'alpha', 'beta' or 'gamma' in the name.
+
+        ini_file:           Path to source INI file
+        json_dict:          JSON dictionary to be updated. Multiple passes through this function using
+                            the same dictionary is possible.
+        replace_suffix:     The credentials in the INI file typically have keys that end with 0. This suffix
+                            can be replaced with a different number.
+    '''
+    if ('repl-config' not in json_dict):
+        json_dict['repl-config'] = {}
+
+    if ('caList' not in json_dict['repl-config']):
+        json_dict['repl-config']['caList'] = {}
+
+    json_dict['repl-config']['caList'][replace_suffix] = [
+        {'fabricId': int(replace_suffix), 'vendorId': 0XFFF1}
+    ]
+
+    if ('sdk-config' not in json_dict):
+        json_dict['sdk-config'] = {}
+
+    load_ini_into_dict(ini_file=ini_file, json_dict=json_dict['sdk-config'], replace_suffix=replace_suffix)
+
+
 def load_ini_into_dict(ini_file: str, json_dict: typing.Dict, replace_suffix: str):
-    """ Loads the specific INI file into the provided dictionary. A 'replace_suffix' string
+    """ Loads the specific INI file containing CA credential information into the provided dictionary. A 'replace_suffix' string
         has to be provided to convert the existing numerical suffix to a different value.
+
+        NOTE: This does not do any conversion of the keys into a format acceptable by the Python REPL environment. Please see
+              create_repl_config_from_init above if that is desired.
     """
     config = ConfigParser()
 
