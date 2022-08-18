@@ -18,6 +18,7 @@
 from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body
 import chip.clusters as Clusters
 import chip.FabricAdmin
+import chip.CertificateAuthority
 import logging
 from mobly import asserts
 from chip.utils import CommissioningBuildingBlocks
@@ -120,7 +121,9 @@ class TC_RR_1_1(MatterBaseTest):
         for i in range(num_fabrics_to_commission - 1):
             admin_index = 2 + i
             logging.info("Commissioning fabric %d/%d" % (admin_index, num_fabrics_to_commission))
-            new_fabric_admin = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1, adminIndex=admin_index)
+            new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+            new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=admin_index)
+
             new_admin_ctrl = new_fabric_admin.NewController(nodeId=dev_ctrl.nodeId)
             new_admin_ctrl.name = all_names.pop(0)
             client_list.append(new_admin_ctrl)
