@@ -22088,6 +22088,41 @@ using chip::SessionHandle;
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
 
+- (void)failRandomlyAtFaultWithParams:(MTRFaultInjectionClusterFailRandomlyAtFaultParams *)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completionHandler:(StatusCompletion)completionHandler
+{
+    // Make a copy of params before we go async.
+    params = [params copy];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
+    new MTRCommandSuccessCallbackBridge(
+        self.callbackQueue, baseDevice,
+        ^(id _Nullable value, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            chip::Optional<uint16_t> timedInvokeTimeoutMs;
+            ListFreer listFreer;
+            FaultInjection::Commands::FailRandomlyAtFault::Type request;
+            if (params != nil) {
+                if (params.timedInvokeTimeoutMs != nil) {
+                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+                }
+            }
+            request.type = static_cast<std::remove_reference_t<decltype(request.type)>>(params.type.unsignedCharValue);
+            request.id = params.id.unsignedIntValue;
+            request.percentage = params.percentage.unsignedCharValue;
+
+            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+            chip::Controller::FaultInjectionCluster cppCluster(exchangeManager, session, self->_endpoint);
+            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+        });
+
+    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+}
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)

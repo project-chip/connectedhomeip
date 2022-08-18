@@ -8149,6 +8149,7 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * FailAtFault                                                       |   0x00 |
+| * FailRandomlyAtFault                                               |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * GeneratedCommandList                                              | 0xFFF8 |
@@ -8192,6 +8193,39 @@ public:
 
 private:
     chip::app::Clusters::FaultInjection::Commands::FailAtFault::Type mRequest;
+};
+
+/*
+ * Command FailRandomlyAtFault
+ */
+class FaultInjectionFailRandomlyAtFault : public ClusterCommand
+{
+public:
+    FaultInjectionFailRandomlyAtFault(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("fail-randomly-at-fault", credsIssuerConfig)
+    {
+        AddArgument("Type", 0, UINT8_MAX, &mRequest.type);
+        AddArgument("Id", 0, UINT32_MAX, &mRequest.id);
+        AddArgument("Percentage", 0, UINT8_MAX, &mRequest.percentage);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC06) command (0x00000001) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC06, 0x00000001, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC06) command (0x00000001) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC06, 0x00000001, mRequest);
+    }
+
+private:
+    chip::app::Clusters::FaultInjection::Commands::FailRandomlyAtFault::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -13266,8 +13300,9 @@ void registerClusterFaultInjection(Commands & commands, CredentialIssuerCommands
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),        //
-        make_unique<FaultInjectionFailAtFault>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                //
+        make_unique<FaultInjectionFailAtFault>(credsIssuerConfig),         //
+        make_unique<FaultInjectionFailRandomlyAtFault>(credsIssuerConfig), //
         //
         // Attributes
         //

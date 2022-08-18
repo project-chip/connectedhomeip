@@ -29040,6 +29040,25 @@ class FaultInjection(Cluster):
             numCallsToFail: 'uint' = 0
             takeMutex: 'bool' = False
 
+        @dataclass
+        class FailRandomlyAtFault(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC06
+            command_id: typing.ClassVar[int] = 0x0001
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="type", Tag=0, Type=FaultInjection.Enums.FaultType),
+                            ClusterObjectFieldDescriptor(Label="id", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="percentage", Tag=2, Type=uint),
+                    ])
+
+            type: 'FaultInjection.Enums.FaultType' = 0
+            id: 'uint' = 0
+            percentage: 'uint' = 0
+
 
     class Attributes:
         @dataclass

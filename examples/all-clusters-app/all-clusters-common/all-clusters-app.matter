@@ -3850,7 +3850,14 @@ server cluster FaultInjection = 4294048774 {
     BOOLEAN takeMutex = 4;
   }
 
+  request struct FailRandomlyAtFaultRequest {
+    FaultType type = 0;
+    INT32U id = 1;
+    INT8U percentage = 2;
+  }
+
   command access(invoke: manage) FailAtFault(FailAtFaultRequest): DefaultSuccess = 0;
+  command access(invoke: manage) FailRandomlyAtFault(FailRandomlyAtFaultRequest): DefaultSuccess = 1;
 }
 
 endpoint 0 {
