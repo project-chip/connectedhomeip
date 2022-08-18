@@ -106,7 +106,7 @@ for arg; do
         enable_p6_builds=true)
             p6_builds_enabled=1
             ;;
-        p6_board=*)
+        psoc6_board=*)
             p6_board_selected=1
             ;;
     esac
@@ -141,13 +141,13 @@ fi
 
 echo
 
-# P6 Build setup
+# PSoC6 Build setup
 if [[ -z "$p6_builds_enabled" ]]; then
     echo "Hint: Pass enable_p6_builds=true to this script to enable building for PSoC6-43012"
 else
-    p6_sdk_args=""
+    psoc6_sdk_args=""
     if [[ -z "$p6_board_selected" ]]; then
-        p6_sdk_args="p6_board=\"CY8CKIT-062S2-43012\""
+        psoc6_sdk_args="psoc6_board=\"CY8CKIT-062S2-43012\""
     fi
 fi
 
