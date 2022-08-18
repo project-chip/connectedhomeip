@@ -253,8 +253,16 @@ efr32_executable("lighting_app") {
   }
 
   if (!disable_lcd) {
-    sources += [ "${examples_plat_dir}/display/lcd.c" ]
-    defines += [ "DISPLAY_ENABLED" ]
+    sources += [
+      "${examples_plat_dir}/display/demo-ui.c",
+      "${examples_plat_dir}/display/lcd.cpp",
+    ]
+
+    include_dirs += [ "${examples_plat_dir}/display" ]
+    defines += [
+      "DISPLAY_ENABLED",
+      "IS_DEMO_LIGHT=1",
+    ]
     if (show_qr_code) {
       defines += [ "QR_CODE_ENABLED" ]
 

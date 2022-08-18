@@ -237,9 +237,11 @@ efr32_executable("window_app") {
 
   if (!disable_lcd) {
     sources += [
-      "${examples_plat_dir}/display/lcd.c",
+      "${examples_plat_dir}/display/demo-ui.c",
+      "${examples_plat_dir}/display/lcd.cpp",
       "src/LcdPainter.cpp",
     ]
+    include_dirs += [ "${examples_plat_dir}/display" ]
     defines += [ "DISPLAY_ENABLED" ]
 
     if (show_qr_code) {
