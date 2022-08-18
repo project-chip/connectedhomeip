@@ -391,7 +391,7 @@ class BaseTestHelper:
         '''
 
         # Allocate a new controller instance with a CAT tag.
-        newController = self.fabricAdmin.NewController(nodeId=300, catTags=[0xFFFFFFFD00010001])
+        newController = self.fabricAdmin.NewController(nodeId=300, catTags=[0x00010001])
 
         # Read out an attribute using the new controller. It has no privileges, so this should fail with an UnsupportedAccess error.
         res = await newController.ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
