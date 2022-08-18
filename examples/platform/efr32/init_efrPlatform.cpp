@@ -60,7 +60,6 @@ extern "C" {
 #include "lcd.h"
 #endif
 
-
 /****************************************************************
  * Common Hal board initilization for Rs9116 and WF200
  * For Rs9116 - called from common SAPI
