@@ -118,9 +118,15 @@ EFR32OpaqueKeypair::EFR32OpaqueKeypair()
 
 EFR32OpaqueKeypair::~EFR32OpaqueKeypair()
 {
-    // Free dynamic resource
+    // Free key resources
     if (mContext != nullptr)
     {
+        // Delete volatile keys, since nobody else can after we drop the key ID.
+        if (!mIsPersistent)
+        {
+            Delete();
+        }
+
         MemoryFree(mContext);
         mContext = nullptr;
     }
@@ -244,7 +250,7 @@ CHIP_ERROR EFR32OpaqueKeypair::Create(EFR32OpaqueKeyId opaque_id, EFR32OpaqueKey
 
     // Store the key ID and mark the key as valid
     mHasKey       = true;
-    mIsPersistent = key_id != kEFR32OpaqueKeyIdVolatile;
+    mIsPersistent = opaque_id != kEFR32OpaqueKeyIdVolatile;
 
 exit:
     psa_reset_key_attributes(&attr);
