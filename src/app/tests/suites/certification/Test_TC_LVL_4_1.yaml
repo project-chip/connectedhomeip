@@ -44,6 +44,15 @@ tests:
       response:
           value: 1
 
+    #Adding below step resolve the issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/499
+    - label:
+          "Precondition: write default value of OnOffTransitionTime attribute"
+      PICS: LVL.S.A0013
+      command: "writeAttribute"
+      attribute: "OnOffTransitionTime"
+      arguments:
+          value: 0
+
     - label: "TH writes 0 to the Options attribute"
       PICS: LVL.S.A000f
       command: "writeAttribute"

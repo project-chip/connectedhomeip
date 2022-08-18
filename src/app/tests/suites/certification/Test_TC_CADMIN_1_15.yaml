@@ -11,293 +11,279 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    4.1.15. [TC-CADMIN-1.15] Removing Fabrics from DUT and Fabric index
-    enumeration using ECM [DUT -    Commissionee]
+    30.1.15. [TC-CADMIN-1.15] Removing Fabrics from DUT and Fabric index
+    enumeration using ECM [DUT - Commissionee]
 
 PICS:
     - CADMIN.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    nodeId2:
+        type: node_id
+        defaultValue: 0xCAFE
+    nodeId3:
+        type: node_id
+        defaultValue: 0xC00FEE
     endpoint: 0
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+    PakeVerifier:
+        type: octet_string
+        defaultValue:
+            "\xb9\x61\x70\xaa\xe8\x03\x34\x68\x84\x72\x4f\xe9\xa3\xb2\x87\xc3\x03\x30\xc2\xa6\x60\x37\x5d\x17\xbb\x20\x5a\x8c\xf1\xae\xcb\x35\x04\x57\xf8\xab\x79\xee\x25\x3a\xb6\xa8\xe4\x6b\xb0\x9e\x54\x3a\xe4\x22\x73\x6d\xe5\x01\xe3\xdb\x37\xd4\x41\xfe\x34\x49\x20\xd0\x95\x48\xe4\xc1\x82\x40\x63\x0c\x4f\xf4\x91\x3c\x53\x51\x38\x39\xb7\xc0\x7f\xcc\x06\x27\xa1\xb8\x57\x3a\x14\x9f\xcd\x1f\xa4\x66\xcf"
 
 tests:
-    - label: "Precondition"
+    - label: "Precondition: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Precondition: Reset Devices to factory defaults"
       verification: |
-          Reset Devices to factory defaults
-      disabled: true
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
+      identity: "alpha"
       PICS: CADMIN.S
-      verification: |
-          "1. Provision the device using 1st controller chip tool(use above instructions) ,
-          "
-      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+    - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
+      identity: "alpha"
       PICS: CADMIN.S.C00.Rsp
-      verification: |
-          On 1st controller chip tool, open commissioning window using ECM
-
-          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
-
-          [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
-          [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
-          [1635925713.966938][9695:9700] CHIP:CTL: OpenCommissioningWindow for device ID 1
-          [1635925713.972601][9695:9700] CHIP:DMG: ICR moving to [AddingComm]
-          [1635925713.972705][9695:9700] CHIP:DMG: ICR moving to [AddedComma]
-          [1635925713.972815][9695:9700] CHIP:IN: Prepared encrypted message 0xaaaad9b57d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 31056i with MessageCounter:0.
-          [1635925713.972876][9695:9700] CHIP:IN: Sending encrypted msg 0xaaaad9b57d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 13449459 msec
-          [1635925713.973006][9695:9700] CHIP:DMG: ICR moving to [CommandSen]
-          [1635925713.973061][9695:9700] CHIP:CTL: Manual pairing code: [36217551633]
-          [1635925713.973120][9695:9700] CHIP:CTL: SetupQRCode: [MT:00000CQM00A7F87ZT10]
-          [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
-      disabled: true
+      cluster: "AdministratorCommissioning"
+      command: "OpenCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEVerifier"
+                value: PakeVerifier
+              - name: "discriminator"
+                value: discriminator
+              - name: "iterations"
+                value: 1000
+              - name: "salt"
+                value: "SPAKE2P Key Salt"
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
       PICS: CADMIN.S
-      verification: |
-          On 2nd controller using chip tool connect to the accessory
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
 
+    - label: "DUT_CE is commissioned to TH_CR2"
+      identity: "beta"
+      PICS: CADMIN.S
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
 
-          ./chip-tool pairing code 2 36217551633  --commissioner-name beta
-
-          Verify you got below message
-          Device commissioning completed with success
-      disabled: true
-
-    - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+    - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
+      identity: "alpha"
       PICS: CADMIN.S.C00.Rsp
-      verification: |
-          On 1st controller chip tool, open commissioning window using ECM
+      cluster: "AdministratorCommissioning"
+      command: "OpenCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEVerifier"
+                value: PakeVerifier
+              - name: "discriminator"
+                value: discriminator
+              - name: "iterations"
+                value: 1000
+              - name: "salt"
+                value: "SPAKE2P Key Salt"
 
-          ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
-
-          [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
-          [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
-          [1635925713.966938][9695:9700] CHIP:CTL: OpenCommissioningWindow for device ID 1
-          [1635925713.972601][9695:9700] CHIP:DMG: ICR moving to [AddingComm]
-          [1635925713.972705][9695:9700] CHIP:DMG: ICR moving to [AddedComma]
-          [1635925713.972815][9695:9700] CHIP:IN: Prepared encrypted message 0xaaaad9b57d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 31056i with MessageCounter:0.
-          [1635925713.972876][9695:9700] CHIP:IN: Sending encrypted msg 0xaaaad9b57d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 13449459 msec
-          [1635925713.973006][9695:9700] CHIP:DMG: ICR moving to [CommandSen]
-          [1635925713.973061][9695:9700] CHIP:CTL: Manual pairing code: [36217551633]
-          [1635925713.973120][9695:9700] CHIP:CTL: SetupQRCode: [MT:00000CQM00A7F87ZT10]
-          [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
-      disabled: true
-
-    - label: "TH_CR3 starts a commissioning process with DUT_CE"
+    - label: "TH_CR3 Commissions with DUT_CE"
       PICS: CADMIN.S
-      verification: |
-          On 3rd controller using chip tool connect to the accessory
+      identity: "gamma"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId3
+              - name: "payload"
+                value: payload
 
-
-
-          ./chip-tool pairing code 3 36217551633  --commissioner-name gamma
-
-          Verify you got below message
-          Device commissioning completed with success
-      disabled: true
+    - label: "DUT_CE is commissioned to TH_CR3"
+      PICS: CADMIN.S
+      identity: "gamma"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId3
 
     - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
+      identity: "beta"
+      cluster: "Operational Credentials"
       PICS: OPCREDS.S.A0001
-      verification: |
-          On 2nd controller using chip tool, read fabrics list
-
-          ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0  --commissioner-name beta
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2455995193
-          CHIP:TOO:   Fabrics: 3 entries
-          CHIP:TOO:     [1]: {
-          CHIP:TOO:       RootPublicKey: 04656F56DBDB677DC957028DFC0ED76709C72753C9194B117A483BDC07386BFD9529B68EB4448FBBA3964EFF37A56A8F461D348B0DAF3B56A75F3B94BF8209D36F
-          CHIP:TOO:       VendorId: 65521
-          CHIP:TOO:       FabricId: 1
-          CHIP:TOO:       NodeId: 1
-          CHIP:TOO:       Label:
-          CHIP:TOO:       FabricIndex: 1
-          CHIP:TOO:      }
-          CHIP:TOO:     [2]: {
-          CHIP:TOO:       RootPublicKey: 04F8F28D5D70A4510E0F72FBBA31369796C4206FF95D97B77C1BDFD0438A3BE43510631A1B915BE189323F4CC0E015480192654D8170F8F230C7713898962958B7
-          CHIP:TOO:       VendorId: 65521
-          CHIP:TOO:       FabricId: 1
-          CHIP:TOO:       NodeId: 2
-          CHIP:TOO:       Label:
-          CHIP:TOO:       FabricIndex: 2
-          CHIP:TOO:      }
-          CHIP:TOO:     [3]: {
-          CHIP:TOO:       RootPublicKey: 04F8F28D5D70A4510E0F72FBBA31369796C4206FF95D97B77C1BDFD0438A3BE43510631A1B915BE189323F4CC0E015480192654D8170F8F230C7713898962958B7
-          CHIP:TOO:       VendorId: 65521
-          CHIP:TOO:       FabricId: 1
-          CHIP:TOO:       NodeId: 3
-          CHIP:TOO:       Label:
-          CHIP:TOO:       FabricIndex: 3
-          CHIP:TOO:      }
-          CHIP:EM: Sending Standalone Ack for MessageCounter:9143157 on exchange 1147i
-      disabled: true
+      command: "readAttribute"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { Label: "", FabricIndex: 1, nodeId: nodeId },
+                  { Label: "", FabricIndex: 2, nodeId: nodeId2 },
+                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+              ]
+          constraints:
+              type: list
 
     - label: "TH_CR2 sends RemoveFabric with FabricIndex = 2 command to DUT_CE"
       PICS: OPCREDS.S.C0a.Rsp
-      verification: |
-          on 2nd controller using chip tool, remove fabric with FabricIndex=2
-
-          ./chip-tool operationalcredentials remove-fabric 2 2 0  --commissioner-name beta
-
-          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          CHIP:TOO:   NOCResponse: {
-          CHIP:TOO:     statusCode: 0
-          CHIP:TOO:     fabricIndex: 2
-          CHIP:TOO:    }
-          CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: 2
 
     - label:
-          "TH_CR2 writes and reads the Basic Information Clusters NodeLabel
-          mandatory attribute of DUT_CE"
+          "TH_CR2 writes the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
       PICS: BINFO.S.A0005
+      identity: "beta"
+      command: "writeAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      arguments:
+          value: "chiptest"
+      response:
+          error: FAILURE
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/21999
+    - label:
+          "TH_CR2 reads the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      PICS: BINFO.S.A0005 && PICS_USER_PROMPT
       verification: |
-          Using your 2nd controller, write attribute and read attribute
+          Using your 2nd controller read attribute
 
           Below is the example while using chip tool on second controller,
-          ./chip-tool basic write node-label te5new 2 0  --commissioner-name beta
+          ./chip-tool basic read node-label 2 0
 
            Received error (protocol code 2) during pairing process. ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter
           [1651819620.929567][4359:4364] CHIP:CTL: OperationalDeviceProxy[B8070CD13C99D367:0000000000000002]: State change 3 --> 2
           [1651819620.929700][4359:4364] CHIP:-: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter at ../../commands/clusters/ModelCommand.cpp:53
-
-          ./chip-tool basic read node-label 2 0  --commissioner-name beta
-
-           Received error (protocol code 2) during pairing process. ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter
-          [1651819620.929567][4359:4364] CHIP:CTL: OperationalDeviceProxy[B8070CD13C99D367:0000000000000002]: State change 3 --> 2
-          [1651819620.929700][4359:4364] CHIP:-: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter at ../../commands/clusters/ModelCommand.cpp:53
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+      identity: "alpha"
       PICS: OPCREDS.S.A0001
-      verification: |
-          On 1st controller using chip tool, read fabrics list
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { Label: "", FabricIndex: 1, nodeId: nodeId },
+                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+              ]
+          constraints:
+              type: list
 
-          Below is the command using chip tool controller
-
-          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2455995219
-          [1647863260.286772][9294:9299] CHIP:TOO:   Fabrics: 2 entries
-          [1647863260.286908][9294:9299] CHIP:TOO:     [1]: {
-          [1647863260.286947][9294:9299] CHIP:TOO:       RootPublicKey: 04656F56DBDB677DC957028DFC0ED76709C72753C9194B117A483BDC07386BFD9529B68EB4448FBBA3964EFF37A56A8F461D348B0DAF3B56A75F3B94BF8209D36F
-          [1647863260.286995][9294:9299] CHIP:TOO:       VendorId: 65521
-          [1647863260.287026][9294:9299] CHIP:TOO:       FabricId: 1
-          [1647863260.287055][9294:9299] CHIP:TOO:       NodeId: 1
-          [1647863260.287084][9294:9299] CHIP:TOO:       Label:
-          [1647863260.287113][9294:9299] CHIP:TOO:       FabricIndex: 1
-          [1647863260.287144][9294:9299] CHIP:TOO:      }
-          [1647863260.287185][9294:9299] CHIP:TOO:     [2]: {
-          [1647863260.287221][9294:9299] CHIP:TOO:       RootPublicKey: 04F8F28D5D70A4510E0F72FBBA31369796C4206FF95D97B77C1BDFD0438A3BE43510631A1B915BE189323F4CC0E015480192654D8170F8F230C7713898962958B7
-          [1647863260.287253][9294:9299] CHIP:TOO:       VendorId: 65521
-          [1647863260.287282][9294:9299] CHIP:TOO:       FabricId: 1
-          [1647863260.287310][9294:9299] CHIP:TOO:       NodeId: 3
-          [1647863260.287339][9294:9299] CHIP:TOO:       Label:
-          [1647863260.287368][9294:9299] CHIP:TOO:       FabricIndex: 3
-          [1647863260.287396][9294:9299] CHIP:TOO:      }
-          [1647863260.287515][9294:9299] CHIP:EM: Sending Standalone Ack for MessageCounter:11301761 on exchange 13180i"
-      disabled: true
-
-    - label:
-          "Verify DUT_CE is now discoverable over DNS-SD with 2 Operational
-          service records (_matter._tcp SRV records)"
-      verification: |
-          grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
-          + wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
-          + wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
-          = wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
-             hostname = [E45F010F27530000.local]
-             address = [fe80::e65f:1ff:fe0f:2753]
-             port = [5540]
-             txt = ["T=1" "SAI=300" "SII=5000"]
-          = wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
-             hostname = [E45F010F27530000.local]
-             address = [fe80::e65f:1ff:fe0f:2753]
-             port = [5540]
-             txt = ["T=1" "SAI=300" "SII=5000"]
-          grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$
-      disabled: true
-
-    - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+    - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
+      identity: "alpha"
       PICS: CADMIN.S.C00.Rsp
-      verification: |
-          On 1st controller chip tool, open commissioning window using ECM
-
-          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
-
-          [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
-          [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
-          [1635925713.966938][9695:9700] CHIP:CTL: OpenCommissioningWindow for device ID 1
-          [1635925713.972601][9695:9700] CHIP:DMG: ICR moving to [AddingComm]
-          [1635925713.972705][9695:9700] CHIP:DMG: ICR moving to [AddedComma]
-          [1635925713.972815][9695:9700] CHIP:IN: Prepared encrypted message 0xaaaad9b57d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 31056i with MessageCounter:0.
-          [1635925713.972876][9695:9700] CHIP:IN: Sending encrypted msg 0xaaaad9b57d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 13449459 msec
-          [1635925713.973006][9695:9700] CHIP:DMG: ICR moving to [CommandSen]
-          [1635925713.973061][9695:9700] CHIP:CTL: Manual pairing code: [36217551633]
-          [1635925713.973120][9695:9700] CHIP:CTL: SetupQRCode: [MT:00000CQM00A7F87ZT10]
-          [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
-      disabled: true
+      cluster: "AdministratorCommissioning"
+      command: "OpenCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEVerifier"
+                value: PakeVerifier
+              - name: "discriminator"
+                value: discriminator
+              - name: "iterations"
+                value: 1000
+              - name: "salt"
+                value: "SPAKE2P Key Salt"
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
       PICS: CADMIN.S
-      verification: |
-          On 2nd controller using chip tool connect to the accessory
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
 
-
-          ./chip-tool pairing code 2 36217551633  --commissioner-name beta
-
-          Verify you got below message
-          Device commissioning completed with success
-      disabled: true
+    - label: "DUT_CE is commissioned to TH_CR2"
+      PICS: CADMIN.S
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
 
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+      identity: "alpha"
       PICS: OPCREDS.S.A0001
-      verification: |
-          On 1st controller, read fabrics list
-
-          Below is the command using chip tool controller
-
-          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2455995246
-          [1647863342.980899][9309:9314] CHIP:TOO:   Fabrics: 3 entries
-          [1647863342.981158][9309:9314] CHIP:TOO:     [1]: {
-          [1647863342.981231][9309:9314] CHIP:TOO:       RootPublicKey: 04656F56DBDB677DC957028DFC0ED76709C72753C9194B117A483BDC07386BFD9529B68EB4448FBBA3964EFF37A56A8F461D348B0DAF3B56A75F3B94BF8209D36F
-          [1647863342.981322][9309:9314] CHIP:TOO:       VendorId: 65521
-          [1647863342.981380][9309:9314] CHIP:TOO:       FabricId: 1
-          [1647863342.981434][9309:9314] CHIP:TOO:       NodeId: 1
-          [1647863342.981486][9309:9314] CHIP:TOO:       Label:
-          [1647863342.981539][9309:9314] CHIP:TOO:       FabricIndex: 1
-          [1647863342.981594][9309:9314] CHIP:TOO:      }
-          [1647863342.981671][9309:9314] CHIP:TOO:     [2]: {
-          [1647863342.981737][9309:9314] CHIP:TOO:       RootPublicKey: 04F8F28D5D70A4510E0F72FBBA31369796C4206FF95D97B77C1BDFD0438A3BE43510631A1B915BE189323F4CC0E015480192654D8170F8F230C7713898962958B7
-          [1647863342.981796][9309:9314] CHIP:TOO:       VendorId: 65521
-          [1647863342.981849][9309:9314] CHIP:TOO:       FabricId: 1
-          [1647863342.981901][9309:9314] CHIP:TOO:       NodeId: 3
-          [1647863342.981952][9309:9314] CHIP:TOO:       Label:
-          [1647863342.982005][9309:9314] CHIP:TOO:       FabricIndex: 3
-          [1647863342.982057][9309:9314] CHIP:TOO:      }
-          [1647863342.982131][9309:9314] CHIP:TOO:     [3]: {
-          [1647863342.982195][9309:9314] CHIP:TOO:       RootPublicKey: 04F8F28D5D70A4510E0F72FBBA31369796C4206FF95D97B77C1BDFD0438A3BE43510631A1B915BE189323F4CC0E015480192654D8170F8F230C7713898962958B7
-          [1647863342.982252][9309:9314] CHIP:TOO:       VendorId: 65521
-          [1647863342.982305][9309:9314] CHIP:TOO:       FabricId: 1
-          [1647863342.982357][9309:9314] CHIP:TOO:       NodeId: 2
-          [1647863342.982409][9309:9314] CHIP:TOO:       Label:
-          [1647863342.982460][9309:9314] CHIP:TOO:       FabricIndex: 4
-          [1647863342.982512][9309:9314] CHIP:TOO:      }
-          [1647863342.982738][9309:9314] CHIP:EM: Sending Standalone Ack for MessageCounter:5772016 on exchange 3310i
-      disabled: true
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { Label: "", FabricIndex: 1, nodeId: nodeId },
+                  { Label: "", FabricIndex: 4, nodeId: nodeId2 },
+                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+              ]
+          constraints:
+              type: list
