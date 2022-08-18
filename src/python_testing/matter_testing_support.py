@@ -25,6 +25,7 @@ from chip.storage import PersistentStorage
 import chip.logging
 import chip.native
 import chip.FabricAdmin
+import chip.CertificateAuthority
 from chip.utils import CommissioningBuildingBlocks
 import builtins
 from typing import Optional, List, Tuple
@@ -44,7 +45,6 @@ from mobly import logger
 from mobly import signals
 from mobly import utils
 from mobly.test_runner import TestRunner
-
 
 # TODO: Add utility to commission a device if needed
 # TODO: Add utilities to keep track of controllers/fabrics
@@ -157,7 +157,6 @@ class MatterStackState:
     def __init__(self, config: MatterTestConfig):
         self._logger = logger
         self._config = config
-        self._fabric_admins = []
 
         if not hasattr(builtins, "chipStack"):
             chip.native.Init(bluetoothAdapter=config.ble_interface_id)
@@ -180,22 +179,17 @@ class MatterStackState:
             builtins.chipStack = self._chip_stack
 
         self._storage = self._chip_stack.GetStorageManager()
+        self._certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self._chip_stack)
+        self._certificate_authority_manager.LoadAuthoritiesFromStorage()
 
-        try:
-            admin_list = self._storage.GetReplKey('fabricAdmins')
-            found_admin_list = True
-        except KeyError:
-            found_admin_list = False
-
-        if not found_admin_list:
-            self._logger.warn("No previous fabric administrative data found in persistent data: initializing a new one")
-            self._fabric_admins.append(chip.FabricAdmin.FabricAdmin(self._config.admin_vendor_id))
-        else:
-            for admin_idx in admin_list:
-                self._logger.info(
-                    f"Restoring FabricAdmin from storage to manage FabricId {admin_list[admin_idx]['fabricId']}, AdminIndex {admin_idx}")
-                self._fabric_admins.append(chip.FabricAdmin.FabricAdmin(vendorId=int(admin_list[admin_idx]['vendorId']),
-                                           fabricId=admin_list[admin_idx]['fabricId'], adminIndex=int(admin_idx)))
+        if (len(self._certificate_authority_manager.activeCaList) == 0):
+            self._logger.warn(
+                "Didn't find any CertificateAuthorities in storage -- creating a new CertificateAuthority + FabricAdmin...")
+            ca = self._certificate_authority_manager.NewCertificateAuthority()
+            ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=0xFFF1)
+        elif (len(self._certificate_authority_manager.activeCaList[0].adminList) == 0):
+            self._logger.warn("Didn't find any FabricAdmins in storage -- creating a new one...")
+            self._certificate_authority_manager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=0xFFF1)
 
     # TODO: support getting access to chip-tool credentials issuer's data
 
@@ -204,14 +198,17 @@ class MatterStackState:
             # Unfortunately, all the below are singleton and possibly
             # managed elsewhere so we have to be careful not to touch unless
             # we initialized ourselves.
-            ChipDeviceCtrl.ChipDeviceController.ShutdownAll()
-            chip.FabricAdmin.FabricAdmin.ShutdownAll()
+            self._certificate_authority_manager.Shutdown()
             global_chip_stack = builtins.chipStack
             global_chip_stack.Shutdown()
 
     @property
-    def fabric_admins(self):
-        return self._fabric_admins
+    def certificate_authorities(self):
+        return self._certificate_authority_manager.activeCaList
+
+    @property
+    def certificate_authority_manager(self):
+        return self._certificate_authority_manager
 
     @property
     def storage(self) -> PersistentStorage:
@@ -250,6 +247,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     @property
     def matter_stack(self) -> MatterStackState:
         return unstash_globally(self.user_params.get("matter_stack"))
+
+    @property
+    def certificate_authority_manager(self) -> chip.CertificateAuthority.CertificateAuthorityManager:
+        return unstash_globally(self.user_params.get("certificate_authority_manager"))
 
     @property
     def dut_node_id(self) -> int:
@@ -684,11 +685,13 @@ def default_matter_test_main(argv=None):
     test_config.user_params["matter_stack"] = stash_globally(stack)
 
     # TODO: Steer to right FabricAdmin!
-    default_controller = stack.fabric_admins[0].NewController(nodeId=matter_test_config.controller_node_id,
-                                                              paaTrustStorePath=str(matter_test_config.paa_trust_store_path))
+    default_controller = stack.certificate_authorities[0].adminList[0].NewController(nodeId=matter_test_config.controller_node_id,
+                                                                                     paaTrustStorePath=str(matter_test_config.paa_trust_store_path))
     test_config.user_params["default_controller"] = stash_globally(default_controller)
 
     test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
+
+    test_config.user_params["certificate_authority_manager"] = stash_globally(stack.certificate_authority_manager)
 
     # Execute the test class with the config
     ok = True

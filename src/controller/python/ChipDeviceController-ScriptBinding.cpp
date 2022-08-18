@@ -100,7 +100,6 @@ chip::Controller::CommissioningParameters sCommissioningParameters;
 
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 chip::Controller::ScriptPairingDeviceDiscoveryDelegate sPairingDeviceDiscoveryDelegate;
-chip::Controller::Python::StorageAdapter * sStorageAdapter = nullptr;
 chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
 
@@ -111,7 +110,7 @@ chip::NodeId kDefaultLocalDeviceId = chip::kTestControllerNodeId;
 chip::NodeId kRemoteDeviceId       = chip::kTestDeviceNodeId;
 
 extern "C" {
-ChipError::StorageType pychip_DeviceController_StackInit();
+ChipError::StorageType pychip_DeviceController_StackInit(Controller::Python::StorageAdapter * storageAdapter);
 ChipError::StorageType pychip_DeviceController_StackShutdown();
 
 ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
@@ -205,43 +204,40 @@ chip::ChipError::StorageType pychip_InteractionModel_ShutdownSubscription(Subscr
 //
 // Storage
 //
-void pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
-                                             chip::Controller::Python::SyncSetKeyValueCb setCb,
-                                             chip::Controller::Python::SetGetKeyValueCb getCb,
-                                             chip::Controller::Python::SyncDeleteKeyValueCb deleteCb);
-void pychip_Storage_ShutdownAdapter();
+void * pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
+                                               chip::Controller::Python::SyncSetKeyValueCb setCb,
+                                               chip::Controller::Python::SetGetKeyValueCb getCb,
+                                               chip::Controller::Python::SyncDeleteKeyValueCb deleteCb);
+void pychip_Storage_ShutdownAdapter(chip::Controller::Python::StorageAdapter * storageAdapter);
 }
 
-void pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
-                                             chip::Controller::Python::SyncSetKeyValueCb setCb,
-                                             chip::Controller::Python::SetGetKeyValueCb getCb,
-                                             chip::Controller::Python::SyncDeleteKeyValueCb deleteCb)
+void * pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
+                                               chip::Controller::Python::SyncSetKeyValueCb setCb,
+                                               chip::Controller::Python::SetGetKeyValueCb getCb,
+                                               chip::Controller::Python::SyncDeleteKeyValueCb deleteCb)
 {
-    sStorageAdapter = new chip::Controller::Python::StorageAdapter(context, setCb, getCb, deleteCb);
+    auto ptr = new chip::Controller::Python::StorageAdapter(context, setCb, getCb, deleteCb);
+    return ptr;
 }
 
-void pychip_Storage_ShutdownAdapter()
+void pychip_Storage_ShutdownAdapter(chip::Controller::Python::StorageAdapter * storageAdapter)
 {
-    delete sStorageAdapter;
+    delete storageAdapter;
 }
 
-chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter()
+ChipError::StorageType pychip_DeviceController_StackInit(Controller::Python::StorageAdapter * storageAdapter)
 {
-    return sStorageAdapter;
-}
-
-ChipError::StorageType pychip_DeviceController_StackInit()
-{
-    VerifyOrDie(sStorageAdapter != nullptr);
+    VerifyOrDie(storageAdapter != nullptr);
 
     FactoryInitParams factoryParams;
-    factoryParams.fabricIndependentStorage = sStorageAdapter;
 
-    sGroupDataProvider.SetStorageDelegate(sStorageAdapter);
+    factoryParams.fabricIndependentStorage = storageAdapter;
+
+    sGroupDataProvider.SetStorageDelegate(storageAdapter);
     ReturnErrorOnFailure(sGroupDataProvider.Init().AsInteger());
     factoryParams.groupDataProvider = &sGroupDataProvider;
 
-    ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(sStorageAdapter).AsInteger());
+    ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(storageAdapter).AsInteger());
     factoryParams.opCertStore = &sPersistentStorageOpCertStore;
 
     factoryParams.enableServerInteractions = true;
