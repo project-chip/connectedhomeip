@@ -75,6 +75,9 @@ class TC_RR_1_1(MatterBaseTest):
 
         # Pre-conditions
 
+        # Make sure all certificates are installed with maximal size
+        dev_ctrl.fabricAdmin.certificateAuthority.maximizeCertChains = True
+
         # TODO: Do from PICS list. The reflection approach here what a real client would do,
         #       and it respects that the test says "TH writes 4 entries per endpoint where LabelList is supported"
         logging.info("Pre-condition: determine whether any endpoints have UserLabel cluster (ULABEL.S.A0000(LabelList))")

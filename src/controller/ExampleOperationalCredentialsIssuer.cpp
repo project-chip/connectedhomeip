@@ -146,6 +146,8 @@ CHIP_ERROR IssueX509Cert(uint32_t now, uint32_t validity, ChipDN issuerDn, ChipD
 
             ReturnErrorOnFailure(ConvertX509CertToChipCert(paddedDerSpan, paddedTlvSpan));
 
+            // TODO: REMOVE
+            printf("   TLV: %d DER: %d\n", (int)paddedTlvSpan.size(), (int)paddedDerSpan.size());
             if (paddedDerSpan.size() <= kMaxDERCertLength && paddedTlvSpan.size() <= kMaxCHIPCertLength)
             {
                 return CopySpanToMutableSpan(paddedDerSpan, outX509Cert);
@@ -241,6 +243,12 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
     PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsRootCertificateStorage, key,
                       err = mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen));
+    // Always regenerate RCAC on maximally sized certs. The keys remain the same, so everything is fine.
+    if (mUseMaximallySizedCerts)
+    {
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
+
     if (err == CHIP_NO_ERROR)
     {
         uint64_t rcacId;
@@ -272,6 +280,11 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     uint16_t icacBufLen = static_cast<uint16_t>(std::min(icac.size(), static_cast<size_t>(UINT16_MAX)));
     PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateCertificateStorage, key,
                       err = mStorage->SyncGetKeyValue(key, icac.data(), icacBufLen));
+    // Always regenerate ICAC on maximally sized certs. The keys remain the same, so everything is fine.
+    if (mUseMaximallySizedCerts)
+    {
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
     if (err == CHIP_NO_ERROR)
     {
         uint64_t icacId;
@@ -302,9 +315,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     ChipDN noc_dn;
     ReturnErrorOnFailure(noc_dn.AddAttribute_MatterFabricId(fabricId));
     ReturnErrorOnFailure(noc_dn.AddAttribute_MatterNodeId(nodeId));
-    CATValues actualCats = cats;
-    actualCats.values[0] = 0xFFF1'FFFF;
-    ReturnErrorOnFailure(noc_dn.AddCATs(actualCats));
+    ReturnErrorOnFailure(noc_dn.AddCATs(cats));
 
     ChipLogProgress(Controller, "Generating NOC");
     return IssueX509Cert(mNow, mValidity, icac_dn, noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey, mIntermediateIssuer,

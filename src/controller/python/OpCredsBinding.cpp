@@ -77,6 +77,8 @@ public:
         return mExampleOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, cats, pubKey, rcac, icac, noc);
     }
 
+    void SetMaximallyLargeCertsUsed(bool enabled) { mExampleOpCredsIssuer.SetMaximallyLargeCertsUsed(enabled); }
+
 private:
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
@@ -403,6 +405,16 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
 
     return CHIP_NO_ERROR.AsInteger();
 }
+
+ChipError::StorageType pychip_OpCreds_SetMaximallyLargeCertsUsed(OpCredsContext * context, bool enabled)
+{
+    VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, CHIP_ERROR_INCORRECT_STATE.AsInteger());
+
+    context->mAdapter->SetMaximallyLargeCertsUsed(enabled);
+
+    return CHIP_NO_ERROR.AsInteger();
+}
+
 
 void pychip_OpCreds_FreeDelegate(OpCredsContext * context)
 {

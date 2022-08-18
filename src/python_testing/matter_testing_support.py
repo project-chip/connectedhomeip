@@ -186,11 +186,12 @@ class MatterStackState:
         if (len(self._certificate_authority_manager.activeCaList) == 0):
             self._logger.warn(
                 "Didn't find any CertificateAuthorities in storage -- creating a new CertificateAuthority + FabricAdmin...")
-            ca = self._certificate_authority_manager.NewCertificateAuthority()
-            ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=0xFFF1)
+            ca = self._certificate_authority_manager.NewCertificateAuthority(caIndex = self._config.root_of_trust_index)
+            ca.maximizeCertChains = True
+            ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
         elif (len(self._certificate_authority_manager.activeCaList[0].adminList) == 0):
             self._logger.warn("Didn't find any FabricAdmins in storage -- creating a new one...")
-            self._certificate_authority_manager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=0xFFF1)
+            self._certificate_authority_manager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
 
     # TODO: support getting access to chip-tool credentials issuer's data
 
@@ -696,6 +697,7 @@ def default_matter_test_main(argv=None):
 
     # TODO: Steer to right FabricAdmin!
     # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
+
     default_controller = stack.certificate_authorities[0].adminList[0].NewController(nodeId=matter_test_config.controller_node_id,
                                                                                      paaTrustStorePath=str(matter_test_config.paa_trust_store_path))
     test_config.user_params["default_controller"] = stash_globally(default_controller)
