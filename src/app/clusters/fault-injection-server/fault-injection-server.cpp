@@ -36,6 +36,34 @@ using namespace chip::app;
 using namespace chip::app::Clusters::FaultInjection;
 using chip::Protocols::InteractionModel::Status;
 
+namespace {
+
+#if CHIP_WITH_NLFAULTINJECTION
+nl::FaultInjection::Manager * GetFaultInjectionManager(FaultType type)
+{
+    nl::FaultInjection::Manager * faultInjectionMgr = nullptr;
+
+    switch (type)
+    {
+    case FaultType::kSystemFault:
+        faultInjectionMgr = &chip::System::FaultInjection::GetManager();
+        break;
+    case FaultType::kInetFault:
+        faultInjectionMgr = &chip::Inet::FaultInjection::GetManager();
+        break;
+    case FaultType::kChipFault:
+        faultInjectionMgr = &chip::FaultInjection::GetManager();
+        break;
+    default:
+        break;
+    }
+
+    return faultInjectionMgr;
+}
+#endif
+
+} // anonymous namespace
+
 bool emberAfFaultInjectionClusterFailAtFaultCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                      const Commands::FailAtFault::DecodableType & commandData)
 {
@@ -48,24 +76,7 @@ bool emberAfFaultInjectionClusterFailAtFaultCallback(CommandHandler * commandObj
 
 #if CHIP_WITH_NLFAULTINJECTION
     Status returnStatus                             = Status::Success;
-    nl::FaultInjection::Manager * faultInjectionMgr = nullptr;
-
-    switch (commandData.type)
-    {
-    case FaultType::kSystemFault:
-        faultInjectionMgr = &chip::System::FaultInjection::GetManager();
-        break;
-    case FaultType::kInetFault:
-        faultInjectionMgr = &chip::Inet::FaultInjection::GetManager();
-        break;
-    case FaultType::kChipFault:
-        faultInjectionMgr = &chip::FaultInjection::GetManager();
-        break;
-    default:
-        ChipLogError(Zcl, "FaultInjection: Unsupported Fault type received");
-        returnStatus = Status::InvalidCommand;
-        break;
-    }
+    nl::FaultInjection::Manager * faultInjectionMgr = GetFaultInjectionManager(commandData.type);
 
     if (faultInjectionMgr != nullptr)
     {
@@ -111,24 +122,7 @@ bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(CommandHandler * co
 
 #if CHIP_WITH_NLFAULTINJECTION
     Status returnStatus                             = Status::Success;
-    nl::FaultInjection::Manager * faultInjectionMgr = nullptr;
-
-    switch (commandData.type)
-    {
-    case FaultType::kSystemFault:
-        faultInjectionMgr = &chip::System::FaultInjection::GetManager();
-        break;
-    case FaultType::kInetFault:
-        faultInjectionMgr = &chip::Inet::FaultInjection::GetManager();
-        break;
-    case FaultType::kChipFault:
-        faultInjectionMgr = &chip::FaultInjection::GetManager();
-        break;
-    default:
-        ChipLogError(Zcl, "FaultInjection: Unsupported Fault type received");
-        returnStatus = Status::InvalidCommand;
-        break;
-    }
+    nl::FaultInjection::Manager * faultInjectionMgr = GetFaultInjectionManager(commandData.type);
 
     if (faultInjectionMgr != nullptr)
     {
