@@ -93,4 +93,66 @@ bool emberAfFaultInjectionClusterFailAtFaultCallback(CommandHandler * commandObj
     return true;
 }
 
+bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                             const Commands::FailRandomlyAtFault::DecodableType & commandData)
+{
+    if (commandPath.mClusterId != Clusters::FaultInjection::Id)
+    {
+        // We shouldn't have been called at all.
+        commandObj->AddStatus(commandPath, Status::UnsupportedCluster);
+        return true;
+    }
+
+    if (commandData.percentage > 100)
+    {
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
+    }
+
+#if CHIP_WITH_NLFAULTINJECTION
+    Status returnStatus                             = Status::Success;
+    nl::FaultInjection::Manager * faultInjectionMgr = nullptr;
+
+    switch (commandData.type)
+    {
+    case FaultType::kSystemFault:
+        faultInjectionMgr = &chip::System::FaultInjection::GetManager();
+        break;
+    case FaultType::kInetFault:
+        faultInjectionMgr = &chip::Inet::FaultInjection::GetManager();
+        break;
+    case FaultType::kChipFault:
+        faultInjectionMgr = &chip::FaultInjection::GetManager();
+        break;
+    default:
+        ChipLogError(Zcl, "FaultInjection: Unsupported Fault type received");
+        returnStatus = Status::InvalidCommand;
+        break;
+    }
+
+    if (faultInjectionMgr != nullptr)
+    {
+        ChipLogProgress(Zcl, "FaultInjection: Configure a fault of type: %d and Id: %d to be triggered randomly",
+                        static_cast<uint8_t>(commandData.type), commandData.id);
+        int32_t err = faultInjectionMgr->FailRandomlyAtFault(commandData.id, commandData.percentage);
+
+        if (err != 0)
+        {
+            ChipLogError(Zcl, "FaultInjection: Pass invalid inputs to FailAtFault");
+            returnStatus = Status::InvalidCommand;
+        }
+    }
+    else
+    {
+        ChipLogError(Zcl, "FaultInjection: Failed to get Fault Injection manager");
+        returnStatus = Status::Failure;
+    }
+#else
+    Status returnStatus = Status::UnsupportedCommand;
+#endif // CHIP_WITH_NLFAULTINJECTION
+
+    commandObj->AddStatus(commandPath, returnStatus);
+    return true;
+}
+
 void MatterFaultInjectionPluginServerInitCallback() {}
