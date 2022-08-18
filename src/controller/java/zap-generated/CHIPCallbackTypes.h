@@ -1963,3 +1963,14 @@ typedef void (*CHIPTestClusterClusterFeatureMapAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+
+typedef void (*CHIPFaultInjectionClusterGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::FaultInjection::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPFaultInjectionClusterAcceptedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::FaultInjection::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPFaultInjectionClusterAttributeListAttributeCallbackType)(
+    void *, const chip::app::Clusters::FaultInjection::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPFaultInjectionClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::FaultInjection::Attributes::FeatureMap::TypeInfo::DecodableArgType);
+typedef void (*CHIPFaultInjectionClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::FaultInjection::Attributes::ClusterRevision::TypeInfo::DecodableArgType);

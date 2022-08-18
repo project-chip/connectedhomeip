@@ -3827,6 +3827,32 @@ server cluster TestCluster = 4294048773 {
   command TestEmitTestFabricScopedEventRequest(TestEmitTestFabricScopedEventRequestRequest): TestEmitTestFabricScopedEventResponse = 21;
 }
 
+server cluster FaultInjection = 4294048774 {
+  enum FaultType : ENUM8 {
+    kUnspecified = 0;
+    kSystemFault = 1;
+    kInetFault = 2;
+    kChipFault = 3;
+    kCertFault = 4;
+  }
+
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct FailAtFaultRequest {
+    FaultType type = 0;
+    INT32U id = 1;
+    INT32U numCallsToSkip = 2;
+    INT32U numCallsToFail = 3;
+    BOOLEAN takeMutex = 4;
+  }
+
+  command access(invoke: manage) FailAtFault(FailAtFaultRequest): DefaultSuccess = 0;
+}
+
 endpoint 0 {
   device type rootdevice = 22;
   binding cluster OtaSoftwareUpdateProvider;
@@ -4144,6 +4170,14 @@ endpoint 0 {
     ram      attribute maxMeasuredValue default = 0x2710;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster FaultInjection {
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
   }
 }
 endpoint 1 {

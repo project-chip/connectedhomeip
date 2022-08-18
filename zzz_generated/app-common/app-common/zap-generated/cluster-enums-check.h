@@ -2096,6 +2096,22 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TestCluster::SimpleEnum
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(FaultInjection::FaultType val)
+{
+    using EnumType = FaultInjection::FaultType;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
+    case EnumType::kSystemFault:
+    case EnumType::kInetFault:
+    case EnumType::kChipFault:
+    case EnumType::kCertFault:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

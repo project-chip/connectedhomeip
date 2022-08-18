@@ -22036,4 +22036,98 @@ using chip::SessionHandle;
 
 @end
 
+@implementation MTRClusterFaultInjection
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = endpoint;
+        _device = device;
+    }
+    return self;
+}
+
+- (void)failAtFaultWithParams:(MTRFaultInjectionClusterFailAtFaultParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+            completionHandler:(StatusCompletion)completionHandler
+{
+    // Make a copy of params before we go async.
+    params = [params copy];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
+    new MTRCommandSuccessCallbackBridge(
+        self.callbackQueue, baseDevice,
+        ^(id _Nullable value, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            chip::Optional<uint16_t> timedInvokeTimeoutMs;
+            ListFreer listFreer;
+            FaultInjection::Commands::FailAtFault::Type request;
+            if (params != nil) {
+                if (params.timedInvokeTimeoutMs != nil) {
+                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+                }
+            }
+            request.type = static_cast<std::remove_reference_t<decltype(request.type)>>(params.type.unsignedCharValue);
+            request.id = params.id.unsignedIntValue;
+            request.numCallsToSkip = params.numCallsToSkip.unsignedIntValue;
+            request.numCallsToFail = params.numCallsToFail.unsignedIntValue;
+            request.takeMutex = params.takeMutex.boolValue;
+
+            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+            chip::Controller::FaultInjectionCluster cppCluster(exchangeManager, session, self->_endpoint);
+            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+        });
+
+    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterFaultInjectionID)
+                                        attributeID:@(MTRClusterFaultInjectionAttributeGeneratedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterFaultInjectionID)
+                                        attributeID:@(MTRClusterFaultInjectionAttributeAcceptedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterFaultInjectionID)
+                                        attributeID:@(MTRClusterFaultInjectionAttributeAttributeListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterFaultInjectionID)
+                                        attributeID:@(MTRClusterFaultInjectionAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterFaultInjectionID)
+                                        attributeID:@(MTRClusterFaultInjectionAttributeClusterRevisionID)
+                                             params:params];
+}
+
+@end
+
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
