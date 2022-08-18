@@ -2306,6 +2306,20 @@ enum class SimpleBitmap : uint8_t
 };
 } // namespace TestCluster
 
+namespace FaultInjection {
+
+// Enum for FaultType
+enum class FaultType : uint8_t
+{
+    kUnspecified      = 0x00,
+    kSystemFault      = 0x01,
+    kInetFault        = 0x02,
+    kChipFault        = 0x03,
+    kCertFault        = 0x04,
+    kUnknownEnumValue = 5,
+};
+} // namespace FaultInjection
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip
