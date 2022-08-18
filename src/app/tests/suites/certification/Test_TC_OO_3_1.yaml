@@ -81,7 +81,7 @@ tests:
 
           ./chip-tool onoff read on-time 1 1
 
-          verify the " on-time-control response" on the TH (all-cluster-app) log:
+          verify the " on-time response" on the TH (all-cluster-app) log:
 
           [...]
           [1650535552.255428][3678:3678] CHIP:IM: Received Read request

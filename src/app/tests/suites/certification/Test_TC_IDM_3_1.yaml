@@ -24,11 +24,16 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT sends the WriteRequestMessage to the TH to modify one attribute
           data"
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
 
           sudo ./chip-tool levelcontrol write on-level 2 1 1
@@ -62,7 +67,7 @@ tests:
           [1655795552.552647][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
           [1655795552.552686][7331:7331] CHIP:DMG: },
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs,, verify that TH all-clusters-app sent success response
           [1657883782.721742][2796:2801] CHIP:DMG: WriteResponseMessage =
           [1657883782.721783][2796:2801] CHIP:DMG: {
           [1657883782.721819][2796:2801] CHIP:DMG:         AttributeStatusIBs =
@@ -112,7 +117,7 @@ tests:
           [1657883808.063295][2457:2457] CHIP:DMG: },
           [1657883808.063369][2457:2457] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs,, verify that TH all-clusters-app sent success response
           [1655795604.755214][6880:6885] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 737039636
           [1655795604.755363][6880:6885] CHIP:TOO:   on level: 2
           [1655795604.755460][6880:6885] CHIP:EM: Sending Standalone Ack for MessageCounter:83198098 on exchange 53763i
@@ -127,10 +132,11 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type bool."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type bool."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Bool
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool basic write local-config-disabled 1 1 0
 
@@ -166,7 +172,7 @@ tests:
 
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent success response
 
           [1657883938.394965][2822:2827] CHIP:DMG: WriteResponseMessage =
           [1657883938.394995][2822:2827] CHIP:DMG: {
@@ -218,22 +224,20 @@ tests:
           [1657884119.523280][2748:2748] CHIP:DMG: },
 
 
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1655795843.336042][6902:6907] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 1263909562
           [1655795843.336093][6902:6907] CHIP:TOO:   LocalConfigDisabled: TRUE
           [1655795843.336251][6902:6907] CHIP:EM: Sending Standalone Ack for MessageCounter:108030495 on exchange 43207i
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type string."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type string."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_String
       verification: |
-          In case of chip tool, here is an example command to use
-
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool basic write node-label node 1 0
-
 
           verify on TH(reference app) receives the right write Request Message for the data sent in the above command
 
@@ -265,8 +269,7 @@ tests:
           [1655796035.023656][7331:7331] CHIP:DMG: },
           [1655796035.023791][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=m
           [1655796035.023851][7331:7331] CHIP:DMG: AccessControl: allowed
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1657884155.221193][2865:2870] CHIP:DMG: WriteResponseMessage =
           [1657884155.221246][2865:2870] CHIP:DMG: {
           [1657884155.221292][2865:2870] CHIP:DMG:         AttributeStatusIBs =
@@ -315,8 +318,7 @@ tests:
           [1657884173.739288][2748:2748] CHIP:DMG: },
 
 
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
 
           [1655796082.079468][6918:6923] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 1263909563
           [1655796082.079509][6918:6923] CHIP:TOO:   NodeLabel: node
@@ -324,11 +326,11 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type unsigned integer."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type unsigned integer."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_UnsignedInteger
       verification: |
-          In case of chip tool, here is an example command to use
-
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
 
@@ -362,7 +364,8 @@ tests:
           [1655796141.168253][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
           [1655796141.168313][7331:7331] CHIP:DMG: AccessControl: allowed
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1657884204.951658][2878:2883] CHIP:DMG: WriteResponseMessage =
           [1657884204.951700][2878:2883] CHIP:DMG: {
           [1657884204.951736][2878:2883] CHIP:DMG:         AttributeStatusIBs =
@@ -413,53 +416,58 @@ tests:
           [1657884227.860339][2748:2748] CHIP:DMG: },
           [1657884227.860413][2748:2748] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1655796192.032715][6931:6936] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0010 DataVersion: 737039637
           [1655796192.032807][6931:6936] CHIP:TOO:   on off transition time: 1
           [1655796192.032908][6931:6936] CHIP:EM: Sending Standalone Ack for MessageCounter:249349258 on exchange 7433i
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type signed integer."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type signed integer."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_SignedInteger
       verification: |
           DUT implementation required to verify write an attribute of data type signed integer.
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type floating point."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type floating point."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_FloatingPoint
       verification: |
           DUT implementation required to verify write an attribute of data type float
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type Octet String."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type Octet String."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_OctetString
       verification: |
           DUT implementation required to verify write an attribute of data type Octet String
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type Struct."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type Struct."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Struct
       verification: |
           DUT implementation required to verify write an attribute ofdata type Struct
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type List."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type List."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_List
       verification: |
           DUT implementation required to verify write an attribute of  data type List
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type enum."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type enum."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Enum
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool any write-by-id 0x0204 0  1  1 1
 
@@ -494,7 +502,7 @@ tests:
           [1655796297.609342][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=o
           [1655796297.609403][7331:7331] CHIP:DMG: AccessControl: allowed
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1657884258.383116][2892:2897] CHIP:DMG: WriteResponseMessage =
           [1657884258.383157][2892:2897] CHIP:DMG: {
           [1657884258.383192][2892:2897] CHIP:DMG:         AttributeStatusIBs =
@@ -530,19 +538,18 @@ tests:
           [1657884282.303778][2898:2903] CHIP:TOO:   temperature display mode: 1
           [1657884282.303862][2898:2903] CHIP:EM: Sending Standalone Ack for MessageCounter:147756485 on exchange 42871i
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs,, verify that TH all-clusters-app sent success response
           [1655796341.132655][6946:6951] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 3165945391
           [1655796341.132864][6946:6951] CHIP:TOO:   temperature display mode: 1
           [1655796341.132973][6946:6951] CHIP:EM: Sending Standalone Ack for MessageCounter:245498041 on exchange 51992i
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type bitmap."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type bitmap."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Bitmap
       verification: |
-          In case of chip tool, here is an example command to use
-
-
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool colorcontrol write-by-id 0x000f 1 1 1
 
@@ -577,7 +584,7 @@ tests:
           [1655796429.698446][7331:7331] CHIP:DMG: AccessControl: allowed
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
 
           [1657884309.994598][2907:2912] CHIP:DMG: WriteResponseMessage =
           [1657884309.994627][2907:2912] CHIP:DMG: {
@@ -630,8 +637,7 @@ tests:
           [1657884334.614053][2748:2748] CHIP:DMG: },
           [1657884334.614128][2748:2748] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1655796493.233673][6961:6966] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_000F DataVersion: 2788050502
           [1655796493.233761][6961:6966] CHIP:TOO:   Options: 1
           [1655796493.233865][6961:6966] CHIP:EM: Sending Standalone Ack for MessageCounter:185730221 on exchange 37136i
@@ -639,7 +645,8 @@ tests:
 
     - label:
           "DUT sends a WriteRequestMessage to the TH with a large list of
-          attribute data which has to be sent in multiple messages."
+          attribute data, which is larger than 1 MTU(1280 bytes), that has to be
+          sent in multiple messages."
       verification: |
           DUT implementation required to verify write an attribute which is is larger than 1 MTU(1280 bytes)
           Here is an example command to verify the write functionality. User must choose an attribute which has large list of attribute data.
@@ -650,7 +657,7 @@ tests:
           "DUT sends the WriteRequestMessage to the TH to write one attribute on
           a given cluster and endpoint. Repeat the above steps 3 times."
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any write-by-id 0x0204 0  1  1 1
 
@@ -685,7 +692,7 @@ tests:
           [1655796724.512195][7331:7331] CHIP:DMG: },
           [1655796724.512344][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=o
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1657884369.932192][2923:2928] CHIP:DMG: WriteResponseMessage =
           [1657884369.932226][2923:2928] CHIP:DMG: {
           [1657884369.932255][2923:2928] CHIP:DMG:         AttributeStatusIBs =
@@ -737,8 +744,7 @@ tests:
           [1657884399.502907][2748:2748] CHIP:DMG: },
           [1657884399.502989][2748:2748] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1655796786.513406][6976:6981] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 3165945392
           [1655796786.513496][6976:6981] CHIP:TOO:   temperature display mode: 1
           [1655796786.513593][6976:6981] CHIP:EM: Sending Standalone Ack for MessageCounter:190446058 on exchange 28240i
@@ -749,9 +755,9 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends a ReadRequest message to the TH to read any
-          attribute on two clusters. TH returns with a report data action with
-          the attribute values and the dataversions of the clusters. DUT sends a
+          "DUT sends a ReadRequest message to the TH to read any attribute on
+          two clusters. TH returns with a report data action with the attribute
+          values and the dataversions of the clusters. DUT sends a
           WriteRequestMessage to the DUT to both the clusters with the
           appropriate dataversions(received in the previous step) to modify the
           value of an attribute"

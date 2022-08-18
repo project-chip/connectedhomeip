@@ -50,9 +50,11 @@ tests:
       verification: |
           On your 1st controller open commissioning widow using BCM.
 
-          Below is the example while using chip tool as controller,
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+
+          Verify success response On TH1(all-clusters-app) Log
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
@@ -116,9 +118,12 @@ tests:
       verification: |
           On the 2nd controller using chip-tool , connect to the accessory
 
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
           ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
 
-          verify you got the following message in the TH log
+          verify you got the following message in the TH2 (all-clusters-app) log
+
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
           CHIP:TOO: Secure Pairing Failed
           CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
@@ -132,10 +137,11 @@ tests:
       verification: |
           On your first controller open commissioning widow using BCM.
 
-          Below is the example while using chip tool as controller,
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
 
           ./chip-tool administratorcommissioning  open-basic-commissioning-window 500 1 0  --timedInteractionTimeoutMs 1000
 
+          Verify success response On TH1(all-clusters-app) Log
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
@@ -175,8 +181,11 @@ tests:
       verification: |
           On your DUT controller revoke commissioning
 
-          Below is the example while using chip tool as controller,
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
           /chip-tool administratorcommissioning revoke-commissioning 1 0 --timedInteractionTimeoutMs 1000
+
+          Verify success response On TH1(all-clusters-app) Log
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
@@ -216,9 +225,12 @@ tests:
       verification: |
           On the 2nd controller using chip-tool , connect to the accessory
 
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
           ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
 
-          verify you got the following message in the TH log
+          verify you got the following message in the TH2(all-clusters-app) log
+
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
           CHIP:TOO: Secure Pairing Failed
           CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
@@ -229,9 +241,11 @@ tests:
       verification: |
           On your 1st controller revoke commissioning
 
-          Below is the example while using chip tool as controller,
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
 
           /chip-tool administratorcommissioning revoke-commissioning 1 0 --timedInteractionTimeoutMs 1000
+
+          Verify success response On TH1(all-clusters-app) Log
 
           CHIP:DMG: InvokeResponseMessage =
           [1650524034.111241][15422:15427] CHIP:DMG: {
@@ -274,8 +288,11 @@ tests:
       verification: |
           Using 1st controller, write attribute and read attribute to and from TH_CE
 
-          Below is the example while using chip tool on second controller,
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
           ./chip-tool basic write node-label te5new 2 0
+
+          Verify success response On TH1(all-clusters-app) Log
 
           CHIP:DMG: WriteResponseMessage =
           [1649245940.788522][10110:10115] CHIP:DMG: {
@@ -303,8 +320,11 @@ tests:
           [1649245940.790033][10110:10115] CHIP:DMG: }
           [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
-          Verify read attribute returns the updated value written
+
           ./chip-tool basic read node-label 2 0
+
+          Verify read attribute returns the updated value written On TH1(all-clusters-app) Log
+
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
           [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te5new
           [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
@@ -318,11 +338,11 @@ tests:
       verification: |
           On 1st controller open commissioning widow using BCM.
 
-          Below is the example while using chip tool as controller,
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
 
-
+          Verify success response On TH1(all-clusters-app) Log
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
@@ -362,9 +382,11 @@ tests:
       verification: |
           On the 2nd controller using chip-tool , connect to the accessory
 
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
           ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
 
-          Verify you got below message
+          Verify you got below message on TH2(all-clusters-app) log
           Device commissioning completed with success
       disabled: true
 
@@ -373,9 +395,11 @@ tests:
       verification: |
           On the 3rd controller using chip-tool , connect to the accessory
 
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
           ./chip-tool pairing onnetwork 3 20202021 --commissioner-name gamma
 
-          verify you got the following message in the TH log
+          verify you got the following message in the TH3(all-clusters-app) log
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
           CHIP:TOO: Secure Pairing Failed
           CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout

@@ -24,9 +24,58 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Pre-Conditions"
+      verification: |
+          Notes
+
+          1.N1 is the node ID of TH1
+
+          2.D_OK_EMPTY:"1718" which is an octstr of length 2 containing valid TLV:
+
+          - top-level anonymous list (empty)
+
+          3.D_OK_SINGLE:"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018" which is an octstr of length 50-100 containing valid TLV:
+
+          - top-level anonymous list, containing - one element with profile-specific tag in fully-qualified form
+
+          4.D_OK_FULL:"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003148656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E0018" which is an octstr of length 128 containing valid TLV:
+
+          - top-level anonymous list, containing - two elements with profile-specific tag in fully-qualified form
+
+          5.D_BAD_LENGTH:"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018" which is an octstr of length 129 containing valid TLV:
+
+          - top-level anonymous list, containing - one element with profile-specific tag in fully-qualified form
+
+          6 .D_BAD_STRUCT: "1518" which is an octstr of length 2 containing valid TLV:
+
+          - top-level anonymous struct, empty
+
+          7.D_BAD_LIST:"3701D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018" which is an octstr of length 50-100 containing valid TLV:
+
+          - top-level list with context-specific tag, containing - one element with profile-specific tag in fully-qualified form
+
+          8.D_BAD_ELEM:"17103D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018" which is an octstr of length 50-100 containing valid TLV:
+
+          - top-level anonymous list, containing - one element with anonymous tag
+
+          9 .D_BAD_OVERFLOW: "17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018FF" which is an octstr of length 50-100 containing valid TLV:
+
+          - top-level anonymous list, containing - one element with profile-specific tag in fully-qualified form - but having extra bytes after the top level list end-of-container
+
+          10.D_BAD_UNDERFLOW:"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700" which is an octstr of length 50-100 containing invalid TLV:
+
+          - top-level anonymous list, containing - one element with profile-specific tag in fully-qualified form - but lacking the top-level list end-of-container
+
+          11.D_BAD_NONE: "" which is an octstr of length 0
+      disabled: true
+
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
-          verification step to be updated.
+          DUT
+          sudo ./chip-all-clusters-app
+
+          TH1
+          ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
       disabled: true
 
     - label:
