@@ -250,7 +250,7 @@ CHIP_ERROR EFR32OpaqueKeypair::Create(EFR32OpaqueKeyId opaque_id, EFR32OpaqueKey
 
     // Store the key ID and mark the key as valid
     mHasKey       = true;
-    mIsPersistent = key_id != kEFR32OpaqueKeyIdVolatile;
+    mIsPersistent = opaque_id != kEFR32OpaqueKeyIdVolatile;
 
 exit:
     psa_reset_key_attributes(&attr);
