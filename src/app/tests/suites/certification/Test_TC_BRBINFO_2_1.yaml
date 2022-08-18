@@ -26,8 +26,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read vendor-name  1 3
 
-          Verify VendorName is of type string and is less than or equal to 32 bytes on TH(chip-tool) Log:
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656495199.434300][2158:2163] CHIP:TOO:   VendorName: TEST_VENDOR
       disabled: true
 
@@ -46,8 +47,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read vendor-name  1 3
 
-          Verify VendorName is not chnged when compared to step 1 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656495199.434300][2158:2163] CHIP:TOO:   VendorName: TEST_VENDOR
       disabled: true
 
@@ -56,8 +58,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read vendor-id  1 3
 
-          Veify VendorID value is in range of 0x0001 to 0xFFF0 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656495322.252171][2177:2182] CHIP:TOO:   VendorID: 65521
       disabled: true
 
@@ -76,8 +79,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read vendor-id  1 3
 
-          Verify VendorID is not chnged when compared to step 8 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656495322.252171][2177:2182] CHIP:TOO:   VendorID: 65521
       disabled: true
 
@@ -86,8 +90,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read product-name  1 3
 
-          Verify ProductName has  human readable string and is less or equal to 32 bytes on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656495708.412745][2200:2205] CHIP:TOO:   ProductName: TEST_PRODUCT
       disabled: true
 
@@ -107,8 +112,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read product-name  1 3
 
-          Verify ProductName is not chnged when compared to step 11 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656495708.412745][2200:2205] CHIP:TOO:   ProductName: TEST_PRODUCT
       disabled: true
 
@@ -117,8 +123,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read node-label 1 3
 
-          Verify the value of node-label is type of string and contains length between 0 and 32 in TH(chip-tool) Log:
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1657696463.081741][15476:15481] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 2577979325
           [1657696463.081791][15476:15481] CHIP:TOO:   NodeLabel: Light 1
       disabled: true
@@ -159,8 +166,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read hardware-version  1 3
 
-          Verify HardwareVersion is in range of 0 to 65534 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656496175.564718][2302:2307] CHIP:TOO:   HardwareVersion: 0
       disabled: true
 
@@ -179,8 +187,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read hardware-version  1 3
 
-          Verify HardwareVersion is not chnged when compared to step 21 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656496175.564718][2302:2307] CHIP:TOO:   HardwareVersion: 0
       disabled: true
 
@@ -189,8 +198,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read hardware-version-string  1 3
 
-          Verify HardwareVersionString value is type of string and in range of 1 to 64 bytes
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656496257.298675][2315:2320] CHIP:TOO:   HardwareVersionString: TEST_VERSION
       disabled: true
 
@@ -209,8 +219,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read hardware-version-string  1 3
 
-          Verify HardwareVersionString is not chnged when compared to step 24 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656496257.298675][2315:2320] CHIP:TOO:   HardwareVersionString: TEST_VERSION
       disabled: true
 
@@ -219,8 +230,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read software-version 1 3
 
-          Verify SoftwareVersion value is in range of 0 to 4294967294 on TH(chip-tol) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656496411.609866][2348:2353] CHIP:TOO:   SoftwareVersion: 1
       disabled: true
 
@@ -239,8 +251,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read software-version 1 3
 
-          Verify SoftwareVersion is not chnged when compared to step 27 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656496411.609866][2348:2353] CHIP:TOO:   SoftwareVersion: 1
       disabled: true
 
@@ -249,8 +262,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read software-version-string  1 3
 
-          Verify the SoftwareVersionString is of type string and has length of 1 to 64 bytes
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656496498.568951][2362:2367] CHIP:TOO:   SoftwareVersionString: 1.0
       disabled: true
 
@@ -270,8 +284,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read software-version-string  1 3
 
-          Verify SoftwareVersionString is not chnged when compared to step 1 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656496498.568951][2362:2367] CHIP:TOO:   SoftwareVersionString: 1.0
       disabled: true
 
@@ -280,8 +295,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read manufacturing-date  1 3
 
-          Verify manufacturing date is of type string and has length of range 8 to 16 bytes on TH()
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656496661.777852][2388:2393] CHIP:TOO:   ManufacturingDate: 20200101
       disabled: true
 
@@ -300,8 +316,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read manufacturing-date  1 3
 
-          Verify VendorName is not chnged when compared to step 1 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656496661.777852][2388:2393] CHIP:TOO:   ManufacturingDate: 20200101
       disabled: true
 
@@ -309,6 +326,10 @@ tests:
       PICS: BRBINFO.S.A000c
       verification: |
           ./chip-tool bridgeddevicebasic read part-number  1 3
+
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+
+          Example Log:
 
           [1656496800.941788][2405:2410] CHIP:TOO:   PartNumber: 1234
       disabled: true
@@ -328,8 +349,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read part-number  1 3
 
-          Verify VendorName is not chnged when compared to step 1 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656496800.941788][2405:2410] CHIP:TOO:   PartNumber: 1234
       disabled: true
 
@@ -337,6 +359,10 @@ tests:
       PICS: BRBINFO.S.A000d
       verification: |
           ./chip-tool bridgeddevicebasic read product-url  1 3
+
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+
+          Example Log:
 
           [1656497181.118653][2436:2441] CHIP:TOO:   ProductURL: https://example.com/myproduct
       disabled: true
@@ -356,8 +382,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read product-url  1 3
 
-          Verify VendorName is not chnged when compared to step 1 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656497181.118653][2436:2441] CHIP:TOO:   ProductURL: https://example.com/myproduct
       disabled: true
 
@@ -365,6 +392,10 @@ tests:
       PICS: BRBINFO.S.A000e
       verification: |
           ./chip-tool bridgeddevicebasic read product-label  1 3
+
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+
+          Example Log:
 
           [1656501313.811305][2602:2607] CHIP:TOO:   ProductLabel: ABCD
       disabled: true
@@ -374,8 +405,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic write product-label newproductlabel  1 3
 
-          Verify response has unsupported write on TH(chip-tool) Log:
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656495259.991989][2164:2169] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
       disabled: true
 
@@ -384,8 +416,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read product-label  1 3
 
-          Verify VendorName is not chnged when compared to step 1 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656501313.811305][2602:2607] CHIP:TOO:   ProductLabel: ABCD
       disabled: true
 
@@ -393,6 +426,10 @@ tests:
       PICS: BRBINFO.S.A000f
       verification: |
           ./chip-tool bridgeddevicebasic read serial-number  1 3
+
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+
+          Example Log:
 
           [1656501452.183890][2624:2630] CHIP:TOO:   SerialNumber: 5678
       disabled: true
@@ -412,8 +449,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read serial-number  1 3
 
-          Verify VendorName is not chnged when compared to step 1 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656501452.183890][2624:2630] CHIP:TOO:   SerialNumber: 5678
       disabled: true
 
@@ -436,7 +474,7 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic write-by-id 0x0005 ‘“false”’ 1 0
 
-          Verify response has unsupported write on TH(chip-tool) Log:
+
 
           On TH verify that, TH receives  UNSUPPORTED_WRITE response as status
           [1656496372.884955][2340:2345] CHIP:DMG: }
@@ -461,6 +499,10 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read unique-id 1 3
 
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+
+          Example Log:
+
           [1656501734.253827][2673:2679] CHIP:TOO:   UniqueID: 30789FE4FCF832C9
       disabled: true
 
@@ -479,7 +521,8 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read unique-id 1 3
 
-          Verify VendorName is not chnged when compared to step 1 on TH(chip-tool) Log
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
+          Example Log:
           [1656501734.253827][2673:2679] CHIP:TOO:   UniqueID: 30789FE4FCF832C9
       disabled: true

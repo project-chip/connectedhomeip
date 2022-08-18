@@ -38,7 +38,7 @@ tests:
           "TH1 establishes a CASE session to the DUT and saves the attestation
           challenge as attestation_challenge"
       verification: |
-          Verify in TH log:
+          Verify case session is established on TH(chip-tool) log:
 
           [1657081321.112631][2354:2359] CHIP:CTL: Operational credentials provisioned on device 0xffff68000b60
           [1657081321.112706][2354:2359] CHIP:TOO: Secure Pairing Success
@@ -51,7 +51,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials certificate-chain-request 1 1 0
 
-          Verify CertificateChainResponse in TH log:
+          Verify CertificateChainResponse on TH(chip-tool) log:
 
           [1658393690.991117][3329:3334] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
           [1658393690.991168][3329:3334] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
@@ -67,7 +67,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe 900 0 1 0
 
-          Verify ArmFailSafeResponse in TH log :
+          Verify ArmFailSafeResponse on TH(chip-tool) log :
           [1658393763.804225][3345:3350] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1658393763.804288][3345:3350] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1658393763.804376][3345:3350] CHIP:TOO:   ArmFailSafeResponse: {
@@ -86,7 +86,7 @@ tests:
 
           ./chip-tool operationalcredentials csrrequest hex:AFB3070A828B7A9CABEE888688F867683C084E6E4B3F13CDEDF17EEF05A9F352 1 0
 
-          Verify CSRResponse in TH log:
+          Verify CSRResponse on TH(chip-tool) log:
           [1658393935.238621][3359:3364] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0005
           [1658393935.238726][3359:3364] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0005
           [1658393935.238839][3359:3364] CHIP:TOO:   CSRResponse: {
@@ -111,13 +111,18 @@ tests:
           verification step to be updated.
       disabled: true
 
+    - label: ""
+      verification: |
+          verification step to be updated.
+      disabled: true
+
     - label:
           "TH1 sends an ArmFailSafe command to the General Commissioning cluster
           with the ExpiryLengthSeconds field set to 0"
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe 0 0 1 0
 
-          Verify ArmFailSafeResponse in TH log :
+          Verify ArmFailSafeResponse on TH(chip-tool) log :
 
           [1658394142.961248][3378:3383] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1658394142.961297][3378:3383] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -133,7 +138,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe 900 0 1 0
 
-          Verify ArmFailSafeResponse in TH log :
+          Verify ArmFailSafeResponse on TH(chip-tool) log :
 
           [1658393763.804225][3345:3350] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1658393763.804288][3345:3350] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -149,7 +154,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials csrrequest hex:AFB3070A828B7A9CABEE888688F867683C084E6E4B3F13CDEDF17EEF05A9 1 0
 
-          Verify General error INVALID_COMMAND in TH log:
+          Verify General error INVALID_COMMAND in TH(chip-tool) log:
           [1658394196.798739][3387:3392] CHIP:EM: Removed CHIP MessageCounter:192677922 from RetransTable on exchange 13029i
           [1658394196.798787][3387:3392] CHIP:DMG: ICR moving to [ResponseRe]
           [1658394196.798859][3387:3392] CHIP:DMG: InvokeResponseMessage =
@@ -191,7 +196,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe 0 0 1 0
 
-          Verify ArmFailSafeResponse in TH log :
+          Verify ArmFailSafeResponse in TH(chip-tool) log :
 
           [1658394142.961248][3378:3383] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1658394142.961297][3378:3383] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -207,7 +212,7 @@ tests:
       verification: |
           ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3840
 
-          Verify TH1 open commissiong window
+          Verify manual pairing code on TH(chip-tool) log
 
           [1658394279.082812][3401:3407] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
           [1658394279.082900][3401:3407] CHIP:CTL: Successfully opened pairing window on the device
@@ -217,9 +222,9 @@ tests:
 
     - label: "TH2 fully commissions the DUT"
       verification: |
-          ./chip-tool pairing code 2 34941319897 --trace_decode 1
+          ./chip-tool pairing code 2 34941319897 --trace_decode 1 --commissioner-name beta
 
-          Verify in TH2 is commissioned successfully in log:
+          Verify TH2 is commissioned successfully  on TH2(chip-tool)  log:
           [1658394409.242162][2474:2479] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           [1658394409.242204][2474:2479] CHIP:CTL: Received CommissioningComplete response, errorCode=0
           [1658394409.242237][2474:2479] CHIP:CTL: Successfully finished commissioning step "SendComplete"
@@ -233,9 +238,9 @@ tests:
           "TH2 reads the NOCs attribute from the Node Operational Credentials
           cluster using a non-fabric-scoped read"
       verification: |
-          ./chip-tool operationalcredentials read nocs 2 0
+          ./chip-tool operationalcredentials read nocs 2 0 --commissioner-name beta
 
-          Verify that there are two element in the list in TH2 log:
+          Verify that there are two element in the list on TH2(chip-tool) log:
           [1658394451.122862][2491:2496] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 1660110007
           [1658394451.126674][2491:2496] CHIP:TOO:   NOCs: 1 entries
           [1658394451.126806][2491:2496] CHIP:TOO:     [1]: {
@@ -247,13 +252,13 @@ tests:
 
     - label: "TH2 extracts the pubic key from noc1 and noc2"
       verification: |
-          Verify both public key of noc1 and noc 2 are different
+          Verify both public key of noc1 and noc 2 are different in TH (all-clusters-app)
 
           To extract public key follow the below step
           1. Copy the NOCVALUE of TH1 in commissioning log of TH1
           2. save it in a file
           3. give below command to get public key
-              ./out/debug/chip-cert print-cert noc_1.txt
+              ./out/debug/chip-cert print-cert noc_1.txt --commissioner-name beta
 
           ---> The extracted public key of noc1 is
           CHIP Certificate:
@@ -279,6 +284,9 @@ tests:
                                 50 C2 C8 6F 78 2D AA 37 AF A1 C9 4A 95 56 78 CD
                                 BA D5 4F AC 3F F0 81 6E 0B D3 E0 BE C9 7E 8E FE
                                 FB 7A 28 67 8E BA 58 8F D9 74 F1 4D C4 82 C5 F4
+
+
+
 
           --->Follow the same steps for noc2
           The generated public key for noc2 is

@@ -24,9 +24,14 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Pre-Conditions"
+      verification: |
+          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
+      disabled: true
+
     - label: "Commission DUT to TH"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "Bring the DUT into a state so StateValue is FALSE"

@@ -326,3 +326,18 @@ tests:
           CHIP:TOO: Secure Pairing Failed
           CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
       disabled: true
+
+    - label: ""
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label: ""
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label: ""
+      verification: |
+          verification step to be updated.
+      disabled: true

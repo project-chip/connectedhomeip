@@ -90,7 +90,7 @@ tests:
           On nth controller using chip tool connect to the accessory
 
 
-          ./chip-tool pairing code 6 36217551633
+          ./chip-tool pairing code 6 36217551633 --commissioner-name beta
 
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1649756670.402192][10794:10799] CHIP:CTL: Device returned status 5 on receiving the NOC

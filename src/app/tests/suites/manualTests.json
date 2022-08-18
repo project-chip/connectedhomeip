@@ -245,8 +245,7 @@
         "Test_TC_OCC_2_2",
         "Test_TC_OCC_2_3",
         "Test_TC_OCC_2_4",
-        "Test_TC_OCC_3_1",
-        "Test_TC_OCC_3_2"
+        "Test_TC_OCC_3_1"
     ],
     "PressureMeasurement": ["Test_TC_PRS_3_1"],
     "PowerSource": ["Test_TC_PS_2_2", "Test_TC_PS_3_1"],
