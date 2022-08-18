@@ -309,7 +309,7 @@ class TC_RR_1_1(MatterBaseTest):
 
         # Step 9: Fill user label list
 
-        if has_user_labels:
+        if has_user_labels and not skip_user_label_cluster_steps:
             await self.fill_user_label_list(dev_ctrl, self.dut_node_id)
         else:
             logging.info("Step 9: Skipped due to no UserLabel cluster instances")
