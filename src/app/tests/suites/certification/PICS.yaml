@@ -5490,3 +5490,68 @@ PICS:
           "Is the device a Server and capable of generating large data which is
           greater than 1 MTU(1280 bytes)"
       id: MCORE.IDM.S.LargeData
+
+    - label:
+          "Is the device a Client and supports writing an attribute of DataType
+          Bool"
+      id: MCORE.IDM.C.WriteRequest.Attribute.DataType_Bool
+
+    - label:
+          "Is the device a Client and supports writing an attribute of DataType
+          String"
+      id: MCORE.IDM.C.WriteRequest.Attribute.DataType_String
+
+    - label:
+          "Is the device a Client and supports writing an attribute of DataType
+          Unsigned Integer"
+      id: MCORE.IDM.C.WriteRequest.Attribute.DataType_UnsignedInteger
+
+    - label:
+          "Is the device a Client and supports writing an attribute of DataType
+          Signed Integer"
+      id: MCORE.IDM.C.WriteRequest.Attribute.DataType_SignedInteger
+
+    - label:
+          "Is the device a Client and supports writing an attribute of DataType
+          Struct"
+      id: MCORE.IDM.C.WriteRequest.Attribute.DataType_Struct
+
+    - label:
+          "Is the device a Client and supports writing an attribute of DataType
+          Floating Point"
+      id: MCORE.IDM.C.WriteRequest.Attribute.DataType_FloatingPoint
+
+    - label:
+          "Is the device a Client and supports writing an attribute of DataType
+          List"
+      id: MCORE.IDM.C.WriteRequest.Attribute.DataType_List
+
+    - label:
+          "Is the device a Client and supports writing an attribute of DataType
+          Octet String"
+      id: MCORE.IDM.C.WriteRequest.Attribute.DataType_OctetString
+
+    - label:
+          "Is the device a Client and supports writing an attribute of DataType
+          Enum"
+      id: MCORE.IDM.C.WriteRequest.Attribute.DataType_Enum
+
+    - label:
+          "Is the device a Client and supports writing an attribute of DataType
+          Bitmap"
+      id: MCORE.IDM.C.WriteRequest.Attribute.DataType_Bitmap
+
+    - label:
+          "Is the device a Client and supports subscribing to an attribute of
+          DataType Bool"
+      id: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_Bool
+
+    - label:
+          "Is the device a Client and supports subscribing to an attribute of
+          DataType String"
+      id: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_String
+
+    - label:
+          "Is the device a Client and supports subscribing for multiple
+          attribute"
+      id: MCORE.IDM.C.SubscribeRequest.MultipleAttributes

@@ -24,11 +24,16 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT sends the WriteRequestMessage to the TH to modify one attribute
           data"
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
 
           sudo ./chip-tool levelcontrol write on-level 2 1 1
@@ -40,8 +45,8 @@ tests:
           [1655795552.551589][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
           [1655795552.551669][7331:7331] CHIP:DMG: WriteRequestMessage =
           [1655795552.551710][7331:7331] CHIP:DMG: {
-          [1655795552.551747][7331:7331] CHIP:DMG:         suppressResponse = false,
-          [1655795552.551791][7331:7331] CHIP:DMG:         timedRequest = false,
+          [1655795552.551747][7331:7331] CHIP:DMG:         suppressResponse = false, 
+          [1655795552.551791][7331:7331] CHIP:DMG:         timedRequest = false, 
           [1655795552.551832][7331:7331] CHIP:DMG:         AttributeDataIBs =
           [1655795552.551882][7331:7331] CHIP:DMG:         [
           [1655795552.551921][7331:7331] CHIP:DMG:                 AttributeDataIB =
@@ -52,17 +57,17 @@ tests:
           [1655795552.552180][7331:7331] CHIP:DMG:                                 Cluster = 0x8,
           [1655795552.552234][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_0011,
           [1655795552.552275][7331:7331] CHIP:DMG:                         }
-          [1655795552.552327][7331:7331] CHIP:DMG:
-          [1655795552.552381][7331:7331] CHIP:DMG:                         Data = 2,
+          [1655795552.552327][7331:7331] CHIP:DMG:                                 
+          [1655795552.552381][7331:7331] CHIP:DMG:                         Data = 2, 
           [1655795552.552428][7331:7331] CHIP:DMG:                 },
-          [1655795552.552478][7331:7331] CHIP:DMG:
+          [1655795552.552478][7331:7331] CHIP:DMG:                 
           [1655795552.552517][7331:7331] CHIP:DMG:         ],
-          [1655795552.552564][7331:7331] CHIP:DMG:
-          [1655795552.552605][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655795552.552564][7331:7331] CHIP:DMG:         
+          [1655795552.552605][7331:7331] CHIP:DMG:         moreChunkedMessages = false, 
           [1655795552.552647][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
           [1655795552.552686][7331:7331] CHIP:DMG: },
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs,, verify that TH all-clusters-app sent success response
           [1657883782.721742][2796:2801] CHIP:DMG: WriteResponseMessage =
           [1657883782.721783][2796:2801] CHIP:DMG: {
           [1657883782.721819][2796:2801] CHIP:DMG:         AttributeStatusIBs =
@@ -75,16 +80,16 @@ tests:
           [1657883782.722172][2796:2801] CHIP:DMG:                                 Cluster = 0x8,
           [1657883782.722227][2796:2801] CHIP:DMG:                                 Attribute = 0x0000_0011,
           [1657883782.722278][2796:2801] CHIP:DMG:                         }
-          [1657883782.722335][2796:2801] CHIP:DMG:
+          [1657883782.722335][2796:2801] CHIP:DMG:                                 
           [1657883782.722384][2796:2801] CHIP:DMG:                         StatusIB =
           [1657883782.722435][2796:2801] CHIP:DMG:                         {
           [1657883782.722493][2796:2801] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657883782.722547][2796:2801] CHIP:DMG:                         },
-          [1657883782.722605][2796:2801] CHIP:DMG:
+          [1657883782.722605][2796:2801] CHIP:DMG:                         
           [1657883782.722648][2796:2801] CHIP:DMG:                 },
-          [1657883782.722697][2796:2801] CHIP:DMG:
+          [1657883782.722697][2796:2801] CHIP:DMG:                 
           [1657883782.722736][2796:2801] CHIP:DMG:         ],
-          [1657883782.722783][2796:2801] CHIP:DMG:
+          [1657883782.722783][2796:2801] CHIP:DMG:         
           [1657883782.722823][2796:2801] CHIP:DMG:         InteractionModelRevision = 1
           [1657883782.722860][2796:2801] CHIP:DMG: }
           [1657883782.722967][2796:2801] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -104,15 +109,15 @@ tests:
           [1657883808.063068][2457:2457] CHIP:DMG:                         Cluster = 0x8,
           [1657883808.063105][2457:2457] CHIP:DMG:                         Attribute = 0x0000_0011,
           [1657883808.063138][2457:2457] CHIP:DMG:                 }
-          [1657883808.063167][2457:2457] CHIP:DMG:
+          [1657883808.063167][2457:2457] CHIP:DMG:                         
           [1657883808.063192][2457:2457] CHIP:DMG:         ],
-          [1657883808.063221][2457:2457] CHIP:DMG:
-          [1657883808.063247][2457:2457] CHIP:DMG:         isFabricFiltered = true,
+          [1657883808.063221][2457:2457] CHIP:DMG:                 
+          [1657883808.063247][2457:2457] CHIP:DMG:         isFabricFiltered = true, 
           [1657883808.063272][2457:2457] CHIP:DMG:         InteractionModelRevision = 1
           [1657883808.063295][2457:2457] CHIP:DMG: },
           [1657883808.063369][2457:2457] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs,, verify that TH all-clusters-app sent success response
           [1655795604.755214][6880:6885] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 737039636
           [1655795604.755363][6880:6885] CHIP:TOO:   on level: 2
           [1655795604.755460][6880:6885] CHIP:EM: Sending Standalone Ack for MessageCounter:83198098 on exchange 53763i
@@ -127,10 +132,11 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type bool."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type bool."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Bool
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
            ./chip-tool basic write local-config-disabled 1 1 0
 
@@ -141,8 +147,8 @@ tests:
           [1655795795.034050][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
           [1655795795.034127][7331:7331] CHIP:DMG: WriteRequestMessage =
           [1655795795.034168][7331:7331] CHIP:DMG: {
-          [1655795795.034206][7331:7331] CHIP:DMG:         suppressResponse = false,
-          [1655795795.034250][7331:7331] CHIP:DMG:         timedRequest = false,
+          [1655795795.034206][7331:7331] CHIP:DMG:         suppressResponse = false, 
+          [1655795795.034250][7331:7331] CHIP:DMG:         timedRequest = false, 
           [1655795795.034290][7331:7331] CHIP:DMG:         AttributeDataIBs =
           [1655795795.034340][7331:7331] CHIP:DMG:         [
           [1655795795.034380][7331:7331] CHIP:DMG:                 AttributeDataIB =
@@ -153,20 +159,20 @@ tests:
           [1655795795.034625][7331:7331] CHIP:DMG:                                 Cluster = 0x28,
           [1655795795.034680][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_0010,
           [1655795795.034737][7331:7331] CHIP:DMG:                         }
-          [1655795795.034784][7331:7331] CHIP:DMG:
-          [1655795795.034834][7331:7331] CHIP:DMG:                         Data = true,
+          [1655795795.034784][7331:7331] CHIP:DMG:                                 
+          [1655795795.034834][7331:7331] CHIP:DMG:                         Data = true, 
           [1655795795.034880][7331:7331] CHIP:DMG:                 },
-          [1655795795.034929][7331:7331] CHIP:DMG:
+          [1655795795.034929][7331:7331] CHIP:DMG:                 
           [1655795795.034968][7331:7331] CHIP:DMG:         ],
-          [1655795795.035015][7331:7331] CHIP:DMG:
-          [1655795795.035056][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655795795.035015][7331:7331] CHIP:DMG:         
+          [1655795795.035056][7331:7331] CHIP:DMG:         moreChunkedMessages = false, 
           [1655795795.035099][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
           [1655795795.035138][7331:7331] CHIP:DMG: },
           [1655795795.035259][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=m
 
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent success response
 
           [1657883938.394965][2822:2827] CHIP:DMG: WriteResponseMessage =
           [1657883938.394995][2822:2827] CHIP:DMG: {
@@ -180,16 +186,16 @@ tests:
           [1657883938.395283][2822:2827] CHIP:DMG:                                 Cluster = 0x28,
           [1657883938.395324][2822:2827] CHIP:DMG:                                 Attribute = 0x0000_0010,
           [1657883938.395363][2822:2827] CHIP:DMG:                         }
-          [1657883938.395406][2822:2827] CHIP:DMG:
+          [1657883938.395406][2822:2827] CHIP:DMG:                                 
           [1657883938.395446][2822:2827] CHIP:DMG:                         StatusIB =
           [1657883938.395485][2822:2827] CHIP:DMG:                         {
           [1657883938.395522][2822:2827] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657883938.395561][2822:2827] CHIP:DMG:                         },
-          [1657883938.395603][2822:2827] CHIP:DMG:
+          [1657883938.395603][2822:2827] CHIP:DMG:                         
           [1657883938.395636][2822:2827] CHIP:DMG:                 },
-          [1657883938.395672][2822:2827] CHIP:DMG:
+          [1657883938.395672][2822:2827] CHIP:DMG:                 
           [1657883938.395700][2822:2827] CHIP:DMG:         ],
-          [1657883938.395735][2822:2827] CHIP:DMG:
+          [1657883938.395735][2822:2827] CHIP:DMG:         
           [1657883938.395765][2822:2827] CHIP:DMG:         InteractionModelRevision = 1
           [1657883938.395794][2822:2827] CHIP:DMG: }
           [1657883938.395875][2822:2827] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -210,30 +216,28 @@ tests:
           [1657884119.523067][2748:2748] CHIP:DMG:                         Cluster = 0x28,
           [1657884119.523097][2748:2748] CHIP:DMG:                         Attribute = 0x0000_0010,
           [1657884119.523126][2748:2748] CHIP:DMG:                 }
-          [1657884119.523153][2748:2748] CHIP:DMG:
+          [1657884119.523153][2748:2748] CHIP:DMG:                         
           [1657884119.523179][2748:2748] CHIP:DMG:         ],
-          [1657884119.523207][2748:2748] CHIP:DMG:
-          [1657884119.523233][2748:2748] CHIP:DMG:         isFabricFiltered = true,
+          [1657884119.523207][2748:2748] CHIP:DMG:                 
+          [1657884119.523233][2748:2748] CHIP:DMG:         isFabricFiltered = true, 
           [1657884119.523257][2748:2748] CHIP:DMG:         InteractionModelRevision = 1
           [1657884119.523280][2748:2748] CHIP:DMG: },
 
 
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1655795843.336042][6902:6907] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 1263909562
           [1655795843.336093][6902:6907] CHIP:TOO:   LocalConfigDisabled: TRUE
           [1655795843.336251][6902:6907] CHIP:EM: Sending Standalone Ack for MessageCounter:108030495 on exchange 43207i
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type string."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type string."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_String
       verification: |
-          In case of chip tool, here is an example command to use
-
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
            ./chip-tool basic write node-label node 1 0
-
 
           verify on TH(reference app) receives the right write Request Message for the data sent in the above command
 
@@ -242,8 +246,8 @@ tests:
           [1655796035.022407][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
           [1655796035.022494][7331:7331] CHIP:DMG: WriteRequestMessage =
           [1655796035.022541][7331:7331] CHIP:DMG: {
-          [1655796035.022584][7331:7331] CHIP:DMG:         suppressResponse = false,
-          [1655796035.022633][7331:7331] CHIP:DMG:         timedRequest = false,
+          [1655796035.022584][7331:7331] CHIP:DMG:         suppressResponse = false, 
+          [1655796035.022633][7331:7331] CHIP:DMG:         timedRequest = false, 
           [1655796035.022679][7331:7331] CHIP:DMG:         AttributeDataIBs =
           [1655796035.022735][7331:7331] CHIP:DMG:         [
           [1655796035.022780][7331:7331] CHIP:DMG:                 AttributeDataIB =
@@ -254,19 +258,18 @@ tests:
           [1655796035.023067][7331:7331] CHIP:DMG:                                 Cluster = 0x28,
           [1655796035.023134][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_0005,
           [1655796035.023192][7331:7331] CHIP:DMG:                         }
-          [1655796035.023252][7331:7331] CHIP:DMG:
-          [1655796035.023313][7331:7331] CHIP:DMG:                         Data = "node",
+          [1655796035.023252][7331:7331] CHIP:DMG:                                 
+          [1655796035.023313][7331:7331] CHIP:DMG:                         Data = "node", 
           [1655796035.023366][7331:7331] CHIP:DMG:                 },
-          [1655796035.023421][7331:7331] CHIP:DMG:
+          [1655796035.023421][7331:7331] CHIP:DMG:                 
           [1655796035.023466][7331:7331] CHIP:DMG:         ],
-          [1655796035.023519][7331:7331] CHIP:DMG:
-          [1655796035.023565][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655796035.023519][7331:7331] CHIP:DMG:         
+          [1655796035.023565][7331:7331] CHIP:DMG:         moreChunkedMessages = false, 
           [1655796035.023613][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
           [1655796035.023656][7331:7331] CHIP:DMG: },
           [1655796035.023791][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=m
           [1655796035.023851][7331:7331] CHIP:DMG: AccessControl: allowed
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1657884155.221193][2865:2870] CHIP:DMG: WriteResponseMessage =
           [1657884155.221246][2865:2870] CHIP:DMG: {
           [1657884155.221292][2865:2870] CHIP:DMG:         AttributeStatusIBs =
@@ -279,16 +282,16 @@ tests:
           [1657884155.221673][2865:2870] CHIP:DMG:                                 Cluster = 0x28,
           [1657884155.221710][2865:2870] CHIP:DMG:                                 Attribute = 0x0000_0005,
           [1657884155.221798][2865:2870] CHIP:DMG:                         }
-          [1657884155.221837][2865:2870] CHIP:DMG:
+          [1657884155.221837][2865:2870] CHIP:DMG:                                 
           [1657884155.221868][2865:2870] CHIP:DMG:                         StatusIB =
           [1657884155.221900][2865:2870] CHIP:DMG:                         {
           [1657884155.221932][2865:2870] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657884155.221965][2865:2870] CHIP:DMG:                         },
-          [1657884155.221996][2865:2870] CHIP:DMG:
+          [1657884155.221996][2865:2870] CHIP:DMG:                         
           [1657884155.222022][2865:2870] CHIP:DMG:                 },
-          [1657884155.222052][2865:2870] CHIP:DMG:
+          [1657884155.222052][2865:2870] CHIP:DMG:                 
           [1657884155.222077][2865:2870] CHIP:DMG:         ],
-          [1657884155.222108][2865:2870] CHIP:DMG:
+          [1657884155.222108][2865:2870] CHIP:DMG:         
           [1657884155.222132][2865:2870] CHIP:DMG:         InteractionModelRevision = 1
           [1657884155.222157][2865:2870] CHIP:DMG: }
           [1657884155.222229][2865:2870] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -307,16 +310,15 @@ tests:
           [1657884173.739073][2748:2748] CHIP:DMG:                         Cluster = 0x28,
           [1657884173.739105][2748:2748] CHIP:DMG:                         Attribute = 0x0000_0005,
           [1657884173.739134][2748:2748] CHIP:DMG:                 }
-          [1657884173.739162][2748:2748] CHIP:DMG:
+          [1657884173.739162][2748:2748] CHIP:DMG:                         
           [1657884173.739188][2748:2748] CHIP:DMG:         ],
-          [1657884173.739215][2748:2748] CHIP:DMG:
-          [1657884173.739241][2748:2748] CHIP:DMG:         isFabricFiltered = true,
+          [1657884173.739215][2748:2748] CHIP:DMG:                 
+          [1657884173.739241][2748:2748] CHIP:DMG:         isFabricFiltered = true, 
           [1657884173.739266][2748:2748] CHIP:DMG:         InteractionModelRevision = 1
           [1657884173.739288][2748:2748] CHIP:DMG: },
 
 
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
 
           [1655796082.079468][6918:6923] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 1263909563
           [1655796082.079509][6918:6923] CHIP:TOO:   NodeLabel: node
@@ -324,13 +326,13 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type unsigned integer."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type unsigned integer."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_UnsignedInteger
       verification: |
-          In case of chip tool, here is an example command to use
-
-
-          ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+           
+          ./chip-tool any write-by-id  0x0008 0x0010 1 1 1 
 
           verify on TH(reference app) receives the right write Request Message for the data sent in the above command
 
@@ -338,8 +340,8 @@ tests:
           [1655796141.166889][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
           [1655796141.166973][7331:7331] CHIP:DMG: WriteRequestMessage =
           [1655796141.167019][7331:7331] CHIP:DMG: {
-          [1655796141.167062][7331:7331] CHIP:DMG:         suppressResponse = false,
-          [1655796141.167111][7331:7331] CHIP:DMG:         timedRequest = false,
+          [1655796141.167062][7331:7331] CHIP:DMG:         suppressResponse = false, 
+          [1655796141.167111][7331:7331] CHIP:DMG:         timedRequest = false, 
           [1655796141.167155][7331:7331] CHIP:DMG:         AttributeDataIBs =
           [1655796141.167211][7331:7331] CHIP:DMG:         [
           [1655796141.167255][7331:7331] CHIP:DMG:                 AttributeDataIB =
@@ -350,19 +352,20 @@ tests:
           [1655796141.167542][7331:7331] CHIP:DMG:                                 Cluster = 0x8,
           [1655796141.167603][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_0010,
           [1655796141.167660][7331:7331] CHIP:DMG:                         }
-          [1655796141.167719][7331:7331] CHIP:DMG:
-          [1655796141.167782][7331:7331] CHIP:DMG:                         Data = 1,
+          [1655796141.167719][7331:7331] CHIP:DMG:                                 
+          [1655796141.167782][7331:7331] CHIP:DMG:                         Data = 1, 
           [1655796141.167836][7331:7331] CHIP:DMG:                 },
-          [1655796141.167890][7331:7331] CHIP:DMG:
+          [1655796141.167890][7331:7331] CHIP:DMG:                 
           [1655796141.167933][7331:7331] CHIP:DMG:         ],
-          [1655796141.167987][7331:7331] CHIP:DMG:
-          [1655796141.168032][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655796141.167987][7331:7331] CHIP:DMG:         
+          [1655796141.168032][7331:7331] CHIP:DMG:         moreChunkedMessages = false, 
           [1655796141.168079][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
           [1655796141.168121][7331:7331] CHIP:DMG: },
           [1655796141.168253][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
           [1655796141.168313][7331:7331] CHIP:DMG: AccessControl: allowed
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1657884204.951658][2878:2883] CHIP:DMG: WriteResponseMessage =
           [1657884204.951700][2878:2883] CHIP:DMG: {
           [1657884204.951736][2878:2883] CHIP:DMG:         AttributeStatusIBs =
@@ -375,23 +378,23 @@ tests:
           [1657884204.952075][2878:2883] CHIP:DMG:                                 Cluster = 0x8,
           [1657884204.952173][2878:2883] CHIP:DMG:                                 Attribute = 0x0000_0010,
           [1657884204.952226][2878:2883] CHIP:DMG:                         }
-          [1657884204.952286][2878:2883] CHIP:DMG:
+          [1657884204.952286][2878:2883] CHIP:DMG:                                 
           [1657884204.952340][2878:2883] CHIP:DMG:                         StatusIB =
           [1657884204.952396][2878:2883] CHIP:DMG:                         {
           [1657884204.952449][2878:2883] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657884204.952500][2878:2883] CHIP:DMG:                         },
-          [1657884204.952552][2878:2883] CHIP:DMG:
+          [1657884204.952552][2878:2883] CHIP:DMG:                         
           [1657884204.952597][2878:2883] CHIP:DMG:                 },
-          [1657884204.952645][2878:2883] CHIP:DMG:
+          [1657884204.952645][2878:2883] CHIP:DMG:                 
           [1657884204.952684][2878:2883] CHIP:DMG:         ],
-          [1657884204.952731][2878:2883] CHIP:DMG:
+          [1657884204.952731][2878:2883] CHIP:DMG:         
           [1657884204.952770][2878:2883] CHIP:DMG:         InteractionModelRevision = 1
           [1657884204.952808][2878:2883] CHIP:DMG: }
           [1657884204.952914][2878:2883] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1657884204.952998][2878:2883] CHIP:EM: Sending Standalone Ack for MessageCounter:264044678
+          [1657884204.952998][2878:2883] CHIP:EM: Sending Standalone Ack for MessageCounter:264044678 
 
 
-           ./chip-tool any read-by-id  0x0008 0x0010 1 1
+           ./chip-tool any read-by-id  0x0008 0x0010 1 1 
 
           verify on TH(reference app) receives the read Request Message for the data sent in the above command
           [1657884227.859836][2748:2748] CHIP:IM: Received Read request
@@ -405,61 +408,66 @@ tests:
           [1657884227.860112][2748:2748] CHIP:DMG:                         Cluster = 0x8,
           [1657884227.860147][2748:2748] CHIP:DMG:                         Attribute = 0x0000_0010,
           [1657884227.860181][2748:2748] CHIP:DMG:                 }
-          [1657884227.860211][2748:2748] CHIP:DMG:
+          [1657884227.860211][2748:2748] CHIP:DMG:                         
           [1657884227.860239][2748:2748] CHIP:DMG:         ],
-          [1657884227.860266][2748:2748] CHIP:DMG:
-          [1657884227.860292][2748:2748] CHIP:DMG:         isFabricFiltered = true,
+          [1657884227.860266][2748:2748] CHIP:DMG:                 
+          [1657884227.860292][2748:2748] CHIP:DMG:         isFabricFiltered = true, 
           [1657884227.860316][2748:2748] CHIP:DMG:         InteractionModelRevision = 1
           [1657884227.860339][2748:2748] CHIP:DMG: },
           [1657884227.860413][2748:2748] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1655796192.032715][6931:6936] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0010 DataVersion: 737039637
           [1655796192.032807][6931:6936] CHIP:TOO:   on off transition time: 1
           [1655796192.032908][6931:6936] CHIP:EM: Sending Standalone Ack for MessageCounter:249349258 on exchange 7433i
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type signed integer."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type signed integer."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_SignedInteger
       verification: |
           DUT implementation required to verify write an attribute of data type signed integer.
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type floating point."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type floating point."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_FloatingPoint
       verification: |
           DUT implementation required to verify write an attribute of data type float
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type Octet String."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type Octet String."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_OctetString
       verification: |
           DUT implementation required to verify write an attribute of data type Octet String
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type Struct."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type Struct."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Struct
       verification: |
           DUT implementation required to verify write an attribute ofdata type Struct
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type List."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type List."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_List
       verification: |
           DUT implementation required to verify write an attribute of  data type List
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type enum."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type enum."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Enum
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
            ./chip-tool any write-by-id 0x0204 0  1  1 1
 
@@ -470,8 +478,8 @@ tests:
           [1655796297.607954][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
           [1655796297.608038][7331:7331] CHIP:DMG: WriteRequestMessage =
           [1655796297.608086][7331:7331] CHIP:DMG: {
-          [1655796297.608128][7331:7331] CHIP:DMG:         suppressResponse = false,
-          [1655796297.608178][7331:7331] CHIP:DMG:         timedRequest = false,
+          [1655796297.608128][7331:7331] CHIP:DMG:         suppressResponse = false, 
+          [1655796297.608178][7331:7331] CHIP:DMG:         timedRequest = false, 
           [1655796297.608222][7331:7331] CHIP:DMG:         AttributeDataIBs =
           [1655796297.608278][7331:7331] CHIP:DMG:         [
           [1655796297.608323][7331:7331] CHIP:DMG:                 AttributeDataIB =
@@ -482,19 +490,19 @@ tests:
           [1655796297.608618][7331:7331] CHIP:DMG:                                 Cluster = 0x204,
           [1655796297.608685][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1655796297.608749][7331:7331] CHIP:DMG:                         }
-          [1655796297.608810][7331:7331] CHIP:DMG:
-          [1655796297.608869][7331:7331] CHIP:DMG:                         Data = 1,
+          [1655796297.608810][7331:7331] CHIP:DMG:                                 
+          [1655796297.608869][7331:7331] CHIP:DMG:                         Data = 1, 
           [1655796297.608923][7331:7331] CHIP:DMG:                 },
-          [1655796297.608981][7331:7331] CHIP:DMG:
+          [1655796297.608981][7331:7331] CHIP:DMG:                 
           [1655796297.609025][7331:7331] CHIP:DMG:         ],
-          [1655796297.609078][7331:7331] CHIP:DMG:
-          [1655796297.609124][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655796297.609078][7331:7331] CHIP:DMG:         
+          [1655796297.609124][7331:7331] CHIP:DMG:         moreChunkedMessages = false, 
           [1655796297.609171][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
           [1655796297.609214][7331:7331] CHIP:DMG: },
           [1655796297.609342][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=o
           [1655796297.609403][7331:7331] CHIP:DMG: AccessControl: allowed
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1657884258.383116][2892:2897] CHIP:DMG: WriteResponseMessage =
           [1657884258.383157][2892:2897] CHIP:DMG: {
           [1657884258.383192][2892:2897] CHIP:DMG:         AttributeStatusIBs =
@@ -507,16 +515,16 @@ tests:
           [1657884258.383538][2892:2897] CHIP:DMG:                                 Cluster = 0x204,
           [1657884258.383592][2892:2897] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1657884258.383647][2892:2897] CHIP:DMG:                         }
-          [1657884258.383703][2892:2897] CHIP:DMG:
+          [1657884258.383703][2892:2897] CHIP:DMG:                                 
           [1657884258.383750][2892:2897] CHIP:DMG:                         StatusIB =
           [1657884258.383800][2892:2897] CHIP:DMG:                         {
           [1657884258.383851][2892:2897] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657884258.383905][2892:2897] CHIP:DMG:                         },
-          [1657884258.383955][2892:2897] CHIP:DMG:
+          [1657884258.383955][2892:2897] CHIP:DMG:                         
           [1657884258.383996][2892:2897] CHIP:DMG:                 },
-          [1657884258.384043][2892:2897] CHIP:DMG:
+          [1657884258.384043][2892:2897] CHIP:DMG:                 
           [1657884258.384081][2892:2897] CHIP:DMG:         ],
-          [1657884258.384170][2892:2897] CHIP:DMG:
+          [1657884258.384170][2892:2897] CHIP:DMG:         
           [1657884258.384212][2892:2897] CHIP:DMG:         InteractionModelRevision = 1
           [1657884258.384249][2892:2897] CHIP:DMG: }
           [1657884258.384358][2892:2897] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -530,21 +538,20 @@ tests:
           [1657884282.303778][2898:2903] CHIP:TOO:   temperature display mode: 1
           [1657884282.303862][2898:2903] CHIP:EM: Sending Standalone Ack for MessageCounter:147756485 on exchange 42871i
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs,, verify that TH all-clusters-app sent success response
           [1655796341.132655][6946:6951] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 3165945391
           [1655796341.132864][6946:6951] CHIP:TOO:   temperature display mode: 1
           [1655796341.132973][6946:6951] CHIP:EM: Sending Standalone Ack for MessageCounter:245498041 on exchange 51992i
       disabled: true
 
     - label:
-          "[Optional] DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type bitmap."
+          "DUT sends the WriteRequestMessage to the TH to write an attribute of
+          data type bitmap."
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Bitmap
       verification: |
-          In case of chip tool, here is an example command to use
-
-
-
-           ./chip-tool colorcontrol write-by-id 0x000f 1 1 1
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+           
+           ./chip-tool colorcontrol write-by-id 0x000f 1 1 1 
 
           verify on TH(reference app) receives the right write Request Message for the data sent in the above command
 
@@ -552,8 +559,8 @@ tests:
           [1655796429.696947][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
           [1655796429.697031][7331:7331] CHIP:DMG: WriteRequestMessage =
           [1655796429.697078][7331:7331] CHIP:DMG: {
-          [1655796429.697121][7331:7331] CHIP:DMG:         suppressResponse = false,
-          [1655796429.697170][7331:7331] CHIP:DMG:         timedRequest = false,
+          [1655796429.697121][7331:7331] CHIP:DMG:         suppressResponse = false, 
+          [1655796429.697170][7331:7331] CHIP:DMG:         timedRequest = false, 
           [1655796429.697215][7331:7331] CHIP:DMG:         AttributeDataIBs =
           [1655796429.697270][7331:7331] CHIP:DMG:         [
           [1655796429.697315][7331:7331] CHIP:DMG:                 AttributeDataIB =
@@ -564,20 +571,20 @@ tests:
           [1655796429.697650][7331:7331] CHIP:DMG:                                 Cluster = 0x300,
           [1655796429.697718][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_000F,
           [1655796429.697781][7331:7331] CHIP:DMG:                         }
-          [1655796429.697843][7331:7331] CHIP:DMG:
-          [1655796429.697910][7331:7331] CHIP:DMG:                         Data = 1,
+          [1655796429.697843][7331:7331] CHIP:DMG:                                 
+          [1655796429.697910][7331:7331] CHIP:DMG:                         Data = 1, 
           [1655796429.697963][7331:7331] CHIP:DMG:                 },
-          [1655796429.698021][7331:7331] CHIP:DMG:
+          [1655796429.698021][7331:7331] CHIP:DMG:                 
           [1655796429.698065][7331:7331] CHIP:DMG:         ],
-          [1655796429.698118][7331:7331] CHIP:DMG:
-          [1655796429.698163][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655796429.698118][7331:7331] CHIP:DMG:         
+          [1655796429.698163][7331:7331] CHIP:DMG:         moreChunkedMessages = false, 
           [1655796429.698210][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
           [1655796429.698252][7331:7331] CHIP:DMG: },
           [1655796429.698386][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=o
           [1655796429.698446][7331:7331] CHIP:DMG: AccessControl: allowed
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
 
           [1657884309.994598][2907:2912] CHIP:DMG: WriteResponseMessage =
           [1657884309.994627][2907:2912] CHIP:DMG: {
@@ -591,16 +598,16 @@ tests:
           [1657884309.994902][2907:2912] CHIP:DMG:                                 Cluster = 0x300,
           [1657884309.994941][2907:2912] CHIP:DMG:                                 Attribute = 0x0000_000F,
           [1657884309.994977][2907:2912] CHIP:DMG:                         }
-          [1657884309.995021][2907:2912] CHIP:DMG:
+          [1657884309.995021][2907:2912] CHIP:DMG:                                 
           [1657884309.995057][2907:2912] CHIP:DMG:                         StatusIB =
           [1657884309.995096][2907:2912] CHIP:DMG:                         {
           [1657884309.995132][2907:2912] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657884309.995168][2907:2912] CHIP:DMG:                         },
-          [1657884309.995203][2907:2912] CHIP:DMG:
+          [1657884309.995203][2907:2912] CHIP:DMG:                         
           [1657884309.995234][2907:2912] CHIP:DMG:                 },
-          [1657884309.995268][2907:2912] CHIP:DMG:
+          [1657884309.995268][2907:2912] CHIP:DMG:                 
           [1657884309.995295][2907:2912] CHIP:DMG:         ],
-          [1657884309.995329][2907:2912] CHIP:DMG:
+          [1657884309.995329][2907:2912] CHIP:DMG:         
           [1657884309.995356][2907:2912] CHIP:DMG:         InteractionModelRevision = 1
           [1657884309.995383][2907:2912] CHIP:DMG: }
           [1657884309.995461][2907:2912] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -608,7 +615,7 @@ tests:
 
 
 
-            ./chip-tool colorcontrol read-by-id 0x000f  1 1
+            ./chip-tool colorcontrol read-by-id 0x000f  1 1 
 
           verify on TH (reference app) receives the right write Request Message for the data sent in the above command
           [1657884334.613535][2748:2748] CHIP:IM: Received Read request
@@ -622,16 +629,15 @@ tests:
           [1657884334.613834][2748:2748] CHIP:DMG:                         Cluster = 0x300,
           [1657884334.613869][2748:2748] CHIP:DMG:                         Attribute = 0x0000_000F,
           [1657884334.613898][2748:2748] CHIP:DMG:                 }
-          [1657884334.613926][2748:2748] CHIP:DMG:
+          [1657884334.613926][2748:2748] CHIP:DMG:                         
           [1657884334.613952][2748:2748] CHIP:DMG:         ],
-          [1657884334.613980][2748:2748] CHIP:DMG:
-          [1657884334.614005][2748:2748] CHIP:DMG:         isFabricFiltered = true,
+          [1657884334.613980][2748:2748] CHIP:DMG:                 
+          [1657884334.614005][2748:2748] CHIP:DMG:         isFabricFiltered = true, 
           [1657884334.614030][2748:2748] CHIP:DMG:         InteractionModelRevision = 1
           [1657884334.614053][2748:2748] CHIP:DMG: },
           [1657884334.614128][2748:2748] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1655796493.233673][6961:6966] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_000F DataVersion: 2788050502
           [1655796493.233761][6961:6966] CHIP:TOO:   Options: 1
           [1655796493.233865][6961:6966] CHIP:EM: Sending Standalone Ack for MessageCounter:185730221 on exchange 37136i
@@ -639,9 +645,10 @@ tests:
 
     - label:
           "DUT sends a WriteRequestMessage to the TH with a large list of
-          attribute data which has to be sent in multiple messages."
+          attribute data, which is larger than 1 MTU(1280 bytes), that has to be
+          sent in multiple messages."
       verification: |
-          DUT implementation required to verify write an attribute which is is larger than 1 MTU(1280 bytes)
+          DUT implementation required to verify write an attribute which is is larger than 1 MTU(1280 bytes) 
           Here is an example command to verify the write functionality. User must choose an attribute which has large list of attribute data.
            ./chip-tool basic write node-label node 1 0
       disabled: true
@@ -650,7 +657,7 @@ tests:
           "DUT sends the WriteRequestMessage to the TH to write one attribute on
           a given cluster and endpoint. Repeat the above steps 3 times."
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
           ./chip-tool any write-by-id 0x0204 0  1  1 1
 
@@ -662,8 +669,8 @@ tests:
           [1655796724.510759][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
           [1655796724.510853][7331:7331] CHIP:DMG: WriteRequestMessage =
           [1655796724.510907][7331:7331] CHIP:DMG: {
-          [1655796724.510955][7331:7331] CHIP:DMG:         suppressResponse = false,
-          [1655796724.511023][7331:7331] CHIP:DMG:         timedRequest = false,
+          [1655796724.510955][7331:7331] CHIP:DMG:         suppressResponse = false, 
+          [1655796724.511023][7331:7331] CHIP:DMG:         timedRequest = false, 
           [1655796724.511076][7331:7331] CHIP:DMG:         AttributeDataIBs =
           [1655796724.511140][7331:7331] CHIP:DMG:         [
           [1655796724.511191][7331:7331] CHIP:DMG:                 AttributeDataIB =
@@ -674,18 +681,18 @@ tests:
           [1655796724.511520][7331:7331] CHIP:DMG:                                 Cluster = 0x204,
           [1655796724.511592][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1655796724.511659][7331:7331] CHIP:DMG:                         }
-          [1655796724.511731][7331:7331] CHIP:DMG:
-          [1655796724.511801][7331:7331] CHIP:DMG:                         Data = 1,
+          [1655796724.511731][7331:7331] CHIP:DMG:                                 
+          [1655796724.511801][7331:7331] CHIP:DMG:                         Data = 1, 
           [1655796724.511864][7331:7331] CHIP:DMG:                 },
-          [1655796724.511930][7331:7331] CHIP:DMG:
+          [1655796724.511930][7331:7331] CHIP:DMG:                 
           [1655796724.511980][7331:7331] CHIP:DMG:         ],
-          [1655796724.512041][7331:7331] CHIP:DMG:
-          [1655796724.512093][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655796724.512041][7331:7331] CHIP:DMG:         
+          [1655796724.512093][7331:7331] CHIP:DMG:         moreChunkedMessages = false, 
           [1655796724.512146][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
           [1655796724.512195][7331:7331] CHIP:DMG: },
           [1655796724.512344][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=o
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response  
           [1657884369.932192][2923:2928] CHIP:DMG: WriteResponseMessage =
           [1657884369.932226][2923:2928] CHIP:DMG: {
           [1657884369.932255][2923:2928] CHIP:DMG:         AttributeStatusIBs =
@@ -698,16 +705,16 @@ tests:
           [1657884369.932534][2923:2928] CHIP:DMG:                                 Cluster = 0x204,
           [1657884369.932579][2923:2928] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1657884369.932621][2923:2928] CHIP:DMG:                         }
-          [1657884369.932667][2923:2928] CHIP:DMG:
+          [1657884369.932667][2923:2928] CHIP:DMG:                                 
           [1657884369.932711][2923:2928] CHIP:DMG:                         StatusIB =
           [1657884369.932753][2923:2928] CHIP:DMG:                         {
           [1657884369.932794][2923:2928] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657884369.932835][2923:2928] CHIP:DMG:                         },
-          [1657884369.932876][2923:2928] CHIP:DMG:
+          [1657884369.932876][2923:2928] CHIP:DMG:                         
           [1657884369.932912][2923:2928] CHIP:DMG:                 },
-          [1657884369.932952][2923:2928] CHIP:DMG:
+          [1657884369.932952][2923:2928] CHIP:DMG:                 
           [1657884369.932983][2923:2928] CHIP:DMG:         ],
-          [1657884369.933022][2923:2928] CHIP:DMG:
+          [1657884369.933022][2923:2928] CHIP:DMG:         
           [1657884369.933054][2923:2928] CHIP:DMG:         InteractionModelRevision = 1
           [1657884369.933085][2923:2928] CHIP:DMG: }
           [1657884369.933178][2923:2928] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -729,16 +736,15 @@ tests:
           [1657884399.502658][2748:2748] CHIP:DMG:                         Cluster = 0x204,
           [1657884399.502693][2748:2748] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1657884399.502730][2748:2748] CHIP:DMG:                 }
-          [1657884399.502762][2748:2748] CHIP:DMG:
+          [1657884399.502762][2748:2748] CHIP:DMG:                         
           [1657884399.502791][2748:2748] CHIP:DMG:         ],
-          [1657884399.502822][2748:2748] CHIP:DMG:
-          [1657884399.502852][2748:2748] CHIP:DMG:         isFabricFiltered = true,
+          [1657884399.502822][2748:2748] CHIP:DMG:                 
+          [1657884399.502852][2748:2748] CHIP:DMG:         isFabricFiltered = true, 
           [1657884399.502881][2748:2748] CHIP:DMG:         InteractionModelRevision = 1
           [1657884399.502907][2748:2748] CHIP:DMG: },
           [1657884399.502989][2748:2748] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1655796786.513406][6976:6981] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 3165945392
           [1655796786.513496][6976:6981] CHIP:TOO:   temperature display mode: 1
           [1655796786.513593][6976:6981] CHIP:EM: Sending Standalone Ack for MessageCounter:190446058 on exchange 28240i
@@ -749,9 +755,9 @@ tests:
       disabled: true
 
     - label:
-          "[Optional] DUT sends a ReadRequest message to the TH to read any
-          attribute on two clusters. TH returns with a report data action with
-          the attribute values and the dataversions of the clusters. DUT sends a
+          "DUT sends a ReadRequest message to the TH to read any attribute on
+          two clusters. TH returns with a report data action with the attribute
+          values and the dataversions of the clusters. DUT sends a
           WriteRequestMessage to the DUT to both the clusters with the
           appropriate dataversions(received in the previous step) to modify the
           value of an attribute"
