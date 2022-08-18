@@ -23,7 +23,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    timeout: 330
+    timeout: 200
     endpoint: 0
     discriminator:
         type: int16u
@@ -69,7 +69,7 @@ tests:
               - name: "discriminator"
                 value: discriminator
 
-    - label: "Wait for commissioning Window to 301 seconds"
+    - label: "Wait for commissioning Window to 181 seconds"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

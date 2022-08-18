@@ -104,7 +104,6 @@ tests:
           constraints:
               notValue: null
 
-    #Issue https://github.com/CHIP-Specifications/chip-test-plans/issues/1972
     - label: "TH_CR1 reads AdminVendorId attribute from DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "readAttribute"
