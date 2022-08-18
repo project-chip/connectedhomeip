@@ -425,7 +425,7 @@ void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onCommissioningStatusUpdateMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningStatusUpdate",
-                                                             "(JLjava/lang/string;I)V", &onCommissioningStatusUpdateMethod);
+                                                             "(JLjava/lang/String;I)V", &onCommissioningStatusUpdateMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
 
     UtfString jStageCompleted(env, StageToString(stageCompleted));
