@@ -605,6 +605,14 @@ void emberAfElectricalMeasurementClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfTestClusterClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Fault Injection Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfFaultInjectionClusterInitCallback(chip::EndpointId endpoint);
+
 // Cluster Server/Client Init Functions
 
 //
@@ -7354,6 +7362,104 @@ void emberAfTestClusterClusterServerTickCallback(chip::EndpointId endpoint);
  */
 void emberAfTestClusterClusterClientTickCallback(chip::EndpointId endpoint);
 
+//
+// Fault Injection Cluster
+//
+
+/** @brief Fault Injection Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfFaultInjectionClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Fault Injection Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfFaultInjectionClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Fault Injection Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterFaultInjectionClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Fault Injection Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfFaultInjectionClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                           EmberStatus status);
+
+/** @brief Fault Injection Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfFaultInjectionClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                           EmberStatus status);
+
+/** @brief Fault Injection Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterFaultInjectionClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Fault Injection Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterFaultInjectionClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Fault Injection Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfFaultInjectionClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Fault Injection Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfFaultInjectionClusterClientTickCallback(chip::EndpointId endpoint);
+
 // Cluster Commands Callback
 
 /**
@@ -8807,6 +8913,12 @@ bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
 bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData);
+/**
+ * @brief Fault Injection Cluster FailAtFault Command callback (from client)
+ */
+bool emberAfFaultInjectionClusterFailAtFaultCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::FaultInjection::Commands::FailAtFault::DecodableType & commandData);
 
 /** @brief Add To Current App Tasks
  *

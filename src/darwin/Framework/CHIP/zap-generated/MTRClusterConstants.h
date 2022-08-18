@@ -93,6 +93,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterAccountLoginID = 0x0000050E,
     MTRClusterElectricalMeasurementID = 0x00000B04,
     MTRClusterTestClusterID = 0xFFF1FC05,
+    MTRClusterFaultInjectionID = 0xFFF1FC06,
 };
 
 #pragma mark - Attributes IDs
@@ -1366,6 +1367,13 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterTestClusterAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterTestClusterAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
+    // Cluster FaultInjection attributes
+    MTRClusterFaultInjectionAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
+    MTRClusterFaultInjectionAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
+    MTRClusterFaultInjectionAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
+    MTRClusterFaultInjectionAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
+    MTRClusterFaultInjectionAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
+
 };
 
 #pragma mark - Commands IDs
@@ -1691,6 +1699,9 @@ typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
     MTRClusterTestClusterCommandTestSimpleOptionalArgumentRequestID = 0x00000013,
     MTRClusterTestClusterCommandTestEmitTestEventRequestID = 0x00000014,
     MTRClusterTestClusterCommandTestEmitTestFabricScopedEventRequestID = 0x00000015,
+
+    // Cluster FaultInjection commands
+    MTRClusterFaultInjectionCommandFailAtFaultID = 0x00000000,
 
 };
 

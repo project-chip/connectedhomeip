@@ -5283,4 +5283,34 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+/**
+ * Cluster Fault Injection
+ *
+ */
+@interface MTRClusterFaultInjection : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+
+- (void)failAtFaultWithParams:(MTRFaultInjectionClusterFailAtFaultParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(StatusCompletion)completionHandler;
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params;
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params;
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params;
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params;
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
 NS_ASSUME_NONNULL_END

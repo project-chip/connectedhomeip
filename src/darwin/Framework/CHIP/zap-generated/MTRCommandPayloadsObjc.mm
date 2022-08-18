@@ -8116,5 +8116,47 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+@implementation MTRFaultInjectionClusterFailAtFaultParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _type = @(0);
+
+        _id = @(0);
+
+        _numCallsToSkip = @(0);
+
+        _numCallsToFail = @(0);
+
+        _takeMutex = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRFaultInjectionClusterFailAtFaultParams alloc] init];
+
+    other.type = self.type;
+    other.id = self.id;
+    other.numCallsToSkip = self.numCallsToSkip;
+    other.numCallsToFail = self.numCallsToFail;
+    other.takeMutex = self.takeMutex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: type:%@; id:%@; numCallsToSkip:%@; numCallsToFail:%@; takeMutex:%@; >",
+                  NSStringFromClass([self class]), _type, _id, _numCallsToSkip, _numCallsToFail, _takeMutex];
+    return descriptionString;
+}
+
+@end
 
 NS_ASSUME_NONNULL_END

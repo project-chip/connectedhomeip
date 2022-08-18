@@ -6048,5 +6048,35 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(nullable NSZone *)zone;
 @end
+@interface MTRFaultInjectionClusterFailAtFaultParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull type;
+
+@property (nonatomic, copy) NSNumber * _Nonnull id;
+
+@property (nonatomic, copy) NSNumber * _Nonnull numCallsToSkip;
+
+@property (nonatomic, copy) NSNumber * _Nonnull numCallsToFail;
+
+@property (nonatomic, copy) NSNumber * _Nonnull takeMutex;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+- (id)copyWithZone:(nullable NSZone *)zone;
+@end
 
 NS_ASSUME_NONNULL_END

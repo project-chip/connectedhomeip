@@ -28085,6 +28085,115 @@ public:
 } // namespace TestFabricScopedEvent
 } // namespace Events
 } // namespace TestCluster
+namespace FaultInjection {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace FailAtFault {
+struct Type;
+struct DecodableType;
+} // namespace FailAtFault
+
+} // namespace Commands
+
+namespace Commands {
+namespace FailAtFault {
+enum class Fields
+{
+    kType           = 0,
+    kId             = 1,
+    kNumCallsToSkip = 2,
+    kNumCallsToFail = 3,
+    kTakeMutex      = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::FailAtFault::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
+
+    FaultType type          = static_cast<FaultType>(0);
+    uint32_t id             = static_cast<uint32_t>(0);
+    uint32_t numCallsToSkip = static_cast<uint32_t>(0);
+    uint32_t numCallsToFail = static_cast<uint32_t>(0);
+    bool takeMutex          = static_cast<bool>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::FailAtFault::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
+
+    FaultType type          = static_cast<FaultType>(0);
+    uint32_t id             = static_cast<uint32_t>(0);
+    uint32_t numCallsToSkip = static_cast<uint32_t>(0);
+    uint32_t numCallsToFail = static_cast<uint32_t>(0);
+    bool takeMutex          = static_cast<bool>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace FailAtFault
+} // namespace Commands
+
+namespace Attributes {
+
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace FaultInjection
 
 } // namespace Clusters
 
