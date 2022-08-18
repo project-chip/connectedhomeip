@@ -15,17 +15,26 @@
 # Options from standalone-chip.mk that differ from configure defaults. These
 # options are used from examples/.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-#import("${chip_root}/build/chip/tests.gni")
+chip_device_platform = "beken"
 
-group("beken") {
-  deps = [
-    "${chip_root}/examples/lighting-app/beken:MatterApp",
-    "${chip_root}/src/lib",
-  ]
-}
-group("default") {
-  deps = [ ":beken" ]
-}
+chip_project_config_include = ""
+chip_system_project_config_include = ""
+chip_ble_project_config_include = ""
+
+mbedtls_target = "${chip_root}/config/beken/mbedtls:mbedtls"
+lwip_platform = "external"
+
+chip_build_tests = false
+
+chip_inet_config_enable_tcp_endpoint = true
+chip_inet_config_enable_udp_endpoint = true
+
+chip_config_network_layer_ble = true
+chip_config_memory_management = "platform"
+chip_enable_additional_data_advertising = true
+chip_enable_rotating_device_id = true
+chip_enable_ota_requestor = true
+
+custom_toolchain = "${chip_root}/config/beken/toolchain:beken"
