@@ -37,6 +37,7 @@ from TC_SC_3_6 import AttributeChangeAccumulator, ResubscriptionCatcher
 #       the trigger the subscriptions not re-opening a new CASE session
 #
 
+
 class TC_RR_1_1(MatterBaseTest):
     def setup_class(self):
         self._pseudo_random_generator = random.Random(1234)
@@ -51,6 +52,8 @@ class TC_RR_1_1(MatterBaseTest):
     async def test_TC_RR_1_1(self):
         dev_ctrl = self.default_controller
 
+        # Debug/test arguments
+
         # Get overrides for debugging the test
         num_fabrics_to_commission = self.user_params.get("num_fabrics_to_commission", 5)
         num_controllers_per_fabric = self.user_params.get("num_controllers_per_fabric", 3)
@@ -63,14 +66,24 @@ class TC_RR_1_1(MatterBaseTest):
         # on MRP params of subscriber and on actual min_report_interval.
         # TODO: Determine the correct max value depending on target. Test plan doesn't say!
         timeout_delay_sec = self.user_params.get("timeout_delay_sec", max_report_interval_sec * 2)
-        # Whether to skip filling the label clusters
-        skip_label_cluster_steps = self.user_params.get("skip_label_cluster_steps", False)
+        # Whether to skip filling the UserLabel clusters
+        skip_user_label_cluster_steps = self.user_params.get("skip_user_label_cluster_steps", False)
 
-        BEFORE_LABEL = "Before Subscriptions"
-        AFTER_LABEL = "After Subscriptions"
+        BEFORE_LABEL = "Before Subscriptions 12345678912"
+        AFTER_LABEL = "After Subscriptions 123456789123"
 
-        await self.fill_user_label_list(dev_ctrl, self.dut_node_id)
-        return
+        # Pre-conditions
+
+        # TODO: Do from PICS list. The reflection approach here what a real client would do,
+        #       and it respects that the test says "TH writes 4 entries per endpoint where LabelList is supported"
+        logging.info("Pre-condition: determine whether any endpoints have UserLabel cluster (ULABEL.S.A0000(LabelList))")
+        endpoints_with_user_label_list = await dev_ctrl.ReadAttribute(self.dut_node_id, [Clusters.UserLabel.Attributes.LabelList])
+        has_user_labels = len(endpoints_with_user_label_list) > 0
+        if has_user_labels:
+            logging.info("--> User label cluster present on endpoints %s" %
+                         ", ".join(["%d" % ep for ep in endpoints_with_user_label_list.keys()]))
+        else:
+            logging.info("--> User label cluster not present on any endpoitns")
 
         # Generate list of all clients names
         all_names = []
@@ -80,11 +93,13 @@ class TC_RR_1_1(MatterBaseTest):
         logging.info("Client names that will be used: %s" % all_names)
         client_list = []
 
+        # TODO: Shall we also verify SupportedFabrics attribute, and the CapabilityMinima attribute?
         logging.info("Pre-conditions: validate CapabilityMinima.CaseSessionsPerFabric >= 3")
 
         capability_minima = await self.read_single_attribute(dev_ctrl, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.Basic.Attributes.CapabilityMinima)
         asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3)
 
+        # Step 1: Commission 5 fabrics with maximized NOC chains
         logging.info("Step 1: use existing fabric to configure new fabrics so that total is %d fabrics" %
                      num_fabrics_to_commission)
 
@@ -122,20 +137,78 @@ class TC_RR_1_1(MatterBaseTest):
         asserts.assert_equal(len(client_list), num_fabrics_to_commission *
                              num_controllers_per_fabric, "Must have the right number of clients")
 
+        client_by_name = {client.name: client for client in client_list}
+
+        # Step 2: Set the Label field for each fabric and BasicInformation.NodeLabel to 32 characters
+        logging.info("Step 2: Setting the Label field for each fabric and BasicInformation.NodeLabel to 32 characters")
+
+        for idx in range(num_fabrics_to_commission):
+            fabric_number = idx + 1
+            # Client is client A for each fabric to set the Label field
+            client_name = "RD%dA" % fabric_number
+            client = client_by_name[client_name]
+
+            # Send the UpdateLabel command
+            label = ("%d" % fabric_number) * 32
+            logging.info("Step 2a: Setting fabric label on fabric %d to '%s' using client %s" % (fabric_number, label, client_name))
+            await client.SendCommand(self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel(label))
+
+            # Read back
+            fabric_metadata = await self.read_single_attribute(client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.OperationalCredentials.Attributes.Fabrics)
+            print(fabric_metadata)
+            asserts.assert_equal(fabric_metadata[0].label, label, "Fabrics[x].label must match what was written")
+
         # Before subscribing, set the NodeLabel to "Before Subscriptions"
-        logging.info("Pre-conditions: writing initial value of NodeLabel, so that we can control for change of attribute detection")
+        logging.info("Step 2b: Set BasicInformation.NodeLabel to '%s'" % BEFORE_LABEL)
         await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.Basic.Attributes.NodeLabel(value=BEFORE_LABEL))])
 
-        # Subscribe with all clients to NodeLabel attribute
+        node_label = await self.read_single_attribute(client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.Basic.Attributes.NodeLabel)
+        asserts.assert_equal(node_label, BEFORE_LABEL, "NodeLabel must match what was written")
+
+        # Step 3: Add 3 Access Control entries on DUT with a list of 4 Subjects and 3 Targets with the following parameters (...)
+        logging.info("Step 3: Fill ACL table so that all minimas are reached")
+
+        for idx in range(num_fabrics_to_commission):
+            fabric_number = idx + 1
+            # Client is client A for each fabric
+            client_name = "RD%dA" % fabric_number
+            client = client_by_name[client_name]
+
+            acl = self.build_acl(fabric_number, client_by_name, num_controllers_per_fabric)
+
+            logging.info("Step 3a: Writing ACL entry for fabric %d" % fabric_number)
+            await client.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
+
+            logging.info("Step 3b: Validating ACL entry for fabric %d" % fabric_number)
+            acl_readback = await self.read_single_attribute(client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.AccessControl.Attributes.Acl)
+            fabric_index = 9999
+            for entry in acl_readback:
+                asserts.assert_equal(entry.fabricIndex, fabric_number, "Fabric Index of response entries must match")
+                fabric_index = entry.fabricIndex
+
+            for entry in acl:
+                # Fix-up the original ACL list items (that all had fabricIndex of 0 on write, since ignored)
+                # so that they match incoming fabric index. Allows checking by equality of the structs
+                entry.fabricIndex = fabric_index
+            asserts.assert_equal(acl_readback, acl, "ACL must match what was written")
+
+        # Step 4 and 5 (the operations cannot be separated): establish all CASE sessions and subscriptions
+
+        # Subscribe with all clients to NodeLabel attribute and 2 more paths
         sub_handlers = []
         resub_catchers = []
         output_queue = queue.Queue()
+        subscription_contents = [
+            (0, Clusters.Basic.Attributes.NodeLabel),  # Single attribute
+            (0, Clusters.OperationalCredentials),  # Wildcard all of opcreds attributes on EP0
+            Clusters.Descriptor  # All descriptors on all endpoints
+        ]
 
-        logging.info("Step 1 (first part): Establish subscription with all %d clients" % len(client_list))
+        logging.info("Step 4 and 5 (first part): Establish subscription with all %d clients" % len(client_list))
         for sub_idx, client in enumerate(client_list):
             logging.info("Establishing subscription %d/%d from controller node %s" % (sub_idx + 1, len(client_list), client.name))
 
-            sub = await client.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.Basic.Attributes.NodeLabel)],
+            sub = await client.ReadAttribute(nodeid=self.dut_node_id, attributes=subscription_contents,
                                              reportInterval=(min_report_interval_sec, max_report_interval_sec), keepSubscriptions=False)
             self._subscriptions.append(sub)
 
@@ -151,9 +224,33 @@ class TC_RR_1_1(MatterBaseTest):
 
         asserts.assert_equal(len(self._subscriptions), len(client_list), "Must have the right number of subscriptions")
 
-        # Trigger a change on NodeLabel
+        # Step 6: TODO: Read 9 paths and validate success
+        logging.info("Step 6: Read 9 paths (first 9 attributes of Basic Information cluster) and validate success")
+
+        large_read_contents = [
+            Clusters.Basic.Attributes.DataModelRevision,
+            Clusters.Basic.Attributes.VendorName,
+            Clusters.Basic.Attributes.VendorID,
+            Clusters.Basic.Attributes.ProductName,
+            Clusters.Basic.Attributes.ProductID,
+            Clusters.Basic.Attributes.NodeLabel,
+            Clusters.Basic.Attributes.Location,
+            Clusters.Basic.Attributes.HardwareVersion,
+            Clusters.Basic.Attributes.HardwareVersionString,
+        ]
+        large_read_paths = [(0, attrib) for attrib in large_read_contents]
+        basic_info = await dev_ctrl.ReadAttribute(self.dut_node_id, large_read_paths)
+
+        # Make sure everything came back from the read that we expected
+        asserts.assert_true(0 in basic_info.keys(), "Must have read endpoint 0 data")
+        asserts.assert_true(Clusters.Basic in basic_info[0].keys(), "Must have read Basic Information cluster data")
+        for attribute in large_read_contents:
+            asserts.assert_true(attribute in basic_info[0][Clusters.Basic],
+                                "Must have read back attribute %s" % (attribute.__name__))
+
+        # Step 7: Trigger a change on NodeLabel
         logging.info(
-            "Step 1 (second part): Change attribute with one client, await all attributes changed within time")
+            "Step 7: Change attribute with one client, await all attributes changed successfully without loss of subscriptions")
         await asyncio.sleep(1)
         await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.Basic.Attributes.NodeLabel(value=AFTER_LABEL))])
 
@@ -186,13 +283,13 @@ class TC_RR_1_1(MatterBaseTest):
             elapsed = time.time() - start_time
             time_remaining = timeout_delay_sec - elapsed
 
-        logging.info("Validation of results")
-        failed = False
+        logging.info("Step 7: Validation of results")
+        sub_test_failed = False
 
         for catcher in resub_catchers:
             if catcher.caught_resubscription:
                 logging.error("Client %s saw a resubscription" % catcher.name)
-                failed = True
+                sub_test_failed = True
             else:
                 logging.info("Client %s correctly did not see a resubscription" % catcher.name)
 
@@ -200,25 +297,30 @@ class TC_RR_1_1(MatterBaseTest):
         if not all_reports_gotten:
             logging.error("Missing reports from the following clients: %s" %
                           ", ".join([name for name, value in all_changes.items() if value is False]))
-            failed = True
+            sub_test_failed = True
         else:
             logging.info("Got successful reports from all clients, meaning all concurrent CASE sessions worked")
 
-        # Determine final result
-        if failed:
-            asserts.fail("Failed test !")
+        # Determine result of Step 7
+        if sub_test_failed:
+            asserts.fail("Failed step 7 !")
 
-        # Pass is implicit if not failed
+        # Step 8: TODO: Validate sessions have not changed by doing a read on NodeLabel from all clients
+
+        # Step 9: Fill user label list
+
+        if has_user_labels:
+            await self.fill_user_label_list(dev_ctrl, self.dut_node_id)
+        else:
+            logging.info("Step 9: Skipped due to no UserLabel cluster instances")
 
     def random_string(self, length) -> str:
         rnd = self._pseudo_random_generator
         return "".join([rnd.choice("abcdef0123456789") for _ in range(length)])[:length]
 
-    async def fill_basic_labels(self, dev_ctrl, target_node_id):
-        pass
-
     async def fill_user_label_list(self, dev_ctrl, target_node_id):
-        user_labels = await dev_ctrl.ReadAttribute(target_node_id, [ Clusters.UserLabel ] )
+        logging.info("Step 9: Fill UserLabel clusters on each endpoint")
+        user_labels = await dev_ctrl.ReadAttribute(target_node_id, [Clusters.UserLabel])
 
         # Build 4 sets of maximized labels
         random_label = self.random_string(16)
@@ -229,11 +331,87 @@ class TC_RR_1_1(MatterBaseTest):
             clusters = user_labels[endpoint_id]
             for cluster in clusters:
                 if cluster == Clusters.UserLabel:
-                    statuses = await dev_ctrl.WriteAttribute(target_node_id, [(10 + endpoint_id, Clusters.UserLabel.Attributes.LabelList(labels))])
+                    logging.info("Step 9a: Filling UserLabel cluster on endpoint %d" % endpoint_id)
+                    statuses = await dev_ctrl.WriteAttribute(target_node_id, [(endpoint_id, Clusters.UserLabel.Attributes.LabelList(labels))])
                     asserts.assert_equal(statuses[0].Status, StatusEnum.Success, "Label write must succeed")
 
-                    read_back_labels = await dev_ctrl.ReadAttribute(target_node_id, [ (endpoint_id, Clusters.UserLabel.Attributes.LabelList) ] )
-                    logging.info(read_back_labels)
+                    logging.info("Step 9b: Validate UserLabel cluster contents after write on endpoint %d" % endpoint_id)
+                    read_back_labels = await self.read_single_attribute(dev_ctrl, node_id=target_node_id, endpoint=endpoint_id, attribute=Clusters.UserLabel.Attributes.LabelList)
+                    print(read_back_labels)
+
+                    asserts.assert_equal(read_back_labels, labels, "LabelList attribute must match what was written")
+
+    def build_acl(self, fabric_number, client_by_name, num_controllers_per_fabric):
+        acl = []
+
+        # Test says:
+        #
+        # . struct
+        # - Privilege field: Administer (5)
+        # - AuthMode field: CASE (2)
+        # - Subjects field: [0xFFFF_FFFD_0001_0001, 0x2000_0000_0000_0001, 0x2000_0000_0000_0002, 0x2000_0000_0000_0003]
+        # - Targets field: [{Endpoint: 0}, {Cluster: 0xFFF1_FC00, DeviceType: 0xFFF1_FC30}, {Cluster: 0xFFF1_FC00, DeviceType: 0xFFF1_FC31}]
+        # . struct
+        # - Privilege field: Manage (4)
+        # - AuthMode field: CASE (2)
+        # - Subjects field: [0x1000_0000_0000_0001, 0x1000_0000_0000_0002, 0x1000_0000_0000_0003, 0x1000_0000_0000_0004]
+        # - Targets field: [{Cluster: 0xFFF1_FC00, DeviceType: 0xFFF1_FC20}, {Cluster: 0xFFF1_FC01, DeviceType: 0xFFF1_FC21}, {Cluster: 0xFFF1_FC02, DeviceType: 0xFFF1_FC22}]
+        # . struct
+        # - Privilege field: Operate (3)
+        # - AuthMode field: CASE (2)
+        # - Subjects field: [0x3000_0000_0000_0001, 0x3000_0000_0000_0002, 0x3000_0000_0000_0003, 0x3000_0000_0000_0004]
+        # - Targets field: [{Cluster: 0xFFF1_FC40, DeviceType: 0xFFF1_FC20}, {Cluster: 0xFFF1_FC41, DeviceType: 0xFFF1_FC21}, {Cluster: 0xFFF1_FC02, DeviceType: 0xFFF1_FC42}]
+
+        # Administer ACL entry
+        admin_subjects = [0xFFFF_FFFD_0001_0001]
+        # TODO: Replace the below with [0x2000_0000_0000_0001, 0x2000_0000_0000_0002, 0x2000_0000_0000_0003] once controllers
+        #       all have CAT tag 0001_0001 in their NOC
+
+        # Find node ID of all controllers (up to 3) and make them admin
+        for subject_idx in range(min(num_controllers_per_fabric, 3)):
+            subject_name = "RD%d%s" % (fabric_number, chr(ord('A') + subject_idx))
+            admin_subjects.append(client_by_name[subject_name].nodeId)
+
+        admin_targets = [
+            Clusters.AccessControl.Structs.Target(endpoint=0),
+            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC00, deviceType=0xFFF1_BC30),
+            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC01, deviceType=0xFFF1_BC31)
+        ]
+        admin_acl_entry = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kAdminister,
+                                                                            authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+                                                                            subjects=admin_subjects,
+                                                                            targets=admin_targets)
+        acl.append(admin_acl_entry)
+
+        # Manage ACL entry
+        manage_subjects = [0x1000_0000_0000_0001, 0x1000_0000_0000_0002, 0x1000_0000_0000_0003, 0x1000_0000_0000_0004]
+        manage_targets = [
+            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC00, deviceType=0xFFF1_BC20),
+            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC01, deviceType=0xFFF1_BC21),
+            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC02, deviceType=0xFFF1_BC22)
+        ]
+
+        manage_acl_entry = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kManage,
+                                                                             authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+                                                                             subjects=manage_subjects,
+                                                                             targets=manage_targets)
+        acl.append(manage_acl_entry)
+
+        # Operate ACL entry
+        operate_subjects = [0x3000_0000_0000_0001, 0x3000_0000_0000_0002, 0x3000_0000_0000_0003, 0x3000_0000_0000_0004]
+        operate_targets = [
+            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC40, deviceType=0xFFF1_BC20),
+            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC41, deviceType=0xFFF1_BC21),
+            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC42, deviceType=0xFFF1_BC42)
+        ]
+
+        operate_acl_entry = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kOperate,
+                                                                              authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
+                                                                              subjects=operate_subjects,
+                                                                              targets=operate_targets)
+        acl.append(operate_acl_entry)
+
+        return acl
 
 
 if __name__ == "__main__":
