@@ -34,15 +34,15 @@ tests:
           1.To run this test case build the OTA Provider app in nRF connectedhomeip Docker . [
           https://github.com/project-chip/connectedhomeip/tree/master/examples/ota-provider-app/linux
 
-          2. Build all-cluster-app in docker 
+          2. Build all-cluster-app in docker
 
           west build -b nrf52840dk_nrf52840 -- -DCONF_FILE=prj_dfu.conf -DCONFIG_CHIP_LIB_SHELL=y
 
 
-          3.Flash 
+          3.Flash
           west flash --erase
 
-          4.OTA Image needs to build on docker 
+          4.OTA Image needs to build on docker
 
           west build -b nrf52840dk_nrf52840 -d build2 -- -DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 -DCONF_FILE=prj_dfu.conf -DCONFIG_CHIP_LIB_SHELL=y
       disabled: true

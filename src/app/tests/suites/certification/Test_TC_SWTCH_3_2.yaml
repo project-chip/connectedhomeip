@@ -37,8 +37,8 @@ tests:
           a. ./scripts/run_in_build_env.sh ./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build
           b. ./scripts/run_in_build_env.sh ./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang build
           2. Build respective app (all-clusters-app)
-          3. Commission DUT to TH 
-          4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT 
+          3. Commission DUT to TH
+          4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT
           ps  -aef|grep all-clusters-app
           5. Follow the Verification step below to generate the event in 2nd terminal of DUT
       disabled: true
@@ -151,10 +151,10 @@ tests:
           [1659679728.732429][2530:2530] CHIP:-: The latching switch is moved to a new position:0
           [1659679728.732454][2530:2530] CHIP:ZCL: SwitchServer: OnSwitchLatch
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event switch-latched 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event switch-latched 1 100 1 1
 
           Verify inTH Log:
           [1659679766.774013][2535:2540] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
@@ -219,12 +219,12 @@ tests:
           After another 10 seconds, repeat the command with /tmp/chip_all_clusters_fifo using with value 1 as position
           Repeat this toggling every 10 seconds for 1 minute total.
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event switch-latched 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event switch-latched 1 100 1 1
 
-          all-clusters app will emit events to the subscriber (DUT-client), e.g. 
+          all-clusters app will emit events to the subscriber (DUT-client), e.g.
           Verify inTH Log:
           [1659680091.149404][2592:2597] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
           [1659680091.149428][2592:2597] CHIP:TOO:          Event number: 3
@@ -269,7 +269,7 @@ tests:
           [1659680091.150630][2592:2597] CHIP:TOO:     NewPosition: 1 <= this value will change for every change in position of simulated switch
 
 
-           
+
           Watch whether DUT presents state of simulated switch and/or controls another device based on the state of the switch.
       disabled: true
 
@@ -327,10 +327,10 @@ tests:
 
           Verify in TH Log, e.g. (one such message per event subscription being set up)
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           [1659683181.743214][2829:2835] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659683181.743251][2829:2835] CHIP:TOO:          Event number: 10
@@ -347,10 +347,10 @@ tests:
           [1659683678.805777][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
           [1659683678.805858][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1  
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           [1659683195.217253][2838:2843] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659683195.217275][2838:2843] CHIP:TOO:          Event number: 11
@@ -364,10 +364,10 @@ tests:
 
           echo "{"Name":"LongPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event long-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event long-press 1 100 1 1
 
 
           [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
@@ -380,10 +380,10 @@ tests:
 
           echo "{"Name":"LongRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event long-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event long-release 1 100 1 1
 
 
           [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
@@ -429,7 +429,7 @@ tests:
           ./chip-tool switch read current-position 1 1  (in practice, DUT will issue this command, TH answers)
 
           [1659621181.542124][5668:5673] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001 DataVersion: 1273335636
-          [1659621181.542207][5668:5673] CHIP:TOO:   current position: 1  
+          [1659621181.542207][5668:5673] CHIP:TOO:   current position: 1
 
 
           ./chip-tool switch read current-position 1 1
@@ -468,25 +468,25 @@ tests:
           Repeat this for 1 minute total.
 
 
-          all-clusters app will emit events to the subscriber (DUT-client), e.g. 
+          all-clusters app will emit events to the subscriber (DUT-client), e.g.
           Verify in TH Log:
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
           [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 4
           [1659527630.476771][4774:4779] CHIP:TOO:   Priority: Info
           [1659527630.476799][4774:4779] CHIP:TOO:   Timestamp: 29687894
-          [1659527630.476887][4774:4779] CHIP:TOO:   InitialPress: { 
+          [1659527630.476887][4774:4779] CHIP:TOO:   InitialPress: {
           [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 1
           [1659527630.476969][4774:4779] CHIP:TOO:    }
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
           [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 5
@@ -524,13 +524,13 @@ tests:
           Repeat this for 1 minute total.
 
 
-          all-clusters app will emit events to the subscriber (DUT-client), e.g. 
+          all-clusters app will emit events to the subscriber (DUT-client), e.g.
           Verify in TH Log:
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
           [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 4
@@ -540,10 +540,10 @@ tests:
           [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 1
           [1659527630.476969][4774:4779] CHIP:TOO:    }
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event long-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event long-press 1 100 1 1
 
           [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
           [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 5
@@ -553,10 +553,10 @@ tests:
           [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 1
           [1659527630.476969][4774:4779] CHIP:TOO:    }
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event long-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event long-release 1 100 1 1
 
           [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
           [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 6

@@ -51,7 +51,7 @@ tests:
           field set to 900"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          ./chip-tool generalcommissioning arm-fail-safe 900 600 1 0 
+          ./chip-tool generalcommissioning arm-fail-safe 900 600 1 0
 
 
           Verify the ErrorCode as "OK"(0) in TH log
@@ -59,7 +59,7 @@ tests:
           [1659676500.047646][2475:2480] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1659676500.055459][2475:2480] CHIP:TOO:   ArmFailSafeResponse: {
           [1659676500.055613][2475:2480] CHIP:TOO:     errorCode: 0
-          [1659676500.055669][2475:2480] CHIP:TOO:     debugText: 
+          [1659676500.055669][2475:2480] CHIP:TOO:     debugText:
           [1659676500.055719][2475:2480] CHIP:TOO:    }
           [1659676500.055806][2475:2480] CHIP:DMG: ICR moving to [AwaitingDe]
           [1659676500.055920][2475:2480] CHIP:EM: Sending Standalone Ack for MessageCounter:225116044 on exchange 37810i
@@ -76,7 +76,7 @@ tests:
           [1658223287.237060][5570:5575] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0003
           [1658223287.237122][5570:5575] CHIP:TOO:   SetRegulatoryConfigResponse: {
           [1658223287.237159][5570:5575] CHIP:TOO:     errorCode: 0
-          [1658223287.237183][5570:5575] CHIP:TOO:     debugText: 
+          [1658223287.237183][5570:5575] CHIP:TOO:     debugText:
           [1658223287.237205][5570:5575] CHIP:TOO:    }
       disabled: true
 
@@ -108,12 +108,12 @@ tests:
           ./chip-tool operationalcredentials certificate-chain-request 2 1 0 --trace_decode 1
 
 
-          Verify the CertificateChainResponse and verify that the size of certificate is less than or equal to 600 bytes and of type octstr in TH Log 
+          Verify the CertificateChainResponse and verify that the size of certificate is less than or equal to 600 bytes and of type octstr in TH Log
 
           [1660214092.609231][14671:14676] CHIP:DMG: InvokeRequestMessage =
           [1660214092.609243][14671:14676] CHIP:DMG: {
-          [1660214092.609255][14671:14676] CHIP:DMG:         suppressResponse = false, 
-          [1660214092.609269][14671:14676] CHIP:DMG:         timedRequest = false, 
+          [1660214092.609255][14671:14676] CHIP:DMG:         suppressResponse = false,
+          [1660214092.609269][14671:14676] CHIP:DMG:         timedRequest = false,
           [1660214092.609281][14671:14676] CHIP:DMG:         InvokeRequests =
           [1660214092.609301][14671:14676] CHIP:DMG:         [
           [1660214092.609311][14671:14676] CHIP:DMG:                 CommandDataIB =
@@ -124,18 +124,18 @@ tests:
           [1660214092.609383][14671:14676] CHIP:DMG:                                 ClusterId = 0x3e,
           [1660214092.609396][14671:14676] CHIP:DMG:                                 CommandId = 0x2,
           [1660214092.609410][14671:14676] CHIP:DMG:                         },
-          [1660214092.609426][14671:14676] CHIP:DMG:                         
-          [1660214092.609437][14671:14676] CHIP:DMG:                         CommandFields = 
+          [1660214092.609426][14671:14676] CHIP:DMG:
+          [1660214092.609437][14671:14676] CHIP:DMG:                         CommandFields =
           [1660214092.609452][14671:14676] CHIP:DMG:                         {
-          [1660214092.609467][14671:14676] CHIP:DMG:                                 0x0 = 2, 
+          [1660214092.609467][14671:14676] CHIP:DMG:                                 0x0 = 2,
           [1660214092.609481][14671:14676] CHIP:DMG:                         },
           [1660214092.609493][14671:14676] CHIP:DMG:                 },
-          [1660214092.609511][14671:14676] CHIP:DMG:                 
+          [1660214092.609511][14671:14676] CHIP:DMG:
           [1660214092.609522][14671:14676] CHIP:DMG:         ],
-          [1660214092.609541][14671:14676] CHIP:DMG:         
+          [1660214092.609541][14671:14676] CHIP:DMG:
           [1660214092.609551][14671:14676] CHIP:DMG:         InteractionModelRevision = 1
           [1660214092.609563][14671:14676] CHIP:DMG: },
-          [1660214092.609576][14671:14676] CHIP:DMG:  
+          [1660214092.609576][14671:14676] CHIP:DMG:
           [1660214092.609674][14671:14676] CHIP:DMG: ICR moving to [CommandSen]
           [1660214092.609707][14671:14676] CHIP:EM: Sending Standalone Ack for MessageCounter:33263154 on exchange 56685i
           [1660214092.609876][14671:14676] CHIP:IN: Prepared unauthenticated message 0x7f5ae77fd000 to 0x0000000000000000 (0)  of type 0x10 and protocolId (0, 0) on exchange 56685i with MessageCounter:66323624.
@@ -153,13 +153,13 @@ tests:
           [1660214092.610290][14671:14676] CHIP:DMG:         AckMsg = 33263154
           [1660214092.610301][14671:14676] CHIP:DMG:     }
           [1660214092.610333][14671:14676] CHIP:DMG: }
-          [1660214092.610355][14671:14676] CHIP:DMG:  
+          [1660214092.610355][14671:14676] CHIP:DMG:
           [1660214092.610379][14671:14676] CHIP:DMG: Encrypted Payload (26 bytes) =
           [1660214092.610394][14671:14676] CHIP:DMG: {
           [1660214092.610407][14671:14676] CHIP:DMG:     data = 04000000a804f40359b4a166302bb28603106ddd0000328efb01
           [1660214092.610423][14671:14676] CHIP:DMG:     buffer_ptr = 140028080604320
           [1660214092.610436][14671:14676] CHIP:DMG: }
-          [1660214092.610450][14671:14676] CHIP:DMG:  
+          [1660214092.610450][14671:14676] CHIP:DMG:
           [1660214092.610521][14671:14676] CHIP:EM: Flushed pending ack for MessageCounter:33263154 on exchange 56685i
           [1660214092.617596][14671:14676] CHIP:DMG: << from UDP:[fe80::e65f:1ff:fe0f:2753%enp0s31f6]:5540 | 219026739 | [Interaction Model  (1) / InvokeCommandResponse (0x09) / Session = 20731 / Exchange = 56686]
           [1660214092.617620][14671:14676] CHIP:DMG: Header Flags =
@@ -170,13 +170,13 @@ tests:
           [1660214092.617657][14671:14676] CHIP:DMG:         NeedsAck = true
           [1660214092.617663][14671:14676] CHIP:DMG:     }
           [1660214092.617672][14671:14676] CHIP:DMG: }
-          [1660214092.617678][14671:14676] CHIP:DMG:  
+          [1660214092.617678][14671:14676] CHIP:DMG:
           [1660214092.617686][14671:14676] CHIP:DMG: Encrypted Payload (531 bytes) =
           [1660214092.617692][14671:14676] CHIP:DMG: {
           [1660214092.617698][14671:14676] CHIP:DMG:     data = 00fb500033150e0d1ee5b6538768098d8ef37ec0e09fbeb30c158a93ffdd1ca81041b2baa637a7e200110cd7cf06f5ffa40a8e4529a8a38cdd47e50715aaa344941b0c760264022f21b37432352c00f457fade1bdee072261fcb5cde3fcd70e2e71d5a8ec9fa038e670a404d8641162b8fb34919e9d6e431a1c895a6e01cbd3125c9322ff741caf28b79f69f103ec0e9c5b1b74c43fde4d4ac21f15e48b2090916feca5662682ae9eb1f8d18011d618492d57139ad99e94f99e3a755d2a8e46ba7133a0f1d2fe20b7e5cf2906542c4685866c7ccbd8e2e15e84e3dc653057623dac7d65d7bb785466bab3e816e06f378d0165aadf7ef38d23afdb42731191683a995fa1223bcccf27c0314aced823b2a00ff0da758b1f910631fab7098f013a7fed82136cf072c1150e4f351541f194f0aa2987bc0d1d7688d7955d94560b34bbce0b407d340b0ebaef6f5e9343af6cb8d030fb8040a9a6b7cd9465974a692072d05597b98ec66c42cf4edd86d841048cf5f045f90fb74d4066f2f23e038530e18dd4a0f3c1d86800077661bbd5ff28ff873bb87c6a2545871c6eeca5426466cecff984822b8dd3b7822fb109ec80c9ca3c9bb70b20056f2f4f8b25d1ec3bd8c17a86403bdd42d8cf2c2f66ca8983812361f34770992a7724fc33c5297169a2dcc99b92f290d2894bad6c612684f29c71eb0190b5d8d31dee66650da1942a798de69389d9c5bcfbf0e56a08c820092a53d4f34
           [1660214092.617712][14671:14676] CHIP:DMG:     buffer_ptr = 140028080581472
           [1660214092.617717][14671:14676] CHIP:DMG: }
-          [1660214092.617722][14671:14676] CHIP:DMG:  
+          [1660214092.617722][14671:14676] CHIP:DMG:
           [1660214092.617768][14671:14676] CHIP:DMG: DAC/PAI (463) =
           [1660214092.617789][14671:14676] CHIP:DMG: {
           -----BEGIN CERTIFICATE-----
@@ -192,13 +192,13 @@ tests:
           Xckrhr2QmIKmxiF3uCXX0F7b58Ivn+pxIg5+pwP4kQ==
           -----END CERTIFICATE-----
           [1660214092.617801][14671:14676] CHIP:DMG: }
-          [1660214092.617807][14671:14676] CHIP:DMG:  
-          [1660214092.617815][14671:14676] CHIP:DMG:  
+          [1660214092.617807][14671:14676] CHIP:DMG:
+          [1660214092.617815][14671:14676] CHIP:DMG:
           [1660214092.617827][14671:14676] CHIP:DMG: Additional Fields =
           [1660214092.617832][14671:14676] CHIP:DMG: {
           [1660214092.617839][14671:14676] CHIP:DMG:     peer_address = UDP:[fe80::e65f:1ff:fe0f:2753%enp0s31f6]:5540
           [1660214092.617845][14671:14676] CHIP:DMG: }
-          [1660214092.617851][14671:14676] CHIP:DMG:  
+          [1660214092.617851][14671:14676] CHIP:DMG:
           [1660214092.617861][14671:14676] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:219026739 on exchange 56686i
           [1660214092.617870][14671:14676] CHIP:EM: Found matching exchange: 56686i, Delegate: 0x7f5ad4003a48
           [1660214092.617885][14671:14676] CHIP:EM: Rxd Ack; Removing MessageCounter:21510045 from Retrans Table on exchange 56686i
@@ -217,8 +217,8 @@ tests:
 
           [1660218221.819087][17048:17053] CHIP:DMG: InvokeRequestMessage =
           [1660218221.819106][17048:17053] CHIP:DMG: {
-          [1660218221.819126][17048:17053] CHIP:DMG:         suppressResponse = false, 
-          [1660218221.819147][17048:17053] CHIP:DMG:         timedRequest = false, 
+          [1660218221.819126][17048:17053] CHIP:DMG:         suppressResponse = false,
+          [1660218221.819147][17048:17053] CHIP:DMG:         timedRequest = false,
           [1660218221.819164][17048:17053] CHIP:DMG:         InvokeRequests =
           [1660218221.819194][17048:17053] CHIP:DMG:         [
           [1660218221.819210][17048:17053] CHIP:DMG:                 CommandDataIB =
@@ -229,18 +229,18 @@ tests:
           [1660218221.819319][17048:17053] CHIP:DMG:                                 ClusterId = 0x3e,
           [1660218221.819341][17048:17053] CHIP:DMG:                                 CommandId = 0x2,
           [1660218221.819361][17048:17053] CHIP:DMG:                         },
-          [1660218221.819386][17048:17053] CHIP:DMG:                         
-          [1660218221.819403][17048:17053] CHIP:DMG:                         CommandFields = 
+          [1660218221.819386][17048:17053] CHIP:DMG:
+          [1660218221.819403][17048:17053] CHIP:DMG:                         CommandFields =
           [1660218221.819425][17048:17053] CHIP:DMG:                         {
-          [1660218221.819448][17048:17053] CHIP:DMG:                                 0x0 = 1, 
+          [1660218221.819448][17048:17053] CHIP:DMG:                                 0x0 = 1,
           [1660218221.819470][17048:17053] CHIP:DMG:                         },
           [1660218221.819488][17048:17053] CHIP:DMG:                 },
-          [1660218221.819515][17048:17053] CHIP:DMG:                 
+          [1660218221.819515][17048:17053] CHIP:DMG:
           [1660218221.819530][17048:17053] CHIP:DMG:         ],
-          [1660218221.819559][17048:17053] CHIP:DMG:         
+          [1660218221.819559][17048:17053] CHIP:DMG:
           [1660218221.819575][17048:17053] CHIP:DMG:         InteractionModelRevision = 1
           [1660218221.819592][17048:17053] CHIP:DMG: },
-          [1660218221.819611][17048:17053] CHIP:DMG:  
+          [1660218221.819611][17048:17053] CHIP:DMG:
           [1660218221.819755][17048:17053] CHIP:DMG: ICR moving to [CommandSen]
           [1660218221.819807][17048:17053] CHIP:EM: Sending Standalone Ack for MessageCounter:33263156 on exchange 41890i
           [1660218221.820060][17048:17053] CHIP:IN: Prepared unauthenticated message 0x7f950d02b000 to 0x0000000000000000 (0)  of type 0x10 and protocolId (0, 0) on exchange 41890i with MessageCounter:146063148.
@@ -258,13 +258,13 @@ tests:
           [1660218221.820730][17048:17053] CHIP:DMG:         AckMsg = 33263156
           [1660218221.820747][17048:17053] CHIP:DMG:     }
           [1660218221.820778][17048:17053] CHIP:DMG: }
-          [1660218221.820792][17048:17053] CHIP:DMG:  
+          [1660218221.820792][17048:17053] CHIP:DMG:
           [1660218221.820819][17048:17053] CHIP:DMG: Encrypted Payload (26 bytes) =
           [1660218221.820834][17048:17053] CHIP:DMG: {
           [1660218221.820853][17048:17053] CHIP:DMG:     data = 040000002cbfb408cd8b12cd2f0d2aeb0310a2a30000348efb01
           [1660218221.820871][17048:17053] CHIP:DMG:     buffer_ptr = 140277792687280
           [1660218221.820888][17048:17053] CHIP:DMG: }
-          [1660218221.820906][17048:17053] CHIP:DMG:  
+          [1660218221.820906][17048:17053] CHIP:DMG:
           [1660218221.820997][17048:17053] CHIP:EM: Flushed pending ack for MessageCounter:33263156 on exchange 41890i
           [1660218221.826505][17048:17053] CHIP:DMG: << from UDP:[fe80::e65f:1ff:fe0f:2753%enp0s31f6]:5540 | 217571241 | [Interaction Model  (1) / InvokeCommandResponse (0x09) / Session = 16041 / Exchange = 41891]
           [1660218221.826559][17048:17053] CHIP:DMG: Header Flags =
@@ -275,13 +275,13 @@ tests:
           [1660218221.826677][17048:17053] CHIP:DMG:         NeedsAck = true
           [1660218221.826695][17048:17053] CHIP:DMG:     }
           [1660218221.826723][17048:17053] CHIP:DMG: }
-          [1660218221.826736][17048:17053] CHIP:DMG:  
+          [1660218221.826736][17048:17053] CHIP:DMG:
           [1660218221.826764][17048:17053] CHIP:DMG: Encrypted Payload (559 bytes) =
           [1660218221.826778][17048:17053] CHIP:DMG: {
           [1660218221.826796][17048:17053] CHIP:DMG:     data = 00a93e00a9dff70c44f908196a2718a5b4cd8fb67b67d2223ade09fa1f23a5e9d6081ef9003a293b4f7ddf1e64767c15165a5544c4bc162a2eea22b085a5392580dec393bc15a705abc25360a7f05f99baf448b6c29e93defc8d01b00c11b268b2a197f88fc5984fe4c541fc523e2ecd2316b5dc1109c54408186296772f48d484047770f70a6af3e639833481b4663c7b65b902a850a8d55d3a86c73523a6853f47727582113480efece0e72f552a42ce49a26746e8d6b405ae87fadc7711a313f1865b90ac934486e05d2ed6868a5b5c4e13010eec98f917308c6fe5e9c6816c045f4640aea37804278a600cede11aee2bb591224edd0524bda56ee2d4d64c8a29c664edb006f4f42855f3868f272e94d8648d2431c0e95f6a55802c18d5938497b6b5c5aa37e37597a6782ca55a2948ceededd45e63537f4f1985f45653dbb118a0e1108eca228973b5c8fb48a1afeb649c46aec6259a649f0795c677ca492452c9fcb07969b6f851421252d30d6e160a350feb8baee6ccea79f54e0ebfae94c99eafa466964671b1fe3aa8585c83c28d9484444ba7d5a8a8e3178aedea00d292a53e3f0939b15bb7bee982e346410d5b064ec496409ba26e6a3b2182cff7b1955ba8f980d99590dfa0f2b690d1f1e5d8d178b1a64893dfcd242949ade66269336bc6c0440e9e4a120af59bfbbaabee32871ec1208915f63f91bdb1305045afeface4c7fc39e8eae7db8923b95aa01d4fee30d525664297305e569a3bfca01a767d47f6fdc0eb1b7706bc4547b1
           [1660218221.826837][17048:17053] CHIP:DMG:     buffer_ptr = 140277792657648
           [1660218221.826854][17048:17053] CHIP:DMG: }
-          [1660218221.826870][17048:17053] CHIP:DMG:  
+          [1660218221.826870][17048:17053] CHIP:DMG:
           [1660218221.826979][17048:17053] CHIP:DMG: DAC/PAI (491) =
           [1660218221.827025][17048:17053] CHIP:DMG: {
           -----BEGIN CERTIFICATE-----
@@ -298,13 +298,13 @@ tests:
           lUXhCOTlTnCXE1M=
           -----END CERTIFICATE-----
           [1660218221.827089][17048:17053] CHIP:DMG: }
-          [1660218221.827105][17048:17053] CHIP:DMG:  
-          [1660218221.827125][17048:17053] CHIP:DMG:  
+          [1660218221.827105][17048:17053] CHIP:DMG:
+          [1660218221.827125][17048:17053] CHIP:DMG:
           [1660218221.827158][17048:17053] CHIP:DMG: Additional Fields =
           [1660218221.827173][17048:17053] CHIP:DMG: {
           [1660218221.827194][17048:17053] CHIP:DMG:     peer_address = UDP:[fe80::e65f:1ff:fe0f:2753%enp0s31f6]:5540
           [1660218221.827211][17048:17053] CHIP:DMG: }
-          [1660218221.827226][17048:17053] CHIP:DMG:  
+          [1660218221.827226][17048:17053] CHIP:DMG:
           [1660218221.827257][17048:17053] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:217571241 on exchange 41891i
           [1660218221.827276][17048:17053] CHIP:EM: Found matching exchange: 41891i, Delegate: 0x7f94f8003a48
           [1660218221.827310][17048:17053] CHIP:EM: Rxd Ack; Removing MessageCounter:228316047 from Retrans Table on exchange 41891i

@@ -41,7 +41,7 @@ tests:
     - label: "DUT_CR1 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
-          "1. Provision the device using your DUT controller (use above instructions) , 
+          "1. Provision the device using your DUT controller (use above instructions) ,
           "
       disabled: true
 
@@ -137,7 +137,7 @@ tests:
           attribute"
       PICS: CADMIN.C.A0000
       verification: |
-          On first controller read window status 
+          On first controller read window status
 
           ./chip-tool administratorcommissioning read window-status 1 0
 
@@ -156,15 +156,15 @@ tests:
           [1658838248.887146][9273:9278] CHIP:DMG:                                         Cluster = 0x3c,
           [1658838248.887208][9273:9278] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1658838248.887256][9273:9278] CHIP:DMG:                                 }
-          [1658838248.887316][9273:9278] CHIP:DMG:                                         
-          [1658838248.887367][9273:9278] CHIP:DMG:                                 Data = 1, 
+          [1658838248.887316][9273:9278] CHIP:DMG:
+          [1658838248.887367][9273:9278] CHIP:DMG:                                 Data = 1,
           [1658838248.887417][9273:9278] CHIP:DMG:                         },
-          [1658838248.887469][9273:9278] CHIP:DMG:                         
+          [1658838248.887469][9273:9278] CHIP:DMG:
           [1658838248.887514][9273:9278] CHIP:DMG:                 },
-          [1658838248.887562][9273:9278] CHIP:DMG:                 
+          [1658838248.887562][9273:9278] CHIP:DMG:
           [1658838248.887597][9273:9278] CHIP:DMG:         ],
-          [1658838248.887630][9273:9278] CHIP:DMG:         
-          [1658838248.887658][9273:9278] CHIP:DMG:         SuppressResponse = true, 
+          [1658838248.887630][9273:9278] CHIP:DMG:
+          [1658838248.887658][9273:9278] CHIP:DMG:         SuppressResponse = true,
           [1658838248.887687][9273:9278] CHIP:DMG:         InteractionModelRevision = 1
           [1658838248.887740][9273:9278] CHIP:DMG: }
           [1658838248.887888][9273:9278] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 2423106591
@@ -186,7 +186,7 @@ tests:
 
           CHIP:DMG: InvokeResponseMessage =
           [1650527622.373450][15824:15829] CHIP:DMG: {
-          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false, 
+          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false,
           [1650527622.373628][15824:15829] CHIP:DMG:         InvokeResponseIBs =
           [1650527622.373734][15824:15829] CHIP:DMG:         [
           [1650527622.373817][15824:15829] CHIP:DMG:                 InvokeResponseIB =
@@ -199,19 +199,19 @@ tests:
           [1650527622.374490][15824:15829] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650527622.374593][15824:15829] CHIP:DMG:                                         CommandId = 0x1,
           [1650527622.374682][15824:15829] CHIP:DMG:                                 },
-          [1650527622.374799][15824:15829] CHIP:DMG:                                 
+          [1650527622.374799][15824:15829] CHIP:DMG:
           [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG:                                 {
           [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
           [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x1,
           [1650527622.375320][15824:15829] CHIP:DMG:                                 },
-          [1650527622.375426][15824:15829] CHIP:DMG:                                 
+          [1650527622.375426][15824:15829] CHIP:DMG:
           [1650527622.375527][15824:15829] CHIP:DMG:                         },
-          [1650527622.375616][15824:15829] CHIP:DMG:                         
+          [1650527622.375616][15824:15829] CHIP:DMG:
           [1650527622.375704][15824:15829] CHIP:DMG:                 },
-          [1650527622.375786][15824:15829] CHIP:DMG:                 
+          [1650527622.375786][15824:15829] CHIP:DMG:
           [1650527622.375864][15824:15829] CHIP:DMG:         ],
-          [1650527622.375940][15824:15829] CHIP:DMG:         
+          [1650527622.375940][15824:15829] CHIP:DMG:
           [1650527622.376000][15824:15829] CHIP:DMG:         InteractionModelRevision = 1
           [1650527622.376058][15824:15829] CHIP:DMG: },
           [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
@@ -234,13 +234,13 @@ tests:
           On your first controller, open commissioning window using BCM
 
           Below is the example when using chip tool as controller
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
 
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false, 
+          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
           [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
           [1650278416.248570][11064:11069] CHIP:DMG:         [
           [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
@@ -253,18 +253,18 @@ tests:
           [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
           [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:                                 
+          [1650278416.249430][11064:11069] CHIP:DMG:
           [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
           [1650278416.249581][11064:11069] CHIP:DMG:                                 {
           [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:                                 
+          [1650278416.249823][11064:11069] CHIP:DMG:
           [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:                         
+          [1650278416.249969][11064:11069] CHIP:DMG:
           [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:                 
+          [1650278416.250113][11064:11069] CHIP:DMG:
           [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:         
+          [1650278416.250241][11064:11069] CHIP:DMG:
           [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
           [1650278416.250355][11064:11069] CHIP:DMG: },
           [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
@@ -277,7 +277,7 @@ tests:
           attribute"
       PICS: CADMIN.C.A0000
       verification: |
-          On first controller read window status 
+          On first controller read window status
 
            ./chip-tool administratorcommissioning read window-status 1 0
 
@@ -296,15 +296,15 @@ tests:
           [1658838248.887146][9273:9278] CHIP:DMG:                                         Cluster = 0x3c,
           [1658838248.887208][9273:9278] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1658838248.887256][9273:9278] CHIP:DMG:                                 }
-          [1658838248.887316][9273:9278] CHIP:DMG:                                         
-          [1658838248.887367][9273:9278] CHIP:DMG:                                 Data = 1, 
+          [1658838248.887316][9273:9278] CHIP:DMG:
+          [1658838248.887367][9273:9278] CHIP:DMG:                                 Data = 1,
           [1658838248.887417][9273:9278] CHIP:DMG:                         },
-          [1658838248.887469][9273:9278] CHIP:DMG:                         
+          [1658838248.887469][9273:9278] CHIP:DMG:
           [1658838248.887514][9273:9278] CHIP:DMG:                 },
-          [1658838248.887562][9273:9278] CHIP:DMG:                 
+          [1658838248.887562][9273:9278] CHIP:DMG:
           [1658838248.887597][9273:9278] CHIP:DMG:         ],
-          [1658838248.887630][9273:9278] CHIP:DMG:         
-          [1658838248.887658][9273:9278] CHIP:DMG:         SuppressResponse = true, 
+          [1658838248.887630][9273:9278] CHIP:DMG:
+          [1658838248.887658][9273:9278] CHIP:DMG:         SuppressResponse = true,
           [1658838248.887687][9273:9278] CHIP:DMG:         InteractionModelRevision = 1
           [1658838248.887740][9273:9278] CHIP:DMG: }
           [1658838248.887888][9273:9278] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 2423106591
@@ -325,7 +325,7 @@ tests:
 
           [1658838344.191922][9291:9296] CHIP:DMG: InvokeResponseMessage =
           [1658838344.191947][9291:9296] CHIP:DMG: {
-          [1658838344.191971][9291:9296] CHIP:DMG:         suppressResponse = false, 
+          [1658838344.191971][9291:9296] CHIP:DMG:         suppressResponse = false,
           [1658838344.192003][9291:9296] CHIP:DMG:         InvokeResponseIBs =
           [1658838344.192035][9291:9296] CHIP:DMG:         [
           [1658838344.192059][9291:9296] CHIP:DMG:                 InvokeResponseIB =
@@ -338,19 +338,19 @@ tests:
           [1658838344.192290][9291:9296] CHIP:DMG:                                         ClusterId = 0x3c,
           [1658838344.192328][9291:9296] CHIP:DMG:                                         CommandId = 0x1,
           [1658838344.192364][9291:9296] CHIP:DMG:                                 },
-          [1658838344.192401][9291:9296] CHIP:DMG:                                 
+          [1658838344.192401][9291:9296] CHIP:DMG:
           [1658838344.192430][9291:9296] CHIP:DMG:                                 StatusIB =
           [1658838344.192461][9291:9296] CHIP:DMG:                                 {
           [1658838344.192500][9291:9296] CHIP:DMG:                                         status = 0x01 (FAILURE),
           [1658838344.192538][9291:9296] CHIP:DMG:                                         cluster-status = 0x1,
           [1658838344.192574][9291:9296] CHIP:DMG:                                 },
-          [1658838344.192611][9291:9296] CHIP:DMG:                                 
+          [1658838344.192611][9291:9296] CHIP:DMG:
           [1658838344.192640][9291:9296] CHIP:DMG:                         },
-          [1658838344.192673][9291:9296] CHIP:DMG:                         
+          [1658838344.192673][9291:9296] CHIP:DMG:
           [1658838344.192698][9291:9296] CHIP:DMG:                 },
-          [1658838344.192728][9291:9296] CHIP:DMG:                 
+          [1658838344.192728][9291:9296] CHIP:DMG:
           [1658838344.192752][9291:9296] CHIP:DMG:         ],
-          [1658838344.192782][9291:9296] CHIP:DMG:         
+          [1658838344.192782][9291:9296] CHIP:DMG:
           [1658838344.192805][9291:9296] CHIP:DMG:         InteractionModelRevision = 1
           [1658838344.192828][9291:9296] CHIP:DMG: },
           [1658838344.192887][9291:9296] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
@@ -372,11 +372,11 @@ tests:
           On your first controller, open commissioning window using BCM
 
           Below is the example when using chip tool as controller
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false, 
+          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
           [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
           [1650278416.248570][11064:11069] CHIP:DMG:         [
           [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
@@ -389,18 +389,18 @@ tests:
           [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
           [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:                                 
+          [1650278416.249430][11064:11069] CHIP:DMG:
           [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
           [1650278416.249581][11064:11069] CHIP:DMG:                                 {
           [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:                                 
+          [1650278416.249823][11064:11069] CHIP:DMG:
           [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:                         
+          [1650278416.249969][11064:11069] CHIP:DMG:
           [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:                 
+          [1650278416.250113][11064:11069] CHIP:DMG:
           [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:         
+          [1650278416.250241][11064:11069] CHIP:DMG:
           [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
           [1650278416.250355][11064:11069] CHIP:DMG: },
           [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
@@ -423,7 +423,7 @@ tests:
 
           CHIP:DMG: InvokeResponseMessage =
           [1650527622.373450][15824:15829] CHIP:DMG: {
-          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false, 
+          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false,
           [1650527622.373628][15824:15829] CHIP:DMG:         InvokeResponseIBs =
           [1650527622.373734][15824:15829] CHIP:DMG:         [
           [1650527622.373817][15824:15829] CHIP:DMG:                 InvokeResponseIB =
@@ -436,19 +436,19 @@ tests:
           [1650527622.374490][15824:15829] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650527622.374593][15824:15829] CHIP:DMG:                                         CommandId = 0x1,
           [1650527622.374682][15824:15829] CHIP:DMG:                                 },
-          [1650527622.374799][15824:15829] CHIP:DMG:                                 
+          [1650527622.374799][15824:15829] CHIP:DMG:
           [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG:                                 {
           [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
           [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x1,
           [1650527622.375320][15824:15829] CHIP:DMG:                                 },
-          [1650527622.375426][15824:15829] CHIP:DMG:                                 
+          [1650527622.375426][15824:15829] CHIP:DMG:
           [1650527622.375527][15824:15829] CHIP:DMG:                         },
-          [1650527622.375616][15824:15829] CHIP:DMG:                         
+          [1650527622.375616][15824:15829] CHIP:DMG:
           [1650527622.375704][15824:15829] CHIP:DMG:                 },
-          [1650527622.375786][15824:15829] CHIP:DMG:                 
+          [1650527622.375786][15824:15829] CHIP:DMG:
           [1650527622.375864][15824:15829] CHIP:DMG:         ],
-          [1650527622.375940][15824:15829] CHIP:DMG:         
+          [1650527622.375940][15824:15829] CHIP:DMG:
           [1650527622.376000][15824:15829] CHIP:DMG:         InteractionModelRevision = 1
           [1650527622.376058][15824:15829] CHIP:DMG: },
           [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1

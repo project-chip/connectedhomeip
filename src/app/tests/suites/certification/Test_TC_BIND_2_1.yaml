@@ -37,7 +37,7 @@ tests:
       verification: |
           1.Need 4 raspi for this test case and use 3 raspi as dut[all-cluster-app] and 1 raspi as chip-tool.
 
-          2.1st raspi which is used as DUT , which you are going to pair with onnetwork, you need to build shell command on that all clusters app.[build shell on DUT 1 Use - [scripts/examples/gn_build_example.sh examples/all-clusters-app/linux/ out/all-clusters-app chip_inet_config_enable_ipv4=false chip_build_libshell=true ] 
+          2.1st raspi which is used as DUT , which you are going to pair with onnetwork, you need to build shell command on that all clusters app.[build shell on DUT 1 Use - [scripts/examples/gn_build_example.sh examples/all-clusters-app/linux/ out/all-clusters-app chip_inet_config_enable_ipv4=false chip_build_libshell=true ]
 
           3.Pair TH2 , TH3 with ble-wifi with different discriminator as mentioned below, using the chip-tool running on 4th raspi.
 
@@ -77,18 +77,18 @@ tests:
 
           On TH(Chip-tool), Verify the success response for binding entries
 
-                           
+
           [1657797710.456056][3796:3801] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           MG:                                 status = 0x00 (SUCCESS),
           [1657797710.457093][3796:3801] CHIP:DMG:                         },
-          [1657797710.457171][3796:3801] CHIP:DMG:                         
+          [1657797710.457171][3796:3801] CHIP:DMG:
           [1657797710.457232][3796:3801] CHIP:DMG:                 },
-          [1657797710.457318][3796:3801] CHIP:DMG:                 
+          [1657797710.457318][3796:3801] CHIP:DMG:
           [1               StatusIB =
           [1657797710.458209][3796:3801] CHIP:DMG:                         {
           [1657797710.458286][3796:3801] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657797710.458369][3796:3801] CHIP:DMG:                         },
-          [1657797710.458444][3796:3801] CHIP:DMG:                         
+          [1657797710.458444][3796:3801] CHIP:DMG:
               pted msg 0xffff7e7cd9d8 with MessageCounter:161235290 to 0x0000000000000001 (1) at monotonic time: 000000000071D1BB msec
           [1657797710.459711][3796:3801] CHIP:EM: Flushed pending ack for MessageCounter:23683634 on exchange 26818i
       disabled: true
@@ -103,7 +103,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}]}]" 2 0
 
-          on TH (Chip-tool), Verify the on command receives success response 
+          on TH (Chip-tool), Verify the on command receives success response
 
           [1652330385.328196][3240:3245] CHIP:DMG:                        StatusIB =
           [1652330385.328229][3240:3245] CHIP:DMG:                        {
@@ -111,9 +111,9 @@ tests:
           [1652330385.328298][3240:3245] CHIP:DMG:                        },
 
 
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 2, "deviceType": null}]}]" 3 0 
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 2, "deviceType": null}]}]" 3 0
 
-          on TH(Chip-tool), Verify the on command receives success response 
+          on TH(Chip-tool), Verify the on command receives success response
 
           [1650610345.847274][2626:2631] CHIP:DMG:                                StatusIB =
           [1650610345.847317][2626:2631] CHIP:DMG:                                {
@@ -123,7 +123,7 @@ tests:
           NOTE:
           Every DUT should have their own mechanism to trigger on/off mechanism  ,this for raspi platform
 
-          DUT sends on command in the shell 
+          DUT sends on command in the shell
 
           > switch on
           [1658837711.917557][4764:4764] CHIP:DMG: ICR moving to [AddingComm]
@@ -231,7 +231,7 @@ tests:
           [1657798291.396477][3835:3841] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 4260513117
           [1657798291.396514][3835:3841] CHIP:TOO:   OnOff: TRUE
 
-          ./chip-tool onoff read on-off 3 2  
+          ./chip-tool onoff read on-off 3 2
 
           Verify on TH(Chip-tool) ,the onoff value is set to ON
 
@@ -259,14 +259,14 @@ tests:
           [1657800844.740275][4000:4006] CHIP:DMG:                                 Cluster = 0x1e,
           [1657800844.740322][4000:4006] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1657800844.740359][4000:4006] CHIP:DMG:                         }
-          [1657800844.740405][4000:4006] CHIP:DMG:                                 
+          [1657800844.740405][4000:4006] CHIP:DMG:
           [1657800844.740444][4000:4006] CHIP:DMG:                         StatusIB =
           [1657800844.740477][4000:4006] CHIP:DMG:                         {
           [1657800844.740516][4000:4006] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657800844.740548][4000:4006] CHIP:DMG:                         },
-          [1657800844.740584][4000:4006] CHIP:DMG:                         
+          [1657800844.740584][4000:4006] CHIP:DMG:
           [1657800844.740607][4000:4006] CHIP:DMG:                 },
-          [1657800844.740653][4000:4006] CHIP:DMG:                 
+          [1657800844.740653][4000:4006] CHIP:DMG:
           [1657800844.740687][4000:4006] CHIP:DMG:                 AttributeStatusIB =
           [1657800844.740714][4000:4006] CHIP:DMG:                 {
           [1657800844.740748][4000:4006] CHIP:DMG:                         AttributePathIB =
@@ -276,16 +276,16 @@ tests:
           [1657800844.740905][4000:4006] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1657800844.740946][4000:4006] CHIP:DMG:                                 ListIndex = Null,
           [1657800844.740981][4000:4006] CHIP:DMG:                         }
-          [1657800844.741025][4000:4006] CHIP:DMG:                                 
+          [1657800844.741025][4000:4006] CHIP:DMG:
           [1657800844.741063][4000:4006] CHIP:DMG:                         StatusIB =
           [1657800844.741094][4000:4006] CHIP:DMG:                         {
           [1657800844.741133][4000:4006] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1657800844.741168][4000:4006] CHIP:DMG:                         },
-          [1657800844.741208][4000:4006] CHIP:DMG:                         
+          [1657800844.741208][4000:4006] CHIP:DMG:
           [1657800844.741241][4000:4006] CHIP:DMG:                 },
-          [1657800844.741272][4000:4006] CHIP:DMG:                 
+          [1657800844.741272][4000:4006] CHIP:DMG:
           [1657800844.741295][4000:4006] CHIP:DMG:         ],
-          [1657800844.741336][4000:4006] CHIP:DMG:         
+          [1657800844.741336][4000:4006] CHIP:DMG:
           [1657800844.741369][4000:4006] CHIP:DMG:         InteractionModelRevision = 1
           [1657800844.741392][4000:4006] CHIP:DMG: }
           [1657800844.741511][4000:4006] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -295,7 +295,7 @@ tests:
     - label: "DUT is triggered to send off command to its binding entries"
       PICS: OO.C.C00.Tx
       verification: |
-          DUT sends off command in the shell 
+          DUT sends off command in the shell
 
           > switch off
           [1658838896.810567][4764:4764] CHIP:DMG: ICR moving to [AddingComm]

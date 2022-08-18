@@ -92,7 +92,7 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read accepted-command-list 1 3
 
-          On TH(chip-tool), verify  DUT responds as list of Accepted Commands as 0 entries  
+          On TH(chip-tool), verify  DUT responds as list of Accepted Commands as 0 entries
 
           [1657696300.165081][15447:15452] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_FFF9 DataVersion: 2577979325
           [1657696300.165174][15447:15452] CHIP:TOO:   AcceptedCommandList: 0 entries
@@ -102,7 +102,7 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic read generated-command-list 1 3
 
-          On TH(chip-tool), verify that DUT responds as list of GeneratedCommands as 0 entries 
+          On TH(chip-tool), verify that DUT responds as list of GeneratedCommands as 0 entries
 
           [1657696328.889936][15454:15459] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_FFF8 DataVersion: 2577979325
           [1657696328.890017][15454:15459] CHIP:TOO:   GeneratedCommandList: 0 entries

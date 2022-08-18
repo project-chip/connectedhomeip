@@ -34,7 +34,7 @@ tests:
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S.C00.Rsp
       verification: |
-          "1. Provision the device using 1st controller chip tool(use above instructions) , 
+          "1. Provision the device using 1st controller chip tool(use above instructions) ,
           "
       disabled: true
 
@@ -88,7 +88,7 @@ tests:
           On 1st controller chip tool, open commissioning window
 
           For BCM,
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 901 2 0 --timedInteractionTimeoutMs 1000 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 901 2 0 --timedInteractionTimeoutMs 1000
 
           CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x85
           [1652860801.225084][9512:9517] CHIP:TOO: Error: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
