@@ -224,9 +224,12 @@ private:
         // mPreviousReportsBeginGeneration will be set to mCurrentReportsBeginGeneration after we send the last
         // chunk of the current report.  Anything that was dirty with a generation earlier than
         // mPreviousReportsBeginGeneration has had its value sent to the client.
-        // when receiving initial request, it needs mark current handler as dirty
-        ForceDirty  = (1 << 6),
-        UrgentEvent = (1 << 7),
+        // when receiving initial request, it needs mark current handler as dirty.
+        // when there is urgent event, it needs mark current handler as dirty.
+        ForceDirty = (1 << 6),
+
+        // Don't need the response for report data if true
+        SuppressResponse = (1 << 7),
     };
 
     /**
@@ -294,10 +297,8 @@ private:
     void SetDirty(const AttributePathParams & aAttributeChanged);
     bool IsDirty() const
     {
-        return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::UrgentEvent) ||
-            mFlags.Has(ReadHandlerFlags::ForceDirty);
+        return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
     }
-    void ClearUrgentEventFlag() { mFlags.Clear(ReadHandlerFlags::UrgentEvent); }
     void ClearForceDirtyFlag() { mFlags.Clear(ReadHandlerFlags::ForceDirty); }
     NodeId GetInitiatorNodeId() const
     {
@@ -316,7 +317,7 @@ private:
 
     auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
 
-    void UnblockUrgentEventDelivery() { mFlags.Set(ReadHandlerFlags::UrgentEvent); }
+    void UnblockUrgentEventDelivery() { mFlags.Set(ReadHandlerFlags::ForceDirty); }
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }

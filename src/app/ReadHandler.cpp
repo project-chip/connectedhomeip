@@ -244,7 +244,6 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     {
         mPreviousReportsBeginGeneration = mCurrentReportsBeginGeneration;
         ClearForceDirtyFlag();
-        ClearUrgentEventFlag();
         InteractionModelEngine::GetInstance()->ReleaseDataVersionFilterList(mpDataVersionFilterList);
     }
 

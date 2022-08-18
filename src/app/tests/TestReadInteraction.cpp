@@ -1559,6 +1559,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         // Test report with 2 different path
         delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
         delegate.mGotReport            = false;
+        delegate.mGotEventResponse     = false;
         delegate.mNumAttributeResponse = 0;
 
         printf("HereHere\n");
