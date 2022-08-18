@@ -118,9 +118,15 @@ EFR32OpaqueKeypair::EFR32OpaqueKeypair()
 
 EFR32OpaqueKeypair::~EFR32OpaqueKeypair()
 {
-    // Free dynamic resource
+    // Free key resources
     if (mContext != nullptr)
     {
+        // Delete volatile keys, since nobody else can after we drop the key ID.
+        if (!mIsPersistent)
+        {
+            Delete();
+        }
+
         MemoryFree(mContext);
         mContext = nullptr;
     }
