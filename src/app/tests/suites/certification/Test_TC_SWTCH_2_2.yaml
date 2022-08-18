@@ -24,30 +24,23 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
+    - label: "Note"
       verification: |
-
+          NOTE: https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#readme
+          Events to be executed as following
+          1. Compile app using below command in connectedhomeip folder
+          a. ./scripts/run_in_build_env.sh ./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build
+          b. ./scripts/run_in_build_env.sh ./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang build
+          2. Build respective app (all-clusters-app)
+          3. Commission DUT to TH
+          4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT
+          ps  -aef|grep all-clusters-app
+          5. Follow the Verification step below to generate the event in 2nd terminal of DUT
       disabled: true
 
     - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
       verification: |
-          NOTE:
-          To Run the event test case we need to build event commands on DUT[All-cluster-ap] terminal.Below I mention the commands for how to build for linux arm64 it depends on the DUT what we use.I provided the link for build events.
-
-          https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#trigger-switch-events
-
-
-
-
-          Here I provide cmmds for build on linux arm64
-
-          1. ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build
-
-          2../scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang build
-
-          3.  ./out/linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang/chip-all-clusters-app-fuzzing
-
-          4. ./out/linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang/chip-all-clusters-app-fuzzing $(INPUT_FILE)
+          Commission DUT to TH
       disabled: true
 
     - label: "Set up subscription to SwitchLatched event"
@@ -127,7 +120,6 @@ tests:
     - label:
           "If NumberOfPositions>2 (see 2c of TC-SWTCH-2.1) : - Operator sets
           switch to next position - Read CurrentPosition attribute"
-      PICS: SWTCH.S.F00
       verification: |
           Raspi device doesn"t support more than 2 position ,so this step is not verifiable by using raspi device
 
@@ -877,6 +869,9 @@ tests:
           [1659696223.568397][3981:3986] CHIP:TOO:    }
 
 
+          In Raspi platform to change the switch position use the below command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
+
+          echo "{"Name":"MultiPressOngoing","previousPosition":1,"CurrentNumberOfPressesCounted":3}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
@@ -888,7 +883,7 @@ tests:
           [1659695330.923283][3912:3918] CHIP:TOO:          Priority: Info
           [1659695330.923302][3912:3918] CHIP:TOO:          Timestamp: 17754336
           [1659695330.923326][3912:3918] CHIP:TOO:   MultiPressComplete: {
-          [1659695330.923346][3912:3918] CHIP:TOO:     PrevioiusPosition: 1
+          [1659695330.923346][3912:3918] CHIP:TOO:     PreviousPosition: 1
           [1659695330.923366][3912:3918] CHIP:TOO:     TotalNumberOfPressesCounted: 3
           [1659695330.923385][3912:3918] CHIP:TOO:    }
       disabled: true

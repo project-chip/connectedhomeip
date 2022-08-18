@@ -71,7 +71,7 @@ tests:
 
           On 3rd controller using chip tool connect using manual code
 
-          ./chip-tool pairing code 1 35484132896
+          ./chip-tool pairing code 1 35484132896  --commissioner-name gamma
 
           Verify you got below message
           Device commissioning completed with success
@@ -103,7 +103,7 @@ tests:
 
           On 2nd controller using chip tool connect using manual code
 
-          ./chip-tool pairing code 1 35484132896
+          ./chip-tool pairing code 2 35484132896  --commissioner-name beta
 
           Verify you got below message
           Device commissioning completed with success
@@ -321,7 +321,7 @@ tests:
       verification: |
           On third controller open commissioning window verify status code 1
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 3 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 3 0 --timedInteractionTimeoutMs 1000  --commissioner-name gamma
 
           [1658838344.191922][9291:9296] CHIP:DMG: InvokeResponseMessage =
           [1658838344.191947][9291:9296] CHIP:DMG: {
@@ -416,7 +416,7 @@ tests:
       verification: |
           On the 2nd controller using chip tool, open commissioning window using BCM before the timer expiry from above step
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000  --commissioner-name beta
 
 
 

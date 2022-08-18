@@ -32,7 +32,7 @@ tests:
           Reset Devices to factory defaults
       disabled: true
 
-    - label: "TH_CR1 starts a commissioning process with DUT_CE using BCM"
+    - label: "TH_CR1 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S.C01.Rsp
       verification: |
           "1. Provision the device using 1st controller chip tool(use above instructions) ,
@@ -40,8 +40,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE with a value of 900
-          seconds"
+          "TH_CR1 opens a commissioning window on DUT_CE using BCM with a value
+          of 900 seconds"
       PICS: CADMIN.S.C01.Rsp
       verification: |
           On 1st controller chip tool, open commissioning window
@@ -85,7 +85,7 @@ tests:
           [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label: "Wait for commissioning Window to 901 seconds"
+    - label: "Wait 901 seconds for commissioning Window to be closed"
       verification: |
           Wait for commissioning Window to Timeout
       disabled: true
@@ -102,8 +102,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE with a value of 901
-          seconds"
+          "TH_CR1 opens a commissioning window on DUT_CE using BCM with a value
+          of 901 seconds"
       PICS: CADMIN.S.C01.Rsp
       verification: |
           On 1st controller chip tool, open commissioning window

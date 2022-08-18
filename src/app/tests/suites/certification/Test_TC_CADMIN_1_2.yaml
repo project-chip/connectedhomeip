@@ -50,8 +50,11 @@ tests:
       verification: |
           On first controller, usinadministratorcommissioningg chip tool open commissioning window.
 
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
+          On TH1(all-clusters-app) Log
 
 
           CHIP:DMG: InvokeResponseMessage =
@@ -92,7 +95,11 @@ tests:
       verification: |
           On first controller, using chip tool read fabricList
 
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
           ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
+
+          On TH1(all-clusters-app) Log
 
 
            CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 3621507058
@@ -113,16 +120,22 @@ tests:
       verification: |
           On second Controller connect to the accessory.
 
-          Below is the example when using chip tool as controller
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
+
           ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
 
-          Verify you got below message
+          Verify you got below message On TH2(all-clusters-app) Log
           Device commissioning completed with success
       disabled: true
 
     - label: "Verify TH_CE is now discoverable over DNS-SD with two SRV Records"
       verification: |
           On the raspi , Verify if the DUT is broadcasting using
+
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
+
 
           ubuntu@ubuntu:~/may10_cntrl2/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
           +   eth0 IPv6 E0AF53B23E580769-0000000000000002             _matter._tcp         local
@@ -146,8 +159,13 @@ tests:
       verification: |
           On the 2nd controller write attribute and read attribute to and from TH_CE
 
-          Below is the example while using chip tool on second controller,
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
+
           ./chip-tool basic write  node-label te5new 2 0 --commissioner-name beta
+
+          On TH2(all-clusters-app) Log
+
 
           CHIP:DMG: WriteResponseMessage =
           [1649245940.788522][10110:10115] CHIP:DMG: {
@@ -177,7 +195,12 @@ tests:
 
 
           Verify read attribute returns the updated value written
+
           ./chip-tool basic read node-label 1 0 --commissioner-name beta
+
+          On TH2(all-clusters-app) Log
+
+
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
           [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te5new
           [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
@@ -189,8 +212,13 @@ tests:
       verification: |
           On second controller controller read fabricList
 
-          Below is the example while using chip tool on second controller,
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
+
           ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0 --commissioner-name beta
+
+          On TH2(all-clusters-app) Log
+
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 3229397217
           [1650277071.834099][40790:40795] CHIP:TOO:   Fabrics: 2 entries
@@ -220,7 +248,13 @@ tests:
       verification: |
           On first controller, using chip-tool write attribute, Verify read attribute returns the updated value written.
 
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
+
           ./chip-tool basic write node-label te8 1 0
+
+          On TH1(all-clusters-app) Log
+
 
           CHIP:DMG: WriteResponseMessage =
           [1649245940.788522][10110:10115] CHIP:DMG: {
@@ -249,7 +283,12 @@ tests:
           [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
           Verify read attribute returns the updated value written
+
           ./chip-tool basic read node-label 1 0
+
+          On TH1(all-clusters-app) Log
+
+
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
           [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te8
           [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
@@ -262,10 +301,13 @@ tests:
       verification: |
           On second controller read, write attribute and then read attribute to and from TH_CE
 
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
 
 
-          Below is the example while using chip tool on second controller,
           ./chip-tool basic write node-label te5new 2 0 --commissioner-name beta
+
+          On TH2(all-clusters-app) Log
+
 
           CHIP:DMG: WriteResponseMessage =
           [1649245940.788522][10110:10115] CHIP:DMG: {
@@ -296,6 +338,10 @@ tests:
           Verify read attribute returns the updated value written
 
           ./chip-tool basic read node-label 2 0 --commissioner-name beta
+
+          On TH2(all-clusters-app) Log
+
+
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
           [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te5new
           [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
@@ -314,8 +360,12 @@ tests:
       verification: |
           On second controller using chip-tool open commissioning widow using BCM.
 
-          Below is the example while using chip tool on second controller,
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
+
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000  --commissioner-name beta
+
+          On TH2(all-clusters-app) Log
 
 
           CHIP:DMG: InvokeResponseMessage =
@@ -358,8 +408,12 @@ tests:
       verification: |
           On second controller using chip-tool run revoke command
 
-          Below is the example while using chip tool on second controller,
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
+
           ./chip-tool administratorcommissioning revoke-commissioning 2 0 --timedInteractionTimeoutMs 1000 --commissioner-name beta
+
+          On TH2(all-clusters-app) Log
 
 
           CHIP:DMG: InvokeResponseMessage =
@@ -401,9 +455,13 @@ tests:
       PICS: CADMIN.C
       verification: |
           1. On third controller, using chip-tool connect to the accessory. Connect attempt should fail, i.e
+
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
+
           ./chip-tool pairing onnetwork 3 20202021 --commissioner-name gamma
 
-          verify you got the following message in the TH log
+          verify you got the following message in the TH3 (all-clusters-app) log
 
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
           CHIP:TOO: Secure Pairing Failed
@@ -417,8 +475,13 @@ tests:
       verification: |
           On second controller, write attribute and read attribute to and from TH_CE
 
-          Below is the example while using chip tool on second controller,
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
+
           ./chip-tool basic write node-label te5new 2 0 --commissioner-name beta
+
+          On TH2(all-clusters-app) Log
+
 
           CHIP:DMG: WriteResponseMessage =
           [1649245940.788522][10110:10115] CHIP:DMG: {
@@ -447,6 +510,9 @@ tests:
           [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
           Verify read attribute returns the updated value written
+
+          On TH2(all-clusters-app) Log
+
           ./chip-tool basic read node-label 2 0 --commissioner-name beta
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
           [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te5new
@@ -460,8 +526,12 @@ tests:
       verification: |
           On second controller using chip-tool open commissioning widow using BCM.
 
-          Below is the example while using chip tool on second controller,
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
+
           ./chip-tool administratorcommissioning open-basic-commissioning-window 180 2 0 --timedInteractionTimeoutMs 1000 --commissioner-name beta
+
+          On TH2(all-clusters-app) Log
 
 
           CHIP:DMG: InvokeResponseMessage =
@@ -510,9 +580,12 @@ tests:
       verification: |
           On second controller using chip-tool open commissioning widow using BCM.
 
-          Below is the example while using chip tool on second controller,
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
+
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000 --commissioner-name beta
 
+          On TH2(all-clusters-app) Log
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
@@ -554,8 +627,12 @@ tests:
       verification: |
           Using your 1st Controller connect to the accessory.
 
-          Below is the example when using chip tool as controller
+          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+
           ./chip-tool pairing onnetwork 1 20202021
+
+          On TH1(all-clusters-app) Log
+
 
           [1651786200275] [36301:315544] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1651786200275] [36301:315544] CHIP: [CTL] Device returned status 9 on receiving the NOC

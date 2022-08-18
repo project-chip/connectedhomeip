@@ -27,9 +27,14 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Pre-Conditions"
+      verification: |
+          DUT as server
+      disabled: true
+
     - label:
           "TH reads NumberOfHoliday SchedulesSupported and saves for future use."
-      PICS: DRLK.S.F04 && DRLK.S.A0016
+      PICS: DRLK.S.F11 && DRLK.S.A0016
       verification: |
           ./chip-tool doorlock read number-of-holiday-schedules-supported 1 1
           Verify " NumberOfHoliDay SchedulesSuppored" on the TH(Chip-tool) Log:
@@ -46,7 +51,7 @@ tests:
           "TH sends Set Holiday Schedule Command to DUT with the following
           values: HolidayIndex as 1 LocalStartTime as 20 Seconds LocalEndTime as
           30 Seconds OperatingMode as 0"
-      PICS: DRLK.S.F04 && DRLK.S.C11.Rsp
+      PICS: DRLK.S.F11 && DRLK.S.C11.Rsp
       verification: |
           ./chip-tool doorlock set-holiday-schedule 1 20 30 0 1 1
           Verify " DUT send SUCCESS response." on the TH(Chip-tool) Log:
@@ -68,7 +73,7 @@ tests:
 
     - label:
           "TH sends Get Holiday Schedule Command to DUT with HolidayIndex as 1"
-      PICS: DRLK.S.F04 && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
+      PICS: DRLK.S.F11 && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       verification: |
           ./chip-tool doorlock get-holiday-schedule 1 1 1
           Verify " DUT responds with Get Holiday Schedule Response" on the TH(Chip-tool) Log:
@@ -126,7 +131,7 @@ tests:
     - label:
           "TH sends Get Holiday Schedule Command to DUT with Invalid
           HolidayIndex as 15."
-      PICS: DRLK.S.F04 && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
+      PICS: DRLK.S.F11 && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       verification: |
           ./chip-tool doorlock get-holiday-schedule 15 1 1
           Verify " DUT sends INVALID_COMMAND response" on the TH(Chip-tool) Log:
@@ -148,7 +153,7 @@ tests:
           "TH sends Get Holiday Schedule Command to DUT with the HolidayIndex as
           10 (value is in the the range of step 1 but Holiday Schedule entry not
           available)"
-      PICS: DRLK.S.F04 && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
+      PICS: DRLK.S.F11 && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       verification: |
           ./chip-tool doorlock get-holiday-schedule 10 1 1
           Verify " DUT sends a NOT_FOUND status" on the TH(Chip-tool) Log:
@@ -164,7 +169,7 @@ tests:
 
     - label:
           "TH send Clear Holiday Schedule Command to DUT with HolidayIndex as 1"
-      PICS: DRLK.S.F04 && DRLK.S.C13.Rsp
+      PICS: DRLK.S.F11 && DRLK.S.C13.Rsp
       verification: |
           ./chip-tool doorlock clear-holiday-schedule 1 1 1
           Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
@@ -186,7 +191,7 @@ tests:
 
     - label:
           "TH sends Get Holiday Schedule Command to DUT with HolidayIndex as 1."
-      PICS: DRLK.S.F04 && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
+      PICS: DRLK.S.F11 && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       verification: |
           ./chip-tool doorlock get-holiday-schedule 1 1 1
           Verify " DUT sends a NOT_FOUND status" on the TH(Chip-tool) Log:

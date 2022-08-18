@@ -89,7 +89,7 @@ tests:
           On 2nd controller using chip tool connect to the accessory
 
 
-          ./chip-tool pairing code 1 35484132896
+          ./chip-tool pairing code 1 35484132896  --commissioner-name beta
 
           Verify you got below message
           Device commissioning completed with success
@@ -140,7 +140,7 @@ tests:
           On 3rd controller using chip tool connect to the accessory
 
 
-          ./chip-tool pairing code 1 35484132896
+          ./chip-tool pairing code 1 35484132896  --commissioner-name gamma
 
           Verify you got below message
           Device commissioning completed with success
@@ -151,7 +151,7 @@ tests:
       verification: |
           On 2nd controller using chip tool, read fabrics list
 
-          ./chip-tool operationalcredentials read fabrics 1234 0 --fabric-filtered 0
+          ./chip-tool operationalcredentials read fabrics 1234 0 --fabric-filtered 0  --commissioner-name beta
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2455995193
           CHIP:TOO:   Fabrics: 3 entries
@@ -187,7 +187,7 @@ tests:
       verification: |
           on 2nd controller using chip tool, remove fabric with FabricIndex=2
 
-          ./chip-tool operationalcredentials remove-fabric 2 1 0
+          ./chip-tool operationalcredentials remove-fabric 2 1 0  --commissioner-name beta
 
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
@@ -206,13 +206,13 @@ tests:
           Using your 2nd controller, write attribute and read attribute to and from TH_CE
 
           Below is the example while using chip tool on second controller,
-          ./chip-tool basic write node-label te5new 2 0
+          ./chip-tool basic write node-label te5new 2 0  --commissioner-name beta
 
            Received error (protocol code 2) during pairing process. ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter
           [1651819620.929567][4359:4364] CHIP:CTL: OperationalDeviceProxy[B8070CD13C99D367:0000000000000002]: State change 3 --> 2
           [1651819620.929700][4359:4364] CHIP:-: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter at ../../commands/clusters/ModelCommand.cpp:53
 
-          ./chip-tool basic read node-label 2 0
+          ./chip-tool basic read node-label 2 0  --commissioner-name beta
 
            Received error (protocol code 2) during pairing process. ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter
           [1651819620.929567][4359:4364] CHIP:CTL: OperationalDeviceProxy[B8070CD13C99D367:0000000000000002]: State change 3 --> 2
@@ -300,7 +300,7 @@ tests:
           On 2nd controller using chip tool connect to the accessory
 
 
-          ./chip-tool pairing code 1 36217551633
+          ./chip-tool pairing code 1 36217551633  --commissioner-name beta
 
           Verify you got below message
           Device commissioning completed with success
@@ -314,7 +314,7 @@ tests:
 
           Below is the command using chip tool controller
 
-          ./chip-tool operationalcredentials read fabrics 1234 0 --fabric-filtered 0
+          ./chip-tool operationalcredentials read fabrics 1234 0 --fabric-filtered 0  --commissioner-name beta
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2455995246
           [1647863342.980899][9309:9314] CHIP:TOO:   Fabrics: 3 entries

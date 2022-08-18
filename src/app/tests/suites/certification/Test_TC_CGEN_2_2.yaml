@@ -100,8 +100,9 @@ tests:
           Once build completes
           3. cd out/debug
           4.  ./chip-cert gen-cert --type r --subject-chip-id CACACACA00000001 --valid-from "2020-10-15 14:23:43" --lifetime 7305 --out-key Chip-Root-Key.txt --out Chip-Root-Cert.txt --out-format chip-hex
-          5. cat Chip-Root-Key.txt
+          5. cat Chip-Root-Cert.txt
 
+          While adding new add-trusted-root-certificate  please use the above generated new root key
 
           ./chip-tool  operationalcredentials add-trusted-root-certificate  hex:1530010828c376ebc17f21512402013703271401000000cacacaca182604ef171b2726056eb5b94c3706271401000000cacacaca182407012408013009410452c19fd9d329a738fd65722a8309fa68bcaa9ffe87d8114b802c922e5066d0b2f0573b89b38bf98fc9c424ab8ffdabcb18d42e623d82a02d0ca0c062ccadb4bc370a350129011824026030041457934de5405e9a40eacb86ee647e583141ae78f430051457934de5405e9a40eacb86ee647e583141ae78f418300b40a0b0d57bddbc7bcf44480a8b7bd0231d54ccacd68d90efb67b7aa3206adbd268725092992a0388c8e934504178613c5b932d422eed7463f38fd82aaa429b574a18 1 0
 
