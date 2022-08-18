@@ -62,12 +62,7 @@ CHIP_ERROR SetupPayloadParseCommand::Run()
     NSError * error;
     MTRSetupPayload * payload;
     MTROnboardingPayloadType codeType;
-    if (IsQRCode(codeString)) {
-        codeType = MTROnboardingPayloadTypeQRCode;
-    } else {
-        codeType = MTROnboardingPayloadTypeManualCode;
-    }
-    payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:codeString ofType:codeType error:&error];
+    payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:codeString error:&error];
     if (error) {
         LogNSError("Error: ", error);
         return CHIP_ERROR_INTERNAL;
