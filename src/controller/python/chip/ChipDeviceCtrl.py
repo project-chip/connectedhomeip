@@ -181,10 +181,10 @@ class ChipDeviceController():
         self._fabricAdmin = fabricAdmin
         self._fabricId = fabricId
         self._nodeId = nodeId
-        self._adminIndex = fabricAdmin.adminIndex
+        self._caIndex = fabricAdmin.caIndex
 
         if name is None:
-            self._name = "adminIndex(%x)/fabricId(0x%016X)/nodeId(0x%016X)" % (fabricAdmin.adminIndex, fabricId, nodeId)
+            self._name = "caIndex(%x)/fabricId(0x%016X)/nodeId(0x%016X)" % (fabricAdmin.caIndex, fabricId, nodeId)
         else:
             self._name = name
 
@@ -258,8 +258,8 @@ class ChipDeviceController():
         return self._fabricId
 
     @property
-    def adminIndex(self) -> int:
-        return self._adminIndex
+    def caIndex(self) -> int:
+        return self._caIndex
 
     @property
     def name(self) -> str:
