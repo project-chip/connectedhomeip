@@ -24,6 +24,29 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Pre-conditions:"
+      verification: |
+          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
+      disabled: true
+
+    - label: "Note"
+      verification: |
+          1.To run this test case build the OTA Provider app in nRF connectedhomeip Docker . [
+          https://github.com/project-chip/connectedhomeip/tree/master/examples/ota-provider-app/linux
+
+          2. Build all-cluster-app in docker
+
+          west build -b nrf52840dk_nrf52840 -- -DCONF_FILE=prj_dfu.conf -DCONFIG_CHIP_LIB_SHELL=y
+
+
+          3.Flash
+          west flash --erase
+
+          4.OTA Image needs to build on docker
+
+          west build -b nrf52840dk_nrf52840 -d build2 -- -DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 -DCONF_FILE=prj_dfu.conf -DCONFIG_CHIP_LIB_SHELL=y
+      disabled: true
+
     - label: "TH reads the StartUpMode attribute from the DUT"
       PICS: MOD.S.A0004
       verification: |

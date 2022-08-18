@@ -28,7 +28,14 @@ config:
 tests:
     - label: "Note"
       verification: |
-          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+          Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Pre-Conditions"
+      verification: |
+          1. PAA, PAI, DAC certificates are obtained and validated
+          2. Operations happen within the Fail-Safe Context
+          3. TH1 should be known about Commissioner based error condition/warning
       disabled: true
 
     - label: "Start the commissioning process of TH1 on DUT"
@@ -207,7 +214,7 @@ tests:
           Product ID (PID) the DAC is not present in the product_id_array field
           in the Certification Declaration"
       verification: |
-          To Execute ths step for error condition 1 follow the following
+          To Execute ths step for error condition 1 follow the following steps
 
           1. To generate the CD use the below command
           ./out/debug/chip-cert gen-cd -I -E dac-origin-vid-present -C credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem -K credentials/test/certification-declaration/Chip-Test-CD-Signing-Key.pem --out cd_vid_present_pid_missing.txt -o 0x8000 -r 0xFFF1 -f 1 -V FFF1 -p 8000 -p 8001 -p 8002 -p 8003 -p 8004 -p 8005 -p 8006 -p 8007 -p 8008 -p 8009 -p 800A -p 800B -p 800C -p 800D -p 800E -p 800F -p 8010 -p 8011 -p 8012 -p 8013 -p 8014 -p 8015 -p 8016 -p 8017 -p 8018 -p 8019 -p 801A -p 801B -p 801C -p 801D -p 801E -p 801F -p 8020 -p 8021 -p 8022 -p 8023 -p 8024 -p 8025 -p 8026 -p 8027 -p 8028 -p 8029 -p 802A -p 802B -p 802C -p 802D -p 802E -p 802F -p 8030 -p 8031 -p 8032 -p 8033 -p 8034 -p 8035 -p 8036 -p 8037 -p 8038 -p 8039 -p 803A -p 803B -p 803C -p 803D -p 803E -p 803F -p 8040 -p 8041 -p 8042 -p 8043 -p 8044 -p 8045 -p 8046 -p 8047 -p 8048 -p 8049 -p 804A -p 804B -p 804C -p 804D -p 804E -p 804F -p 8050 -p 8051 -p 8052 -p 8053 -p 8054 -p 8055 -p 8056 -p 8057 -p 8058 -p 8059 -p 805A -p 805B -p 805C -p 805D -p 805E -p 805F -p 8060 -p 8061 -p 8062 -p 8063 -d 0016 -c "ZIG20142ZB330003-24" -l 0 -i 0 -n 2694 -t 0
@@ -244,4 +251,8 @@ tests:
           [1658320561.366481][4126:4132] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1011: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
           [1658320561.366524][4126:4132] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1011: CHIP Error 0x000000AC: Internal error"
           [1658320561.366554][4126:4132] CHIP:CTL: Expiring failsafe on proxy 0xffff84000b60
+
+          Similary for 2nd error condition follow the below steps
+
+          1. 1. To generate the CD use the below command
       disabled: true
