@@ -87,7 +87,7 @@ tests:
               - name: "ms"
                 value: 190000
 
-    - label: "Commission from beta"
+    - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"

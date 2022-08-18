@@ -35,6 +35,19 @@ tests:
           "Read FeatureMap  attribute and Check values of flags in this
           FeatureMap"
       PICS:
+          "!SWTCH.S.F00 && SWTCH.S.F01 && !SWTCH.S.F02 && !SWTCH.S.F03 &&
+          !SWTCH.S.F04"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Read FeatureMap  attribute and Check values of flags in this
+          FeatureMap"
+      PICS:
           (SWTCH.S.F00 || SWTCH.S.F01 || SWTCH.S.F02 || SWTCH.S.F03 ||
           SWTCH.S.F04)
       command: "readAttribute"
@@ -42,7 +55,7 @@ tests:
       response:
           constraints:
               type: bitmap32
-              minValue: 0
+              minValue: 1
               maxValue: 31
 
     - label: "read the global attribute: ClusterRevision"
