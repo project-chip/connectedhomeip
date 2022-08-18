@@ -591,6 +591,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::FailRandomlyAtFault::Id: {
+            Commands::FailRandomlyAtFault::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         default: {
             // Unrecognized command ID, error status will apply.
             apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
