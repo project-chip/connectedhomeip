@@ -19,6 +19,7 @@ from typing import List
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
 from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
+from builders.cc32xx import cc32xxApp, cc32xxBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
 from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
@@ -562,6 +563,10 @@ def cc13x2x7_26x2x7Targets():
     yield target.Extend('all-clusters-minimal', app=cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL)
     yield target.Extend('shell', app=cc13x2x7_26x2x7App.SHELL)
 
+def cc32xxTargets():
+    target = Target('cc32xx', cc32xxBuilder)
+
+    yield target.Extend('lock', app=cc32xxApp.LOCK)
 
 def Cyw30739Targets():
     yield Target('cyw30739-cyw930739m2evb_01-light', Cyw30739Builder,
@@ -646,6 +651,7 @@ target_generators = [
     AmebaTargets(),
     K32WTargets(),
     cc13x2x7_26x2x7Targets(),
+    cc32xxTargets(),
     Cyw30739Targets(),
     QorvoTargets(),
     TizenTargets(),
