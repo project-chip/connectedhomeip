@@ -206,6 +206,7 @@
         "TestDiscovery",
         "TestLogCommands",
         "TestSaveAs",
+        "TestPixit",
         "TestConfigVariables",
         "TestDescriptorCluster",
         "TestBasicInformation",

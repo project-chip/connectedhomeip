@@ -14,49 +14,49 @@
       VerifyOrReturn(CheckConstraintType("{{asPropertyValue context=..}}", "{{asTestType ../type ../isArray}}", "{{value}}"));
     {{~else if (isStrEqual constraint "format")}}VerifyOrReturn(CheckConstraintFormat("{{asPropertyValue context=..}}", "", "{{value}}"));
 
-    {{~else if (isStrEqual constraint "startsWith")}}VerifyOrReturn(CheckConstraintStartsWith("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value ../type false false}}));
+    {{~else if (isStrEqual constraint "startsWith")}}VerifyOrReturn(CheckConstraintStartsWith("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value ../type}}));
 
-    {{~else if (isStrEqual constraint "endsWith")}}VerifyOrReturn(CheckConstraintEndsWith("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value ../type false false}}));
+    {{~else if (isStrEqual constraint "endsWith")}}VerifyOrReturn(CheckConstraintEndsWith("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value ../type}}));
 
-    {{~else if (isStrEqual constraint "isUpperCase")}}VerifyOrReturn(CheckConstraintIsUpperCase("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value "bool" false false}}));
+    {{~else if (isStrEqual constraint "isUpperCase")}}VerifyOrReturn(CheckConstraintIsUpperCase("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value "bool"}}));
 
-    {{~else if (isStrEqual constraint "isLowerCase")}}VerifyOrReturn(CheckConstraintIsLowerCase("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value "bool" false false}}));
+    {{~else if (isStrEqual constraint "isLowerCase")}}VerifyOrReturn(CheckConstraintIsLowerCase("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value "bool"}}));
 
-    {{~else if (isStrEqual constraint "isHexString")}}VerifyOrReturn(CheckConstraintIsHexString("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value "bool" false false}}));
+    {{~else if (isStrEqual constraint "isHexString")}}VerifyOrReturn(CheckConstraintIsHexString("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value "bool"}}));
 
-    {{~else if (isStrEqual constraint "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value "size_t" false false}}));
+    {{~else if (isStrEqual constraint "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value "size_t"}}));
 
-    {{~else if (isStrEqual constraint "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value "size_t" false false}}));
+    {{~else if (isStrEqual constraint "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value "size_t"}}));
 
-    {{~else if (isStrEqual constraint "minValue")}}VerifyOrReturn(CheckConstraintMinValue("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value ../type true false}}));
+    {{~else if (isStrEqual constraint "minValue")}}VerifyOrReturn(CheckConstraintMinValue("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value ../type typedLiteral=true}}));
 
-    {{~else if (isStrEqual constraint "maxValue")}}VerifyOrReturn(CheckConstraintMaxValue("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value ../type true false}}));
+    {{~else if (isStrEqual constraint "maxValue")}}VerifyOrReturn(CheckConstraintMaxValue("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value ../type typedLiteral=true}}));
 
     {{~else if (isStrEqual constraint "contains")}}
         {{#chip_tests_iterate_expected_list value context=..}}
-    VerifyOrReturn(CheckConstraintContains("{{asPropertyValue context=..}}", {{asPropertyValue}}, {{maybeSubPixit value type true false}}));
+    VerifyOrReturn(CheckConstraintContains("{{asPropertyValue context=..}}", {{asPropertyValue}}, {{maybeSubPixit value type typedLiteral=true}}));
         {{/chip_tests_iterate_expected_list}}
 
     {{~else if (isStrEqual constraint "excludes")}}
         {{#chip_tests_iterate_expected_list value context=..}}
-    VerifyOrReturn(CheckConstraintExcludes("{{asPropertyValue context=..}}", {{asPropertyValue}}, {{maybeSubPixit value type true false}}));
+    VerifyOrReturn(CheckConstraintExcludes("{{asPropertyValue context=..}}", {{asPropertyValue}}, {{maybeSubPixit value type typedLiteral=true}}));
         {{/chip_tests_iterate_expected_list}}
 
     {{~else if (isStrEqual constraint "hasMasksSet")}}
         {{#chip_tests_iterate_expected_list value context=..}}
-    VerifyOrReturn(CheckConstraintHasMasksSet("{{asPropertyValue context=..}}", {{asPropertyValue}}, {{maybeSubPixit value type true false}}));
+    VerifyOrReturn(CheckConstraintHasMasksSet("{{asPropertyValue context=..}}", {{asPropertyValue}}, {{maybeSubPixit value type typedLiteral=true}}));
         {{/chip_tests_iterate_expected_list}}
 
     {{~else if (isStrEqual constraint "hasMasksClear")}}
         {{#chip_tests_iterate_expected_list value context=..}}
-    VerifyOrReturn(CheckConstraintHasMasksClear("{{asPropertyValue context=..}}", {{asPropertyValue}}, {{maybeSubPixit value type true false}}));
+    VerifyOrReturn(CheckConstraintHasMasksClear("{{asPropertyValue context=..}}", {{asPropertyValue}}, {{maybeSubPixit value type typedLiteral=true}}));
         {{/chip_tests_iterate_expected_list}}
 
     {{~else if (isStrEqual constraint "notValue")}}
         {{#if (isLiteralNull value)}}
             VerifyOrReturn(CheckValueNonNull("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}));
         {{else}}
-            VerifyOrReturn(CheckConstraintNotValue("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value ../type true false}}));
+            VerifyOrReturn(CheckConstraintNotValue("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{maybeSubPixit value ../type typedLiteral=true}}));
         {{/if}}
 
     {{~else}}

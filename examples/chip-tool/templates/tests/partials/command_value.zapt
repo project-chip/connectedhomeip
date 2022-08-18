@@ -56,12 +56,12 @@
       {{/if_is_strongly_typed_chip_enum~}}
     {{else if (isPixit definedValue)}}
       {{~#if_is_strongly_typed_chip_enum type~}}
-        static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{formatPixit definedValue type true}});
+        static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{formatPixit definedValue type useSpans=true}});
       {{else}}
         {{#if_is_strongly_typed_bitmap type}}
-          static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{formatPixit definedValue type true}});
+          static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{formatPixit definedValue type useSpans=true}});
         {{else}}
-          {{formatPixit definedValue type true}};
+          {{formatPixit definedValue type useSpans=true}};
         {{/if_is_strongly_typed_bitmap}}
       {{/if_is_strongly_typed_chip_enum~}}
     {{else~}}
