@@ -126,11 +126,11 @@ private:
      * Caller must pass a non-nil value for the rootCertificate, intermediateCertificate, operationalCertificate
      * If ipk and adminSubject are non nil, then they will be used in the AddNOC command sent to the commissionee. If they are not
      * populated, then the values provided in the MTRDeviceController initialization will be used.
-     *
-     * @return error code (0 is no error)
      */
-    NSNumber * onNOCChainGenerationComplete(MTROperationalCredentialsDelegate * thisDelegate, NSData * operationalCertificate,
-        NSData * intermediateCertificate, NSData * rootCertificate, NSData * _Nullable ipk, NSNumber * _Nullable adminSubject);
+    void onNOCChainGenerationComplete(NSData * operationalCertificate, NSData * intermediateCertificate, NSData * rootCertificate,
+        NSData * _Nullable ipk, NSNumber * _Nullable adminSubject, NSError * __autoreleasing * error);
+
+    void setNSError(CHIP_ERROR err, NSError * __autoreleasing * outError);
 
     CHIP_ERROR CallbackGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
         const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,

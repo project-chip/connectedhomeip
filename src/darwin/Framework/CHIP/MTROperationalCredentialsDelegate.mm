@@ -184,6 +184,8 @@ CHIP_ERROR MTROperationalCredentialsDelegate::CallbackGenerateNOCChain(const chi
     });
     VerifyOrReturnError(commissioningParameters.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
+    // Attestation Elements, nonce and signature will have a value in Commissioning Params as the CSR needs a signature or else we
+    // cannot trust it
     ReturnErrorOnFailure(
         chip::Credentials::DeconstructAttestationElements(commissioningParameters.Value().GetAttestationElements().Value(),
             certificationDeclarationSpan, attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan, vendorReserved));
@@ -201,38 +203,50 @@ CHIP_ERROR MTROperationalCredentialsDelegate::CallbackGenerateNOCChain(const chi
     dispatch_sync(mNocChainIssuerQueue, ^{
         [mNocChainIssuer onNOCChainGenerationNeeded:csrInfo
                                     attestationInfo:attestationInfo
-                       onNOCChainGenerationComplete:^NSNumber *(NSData * operationalCertificate, NSData * intermediateCertificate,
-                           NSData * rootCertificate, NSData * ipk, NSNumber * adminSubject) {
-                           return onNOCChainGenerationComplete(
-                               this, operationalCertificate, intermediateCertificate, rootCertificate, ipk, adminSubject);
+                       onNOCChainGenerationComplete:^void(NSData * operationalCertificate, NSData * intermediateCertificate,
+                           NSData * rootCertificate, NSData * ipk, NSNumber * adminSubject, NSError * __autoreleasing * error) {
+                           onNOCChainGenerationComplete(
+                               operationalCertificate, intermediateCertificate, rootCertificate, ipk, adminSubject, error);
                        }];
     });
 
     return CHIP_NO_ERROR;
 }
 
-NSNumber * MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(MTROperationalCredentialsDelegate * thisDelegate,
-    NSData * operationalCertificate, NSData * intermediateCertificate, NSData * rootCertificate, NSData * _Nullable ipk,
-    NSNumber * _Nullable adminSubject)
+void MTROperationalCredentialsDelegate::setNSError(CHIP_ERROR err, NSError * __autoreleasing * outError)
 {
-    VerifyOrReturnValue(operationalCertificate != nil, [NSNumber numberWithUnsignedInt:CHIP_ERROR_INVALID_ARGUMENT.AsInteger()]);
-    VerifyOrReturnValue(intermediateCertificate != nil, [NSNumber numberWithUnsignedInt:CHIP_ERROR_INVALID_ARGUMENT.AsInteger()]);
-    VerifyOrReturnValue(rootCertificate != nil, [NSNumber numberWithUnsignedInt:CHIP_ERROR_INVALID_ARGUMENT.AsInteger()]);
+    if (outError) {
+        *outError = [MTRError errorForCHIPErrorCode:err];
+    }
+}
+
+void MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(NSData * operationalCertificate,
+    NSData * intermediateCertificate, NSData * rootCertificate, NSData * _Nullable ipk, NSNumber * _Nullable adminSubject,
+    NSError * __autoreleasing * error)
+{
+    if (operationalCertificate == nil || intermediateCertificate == nil || rootCertificate == nil) {
+        setNSError(CHIP_ERROR_INVALID_ARGUMENT, error);
+        return;
+    }
 
     // use ipk and adminSubject from CommissioningParameters if not passed in
     __block chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters;
     dispatch_sync(mChipWorkQueue, ^{
         commissioningParameters = mCppCommissioner->GetCommissioningParameters();
     });
-    VerifyOrReturnValue(
-        commissioningParameters.HasValue(), [NSNumber numberWithUnsignedInt:CHIP_ERROR_INCORRECT_STATE.AsInteger()]);
+    if (!commissioningParameters.HasValue()) {
+        setNSError(CHIP_ERROR_INCORRECT_STATE, error);
+        return;
+    }
 
     chip::Optional<chip::Crypto::AesCcm128KeySpan> ipkOptional;
     uint8_t ipkValue[chip::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
     chip::Crypto::AesCcm128KeySpan ipkTempSpan(ipkValue);
     if (ipk != nil) {
-        VerifyOrReturnValue(
-            [ipk length] == sizeof(ipkValue), [NSNumber numberWithUnsignedInt:CHIP_ERROR_INCORRECT_STATE.AsInteger()]);
+        if ([ipk length] != sizeof(ipkValue)) {
+            setNSError(CHIP_ERROR_INCORRECT_STATE, error);
+            return;
+        }
         memcpy(&ipkValue[0], [ipk bytes], [ipk length]);
         ipkOptional.SetValue(ipkTempSpan);
     } else if (commissioningParameters.Value().GetIpk().HasValue()) {
@@ -251,8 +265,8 @@ NSNumber * MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(MTROp
 
     if (err != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Failed to SetNocChain for the device: %" CHIP_ERROR_FORMAT, err.Format());
+        setNSError(CHIP_ERROR_INCORRECT_STATE, error);
     }
-    return [NSNumber numberWithUnsignedInt:err.AsInteger()];
 }
 
 CHIP_ERROR MTROperationalCredentialsDelegate::LocalGenerateNOCChain(const chip::ByteSpan & csrElements,

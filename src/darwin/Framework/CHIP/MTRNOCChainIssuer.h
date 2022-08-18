@@ -37,15 +37,15 @@ NS_ASSUME_NONNULL_BEGIN
  * rootCertificate, intermediateCertificate, operationalCertificate.
  * If ipk and adminSubject are passed, then they will be used in
  * the AddNOC command sent to the commissionee. If they are not passed, then the values
- * provided in the ChipDeviceController initialization will be used.
+ * provided in the MTRDeviceController initialization will be used.
  *
  * All csr and attestation fields are provided to allow for custom attestestation checks.
  */
 - (void)onNOCChainGenerationNeeded:(CSRInfo *)csrInfo
                    attestationInfo:(AttestationInfo *)attestationInfo
-      onNOCChainGenerationComplete:(NSNumber * (^)(NSData * operationalCertificate, NSData * intermediateCertificate,
-                                       NSData * rootCertificate, NSData * ipk,
-                                       NSNumber * adminSubject))onNOCChainGenerationComplete;
+      onNOCChainGenerationComplete:(void (^)(NSData * operationalCertificate, NSData * intermediateCertificate,
+                                       NSData * rootCertificate, NSData * ipk, NSNumber * adminSubject,
+                                       NSError * __autoreleasing * error))onNOCChainGenerationComplete;
 
 @end
 
