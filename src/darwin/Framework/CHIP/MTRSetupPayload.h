@@ -61,7 +61,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  *
  * Otherwise its value is made up of the MTRDiscoveryCapabilities flags.
  */
-@property (nonatomic, assign, nullable) NSNumber * rendezvousInformation;
+@property (nonatomic, copy, nullable) NSNumber * rendezvousInformation;
 @property (nonatomic, copy) NSNumber * discriminator;
 @property (nonatomic, assign) BOOL hasShortDiscriminator;
 @property (nonatomic, copy) NSNumber * setUpPINCode;
