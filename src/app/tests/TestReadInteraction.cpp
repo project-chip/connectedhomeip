@@ -1699,6 +1699,8 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         ctx.DrainAndServiceIO();
 
+        System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
+
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
@@ -1713,8 +1715,31 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty() == true);
         delegate.mGotEventResponse = false;
         delegate.mGotReport        = false;
-        // wait for min interval 2 seconds, in test, we pick up 2.1 seconds, then the urgent event would be sent out
-        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2100), [&]() { return delegate.mGotEventResponse == true; });
+
+        // wait for min interval 2 seconds(in test, we use 1.9second considering the time variation), expect no event is received,
+        // then wait for 0.5 seconds, then the urgent event would be sent out
+        while (true)
+        {
+            ctx.GetIOContext().DriveIO(); // at least one IO loop is guaranteed
+
+            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(1900))
+            {
+                break;
+            }
+        }
+
+        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse != true);
+
+        startTime = System::SystemClock().GetMonotonicTimestamp();
+        while (true)
+        {
+            ctx.GetIOContext().DriveIO(); // at least one IO loop is guaranteed
+
+            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(500))
+            {
+                break;
+            }
+        }
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse == true);
     }
 
