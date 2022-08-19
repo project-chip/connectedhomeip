@@ -17,6 +17,7 @@
 #pragma once
 
 #include <lib/core/ScopedNodeId.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
 
