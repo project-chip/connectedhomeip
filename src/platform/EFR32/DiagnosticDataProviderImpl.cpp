@@ -283,12 +283,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             case Inet::InterfaceType::Cellular:
                 ifp->type = EMBER_ZCL_INTERFACE_TYPE_CELLULAR;
                 break;
+            default:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+                break;
             }
         }
         else
         {
-            // Setting the type to EMBER_ZCL_INTERFACE_TYPE_WI_FI since GetInterfaceType returns CHIP_ERROR_NOT_IMPLEMENTED for LWIP
-            ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
             ChipLogError(DeviceLayer, "Failed to get interface type");
         }
 
