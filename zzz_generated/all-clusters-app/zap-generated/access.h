@@ -431,6 +431,7 @@
     257, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
     4294048774, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
+    4294048774, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
@@ -482,6 +483,7 @@
     36, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     38, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
     0, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
+    1, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
@@ -533,6 +535,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

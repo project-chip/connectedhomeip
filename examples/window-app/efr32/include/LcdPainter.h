@@ -23,6 +23,8 @@
 #include "app-common/app-common/zap-generated/cluster-enums.h"
 // clang-format on
 
+#include <lcd.h>
+
 #include <stdint.h>
 
 enum class LcdIcon
@@ -104,7 +106,7 @@ private:
 class LcdPainter
 {
 public:
-    static void Paint(chip::app::Clusters::WindowCovering::Type type, uint16_t lift, uint16_t tilt, LcdIcon icon);
+    static void Paint(SilabsLCD & lcd, chip::app::Clusters::WindowCovering::Type type, uint16_t lift, uint16_t tilt, LcdIcon icon);
 
 private:
     static PixelPainter * GetCoverPainter(chip::app::Clusters::WindowCovering::Type type, uint16_t lift, uint16_t tilt);

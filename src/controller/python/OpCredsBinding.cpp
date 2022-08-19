@@ -321,7 +321,8 @@ void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::C
 ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * context,
                                                          chip::Controller::DeviceCommissioner ** outDevCtrl, FabricId fabricId,
                                                          chip::NodeId nodeId, chip::VendorId adminVendorId,
-                                                         const char * paaTrustStorePath, bool useTestCommissioner)
+                                                         const char * paaTrustStorePath, bool useTestCommissioner,
+                                                         CASEAuthTag * caseAuthTags, uint32_t caseAuthTagLen)
 {
     ChipLogDetail(Controller, "Creating New Device Controller");
 
@@ -357,8 +358,17 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     ReturnErrorCodeIf(!rcac.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
     MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
 
-    err = context->mAdapter->GenerateNOCChain(nodeId, fabricId, chip::kUndefinedCATs, ephemeralKey.Pubkey(), rcacSpan, icacSpan,
-                                              nocSpan);
+    CATValues catValues;
+
+    if ((caseAuthTagLen + 1) > kMaxSubjectCATAttributeCount)
+    {
+        ChipLogError(Controller, "# of CASE Tags exceeds kMaxSubjectCATAttributeCount");
+        return CHIP_ERROR_INVALID_ARGUMENT.AsInteger();
+    }
+
+    memcpy(catValues.values.data(), caseAuthTags, caseAuthTagLen * sizeof(CASEAuthTag));
+
+    err = context->mAdapter->GenerateNOCChain(nodeId, fabricId, catValues, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     Controller::SetupParams initParams;

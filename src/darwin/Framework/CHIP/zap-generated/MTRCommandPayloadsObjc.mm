@@ -8158,5 +8158,40 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+@implementation MTRFaultInjectionClusterFailRandomlyAtFaultParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _type = @(0);
+
+        _id = @(0);
+
+        _percentage = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRFaultInjectionClusterFailRandomlyAtFaultParams alloc] init];
+
+    other.type = self.type;
+    other.id = self.id;
+    other.percentage = self.percentage;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: type:%@; id:%@; percentage:%@; >", NSStringFromClass([self class]), _type, _id, _percentage];
+    return descriptionString;
+}
+
+@end
 
 NS_ASSUME_NONNULL_END

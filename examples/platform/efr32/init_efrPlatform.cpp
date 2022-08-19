@@ -56,20 +56,12 @@ extern "C" {
 #include "sl_mbedtls.h"
 #include "sl_system_init.h"
 
-#if DISPLAY_ENABLED
-#include "lcd.h"
-#endif
-
 void initAntenna(void);
 
 void init_efrPlatform(void)
 {
     sl_system_init();
     sl_mbedtls_init();
-
-#if DISPLAY_ENABLED
-    initLCD();
-#endif
 
 #if EFR32_LOG_ENABLED
     efr32InitLog();
