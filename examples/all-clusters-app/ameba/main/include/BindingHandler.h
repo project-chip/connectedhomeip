@@ -35,5 +35,5 @@ struct BindingCommandData
     chip::ClusterId clusterId;
     bool isGroup = false;
     bool isReadAttribute = false;
-    uint32_t args[3];
+    uint32_t args[5];
 };
