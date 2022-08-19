@@ -79,7 +79,7 @@ class TC_RR_1_1(MatterBaseTest):
         dev_ctrl.fabricAdmin.certificateAuthority.maximizeCertChains = True
 
         # TODO: Do from PICS list. The reflection approach here what a real client would do,
-        #       and it respects that the test says "TH writes 4 entries per endpoint where LabelList is supported"
+        #       and it respects what the test says: "TH writes 4 entries per endpoint where LabelList is supported"
         logging.info("Pre-condition: determine whether any endpoints have UserLabel cluster (ULABEL.S.A0000(LabelList))")
         endpoints_with_user_label_list = await dev_ctrl.ReadAttribute(self.dut_node_id, [Clusters.UserLabel.Attributes.LabelList])
         has_user_labels = len(endpoints_with_user_label_list) > 0
@@ -94,7 +94,7 @@ class TC_RR_1_1(MatterBaseTest):
         for fabric_idx in range(num_fabrics_to_commission):
             for controller_idx in range(num_controllers_per_fabric):
                 all_names.append("RD%d%s" % (fabric_idx + 1, chr(ord('A') + controller_idx)))
-        logging.info("Client names that will be used: %s" % all_names)
+        logging.info(f"Client names that will be used: {all_names}")
         client_list = []
 
         # TODO: Shall we also verify SupportedFabrics attribute, and the CapabilityMinima attribute?
@@ -104,8 +104,7 @@ class TC_RR_1_1(MatterBaseTest):
         asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3)
 
         # Step 1: Commission 5 fabrics with maximized NOC chains
-        logging.info("Step 1: use existing fabric to configure new fabrics so that total is %d fabrics" %
-                     num_fabrics_to_commission)
+        logging.info(f"Step 1: use existing fabric to configure new fabrics so that total is {num_fabrics_to_commission} fabrics")
 
         # Generate Node IDs for subsequent controllers start at 200, follow 200, 300, ...
         node_ids = [200 + (i * 100) for i in range(num_controllers_per_fabric - 1)]
@@ -165,7 +164,7 @@ class TC_RR_1_1(MatterBaseTest):
             asserts.assert_equal(fabric_metadata[0].label, label, "Fabrics[x].label must match what was written")
 
         # Before subscribing, set the NodeLabel to "Before Subscriptions"
-        logging.info("Step 2b: Set BasicInformation.NodeLabel to '%s'" % BEFORE_LABEL)
+        logging.info(f"Step 2b: Set BasicInformation.NodeLabel to {BEFORE_LABEL}")
         await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.Basic.Attributes.NodeLabel(value=BEFORE_LABEL))])
 
         node_label = await self.read_single_attribute(client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.Basic.Attributes.NodeLabel)
@@ -182,10 +181,10 @@ class TC_RR_1_1(MatterBaseTest):
 
             acl = self.build_acl(fabric_number, client_by_name, num_controllers_per_fabric)
 
-            logging.info("Step 3a: Writing ACL entry for fabric %d" % fabric_number)
+            logging.info(f"Step 3a: Writing ACL entry for fabric {fabric_number}")
             await client.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
 
-            logging.info("Step 3b: Validating ACL entry for fabric %d" % fabric_number)
+            logging.info(f"Step 3b: Validating ACL entry for fabric {fabric_number}")
             acl_readback = await self.read_single_attribute(client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.AccessControl.Attributes.Acl)
             fabric_index = 9999
             for entry in acl_readback:
@@ -230,7 +229,7 @@ class TC_RR_1_1(MatterBaseTest):
 
         asserts.assert_equal(len(self._subscriptions), len(client_list), "Must have the right number of subscriptions")
 
-        # Step 6: TODO: Read 9 paths and validate success
+        # Step 6: Read 9 paths and validate success
         logging.info("Step 6: Read 9 paths (first 9 attributes of Basic Information cluster) and validate success")
 
         large_read_contents = [
