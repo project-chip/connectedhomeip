@@ -38,7 +38,9 @@
 - (void)testOnboardingPayloadParser_Manual_NoError
 {
     NSError * error;
-    MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015" error:&error];
+    MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
+                                                                                      ofType:MTROnboardingPayloadTypeManualCode
+                                                                                       error:&error];
 
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
@@ -53,10 +55,53 @@
     XCTAssertNil(payload.rendezvousInformation);
 }
 
+- (void)testOnboardingPayloadParser_Manual_WrongType
+{
+    NSError * error;
+    MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
+                                                                                      ofType:MTROnboardingPayloadTypeQRCode
+                                                                                       error:&error];
+
+    XCTAssertNil(payload);
+    XCTAssertEqual(error.code, MTRErrorCodeInvalidArgument);
+}
+
+- (void)testOnboardingPayloadParser_Admin_NoError
+{
+    NSError * error;
+    MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
+                                                                                      ofType:MTROnboardingPayloadTypeAdmin
+                                                                                       error:&error];
+
+    XCTAssertNotNil(payload);
+    XCTAssertNil(error);
+
+    XCTAssertTrue(payload.hasShortDiscriminator);
+    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 10);
+    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 123456780);
+    XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 1);
+    XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
+    XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowCustom);
+    XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
+    XCTAssertNil(payload.rendezvousInformation);
+}
+
+- (void)testOnboardingPayloadParser_Admin_WrongType
+{
+    NSError * error;
+    MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
+                                                                                      ofType:MTROnboardingPayloadTypeQRCode
+                                                                                       error:&error];
+
+    XCTAssertNil(payload);
+    XCTAssertEqual(error.code, MTRErrorCodeInvalidArgument);
+}
+
 - (void)testOnboardingPayloadParser_QRCode_NoError
 {
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"MT:R5L90MP500K64J00000"
+                                                                                      ofType:MTROnboardingPayloadTypeQRCode
                                                                                        error:&error];
 
     XCTAssertNotNil(payload);
@@ -73,11 +118,23 @@
     XCTAssertEqual([payload.rendezvousInformation unsignedLongValue], MTRDiscoveryCapabilitiesSoftAP);
 }
 
+- (void)testOnboardingPayloadParser_QRCode_WrongType
+{
+    NSError * error;
+    MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"MT:R5L90MP500K64J00000"
+                                                                                      ofType:MTROnboardingPayloadTypeAdmin
+                                                                                       error:&error];
+
+    XCTAssertNil(payload);
+    XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+}
+
 - (void)testOnboardingPayloadParser_NFC_NoError
 {
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser
         setupPayloadForOnboardingPayload:@"MT:R5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0"
+                                  ofType:MTROnboardingPayloadTypeNFC
                                    error:&error];
 
     XCTAssertNotNil(payload);
@@ -92,6 +149,18 @@
     XCTAssertEqual(payload.version.unsignedIntegerValue, 5);
     XCTAssertNotNil(payload.rendezvousInformation);
     XCTAssertEqual([payload.rendezvousInformation unsignedLongValue], MTRDiscoveryCapabilitiesSoftAP);
+}
+
+- (void)testOnboardingPayloadParser_NFC_WrongType
+{
+    NSError * error;
+    MTRSetupPayload * payload = [MTROnboardingPayloadParser
+        setupPayloadForOnboardingPayload:@"MT:R5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0"
+                                  ofType:MTROnboardingPayloadTypeManualCode
+                                   error:&error];
+
+    XCTAssertNil(payload);
+    XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
 }
 
 - (void)testManualParser

@@ -31,6 +31,7 @@ typedef NS_ENUM(NSUInteger, MTROnboardingPayloadType) {
 @interface MTROnboardingPayloadParser : NSObject
 
 + (nullable MTRSetupPayload *)setupPayloadForOnboardingPayload:(NSString *)onboardingPayload
+                                                        ofType:(MTROnboardingPayloadType)type
                                                          error:(NSError * __autoreleasing *)error;
 
 @end
