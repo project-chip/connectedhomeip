@@ -84,6 +84,7 @@ template("chip_data_model") {
                            "*",
                            [
                              "zap_pregenerated_dir",
+                             "zap_clusters_with_custom_implementation",
                              "zap_file",
                              "is_server",
                            ])
@@ -137,8 +138,22 @@ template("chip_data_model") {
                                      [ invoker.zap_file ])
     }
 
+    _cust_impl_clusters = []
+    if (defined(invoker.zap_clusters_with_custom_implementation)) {
+      _cust_impl_clusters = invoker.zap_clusters_with_custom_implementation
+    }
+
     foreach(cluster, _cluster_sources) {
-      if (cluster == "door-lock-server") {
+      _cust_impl = false
+      foreach(ci, _cust_impl_clusters) {
+        if (cluster == ci) {
+          _cust_impl = true
+        }
+      }
+
+      if (_cust_impl) {
+        # do not include any sources, we have a custom implementation for this cluster
+      } else if (cluster == "door-lock-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/door-lock-server-callback.cpp",
           "${_app_root}/clusters/${cluster}/door-lock-server.cpp",
