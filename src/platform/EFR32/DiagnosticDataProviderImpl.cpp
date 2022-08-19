@@ -264,7 +264,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         ifp->name          = CharSpan::fromCharString(ifp->Name);
         ifp->isOperational = true;
         Inet::InterfaceType interfaceType;
-        CHIP_ERROR err = interfaceIterator.GetInterfaceType(interfaceType)
+        CHIP_ERROR err = interfaceIterator.GetInterfaceType(interfaceType);
         if (err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED)
         {
             switch (interfaceType)
