@@ -31,18 +31,6 @@ group("efr32_sdk") {
   public_deps = [ efr32_sdk_target ]
 }
 
-if (chip_enable_openthread) {
-  group("openthread_cli") {
-    if (!use_silabs_thread_lib) {
-      if (chip_openthread_ftd) {
-        public_deps = [ "${sl_openthread_root}:libopenthread-cli-ftd" ]
-      } else {
-        public_deps = [ "${sl_openthread_root}:libopenthread-cli-mtd" ]
-      }
-    }
-  }
-}
-
 if (use_silabs_thread_lib) {
   config("libopenthread-platform_config") {
     include_dirs = [ "${sl_openthread_root}/examples/platforms" ]
@@ -74,7 +62,6 @@ if (use_silabs_thread_lib) {
       "RADIO_CONFIG_DMP_SUPPORT=1",
       "${efr32_board}=1",
       "${efr32_mcu}",
-      "USE_SL_THREAD_CERT_LIB",
       "OPENTHREAD_CORE_CONFIG_PLATFORM_CHECK_FILE=\"openthread-core-efr32-config-check.h\"",
     ]
 
@@ -88,7 +75,6 @@ if (use_silabs_thread_lib) {
 
   source_set("openthread_core_config_efr32") {
     sources = [
-      "${sl_openthread_root}/src/cli/cli_config.h",
       "${sl_ot_efr32_root}/src/src/openthread-core-efr32-config-check.h",
       "${sl_ot_efr32_root}/src/src/openthread-core-efr32-config.h",
     ]
@@ -102,37 +88,39 @@ if (use_silabs_thread_lib) {
   }
 
   source_set("ot-efr32-cert") {
-    sources = [
-      "${sl_openthread_root}/examples/apps/cli/cli_uart.cpp",
-      "${sl_openthread_root}/src/cli/cli.cpp",
-      "${sl_openthread_root}/src/cli/cli.hpp",
-      "${sl_openthread_root}/src/cli/cli_coap.cpp",
-      "${sl_openthread_root}/src/cli/cli_coap.hpp",
-      "${sl_openthread_root}/src/cli/cli_coap_secure.cpp",
-      "${sl_openthread_root}/src/cli/cli_coap_secure.hpp",
-      "${sl_openthread_root}/src/cli/cli_commissioner.cpp",
-      "${sl_openthread_root}/src/cli/cli_commissioner.hpp",
-      "${sl_openthread_root}/src/cli/cli_config.h",
-      "${sl_openthread_root}/src/cli/cli_dataset.cpp",
-      "${sl_openthread_root}/src/cli/cli_dataset.hpp",
-      "${sl_openthread_root}/src/cli/cli_history.cpp",
-      "${sl_openthread_root}/src/cli/cli_history.hpp",
-      "${sl_openthread_root}/src/cli/cli_joiner.cpp",
-      "${sl_openthread_root}/src/cli/cli_joiner.hpp",
-      "${sl_openthread_root}/src/cli/cli_network_data.cpp",
-      "${sl_openthread_root}/src/cli/cli_network_data.hpp",
-      "${sl_openthread_root}/src/cli/cli_output.cpp",
-      "${sl_openthread_root}/src/cli/cli_output.hpp",
-      "${sl_openthread_root}/src/cli/cli_srp_client.cpp",
-      "${sl_openthread_root}/src/cli/cli_srp_client.hpp",
-      "${sl_openthread_root}/src/cli/cli_srp_server.cpp",
-      "${sl_openthread_root}/src/cli/cli_srp_server.hpp",
-      "${sl_openthread_root}/src/cli/cli_tcp.cpp",
-      "${sl_openthread_root}/src/cli/cli_tcp.hpp",
-      "${sl_openthread_root}/src/cli/cli_udp.cpp",
-      "${sl_openthread_root}/src/cli/cli_udp.hpp",
-      "${sl_openthread_root}/src/cli/x509_cert_key.hpp",
-    ]
+    if (enable_openthread_cli) {
+      sources = [
+        "${sl_openthread_root}/examples/apps/cli/cli_uart.cpp",
+        "${sl_openthread_root}/src/cli/cli.cpp",
+        "${sl_openthread_root}/src/cli/cli.hpp",
+        "${sl_openthread_root}/src/cli/cli_coap.cpp",
+        "${sl_openthread_root}/src/cli/cli_coap.hpp",
+        "${sl_openthread_root}/src/cli/cli_coap_secure.cpp",
+        "${sl_openthread_root}/src/cli/cli_coap_secure.hpp",
+        "${sl_openthread_root}/src/cli/cli_commissioner.cpp",
+        "${sl_openthread_root}/src/cli/cli_commissioner.hpp",
+        "${sl_openthread_root}/src/cli/cli_config.h",
+        "${sl_openthread_root}/src/cli/cli_dataset.cpp",
+        "${sl_openthread_root}/src/cli/cli_dataset.hpp",
+        "${sl_openthread_root}/src/cli/cli_history.cpp",
+        "${sl_openthread_root}/src/cli/cli_history.hpp",
+        "${sl_openthread_root}/src/cli/cli_joiner.cpp",
+        "${sl_openthread_root}/src/cli/cli_joiner.hpp",
+        "${sl_openthread_root}/src/cli/cli_network_data.cpp",
+        "${sl_openthread_root}/src/cli/cli_network_data.hpp",
+        "${sl_openthread_root}/src/cli/cli_output.cpp",
+        "${sl_openthread_root}/src/cli/cli_output.hpp",
+        "${sl_openthread_root}/src/cli/cli_srp_client.cpp",
+        "${sl_openthread_root}/src/cli/cli_srp_client.hpp",
+        "${sl_openthread_root}/src/cli/cli_srp_server.cpp",
+        "${sl_openthread_root}/src/cli/cli_srp_server.hpp",
+        "${sl_openthread_root}/src/cli/cli_tcp.cpp",
+        "${sl_openthread_root}/src/cli/cli_tcp.hpp",
+        "${sl_openthread_root}/src/cli/cli_udp.cpp",
+        "${sl_openthread_root}/src/cli/cli_udp.hpp",
+        "${sl_openthread_root}/src/cli/x509_cert_key.hpp",
+      ]
+    }
 
     public_configs = [
       ":openthread_efr32_config",

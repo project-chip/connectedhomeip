@@ -188,6 +188,7 @@ efr32_executable("window_app") {
   if (chip_enable_openthread) {
     deps += [
       "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread:openthread_device",
       "${examples_plat_dir}:efr-matter-shell",
     ]
   }
