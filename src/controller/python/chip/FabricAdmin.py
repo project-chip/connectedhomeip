@@ -102,7 +102,7 @@ class FabricAdmin:
                 raise RuntimeError(f"Provided NodeId {nodeId} collides with an existing controller instance!")
 
         self.logger().warning(
-            f"Allocating new controller with CaIndex: {self._certificateAuthority.caIndex}, FabricId: 0x{self._fabricId:016X}, NodeId: 0x{nodeId:016X}")
+            f"Allocating new controller with CaIndex: {self._certificateAuthority.caIndex}, FabricId: 0x{self._fabricId:016X}, NodeId: 0x{nodeId:016X}, CatTags: {catTags}")
 
         controller = ChipDeviceCtrl.ChipDeviceController(opCredsContext=self._certificateAuthority.GetOpCredsContext(), fabricId=self._fabricId, nodeId=nodeId,
                                                          adminVendorId=self._vendorId, paaTrustStorePath=paaTrustStorePath, useTestCommissioner=useTestCommissioner, fabricAdmin=self, catTags=catTags)

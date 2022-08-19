@@ -40,6 +40,7 @@ import chip.CertificateAuthority
 import copy
 import secrets
 import faulthandler
+import ipdb
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -389,31 +390,28 @@ class BaseTestHelper:
     async def TestControllerCATValues(self, nodeid: int):
         ''' This tests controllers using CAT Values
         '''
-
         # Allocate a new controller instance with a CAT tag.
-        newController = self.fabricAdmin.NewController(nodeId=300, catTags=[0x00010001])
+        newControllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=self.fabricAdmin, adminDevCtrl=self.devCtrl, controllerNodeIds=[300], targetNodeId=nodeid, privilege=None, catTags=[0x0001_0001])
 
         # Read out an attribute using the new controller. It has no privileges, so this should fail with an UnsupportedAccess error.
-        res = await newController.ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
         if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
             self.logger.error(f"1: Received data instead of an error:{res}")
             return False
 
-        # Do a read-modify-write operation on the ACL list to add the CAT tag to the ACL list.
-        aclList = (await self.devCtrl.ReadAttribute(nodeid, [(0, Clusters.AccessControl.Attributes.Acl)]))[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
-        origAclList = copy.deepcopy(aclList)
-        aclList[0].subjects.append(0xFFFFFFFD00010001)
-        await self.devCtrl.WriteAttribute(nodeid, [(0, Clusters.AccessControl.Attributes.Acl(aclList))])
+        # Grant the new controller privilege by adding the CAT tag to the subject.
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=nodeid, targetCatTags=[0x0001_0001])
 
         # Read out the attribute again - this time, it should succeed.
-        res = await newController.ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
         if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
             self.logger.error(f"2: Received something other than data:{res}")
             return False
 
-        # Write back the old entry to reset ACL list back.
-        await self.devCtrl.WriteAttribute(nodeid, [(0, Clusters.AccessControl.Attributes.Acl(origAclList))])
-        newController.Shutdown()
+        # Reset the privilege back to pre-test.
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=None, targetNodeId=nodeid)
+
+        newControllers[0].Shutdown()
 
         return True
 
