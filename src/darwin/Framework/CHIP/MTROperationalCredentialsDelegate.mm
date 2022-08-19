@@ -179,6 +179,8 @@ CHIP_ERROR MTROperationalCredentialsDelegate::CallbackGenerateNOCChain(const chi
     chip::Credentials::DeviceAttestationVendorReservedDeconstructor vendorReserved;
 
     __block chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters;
+    // Dereferencing mCppCommissioner as it would be set to point to a valid Cpp commissioner by now, as we are in the middle of
+    // commissioning
     dispatch_sync(mChipWorkQueue, ^{
         commissioningParameters = mCppCommissioner->GetCommissioningParameters();
     });
@@ -229,7 +231,9 @@ void MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(NSData * op
         return;
     }
 
-    // use ipk and adminSubject from CommissioningParameters if not passed in
+    // use ipk and adminSubject from CommissioningParameters if not passed in.
+    // Dereferencing mCppCommissioner as it would be set to point to a valid Cpp commissioner by now, as we are in the middle of
+    // commissioning
     __block chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters;
     dispatch_sync(mChipWorkQueue, ^{
         commissioningParameters = mCppCommissioner->GetCommissioningParameters();
@@ -260,6 +264,9 @@ void MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(NSData * op
         adminSubjectOptional = commissioningParameters.Value().GetAdminSubject();
     }
 
+    // This could potentially be done as an async operation as a future optimization. But it ultimately calls
+    // DeviceCommissioner::OnDeviceNOCChainGeneration which sends the AddNoc message to the target. The call returns without
+    // blocking as it is.
     CHIP_ERROR err = NOCChainGenerated(CHIP_NO_ERROR, AsByteSpan(operationalCertificate), AsByteSpan(intermediateCertificate),
         AsByteSpan(rootCertificate), ipkOptional, adminSubjectOptional);
 
