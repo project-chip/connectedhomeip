@@ -157,7 +157,7 @@ class DiscoveryFilterType(enum.IntEnum):
 class ChipDeviceController():
     activeList = set()
 
-    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, paaTrustStorePath: str = "", useTestCommissioner: bool = False, fabricAdmin: FabricAdmin = None, name: str = None):
+    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, catTags: typing.List[int] = [], paaTrustStorePath: str = "", useTestCommissioner: bool = False, fabricAdmin: FabricAdmin = None, name: str = None):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         self._ChipStack = builtins.chipStack
@@ -169,9 +169,18 @@ class ChipDeviceController():
 
         devCtrl = c_void_p(None)
 
+        c_catTags = (c_uint32 * len(catTags))()
+
+        for i, item in enumerate(catTags):
+            c_catTags[i] = item
+
+        self._dmLib.pychip_OpCreds_AllocateController.argtypes = [c_void_p, POINTER(
+            c_void_p), c_uint64, c_uint64, c_uint16, c_char_p, c_bool, POINTER(c_uint32), c_uint32]
+        self._dmLib.pychip_OpCreds_AllocateController.restype = c_uint32
+
         res = self._ChipStack.Call(
-            lambda: self._dmLib.pychip_OpCreds_AllocateController(ctypes.c_void_p(
-                opCredsContext), pointer(devCtrl), fabricId, nodeId, adminVendorId, ctypes.c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
+            lambda: self._dmLib.pychip_OpCreds_AllocateController(c_void_p(
+                opCredsContext), pointer(devCtrl), fabricId, nodeId, adminVendorId, c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner, c_catTags, len(catTags))
         )
 
         if res != 0:
@@ -233,7 +242,7 @@ class ChipDeviceController():
             self.devCtrl, self.cbHandleCommissioningCompleteFunct)
 
         self.state = DCState.IDLE
-        self.isActive = True
+        self._isActive = True
 
         # Validate FabricID/NodeID followed from NOC Chain
         self._fabricId = self.GetFabricIdInternal()
@@ -249,12 +258,10 @@ class ChipDeviceController():
 
     @property
     def nodeId(self) -> int:
-        self.CheckIsActive()
         return self._nodeId
 
     @property
     def fabricId(self) -> int:
-        self.CheckIsActive()
         return self._fabricId
 
     @property
@@ -269,11 +276,15 @@ class ChipDeviceController():
     def name(self, new_name: str):
         self._name = new_name
 
+    @property
+    def isActive(self) -> bool:
+        return self._isActive
+
     def Shutdown(self):
         ''' Shuts down this controller and reclaims any used resources, including the bound
             C++ constructor instance in the SDK.
         '''
-        if (self.isActive):
+        if (self._isActive):
             if self.devCtrl != None:
                 self._ChipStack.Call(
                     lambda: self._dmLib.pychip_DeviceController_DeleteDeviceController(
@@ -282,7 +293,7 @@ class ChipDeviceController():
                 self.devCtrl = None
 
             ChipDeviceController.activeList.remove(self)
-            self.isActive = False
+            self._isActive = False
 
     def ShutdownAll():
         ''' Shut down all active controllers and reclaim any used resources.
@@ -304,7 +315,7 @@ class ChipDeviceController():
         ChipDeviceController.activeList.clear()
 
     def CheckIsActive(self):
-        if (not self.isActive):
+        if (not self._isActive):
             raise RuntimeError(
                 "DeviceCtrl instance was already shutdown previously!")
 
