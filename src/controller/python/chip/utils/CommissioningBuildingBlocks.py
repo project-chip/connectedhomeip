@@ -64,7 +64,7 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
     currentAcls = data[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
 
     if len(targetCatTags) != 0:
-        # Convert to a full-qualified 32-bit Node Identifier
+        # Convert to an ACL subject format in CAT range
         targetSubjects = [tag | 0xFFFF_FFFD_0000_0000 for tag in targetCatTags]
     else:
         targetSubjects = [grantedCtrl.nodeId]
