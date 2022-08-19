@@ -714,7 +714,7 @@ def default_matter_test_main(argv=None, **kwargs):
     # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
 
     default_controller = stack.certificate_authorities[0].adminList[0].NewController(nodeId=matter_test_config.controller_node_id,
-                                                                                     paaTrustStorePath=str(matter_test_config.paa_trust_store_path))
+                                                                                     paaTrustStorePath=str(matter_test_config.paa_trust_store_path), catTags=matter_test_config.controller_cat_tags)
     test_config.user_params["default_controller"] = stash_globally(default_controller)
 
     test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
