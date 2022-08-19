@@ -56,6 +56,10 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     else
     {
         size_t * dummy_read_bytes_size = (size_t *) pvPortMalloc(sizeof(size_t));
+        if (!dummy_read_bytes_size)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
         ret                            = getPref_bin_new(key, key, (uint8_t *) value, value_size, dummy_read_bytes_size);
         vPortFree(dummy_read_bytes_size);
     }
