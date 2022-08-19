@@ -114,7 +114,7 @@ class TC_RR_1_1(MatterBaseTest):
         client_list.append(dev_ctrl)
 
         if num_controllers_per_fabric > 1:
-            new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=dev_ctrl.fabricAdmin, adminDevCtrl=dev_ctrl, controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=self.dut_node_id)
+            new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=dev_ctrl.fabricAdmin, adminDevCtrl=dev_ctrl, controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=self.dut_node_id, catTags=[0x0001_0001])
             for controller in new_controllers:
                 controller.name = all_names.pop(0)
             client_list.extend(new_controllers)
@@ -126,14 +126,14 @@ class TC_RR_1_1(MatterBaseTest):
             new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
             new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=admin_index)
 
-            new_admin_ctrl = new_fabric_admin.NewController(nodeId=dev_ctrl.nodeId)
+            new_admin_ctrl = new_fabric_admin.NewController(nodeId=dev_ctrl.nodeId, catTags=[0x0001_0001])
             new_admin_ctrl.name = all_names.pop(0)
             client_list.append(new_admin_ctrl)
             await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(commissionerDevCtrl=dev_ctrl, newFabricDevCtrl=new_admin_ctrl, existingNodeId=self.dut_node_id, newNodeId=self.dut_node_id)
 
             if num_controllers_per_fabric > 1:
                 new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=new_fabric_admin, adminDevCtrl=new_admin_ctrl,
-                                                                                              controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=self.dut_node_id)
+                                                                                              controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=self.dut_node_id, catTags=[0x0001_0001])
                 for controller in new_controllers:
                     controller.name = all_names.pop(0)
 
@@ -376,14 +376,7 @@ class TC_RR_1_1(MatterBaseTest):
         # - Targets field: [{Cluster: 0xFFF1_FC40, DeviceType: 0xFFF1_FC20}, {Cluster: 0xFFF1_FC41, DeviceType: 0xFFF1_FC21}, {Cluster: 0xFFF1_FC02, DeviceType: 0xFFF1_FC42}]
 
         # Administer ACL entry
-        admin_subjects = [0xFFFF_FFFD_0001_0001]
-        # TODO: Replace the below with [0x2000_0000_0000_0001, 0x2000_0000_0000_0002, 0x2000_0000_0000_0003] once controllers
-        #       all have CAT tag 0001_0001 in their NOC
-
-        # Find node ID of all controllers (up to 3) and make them admin
-        for subject_idx in range(min(num_controllers_per_fabric, 3)):
-            subject_name = "RD%d%s" % (fabric_number, chr(ord('A') + subject_idx))
-            admin_subjects.append(client_by_name[subject_name].nodeId)
+        admin_subjects = [0xFFFF_FFFD_0001_0001, 0x2000_0000_0000_0001, 0x2000_0000_0000_0002, 0x2000_0000_0000_0003]
 
         admin_targets = [
             Clusters.AccessControl.Structs.Target(endpoint=0),
@@ -428,4 +421,4 @@ class TC_RR_1_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main(maximize_cert_chains=True)
+    default_matter_test_main(maximize_cert_chains=True, controller_cat_tags=[0x0001_0001])
