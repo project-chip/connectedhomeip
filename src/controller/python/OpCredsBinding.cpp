@@ -415,7 +415,6 @@ ChipError::StorageType pychip_OpCreds_SetMaximallyLargeCertsUsed(OpCredsContext 
     return CHIP_NO_ERROR.AsInteger();
 }
 
-
 void pychip_OpCreds_FreeDelegate(OpCredsContext * context)
 {
     Platform::Delete(context);

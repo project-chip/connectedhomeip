@@ -200,7 +200,6 @@ class CertificateAuthority:
 
         self._maximizeCertChains = enabled
 
-
     def __del__(self):
         self.Shutdown()
 

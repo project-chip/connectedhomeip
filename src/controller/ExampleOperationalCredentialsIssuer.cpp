@@ -146,8 +146,8 @@ CHIP_ERROR IssueX509Cert(uint32_t now, uint32_t validity, ChipDN issuerDn, ChipD
 
             ReturnErrorOnFailure(ConvertX509CertToChipCert(paddedDerSpan, paddedTlvSpan));
 
-            // TODO: REMOVE
-            printf("   TLV: %d DER: %d\n", (int)paddedTlvSpan.size(), (int)paddedDerSpan.size());
+            ChipLogProgress(Controller, "Generated maximized certificate with %u DER bytes, %u TLV bytes",
+                            static_cast<unsigned>(paddedDerSpan.size()), static_cast<unsigned>(paddedTlvSpan.size()));
             if (paddedDerSpan.size() <= kMaxDERCertLength && paddedTlvSpan.size() <= kMaxCHIPCertLength)
             {
                 return CopySpanToMutableSpan(paddedDerSpan, outX509Cert);

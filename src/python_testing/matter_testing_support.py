@@ -133,6 +133,7 @@ class MatterTestConfig:
     discriminator: int = None
     setup_passcode: int = None
     commissionee_ip_address_just_for_testing: str = None
+    maximize_cert_chains: bool = False
 
     qr_code_content: str = None
     manual_code: str = None
@@ -186,8 +187,8 @@ class MatterStackState:
         if (len(self._certificate_authority_manager.activeCaList) == 0):
             self._logger.warn(
                 "Didn't find any CertificateAuthorities in storage -- creating a new CertificateAuthority + FabricAdmin...")
-            ca = self._certificate_authority_manager.NewCertificateAuthority(caIndex = self._config.root_of_trust_index)
-            ca.maximizeCertChains = True
+            ca = self._certificate_authority_manager.NewCertificateAuthority(caIndex=self._config.root_of_trust_index)
+            ca.maximizeCertChains = self._config.maximize_cert_chains
             ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
         elif (len(self._certificate_authority_manager.activeCaList[0].adminList) == 0):
             self._logger.warn("Didn't find any FabricAdmins in storage -- creating a new one...")
@@ -666,7 +667,7 @@ class CommissionDeviceTest(MatterBaseTest):
             raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)
 
 
-def default_matter_test_main(argv=None):
+def default_matter_test_main(argv=None, **kwargs):
     """Execute the test class in a test module.
     This is the default entry point for running a test script file directly.
     In this case, only one test class in a test script is allowed.
@@ -691,6 +692,13 @@ def default_matter_test_main(argv=None):
     tests = None
     if len(matter_test_config.tests) > 0:
         tests = matter_test_config.tests
+
+    # This is required in case we need any testing with maximized certificate chains.
+    # We need *all* issuers from the start, even for default controller, to use
+    # maximized chains, before MatterStackState init, others some stale certs
+    # may not chain properly.
+    if "maximize_cert_chains" in kwargs:
+        matter_test_config.maximize_cert_chains = kwargs["maximize_cert_chains"]
 
     stack = MatterStackState(matter_test_config)
     test_config.user_params["matter_stack"] = stash_globally(stack)

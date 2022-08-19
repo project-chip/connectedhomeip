@@ -311,10 +311,18 @@ class TC_RR_1_1(MatterBaseTest):
         if sub_test_failed:
             asserts.fail("Failed step 7 !")
 
-        # Step 8: TODO: Validate sessions have not changed by doing a read on NodeLabel from all clients
+        # Step 8: Validate sessions have not changed by doing a read on NodeLabel from all clients
+        logging.info("Step 8: Read back NodeLabel directly from all clients")
+        for sub_idx, client in enumerate(client_list):
+            logging.info("Reading NodeLabel (%d/%d) from controller node %s" % (sub_idx + 1, len(client_list), client.name))
+
+            label_readback = await self.read_single_attribute(client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.Basic.Attributes.NodeLabel)
+            asserts.assert_equal(label_readback, AFTER_LABEL)
+
+            # TODO: Compare before/after session IDs. Requires more native changes, and the
+            #       subcription method above is actually good enough we think.
 
         # Step 9: Fill user label list
-
         if has_user_labels and not skip_user_label_cluster_steps:
             await self.fill_user_label_list(dev_ctrl, self.dut_node_id)
         else:
@@ -421,4 +429,4 @@ class TC_RR_1_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    default_matter_test_main(maximize_cert_chains=True)
