@@ -124,6 +124,7 @@ class MatterTestConfig:
     ble_interface_id: int = None
 
     admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
+    case_admin_subject: int = None
     global_test_params: dict = field(default_factory=dict)
     # List of explicit tests to run by name. If empty, all tests will run
     tests: List[str] = field(default_factory=list)
@@ -132,6 +133,7 @@ class MatterTestConfig:
     discriminator: int = None
     setup_passcode: int = None
     commissionee_ip_address_just_for_testing: str = None
+    maximize_cert_chains: bool = False
 
     qr_code_content: str = None
     manual_code: str = None
@@ -144,6 +146,9 @@ class MatterTestConfig:
     dut_node_id: int = _DEFAULT_DUT_NODE_ID
     # Node ID to use for controller/commissioner
     controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
+    # CAT Tags for default controller/commissioner
+    controller_cat_tags: List[int] = None
+
     # Fabric ID which to use
     fabric_id: int = None
     # "Alpha" by default
@@ -185,11 +190,12 @@ class MatterStackState:
         if (len(self._certificate_authority_manager.activeCaList) == 0):
             self._logger.warn(
                 "Didn't find any CertificateAuthorities in storage -- creating a new CertificateAuthority + FabricAdmin...")
-            ca = self._certificate_authority_manager.NewCertificateAuthority()
-            ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=0xFFF1)
+            ca = self._certificate_authority_manager.NewCertificateAuthority(caIndex=self._config.root_of_trust_index)
+            ca.maximizeCertChains = self._config.maximize_cert_chains
+            ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
         elif (len(self._certificate_authority_manager.activeCaList[0].adminList) == 0):
             self._logger.warn("Didn't find any FabricAdmins in storage -- creating a new one...")
-            self._certificate_authority_manager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=0xFFF1)
+            self._certificate_authority_manager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
 
     # TODO: support getting access to chip-tool credentials issuer's data
 
@@ -477,6 +483,13 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
             return False
         config.commissionee_ip_address_just_for_testing = args.ip_addr
 
+    if args.case_admin_subject is None:
+        # Use controller node ID as CASE admin subject during commissioning if nothing provided
+        config.case_admin_subject = config.controller_node_id
+    else:
+        # If a CASE admin subject is provided, then use that
+        config.case_admin_subject = args.case_admin_subject
+
     return True
 
 
@@ -569,6 +582,8 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
 
     commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=_DEFAULT_ADMIN_VENDOR_ID,
                                   metavar="VENDOR_ID", help="VendorID to use during commissioning (default 0x%04X)" % _DEFAULT_ADMIN_VENDOR_ID)
+    commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
+                                  metavar="CASE_ADMIN_SUBJECT", help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
 
     code_group = parser.add_mutually_exclusive_group(required=False)
 
@@ -655,7 +670,7 @@ class CommissionDeviceTest(MatterBaseTest):
             raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)
 
 
-def default_matter_test_main(argv=None):
+def default_matter_test_main(argv=None, **kwargs):
     """Execute the test class in a test module.
     This is the default entry point for running a test script file directly.
     In this case, only one test class in a test script is allowed.
@@ -670,6 +685,10 @@ def default_matter_test_main(argv=None):
     """
     matter_test_config = parse_matter_test_args(argv)
 
+    # Allow override of command line from optional arguments
+    if matter_test_config.controller_cat_tags is None and "controller_cat_tags" in kwargs:
+        matter_test_config.controller_cat_tags = kwargs["controller_cat_tags"]
+
     # Find the test class in the test script.
     test_class = _find_test_class()
 
@@ -681,12 +700,21 @@ def default_matter_test_main(argv=None):
     if len(matter_test_config.tests) > 0:
         tests = matter_test_config.tests
 
+    # This is required in case we need any testing with maximized certificate chains.
+    # We need *all* issuers from the start, even for default controller, to use
+    # maximized chains, before MatterStackState init, others some stale certs
+    # may not chain properly.
+    if "maximize_cert_chains" in kwargs:
+        matter_test_config.maximize_cert_chains = kwargs["maximize_cert_chains"]
+
     stack = MatterStackState(matter_test_config)
     test_config.user_params["matter_stack"] = stash_globally(stack)
 
     # TODO: Steer to right FabricAdmin!
+    # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
+
     default_controller = stack.certificate_authorities[0].adminList[0].NewController(nodeId=matter_test_config.controller_node_id,
-                                                                                     paaTrustStorePath=str(matter_test_config.paa_trust_store_path))
+                                                                                     paaTrustStorePath=str(matter_test_config.paa_trust_store_path), catTags=matter_test_config.controller_cat_tags)
     test_config.user_params["default_controller"] = stash_globally(default_controller)
 
     test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
