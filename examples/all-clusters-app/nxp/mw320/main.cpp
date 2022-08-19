@@ -96,6 +96,7 @@ extern "C" {
 #define SSID_FNAME "ssid_fname"
 #define PSK_FNAME "psk_fname"
 
+#define VERSION_STR	"mw320-2.9.10-001"
 enum
 {
     MCUXPRESSO_WIFI_CLI,
@@ -1199,6 +1200,8 @@ void ShellCLIMain(void * pvParameter)
         ChipLogError(Shell, "Streamer initialization failed: %d", rc);
         return;
     }
+
+    PRINTF("version: [%s] \r\n", VERSION_STR);
 
     // Initialize the SDK components
     init_mw320_sdk();
