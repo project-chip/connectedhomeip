@@ -20,6 +20,7 @@
 #include "OnOffCommands.h"
 #include "LevelControlCommands.h"
 #include "ColorControlCommands.h"
+#include "ThermostatCommands.h"
 #include "app/clusters/bindings/BindingManager.h"
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
@@ -43,9 +44,7 @@ using Shell::streamer_get;
 using Shell::streamer_printf;
 
 Engine sShellSwitchSubCommands;
-
 Engine sShellSwitchGroupsSubCommands;
-
 Engine sShellSwitchBindingSubCommands;
 #endif // defined(ENABLE_CHIP_SHELL)
 
@@ -70,6 +69,9 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
                 break;
             case Clusters::ColorControl::Id:
                 ProcessColorControlUnicastBindingRead(data, binding, peer_device);
+                break;
+            case Clusters::Thermostat::Id:
+                ProcessThermostatUnicastBindingRead(data, binding, peer_device);
                 break;
             }
         }
@@ -98,6 +100,9 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
                 break;
             case Clusters::ColorControl::Id:
                 ProcessColorControlUnicastBindingCommand(data, binding, peer_device);
+                break;
+            case Clusters::Thermostat::Id:
+                ProcessThermostatUnicastBindingCommand(data, binding, peer_device);
                 break;
             }
         }
@@ -225,6 +230,7 @@ static void RegisterSwitchCommands()
         { &OnOffSwitchCommandHandler, "onoff", " Usage: switch onoff <subcommand>" },
         { &LevelControlSwitchCommandHandler, "levelcontrol", " Usage: switch levlecontrol <subcommand>" },
         { &ColorControlSwitchCommandHandler, "colorcontrol", " Usage: switch colorcontrol <subcommand>" },
+        { &ThermostatSwitchCommandHandler, "thermostat", " Usage: switch thermostat <subcommand>" },
         { &GroupsSwitchCommandHandler, "groups", "Usage: switch groups <subcommand>" },
         { &BindingSwitchCommandHandler, "binding", "Usage: switch binding <subcommand>" }
     };
@@ -362,11 +368,28 @@ static void RegisterSwitchCommands()
     };
 
     static const shell_command_t sSwitchThermostatSubCommands[] = {
-        // fill in thermostat commands
+        { &ThermostatHelpHandler, "help", "Usage: switch thermostat <subcommand>" },
+        { &SetpointRaiseLowerSwitchCommandHandler, "SPRL", "setpointraiselower Usage: switch thermostat SPRL <mode> <amount>" },
+        { &ThermostatRead, "read", "Usage : switch thermostat read <attribute>" }
     };
 
-    static const shell_command_t sSwitchReadThermostatSubCommands[] = {
-        // fill in read thermostat attributes commands
+    static const shell_command_t sSwitchThermostatReadSubCommands[] = {
+        { &ThermostatReadHelpHandler, "help", "Usage : switch thermostat read <attribute>" },
+        { &ThermostatReadLocalTemperature, "localtemp", "Read localtemperature attribute" },
+        { &ThermostatReadAbsMinHeatSetpointLimit, "absminHSL", "Read absminheatsetpointlimit attribute" },
+        { &ThermostatReadAbsMaxHeatSetpointLimit, "absmaxHSL", "Read absmaxheatsetpointlimit attribute" },
+        { &ThermostatReadAbsMinCoolSetpointLimit, "absminCSL", "Read absmincoolsetpointlimit attribute" },
+        { &ThermostatReadAbsMaxCoolSetpointLimit, "absmaxCSL", "Read absmaxcoolsetpointlimit attribute" },
+        { &ThermostatReadPiCoolingDemand, "picoolingdemand", "Read picoolingdemand attribute" },
+        { &ThermostatReadPiHeatingDemand, "piheatingdemand", "Read piheatingdemand attribute" },
+        { &ThermostatReadOccupiedCoolingSetpoint, "OCS", "Read occupiedcoolingsetpoint attribute" },
+        { &ThermostatReadOccupiedHeatingSetpoint, "OHS", "Read occupiedheatingsetpoint attribute" },
+        { &ThermostatReadMinHeatSetpointLimit, "minHSL", "Read minheatsetpointlimit attribute" },
+        { &ThermostatReadMaxHeatSetpointLimit, "maxHSL", "Read maxheatsetpointlimit attribute" },
+        { &ThermostatReadMinCoolSetpointLimit, "minCSL", "Read mincoolsetpointlimit attribute" },
+        { &ThermostatReadMaxCoolSetpointLimit, "maxCSL", "Read maxcoolsetpointlimit attribute" },
+        { &ThermostatReadControlSequenceOfOperation, "CSOP", "Read controlsequenceofoperation attribute" },
+        { &ThermostatReadSystemMode, "systemmode", "Read systemmode attribute" },
     };
 
     static const shell_command_t sSwitchGroupsSubCommands[] = { 
@@ -400,6 +423,8 @@ static void RegisterSwitchCommands()
     sShellSwitchLevelControlReadSubCommands.RegisterCommands(sSwitchLevelControlReadSubCommands, ArraySize(sSwitchLevelControlReadSubCommands));
     sShellSwitchColorControlSubCommands.RegisterCommands(sSwitchColorControlSubCommands, ArraySize(sSwitchColorControlSubCommands));
     sShellSwitchColorControlReadSubCommands.RegisterCommands(sSwitchColorControlReadSubCommands, ArraySize(sSwitchColorControlReadSubCommands));
+    sShellSwitchThermostatSubCommands.RegisterCommands(sSwitchThermostatSubCommands, ArraySize(sSwitchThermostatSubCommands));
+    sShellSwitchThermostatReadSubCommands.RegisterCommands(sSwitchThermostatReadSubCommands, ArraySize(sSwitchThermostatReadSubCommands));
     sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, ArraySize(sSwitchGroupsSubCommands));
     sShellSwitchBindingSubCommands.RegisterCommands(sSwitchBindingSubCommands, ArraySize(sSwitchBindingSubCommands));
     sShellSwitchSubCommands.RegisterCommands(sSwitchSubCommands, ArraySize(sSwitchSubCommands));
