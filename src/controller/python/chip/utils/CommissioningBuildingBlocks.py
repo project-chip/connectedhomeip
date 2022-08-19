@@ -93,7 +93,7 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
     await adminCtrl.WriteAttribute(targetNodeId, [(0, Clusters.AccessControl.Attributes.Acl(currentAcls))])
 
 
-async def CreateControllersOnFabric(fabricAdmin: FabricAdmin, adminDevCtrl: ChipDeviceController, controllerNodeIds: typing.List[int], privilege: Clusters.AccessControl.Enums.Privilege, targetNodeId: int) -> typing.List[ChipDeviceController]:
+async def CreateControllersOnFabric(fabricAdmin: FabricAdmin, adminDevCtrl: ChipDeviceController, controllerNodeIds: typing.List[int], privilege: Clusters.AccessControl.Enums.Privilege, targetNodeId: int, catTags: typing.List[int] = []) -> typing.List[ChipDeviceController]:
     ''' Create new ChipDeviceController instances on a given fabric with a specific privilege on a target node.
 
         Args:
@@ -102,12 +102,13 @@ async def CreateControllersOnFabric(fabricAdmin: FabricAdmin, adminDevCtrl: Chip
             controllerNodeIds:          List of desired nodeIds for the controllers.
             privilege:                  The specific ACL privilege to grant to the newly minted controllers.
             targetNodeId:               The Node ID of the target.
+            catTags:                    CAT Tags to include in the NOC of controller
     '''
 
     controllerList = []
 
     for nodeId in controllerNodeIds:
-        newController = fabricAdmin.NewController(nodeId=nodeId)
+        newController = fabricAdmin.NewController(nodeId=nodeId, catTags=catTags)
         await GrantPrivilege(adminDevCtrl, newController, privilege, targetNodeId)
         controllerList.append(newController)
 

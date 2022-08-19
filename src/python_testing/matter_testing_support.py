@@ -146,6 +146,9 @@ class MatterTestConfig:
     dut_node_id: int = _DEFAULT_DUT_NODE_ID
     # Node ID to use for controller/commissioner
     controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
+    # CAT Tags for default controller/commissioner
+    controller_cat_tags: List[int] = None
+
     # Fabric ID which to use
     fabric_id: int = None
     # "Alpha" by default
@@ -681,6 +684,10 @@ def default_matter_test_main(argv=None, **kwargs):
       argv: A list that is then parsed as command line args. If None, defaults to sys.argv
     """
     matter_test_config = parse_matter_test_args(argv)
+
+    # Allow override of command line from optional arguments
+    if matter_test_config.controller_cat_tags is None and "controller_cat_tags" in kwargs:
+        matter_test_config.controller_cat_tags = kwargs["controller_cat_tags"]
 
     # Find the test class in the test script.
     test_class = _find_test_class()

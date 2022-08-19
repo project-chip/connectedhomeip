@@ -362,9 +362,10 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
 
     CATValues catValues;
 
-    if ((caseAuthTagLen + 1) > kMaxSubjectCATAttributeCount)
+    if (caseAuthTagLen > kMaxSubjectCATAttributeCount)
     {
-        ChipLogError(Controller, "# of CASE Tags exceeds kMaxSubjectCATAttributeCount");
+        ChipLogError(Controller, "Too many of CASE Tags (%u) exceeds kMaxSubjectCATAttributeCount",
+                     static_cast<unsigned>(caseAuthTagLen));
         return CHIP_ERROR_INVALID_ARGUMENT.AsInteger();
     }
 
