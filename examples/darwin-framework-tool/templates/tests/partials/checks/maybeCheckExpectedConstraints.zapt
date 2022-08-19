@@ -12,37 +12,37 @@
 
     {{~#if (hasProperty expectedConstraints "format")}}VerifyOrReturn(CheckConstraintFormat("{{>item}}", "", "{{expectedConstraints.format}}"));{{/if}}
 
-    {{~#if (hasProperty expectedConstraints "startsWith")}}VerifyOrReturn(CheckConstraintStartsWith("{{>item}}", {{>actualValue}}, "{{expectedConstraints.startsWith}}"));{{/if}}
+    {{~#if (hasProperty expectedConstraints "startsWith")}}VerifyOrReturn(CheckConstraintStartsWith("{{>item}}", {{>actualValue}}, {{maybeSubPixit expectedConstraints.startsWith type}}));{{/if}}
 
-    {{~#if (hasProperty expectedConstraints "endsWith")}}VerifyOrReturn(CheckConstraintEndsWith("{{>item}}", {{>actualValue}}, "{{expectedConstraints.endsWith}}"));{{/if}}
+    {{~#if (hasProperty expectedConstraints "endsWith")}}VerifyOrReturn(CheckConstraintEndsWith("{{>item}}", {{>actualValue}}, {{maybeSubPixit expectedConstraints.endsWith type}}));{{/if}}
 
-    {{~#if (hasProperty expectedConstraints "isUpperCase")}}VerifyOrReturn(CheckConstraintIsUpperCase("{{>item}}", {{>actualValue}}, {{expectedConstraints.isUpperCase}}));{{/if}}
+    {{~#if (hasProperty expectedConstraints "isUpperCase")}}VerifyOrReturn(CheckConstraintIsUpperCase("{{>item}}", {{>actualValue}}, {{maybeSubPixit expectedConstraints.isUpperCase "bool"}}));{{/if}}
 
-    {{~#if (hasProperty expectedConstraints "isLowerCase")}}VerifyOrReturn(CheckConstraintIsLowerCase("{{>item}}", {{>actualValue}}, {{expectedConstraints.isLowerCase}}));{{/if}}
+    {{~#if (hasProperty expectedConstraints "isLowerCase")}}VerifyOrReturn(CheckConstraintIsLowerCase("{{>item}}", {{>actualValue}}, {{maybeSubPixit expectedConstraints.isLowerCase "bool"}}));{{/if}}
 
-    {{~#if (hasProperty expectedConstraints "isHexString")}}VerifyOrReturn(CheckConstraintIsHexString("{{>item}}", {{>actualValue}}, {{expectedConstraints.isHexString}}));{{/if}}
+    {{~#if (hasProperty expectedConstraints "isHexString")}}VerifyOrReturn(CheckConstraintIsHexString("{{>item}}", {{>actualValue}}, {{maybeSubPixit expectedConstraints.isHexString "bool"}}));{{/if}}
 
-    {{~#if (hasProperty expectedConstraints "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{>item}}", {{>actualValue}}, {{expectedConstraints.minLength}}));{{/if}}
+    {{~#if (hasProperty expectedConstraints "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{>item}}", {{>actualValue}}, {{maybeSubPixit expectedConstraints.minLength "size_t"}}));{{/if}}
 
-    {{~#if (hasProperty expectedConstraints "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{>item}}", {{>actualValue}}, {{expectedConstraints.maxLength}}));{{/if}}
+    {{~#if (hasProperty expectedConstraints "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{>item}}", {{>actualValue}}, {{maybeSubPixit expectedConstraints.maxLength "size_t"}}));{{/if}}
 
     {{~#if (hasProperty expectedConstraints "minValue")}}
-    VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", [{{>actualValue}} {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.minValue type}}));
+    VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", [{{>actualValue}} {{asObjectiveCNumberType "" type true}}Value], {{maybeSubPixit expectedConstraints.minValue type typedLiteral=true useNSNumberForNumbers=true}}));
     {{/if}}
 
     {{~#if (hasProperty expectedConstraints "maxValue")}}
-    VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{>item}}", [{{>actualValue}} {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.maxValue type}}));
+    VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{>item}}", [{{>actualValue}} {{asObjectiveCNumberType "" type true}}Value], {{maybeSubPixit expectedConstraints.maxValue type typedLiteral=true useNSNumberForNumbers=true}}));
     {{/if}}
 
     {{~#if (hasProperty expectedConstraints "contains")}}
       {{#chip_tests_iterate_expected_list expectedConstraints.contains}}
-        VerifyOrReturn(CheckConstraintContains("{{asLowerCamelCase name}}", {{>actualValue}}, {{asTypedLiteral value type}}));
+        VerifyOrReturn(CheckConstraintContains("{{asLowerCamelCase name}}", {{>actualValue}}, {{maybeSubPixit value type typedLiteral=true}}));
       {{/chip_tests_iterate_expected_list}}
     {{/if}}
 
     {{~#if (hasProperty expectedConstraints "excludes")}}
       {{#chip_tests_iterate_expected_list expectedConstraints.excludes}}
-        VerifyOrReturn(CheckConstraintExcludes("{{asLowerCamelCase name}}", {{>actualValue}}, {{asTypedLiteral value type}}));
+        VerifyOrReturn(CheckConstraintExcludes("{{asLowerCamelCase name}}", {{>actualValue}}, {{maybeSubPixit value type typedLiteral=true}}));
       {{/chip_tests_iterate_expected_list}}
     {{/if}}
 
@@ -56,7 +56,7 @@
         {{#if (isLiteralNull expectedConstraints.notValue)}}
           VerifyOrReturn(CheckValueNonNull("{{>item}}", {{>actualValue}}));
         {{else}}
-          VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>actualValue}}, {{asTypedLiteral expectedConstraints.notValue type}}));
+          VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>actualValue}}, {{maybeSubPixit expectedConstraints.notValue type typedLiteral=true}}));
         {{/if}}
     {{/if}}
 {{/if}}

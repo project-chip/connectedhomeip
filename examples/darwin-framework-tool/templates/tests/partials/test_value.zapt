@@ -43,7 +43,9 @@
         [NSNumber numberWith{{asObjectiveCNumberType definedValue type false}}:{{asTypedExpressionFromObjectiveC (chip_tests_config_get_default_value definedValue) type}}];
       {{/if}}
     {{else}}
-      {{#if (isCharString type)}}
+      {{#if (isPixit definedValue)}}
+        {{formatPixit definedValue type useNSStringForStrings=true useNSNumberForNumbers=true}};
+      {{else if (isCharString type)}}
         @"{{definedValue}}";
       {{else if (isOctetString type)}}
         {{> octetStringValue value=definedValue}};

@@ -8,7 +8,8 @@
         "templates/app/helper.js",
         "templates/chip/helper.js",
         "common/ClusterTestGeneration.js",
-        "darwin/Framework/CHIP/templates/helper.js"
+        "darwin/Framework/CHIP/templates/helper.js",
+        "common/ChipTypesHelper.js"
     ],
     "resources": {
         "pics-metafile": "../../../src/app/tests/suites/certification/PICS.yaml",

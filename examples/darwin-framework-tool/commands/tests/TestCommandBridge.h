@@ -23,6 +23,7 @@
 #include <app/tests/suites/commands/system/SystemCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
 #include <app/tests/suites/include/PICSChecker.h>
+#include <app/tests/suites/include/PixitStorage.h>
 #include <app/tests/suites/include/ValueChecker.h>
 #include <lib/support/UnitTestUtils.h>
 #include <map>
@@ -65,6 +66,7 @@ class TestCommandBridge : public CHIPCommandBridge,
                           public ValueChecker,
                           public ConstraintsChecker,
                           public PICSChecker,
+                          public PixitStorage,
                           public LogCommands,
                           public SystemCommands {
 public:
