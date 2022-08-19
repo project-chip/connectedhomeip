@@ -431,6 +431,10 @@ CHIP_ERROR StopWithOnOffSwitchCommandHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+/********************************************************
+ * LevelControl Read switch shell functions
+ *********************************************************/
+
 CHIP_ERROR LevelControlReadHelpHandler(int argc, char ** argv)
 {
     sShellSwitchLevelControlReadSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);

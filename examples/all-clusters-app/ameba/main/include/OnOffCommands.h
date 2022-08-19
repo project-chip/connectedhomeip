@@ -274,6 +274,10 @@ CHIP_ERROR OnWithTimedOffSwitchCommandHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+/********************************************************
+ * OnOff Read switch shell functions
+ *********************************************************/
+
 CHIP_ERROR OnOffReadHelpHandler(int argc, char ** argv)
 {
     sShellSwitchOnOffReadSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);

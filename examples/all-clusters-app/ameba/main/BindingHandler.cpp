@@ -19,6 +19,7 @@
 #include "BindingHandler.h"
 #include "OnOffCommands.h"
 #include "LevelControlCommands.h"
+#include "ColorControlCommands.h"
 #include "app/clusters/bindings/BindingManager.h"
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
@@ -42,8 +43,6 @@ using Shell::streamer_get;
 using Shell::streamer_printf;
 
 Engine sShellSwitchSubCommands;
-Engine sShellSwitchColorControlSubCommands;
-Engine sShellSwitchColorControlReadSubCommands;
 
 Engine sShellSwitchGroupsSubCommands;
 
@@ -69,6 +68,9 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
             case Clusters::LevelControl::Id:
                 ProcessLevelControlUnicastBindingRead(data, binding, peer_device);
                 break;
+            case Clusters::ColorControl::Id:
+                ProcessColorControlUnicastBindingRead(data, binding, peer_device);
+                break;
             }
         }
     }
@@ -81,6 +83,7 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
             case Clusters::OnOff::Id:
                 ProcessOnOffGroupBindingCommand(data, binding);
                 break;
+            //TODO: Add other clusters for group commands
             }
         }
         else if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup)
@@ -92,6 +95,9 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
                 break;
             case Clusters::LevelControl::Id:
                 ProcessLevelControlUnicastBindingCommand(data, binding, peer_device);
+                break;
+            case Clusters::ColorControl::Id:
+                ProcessColorControlUnicastBindingCommand(data, binding, peer_device);
                 break;
             }
         }
@@ -217,7 +223,8 @@ static void RegisterSwitchCommands()
     static const shell_command_t sSwitchSubCommands[] = {
         { &SwitchHelpHandler, "help", "Usage: switch <subcommand>" },
         { &OnOffSwitchCommandHandler, "onoff", " Usage: switch onoff <subcommand>" },
-        { &LevelControlSwitchCommandHandler, "levelcontrol", " Usage: switch onoff <subcommand>" },
+        { &LevelControlSwitchCommandHandler, "levelcontrol", " Usage: switch levlecontrol <subcommand>" },
+        { &ColorControlSwitchCommandHandler, "colorcontrol", " Usage: switch colorcontrol <subcommand>" },
         { &GroupsSwitchCommandHandler, "groups", "Usage: switch groups <subcommand>" },
         { &BindingSwitchCommandHandler, "binding", "Usage: switch binding <subcommand>" }
     };
@@ -230,7 +237,7 @@ static void RegisterSwitchCommands()
         { &OffWithEffectSwitchCommandHandler, "offWE", "off-with-effect Usage: switch onoff offWE <EffectId> <EffectVariant>" },
         { &OnWithRecallGlobalSceneSwitchCommandHandler, "onWRGS", "on-with-recall-global-scene Usage: switch onoff onWRGS" },
         { &OnWithTimedOffSwitchCommandHandler, "onWTO", "on-with-timed-off Usage: switch onoff onWTO <OnOffControl> <OnTime> <OffWaitTime>" },
-        { &OnOffRead, "read", "Usage : switch levelcontrol read <attributeId>" }
+        { &OnOffRead, "read", "Usage : switch levelcontrol read <attribute>" }
     };
 
     static const shell_command_t sSwitchOnOffReadSubCommands[] = {
@@ -243,7 +250,6 @@ static void RegisterSwitchCommands()
     };
 
     static const shell_command_t sSwitchLevelControlSubCommands[] = {
-        // fill in level control commands
         { &LevelControlHelpHandler, "help", "Usage: switch levelcontrol <subcommand>" },
         { &MoveToLevelSwitchCommandHandler, "movetolevel", "movetolevel Usage: switch levelcontrol movetolevel <level> <transitiontime> <optionsmask> <optionsoverride>" },
         { &MoveSwitchCommandHandler, "move", "move Usage: switch levelcontrol move <movemode> <rate> <optionsmask> <optionsoverride>" },
@@ -253,11 +259,10 @@ static void RegisterSwitchCommands()
         { &MoveWithOnOffSwitchCommandHandler, "MWOO", "movewithonoff Usage: switch levelcontrol MWOO <movemode> <rate> <optionsmask> <optionsoverride>" },
         { &StepWithOnOffSwitchCommandHandler, "stepWOO", "stepwithonoff Usage: switch levelcontrol stepWOO <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
         { &StopWithOnOffSwitchCommandHandler, "stopWOO", "stopwithonoff Usage: switch levelcontrol stopWOO <optionsmask> <optionsoverride>" },
-        { &LevelControlRead, "read", "Usage : switch levelcontrol read <attributeId>" }
+        { &LevelControlRead, "read", "Usage : switch levelcontrol read <attribute>" }
     };
 
     static const shell_command_t sSwitchLevelControlReadSubCommands[] = {
-        // fill in read level control attributes commands
         { &LevelControlReadHelpHandler, "help", "Usage : switch levelcontrol read <attribute>" },
         { &LevelControlReadCurrentLevel, "currentlevel", "Read currentlevel attribute" },
         { &LevelControlReadRemainingTime, "remainingtime", "Read remainingtime attribute" },
@@ -276,11 +281,84 @@ static void RegisterSwitchCommands()
     };
 
     static const shell_command_t sSwitchColorControlSubCommands[] = {
-        // fill in color control commands
+        { &ColorControlHelpHandler, "help", "Usage: switch colorcontrol <subcommand>" },
+        { &MoveToHueCommandHandler, "movetohue", "movetohue Usage: switch colorcontrol movetohue <hue> <direction> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveHueCommandHandler, "movehue", "movehue Usage: switch colorcontrol movehue <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &StepHueCommandHandler, "stephue", "stephue Usage: switch colorcontrol stephue <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveToSaturationCommandHandler, "movetosat", "movetosaturation Usage: switch colorcontrol movetosat <saturation> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveSaturationCommandHandler, "movesat", "movesaturation Usage: switch colorcontrol movesat <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &StepSaturationCommandHandler, "stepsat", "stepsaturation Usage: switch colorcontrol stepsat <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveToHueAndSaturationCommandHandler, "movetoHS", "movetohueandsaturation Usage: switch colorcontrol movetoHS <hue> <saturation> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveToColorCommandHandler, "movetocolor", "movetocolor Usage: switch colorcontrol movetocolor <colorx> <colory> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveColorCommandHandler, "movecolor", "movecolor Usage: switch colorcontrol movecolor <ratex> <ratey> <optionsmask> <optionsoverride>" },
+        { &StepColorCommandHandler, "stepcolor", "stepcolor Usage: switch colorcontrol stepcolor <stepx> <stepy> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveToColorTemperatureCommandHandler, "movetoCT", "movetocolortemperature Usage: switch colorcontrol movetoCT <colortempmireds> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &EnhancedMoveToHueCommandHandler, "Emovetohue", "enhancedmovetohue Usage: switch colorcontrol Emovetohue <enhancedhue> <direction> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &EnhancedMoveHueCommandHandler, "Emovehue", "enhancedmovehue Usage: switch colorcontrol Emovehue <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &EnhancedStepHueCommandHandler, "Estephue", "enhancedstephue Usage: switch colorcontrol Estephue <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &EnhancedMoveToHueAndSaturationCommandHandler, "EmovetoHS", "enhancedmovetohueandsaturation Usage: switch colorcontrol EmovetoHS <enhancedhue> <saturation> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &ColorLoopSetCommandHandler, "colorloopset", "colorloopset Usage: switch colorcontrol colorloopset <updateflags> <action> <direction> <time> <starhue> <optionsmask> <optionsoverride>" },
+        { &StopMoveStepCommandHandler, "stopmovestep", "stopmovestep Usage: switch colorcontrol stopmovestep <optionsmask> <optionsoverride>" },
+        { &MoveColorTemperatureCommandHandler, "moveCT", "movecolortemperature Usage: switch colorcontrol moveCT <movemode> <rate> <colortempminmireds> <colortempmaxmireds> <optionsmask> <optionsoverride>" },
+        { &StepColorTemperatureCommandHandler, "stepCT", "stepcolortemperature Usage: switch colorcontrol stepCT <stepmode> <stepsize> <transitiontime> <colortempminmireds> <colortempmaxmireds> <optionsmask> <optionsoverride>" },
+        { &ColorControlRead, "read", "Usage : switch colorcontrol read <attribute>" }
     };
 
-    static const shell_command_t sSwitchReadColorControlSubCommands[] = {
+    static const shell_command_t sSwitchColorControlReadSubCommands[] = {
         // fill in read color control attributes commands
+        { &ColorControlReadHelpHandler, "help", "Usage : switch colorcontrol read <attribute>" },
+        { &ColorControlReadCurrentHue, "currenthue", "Read currenthue attribute" },
+        { &ColorControlReadCurrentSaturation, "currentsat", "Read currentsaturaion attribute" },
+        { &ColorControlReadRemainingTime, "remaintime", "Read remainingtime attribute" },
+        { &ColorControlReadCurrentX, "currentx", "Read currentx attribute" },
+        { &ColorControlReadCurrentY, "currenty", "Read currenty attribute" },
+        { &ColorControlReadDriftCompensation, "driftcomp", "Read driftcompensation attribute" },
+        { &ColorControlReadCompensationText, "comptext", "Read compensationtext attribute" },
+        { &ColorControlReadColorTemperature, "colortemp", "Read colortemperature attribute" },
+        { &ColorControlReadColorMode, "colormode", "Read colormode attribute" },
+        { &ColorControlReadOptions, "options", "Read options attribute" },
+        { &ColorControlReadNumberOfPrimaries, "noofprimaries", "Read numberofprimaries attribute" },
+        { &ColorControlReadPrimary1X, "primary1x", "Read primary1x attribute" },
+        { &ColorControlReadPrimary1Y, "primary1y", "Read primary1y attribute" },
+        { &ColorControlReadPrimary1Intensity, "primary1intensity", "Read primary1intensity attribute" },
+        { &ColorControlReadPrimary2X, "primary2x", "Read primary2x attribute" },
+        { &ColorControlReadPrimary2Y, "primary2y", "Read primary2y attribute" },
+        { &ColorControlReadPrimary2Intensity, "primary2intensity", "Read primary2intensity attribute" },
+        { &ColorControlReadPrimary3X, "primary3x", "Read primary3x attribute" },
+        { &ColorControlReadPrimary3Y, "primary3y", "Read primary3y attribute" },
+        { &ColorControlReadPrimary3Intensity, "primary3intensity", "Read primary3intensity attribute" },
+        { &ColorControlReadPrimary4X, "primary4x", "Read primary4x attribute" },
+        { &ColorControlReadPrimary4Y, "primary4y", "Read primary4y attribute" },
+        { &ColorControlReadPrimary4Intensity, "primary4intensity", "Read primary4intensity attribute" },
+        { &ColorControlReadPrimary5X, "primary5x", "Read primary5x attribute" },
+        { &ColorControlReadPrimary5Y, "primary5y", "Read primary5y attribute" },
+        { &ColorControlReadPrimary5Intensity, "primary5intensity", "Read primary5intensity attribute" },
+        { &ColorControlReadPrimary6X, "primary6x", "Read primary6x attribute" },
+        { &ColorControlReadPrimary6Y, "primary6y", "Read primary6y attribute" },
+        { &ColorControlReadPrimary6Intensity, "primary6intensity", "Read primary6intensity attribute" },
+        { &ColorControlReadWhitePointX, "whitepointx", "Read whitepointx attribute" },
+        { &ColorControlReadWhitePointY, "whitepointy", "Read whitepointy attribute" },
+        { &ColorControlReadColorPointRX, "colorpointrx", "Read colorpointrx attribute" },
+        { &ColorControlReadColorPointRY, "colorpointry", "Read colorpointry attribute" },
+        { &ColorControlReadColorPointRIntensity, "colorpointrintensity", "Read colorpointrintensity attribute" },
+        { &ColorControlReadColorPointGX, "colorpointgx", "Read colorpointgx attribute" },
+        { &ColorControlReadColorPointGY, "colorpointgy", "Read colorpointgy attribute" },
+        { &ColorControlReadColorPointGIntensity, "colorpointgintensity", "Read colorpointgintensity attribute" },
+        { &ColorControlReadColorPointBX, "colorpointbx", "Read colorpointbx attribute" },
+        { &ColorControlReadColorPointBY, "colorpointby", "Read colorpointby attribute" },
+        { &ColorControlReadColorPointBIntensity, "colorpointbintensity", "Read colorpointbintensity attribute" },
+        { &ColorControlReadEnhancedCurrentHue, "Ecurrenthue", "Read enhancedcurrenthue attribute" },
+        { &ColorControlReadEnhancedColorMode, "Ecolormode", "Read enhancedcolormode attribute" },
+        { &ColorControlReadColorLoopActive, "colorloopactive", "Read colorloopactive attribute" },
+        { &ColorControlReadColorLoopDirection, "colorloopdirection", "Read colorloopdirection attribute" },
+        { &ColorControlReadColorLoopTime, "colorlooptime", "Read colorlooptime attribute" },
+        { &ColorControlReadColorLoopStartEnhancedHue, "colorloopstartenhancedhue", "Read colorloopstartenhancedHue attribute" },
+        { &ColorControlReadColorLoopStoredEnhancedHue, "colorloopstoredenhancedhue", "Read colorloopstoredenhancedHue attribute" },
+        { &ColorControlReadColorCapabilities, "colorcapabilities", "Read colorcapabilities attribute" },
+        { &ColorControlReadColorTempPhysicalMinMireds, "colortempphyminmireds", "Read colortempphysicalminmireds attribute" },
+        { &ColorControlReadColorTempPhysicalMaxMireds, "colortempphymaxmireds", "Read colortempphysicalmaxmireds attribute" },
+        { &ColorControlReadCoupleColorTempToLevelMinMireds, "CCTTMM", "Read couplecolortemptolevelminmireds attribute" },
+        { &ColorControlReadStartUpColorTemperatureMireds, "SUCTM", "Read startupcolortempmireds attribute" },
     };
 
     static const shell_command_t sSwitchThermostatSubCommands[] = {
@@ -320,6 +398,8 @@ static void RegisterSwitchCommands()
     sShellSwitchOnOffReadSubCommands.RegisterCommands(sSwitchOnOffReadSubCommands, ArraySize(sSwitchOnOffReadSubCommands));
     sShellSwitchLevelControlSubCommands.RegisterCommands(sSwitchLevelControlSubCommands, ArraySize(sSwitchLevelControlSubCommands));
     sShellSwitchLevelControlReadSubCommands.RegisterCommands(sSwitchLevelControlReadSubCommands, ArraySize(sSwitchLevelControlReadSubCommands));
+    sShellSwitchColorControlSubCommands.RegisterCommands(sSwitchColorControlSubCommands, ArraySize(sSwitchColorControlSubCommands));
+    sShellSwitchColorControlReadSubCommands.RegisterCommands(sSwitchColorControlReadSubCommands, ArraySize(sSwitchColorControlReadSubCommands));
     sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, ArraySize(sSwitchGroupsSubCommands));
     sShellSwitchBindingSubCommands.RegisterCommands(sSwitchBindingSubCommands, ArraySize(sSwitchBindingSubCommands));
     sShellSwitchSubCommands.RegisterCommands(sSwitchSubCommands, ArraySize(sSwitchSubCommands));
