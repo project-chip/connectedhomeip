@@ -73,7 +73,7 @@ class FabricAdmin:
         self._isActive = True
         self._activeControllers = []
 
-    def NewController(self, nodeId: int = None, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
+    def NewController(self, nodeId: int = None, paaTrustStorePath: str = "", useTestCommissioner: bool = False, catTags: List[int] = []):
         ''' Create a new chip.ChipDeviceCtrl.ChipDeviceController instance on this fabric.
 
             When vending ChipDeviceController instances on a given fabric, each controller instance
@@ -85,12 +85,13 @@ class FabricAdmin:
 
             paaTrustStorePath:      Path to the PAA trust store. If one isn't provided, a suitable default is selected.
             useTestCommissioner:    If a test commmisioner is to be created.
+            catTags:			    A list of 32-bit CAT tags that will added to the NOC generated for this controller.
         '''
         if (not(self._isActive)):
             raise RuntimeError(
                 f"FabricAdmin object was previously shutdown and is no longer valid!")
 
-        nodeIdList = [controller.nodeId for controller in self._activeControllers]
+        nodeIdList = [controller.nodeId for controller in self._activeControllers if controller.isActive]
         if (nodeId is None):
             if (len(nodeIdList) != 0):
                 nodeId = max(nodeIdList) + 1
@@ -103,8 +104,8 @@ class FabricAdmin:
         self.logger().warning(
             f"Allocating new controller with CaIndex: {self._certificateAuthority.caIndex}, FabricId: 0x{self._fabricId:016X}, NodeId: 0x{nodeId:016X}")
 
-        controller = ChipDeviceCtrl.ChipDeviceController(
-            self._certificateAuthority.GetOpCredsContext(), self._fabricId, nodeId, self._vendorId, paaTrustStorePath, useTestCommissioner, fabricAdmin=self)
+        controller = ChipDeviceCtrl.ChipDeviceController(opCredsContext=self._certificateAuthority.GetOpCredsContext(), fabricId=self._fabricId, nodeId=nodeId,
+                                                         adminVendorId=self._vendorId, paaTrustStorePath=paaTrustStorePath, useTestCommissioner=useTestCommissioner, fabricAdmin=self, catTags=catTags)
 
         self._activeControllers.append(controller)
         return controller

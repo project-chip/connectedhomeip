@@ -42,6 +42,18 @@ tests:
 
     - label: "TH reads the FeatureMap from DUT"
       PICS:
+          " !DRLK.S.F00 && !DRLK.S.F01 && !DRLK.S.F02 && !DRLK.S.F04 &&
+          !DRLK.S.F05 && !DRLK.S.F06 && !DRLK.S.F07 && !DRLK.S.F08 &&
+          !DRLK.S.F10 && !DRLK.S.F11 "
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label: "TH reads the FeatureMap from DUT"
+      PICS:
           DRLK.S.F00 || DRLK.S.F01 || DRLK.S.F02 || DRLK.S.F04 || DRLK.S.F05 ||
           DRLK.S.F06 || DRLK.S.F07 || DRLK.S.F08 || DRLK.S.F10 || DRLK.S.F11
       command: "readAttribute"
@@ -49,7 +61,7 @@ tests:
       response:
           constraints:
               type: bitmap32
-              minValue: 0
+              minValue: 1
               maxValue: 4095
 
     - label: "TH reads AttributeList from DUT"
