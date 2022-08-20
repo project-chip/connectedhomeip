@@ -43,9 +43,8 @@ tests:
       disabled: true
 
     - label: "Read EndpointLists attribute"
-      PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          ./chip-tool bridgedactions read endpoint-list 1 1
+          ./chip-tool actions read endpoint-lists 1 1
 
           On TH(chip-tool), verify the EndpointListStructs in TH Log:
           [1658426570.716289][16527:16532] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3768747568
@@ -79,7 +78,7 @@ tests:
     - label: "Read EndpointLists attribute again"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          ./chip-tool bridgedactions read endpoint-list 1 1
+          ./chip-tool actions read endpoint-lists 1 1
 
           On TH(chip-tool), verify the EndpointListStructs in below Log:
           [1658408033.786811][14495:14500] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3742844648
@@ -160,7 +159,7 @@ tests:
     - label: "Read EndpointLists attribute again"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          ./chip-tool bridgedactions read endpoint-list 1 1
+          ./chip-tool actions read endpoint-lists 1 1
 
           On TH(chip-tool), verify the EndpointListStructs
           [1658408033.786811][14495:14500] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3742844648
@@ -182,7 +181,7 @@ tests:
           [1658408033.788278][14495:14500] CHIP:TOO:      }
       disabled: true
 
-    - label: "compare result of step 2g to what was read in step 2e"
+    - label: "compare result of step 2g to what was read in step 2d"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
           compare result of step 2g to what was read in step 2d, Verify one EP (EP 3 in this case) has been moved from one EndpointListStruct to another EndpointListStruct
@@ -199,7 +198,7 @@ tests:
     - label: "Read EndpointLists attribute again"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
-          ./chip-tool bridgedactions read endpoint-list 1 1
+          ./chip-tool actions read endpoint-lists 1 1
 
           On TH(chip-tool), verify the EndpointListStructs
           [1658426959.409374][16560:16565] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3768747568
@@ -213,7 +212,7 @@ tests:
           [1658426959.409755][16560:16565] CHIP:TOO:      }
       disabled: true
 
-    - label: "compare result of step 2j to what was read in step 2h"
+    - label: "compare result of step 2j to what was read in step 2g"
       PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
           compare result of step 2j to what was read in step 2g, Verify one EndpointListStruct (the 2nd one in this example) got removed while the other one(s) did not change
@@ -231,7 +230,7 @@ tests:
     - label: "Read EndpointLists attribute again"
       PICS: ACT.S.A0001 && ACT.S.M.OverlappingEndpointLists
       verification: |
-          ./chip-tool bridgedactions read endpoint-list 1 1
+          ./chip-tool actions read endpoint-lists 1 1
 
           On TH(chip-tool), verify the EndpointListStructs
           1658427088.316681][16578:16583] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 3768747568
@@ -268,7 +267,7 @@ tests:
     - label: "Read ActionList attribute"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          ./chip-tool bridgedactions read action-list 1 1
+          ./chip-tool actions read action-list 1 1
 
           Verify  ActionStructs in TH(chip-tool) Log:
           [1658479958.699434][26130:26135] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
@@ -302,7 +301,7 @@ tests:
     - label: "Read ActionList attribute again"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          ./chip-tool bridgedactions read action-list 1 1
+          ./chip-tool actions read action-list 1 1
 
           Verify  ActionStructs in TH(chip-tool) Log:
           [1658480004.064867][26153:26158] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
@@ -384,7 +383,7 @@ tests:
     - label: "Read ActionList attribute again"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          ./chip-tool bridgedactions read action-list 1 1
+          ./chip-tool actions read action-list 1 1
 
           Verify  ActionStructs in TH(chip-tool) Log:
           [1658480039.164683][26172:26177] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
@@ -415,7 +414,7 @@ tests:
     - label: "Read ActionList attribute again"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          ./chip-tool bridgedactions read action-list 1 1
+          ./chip-tool actions read action-list 1 1
 
           Verify  ActionStructs in TH(chip-tool) Log:
           [1658480059.199268][26178:26183] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
@@ -454,7 +453,7 @@ tests:
     - label: "Read ActionList attribute"
       PICS: ACT.S.A0000
       verification: |
-          ./chip-tool bridgedactions read action-list 1 1
+          ./chip-tool actions read action-list 1 1
 
           Verify  ActionStructs in TH(chip-tool) Log:
           [1658480080.135069][26185:26190] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 198994220
@@ -481,7 +480,7 @@ tests:
       verification: |
           To subscribe StateChanged event follow below steps
           1) ./chip-tool interactive start
-          2) bridgedactions subscribe-event action-failed 2 30 1 0
+          2) actions subscribe-event action-failed 2 30 1 0
           Verify in TH Log:
           [1659962630.453221][25381:25386] CHIP:EM: Removed CHIP MessageCounter:65903257 from RetransTable on exchange 50035i
           [1659962630.453246][25381:25386] CHIP:DMG: ReportDataMessage =
@@ -506,7 +505,7 @@ tests:
           [1659962630.456551][25381:25386] CHIP:DMG: }
           [1659962630.456563][25381:25386] CHIP:DMG: Subscription established with SubscriptionID = 0x78f0a04c MinInterval = 0s MaxInterval = 100s Peer = 01:0000000000000001
 
-          3) bridgedactions  instant-action  0x1001 1 1
+          3) actions  instant-action  0x1001 1 1
 
           Verify in TH Log
 
@@ -524,7 +523,7 @@ tests:
       verification: |
           Only InstantActions  command is supported
 
-          ./chip-tool bridgedactions  instant-action  0x1001 1 1
+          ./chip-tool actions  instant-action  0x1001 1 1
 
           Verify in TH Log
 

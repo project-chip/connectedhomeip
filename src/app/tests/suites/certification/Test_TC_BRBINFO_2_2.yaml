@@ -21,6 +21,19 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          1. DUT and TH can interact with each other. DUT is commissioned.
+
+          2. TH reads SoftwareVersion attribute from DUT and saves for future use
+
+          3. TH reads Reachable attribute from DUT and saves for future use
+
+          4. TH subscribes to StartUp, ShutDown, ReachableChanged and Leave events on the Basic cluster of the DUT
+
+          5. TH saves the FabricIndex during commissioning
+      disabled: true
+
     - label:
           "Reboot the DUT (i.e. restart by power cycle, not by making it factory
           new) TH receives the StartUp event from DUT"

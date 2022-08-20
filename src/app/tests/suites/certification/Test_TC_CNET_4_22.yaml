@@ -26,6 +26,30 @@ config:
     endpoint: 0
 
 tests:
+    - label: "DUT supports CNET.S.F01(TH)"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "DUT has a Network Commissioning cluster on endpoint
+          PIXIT.CNET.ENDPOINT_THREAD with FeatureMap attribute of 2"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label: "DUT is commissioned on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "TH can communicate with the DUT on
+          PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
     - label:
           "TH sends ScanNetworks command to the DUT with the SSID field omitted
           and the Breadcrumb field set to 1"
