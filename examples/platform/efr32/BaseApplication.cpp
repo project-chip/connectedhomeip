@@ -391,8 +391,10 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             CancelFunctionTimer();
             mFunction = kFunction_NoneSelected;
 
+#ifdef DISPLAY_ENABLED
             // TOGGLE QRCode/LCD demo UI
             slLCD.ToggleQRCode();
+#endif
 
 #ifdef SL_WIFI
             if (!ConnectivityMgr().IsWiFiStationProvisioned())
