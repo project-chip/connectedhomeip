@@ -26,7 +26,11 @@ config:
 tests:
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
-          verification step to be updated.
+          DUT
+          sudo ./chip-all-clusters-app
+
+          TH1
+          ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
       disabled: true
 
     - label:
@@ -88,9 +92,9 @@ tests:
           888] Targets field: [{Cluster: 55}, {Endpoint: 66}]"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
            { "privilege": 1, "authMode": 3, "subjects": [111,222,333,444], "targets": [{"cluster":11 , "endpoint":22, "deviceType": null}]},
-           { "privilege": 3, "authMode": 3, "subjects": [555,666,777,888], "targets": [{"cluster": 55, "endpoint": 66, "deviceType":null }]}]" 1 0
+           { "privilege": 3, "authMode": 3, "subjects": [555,666,777,888], "targets": [{"cluster": 55, "endpoint": 66, "deviceType":null }]}]' 1 0
           On TH1(Chiptool), Verify Successfully AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 3 elements
           [1658323877.660699][2502:2507] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1658323877.660829][2502:2507] CHIP:DMG: WriteResponseMessage =
@@ -235,7 +239,7 @@ tests:
           666, 555] Targets field: [{Cluster: 88}, {Endpoint: 77}]"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 4, "authMode": 2, "subjects": [444,333,222,111], "targets": [{"cluster":44 , "endpoint":33, "deviceType":null}]},{ "privilege":4 , "authMode":3, "subjects": [888,777,666,555], "targets": [{"cluster": 88, "endpoint": 77, "deviceType":null}]}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 4, "authMode": 2, "subjects": [444,333,222,111], "targets": [{"cluster":44 , "endpoint":33, "deviceType":null}]},{ "privilege":4 , "authMode":3, "subjects": [888,777,666,555], "targets": [{"cluster": 88, "endpoint": 77, "deviceType":null}]}]' 1 0
 
           On TH1(Chiptool) , Verify Successfully AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 3 elements
           1658226959.554674][4736:4741] CHIP:DMG:        AttributeStatusIBs =
@@ -377,7 +381,7 @@ tests:
           Endpoint: 66}, {Cluster: 77, DeviceType: 88}]"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 1, "authMode": 2, "subjects": [111,222,333,444], "targets":[{ "cluster": 11, "endpoint": 22, "deviceType": null },{ "cluster": 33, "endpoint": null, "deviceType": 44 }]}, { "privilege": 3, "authMode": 3, "subjects": [555,666,777,888], "targets":[{ "cluster": 55, "endpoint": 66, "deviceType": null },{ "cluster": 77, "endpoint": null, "deviceType": 88 }]}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 1, "authMode": 2, "subjects": [111,222,333,444], "targets":[{ "cluster": 11, "endpoint": 22, "deviceType": null },{ "cluster": 33, "endpoint": null, "deviceType": 44 }]}, { "privilege": 3, "authMode": 3, "subjects": [555,666,777,888], "targets":[{ "cluster": 55, "endpoint": 66, "deviceType": null },{ "cluster": 77, "endpoint": null, "deviceType": 88 }]}]' 1 0
             On TH1(Chiptool), Verify the  Successfully to acl attribute with a  value is list of AccessControlEntryStruct containing 3 elements
           1657276276.708941][2297:2302] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1657276276.709021][2297:2302] CHIP:DMG: WriteResponseMessage =
@@ -535,7 +539,7 @@ tests:
           DeviceType: 88}]"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 1, "authMode": 2, "subjects": [], "targets":[{ "cluster": 11, "endpoint": 22, "deviceType": null },{ "cluster": 33, "endpoint": null, "deviceType": 44 }]}, { "privilege": 3, "authMode": 3, "subjects": [], "targets":[{ "cluster": 55, "endpoint": 66, "deviceType": null },{ "cluster": 77, "endpoint": null, "deviceType": 88 }]}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 1, "authMode": 2, "subjects": [], "targets":[{ "cluster": 11, "endpoint": 22, "deviceType": null },{ "cluster": 33, "endpoint": null, "deviceType": 44 }]}, { "privilege": 3, "authMode": 3, "subjects": [], "targets":[{ "cluster": 55, "endpoint": 66, "deviceType": null },{ "cluster": 77, "endpoint": null, "deviceType": 88 }]}]' 1 0
           On TH1(Chiptool) , Verify Successfully AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 3 elements
 
           [1657541707.114348][3004:3009] CHIP:DMG: {
@@ -686,9 +690,9 @@ tests:
           Group (3) Subjects field: [555, 666, 777, 888] Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
           { "privilege": 1, "authMode": 2, "subjects":  [111, 222, 333, 444], "targets": null},
-          { "privilege": 3, "authMode": 3, "subjects":  [555, 666, 777, 888], "targets": null}]" 1 0
+          { "privilege": 3, "authMode": 3, "subjects":  [555, 666, 777, 888], "targets": null}]' 1 0
           On TH1(Chiptool) , Verify   Successfully to acl attribute  value is list of AccessControlEntryStruct containing 3 elements as Target Null.
 
           [1657542060.230268][3398:3403] CHIP:DMG: {
@@ -819,8 +823,8 @@ tests:
           AuthMode field: Group (3) Subjects field: null Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
-           { "privilege": 3, "authMode": 3, "subjects": null, "targets": null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
+           { "privilege": 3, "authMode": 3, "subjects": null, "targets": null}]' 1 0
 
           On TH1(Chiptool) , Verify   Successfully to acl attribute with a  value is list of AccessControlEntryStruct containing 2 elements as Target Null
 
@@ -866,7 +870,7 @@ tests:
           [1656507141.631353][3224:3229] CHIP:DMG:                        AttributePathIB =
           [1656507141.631426][3224:3229] CHIP:DMG:                        {
           [1656507141.631501][3224:3229] CHIP:DMG:                                Endpoint = 0x0,
-          [1656507141.631584][3224:3229] CHIP:DMG:                                Cluster = 0x1f,
+          [1656507141.631584][3224:3229] CHIP:DMG:                               Cluster = 0x1f,
           [1656507141.631664][3224:3229] CHIP:DMG:                                Attribute = 0x0000_0000,
           [1656507141.631742][3224:3229] CHIP:DMG:                                ListIndex = Null,
           [1656507141.631824][3224:3229] CHIP:DMG:                        }
@@ -925,8 +929,8 @@ tests:
           (2) AuthMode field: CASE (2) Subjects field: null Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
-          { "privilege": 2, "authMode": 2, "subjects": null, "targets": null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
+          { "privilege": 2, "authMode": 2, "subjects": null, "targets": null}]' 1 0
           On TH1(Chiptool), Verify  Successfully that  acl attribute with a  value is list of AccessControlEntryStruct containing 2 elements as Subject and Target as null
           [1656507439.868495][3249:3254] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1656507439.868612][3249:3254] CHIP:DMG: WriteResponseMessage =
@@ -1050,7 +1054,7 @@ tests:
           node IDs (stored as SUBJECTS) Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects":[33,44,55,66] , "targets": null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects":[33,44,55,66] , "targets": null}]' 1 0
           On TH1(Chiptool), Verify  Successfully  acl attribute with a  value is list of AccessControlEntryStruct containing 2 elements as Subject as SUBJECTS and Target as null
 
 
@@ -1160,8 +1164,8 @@ tests:
           Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
-           { "privilege": 3, "authMode": 2, "subjects":[65520,65521,65522,65523] , "targets": null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
+           { "privilege": 3, "authMode": 2, "subjects":[65520,65521,65522,65523] , "targets": null}]' 1 0
 
           On TH1(Chiptool) , Verify  Successfully   acl attribute  value is list of AccessControlEntryStruct containing 2 elements , Subjects as CAT Values and Target as null
           [1656509348.174135][3403:3408] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -1289,7 +1293,7 @@ tests:
           MAXTARGETS targets {Cluster: random} (stored as TARGETS)"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": 40, "endpoint": null, "deviceType": null },{ "cluster": 28, "endpoint": null, "deviceType": null }]}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": 40, "endpoint": null, "deviceType": null },{ "cluster": 28, "endpoint": null, "deviceType": null }]}]' 1 0
 
           On TH1(Chiptool) , Verify  Successfully   acl attribute with   value is list of AccessControlEntryStruct containing 2 elements , Subjects as null  and  and Target as null
 
@@ -1436,9 +1440,9 @@ tests:
           field: null subsequent elements same as second element"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": null, "targets": null},
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": null, "targets": null},
           { "privilege": 3, "authMode": 2, "subjects": [], "targets":null},
-          { "privilege": 3, "authMode": 2, "subjects": [], "targets":null}]" 1 0
+          { "privilege": 3, "authMode": 2, "subjects": [], "targets":null}]' 1 0
 
           On TH1(Chiptool) , Verify  Successfully that  acl attribute  value is list of AccessControlEntryStruct containing MAXENTRIES elements
 
@@ -1559,8 +1563,8 @@ tests:
           AuthMode field: PASE (1) Subjects field: null Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{"privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
-           { "privilege": 3, "authMode": 1, "subjects": [], "targets":null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{"privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
+           { "privilege": 3, "authMode": 1, "subjects": [], "targets":null}]' 1 0
 
           On TH1(Chiptool) , Verify  Successfully  acl attribute   value is list of AccessControlEntryStruct containing 2 elements and Returns CONSTRAINT_ERROR (0x87) for second element path
           [1658475475.310438][3113:3119] CHIP:DMG: {
@@ -1704,8 +1708,8 @@ tests:
           (5) AuthMode field: Group (3) Subjects field: null Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
-           { "privilege": 5, "authMode": 3, "subjects": [], "targets":null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
+           { "privilege": 5, "authMode": 3, "subjects": [], "targets":null}]' 1 0
 
           On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements as Subject null and Target null for second element path Returns CONSTRAINT_ERROR (0x87)
           [1658475916.602576][3151:3156] CHIP:DMG: WriteResponseMessage =
@@ -1780,8 +1784,8 @@ tests:
           field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
-          { "privilege": 6, "authMode": 2, "subjects": null, "targets":null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
+          { "privilege": 6, "authMode": 2, "subjects": null, "targets":null}]' 1 0
 
 
 
@@ -1861,10 +1865,10 @@ tests:
           field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
-           { "privilege": 3, "authMode": 4, "subjects": [], "targets":null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
+           { "privilege": 3, "authMode": 4, "subjects": [], "targets":null}]' 1 0
 
-          On TH(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
+          On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Authmode  for second element path Returns CONSTRAINT_ERROR (0x87)
           [1658476412.664216][3192:3197] CHIP:DMG: WriteResponseMessage =
           [1658476412.664247][3192:3197] CHIP:DMG: {
@@ -1937,8 +1941,8 @@ tests:
           AuthMode field: CASE (2) Subjects field: [0] Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
-           { "privilege": 3, "authMode": 2, "subjects": [0], "targets":null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
+           { "privilege": 3, "authMode": 2, "subjects": [0], "targets":null}]' 1 0
           On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Subject Field  for second element path Returns CONSTRAINT_ERROR (0x87)
           [1658476622.665126][3229:3234] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -2012,8 +2016,8 @@ tests:
           field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
-          { "privilege": 3, "authMode": 2, "subjects": [18446744073709551615], "targets":null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
+          { "privilege": 3, "authMode": 2, "subjects": [18446744073709551615], "targets":null}]' 1 0
 
 
           On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
@@ -2088,7 +2092,7 @@ tests:
           Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": [18446744060824649728], "targets": null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": [18446744060824649728], "targets": null}]' 1 0
           On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Subject Field  for second element path Returns CONSTRAINT_ERROR (0x87)
           8477037.056167][3264:3269] CHIP:DMG:                {
@@ -2158,8 +2162,8 @@ tests:
           field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
-          { "privilege": 3, "authMode": 2, "subjects": [18446744073709486080], "targets":null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
+          { "privilege": 3, "authMode": 2, "subjects": [18446744073709486080], "targets":null}]' 1 0
 
           On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Subject Field  for second element path Returns CONSTRAINT_ERROR (0x87)
@@ -2232,7 +2236,7 @@ tests:
           AuthMode field: CASE (2) Subjects field: null Targets field: [{}]"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": null, "endpoint": null, "deviceType": null }]}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": null, "endpoint": null, "deviceType": null }]}]' 1 0
 
           On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Target Field  for second element path Returns CONSTRAINT_ERROR (0x87)
@@ -2308,7 +2312,7 @@ tests:
           [{Cluster: 0xFFFFFFFF}]"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": 4294967295, "endpoint": null, "deviceType": null }]}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": 4294967295, "endpoint": null, "deviceType": null }]}]' 1 0
 
           On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Target Field  for second element path Returns CONSTRAINT_ERROR (0x87)
@@ -2383,7 +2387,7 @@ tests:
           null  Targets field: [{Endpoint: 65535}]"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": null, "endpoint": 65535, "deviceType": null }]}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": null, "endpoint": 65535, "deviceType": null }]}]' 1 0
           On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Target field  for second element path Returns CONSTRAINT_ERROR (0x87)
           [1657617920.044059][8948:8953] CHIP:DMG: {
@@ -2456,7 +2460,7 @@ tests:
           [{DeviceType: 0xFFFFFFFF}]"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": null, "endpoint": null, "deviceType": 4294967295 }]}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": null, "endpoint": null, "deviceType": 4294967295 }]}]' 1 0
           On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Target field   for second element path Returns CONSTRAINT_ERROR (0x87)
 
@@ -2532,7 +2536,7 @@ tests:
           [{Endpoint: 22, DeviceType: 33}]"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": null, "endpoint": 22, "deviceType": 33 }]}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": null, "endpoint": 22, "deviceType": 33 }]}]' 1 0
           On TH1(Chiptool) , Verify   Successfully to  AccessControlEntryStruct containing 2 elements using
           Invalid Target field  for second element path Returns CONSTRAINT_ERROR (0x87)
           [1658477583.616961][3701:3706] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -2608,7 +2612,7 @@ tests:
           [{Cluster: 11, Endpoint: 22, DeviceType: 33}]"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": 11, "endpoint": 22, "deviceType": 33 }]}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": 11, "endpoint": 22, "deviceType": 33 }]}]' 1 0
           On TH1(Chiptool) , Verify   Successfully   AccessControlEntryStruct containing 2 elements using
           Invalid Target field  for second element path Returns CONSTRAINT_ERROR (0x87)
           [1658477662.415412][3710:3715] CHIP:EM: Removed CHIP MessageCounter:35384027 from RetransTable on exchange 6953i
@@ -2682,7 +2686,7 @@ tests:
           is an empty list"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[]" 1 0
+          ./chip-tool accesscontrol write acl '[]' 1 0
 
           On TH1(Chiptool) , Verify   Successfully to  AccessControl cluster ACL attribute value is an empty list since all ACL entries removed.
           RetransTable on exchange 43997i

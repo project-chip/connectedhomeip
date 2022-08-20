@@ -23,18 +23,18 @@ config:
 tests:
     - label: "Note"
       verification: |
-          Note: : For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
-    - label: "Note"
+    - label: "Precondition"
       verification: |
-          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+          1. Commission TH to DUT
       disabled: true
 
     - label: "DUT reads VendorName from the TH"
       PICS: BRBINFO.C.A0001
       verification: |
-          ./chip-tool bridgeddevicebasic read vendor-name 1 0
+          ./chip-tool bridgeddevicebasic read vendor-name 1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -66,7 +66,7 @@ tests:
     - label: "DUT reads VendorID from the TH"
       PICS: BRBINFO.C.A0002
       verification: |
-          ./chip-tool bridgeddevicebasic read vendor-id 1 0
+          ./chip-tool bridgeddevicebasic read vendor-id 1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -120,7 +120,7 @@ tests:
     - label: "DUT reads ProductName from the TH"
       PICS: BRBINFO.C.A0003
       verification: |
-          ./chip-tool bridgeddevicebasic read product-name 1 0
+          ./chip-tool bridgeddevicebasic read product-name 1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -150,7 +150,7 @@ tests:
     - label: "DUT reads NodeLabel from the TH"
       PICS: BRBINFO.C.A0005
       verification: |
-          ./chip-tool bridgeddevicebasic read node-label 1 0
+          ./chip-tool bridgeddevicebasic read node-label 1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -183,7 +183,7 @@ tests:
     - label: "DUT reads Location from the TH"
       PICS: BRBINFO.C.A0006
       verification: |
-          ./chip-tool bridgeddevicebasic read location 1 0
+          ./chip-tool bridgeddevicebasic read location 1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -216,7 +216,7 @@ tests:
     - label: "DUT reads HardwareVersion from the TH"
       PICS: BRBINFO.C.A0007
       verification: |
-          ./chip-tool bridgeddevicebasic read  hardware-version-string 1 0
+          ./chip-tool bridgeddevicebasic read  hardware-version 1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -249,7 +249,7 @@ tests:
     - label: "DUT reads HardwareVersionString from the TH"
       PICS: BRBINFO.C.A0008
       verification: |
-          ./chip-tool bridgeddevicebasic read  hardware-version-string 1 0
+          ./chip-tool bridgeddevicebasic read  hardware-version-string 1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -283,7 +283,7 @@ tests:
     - label: "DUT reads SoftwareVersion from the TH"
       PICS: BRBINFO.C.A0009
       verification: |
-          ./chip-tool bridgeddevicebasic read software-version 1 0
+          ./chip-tool bridgeddevicebasic read software-version 1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -317,7 +317,7 @@ tests:
     - label: "DUT reads SoftwareVersionString from the TH"
       PICS: BRBINFO.C.A000a
       verification: |
-          ./chip-tool bridgeddevicebasic read software-version-string 1 0
+          ./chip-tool bridgeddevicebasic read software-version-string 1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -351,7 +351,7 @@ tests:
     - label: "DUT reads ManufacturingDate from the TH"
       PICS: BRBINFO.C.A000b
       verification: |
-          ./chip-tool bridgeddevicebasic read manufacturing-date  1 0
+          ./chip-tool bridgeddevicebasic read manufacturing-date  1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -385,7 +385,7 @@ tests:
     - label: "DUT reads PartNumber from the TH"
       PICS: BRBINFO.C.A000c
       verification: |
-          ./chip-tool bridgeddevicebasic read part-number  1 0
+          ./chip-tool bridgeddevicebasic read part-number  1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -419,7 +419,7 @@ tests:
     - label: "DUT reads ProductURL from the TH"
       PICS: BRBINFO.C.A000d
       verification: |
-          ./chip-tool bridgeddevicebasic read product-url  1 0
+          ./chip-tool bridgeddevicebasic read product-url  1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -453,7 +453,7 @@ tests:
     - label: "DUT reads ProductLabel from the TH"
       PICS: BRBINFO.C.A000e
       verification: |
-          ./chip-tool bridgeddevicebasic read product-label  1 0
+          ./chip-tool bridgeddevicebasic read product-label  1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -487,7 +487,7 @@ tests:
     - label: "DUT reads SerialNumber from the TH"
       PICS: BRBINFO.C.A000f
       verification: |
-          ./chip-tool bridgeddevicebasic read serial-number  1 0
+          ./chip-tool bridgeddevicebasic read serial-number  1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -521,7 +521,7 @@ tests:
     - label: "DUT reads Reachable from the TH"
       PICS: BRBINFO.C.A0011
       verification: |
-          ./chip-tool bridgeddevicebasic read reachable 1 0
+          ./chip-tool bridgeddevicebasic read reachable 1 3
 
           Verify ReadRequestMessage is displayed on TH(all-clusters-app) Log
           [1659966974.431316][3334:3334] CHIP:IM: Received Read request
@@ -552,7 +552,7 @@ tests:
     - label: "DUT reads UniqueID from the TH"
       PICS: BRBINFO.C.A0012
       verification: |
-          ./chip-tool bridgeddevicebasic read unique-id 1 0
+          ./chip-tool bridgeddevicebasic read unique-id 1 3
 
           Optional Attribute - If it is supported, then in TH(all-clusters-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
