@@ -139,15 +139,15 @@ tests:
 
           NOTE the quotes: single-quote/double-quote/string/double-quote/single-quote
 
-          On TH(chip-tool) verify that DUT sends a success response
-          [1656495932.122094][2236:2241] CHIP:DMG:                         }
-          [1656495932.122264][2236:2241] CHIP:DMG:
-          [1656495932.122332][2236:2241] CHIP:DMG:                         StatusIB =
-          [1656495932.122398][2236:2241] CHIP:DMG:                         {
-          [1656495932.122466][2236:2241] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1656495932.122538][2236:2241] CHIP:DMG:                         },
-          [1656495932.122602][2236:2241] CHIP:DMG:
-          [1656495932.122660][2236:2241] CHIP:DMG:                 },
+
+          [1660839701.840432][2444:2449] CHIP:DMG: 			}
+          [1660839701.840505][2444:2449] CHIP:DMG:
+          [1660839701.840578][2444:2449] CHIP:DMG: 			StatusIB =
+          [1660839701.840661][2444:2449] CHIP:DMG: 			{
+          [1660839701.840742][2444:2449] CHIP:DMG: 				status = 0x88 (UNSUPPORTED_WRITE),
+          [1660839701.840827][2444:2449] CHIP:DMG: 			},
+          [1660839701.840905][2444:2449] CHIP:DMG:
+          [1660839701.840973][2444:2449] CHIP:DMG: 		},
       disabled: true
 
     - label: "TH reads NodeLabel"
@@ -472,7 +472,7 @@ tests:
           false."
       PICS: BRBINFO.S.A0011
       verification: |
-          ./chip-tool bridgeddevicebasic write-by-id 0x0005 ‘“false”’ 1 0
+          ./chip-tool bridgeddevicebasic write-by-id 0x0005 false 1 0
 
 
 

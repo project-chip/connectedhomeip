@@ -27,11 +27,17 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          1 - Commissioner is on an operational network and has accurate date, time, timezone, regulatory, and fabric information available.
+          2 - 5.1.3 - QR code is printed on the Commissionee device or in additional provided materials (ex: manual).
+      disabled: true
+
     - label:
           "Place DUT into commissioning mode using the DUTs manufacturers means
           to be discovered by the TH Commissioner"
       verification: |
-          DUT Commissionee:
+          Verify on DUT Commissionee side:
           $ ./out/all-clusters-app/chip-all-clusters-app --discriminator 3841
 
           [1651111142.369356][32024:32024] CHIP:DL: Device Configuration:
@@ -45,7 +51,7 @@ tests:
           [1651111142.369573][32024:32024] CHIP:DL:   Device Type: 65535 (0xFFFF)
           [1651111142.370760][32024:32024] CHIP:SVR: SetupQRCode: [MT:-24J0ALY01KA0648G00]
 
-          TH Commissioner:
+          Verify on TH Commissioner side:
           $ ./chip-tool discover commissionables
 
           [1651111150395] [95835:65674062] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
@@ -68,11 +74,11 @@ tests:
           for the Commissioner/Commissionee to complete the commissioning
           process over the DUT Commissionees method of device discovery"
       verification: |
-          DUT Commissionee:
+          Verify on DUT Commissionee side:
           [1651111335.475159][32130:32130] CHIP:SVR: Commissioning completed successfully
           [1651111335.475204][32130:32130] CHIP:DIS: Updating services using commissioning mode 0
 
-          TH Commissioner:
+          Verify on TH Commissioner side:
           $ ./chip-tool pairing code 1 MT:-24J0ALY01KA0648G00
 
           [1651111335378] [95843:65675989] CHIP: [CTL] Received CommissioningComplete response
@@ -106,7 +112,7 @@ tests:
           1. On RasPi DUT $ rm -rf /tmp/chip*
           2. On RasPi DUT $ ./out/all-clusters-app/chip-all-clusters-app --discriminator 3841
 
-          On TH chip-tool:
+          Verify on TH Commissioner side:
           $ ./chip-tool discover commissionables
           [1651111576350] [95850:65678872] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
           [1651111576350] [95850:65678872] CHIP: [DIS]         Vendor ID: 65521
@@ -128,11 +134,11 @@ tests:
           for the Commissioner/Commissionee to complete the commissioning
           process over the DUT Commissionees method of device discovery"
       verification: |
-          DUT Commissionee:
+          Verify on DUT Commissionee side:
           [1651111614.006849][32259:32259] CHIP:SVR: Commissioning completed successfully
           [1651111614.006893][32259:32259] CHIP:DIS: Updating services using commissioning mode 0
 
-          TH Commissioner:
+          Verify on TH Commissioner side:
           $ ./chip-tool pairing code 1 MT:-24J0ALY01KA0648G00
 
           [1651111613912] [95856:65679504] CHIP: [CTL] Received CommissioningComplete response

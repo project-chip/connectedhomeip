@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Pre-Conditions"
+      verification: |
+          N1 is the node ID of TH1
+      disabled: true
+
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
           DUT
