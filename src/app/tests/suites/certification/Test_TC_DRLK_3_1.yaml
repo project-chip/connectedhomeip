@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label: "DUT reads LockState from the TH."
       PICS: DRLK.C.A0000
       verification: |
@@ -152,7 +157,7 @@ tests:
     - label: "DUT reads DoorOpenEvents from the TH."
       PICS: DRLK.S.F05 && DRLK.C.A0004
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+          This is an Optional attribute, so its not compulsory to get the expected outcome 
 
           ./chip-tool doorlock read door-open-events 1 1
 
@@ -181,9 +186,9 @@ tests:
     - label: "DUT reads DoorClosedEvents from the TH."
       PICS: DRLK.S.F05 && DRLK.C.A0005
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+          This is an Optional attribute, so its not compulsory to get the expected outcome 
 
-           ./chip-tool doorlock read door-closed-events 1 1
+           ./chip-tool doorlock read door-closed-events 1 1 
 
           Verify the " DoorClosedEvents response" on TH(lock-app):
 
@@ -210,7 +215,7 @@ tests:
     - label: "DUT reads OpenPeriod from the TH."
       PICS: DRLK.S.F05 && DRLK.C.A0006
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+          This is an Optional attribute, so its not compulsory to get the expected outcome 
 
           ./chip-tool doorlock read open-period 1 1
 
@@ -628,7 +633,7 @@ tests:
     - label: "DUT reads LEDSettings from the TH."
       PICS: DRLK.C.A0022
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+          This is an Optional attribute, so its not compulsory to get the expected outcome 
 
           ./chip-tool doorlock read ledsettings 1 1
 
@@ -788,7 +793,7 @@ tests:
     - label: "DUT reads DefaultConfigurationRegister from the TH."
       PICS: DRLK.C.A0027
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+          This is an Optional attribute, so its not compulsory to get the expected outcome 
 
           Verify the " DefaultConfigurationRegister response" on TH(lock-app):
 
@@ -815,7 +820,7 @@ tests:
     - label: "DUT reads EnableLocalProgramming from the TH."
       PICS: DRLK.C.A0028
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+          This is an Optional attribute, so its not compulsory to get the expected outcome  
 
           ./chip-tool doorlock read enable-local-programming 1 1
           Verify the " EnableLocalProgramming response" on TH(lock-app):
@@ -877,9 +882,9 @@ tests:
     - label: "DUT reads EnableInsideStatusLED from the TH."
       PICS: DRLK.C.A002a
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+          This is an Optional attribute, so its not compulsory to get the expected outcome 
 
-          ./chip-tool doorlock read enable-inside-status-led 1 1
+          ./chip-tool doorlock read enable-inside-status-led 1 1 
 
           Verify the " EnableInsideStatusLED response" on TH(lock-app):
 
@@ -940,7 +945,7 @@ tests:
     - label: "DUT reads LocalProgrammingFeatures from the TH."
       PICS: DRLK.C.A002c
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+          This is an Optional attribute, so its not compulsory to get the expected outcome 
 
            ./chip-tool doorlock read  local-programming-features 1 1
 
@@ -1035,7 +1040,7 @@ tests:
     - label: "DUT reads SendPINOverTheAir from the TH."
       PICS: DRLK.C.F00 && DRLK.C.A0032
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+          This is an Optional attribute, so its not compulsory to get the expected outcome 
 
           ./chip-tool doorlock read send-pinover-the-air 1 1
 
@@ -1099,7 +1104,7 @@ tests:
     - label: "DUT reads ExpiringUserTimeOut from the TH"
       PICS: DRLK.C.F08 && DRLK.C.A0035
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+          This is an Optional attribute, so its not compulsory to get the expected outcome 
 
           ./chip-tool doorlock read expiring-user-timeout 1 1
 

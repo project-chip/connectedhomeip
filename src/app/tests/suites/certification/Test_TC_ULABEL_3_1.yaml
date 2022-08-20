@@ -24,10 +24,15 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label: "DUT reads LabelList from the TH"
       PICS: ULABEL.C.A0000
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
           ./chip-tool userlabel read label-list 1 0
 
@@ -44,10 +49,10 @@ tests:
           [1659609723.950868][2409:2409] CHIP:DMG:                         Cluster = 0x41,
           [1659609723.950926][2409:2409] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1659609723.950980][2409:2409] CHIP:DMG:                 }
-          [1659609723.951024][2409:2409] CHIP:DMG:
+          [1659609723.951024][2409:2409] CHIP:DMG:                         
           [1659609723.951065][2409:2409] CHIP:DMG:         ],
-          [1659609723.951111][2409:2409] CHIP:DMG:
-          [1659609723.951152][2409:2409] CHIP:DMG:         isFabricFiltered = true,
+          [1659609723.951111][2409:2409] CHIP:DMG:                 
+          [1659609723.951152][2409:2409] CHIP:DMG:         isFabricFiltered = true, 
           [1659609723.951192][2409:2409] CHIP:DMG:         InteractionModelRevision = 1
           [1659609723.951228][2409:2409] CHIP:DMG: },
           [1659609723.951341][2409:2409] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -58,7 +63,7 @@ tests:
           LabelList"
       PICS: ULABEL.C.A0000
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
            ./chip-tool userlabel write label-list "[{"label":"room", "value":"bedroom 1"}, {"label":"orientation", "value":"east"}]" 1 0
 
@@ -67,8 +72,8 @@ tests:
           [1659609795.578716][2409:2409] CHIP:DMG: IM WH moving to [Initialized]
           [1659609795.578784][2409:2409] CHIP:DMG: WriteRequestMessage =
           [1659609795.578809][2409:2409] CHIP:DMG: {
-          [1659609795.578829][2409:2409] CHIP:DMG:         suppressResponse = false,
-          [1659609795.578852][2409:2409] CHIP:DMG:         timedRequest = false,
+          [1659609795.578829][2409:2409] CHIP:DMG:         suppressResponse = false, 
+          [1659609795.578852][2409:2409] CHIP:DMG:         timedRequest = false, 
           [1659609795.578873][2409:2409] CHIP:DMG:         AttributeDataIBs =
           [1659609795.578900][2409:2409] CHIP:DMG:         [
           [1659609795.578922][2409:2409] CHIP:DMG:                 AttributeDataIB =
@@ -79,12 +84,12 @@ tests:
           [1659609795.579069][2409:2409] CHIP:DMG:                                 Cluster = 0x41,
           [1659609795.579101][2409:2409] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1659609795.579133][2409:2409] CHIP:DMG:                         }
-          [1659609795.579166][2409:2409] CHIP:DMG:
+          [1659609795.579166][2409:2409] CHIP:DMG:                                 
           [1659609795.579197][2409:2409] CHIP:DMG:                         Data = [
-          [1659609795.579227][2409:2409] CHIP:DMG:
+          [1659609795.579227][2409:2409] CHIP:DMG:                                         
           [1659609795.579345][2409:2409] CHIP:DMG:                         ],
           [1659609795.579372][2409:2409] CHIP:DMG:                 },
-          [1659609795.579401][2409:2409] CHIP:DMG:
+          [1659609795.579401][2409:2409] CHIP:DMG:                 
           [1659609795.579422][2409:2409] CHIP:DMG:                 AttributeDataIB =
           [1659609795.579446][2409:2409] CHIP:DMG:                 {
           [1659609795.579468][2409:2409] CHIP:DMG:                         AttributePathIB =
@@ -94,14 +99,14 @@ tests:
           [1659609795.579591][2409:2409] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1659609795.579623][2409:2409] CHIP:DMG:                                 ListIndex = Null,
           [1659609795.579653][2409:2409] CHIP:DMG:                         }
-          [1659609795.579682][2409:2409] CHIP:DMG:
-          [1659609795.579712][2409:2409] CHIP:DMG:                         Data =
+          [1659609795.579682][2409:2409] CHIP:DMG:                                 
+          [1659609795.579712][2409:2409] CHIP:DMG:                         Data = 
           [1659609795.579743][2409:2409] CHIP:DMG:                         {
-          [1659609795.579777][2409:2409] CHIP:DMG:                                 0x0 = "room" (4 chars),
-          [1659609795.579809][2409:2409] CHIP:DMG:                                 0x1 = "bedroom 1" (9 chars),
+          [1659609795.579777][2409:2409] CHIP:DMG:                                 0x0 = "room" (4 chars), 
+          [1659609795.579809][2409:2409] CHIP:DMG:                                 0x1 = "bedroom 1" (9 chars), 
           [1659609795.579841][2409:2409] CHIP:DMG:                         },
           [1659609795.579871][2409:2409] CHIP:DMG:                 },
-          [1659609795.579903][2409:2409] CHIP:DMG:
+          [1659609795.579903][2409:2409] CHIP:DMG:                 
           [1659609795.579924][2409:2409] CHIP:DMG:                 AttributeDataIB =
           [1659609795.579950][2409:2409] CHIP:DMG:                 {
           [1659609795.579972][2409:2409] CHIP:DMG:                         AttributePathIB =
@@ -111,17 +116,17 @@ tests:
           [1659609795.580098][2409:2409] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1659609795.580130][2409:2409] CHIP:DMG:                                 ListIndex = Null,
           [1659609795.580157][2409:2409] CHIP:DMG:                         }
-          [1659609795.580186][2409:2409] CHIP:DMG:
-          [1659609795.580215][2409:2409] CHIP:DMG:                         Data =
+          [1659609795.580186][2409:2409] CHIP:DMG:                                 
+          [1659609795.580215][2409:2409] CHIP:DMG:                         Data = 
           [1659609795.580241][2409:2409] CHIP:DMG:                         {
-          [1659609795.580270][2409:2409] CHIP:DMG:                                 0x0 = "orientation" (11 chars),
-          [1659609795.580302][2409:2409] CHIP:DMG:                                 0x1 = "east" (4 chars),
+          [1659609795.580270][2409:2409] CHIP:DMG:                                 0x0 = "orientation" (11 chars), 
+          [1659609795.580302][2409:2409] CHIP:DMG:                                 0x1 = "east" (4 chars), 
           [1659609795.580332][2409:2409] CHIP:DMG:                         },
           [1659609795.580357][2409:2409] CHIP:DMG:                 },
-          [1659609795.580383][2409:2409] CHIP:DMG:
+          [1659609795.580383][2409:2409] CHIP:DMG:                 
           [1659609795.580404][2409:2409] CHIP:DMG:         ],
-          [1659609795.580437][2409:2409] CHIP:DMG:
-          [1659609795.580459][2409:2409] CHIP:DMG:         moreChunkedMessages = false,
+          [1659609795.580437][2409:2409] CHIP:DMG:         
+          [1659609795.580459][2409:2409] CHIP:DMG:         moreChunkedMessages = false, 
           [1659609795.580480][2409:2409] CHIP:DMG:         InteractionModelRevision = 1
           [1659609795.580500][2409:2409] CHIP:DMG: },
           [1659609795.580591][2409:2409] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0041 e=0 p=m

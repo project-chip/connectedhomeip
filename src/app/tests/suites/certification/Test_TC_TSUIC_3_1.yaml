@@ -28,11 +28,16 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
           ./chip-tool thermostatuserinterfaceconfiguration read temperature-display-mode 1 1
           Verify DUT receives  temperature-display-mode attribute response on the TH(all-clusters-app) Log:
@@ -47,10 +52,10 @@ tests:
           [1658142864.199181][13946:13946] CHIP:DMG:                         Cluster = 0x204,
           [1658142864.199221][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1658142864.199253][13946:13946] CHIP:DMG:                 }
-          [1658142864.199284][13946:13946] CHIP:DMG:
+          [1658142864.199284][13946:13946] CHIP:DMG:                         
           [1658142864.199311][13946:13946] CHIP:DMG:         ],
-          [1658142864.199341][13946:13946] CHIP:DMG:
-          [1658142864.199369][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142864.199341][13946:13946] CHIP:DMG:                 
+          [1658142864.199369][13946:13946] CHIP:DMG:         isFabricFiltered = true, 
           [1658142864.199396][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
           [1658142864.199421][13946:13946] CHIP:DMG: },
           [1658142864.199502][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -69,10 +74,10 @@ tests:
           [1658142905.390335][13946:13946] CHIP:DMG:                         Cluster = 0x204,
           [1658142905.390370][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1658142905.390400][13946:13946] CHIP:DMG:                 }
-          [1658142905.390430][13946:13946] CHIP:DMG:
+          [1658142905.390430][13946:13946] CHIP:DMG:                         
           [1658142905.390455][13946:13946] CHIP:DMG:         ],
-          [1658142905.390483][13946:13946] CHIP:DMG:
-          [1658142905.390509][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142905.390483][13946:13946] CHIP:DMG:                 
+          [1658142905.390509][13946:13946] CHIP:DMG:         isFabricFiltered = true, 
           [1658142905.390534][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
           [1658142905.390557][13946:13946] CHIP:DMG: },
           [1658142905.390634][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -83,7 +88,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
           ./chip-tool thermostatuserinterfaceconfiguration read  schedule-programming-visibility  1 1
           Verify DUT receives  schedule-programming-visibility  attribute response on the TH(all-clusters-app) Log:
@@ -99,10 +104,10 @@ tests:
           [1658143293.503159][13946:13946] CHIP:DMG:                         Cluster = 0x204,
           [1658143293.503190][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1658143293.503218][13946:13946] CHIP:DMG:                 }
-          [1658143293.503248][13946:13946] CHIP:DMG:
+          [1658143293.503248][13946:13946] CHIP:DMG:                         
           [1658143293.503273][13946:13946] CHIP:DMG:         ],
-          [1658143293.503300][13946:13946] CHIP:DMG:
-          [1658143293.503326][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658143293.503300][13946:13946] CHIP:DMG:                 
+          [1658143293.503326][13946:13946] CHIP:DMG:         isFabricFiltered = true, 
           [1658143293.503351][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
           [1658143293.503374][13946:13946] CHIP:DMG: },
           [1658143293.503450][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -112,14 +117,14 @@ tests:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
           ./chip-tool thermostatuserinterfaceconfiguration write temperature-display-mode  1 1 1
           Verify DUT receives  temperature-display-mode   attribute  write response on the TH(all-clusters-app) Log:
           [1658143515.699171][13946:13946] CHIP:DMG: WriteRequestMessage =
           [1658143515.699197][13946:13946] CHIP:DMG: {
-          [1658143515.699221][13946:13946] CHIP:DMG:         suppressResponse = false,
-          [1658143515.699248][13946:13946] CHIP:DMG:         timedRequest = false,
+          [1658143515.699221][13946:13946] CHIP:DMG:         suppressResponse = false, 
+          [1658143515.699248][13946:13946] CHIP:DMG:         timedRequest = false, 
           [1658143515.699272][13946:13946] CHIP:DMG:         AttributeDataIBs =
           [1658143515.699302][13946:13946] CHIP:DMG:         [
           [1658143515.699326][13946:13946] CHIP:DMG:                 AttributeDataIB =
@@ -130,13 +135,13 @@ tests:
           [1658143515.699484][13946:13946] CHIP:DMG:                                 Cluster = 0x204,
           [1658143515.699514][13946:13946] CHIP:DMG:                                 Attribute = 0x0000_0001,
           [1658143515.699544][13946:13946] CHIP:DMG:                         }
-          [1658143515.699577][13946:13946] CHIP:DMG:
-          [1658143515.699609][13946:13946] CHIP:DMG:                         Data = 1,
+          [1658143515.699577][13946:13946] CHIP:DMG:                                 
+          [1658143515.699609][13946:13946] CHIP:DMG:                         Data = 1, 
           [1658143515.699638][13946:13946] CHIP:DMG:                 },
-          [1658143515.699667][13946:13946] CHIP:DMG:
+          [1658143515.699667][13946:13946] CHIP:DMG:                 
           [1658143515.699690][13946:13946] CHIP:DMG:         ],
-          [1658143515.699719][13946:13946] CHIP:DMG:
-          [1658143515.699743][13946:13946] CHIP:DMG:         moreChunkedMessages = false,
+          [1658143515.699719][13946:13946] CHIP:DMG:         
+          [1658143515.699743][13946:13946] CHIP:DMG:         moreChunkedMessages = false, 
           [1658143515.699768][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
           [1658143515.699792][13946:13946] CHIP:DMG: },
           [1658143515.699876][13946:13946] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=m
@@ -146,8 +151,8 @@ tests:
           Verify DUT receives keypad-lockout  attribute  write response on the TH(all-clusters-app) Log:
           [1658143708.436060][13946:13946] CHIP:DMG: WriteRequestMessage =
           [1658143708.436090][13946:13946] CHIP:DMG: {
-          [1658143708.436115][13946:13946] CHIP:DMG:         suppressResponse = false,
-          [1658143708.436148][13946:13946] CHIP:DMG:         timedRequest = false,
+          [1658143708.436115][13946:13946] CHIP:DMG:         suppressResponse = false, 
+          [1658143708.436148][13946:13946] CHIP:DMG:         timedRequest = false, 
           [1658143708.436176][13946:13946] CHIP:DMG:         AttributeDataIBs =
           [1658143708.436210][13946:13946] CHIP:DMG:         [
           [1658143708.436238][13946:13946] CHIP:DMG:                 AttributeDataIB =
@@ -158,13 +163,13 @@ tests:
           [1658143708.436406][13946:13946] CHIP:DMG:                                 Cluster = 0x204,
           [1658143708.436444][13946:13946] CHIP:DMG:                                 Attribute = 0x0000_0001,
           [1658143708.436483][13946:13946] CHIP:DMG:                         }
-          [1658143708.436520][13946:13946] CHIP:DMG:
-          [1658143708.436561][13946:13946] CHIP:DMG:                         Data = 1,
+          [1658143708.436520][13946:13946] CHIP:DMG:                                 
+          [1658143708.436561][13946:13946] CHIP:DMG:                         Data = 1, 
           [1658143708.436592][13946:13946] CHIP:DMG:                 },
-          [1658143708.436627][13946:13946] CHIP:DMG:
+          [1658143708.436627][13946:13946] CHIP:DMG:                 
           [1658143708.436654][13946:13946] CHIP:DMG:         ],
-          [1658143708.436686][13946:13946] CHIP:DMG:
-          [1658143708.436714][13946:13946] CHIP:DMG:         moreChunkedMessages = false,
+          [1658143708.436686][13946:13946] CHIP:DMG:         
+          [1658143708.436714][13946:13946] CHIP:DMG:         moreChunkedMessages = false, 
           [1658143708.436743][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
           [1658143708.436770][13946:13946] CHIP:DMG: },
           [1658143708.436862][13946:13946] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=m
@@ -175,14 +180,14 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
           ./chip-tool thermostatuserinterfaceconfiguration write schedule-programming-visibility 1 1 1
           Verify DUT receives schedule-programming-visibility   attribute  write response on the TH(all-clusters-app) Log:
           [1658143828.619738][13946:13946] CHIP:DMG: WriteRequestMessage =
           [1658143828.619764][13946:13946] CHIP:DMG: {
-          [1658143828.619787][13946:13946] CHIP:DMG:         suppressResponse = false,
-          [1658143828.619814][13946:13946] CHIP:DMG:         timedRequest = false,
+          [1658143828.619787][13946:13946] CHIP:DMG:         suppressResponse = false, 
+          [1658143828.619814][13946:13946] CHIP:DMG:         timedRequest = false, 
           [1658143828.619838][13946:13946] CHIP:DMG:         AttributeDataIBs =
           [1658143828.619867][13946:13946] CHIP:DMG:         [
           [1658143828.619891][13946:13946] CHIP:DMG:                 AttributeDataIB =
@@ -193,13 +198,13 @@ tests:
           [1658143828.620045][13946:13946] CHIP:DMG:                                 Cluster = 0x204,
           [1658143828.620078][13946:13946] CHIP:DMG:                                 Attribute = 0x0000_0002,
           [1658143828.620108][13946:13946] CHIP:DMG:                         }
-          [1658143828.620140][13946:13946] CHIP:DMG:
-          [1658143828.620172][13946:13946] CHIP:DMG:                         Data = 1,
+          [1658143828.620140][13946:13946] CHIP:DMG:                                 
+          [1658143828.620172][13946:13946] CHIP:DMG:                         Data = 1, 
           [1658143828.620200][13946:13946] CHIP:DMG:                 },
-          [1658143828.620228][13946:13946] CHIP:DMG:
+          [1658143828.620228][13946:13946] CHIP:DMG:                 
           [1658143828.620252][13946:13946] CHIP:DMG:         ],
-          [1658143828.620280][13946:13946] CHIP:DMG:
-          [1658143828.620305][13946:13946] CHIP:DMG:         moreChunkedMessages = false,
+          [1658143828.620280][13946:13946] CHIP:DMG:         
+          [1658143828.620305][13946:13946] CHIP:DMG:         moreChunkedMessages = false, 
           [1658143828.620330][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
           [1658143828.620353][13946:13946] CHIP:DMG: },
           [1658143828.620434][13946:13946] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=m
@@ -211,7 +216,7 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
           ./chip-tool thermostatuserinterfaceconfiguration read temperature-display-mode 1 1
           Verify DUT receives  temperature-display-mode attribute response on the TH(all-clusters-minimal-app) Log:
@@ -226,10 +231,10 @@ tests:
           [1658142864.199181][13946:13946] CHIP:DMG:                         Cluster = 0x204,
           [1658142864.199221][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1658142864.199253][13946:13946] CHIP:DMG:                 }
-          [1658142864.199284][13946:13946] CHIP:DMG:
+          [1658142864.199284][13946:13946] CHIP:DMG:                         
           [1658142864.199311][13946:13946] CHIP:DMG:         ],
-          [1658142864.199341][13946:13946] CHIP:DMG:
-          [1658142864.199369][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142864.199341][13946:13946] CHIP:DMG:                 
+          [1658142864.199369][13946:13946] CHIP:DMG:         isFabricFiltered = true, 
           [1658142864.199396][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
           [1658142864.199421][13946:13946] CHIP:DMG: },
           [1658142864.199502][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -248,10 +253,10 @@ tests:
           [1658142905.390335][13946:13946] CHIP:DMG:                         Cluster = 0x204,
           [1658142905.390370][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1658142905.390400][13946:13946] CHIP:DMG:                 }
-          [1658142905.390430][13946:13946] CHIP:DMG:
+          [1658142905.390430][13946:13946] CHIP:DMG:                         
           [1658142905.390455][13946:13946] CHIP:DMG:         ],
-          [1658142905.390483][13946:13946] CHIP:DMG:
-          [1658142905.390509][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142905.390483][13946:13946] CHIP:DMG:                 
+          [1658142905.390509][13946:13946] CHIP:DMG:         isFabricFiltered = true, 
           [1658142905.390534][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
           [1658142905.390557][13946:13946] CHIP:DMG: },
           [1658142905.390634][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -262,7 +267,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
           ./chip-tool thermostatuserinterfaceconfiguration read  schedule-programming-visibility  1 1
 
@@ -274,7 +279,7 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
           ./chip-tool thermostatuserinterfaceconfiguration write schedule-programming-visibility 1 1 1
 

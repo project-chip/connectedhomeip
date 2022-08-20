@@ -42,8 +42,8 @@ tests:
           device for a single attribute of any data type supported."
       PICS: MCORE.IDM.C.SubscribeRequest
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
-
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+           
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
@@ -92,14 +92,14 @@ tests:
           [1657884469.617961][2938:2943] CHIP:DMG:                                         Cluster = 0x6,
           [1657884469.618006][2938:2943] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1657884469.618051][2938:2943] CHIP:DMG:                                 }
-          [1657884469.618094][2938:2943] CHIP:DMG:
-          [1657884469.618137][2938:2943] CHIP:DMG:                                 Data = false,
+          [1657884469.618094][2938:2943] CHIP:DMG:                                         
+          [1657884469.618137][2938:2943] CHIP:DMG:                                 Data = false, 
           [1657884469.618176][2938:2943] CHIP:DMG:                         },
-          [1657884469.618216][2938:2943] CHIP:DMG:
+          [1657884469.618216][2938:2943] CHIP:DMG:                         
           [1657884469.618250][2938:2943] CHIP:DMG:                 },
-          [1657884469.618288][2938:2943] CHIP:DMG:
+          [1657884469.618288][2938:2943] CHIP:DMG:                 
           [1657884469.618317][2938:2943] CHIP:DMG:         ],
-          [1657884469.618354][2938:2943] CHIP:DMG:
+          [1657884469.618354][2938:2943] CHIP:DMG:         
           [1657884469.618384][2938:2943] CHIP:DMG:         InteractionModelRevision = 1
           [1657884469.618413][2938:2943] CHIP:DMG: }
           [1657884469.618568][2938:2943] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 1121586347
@@ -126,7 +126,7 @@ tests:
           data DUT sends the status response back to TH"
       PICS: MCORE.IDM.C.SubscribeRequest
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
@@ -163,14 +163,14 @@ tests:
           [1657884569.751544][2938:2943] CHIP:DMG:                                         Cluster = 0x6,
           [1657884569.751596][2938:2943] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1657884569.751645][2938:2943] CHIP:DMG:                                 }
-          [1657884569.751696][2938:2943] CHIP:DMG:
-          [1657884569.751749][2938:2943] CHIP:DMG:                                 Data = false,
+          [1657884569.751696][2938:2943] CHIP:DMG:                                         
+          [1657884569.751749][2938:2943] CHIP:DMG:                                 Data = false, 
           [1657884569.751796][2938:2943] CHIP:DMG:                         },
-          [1657884569.751843][2938:2943] CHIP:DMG:
+          [1657884569.751843][2938:2943] CHIP:DMG:                         
           [1657884569.751874][2938:2943] CHIP:DMG:                 },
-          [1657884569.751915][2938:2943] CHIP:DMG:
+          [1657884569.751915][2938:2943] CHIP:DMG:                 
           [1657884569.751941][2938:2943] CHIP:DMG:         ],
-          [1657884569.751971][2938:2943] CHIP:DMG:
+          [1657884569.751971][2938:2943] CHIP:DMG:         
           [1657884569.751996][2938:2943] CHIP:DMG:         InteractionModelRevision = 1
           [1657884569.752022][2938:2943] CHIP:DMG: }
           [1657884569.752174][2938:2943] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 1121586347
@@ -199,7 +199,7 @@ tests:
           multiple times (3 times)."
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_Bool
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
 
            Please use Interactive mode to Verify subscription test cases
@@ -249,14 +249,14 @@ tests:
           [1657884643.153069][2938:2943] CHIP:DMG:                                         Cluster = 0x28,
           [1657884643.153134][2938:2943] CHIP:DMG:                                         Attribute = 0x0000_0010,
           [1657884643.153282][2938:2943] CHIP:DMG:                                 }
-          [1657884643.153349][2938:2943] CHIP:DMG:
-          [1657884643.153412][2938:2943] CHIP:DMG:                                 Data = true,
+          [1657884643.153349][2938:2943] CHIP:DMG:                                         
+          [1657884643.153412][2938:2943] CHIP:DMG:                                 Data = true, 
           [1657884643.153471][2938:2943] CHIP:DMG:                         },
-          [1657884643.153529][2938:2943] CHIP:DMG:
+          [1657884643.153529][2938:2943] CHIP:DMG:                         
           [1657884643.153576][2938:2943] CHIP:DMG:                 },
-          [1657884643.153631][2938:2943] CHIP:DMG:
+          [1657884643.153631][2938:2943] CHIP:DMG:                 
           [1657884643.153675][2938:2943] CHIP:DMG:         ],
-          [1657884643.153731][2938:2943] CHIP:DMG:
+          [1657884643.153731][2938:2943] CHIP:DMG:         
           [1657884643.153776][2938:2943] CHIP:DMG:         InteractionModelRevision = 1
           [1657884643.153821][2938:2943] CHIP:DMG: }
           [1657884643.153988][2938:2943] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3826372937
@@ -285,7 +285,7 @@ tests:
           multiple times (3 times)."
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_String
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
@@ -338,14 +338,14 @@ tests:
           [1657884902.175936][2938:2943] CHIP:DMG:                                         Cluster = 0x28,
           [1657884902.176007][2938:2943] CHIP:DMG:                                         Attribute = 0x0000_0005,
           [1657884902.176067][2938:2943] CHIP:DMG:                                 }
-          [1657884902.176147][2938:2943] CHIP:DMG:
-          [1657884902.176215][2938:2943] CHIP:DMG:                                 Data = "label",
+          [1657884902.176147][2938:2943] CHIP:DMG:                                         
+          [1657884902.176215][2938:2943] CHIP:DMG:                                 Data = "label", 
           [1657884902.176265][2938:2943] CHIP:DMG:                         },
-          [1657884902.176322][2938:2943] CHIP:DMG:
+          [1657884902.176322][2938:2943] CHIP:DMG:                         
           [1657884902.176369][2938:2943] CHIP:DMG:                 },
-          [1657884902.176424][2938:2943] CHIP:DMG:
+          [1657884902.176424][2938:2943] CHIP:DMG:                 
           [1657884902.176467][2938:2943] CHIP:DMG:         ],
-          [1657884902.176522][2938:2943] CHIP:DMG:
+          [1657884902.176522][2938:2943] CHIP:DMG:         
           [1657884902.176568][2938:2943] CHIP:DMG:         InteractionModelRevision = 1
           [1657884902.176610][2938:2943] CHIP:DMG: }
           [1657884902.176771][2938:2943] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3826372940
@@ -360,12 +360,12 @@ tests:
           attribute multiple times (3 times)."
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_UnsignedInteger
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
-          any subscribe-by-id 0x0008 0x0010 10 100  1 1
+          any subscribe-by-id 0x0008 0x0010 10 100  1 1 
           On TH (On the reference app) Verify if DUT is responding with the below status response for the above command
           [1657448410.108491][11525:11525] CHIP:EM: Removed CHIP MessageCounter:11055857 from RetransTable on exchange 33616r
           [1657448410.108543][11525:11525] CHIP:DMG: StatusResponseMessage =
@@ -392,14 +392,14 @@ tests:
           [1657884929.245556][2938:2943] CHIP:DMG:                                         Cluster = 0x8,
           [1657884929.245638][2938:2943] CHIP:DMG:                                         Attribute = 0x0000_0010,
           [1657884929.245696][2938:2943] CHIP:DMG:                                 }
-          [1657884929.245773][2938:2943] CHIP:DMG:
-          [1657884929.245841][2938:2943] CHIP:DMG:                                 Data = 1,
+          [1657884929.245773][2938:2943] CHIP:DMG:                                         
+          [1657884929.245841][2938:2943] CHIP:DMG:                                 Data = 1, 
           [1657884929.245897][2938:2943] CHIP:DMG:                         },
-          [1657884929.245955][2938:2943] CHIP:DMG:
+          [1657884929.245955][2938:2943] CHIP:DMG:                         
           [1657884929.246003][2938:2943] CHIP:DMG:                 },
-          [1657884929.246059][2938:2943] CHIP:DMG:
+          [1657884929.246059][2938:2943] CHIP:DMG:                 
           [1657884929.246104][2938:2943] CHIP:DMG:         ],
-          [1657884929.246160][2938:2943] CHIP:DMG:
+          [1657884929.246160][2938:2943] CHIP:DMG:         
           [1657884929.246207][2938:2943] CHIP:DMG:         InteractionModelRevision = 1
           [1657884929.246252][2938:2943] CHIP:DMG: }
           [1657884929.246416][2938:2943] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0010 DataVersion: 3439199876
@@ -456,14 +456,14 @@ tests:
           [1657884955.074199][2938:2943] CHIP:DMG:                                         Cluster = 0x8,
           [1657884955.074263][2938:2943] CHIP:DMG:                                         Attribute = 0x0000_0010,
           [1657884955.074329][2938:2943] CHIP:DMG:                                 }
-          [1657884955.074393][2938:2943] CHIP:DMG:
-          [1657884955.074455][2938:2943] CHIP:DMG:                                 Data = 1,
+          [1657884955.074393][2938:2943] CHIP:DMG:                                         
+          [1657884955.074455][2938:2943] CHIP:DMG:                                 Data = 1, 
           [1657884955.074512][2938:2943] CHIP:DMG:                         },
-          [1657884955.074574][2938:2943] CHIP:DMG:
+          [1657884955.074574][2938:2943] CHIP:DMG:                         
           [1657884955.074625][2938:2943] CHIP:DMG:                 },
-          [1657884955.074684][2938:2943] CHIP:DMG:
+          [1657884955.074684][2938:2943] CHIP:DMG:                 
           [1657884955.074732][2938:2943] CHIP:DMG:         ],
-          [1657884955.074788][2938:2943] CHIP:DMG:
+          [1657884955.074788][2938:2943] CHIP:DMG:         
           [1657884955.074833][2938:2943] CHIP:DMG:         InteractionModelRevision = 1
           [1657884955.074877][2938:2943] CHIP:DMG: }
           [1657884955.075032][2938:2943] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0010 DataVersion: 3439199877
@@ -520,7 +520,7 @@ tests:
           device for multiple attributes(3 attributes)."
       PICS: MCORE.IDM.C.SubscribeRequest.MultipleAttributes
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
 
            Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
@@ -580,9 +580,9 @@ tests:
 
           If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent Subscription report with unic subscriptionID
           884990.165955][2938:2943] CHIP:DMG:                 },
-          [1657884990.166021][2938:2943] CHIP:DMG:
+          [1657884990.166021][2938:2943] CHIP:DMG:                 
           [1657884990.166072][2938:2943] CHIP:DMG:         ],
-          [1657884990.166149][2938:2943] CHIP:DMG:
+          [1657884990.166149][2938:2943] CHIP:DMG:         
           [1657884990.166201][2938:2943] CHIP:DMG:         InteractionModelRevision = 1
           [1657884990.166255][2938:2943] CHIP:DMG: }
           [1657884990.166480][2938:2943] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 2311319147

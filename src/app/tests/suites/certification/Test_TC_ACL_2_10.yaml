@@ -24,6 +24,20 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Pre-Conditions"
+      verification: |
+          1.N1 is the node ID of TH1
+
+          2.N2 is the node ID of TH2
+
+          2.D_OK_EMPTY:"1718" which is an octstr of length 2 containing valid TLV:
+
+          - top-level anonymous list (empty)
+          3.D_OK_SINGLE:"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018" which is an octstr of length 50-100 containing valid TLV:
+
+          - top-level anonymous list, containing - one element with profile-specific tag in fully-qualified form
+      disabled: true
+
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
           DUT

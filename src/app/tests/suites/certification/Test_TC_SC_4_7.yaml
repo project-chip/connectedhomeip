@@ -36,7 +36,7 @@ tests:
           MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.VP_KEY && MCORE.SC.DT_KEY &&
           MCORE.SC.DN_KEY
       verification: |
-          if DUT supports discovering UDC, DUT should be able to scan the TV-app
+          if DUT supports discovering UDC, DUT should be able to scan the TV-app 
 
           Execute the below command on TH terminal and verify the AAA records:
 
@@ -62,7 +62,7 @@ tests:
 
     - label: "Scan for DNS-SD commissioner advertisements from TH"
       verification: |
-          Verify the DUT is able to discover the TH.
+          Verify the DUT is able to discover the TH. 
 
           As an example, In the case of chip-tool as commissioner, you can verify with the below command, (Use the equivalent command on the DUT)
 

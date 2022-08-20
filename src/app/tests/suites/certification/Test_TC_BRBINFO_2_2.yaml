@@ -21,12 +21,25 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          1. DUT and TH can interact with each other. DUT is commissioned.
+
+          2. TH reads SoftwareVersion attribute from DUT and saves for future use
+
+          3. TH reads Reachable attribute from DUT and saves for future use
+
+          4. TH subscribes to StartUp, ShutDown, ReachableChanged and Leave events on the Basic cluster of the DUT
+
+          5. TH saves the FabricIndex during commissioning
+      disabled: true
+
     - label:
           "Reboot the DUT (i.e. restart by power cycle, not by making it factory
           new) TH receives the StartUp event from DUT"
       PICS: BRBINFO.S.E00
       verification: |
-          StartUp is an optional Event -
+          StartUp is an optional Event - 
           As its an optional event we cannot generate the event as of now , hence no example logs provided.
 
 
@@ -43,7 +56,7 @@ tests:
           To verify thi ReachableChanged follow the below procedure
 
           1. ./chip-tool interactive start
-          2. bridgeddevicebasic subscribe reachable 1 60 1 4
+          2. bridgeddevicebasic subscribe reachable 1 60 1 4 
           3. press "u" on bridge-app to change reachable to false for endpoint 4 and see the reachable value has been changed compared with precondition
 
           [1659441181.388547][2392:2397] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0039 Attribute 0x0000_0011 DataVersion: 2189020906

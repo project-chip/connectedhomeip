@@ -85,38 +85,26 @@ tests:
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
           On TH(chip-tool), verify the StateValue value as FALSE
-
-          [1646119162.628169][3311:3316] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
-          [1646119162.628207][3311:3316] CHIP:TOO:   StateValue: FALSE
       disabled: true
 
     - label: "TH reads the StateValue attribute from the DUT"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
-          ./chip-tool booleanstate read state-value 1 1
+          booleanstate read state-value 1 1
 
           On TH(chip-tool), verify the StateValue value as FALSE
-
-          [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
-          [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: FALSE
       disabled: true
 
     - label: "Bring the DUT into a state so StateValue is TRUE"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
           On TH(chip-tool), verify the StateValue value as TRUE
-
-          [1646119162.628169][3311:3316] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
-          [1646119162.628207][3311:3316] CHIP:TOO:   StateValue: TRUE
       disabled: true
 
     - label: "TH reads the StateValue attribute from the DUT"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
-          ./chip-tool booleanstate read state-value 1 1
+          booleanstate read state-value 1 1
 
           On TH(chip-tool), verify the StateValue value as TRUE
-
-          [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
-          [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: TRUE
       disabled: true

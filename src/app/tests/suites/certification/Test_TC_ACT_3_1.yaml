@@ -28,11 +28,16 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          ./chip-tool bridgedactions  read action-list 1 1
+          ./chip-tool actions  read action-list 1 1
 
           Verify read command is received on TH(all-clusters-app)
 
@@ -47,10 +52,10 @@ tests:
           [1658848323.188690][28392:28392] CHIP:DMG:                         Cluster = 0x25,
           [1658848323.188733][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1658848323.188774][28392:28392] CHIP:DMG:                 }
-          [1658848323.188812][28392:28392] CHIP:DMG:
+          [1658848323.188812][28392:28392] CHIP:DMG:                         
           [1658848323.188846][28392:28392] CHIP:DMG:         ],
-          [1658848323.188884][28392:28392] CHIP:DMG:
-          [1658848323.188919][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848323.188884][28392:28392] CHIP:DMG:                 
+          [1658848323.188919][28392:28392] CHIP:DMG:         isFabricFiltered = true, 
           [1658848323.188954][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
           [1658848323.188985][28392:28392] CHIP:DMG: },
           [1658848323.189080][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -59,7 +64,7 @@ tests:
 
 
 
-          ./chip-tool bridgedactions  read endpoint-list   1 1
+          ./chip-tool actions  read endpoint-list   1 1
 
           Verify read command is received on TH(all-clusters-app
           )
@@ -74,10 +79,10 @@ tests:
           [1658848398.260642][28392:28392] CHIP:DMG:                         Cluster = 0x25,
           [1658848398.260673][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1658848398.260702][28392:28392] CHIP:DMG:                 }
-          [1658848398.260731][28392:28392] CHIP:DMG:
+          [1658848398.260731][28392:28392] CHIP:DMG:                         
           [1658848398.260756][28392:28392] CHIP:DMG:         ],
-          [1658848398.260784][28392:28392] CHIP:DMG:
-          [1658848398.260810][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848398.260784][28392:28392] CHIP:DMG:                 
+          [1658848398.260810][28392:28392] CHIP:DMG:         isFabricFiltered = true, 
           [1658848398.260836][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
           [1658848398.260859][28392:28392] CHIP:DMG: },
           [1658848398.260930][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -91,7 +96,7 @@ tests:
       verification: |
           Optional attibute
 
-          ./chip-tool bridgedactions read setup-url 1 1
+          ./chip-tool actions read setup-url 1 1
 
           Verify read command is received on TH(all-clusters-app)
 
@@ -106,10 +111,10 @@ tests:
           [1658848453.729118][28392:28392] CHIP:DMG:                         Cluster = 0x25,
           [1658848453.729157][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1658848453.729191][28392:28392] CHIP:DMG:                 }
-          [1658848453.729223][28392:28392] CHIP:DMG:
+          [1658848453.729223][28392:28392] CHIP:DMG:                         
           [1658848453.729251][28392:28392] CHIP:DMG:         ],
-          [1658848453.729280][28392:28392] CHIP:DMG:
-          [1658848453.729307][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848453.729280][28392:28392] CHIP:DMG:                 
+          [1658848453.729307][28392:28392] CHIP:DMG:         isFabricFiltered = true, 
           [1658848453.729332][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
           [1658848453.729358][28392:28392] CHIP:DMG: },
           [1658848453.729436][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -137,7 +142,7 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          ./chip-tool bridgedactions  read  attribute-list 1 1
+          ./chip-tool actions  read  attribute-list 1 1
 
           Verify attribute-list attribute contains 7 entries on TH(all-clusters-minimal-app)
           [1658393025.602745][13481:13486] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_FFFB DataVersion: 2868144574
@@ -167,10 +172,10 @@ tests:
           [1658848323.188690][28392:28392] CHIP:DMG:                         Cluster = 0x25,
           [1658848323.188733][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1658848323.188774][28392:28392] CHIP:DMG:                 }
-          [1658848323.188812][28392:28392] CHIP:DMG:
+          [1658848323.188812][28392:28392] CHIP:DMG:                         
           [1658848323.188846][28392:28392] CHIP:DMG:         ],
-          [1658848323.188884][28392:28392] CHIP:DMG:
-          [1658848323.188919][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848323.188884][28392:28392] CHIP:DMG:                 
+          [1658848323.188919][28392:28392] CHIP:DMG:         isFabricFiltered = true, 
           [1658848323.188954][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
           [1658848323.188985][28392:28392] CHIP:DMG: },
           [1658848323.189080][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -194,10 +199,10 @@ tests:
           [1658848398.260642][28392:28392] CHIP:DMG:                         Cluster = 0x25,
           [1658848398.260673][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1658848398.260702][28392:28392] CHIP:DMG:                 }
-          [1658848398.260731][28392:28392] CHIP:DMG:
+          [1658848398.260731][28392:28392] CHIP:DMG:                         
           [1658848398.260756][28392:28392] CHIP:DMG:         ],
-          [1658848398.260784][28392:28392] CHIP:DMG:
-          [1658848398.260810][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848398.260784][28392:28392] CHIP:DMG:                 
+          [1658848398.260810][28392:28392] CHIP:DMG:         isFabricFiltered = true, 
           [1658848398.260836][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
           [1658848398.260859][28392:28392] CHIP:DMG: },
           [1658848398.260930][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -211,7 +216,7 @@ tests:
       verification: |
           Optional attibute
 
-          ./chip-tool bridgedactions read setup-url 1 1
+          ./chip-tool actions read setup-url 1 1
 
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
