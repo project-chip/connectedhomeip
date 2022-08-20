@@ -37,8 +37,8 @@ tests:
           a. ./scripts/run_in_build_env.sh ./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build
           b. ./scripts/run_in_build_env.sh ./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang build
           2. Build respective app (all-clusters-app)
-          3. Commission DUT to TH 
-          4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT 
+          3. Commission DUT to TH
+          4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT
           ps  -aef|grep all-clusters-app
           5. Follow the Verification step below to generate the event in 2nd terminal of DUT
       disabled: true

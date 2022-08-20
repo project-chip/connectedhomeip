@@ -37,7 +37,7 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool temperaturemeasurement read measured-value 1 1
 
@@ -53,10 +53,10 @@ tests:
           [1650880412.037938][15013:15013] CHIP:DMG:                         Cluster = 0x402,
           [1650880412.037984][15013:15013] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1650880412.038023][15013:15013] CHIP:DMG:                 }
-          [1650880412.038055][15013:15013] CHIP:DMG:                         
+          [1650880412.038055][15013:15013] CHIP:DMG:
           [1650880412.038081][15013:15013] CHIP:DMG:         ],
-          [1650880412.038110][15013:15013] CHIP:DMG:                 
-          [1650880412.038137][15013:15013] CHIP:DMG:         isFabricFiltered = true, 
+          [1650880412.038110][15013:15013] CHIP:DMG:
+          [1650880412.038137][15013:15013] CHIP:DMG:         isFabricFiltered = true,
           [1650880412.038162][15013:15013] CHIP:DMG:         InteractionModelRevision = 1
           [1650880412.038186][15013:15013] CHIP:DMG: },
           [1650880412.038259][15013:15013] CHIP:DMG: IM RH moving to [Generatin
@@ -76,10 +76,10 @@ tests:
           [1650880462.518365][15013:15013] CHIP:DMG:                         Cluster = 0x402,
           [1650880462.518405][15013:15013] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1650880462.518446][15013:15013] CHIP:DMG:                 }
-          [1650880462.518483][15013:15013] CHIP:DMG:                         
+          [1650880462.518483][15013:15013] CHIP:DMG:
           [1650880462.518557][15013:15013] CHIP:DMG:         ],
-          [1650880462.518596][15013:15013] CHIP:DMG:                 
-          [1650880462.518630][15013:15013] CHIP:DMG:         isFabricFiltered = true, 
+          [1650880462.518596][15013:15013] CHIP:DMG:
+          [1650880462.518630][15013:15013] CHIP:DMG:         isFabricFiltered = true,
           [1650880462.518662][15013:15013] CHIP:DMG:         InteractionModelRevision = 1
           [1650880462.518690][15013:15013] CHIP:DMG: },
 
@@ -98,10 +98,10 @@ tests:
           [1650880507.409874][15013:15013] CHIP:DMG:                         Cluster = 0x402,
           [1650880507.409907][15013:15013] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1650880507.409936][15013:15013] CHIP:DMG:                 }
-          [1650880507.409966][15013:15013] CHIP:DMG:                         
+          [1650880507.409966][15013:15013] CHIP:DMG:
           [1650880507.409992][15013:15013] CHIP:DMG:         ],
-          [1650880507.410021][15013:15013] CHIP:DMG:                 
-          [1650880507.410048][15013:15013] CHIP:DMG:         isFabricFiltered = true, 
+          [1650880507.410021][15013:15013] CHIP:DMG:
+          [1650880507.410048][15013:15013] CHIP:DMG:         isFabricFiltered = true,
           [1650880507.410073][15013:15013] CHIP:DMG:         InteractionModelRevision = 1
           [1650880507.410097][15013:15013] CHIP:DMG: },
       disabled: true
@@ -110,7 +110,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool temperaturemeasurement read tolerance  1 1
 
@@ -127,10 +127,10 @@ tests:
           [1658141616.809068][13946:13946] CHIP:DMG:                         Cluster = 0x402,
           [1658141616.809104][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0003,
           [1658141616.809138][13946:13946] CHIP:DMG:                 }
-          [1658141616.809170][13946:13946] CHIP:DMG:                         
+          [1658141616.809170][13946:13946] CHIP:DMG:
           [1658141616.809198][13946:13946] CHIP:DMG:         ],
-          [1658141616.809230][13946:13946] CHIP:DMG:                 
-          [1658141616.809259][13946:13946] CHIP:DMG:         isFabricFiltered = true, 
+          [1658141616.809230][13946:13946] CHIP:DMG:
+          [1658141616.809259][13946:13946] CHIP:DMG:         isFabricFiltered = true,
           [1658141616.809288][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
           [1658141616.809314][13946:13946] CHIP:DMG: },
           [1658141616.809417][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -157,8 +157,8 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
-          To verify all below steps use all-clusters-minimal-app 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          To verify all below steps use all-clusters-minimal-app
 
            ./chip-tool temperaturemeasurement read measured-value 1 1
           Verify DUT receives measured-value attribute response on the TH(all-clusters-minimal-app) Log:
@@ -172,10 +172,10 @@ tests:
           [1650880412.037938][15013:15013] CHIP:DMG:                         Cluster = 0x402,
           [1650880412.037984][15013:15013] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1650880412.038023][15013:15013] CHIP:DMG:                 }
-          [1650880412.038055][15013:15013] CHIP:DMG:                         
+          [1650880412.038055][15013:15013] CHIP:DMG:
           [1650880412.038081][15013:15013] CHIP:DMG:         ],
-          [1650880412.038110][15013:15013] CHIP:DMG:                 
-          [1650880412.038137][15013:15013] CHIP:DMG:         isFabricFiltered = true, 
+          [1650880412.038110][15013:15013] CHIP:DMG:
+          [1650880412.038137][15013:15013] CHIP:DMG:         isFabricFiltered = true,
           [1650880412.038162][15013:15013] CHIP:DMG:         InteractionModelRevision = 1
           [1650880412.038186][15013:15013] CHIP:DMG: },
           [1650880412.038259][15013:15013] CHIP:DMG: IM RH moving to [Generatin
@@ -193,10 +193,10 @@ tests:
           [1650880462.518365][15013:15013] CHIP:DMG:                         Cluster = 0x402,
           [1650880462.518405][15013:15013] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1650880462.518446][15013:15013] CHIP:DMG:                 }
-          [1650880462.518483][15013:15013] CHIP:DMG:                         
+          [1650880462.518483][15013:15013] CHIP:DMG:
           [1650880462.518557][15013:15013] CHIP:DMG:         ],
-          [1650880462.518596][15013:15013] CHIP:DMG:                 
-          [1650880462.518630][15013:15013] CHIP:DMG:         isFabricFiltered = true, 
+          [1650880462.518596][15013:15013] CHIP:DMG:
+          [1650880462.518630][15013:15013] CHIP:DMG:         isFabricFiltered = true,
           [1650880462.518662][15013:15013] CHIP:DMG:         InteractionModelRevision = 1
           [1650880462.518690][15013:15013] CHIP:DMG: },
 
@@ -213,10 +213,10 @@ tests:
           [1650880507.409874][15013:15013] CHIP:DMG:                         Cluster = 0x402,
           [1650880507.409907][15013:15013] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1650880507.409936][15013:15013] CHIP:DMG:                 }
-          [1650880507.409966][15013:15013] CHIP:DMG:                         
+          [1650880507.409966][15013:15013] CHIP:DMG:
           [1650880507.409992][15013:15013] CHIP:DMG:         ],
-          [1650880507.410021][15013:15013] CHIP:DMG:                 
-          [1650880507.410048][15013:15013] CHIP:DMG:         isFabricFiltered = true, 
+          [1650880507.410021][15013:15013] CHIP:DMG:
+          [1650880507.410048][15013:15013] CHIP:DMG:         isFabricFiltered = true,
           [1650880507.410073][15013:15013] CHIP:DMG:         InteractionModelRevision = 1
           [1650880507.410097][15013:15013] CHIP:DMG: },"
       disabled: true
@@ -225,7 +225,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          .Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          .Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           /chip-tool temperaturemeasurement read tolerance 1 1
 

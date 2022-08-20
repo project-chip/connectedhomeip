@@ -105,7 +105,7 @@ tests:
           [1657232374.956534][370357:370357] CHIP:SVR: Commissioning completed successfully
           [1657232374.956577][370357:370357] CHIP:DIS: Updating services using commissioning mode 0
 
-          Verify on the DUT Commissioner side: 
+          Verify on the DUT Commissioner side:
           $ ./chip-tool pairing code 1  MT:-24J0YXE00KA0648G00
 
           [1657232374820] [31379:16804218] CHIP: [CTL] Received CommissioningComplete response, errorCode=0
@@ -159,7 +159,7 @@ tests:
           [1651105530.973166][27371:27371] CHIP:SVR: Commissioning completed successfully
           [1651105530.973215][27371:27371] CHIP:DIS: Updating services using commissioning mode 0
 
-          Verify on the DUT Commissioner: 
+          Verify on the DUT Commissioner:
           $ ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 
           [1651105530854] [95067:65607294] CHIP: [CTL] Received CommissioningComplete response

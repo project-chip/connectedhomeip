@@ -45,7 +45,7 @@ tests:
       verification: |
           Execute the following command on the TH and verify the AAA records:
 
-          ubuntu@ubuntu:~$ 
+          ubuntu@ubuntu:~$
           avahi-browse -rt _matterd._udp
 
           ++   eth0 IPv6 8BA9B3B40B98E9BB                              _matterd._udp        local

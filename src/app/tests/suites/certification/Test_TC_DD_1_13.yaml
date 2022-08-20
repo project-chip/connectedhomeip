@@ -66,7 +66,7 @@ tests:
       verification: |
           1. Follow vendor-specific steps from the pairing hint to put DUT into commissioning mode
 
-          2. Verify DUT is advertising in commissioning mode. On DUT, 
+          2. Verify DUT is advertising in commissioning mode. On DUT,
 
           $  ./chip-tool discover commissionables
           Verify in TH as commissioner side:

@@ -41,7 +41,7 @@ tests:
           Endpoint 0"
       PICS: DESC.S.A0000 && DESC.S.A0003
       verification: |
-          Send a read request to the DUT using chip-tool to read the partsList attribute in the descriptor cluster on Endpoint 0. 
+          Send a read request to the DUT using chip-tool to read the partsList attribute in the descriptor cluster on Endpoint 0.
           Make a note of all the items(Endpoint id’s) in the list. In the below example there are 2 endpoint id"s listed [1,2]
 
           ./chip-tool descriptor read  parts-list 1 0
@@ -72,7 +72,7 @@ tests:
           Endpoint supported by DUT (except Endpoint 0)."
       PICS: DESC.S.A0000 && DESC.S.A0003
       verification: |
-          For all the Endpoint id’s listed from the previous step run the following steps. The device type should correspond to the id value in the device_type.json 
+          For all the Endpoint id’s listed from the previous step run the following steps. The device type should correspond to the id value in the device_type.json
           Chip tool outputs all values in integer,  convert to hex before comparing.
 
 
@@ -121,7 +121,7 @@ tests:
     - label: "TH reads ServerList attribute."
       PICS: DESC.S.A0001
       verification: |
-          For all the Endpoint id’s listed in step 1a run the following steps. For all the server list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output. 
+          For all the Endpoint id’s listed in step 1a run the following steps. For all the server list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output.
 
           ./chip-tool descriptor read server-list 1 1
 
@@ -189,7 +189,7 @@ tests:
     - label: "TH reads ClientList attribute"
       PICS: DESC.S.A0002
       verification: |
-          For all the Endpoint id’s listed in step 1a run the following steps. For all the client list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output. 
+          For all the Endpoint id’s listed in step 1a run the following steps. For all the client list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output.
 
 
           ./chip-tool descriptor read client-list 1 1
@@ -226,7 +226,7 @@ tests:
           to make sure all mandatory (and applicable optional)
           attributes/commands are implemented."
       verification: |
-          FOR ENDPOINTS 2 
+          FOR ENDPOINTS 2
 
 
           ./chip-tool descriptor read  parts-list 1 2

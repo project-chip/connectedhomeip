@@ -39,7 +39,7 @@ tests:
       verification: |
           ./chip-tool pressuremeasurement read measured-value 1 1
 
-          verify the " measured-value response" on the TH (all-cluster-app) log: 
+          verify the " measured-value response" on the TH (all-cluster-app) log:
 
           [1653992317.047323][2347:2347] CHIP:IM: Received Read request
           [1653992317.047382][2347:2347] CHIP:DMG: ReadRequestMessage =
@@ -52,17 +52,17 @@ tests:
           [1653992317.047657][2347:2347] CHIP:DMG:                         Cluster = 0x403,
           [1653992317.047695][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1653992317.047725][2347:2347] CHIP:DMG:                 }
-          [1653992317.047774][2347:2347] CHIP:DMG:                         
+          [1653992317.047774][2347:2347] CHIP:DMG:
           [1653992317.047803][2347:2347] CHIP:DMG:         ],
-          [1653992317.047831][2347:2347] CHIP:DMG:                 
-          [1653992317.047859][2347:2347] CHIP:DMG:         isFabricFiltered = true, 
+          [1653992317.047831][2347:2347] CHIP:DMG:
+          [1653992317.047859][2347:2347] CHIP:DMG:         isFabricFiltered = true,
           [1653992317.047884][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
           [1653992317.047908][2347:2347] CHIP:DMG: },
           [1653992317.047995][2347:2347] CHIP:DMG: IM RH moving to [GeneratingReports]
 
           ./chip-tool pressuremeasurement read  min-measured-value 1 1
 
-          verify the " min-measured-value response" on the TH (all-cluster-app) log: 
+          verify the " min-measured-value response" on the TH (all-cluster-app) log:
 
           [1653992385.759474][2347:2347] CHIP:IM: Received Read request
           [1653992385.759533][2347:2347] CHIP:DMG: ReadRequestMessage =
@@ -75,17 +75,17 @@ tests:
           [1653992385.759781][2347:2347] CHIP:DMG:                         Cluster = 0x403,
           [1653992385.759859][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1653992385.759918][2347:2347] CHIP:DMG:                 }
-          [1653992385.759971][2347:2347] CHIP:DMG:                         
+          [1653992385.759971][2347:2347] CHIP:DMG:
           [1653992385.760000][2347:2347] CHIP:DMG:         ],
-          [1653992385.760049][2347:2347] CHIP:DMG:                 
-          [1653992385.760100][2347:2347] CHIP:DMG:         isFabricFiltered = true, 
+          [1653992385.760049][2347:2347] CHIP:DMG:
+          [1653992385.760100][2347:2347] CHIP:DMG:         isFabricFiltered = true,
           [1653992385.760125][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
           [1653992385.760168][2347:2347] CHIP:DMG: }
 
 
           ./chip-tool pressuremeasurement read  max-measured-value 1 1
 
-          verify the " max-measured-value response" on the TH (all-cluster-app) log: 
+          verify the " max-measured-value response" on the TH (all-cluster-app) log:
 
           [1653992415.580348][2347:2347] CHIP:IM: Received Read request
           [1653992415.580414][2347:2347] CHIP:DMG: ReadRequestMessage =
@@ -98,10 +98,10 @@ tests:
           [1653992415.580674][2347:2347] CHIP:DMG:                         Cluster = 0x403,
           [1653992415.580713][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1653992415.580746][2347:2347] CHIP:DMG:                 }
-          [1653992415.580786][2347:2347] CHIP:DMG:                         
+          [1653992415.580786][2347:2347] CHIP:DMG:
           [1653992415.580812][2347:2347] CHIP:DMG:         ],
-          [1653992415.580852][2347:2347] CHIP:DMG:                 
-          [1653992415.580879][2347:2347] CHIP:DMG:         isFabricFiltered = true, 
+          [1653992415.580852][2347:2347] CHIP:DMG:
+          [1653992415.580879][2347:2347] CHIP:DMG:         isFabricFiltered = true,
           [1653992415.580913][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
           [1653992415.580936][2347:2347] CHIP:DMG: }
       disabled: true
@@ -142,7 +142,7 @@ tests:
       verification: |
           ./chip-tool pressuremeasurement read attribute-list  1 1
 
-          verify the " attribute-list response" on the TH (all-cluster-minimal-app) log: 
+          verify the " attribute-list response" on the TH (all-cluster-minimal-app) log:
 
           [1659606175.282588][7312:7312] CHIP:EM: Handling via exchange: 12368r, Delegate: 0xaaaaad2c4f68
           [1659606175.282635][7312:7312] CHIP:IM: Received Read request
@@ -156,10 +156,10 @@ tests:
           [1659606175.282910][7312:7312] CHIP:DMG:                         Cluster = 0x403,
           [1659606175.282946][7312:7312] CHIP:DMG:                         Attribute = 0x0000_FFFB,
           [1659606175.282975][7312:7312] CHIP:DMG:                 }
-          [1659606175.283004][7312:7312] CHIP:DMG:                         
+          [1659606175.283004][7312:7312] CHIP:DMG:
           [1659606175.283029][7312:7312] CHIP:DMG:         ],
-          [1659606175.283056][7312:7312] CHIP:DMG:                 
-          [1659606175.283083][7312:7312] CHIP:DMG:         isFabricFiltered = true, 
+          [1659606175.283056][7312:7312] CHIP:DMG:
+          [1659606175.283083][7312:7312] CHIP:DMG:         isFabricFiltered = true,
           [1659606175.283108][7312:7312] CHIP:DMG:         InteractionModelRevision = 1
           [1659606175.283132][7312:7312] CHIP:DMG: },
           [1659606175.283211][7312:7312] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -172,7 +172,7 @@ tests:
 
            ./chip-tool pressuremeasurement read measured-value 1 1
 
-          verify the " measured-value response" on the TH (all-cluster-minimal-app) log: 
+          verify the " measured-value response" on the TH (all-cluster-minimal-app) log:
 
           [1653992317.047323][2347:2347] CHIP:IM: Received Read request
           [1653992317.047382][2347:2347] CHIP:DMG: ReadRequestMessage =
@@ -185,17 +185,17 @@ tests:
           [1653992317.047657][2347:2347] CHIP:DMG:                         Cluster = 0x403,
           [1653992317.047695][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1653992317.047725][2347:2347] CHIP:DMG:                 }
-          [1653992317.047774][2347:2347] CHIP:DMG:                         
+          [1653992317.047774][2347:2347] CHIP:DMG:
           [1653992317.047803][2347:2347] CHIP:DMG:         ],
-          [1653992317.047831][2347:2347] CHIP:DMG:                 
-          [1653992317.047859][2347:2347] CHIP:DMG:         isFabricFiltered = true, 
+          [1653992317.047831][2347:2347] CHIP:DMG:
+          [1653992317.047859][2347:2347] CHIP:DMG:         isFabricFiltered = true,
           [1653992317.047884][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
           [1653992317.047908][2347:2347] CHIP:DMG: },
           [1653992317.047995][2347:2347] CHIP:DMG: IM RH moving to [GeneratingReports]
 
           ./chip-tool pressuremeasurement read  min-measured-value 1 1
 
-          verify the " min-measured-value response" on the TH (all-cluster-minimal-app) log: 
+          verify the " min-measured-value response" on the TH (all-cluster-minimal-app) log:
 
           [1653992385.759474][2347:2347] CHIP:IM: Received Read request
           [1653992385.759533][2347:2347] CHIP:DMG: ReadRequestMessage =
@@ -208,17 +208,17 @@ tests:
           [1653992385.759781][2347:2347] CHIP:DMG:                         Cluster = 0x403,
           [1653992385.759859][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1653992385.759918][2347:2347] CHIP:DMG:                 }
-          [1653992385.759971][2347:2347] CHIP:DMG:                         
+          [1653992385.759971][2347:2347] CHIP:DMG:
           [1653992385.760000][2347:2347] CHIP:DMG:         ],
-          [1653992385.760049][2347:2347] CHIP:DMG:                 
-          [1653992385.760100][2347:2347] CHIP:DMG:         isFabricFiltered = true, 
+          [1653992385.760049][2347:2347] CHIP:DMG:
+          [1653992385.760100][2347:2347] CHIP:DMG:         isFabricFiltered = true,
           [1653992385.760125][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
           [1653992385.760168][2347:2347] CHIP:DMG: },
 
 
           ./chip-tool pressuremeasurement read  max-measured-value 1 1
 
-          verify the " max-measured-value response" on the TH (all-cluster-minimal-app) log: 
+          verify the " max-measured-value response" on the TH (all-cluster-minimal-app) log:
 
           [1653992415.580348][2347:2347] CHIP:IM: Received Read request
           [1653992415.580414][2347:2347] CHIP:DMG: ReadRequestMessage =
@@ -231,10 +231,10 @@ tests:
           [1653992415.580674][2347:2347] CHIP:DMG:                         Cluster = 0x403,
           [1653992415.580713][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1653992415.580746][2347:2347] CHIP:DMG:                 }
-          [1653992415.580786][2347:2347] CHIP:DMG:                         
+          [1653992415.580786][2347:2347] CHIP:DMG:
           [1653992415.580812][2347:2347] CHIP:DMG:         ],
-          [1653992415.580852][2347:2347] CHIP:DMG:                 
-          [1653992415.580879][2347:2347] CHIP:DMG:         isFabricFiltered = true, 
+          [1653992415.580852][2347:2347] CHIP:DMG:
+          [1653992415.580879][2347:2347] CHIP:DMG:         isFabricFiltered = true,
           [1653992415.580913][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
           [1653992415.580936][2347:2347] CHIP:DMG: },"
       disabled: true
@@ -243,7 +243,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          TH all-clusters-minimal-app does not support optional attributes 
+          TH all-clusters-minimal-app does not support optional attributes
 
           ./chip-tool pressuremeasurement read  tolerance 1 1
           ./chip-tool pressuremeasurement read scaled-value 1 1

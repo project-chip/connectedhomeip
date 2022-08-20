@@ -62,7 +62,7 @@ tests:
           commissioning mode."
       verification: |
           1. Launch the TH commissionee all-clusters-app:
-          $ ./chip-all-clusters-app 
+          $ ./chip-all-clusters-app
           Verifiy on TH as commissionee side:
           [1660152729.426029][648909:648909] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
           [1660152729.426076][648909:648909] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]

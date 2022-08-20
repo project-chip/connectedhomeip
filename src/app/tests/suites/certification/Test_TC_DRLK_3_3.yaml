@@ -38,8 +38,8 @@ tests:
           a. ./scripts/run_in_build_env.sh ./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build
           b. ./scripts/run_in_build_env.sh ./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang build
           2. Build respective app (lock-app)
-          3. Commission DUT to TH 
-          4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT 
+          3. Commission DUT to TH
+          4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT
           ps  -aef|grep lock-app
           5. Follow the Verification step below to generate the event in 2nd terminal of DUT "
       disabled: true
@@ -50,7 +50,7 @@ tests:
           To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in lock-app to generate the event, Vendor Dut should have capability to generate this event)
 
 
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) and TH as lock-app. 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) and TH as lock-app.
 
           To generate the event give below command
           echo "{"Cmd": "SendDoorLockAlarm", "Params": { "EndpointId": 1, "AlarmCode": 0 } }" > /tmp/chip_lock_app_fifo-<PID>   (PID of lock app)
@@ -69,10 +69,10 @@ tests:
           [1660933624.279232][18319:18319] CHIP:DMG:                         Cluster = 0x101,
           [1660933624.279271][18319:18319] CHIP:DMG:                         Event = 0x0,
           [1660933624.279300][18319:18319] CHIP:DMG:                 },
-          [1660933624.279337][18319:18319] CHIP:DMG:                 
+          [1660933624.279337][18319:18319] CHIP:DMG:
           [1660933624.279360][18319:18319] CHIP:DMG:         ],
-          [1660933624.279397][18319:18319] CHIP:DMG:         
-          [1660933624.279422][18319:18319] CHIP:DMG:         isFabricFiltered = true, 
+          [1660933624.279397][18319:18319] CHIP:DMG:
+          [1660933624.279422][18319:18319] CHIP:DMG:         isFabricFiltered = true,
           [1660933624.279455][18319:18319] CHIP:DMG:         InteractionModelRevision = 1
           [1660933624.279478][18319:18319] CHIP:DMG: },
       disabled: true
@@ -111,8 +111,8 @@ tests:
 
           [1660931208.583139][18319:18319] CHIP:DMG: InvokeRequestMessage =
           [1660931208.583184][18319:18319] CHIP:DMG: {
-          [1660931208.583226][18319:18319] CHIP:DMG:         suppressResponse = false, 
-          [1660931208.583275][18319:18319] CHIP:DMG:         timedRequest = true, 
+          [1660931208.583226][18319:18319] CHIP:DMG:         suppressResponse = false,
+          [1660931208.583275][18319:18319] CHIP:DMG:         timedRequest = true,
           [1660931208.583319][18319:18319] CHIP:DMG:         InvokeRequests =
           [1660931208.583381][18319:18319] CHIP:DMG:         [
           [1660931208.583426][18319:18319] CHIP:DMG:                 CommandDataIB =
@@ -123,26 +123,26 @@ tests:
           [1660931208.583698][18319:18319] CHIP:DMG:                                 ClusterId = 0x101,
           [1660931208.583757][18319:18319] CHIP:DMG:                                 CommandId = 0x22,
           [1660931208.583813][18319:18319] CHIP:DMG:                         },
-          [1660931208.583871][18319:18319] CHIP:DMG:                         
-          [1660931208.583923][18319:18319] CHIP:DMG:                         CommandFields = 
+          [1660931208.583871][18319:18319] CHIP:DMG:
+          [1660931208.583923][18319:18319] CHIP:DMG:                         CommandFields =
           [1660931208.583979][18319:18319] CHIP:DMG:                         {
-          [1660931208.584037][18319:18319] CHIP:DMG:                                 0x0 = 0, 
-          [1660931208.584100][18319:18319] CHIP:DMG:                                 0x1 = 
+          [1660931208.584037][18319:18319] CHIP:DMG:                                 0x0 = 0,
+          [1660931208.584100][18319:18319] CHIP:DMG:                                 0x1 =
           [1660931208.584158][18319:18319] CHIP:DMG:                                 {
-          [1660931208.584220][18319:18319] CHIP:DMG:                                         0x0 = 1, 
-          [1660931208.584289][18319:18319] CHIP:DMG:                                         0x1 = 1, 
+          [1660931208.584220][18319:18319] CHIP:DMG:                                         0x0 = 1,
+          [1660931208.584289][18319:18319] CHIP:DMG:                                         0x1 = 1,
           [1660931208.584353][18319:18319] CHIP:DMG:                                 },
           [1660931208.584413][18319:18319] CHIP:DMG:                                 0x2 = [
-          [1660931208.584473][18319:18319] CHIP:DMG:                                                 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 
+          [1660931208.584473][18319:18319] CHIP:DMG:                                                 0x31, 0x32, 0x33, 0x34, 0x35, 0x36,
           [1660931208.584540][18319:18319] CHIP:DMG:                                 ] (6 bytes)
-          [1660931208.584596][18319:18319] CHIP:DMG:                                 0x3 = 1, 
+          [1660931208.584596][18319:18319] CHIP:DMG:                                 0x3 = 1,
           [1660931208.584662][18319:18319] CHIP:DMG:                                 0x4 = NULL
           [1660931208.584722][18319:18319] CHIP:DMG:                                 0x5 = NULL
           [1660931208.584781][18319:18319] CHIP:DMG:                         },
           [1660931208.584834][18319:18319] CHIP:DMG:                 },
-          [1660931208.584895][18319:18319] CHIP:DMG:                 
+          [1660931208.584895][18319:18319] CHIP:DMG:
           [1660931208.584938][18319:18319] CHIP:DMG:         ],
-          [1660931208.584999][18319:18319] CHIP:DMG:         
+          [1660931208.584999][18319:18319] CHIP:DMG:
           [1660931208.585043][18319:18319] CHIP:DMG:         InteractionModelRevision = 1
           [1660931208.585086][18319:18319] CHIP:DMG: },
 
@@ -222,10 +222,10 @@ tests:
           [1660933582.188006][18319:18319] CHIP:DMG:                         Cluster = 0x101,
           [1660933582.188035][18319:18319] CHIP:DMG:                         Event = 0x1,
           [1660933582.188069][18319:18319] CHIP:DMG:                 },
-          [1660933582.188100][18319:18319] CHIP:DMG:                 
+          [1660933582.188100][18319:18319] CHIP:DMG:
           [1660933582.188132][18319:18319] CHIP:DMG:         ],
-          [1660933582.188159][18319:18319] CHIP:DMG:         
-          [1660933582.188193][18319:18319] CHIP:DMG:         isFabricFiltered = true, 
+          [1660933582.188159][18319:18319] CHIP:DMG:
+          [1660933582.188193][18319:18319] CHIP:DMG:         isFabricFiltered = true,
           [1660933582.188218][18319:18319] CHIP:DMG:         InteractionModelRevision = 1
           [1660933582.188250][18319:18319] CHIP:DMG: },
           [1660933582.188328][18319:18319] CHIP:DMG: IM RH moving to [GeneratingReports]

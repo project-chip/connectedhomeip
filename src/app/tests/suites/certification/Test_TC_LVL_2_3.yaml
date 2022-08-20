@@ -37,7 +37,7 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool levelcontrol read current-level 1 1
           Verify DUT receives  current-level attribute response on the TH(all-clusters-app) Log:
@@ -52,10 +52,10 @@ tests:
           [1657279115.433703][4417:4417] CHIP:DMG:                         Cluster = 0x8,
           [1657279115.433781][4417:4417] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1657279115.433851][4417:4417] CHIP:DMG:                 }
-          [1657279115.433920][4417:4417] CHIP:DMG:                         
+          [1657279115.433920][4417:4417] CHIP:DMG:
           [1657279115.433980][4417:4417] CHIP:DMG:         ],
-          [1657279115.434047][4417:4417] CHIP:DMG:                 
-          [1657279115.434109][4417:4417] CHIP:DMG:         isFabricFiltered = true, 
+          [1657279115.434047][4417:4417] CHIP:DMG:
+          [1657279115.434109][4417:4417] CHIP:DMG:         isFabricFiltered = true,
           [1657279115.434169][4417:4417] CHIP:DMG:         InteractionModelRevision = 1
           [1657279115.434226][4417:4417] CHIP:DMG: },
 
@@ -73,10 +73,10 @@ tests:
           [1657279142.247028][4417:4417] CHIP:DMG:                         Cluster = 0x8,
           [1657279142.247100][4417:4417] CHIP:DMG:                         Attribute = 0x0000_0011,
           [1657279142.247164][4417:4417] CHIP:DMG:                 }
-          [1657279142.247245][4417:4417] CHIP:DMG:                         
+          [1657279142.247245][4417:4417] CHIP:DMG:
           [1657279142.247310][4417:4417] CHIP:DMG:         ],
-          [1657279142.247375][4417:4417] CHIP:DMG:                 
-          [1657279142.247439][4417:4417] CHIP:DMG:         isFabricFiltered = true, 
+          [1657279142.247375][4417:4417] CHIP:DMG:
+          [1657279142.247439][4417:4417] CHIP:DMG:         isFabricFiltered = true,
           [1657279142.247500][4417:4417] CHIP:DMG:         InteractionModelRevision = 1
           [1657279142.247552][4417:4417] CHIP:DMG: },
 
@@ -94,10 +94,10 @@ tests:
           [1657279166.426245][4417:4417] CHIP:DMG:                         Cluster = 0x8,
           [1657279166.426310][4417:4417] CHIP:DMG:                         Attribute = 0x0000_000F,
           [1657279166.426389][4417:4417] CHIP:DMG:                 }
-          [1657279166.426465][4417:4417] CHIP:DMG:                         
+          [1657279166.426465][4417:4417] CHIP:DMG:
           [1657279166.426528][4417:4417] CHIP:DMG:         ],
-          [1657279166.426597][4417:4417] CHIP:DMG:                 
-          [1657279166.426660][4417:4417] CHIP:DMG:         isFabricFiltered = true, 
+          [1657279166.426597][4417:4417] CHIP:DMG:
+          [1657279166.426660][4417:4417] CHIP:DMG:         isFabricFiltered = true,
           [1657279166.426721][4417:4417] CHIP:DMG:         InteractionModelRevision = 1
           [1657279166.426777][4417:4417] CHIP:DMG: },
       disabled: true
@@ -106,7 +106,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool levelcontrol read remaining-time 1 1
           Verify DUT receives  remaining-time  attribute response on the TH(all-clusters-app) Log:
@@ -343,7 +343,7 @@ tests:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool levelcontrol write on-level 5 (replace with your value) 1 1
           Verify DUT receives on-level attribute write response on the TH(all-clusters-app) Log:
@@ -376,7 +376,7 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool levelcontrol write on-off-transition-time 5 (replace with your own value) 123123 1
           Verify DUT receives on-off-transition-time attribute write response on the TH(all-clusters-app) Log:
@@ -520,7 +520,7 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool levelcontrol read current-level 1 1
           Verify DUT receives  current-level attribute response on the TH(all-clusters-minimal-app) Log:
@@ -562,7 +562,7 @@ tests:
           [1657913877.851251][3126:3126] CHIP:DMG:        isFabricFiltered = true,
           [1657913877.851297][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
           [1657913877.851343][3126:3126] CHIP:DMG: },
-          [1657913877.851471][3126:3126] CHIP:DMG: IM 
+          [1657913877.851471][3126:3126] CHIP:DMG: IM
 
 
           ./chip-tool levelcontrol read options 1 1
@@ -611,15 +611,15 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          TH all-clusters-minimal-app does not support optional attributes 
+          TH all-clusters-minimal-app does not support optional attributes
           To verify this behaviour send the below mentioned commands and check the result as unsupported attribute
            ./chip-tool levelcontrol read remaining-time 1 1
 
-           ./chip-tool levelcontrol read min-level 1 1   
+           ./chip-tool levelcontrol read min-level 1 1
 
-           ./chip-tool levelcontrol read max-level 1 1  
+           ./chip-tool levelcontrol read max-level 1 1
 
           ./chip-tool levelcontrol read current-frequency 1 1
 
@@ -634,9 +634,9 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          TH all-clusters-minimal-app does not support optional attributes 
+          TH all-clusters-minimal-app does not support optional attributes
           To verify this behaviour send the below mentioned commands and check the result as unsupported attribute
           ./chip-tool levelcontrol write on-off-transition-time 5 1 1
           ./chip-tool levelcontrol write on-transition-time 5 1 1

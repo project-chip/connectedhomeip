@@ -39,7 +39,7 @@ tests:
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          verify the "supported-modes response" on the TH (all-cluster-app) log: 
+          verify the "supported-modes response" on the TH (all-cluster-app) log:
 
           [1650968776.863713][12747:12747] CHIP:IM: Received Read request
           [1650968776.863767][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -52,10 +52,10 @@ tests:
           [1650968776.864023][12747:12747] CHIP:DMG:                         Cluster = 0x50,
           [1650968776.864052][12747:12747] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1650968776.864085][12747:12747] CHIP:DMG:                 }
-          [1650968776.864124][12747:12747] CHIP:DMG:                         
+          [1650968776.864124][12747:12747] CHIP:DMG:
           [1650968776.864153][12747:12747] CHIP:DMG:         ],
-          [1650968776.864190][12747:12747] CHIP:DMG:                 
-          [1650968776.864216][12747:12747] CHIP:DMG:         isFabricFiltered = true, 
+          [1650968776.864190][12747:12747] CHIP:DMG:
+          [1650968776.864216][12747:12747] CHIP:DMG:         isFabricFiltered = true,
           [1650968776.864251][12747:12747] CHIP:DMG:         InteractionModelRevision = 1
           [1650968776.864273][12747:12747] CHIP:DMG: },
           [1650968776.864361][12747:12747] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -68,7 +68,7 @@ tests:
 
           ./chip-tool modeselect read current-mode 1 1
 
-          verify the "current-modes response" on the TH (all-cluster-app) log: 
+          verify the "current-modes response" on the TH (all-cluster-app) log:
 
           1650968848.687576][12747:12747] CHIP:IM: Received Read request
           [1650968848.687628][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -81,10 +81,10 @@ tests:
           [1650968848.687855][12747:12747] CHIP:DMG:                         Cluster = 0x50,
           [1650968848.687887][12747:12747] CHIP:DMG:                         Attribute = 0x0000_0003,
           [1650968848.687917][12747:12747] CHIP:DMG:                 }
-          [1650968848.687974][12747:12747] CHIP:DMG:                         
+          [1650968848.687974][12747:12747] CHIP:DMG:
           [1650968848.688003][12747:12747] CHIP:DMG:         ],
-          [1650968848.688031][12747:12747] CHIP:DMG:                 
-          [1650968848.688057][12747:12747] CHIP:DMG:         isFabricFiltered = true, 
+          [1650968848.688031][12747:12747] CHIP:DMG:
+          [1650968848.688057][12747:12747] CHIP:DMG:         isFabricFiltered = true,
           [1650968848.688082][12747:12747] CHIP:DMG:         InteractionModelRevision = 1
           [1650968848.688105][12747:12747] CHIP:DMG: },
           [1650968848.688174][12747:12747] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -94,7 +94,7 @@ tests:
 
            ./chip-tool modeselect read standard-namespace 1 1
 
-          verify the "standard-namespace response" on the TH (all-cluster-app) log: 
+          verify the "standard-namespace response" on the TH (all-cluster-app) log:
 
           1650968644.223891][12747:12747] CHIP:IM: Received Read request
           [1650968644.223954][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -107,10 +107,10 @@ tests:
           [1650968644.224169][12747:12747] CHIP:DMG:                         Cluster = 0x50,
           [1650968644.224206][12747:12747] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1650968644.224233][12747:12747] CHIP:DMG:                 }
-          [1650968644.224272][12747:12747] CHIP:DMG:                         
+          [1650968644.224272][12747:12747] CHIP:DMG:
           [1650968644.224297][12747:12747] CHIP:DMG:         ],
-          [1650968644.224334][12747:12747] CHIP:DMG:                 
-          [1650968644.224369][12747:12747] CHIP:DMG:         isFabricFiltered = true, 
+          [1650968644.224334][12747:12747] CHIP:DMG:
+          [1650968644.224369][12747:12747] CHIP:DMG:         isFabricFiltered = true,
           [1650968644.224394][12747:12747] CHIP:DMG:         InteractionModelRevision = 1
           [1650968644.224426][12747:12747] CHIP:DMG: },
           [1650968644.224507][12747:12747] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -124,7 +124,7 @@ tests:
 
           ./chip-tool modeselect read description 1 1
 
-          verify the "description response" on the TH (all-cluster-app) log: 
+          verify the "description response" on the TH (all-cluster-app) log:
 
           [1650969447.413679][12747:12747] CHIP:EM: Handling via exchange: 65381r, Delegate: 0xaaaae5201098
           [1650969447.413718][12747:12747] CHIP:IM: Received Read request
@@ -138,10 +138,10 @@ tests:
           [1650969447.413989][12747:12747] CHIP:DMG:                         Cluster = 0x50,
           [1650969447.414021][12747:12747] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1650969447.414051][12747:12747] CHIP:DMG:                 }
-          [1650969447.414080][12747:12747] CHIP:DMG:                         
+          [1650969447.414080][12747:12747] CHIP:DMG:
           [1650969447.414108][12747:12747] CHIP:DMG:         ],
-          [1650969447.414137][12747:12747] CHIP:DMG:                 
-          [1650969447.414163][12747:12747] CHIP:DMG:         isFabricFiltered = true, 
+          [1650969447.414137][12747:12747] CHIP:DMG:
+          [1650969447.414163][12747:12747] CHIP:DMG:         isFabricFiltered = true,
           [1650969447.414188][12747:12747] CHIP:DMG:         InteractionModelRevision = 1
           [1650969447.414211][12747:12747] CHIP:DMG: },
           [1650969447.414280][12747:12747] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -153,7 +153,7 @@ tests:
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
-          verify the "on-modes response" on the TH (all-cluster-app) log: 
+          verify the "on-modes response" on the TH (all-cluster-app) log:
 
           [1650969570.494960][12747:12747] CHIP:IM: Received Read request
           [1650969570.495012][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -166,10 +166,10 @@ tests:
           [1650969570.495210][12747:12747] CHIP:DMG:                         Cluster = 0x50,
           [1650969570.495242][12747:12747] CHIP:DMG:                         Attribute = 0x0000_0005,
           [1650969570.495275][12747:12747] CHIP:DMG:                 }
-          [1650969570.495304][12747:12747] CHIP:DMG:                         
+          [1650969570.495304][12747:12747] CHIP:DMG:
           [1650969570.495332][12747:12747] CHIP:DMG:         ],
-          [1650969570.495360][12747:12747] CHIP:DMG:                 
-          [1650969570.495386][12747:12747] CHIP:DMG:         isFabricFiltered = true, 
+          [1650969570.495360][12747:12747] CHIP:DMG:
+          [1650969570.495386][12747:12747] CHIP:DMG:         isFabricFiltered = true,
           [1650969570.495411][12747:12747] CHIP:DMG:         InteractionModelRevision = 1
           [1650969570.495435][12747:12747] CHIP:DMG: },
           [1650969570.495503][12747:12747] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -177,7 +177,7 @@ tests:
           ./chip-tool modeselect read start-up-mode 1 1
 
 
-          verify the "start-up-modes response" on the TH (all-cluster-app) log: 
+          verify the "start-up-modes response" on the TH (all-cluster-app) log:
 
           [1650970821.970899][12747:12747] CHIP:IM: Received Read request
           [1650970821.970950][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -190,10 +190,10 @@ tests:
           [1650970821.971139][12747:12747] CHIP:DMG:                         Cluster = 0x50,
           [1650970821.971164][12747:12747] CHIP:DMG:                         Attribute = 0x0000_0004,
           [1650970821.971191][12747:12747] CHIP:DMG:                 }
-          [1650970821.971216][12747:12747] CHIP:DMG:                         
+          [1650970821.971216][12747:12747] CHIP:DMG:
           [1650970821.971238][12747:12747] CHIP:DMG:         ],
-          [1650970821.971268][12747:12747] CHIP:DMG:                 
-          [1650970821.971295][12747:12747] CHIP:DMG:         isFabricFiltered = true, 
+          [1650970821.971268][12747:12747] CHIP:DMG:
+          [1650970821.971295][12747:12747] CHIP:DMG:         isFabricFiltered = true,
           [1650970821.971323][12747:12747] CHIP:DMG:         InteractionModelRevision = 1
           [1650970821.971349][12747:12747] CHIP:DMG: },
           [1650970821.971419][12747:12747] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -221,7 +221,7 @@ tests:
       verification: |
           ./chip-tool modeselect read attribute-list  1 1
 
-          verify the "attribute-list response" on the TH (all-cluster-minimal-app) log: 
+          verify the "attribute-list response" on the TH (all-cluster-minimal-app) log:
 
           [1659589890.492170][3088:3088] CHIP:IM: Received Read request
           [1659589890.492250][3088:3088] CHIP:DMG: ReadRequestMessage =
@@ -234,10 +234,10 @@ tests:
           [1659589890.492444][3088:3088] CHIP:DMG:                         Cluster = 0x50,
           [1659589890.492481][3088:3088] CHIP:DMG:                         Attribute = 0x0000_FFFB,
           [1659589890.492510][3088:3088] CHIP:DMG:                 }
-          [1659589890.492545][3088:3088] CHIP:DMG:                         
+          [1659589890.492545][3088:3088] CHIP:DMG:
           [1659589890.492569][3088:3088] CHIP:DMG:         ],
-          [1659589890.492603][3088:3088] CHIP:DMG:                 
-          [1659589890.492627][3088:3088] CHIP:DMG:         isFabricFiltered = true, 
+          [1659589890.492603][3088:3088] CHIP:DMG:
+          [1659589890.492627][3088:3088] CHIP:DMG:         isFabricFiltered = true,
           [1659589890.492658][3088:3088] CHIP:DMG:         InteractionModelRevision = 1
           [1659589890.492679][3088:3088] CHIP:DMG: },
 
@@ -245,7 +245,7 @@ tests:
 
           ./chip-tool modeselect read supported-modes 1 1
 
-          verify the "supported-modes response" on the TH (all-cluster-minimal-app) log: 
+          verify the "supported-modes response" on the TH (all-cluster-minimal-app) log:
 
           [1650968776.863713][12747:12747] CHIP:IM: Received Read request
           [1650968776.863767][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -258,10 +258,10 @@ tests:
           [1650968776.864023][12747:12747] CHIP:DMG:                         Cluster = 0x50,
           [1650968776.864052][12747:12747] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1650968776.864085][12747:12747] CHIP:DMG:                 }
-          [1650968776.864124][12747:12747] CHIP:DMG:                         
+          [1650968776.864124][12747:12747] CHIP:DMG:
           [1650968776.864153][12747:12747] CHIP:DMG:         ],
-          [1650968776.864190][12747:12747] CHIP:DMG:                 
-          [1650968776.864216][12747:12747] CHIP:DMG:         isFabricFiltered = true, 
+          [1650968776.864190][12747:12747] CHIP:DMG:
+          [1650968776.864216][12747:12747] CHIP:DMG:         isFabricFiltered = true,
           [1650968776.864251][12747:12747] CHIP:DMG:         InteractionModelRevision = 1
           [1650968776.864273][12747:12747] CHIP:DMG: },
           [1650968776.864361][12747:12747] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -274,7 +274,7 @@ tests:
 
           ./chip-tool modeselect read current-mode 1 1
 
-          verify the "current-modes response" on the TH (all-cluster-minimal-app) log: 
+          verify the "current-modes response" on the TH (all-cluster-minimal-app) log:
 
           1650968848.687576][12747:12747] CHIP:IM: Received Read request
           [1650968848.687628][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -287,10 +287,10 @@ tests:
           [1650968848.687855][12747:12747] CHIP:DMG:                         Cluster = 0x50,
           [1650968848.687887][12747:12747] CHIP:DMG:                         Attribute = 0x0000_0003,
           [1650968848.687917][12747:12747] CHIP:DMG:                 }
-          [1650968848.687974][12747:12747] CHIP:DMG:                         
+          [1650968848.687974][12747:12747] CHIP:DMG:
           [1650968848.688003][12747:12747] CHIP:DMG:         ],
-          [1650968848.688031][12747:12747] CHIP:DMG:                 
-          [1650968848.688057][12747:12747] CHIP:DMG:         isFabricFiltered = true, 
+          [1650968848.688031][12747:12747] CHIP:DMG:
+          [1650968848.688057][12747:12747] CHIP:DMG:         isFabricFiltered = true,
           [1650968848.688082][12747:12747] CHIP:DMG:         InteractionModelRevision = 1
           [1650968848.688105][12747:12747] CHIP:DMG: },
           [1650968848.688174][12747:12747] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -300,7 +300,7 @@ tests:
 
            ./chip-tool modeselect read standard-namespace 1 1
 
-          verify the "standard-namespace response" on the TH (all-cluster-minimal-app) log: 
+          verify the "standard-namespace response" on the TH (all-cluster-minimal-app) log:
 
           1650968644.223891][12747:12747] CHIP:IM: Received Read request
           [1650968644.223954][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -313,10 +313,10 @@ tests:
           [1650968644.224169][12747:12747] CHIP:DMG:                         Cluster = 0x50,
           [1650968644.224206][12747:12747] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1650968644.224233][12747:12747] CHIP:DMG:                 }
-          [1650968644.224272][12747:12747] CHIP:DMG:                         
+          [1650968644.224272][12747:12747] CHIP:DMG:
           [1650968644.224297][12747:12747] CHIP:DMG:         ],
-          [1650968644.224334][12747:12747] CHIP:DMG:                 
-          [1650968644.224369][12747:12747] CHIP:DMG:         isFabricFiltered = true, 
+          [1650968644.224334][12747:12747] CHIP:DMG:
+          [1650968644.224369][12747:12747] CHIP:DMG:         isFabricFiltered = true,
           [1650968644.224394][12747:12747] CHIP:DMG:         InteractionModelRevision = 1
           [1650968644.224426][12747:12747] CHIP:DMG: },
           [1650968644.224507][12747:12747] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -330,7 +330,7 @@ tests:
 
           ./chip-tool modeselect read description 1 1
 
-          verify the "description response" on the TH (all-cluster-minimal-app) log: 
+          verify the "description response" on the TH (all-cluster-minimal-app) log:
 
           [1650969447.413679][12747:12747] CHIP:EM: Handling via exchange: 65381r, Delegate: 0xaaaae5201098
           [1650969447.413718][12747:12747] CHIP:IM: Received Read request
@@ -344,10 +344,10 @@ tests:
           [1650969447.413989][12747:12747] CHIP:DMG:                         Cluster = 0x50,
           [1650969447.414021][12747:12747] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1650969447.414051][12747:12747] CHIP:DMG:                 }
-          [1650969447.414080][12747:12747] CHIP:DMG:                         
+          [1650969447.414080][12747:12747] CHIP:DMG:
           [1650969447.414108][12747:12747] CHIP:DMG:         ],
-          [1650969447.414137][12747:12747] CHIP:DMG:                 
-          [1650969447.414163][12747:12747] CHIP:DMG:         isFabricFiltered = true, 
+          [1650969447.414137][12747:12747] CHIP:DMG:
+          [1650969447.414163][12747:12747] CHIP:DMG:         isFabricFiltered = true,
           [1650969447.414188][12747:12747] CHIP:DMG:         InteractionModelRevision = 1
           [1650969447.414211][12747:12747] CHIP:DMG: },
           [1650969447.414280][12747:12747] CHIP:DMG: IM RH moving to [GeneratingReports]"
@@ -357,7 +357,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          TH all-clusters-minimal-app does not support optional attributes 
+          TH all-clusters-minimal-app does not support optional attributes
 
           ./chip-tool modeselect read on-mode 1 1
           ./chip-tool modeselect read start-up-mode 1 1

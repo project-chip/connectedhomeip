@@ -307,7 +307,7 @@ tests:
           1. TH is in commissioning mode and discoverable by DUT over IP through DNS-SD advertisements. This can also be verified using through the DUT"s pairing command over IP.
 
           Verify in TH as commissionee side:
-          $ ./out/all-clusters-app/chip-all-clusters-app 
+          $ ./out/all-clusters-app/chip-all-clusters-app
           [1660154789.496930][7968:7968] CHIP:DIS: CHIP minimal mDNS started advertising.
           [1660154789.499623][7968:7968] CHIP:DL: Using wifi MAC for hostname
           [1660154789.499743][7968:7968] CHIP:DIS: Advertise commission parameter vendorID=65521 productID=32769 discriminator=3840/15 cm=1
