@@ -656,6 +656,11 @@ public:
         mDeviceAttestationVerifier = deviceAttestationVerifier;
     }
 
+    Optional<CommissioningParameters> GetCommissioningParameters()
+    {
+        return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
+    }
+
 private:
     DevicePairingDelegate * mPairingDelegate;
 
