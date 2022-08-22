@@ -245,8 +245,15 @@ efr32_executable("thermostat_app") {
   }
 
   if (!disable_lcd) {
-    sources += [ "${examples_plat_dir}/display/lcd.c" ]
-    defines += [ "DISPLAY_ENABLED" ]
+    sources += [
+      "${examples_plat_dir}/display/demo-ui.c",
+      "${examples_plat_dir}/display/lcd.cpp",
+    ]
+    include_dirs += [ "${examples_plat_dir}/display" ]
+    defines += [
+      "DISPLAY_ENABLED",
+      "IS_DEMO_THERMOSTAT=1",
+    ]
     if (show_qr_code) {
       defines += [ "QR_CODE_ENABLED" ]
       deps += [ "${chip_root}/examples/common/QRCode" ]
