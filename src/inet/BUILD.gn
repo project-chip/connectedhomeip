@@ -107,7 +107,7 @@ static_library("inet") {
   }
 
   if (chip_system_config_use_open_thread_inet_endpoints) {
-    public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
+    public_deps += [ "${chip_root}/third_party/openthread:openthread_device" ]
   }
 
   if (chip_inet_config_enable_tcp_endpoint) {
