@@ -35,15 +35,15 @@ tests:
 
     - label: "Note"
       verification: |
-          1.Need 4 raspi for this test case and use 3 raspi as dut[all-cluster-app] and 1 raspi as chip-tool.
+          1.This test case requires 4 raspi to execute.  1 raspi as Commissioner. and 1 raspi as dut[Controller]  2 raspi as controllee
 
-          2.1st raspi which is used as DUT , which you are going to pair with onnetwork, you need to build shell command on that all clusters app.[build shell on DUT 1 Use - [scripts/examples/gn_build_example.sh examples/all-clusters-app/linux/ out/all-clusters-app chip_inet_config_enable_ipv4=false chip_build_libshell=true ]
+          2. In this example, RASP is used as DUT & it requires additional shell access to execute the controller commands. To support the shell, use the following command to build the all-clusters-app . On the DUT device  Use - [scripts/examples/gn_build_example.sh examples/all-clusters-app/linux/ out/all-clusters-app chip_inet_config_enable_ipv4=false chip_build_libshell=true ]  - (Vendor DUT must have this provision to execute the controller commands. )
 
-          3.Pair TH2 , TH3 with ble-wifi with different discriminator as mentioned below, using the chip-tool running on 4th raspi.
+          3.Pair TH2 , TH3 with ble-wifi with different discriminator as mentioned below test steps , using the chip-tool running as commissioner in one RPI.
 
-          4.using chip-tool (on the 4th raspi) write the ACL entries in both TH2 and TH3 allowing to receive commands for onoff cluster from DUT
+          4.using the commissioner  write the ACL entries on both TH2 and TH3 for allowing to receive commands for onoff cluster from DUT(Controller)
 
-          5.Hit Enter on raspi , you will see shell prompt (>) , enter help, you will command for switch . At the prompt enter switch on ,the on command is sent to both TH2 and TH3. you can see that in the log. to test if the TH2/TH3 are turned on or not, you can read the on-off attribute status. Read the status before sending the switch on command and read after sending the command. you should see the value changing.
+          5.Hit the Enter button on raspi , you will see a shell prompt (>) , enter help,  this would list the command for switch . At the prompt enter switch on ,the "on" command is sent to both TH2 and TH3. and the command and corresponding response can be verified in the log.  to test if the TH2/TH3 are turned on or not, you can read the on-off attribute status. Read the status before sending the switch on command and read after sending the command. you should see the value changing.
       disabled: true
 
     - label: "Factory Reset DUT"
@@ -75,7 +75,7 @@ tests:
       verification: |
           ./chip-tool binding write binding "[{"node" : 2 , "cluster" : "0x0006" , "endpoint" : 1 }, { "node" : 3 , "cluster" : "0x0006" , "endpoint" : 2  }]" 1 1
 
-          On TH(Chip-tool), Verify the success response for binding entries
+          On TH1(Chip-tool), Verify the success response for binding entries
 
 
           [1657797710.456056][3796:3801] CHIP:DMG:                                 status = 0x00 (SUCCESS),
@@ -103,7 +103,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}]}]" 2 0
 
-          on TH (Chip-tool), Verify the on command receives success response
+          on TH1 (Chip-tool), Verify the on command receives success response
 
           [1652330385.328196][3240:3245] CHIP:DMG:                        StatusIB =
           [1652330385.328229][3240:3245] CHIP:DMG:                        {
@@ -113,7 +113,7 @@ tests:
 
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 2, "deviceType": null}]}]" 3 0
 
-          on TH(Chip-tool), Verify the on command receives success response
+          on TH1(Chip-tool), Verify the on command receives success response
 
           [1650610345.847274][2626:2631] CHIP:DMG:                                StatusIB =
           [1650610345.847317][2626:2631] CHIP:DMG:                                {
@@ -226,14 +226,14 @@ tests:
       verification: |
           ./chip-tool onoff read on-off 2 1
 
-          Verify on TH (Chip-tool),the onoff value is set to ON
+          Verify on TH2 (Chip-tool),the onoff value is set to ON
 
           [1657798291.396477][3835:3841] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 4260513117
           [1657798291.396514][3835:3841] CHIP:TOO:   OnOff: TRUE
 
           ./chip-tool onoff read on-off 3 2
 
-          Verify on TH(Chip-tool) ,the onoff value is set to ON
+          Verify on TH3 (Chip-tool) ,the onoff value is set to ON
 
           [1657798691.194894][3869:3874] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 470320746
           [1657798691.194948][3869:3874] CHIP:TOO:   OnOff: TRUE
@@ -243,7 +243,7 @@ tests:
       verification: |
           ./chip-tool binding write binding "[{"node" : 2 , "cluster" : "0x0006" , "endpoint" : 1 }]" 1 1
 
-          Verify on TH(Chip-tool) ,binding entry receives success response
+          Verify on TH1(Chip-tool) ,binding entry receives success response
 
           [1657800844.739833][4000:4006] CHIP:EM: Removed CHIP MessageCounter:244702117 from RetransTable on exchange 12653i
           [1657800844.739867][4000:4006] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -347,7 +347,7 @@ tests:
       verification: |
           ./chip-tool onoff read on-off  2 1
 
-          Verify on TH (Chip-tool),the onoff value is set to OFF
+          Verify on TH2 (Chip-tool),the onoff value is set to OFF
 
           [1657803168.769564][4272:4277] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 1968648540
 
@@ -359,7 +359,7 @@ tests:
       verification: |
           ./chip-tool onoff read on-off 3 2
 
-          Verify on TH(Chip-tool) ,the onoff value is set to ON
+          Verify on TH3 (Chip-tool) ,the onoff value is set to ON
 
           [1657803609.731464][4333:4339] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3914456390
 

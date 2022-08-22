@@ -355,3 +355,4 @@
 
 // Commands for cluster: Fault Injection
 #define ZCL_FAIL_AT_FAULT_COMMAND_ID (0x00)
+#define ZCL_FAIL_RANDOMLY_AT_FAULT_COMMAND_ID (0x01)

@@ -246,7 +246,11 @@ efr32_executable("chef_app") {
   }
 
   if (!disable_lcd) {
-    sources += [ "${examples_plat_dir}/display/lcd.c" ]
+    sources += [
+      "${examples_plat_dir}/display/demo-ui.c",
+      "${examples_plat_dir}/display/lcd.cpp",
+    ]
+    include_dirs += [ "${examples_plat_dir}/display" ]
     defines += [ "DISPLAY_ENABLED" ]
     if (show_qr_code) {
       defines += [ "QR_CODE_ENABLED" ]

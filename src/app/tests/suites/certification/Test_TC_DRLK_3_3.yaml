@@ -27,24 +27,54 @@ config:
 tests:
     - label: "Note"
       verification: |
-          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Note"
+      verification: |
+          "NOTE: https://github.com/project-chip/connectedhomeip/tree/master/examples/lock-app/linux#readme
+          Events to be executed as following
+          1. Compile app using below command in connectedhomeip folder
+          a. ./scripts/run_in_build_env.sh ./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build
+          b. ./scripts/run_in_build_env.sh ./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang build
+          2. Build respective app (lock-app)
+          3. Commission DUT to TH
+          4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT
+          ps  -aef|grep lock-app
+          5. Follow the Verification step below to generate the event in 2nd terminal of DUT "
       disabled: true
 
     - label: "TH will initiate DoorLockAlarm Event (LockJammed scenario)"
       PICS: DRLK.C.E00
       verification: |
+          To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in lock-app to generate the event, Vendor Dut should have capability to generate this event)
+
+
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) and TH as lock-app.
+
+          To generate the event give below command
+          echo "{"Cmd": "SendDoorLockAlarm", "Params": { "EndpointId": 1, "AlarmCode": 0 } }" > /tmp/chip_lock_app_fifo-<PID>   (PID of lock app)
+
           ./chip-tool doorlock read-event door-lock-alarm 1 1
 
           Verify "DUT receives the DoorLockAlarm event " on the TH(Lock-app) Log:
 
-          [1659520755.536021][3987:3992] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0000
-          [1659520755.536048][3987:3992] CHIP:TOO:   Event number: 4
-          [1659520755.536069][3987:3992] CHIP:TOO:   Priority: Critical
-          [1659520755.536089][3987:3992] CHIP:TOO:   Timestamp: 22818908
-          [1659520755.536198][3987:3992] CHIP:TOO:   DoorLockAlarm: {
-          [1659520755.536234][3987:3992] CHIP:TOO:     AlarmCode: 0
-          [1659520755.536259][3987:3992] CHIP:TOO:    }
-          [1659520755.536347][3987:3992] CHIP:EM: Sending Standalone Ack for MessageCounter:229373286 on exchange 22555i
+          [1660933624.278924][18319:18319] CHIP:DMG: ReadRequestMessage =
+          [1660933624.278964][18319:18319] CHIP:DMG: {
+          [1660933624.278987][18319:18319] CHIP:DMG:         EventPathIBs =
+          [1660933624.279023][18319:18319] CHIP:DMG:         [
+          [1660933624.279116][18319:18319] CHIP:DMG:                 EventPath =
+          [1660933624.279155][18319:18319] CHIP:DMG:                 {
+          [1660933624.279192][18319:18319] CHIP:DMG:                         Endpoint = 0x1,
+          [1660933624.279232][18319:18319] CHIP:DMG:                         Cluster = 0x101,
+          [1660933624.279271][18319:18319] CHIP:DMG:                         Event = 0x0,
+          [1660933624.279300][18319:18319] CHIP:DMG:                 },
+          [1660933624.279337][18319:18319] CHIP:DMG:
+          [1660933624.279360][18319:18319] CHIP:DMG:         ],
+          [1660933624.279397][18319:18319] CHIP:DMG:
+          [1660933624.279422][18319:18319] CHIP:DMG:         isFabricFiltered = true,
+          [1660933624.279455][18319:18319] CHIP:DMG:         InteractionModelRevision = 1
+          [1660933624.279478][18319:18319] CHIP:DMG: },
       disabled: true
 
     - label: "DUT sends the Unlock Door command to the TH with valid PINCode"
@@ -75,35 +105,47 @@ tests:
           [1658399917.775273][2474:2474] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001A
           [1658399917.775327][2474:2474] CHIP:ZCL: [SetUser] Incoming command [endpointId=1,userIndex=1]
 
-          ./chip-tool doorlock set-credential 0 "{ "credentialType" : 1 , "credentialIndex" : 1 }" 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 "{ "credentialType" : 1 , "credentialIndex" : 1 }" 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT receives the set-credential response " on the TH(Lock-app) Log:
 
-          [1658400025.688730][2474:2474] CHIP:DMG:                        CommandFields =
-          [1658400025.688777][2474:2474] CHIP:DMG:                        {
-          [1658400025.688822][2474:2474] CHIP:DMG:                                0x0 = 0,
-          [1658400025.688873][2474:2474] CHIP:DMG:                                0x1 =
-          [1658400025.688922][2474:2474] CHIP:DMG:                                {
-          [1658400025.688964][2474:2474] CHIP:DMG:                                        0x0 = 1,
-          [1658400025.689016][2474:2474] CHIP:DMG:                                        0x1 = 1,
-          [1658400025.689058][2474:2474] CHIP:DMG:                                },
-          [1658400025.689110][2474:2474] CHIP:DMG:                                0x2 = [
-          [1658400025.689161][2474:2474] CHIP:DMG:                                                0x31, 0x32, 0x33, 0x34, 0x35, 0x36,
-          [1658400025.689209][2474:2474] CHIP:DMG:                                ]
-          [1658400025.689261][2474:2474] CHIP:DMG:                                0x3 = 1,
-          [1658400025.689312][2474:2474] CHIP:DMG:                                0x4 = 0,
-          [1658400025.689353][2474:2474] CHIP:DMG:                                0x5 = 0,
-          [1658400025.689403][2474:2474] CHIP:DMG:                        },
-          [1658400025.689436][2474:2474] CHIP:DMG:                },
-          [1658400025.689477][2474:2474] CHIP:DMG:
-          [1658400025.689529][2474:2474] CHIP:DMG:        ],
-          [1658400025.689575][2474:2474] CHIP:DMG:
-          [1658400025.689619][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
-          [1658400025.689648][2474:2474] CHIP:DMG: },
-          [1658400025.689747][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
-          [1658400025.689802][2474:2474] CHIP:DMG: AccessControl: allowed
-          [1658400025.689836][2474:2474] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0022
-          [1658400025.689909][2474:2474] CHIP:ZCL: [SetCredential] Incoming command [endpointId=1]
+          [1660931208.583139][18319:18319] CHIP:DMG: InvokeRequestMessage =
+          [1660931208.583184][18319:18319] CHIP:DMG: {
+          [1660931208.583226][18319:18319] CHIP:DMG:         suppressResponse = false,
+          [1660931208.583275][18319:18319] CHIP:DMG:         timedRequest = true,
+          [1660931208.583319][18319:18319] CHIP:DMG:         InvokeRequests =
+          [1660931208.583381][18319:18319] CHIP:DMG:         [
+          [1660931208.583426][18319:18319] CHIP:DMG:                 CommandDataIB =
+          [1660931208.583475][18319:18319] CHIP:DMG:                 {
+          [1660931208.583522][18319:18319] CHIP:DMG:                         CommandPathIB =
+          [1660931208.583579][18319:18319] CHIP:DMG:                         {
+          [1660931208.583636][18319:18319] CHIP:DMG:                                 EndpointId = 0x1,
+          [1660931208.583698][18319:18319] CHIP:DMG:                                 ClusterId = 0x101,
+          [1660931208.583757][18319:18319] CHIP:DMG:                                 CommandId = 0x22,
+          [1660931208.583813][18319:18319] CHIP:DMG:                         },
+          [1660931208.583871][18319:18319] CHIP:DMG:
+          [1660931208.583923][18319:18319] CHIP:DMG:                         CommandFields =
+          [1660931208.583979][18319:18319] CHIP:DMG:                         {
+          [1660931208.584037][18319:18319] CHIP:DMG:                                 0x0 = 0,
+          [1660931208.584100][18319:18319] CHIP:DMG:                                 0x1 =
+          [1660931208.584158][18319:18319] CHIP:DMG:                                 {
+          [1660931208.584220][18319:18319] CHIP:DMG:                                         0x0 = 1,
+          [1660931208.584289][18319:18319] CHIP:DMG:                                         0x1 = 1,
+          [1660931208.584353][18319:18319] CHIP:DMG:                                 },
+          [1660931208.584413][18319:18319] CHIP:DMG:                                 0x2 = [
+          [1660931208.584473][18319:18319] CHIP:DMG:                                                 0x31, 0x32, 0x33, 0x34, 0x35, 0x36,
+          [1660931208.584540][18319:18319] CHIP:DMG:                                 ] (6 bytes)
+          [1660931208.584596][18319:18319] CHIP:DMG:                                 0x3 = 1,
+          [1660931208.584662][18319:18319] CHIP:DMG:                                 0x4 = NULL
+          [1660931208.584722][18319:18319] CHIP:DMG:                                 0x5 = NULL
+          [1660931208.584781][18319:18319] CHIP:DMG:                         },
+          [1660931208.584834][18319:18319] CHIP:DMG:                 },
+          [1660931208.584895][18319:18319] CHIP:DMG:
+          [1660931208.584938][18319:18319] CHIP:DMG:         ],
+          [1660931208.584999][18319:18319] CHIP:DMG:
+          [1660931208.585043][18319:18319] CHIP:DMG:         InteractionModelRevision = 1
+          [1660931208.585086][18319:18319] CHIP:DMG: },
+
 
 
           ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
@@ -163,18 +205,30 @@ tests:
     - label: "TH initiates DoorStateChange event with Doorstate set to DoorOpen"
       PICS: DRLK.C.F05 && DRLK.C.E01
       verification: |
+          To trigger the event give below command in another terminal of DUT
+           echo "{"Cmd": "SetDoorState", "Params": { "EndpointId": 1, "DoorState": 1 } }" > /tmp/chip_lock_app_fifo-<PID> (PID of lock-app)
+
           ./chip-tool doorlock read-event door-state-change 1 1
 
           Verify "DUT receives DoorStateChange Event" on the TH(Lock-app) Log:
 
-          [1659521149.394340][4046:4051] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0001
-          [1659521149.394391][4046:4051] CHIP:TOO:   Event number: 1
-          [1659521149.394412][4046:4051] CHIP:TOO:   Priority: Critical
-          [1659521149.394433][4046:4051] CHIP:TOO:   Timestamp: 22783568
-          [1659521149.394503][4046:4051] CHIP:TOO:   DoorStateChange: {
-          [1659521149.394539][4046:4051] CHIP:TOO:     DoorState: 1
-          [1659521149.394564][4046:4051] CHIP:TOO:    }
-          [1659521149.394654][4046:4051] CHIP:EM: Sending Standalone Ack for MessageCounter:231120057 on exchange 10153i
+          [1660933582.187791][18319:18319] CHIP:DMG: ReadRequestMessage =
+          [1660933582.187819][18319:18319] CHIP:DMG: {
+          [1660933582.187851][18319:18319] CHIP:DMG:         EventPathIBs =
+          [1660933582.187877][18319:18319] CHIP:DMG:         [
+          [1660933582.187901][18319:18319] CHIP:DMG:                 EventPath =
+          [1660933582.187937][18319:18319] CHIP:DMG:                 {
+          [1660933582.187966][18319:18319] CHIP:DMG:                         Endpoint = 0x1,
+          [1660933582.188006][18319:18319] CHIP:DMG:                         Cluster = 0x101,
+          [1660933582.188035][18319:18319] CHIP:DMG:                         Event = 0x1,
+          [1660933582.188069][18319:18319] CHIP:DMG:                 },
+          [1660933582.188100][18319:18319] CHIP:DMG:
+          [1660933582.188132][18319:18319] CHIP:DMG:         ],
+          [1660933582.188159][18319:18319] CHIP:DMG:
+          [1660933582.188193][18319:18319] CHIP:DMG:         isFabricFiltered = true,
+          [1660933582.188218][18319:18319] CHIP:DMG:         InteractionModelRevision = 1
+          [1660933582.188250][18319:18319] CHIP:DMG: },
+          [1660933582.188328][18319:18319] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label: "DUT sends the Lock Door command to the TH with valid PINCode"

@@ -44,12 +44,16 @@ tests:
           scenario)"
       PICS: DRLK.S.E00 && DRLK.S.DetectLockJammed
       verification: |
-          To trigger the event give below command in another terminal of DUT
+          To trigger the event give below command by opening an another terminal of DUT
 
           echo "{"Cmd": "SendDoorLockAlarm", "Params": { "EndpointId": 1, "AlarmCode": 0 } }" > /tmp/chip_lock_app_fifo-<PID>  (PID of lock-app)
           For example :
            echo "{"Cmd": "SendDoorLockAlarm", "Params": { "EndpointId": 1, "AlarmCode": 0 } }" > /tmp/chip_lock_app_fifo-3940
+      disabled: true
 
+    - label: "TH reads the DoorLockAlarm event from DUT"
+      PICS: DRLK.S.E00
+      verification: |
           ./chip-tool doorlock read-event door-lock-alarm 1 1
 
           Verify "TH receives the DoorLockAlarm event  and AlarmCode is set to LockJammed " on the TH(Chip-tool) Log:
@@ -63,37 +67,16 @@ tests:
           [1659521453.110591][4098:4103] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH reads the DoorLockAlarm event from DUT"
-      PICS: DRLK.S.E00
-      verification: |
-          verification step to be updated.
-      disabled: true
-
     - label: "Trigger the DUT to generate DoorStateChange Event"
       PICS: DRLK.S.F05 && DRLK.S.E01
       verification: |
           To trigger the event give below command in another terminal of DUT
           echo "{"Cmd": "SetDoorState", "Params": { "EndpointId": 1, "DoorState": 1 } }" > /tmp/chip_lock_app_fifo-4055    (4055 - value changes)
-
-          ./chip-tool doorlock read-event door-state-change 1 1
-
-          Verify "TH recieve the DoorLockAlaram event and DoorState set to DoorClosed " on the TH(Chip-tool) Log:
-
-          [1659521576.156075][4109:4114] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0001
-          [1659521576.156118][4109:4114] CHIP:TOO:   Event number: 1
-          [1659521576.156150][4109:4114] CHIP:TOO:   Priority: Critical
-          [1659521576.156181][4109:4114] CHIP:TOO:   Timestamp: 23466089
-          [1659521576.156277][4109:4114] CHIP:TOO:   DoorStateChange: {
-          [1659521576.156331][4109:4114] CHIP:TOO:     DoorState: 1
-          [1659521576.156368][4109:4114] CHIP:TOO:    }
       disabled: true
 
     - label: "TH reads the DoorStateChange event from DUT"
       PICS: DRLK.S.F05 && DRLK.S.E01
       verification: |
-          To trigger the event give below command in another terminal of DUT
-          echo "{"Cmd": "SetDoorState", "Params": { "EndpointId": 1, "DoorState": 1 } }" > /tmp/chip_lock_app_fifo-4055    (4055 - value changes)
-
           ./chip-tool doorlock read-event door-state-change 1 1
 
           Verify "TH recieve the DoorLockAlaram event and DoorState set to DoorClosed " on the TH(Chip-tool) Log:

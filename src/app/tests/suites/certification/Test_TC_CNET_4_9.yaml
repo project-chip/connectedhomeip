@@ -26,6 +26,88 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "The cluster Identifier 49 (0x0031) is present in the ServerList
+          attribute"
+      verification: |
+          ./chip-tool descriptor read server-list 1 0
+
+          Verify the "descriptor" on the TH(Chip-tool) log
+
+          [1653474860.462391][29901:29906] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 1237231415
+          [1653474860.462487][29901:29906] CHIP:TOO:   server list: 25 entries
+          [1653474860.462524][29901:29906] CHIP:TOO:     [1]: 3
+          [1653474860.462549][29901:29906] CHIP:TOO:     [2]: 4
+          [1653474860.462574][29901:29906] CHIP:TOO:     [3]: 29
+          [1653474860.462598][29901:29906] CHIP:TOO:     [4]: 30
+          [1653474860.462622][29901:29906] CHIP:TOO:     [5]: 31
+          [1653474860.462646][29901:29906] CHIP:TOO:     [6]: 40
+          [1653474860.462670][29901:29906] CHIP:TOO:     [7]: 42
+          [1653474860.462693][29901:29906] CHIP:TOO:     [8]: 43
+          [1653474860.462717][29901:29906] CHIP:TOO:     [9]: 44
+          [1653474860.462741][29901:29906] CHIP:TOO:     [10]: 45
+          [1653474860.462765][29901:29906] CHIP:TOO:     [11]: 46
+          [1653474860.462788][29901:29906] CHIP:TOO:     [12]: 48
+          [1653474860.462812][29901:29906] CHIP:TOO:     [13]: 49
+          [1653474860.462836][29901:29906] CHIP:TOO:     [14]: 50
+          [1653474860.462859][29901:29906] CHIP:TOO:     [15]: 51
+          [1653474860.462883][29901:29906] CHIP:TOO:     [16]: 52
+          [1653474860.462906][29901:29906] CHIP:TOO:     [17]: 53
+          [1653474860.462930][29901:29906] CHIP:TOO:     [18]: 54
+          [1653474860.462954][29901:29906] CHIP:TOO:     [19]: 55
+          [1653474860.462977][29901:29906] CHIP:TOO:     [20]: 60
+          [1653474860.463001][29901:29906] CHIP:TOO:     [21]: 62
+          [1653474860.463024][29901:29906] CHIP:TOO:     [22]: 63
+          [1653474860.463048][29901:29906] CHIP:TOO:     [23]: 64
+          [1653474860.463071][29901:29906] CHIP:TOO:     [24]: 65
+          [1653474860.463095][29901:29906] CHIP:TOO:     [25]: 1029
+          [1653474860.463296][29901:29906] CHIP:EM: Sending Standalone Ack for MessageCounter:10703464 on exchange 2435i
+      disabled: true
+
+    - label: "The FeatureMap attribute value is 1"
+      verification: |
+          ./chip-tool networkcommissioning read feature-map 1 0
+
+          Verify the "feature-map" on the TH(Chip-tool) log
+
+          [1653474932.055513][29920:29925] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 1600858167
+          [1653474932.055578][29920:29925] CHIP:TOO:   FeatureMap: 1
+          [1653474932.055675][29920:29925] CHIP:EM: Sending Standalone Ack for MessageCounter:1494059 on exchange 5482i
+      disabled: true
+
+    - label: "The Networks attribute value is 1 entries"
+      verification: |
+          ./chip-tool networkcommissioning read networks 1 0
+
+          Verify the "networks" on the TH(Chip-tool) log
+
+          [1653478044.910989][30351:30356] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1600858167
+          [1653478044.911109][30351:30356] CHIP:TOO:   Networks: 1 entries
+          [1653478044.911192][30351:30356] CHIP:TOO:     [1]: {
+          [1653478044.911238][30351:30356] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1653478044.911280][30351:30356] CHIP:TOO:       Connected: FALSE
+          [1653478044.911322][30351:30356] CHIP:TOO:      }
+          [1653478044.911474][30351:30356] CHIP:EM: Sending Standalone Ack for MessageCounter:3575760 on exchange 51774i
+      disabled: true
+
+    - label:
+          "MaxNetworks attribute value is at least 1 which is saved as
+          MaxNetworksValue for future use"
+      verification: |
+          ./chip-tool networkcommissioning read max-networks 1 0
+
+          Verify the "max-networks" on the TH(Chip-tool) log
+
+          [1653476960.303444][30164:30169] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0000 DataVersion: 1600858167
+          [1653476960.303531][30164:30169] CHIP:TOO:   MaxNetworks: 1
+          [1653476960.303641][30164:30169] CHIP:EM: Sending Standalone Ack for MessageCounter:2083922 on exchange 45120i
+      disabled: true
+
     - label:
           "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
           to 900"
@@ -181,6 +263,8 @@ tests:
           "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
           to 0"
       verification: |
+          Mark as not applicable and proceed to next step
+
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
 
           Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
@@ -196,6 +280,8 @@ tests:
     - label: "TH reads Networks attribute from the DUT"
       PICS: CNET.S.A0001
       verification: |
+          Mark as not applicable and proceed to next step
+
           ./chip-tool networkcommissioning read networks 1 0
 
           Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
@@ -208,6 +294,8 @@ tests:
           "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
           to 90"
       verification: |
+          Mark as not applicable and proceed to next step
+
           ./chip-tool generalcommissioning arm-fail-safe 90 1 1 0
 
           Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
@@ -225,6 +313,8 @@ tests:
           PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and Breadcrumb field set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
+          Mark as not applicable and proceed to next step
+
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
           Below is an example:
 

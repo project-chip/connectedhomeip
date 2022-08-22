@@ -29,7 +29,6 @@
     MTRSetupPayload * payload;
     switch (type) {
     case MTROnboardingPayloadTypeManualCode:
-    case MTROnboardingPayloadTypeAdmin:
         payload = [self setupPayloadForManualCodeOnboardingPayload:onboardingPayload error:error];
         break;
     case MTROnboardingPayloadTypeQRCode:

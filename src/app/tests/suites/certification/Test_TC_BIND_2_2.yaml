@@ -212,7 +212,7 @@ tests:
 
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]" 74 0
 
-          On TH(Chip-tool), Verify the success response for Acl:
+          On TH1(Chip-tool), Verify the success response for Acl:
 
           [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
           [1659075680.944052][2687:2692] CHIP:DMG:                         {
@@ -222,7 +222,7 @@ tests:
 
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]" 2 0
 
-          On TH(Chip-tool), Verify the success response for Acl:
+          On TH1(Chip-tool), Verify the success response for Acl:
 
           [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
           [1659075680.944052][2687:2692] CHIP:DMG:                         {
@@ -238,7 +238,7 @@ tests:
 
           ./chip-tool onoff read on-off 2 1
 
-          On TH (Chip-tool), Verify the value is set to ON
+          On TH1 (Chip-tool), Verify the value is set to ON
 
           [1657717900.832851][4381:4386] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 1558029216
           [1657717900.832890][4381:4386] CHIP:TOO:   OnOff: TRUE
@@ -250,7 +250,7 @@ tests:
 
           ./chip-tool binding write binding "[]" 74 1
 
-          On TH(Chip-tool), Verify the success response for removing binding entry
+          On TH1(Chip-tool), Verify the success response for removing binding entry
 
           [1659362827.431927][2469:2475] CHIP:DMG:                         StatusIB =
           [1659362827.431996][2469:2475] CHIP:DMG:                         {
@@ -273,7 +273,7 @@ tests:
 
           ./chip-tool onoff read on-off 2 1
 
-          On TH(Chip-tool), Verify the value is set to ON
+          On TH1(Chip-tool), Verify the value is set to ON
 
           [1657718251.169765][4425:4431] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 1558029223
           [1657718251.169817][4425:4431] CHIP:TOO:   OnOff: TRUE

@@ -358,6 +358,12 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
         //        store the credentials in persistent storage, and
         //        generate when not available in the storage.
         ReturnLogErrorOnFailure(mCommissionerStorage.Init(key.c_str()));
+        if (mUseMaxSizedCerts.HasValue())
+        {
+            auto option = CredentialIssuerCommands::CredentialIssuerOptions::kMaximizeCertificateSizes;
+            mCredIssuerCmds->SetCredentialIssuerOption(option, mUseMaxSizedCerts.Value());
+        }
+
         ReturnLogErrorOnFailure(mCredIssuerCmds->InitializeCredentialsIssuer(mCommissionerStorage));
 
         chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);

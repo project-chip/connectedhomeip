@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Matter/MTRNOCChainIssuer.h>
 #import <Matter/MTROnboardingPayloadParser.h>
 
 @class MTRBaseDevice;
@@ -118,6 +119,16 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * @param[in] queue The queue on which the callbacks will be delivered
  */
 - (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
+
+/**
+ * Sets this MTRDeviceController to use the given issuer for issuing operational certs. By default, the MTRDeviceController uses an
+ * internal issuer.
+ *
+ * @param[in] nocChainIssuer the NOC Chain issuer to use for issuer operational certs
+ *
+ * @param[in] queue The queue on which the callbacks will be delivered
+ */
+- (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer queue:(dispatch_queue_t)queue;
 
 /**
  * Shutdown the controller. Calls to shutdown after the first one are NO-OPs.
