@@ -84,8 +84,9 @@ if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
 }
 
-# ThunderBoards  (No LCD)
-if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B") {
+# ThunderBoards and Explorer Kit (No LCD)
+if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B" ||
+    efr32_board == "BRD2703A") {
   show_qr_code = false
   disable_lcd = true
 }
@@ -93,7 +94,7 @@ if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B") {
 # WiFi settings
 if (chip_enable_wifi) {
   # disabling LCD for MG24 for wifi
-  if (efr32_board == "BRD4186A" || efr32_board == "BRD4187A") {
+  if (efr32_board == "BRD4186C" || efr32_board == "BRD4187A") {
     show_qr_code = false
     disable_lcd = true
   }
