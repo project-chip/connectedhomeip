@@ -44,23 +44,34 @@ tests:
 
     - label: "TH reads the FeatureMap from DUT"
       verification: |
+          (WiFi)
           ./chip-tool networkcommissioning read feature-map 1 0
 
           Verify "FeatureMap" on the TH(Chip-tool)  Log:
 
           [1651215443.195852][3285:3290] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 2584224280
-          [1651215443.195939][3285:3290] CHIP:TOO:   FeatureMap: 4
+          [1651215443.195939][3285:3290] CHIP:TOO:   FeatureMap: 1
 
+          (Ethernet)
           ./chip-tool networkcommissioning read feature-map 1 0
 
           Verify "FeatureMap" on the TH(Chip-tool)  Log:
 
           [1660315515.081759][32315:32320] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 4034679103
           [1660315515.081895][32315:32320] CHIP:TOO:   FeatureMap: 4
+
+          (Thread)
+          ./chip-tool networkcommissioning read feature-map 1 0
+
+          Verify "FeatureMap" on the TH(Chip-tool)  Log:
+
+          [1660315948.250922][3101:3106] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 1122474754
+          [1660315948.261520][3101:3106] CHIP:TOO:   FeatureMap: 2
       disabled: true
 
     - label: "TH reads AttributeList from DUT"
       verification: |
+          (WiFi)
           ./chip-tool networkcommissioning read attribute-list 1 0
 
           Verify "AttributeList" on the TH(Chip-tool)  Log:
@@ -82,9 +93,11 @@ tests:
           [1651215479.539564][3293:3298] CHIP:TOO:     [13]: 65533
 
 
-          Ethernet:
+          (Ethernet)
 
           ./chip-tool networkcommissioning read attribute-list 1 0
+
+          Verify "AttributeList" on the TH(Chip-tool)  Log:
 
           [1660315522.163640][32321:32326] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFB DataVersion: 4034679103
           [1660315522.163797][32321:32326] CHIP:TOO:   AttributeList: 13 entries
@@ -101,6 +114,28 @@ tests:
           [1660315522.164636][32321:32326] CHIP:TOO:     [11]: 65531
           [1660315522.164708][32321:32326] CHIP:TOO:     [12]: 65532
           [1660315522.164778][32321:32326] CHIP:TOO:     [13]: 65533
+
+          (Thread)
+
+          ./chip-tool networkcommissioning read attribute-list 1 0
+
+          Verify "AttributeList" on the TH(Chip-tool)  Log:
+
+          [1660316011.016650][3112:3117] CHIP:TOO:   AttributeList: 13 entries
+          [1660316011.016678][3112:3117] CHIP:TOO:     [1]: 0
+          [1660316011.016700][3112:3117] CHIP:TOO:     [2]: 1
+          [1660316011.016721][3112:3117] CHIP:TOO:     [3]: 2
+          [1660316011.016741][3112:3117] CHIP:TOO:     [4]: 3
+          [1660316011.016762][3112:3117] CHIP:TOO:     [5]: 4
+          [1660316011.016782][3112:3117] CHIP:TOO:     [6]: 5
+          [1660316011.016803][3112:3117] CHIP:TOO:     [7]: 6
+          [1660316011.016823][3112:3117] CHIP:TOO:     [8]: 7
+          [1660316011.016844][3112:3117] CHIP:TOO:     [9]: 65528
+          [1660316011.016865][3112:3117] CHIP:TOO:     [10]: 65529
+          [1660316011.016887][3112:3117] CHIP:TOO:     [11]: 65531
+          [1660316011.016908][3112:3117] CHIP:TOO:     [12]: 65532
+          [1660316011.016929][3112:3117] CHIP:TOO:     [13]: 65533
+          [1660316011.017068][3112:3117] CHIP:EM: Sending Standalone Ack for MessageCounter:239150268 on exchange 45209i
       disabled: true
 
     - label: "TH reads EventList from the DUT"
@@ -132,6 +167,20 @@ tests:
 
           [1660315536.068512][32327:32332] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFF9 DataVersion: 4034679103
           [1660315536.068654][32327:32332] CHIP:TOO:   AcceptedCommandList: 0 entries
+
+          (Thread)
+          ./chip-tool networkcommissioning read accepted-command-list 1 0
+
+          Verify "AcceptedCommandList" on the TH(Chip-tool)  Log:
+
+          [1660316038.564553][3121:3126] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFF9 DataVersion: 1122474754
+          [1660316038.564671][3121:3126] CHIP:TOO:   AcceptedCommandList: 5 entries
+          [1660316038.564702][3121:3126] CHIP:TOO:     [1]: 0
+          [1660316038.564725][3121:3126] CHIP:TOO:     [2]: 3
+          [1660316038.564747][3121:3126] CHIP:TOO:     [3]: 4
+          [1660316038.564769][3121:3126] CHIP:TOO:     [4]: 6
+          [1660316038.564853][3121:3126] CHIP:TOO:     [5]: 8
+          [1660316038.564991][3121:3126] CHIP:EM: Sending Standalone Ack for MessageCounter:232731891 on exchange 30329i
       disabled: true
 
     - label: "TH reads GeneratedCommandList from DUT"
@@ -149,6 +198,17 @@ tests:
           [1650370123.418013][42418:42423] CHIP:TOO:     [3]: 7
           [1650370123.418143][42418:42423] CHIP:EM: Sending Standalone Ack for MessageCounter:759910 on exchange 25409i
 
+
+
+          (Ethernet)
+          ./chip-tool networkcommissioning read generated-command-list 1 0
+
+          Verify "GeneratedCommandList" on the TH(Chip-tool)  Log:
+
+          [1660315548.937195][32333:32338] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFF8 DataVersion: 4034679103
+          [1660315548.937327][32333:32338] CHIP:TOO:   GeneratedCommandList: 0 entries
+
+
            ( Thread )
           ./chip-tool networkcommissioning read generated-command-list 51 0
 
@@ -161,15 +221,6 @@ tests:
           [1650370123.417977][42418:42423] CHIP:TOO:     [2]: 5
           [1650370123.418013][42418:42423] CHIP:TOO:     [3]: 7
           [1650370342.693995][7450:7455] CHIP:EM: Sending Standalone Ack for MessageCounter:2345375 on exchange 25146i
-
-
-          (Ethernet)
-          ./chip-tool networkcommissioning read generated-command-list 1 0
-
-          Verify "GeneratedCommandList" on the TH(Chip-tool)  Log:
-
-          [1660315548.937195][32333:32338] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFF8 DataVersion: 4034679103
-          [1660315548.937327][32333:32338] CHIP:TOO:   GeneratedCommandList: 0 entries
       disabled: true
 
     - label:

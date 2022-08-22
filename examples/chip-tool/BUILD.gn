@@ -61,6 +61,7 @@ static_library("chip-tool-utils") {
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
+    "commands/pairing/PairingCommand.cpp",
 
     # TODO - enable CommissionedListCommand once DNS Cache is implemented
     #    "commands/pairing/CommissionedListCommand.cpp",
@@ -97,6 +98,7 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/app/tests/suites/commands/log",
     "${chip_root}/src/app/tests/suites/commands/system",
     "${chip_root}/src/app/tests/suites/pics",
+    "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:file_attestation_trust_store",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
@@ -115,15 +117,9 @@ static_library("chip-tool-utils") {
 }
 
 executable("chip-tool") {
-  sources = [
-    "commands/pairing/PairingCommand.cpp",
-    "main.cpp",
-  ]
+  sources = [ "main.cpp" ]
 
-  deps = [
-    ":chip-tool-utils",
-    "${chip_root}/src/controller/data_model",
-  ]
+  deps = [ ":chip-tool-utils" ]
 
   output_dir = root_out_dir
 }

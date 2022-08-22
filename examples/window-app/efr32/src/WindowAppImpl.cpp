@@ -129,6 +129,10 @@ StaticQueue_t sAppEventQueueStruct;
 
 WindowAppImpl WindowAppImpl::sInstance;
 
+#ifdef DISPLAY_ENABLED
+SilabsLCD slLCD;
+#endif
+
 WindowApp & WindowApp::Instance()
 {
     return WindowAppImpl::sInstance;
@@ -183,6 +187,10 @@ CHIP_ERROR WindowAppImpl::Init()
     LEDWidget::InitGpio();
     mStatusLED.Init(APP_STATE_LED);
     mActionLED.Init(APP_ACTION_LED);
+
+#ifdef DISPLAY_ENABLED
+    slLCD.Init();
+#endif
 
     return CHIP_NO_ERROR;
 }
@@ -427,7 +435,7 @@ void WindowAppImpl::UpdateLCD()
 
         if (!tilt.IsNull() && !lift.IsNull())
         {
-            LcdPainter::Paint(type, lift.Value(), tilt.Value(), mIcon);
+            LcdPainter::Paint(slLCD, type, lift.Value(), tilt.Value(), mIcon);
         }
     }
 #ifdef QR_CODE_ENABLED
@@ -436,7 +444,8 @@ void WindowAppImpl::UpdateLCD()
         chip::MutableCharSpan qrCode(mQRCodeBuffer);
         if (GetQRCode(qrCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
         {
-            LCDWriteQRCode((uint8_t *) qrCode.data());
+            slLCD.SetQRCode((uint8_t *) qrCode.data(), qrCode.size());
+            slLCD.ShowQRCode(true, true);
         }
     }
 #endif // QR_CODE_ENABLED

@@ -11,6 +11,7 @@ RUN set -x \
     automake \
     bison \
     bridge-utils \
+    ccache \
     clang \
     clang-format \
     clang-tidy \

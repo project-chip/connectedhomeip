@@ -52,6 +52,9 @@ public:
         }
     }
 
+    // Restart the periodic query timer
+    void RekickPeriodicQueryTimer(void);
+
     // Set the timeout (in seconds) for the watchdog timer; must be non-zero
     void SetWatchdogTimeout(uint32_t timeout)
     {

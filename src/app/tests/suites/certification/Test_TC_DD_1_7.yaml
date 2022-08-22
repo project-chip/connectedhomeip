@@ -25,7 +25,12 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          1 - 5.1.4.2 - Manual Pairing Code is printed on the device or in additional provided materials (ex: manual)"
+      disabled: true
+
     - label: "Verify using instruments"
       verification: |
-          Vendor specific field testcase
+          Vendor specific field testcase that should be manually verified using the requirements in the Expected Outcome.
       disabled: true

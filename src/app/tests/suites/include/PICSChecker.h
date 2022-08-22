@@ -22,7 +22,7 @@
 
 #include <app/tests/suites/pics/PICSBooleanExpressionParser.h>
 #include <app/tests/suites/pics/PICSBooleanReader.h>
-
+#include <lib/core/Optional.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 class PICSChecker

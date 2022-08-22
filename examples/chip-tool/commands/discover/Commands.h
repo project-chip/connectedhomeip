@@ -18,9 +18,10 @@
 
 #pragma once
 
-#include "DiscoverCommand.h"
-#include "DiscoverCommissionablesCommand.h"
-#include "DiscoverCommissionersCommand.h"
+#include "commands/common/Commands.h"
+#include "commands/discover/DiscoverCommand.h"
+#include "commands/discover/DiscoverCommissionablesCommand.h"
+#include "commands/discover/DiscoverCommissionersCommand.h"
 #include <lib/address_resolve/AddressResolve.h>
 
 class Resolve : public DiscoverCommand, public chip::AddressResolve::NodeListener

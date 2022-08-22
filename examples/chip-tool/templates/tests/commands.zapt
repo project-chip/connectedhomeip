@@ -5,6 +5,7 @@
 #if CONFIG_ENABLE_YAML_TESTS
 
 #include <commands/tests/TestCommand.h>
+#include <commands/common/Commands.h>
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPListUtils.h>
 #include <system/SystemClock.h>

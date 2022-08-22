@@ -80,6 +80,40 @@ DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
 #else
 DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+
+void OTAEventsHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kOtaStateChanged)
+    {
+        switch (event->OtaStateChanged.newState)
+        {
+        case DeviceLayer::kOtaDownloadInProgress:
+            ChipLogProgress(DeviceLayer, "OTA image download in progress");
+            break;
+        case DeviceLayer::kOtaDownloadComplete:
+            ChipLogProgress(DeviceLayer, "OTA image download complete");
+            break;
+        case DeviceLayer::kOtaDownloadFailed:
+            ChipLogProgress(DeviceLayer, "OTA image download failed");
+            break;
+        case DeviceLayer::kOtaDownloadAborted:
+            ChipLogProgress(DeviceLayer, "OTA image download aborted");
+            break;
+        case DeviceLayer::kOtaApplyInProgress:
+            ChipLogProgress(DeviceLayer, "OTA image apply in progress");
+            break;
+        case DeviceLayer::kOtaApplyComplete:
+            ChipLogProgress(DeviceLayer, "OTA image apply complete");
+            break;
+        case DeviceLayer::kOtaApplyFailed:
+            ChipLogProgress(DeviceLayer, "OTA image apply failed");
+            break;
+        default:
+            break;
+        }
+    }
+}
+
 } // namespace
 
 extern "C" void app_main()
@@ -136,4 +170,6 @@ extern "C" void app_main()
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+
+    chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OTAEventsHandler, reinterpret_cast<intptr_t>(nullptr));
 }

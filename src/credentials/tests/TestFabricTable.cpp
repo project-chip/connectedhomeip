@@ -980,12 +980,111 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
 
 void TestAddMultipleSameRootDifferentFabricId(nlTestSuite * inSuite, void * inContext)
 {
-    // TODO: Write test
+    Credentials::TestOnlyLocalCertificateAuthority fabricCertAuthority;
+
+    chip::TestPersistentStorageDelegate storage;
+    NL_TEST_ASSERT(inSuite, fabricCertAuthority.Init().IsSuccess());
+
+    constexpr uint16_t kVendorId = 0xFFF1u;
+
+    // Initialize a fabric table.
+    ScopedFabricTable fabricTableHolder;
+    NL_TEST_ASSERT(inSuite, fabricTableHolder.Init(&storage) == CHIP_NO_ERROR);
+    FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+
+    NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+
+    uint8_t rcac1Buf[kMaxCHIPCertLength];
+    MutableByteSpan rcac1Span{ rcac1Buf };
+
+    // First scope: add FabricID 1111, node ID 55
+    {
+        FabricId fabricId = 1111;
+        NodeId nodeId     = 55;
+
+        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        MutableByteSpan csrSpan{ csrBuf };
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
+
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricCertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
+        ByteSpan rcac = fabricCertAuthority.GetRcac();
+        // Keep a copy for second scope check
+        CopySpanToMutableSpan(rcac, rcac1Span);
+
+        ByteSpan icac = fabricCertAuthority.GetIcac();
+        ByteSpan noc  = fabricCertAuthority.GetNoc();
+
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac));
+        FabricIndex newFabricIndex = kUndefinedFabricIndex;
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex));
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
+        NL_TEST_ASSERT(inSuite, newFabricIndex == 1);
+
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.CommitPendingFabricData());
+
+        // Validate contents
+        const auto * fabricInfo = fabricTable.FindFabricWithIndex(1);
+        NL_TEST_ASSERT(inSuite, fabricInfo != nullptr);
+        if (fabricInfo != nullptr)
+        {
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == 1);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetNodeId() == 55);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricId() == 1111);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetVendorId() == kVendorId);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricLabel().size() == 0);
+        }
+    }
+    size_t numStorageKeysAfterFirstAdd = storage.GetNumKeys();
+    NL_TEST_ASSERT(inSuite, numStorageKeysAfterFirstAdd == 7); // Metadata, index, 3 certs, 1 opkey, last known good time
+
+    // Second scope: add FabricID 2222, node ID 66, same root as first
+    {
+        FabricId fabricId = 2222;
+        NodeId nodeId     = 66;
+
+        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        MutableByteSpan csrSpan{ csrBuf };
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
+
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricCertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
+        ByteSpan rcac2 = fabricCertAuthority.GetRcac();
+        NL_TEST_ASSERT(inSuite, rcac2.data_equal(rcac1Span));
+
+        ByteSpan icac = fabricCertAuthority.GetIcac();
+        ByteSpan noc  = fabricCertAuthority.GetNoc();
+
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac2));
+        FabricIndex newFabricIndex = kUndefinedFabricIndex;
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex));
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
+        NL_TEST_ASSERT(inSuite, newFabricIndex == 2);
+
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.CommitPendingFabricData());
+
+        // Validate contents
+        const auto * fabricInfo = fabricTable.FindFabricWithIndex(2);
+        NL_TEST_ASSERT(inSuite, fabricInfo != nullptr);
+        if (fabricInfo != nullptr)
+        {
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == 2);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetNodeId() == 66);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricId() == 2222);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetVendorId() == kVendorId);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricLabel().size() == 0);
+        }
+    }
+    size_t numStorageKeysAfterSecondAdd = storage.GetNumKeys();
+    NL_TEST_ASSERT(inSuite, numStorageKeysAfterSecondAdd == (numStorageKeysAfterFirstAdd + 5)); // Add 3 certs, 1 metadata, 1 opkey
 }
 
 void TestPersistence(nlTestSuite * inSuite, void * inContext)
 {
-    // TODO: Write test
     /**
      *
      * - Create an outer scope with storage delegate
@@ -2290,7 +2389,122 @@ void TestAddNocRootCollision(nlTestSuite * inSuite, void * inContext)
 
 void TestInvalidChaining(nlTestSuite * inSuite, void * inContext)
 {
-    // TODO: Write test
+    Credentials::TestOnlyLocalCertificateAuthority fabricCertAuthority;
+    Credentials::TestOnlyLocalCertificateAuthority differentCertAuthority;
+
+    chip::TestPersistentStorageDelegate storage;
+    NL_TEST_ASSERT(inSuite, fabricCertAuthority.Init().IsSuccess());
+    NL_TEST_ASSERT(inSuite, differentCertAuthority.Init().IsSuccess());
+
+    constexpr uint16_t kVendorId = 0xFFF1u;
+
+    // Initialize a fabric table.
+    ScopedFabricTable fabricTableHolder;
+    NL_TEST_ASSERT(inSuite, fabricTableHolder.Init(&storage) == CHIP_NO_ERROR);
+    FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+
+    NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+
+    // Try to add fabric with either the NOC not chaining properly, or ICAC not chaining properly, fail,
+    // then succeed with proper chaining
+    {
+        FabricId fabricId = 1111;
+        NodeId nodeId     = 55;
+
+        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        MutableByteSpan csrSpan{ csrBuf };
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
+
+        // Generate same cert chain from two different roots
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricCertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               differentCertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
+
+        ByteSpan rcac = fabricCertAuthority.GetRcac();
+        ByteSpan icac = fabricCertAuthority.GetIcac();
+        ByteSpan noc  = fabricCertAuthority.GetNoc();
+
+        ByteSpan otherIcac = differentCertAuthority.GetIcac();
+        ByteSpan otherNoc  = differentCertAuthority.GetNoc();
+
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac));
+
+        // Add with NOC not chaining to ICAC: fail
+        {
+            FabricIndex newFabricIndex = kUndefinedFabricIndex;
+            CHIP_ERROR err = fabricTable.AddNewPendingFabricWithOperationalKeystore(otherNoc, icac, kVendorId, &newFabricIndex);
+            NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+            NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+        }
+
+        // Add with ICAC not chaining to root: fail
+        {
+            FabricIndex newFabricIndex = kUndefinedFabricIndex;
+            CHIP_ERROR err = fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, otherIcac, kVendorId, &newFabricIndex);
+            NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+            NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+        }
+
+        // Add with NOC and ICAC chaining together, but not to root: fail
+        {
+            FabricIndex newFabricIndex = kUndefinedFabricIndex;
+            CHIP_ERROR err =
+                fabricTable.AddNewPendingFabricWithOperationalKeystore(otherNoc, otherIcac, kVendorId, &newFabricIndex);
+            NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+            NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+        }
+
+        // Revert state, start tests without ICAC
+        fabricTable.RevertPendingFabricData();
+
+        // Generate same cert chain from two different roots
+
+        csrSpan = MutableByteSpan{ csrBuf };
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricCertAuthority.SetIncludeIcac(false).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
+        NL_TEST_ASSERT_SUCCESS(
+            inSuite, differentCertAuthority.SetIncludeIcac(false).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
+
+        rcac = fabricCertAuthority.GetRcac();
+        noc  = fabricCertAuthority.GetNoc();
+
+        otherNoc = differentCertAuthority.GetNoc();
+
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac));
+
+        // Add with NOC not chaining to RCAC: fail
+        {
+            FabricIndex newFabricIndex = kUndefinedFabricIndex;
+            CHIP_ERROR err =
+                fabricTable.AddNewPendingFabricWithOperationalKeystore(otherNoc, ByteSpan{}, kVendorId, &newFabricIndex);
+            NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+            NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+        }
+
+        // Add properly now
+        FabricIndex newFabricIndex = kUndefinedFabricIndex;
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, ByteSpan{}, kVendorId, &newFabricIndex));
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
+        NL_TEST_ASSERT(inSuite, newFabricIndex == 1);
+
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.CommitPendingFabricData());
+
+        // Validate contents
+        const auto * fabricInfo = fabricTable.FindFabricWithIndex(1);
+        NL_TEST_ASSERT(inSuite, fabricInfo != nullptr);
+        if (fabricInfo != nullptr)
+        {
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == 1);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetNodeId() == 55);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricId() == 1111);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetVendorId() == kVendorId);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricLabel().size() == 0);
+        }
+    }
 }
 
 void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)

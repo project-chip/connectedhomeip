@@ -1,4 +1,11 @@
 steps:
+    - name: gcr.io/cloud-builders/git
+      args:
+          - submodule
+          - update
+          - "--init"
+          - "--recursive"
+      id: Submodules
     - name: "connectedhomeip/chip-build-vscode:0.5.91"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -6,6 +13,8 @@ steps:
           - "-c"
           - source ./scripts/bootstrap.sh
       id: Bootstrap
+      waitFor:
+          - Submodules
       entrypoint: /usr/bin/bash
       volumes:
           - name: pwenv

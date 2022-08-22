@@ -1197,7 +1197,8 @@ tests:
           from the DUT."
       verification: |
           In case of chip tool, here is an example command to use
-          sudo ./chip-tool any read-all 1  0xFFFF --timeout 50
 
-          Verify on TH , DUT is responds right attributes and events for above command
+           ./chip-tool any read-all 0xFFFFFFFF,0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF,0xFFFF
+
+          on TH verify that DUT sends back data of all attributes and events that the TH has access to
       disabled: true

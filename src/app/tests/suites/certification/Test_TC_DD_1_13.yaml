@@ -28,11 +28,17 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          1 - 5.1.3 - QR code/ Manual Pairing Code is printed on the device or in additional provided materials (ex: manual)
+      disabled: true
+
     - label: "Power on the DUT device."
       verification: |
           1. Verify DUT is NOT advertising in commissioning mode. On DUT, the DUT should not show up
 
           $  ./chip-tool discover commissionables
+          TH Commissioner should not discover the DUT here
       disabled: true
 
     - label: "Scan the DUTs QR code from the previous step using the TH."
@@ -42,6 +48,8 @@ tests:
 
           2. Parse onboarding payload using TH=chip-tool
           $  ./chip-tool payload parse-setup-payload MT:-24J0AFN00KA0648G00
+
+          Verify in TH as commissioner side:
           [1651193251086] [15494:447566] CHIP: [SPL] Parsing base38Representation: MT:-24J0AFN00KA0648G00
           [1651193251087] [15494:447566] CHIP: [SPL] CommissioningFlow: 1
           [1651193251087] [15494:447566] CHIP: [SPL] VendorID: 65521
@@ -53,23 +61,16 @@ tests:
       disabled: true
 
     - label:
-          "Verify that the TH presents the user with a pairing hint in the
-          CommissioningModeInitialStepsHint field of the DCL. Verify that the
-          CommissioningCustomFlow field is set to a value = 1"
-      verification: |
-          1. Verify CommissioningCustomFlow=1
-          2. Verify CommissioningModeInitialStepsHint contains a valid, non-zero integer
-      disabled: true
-
-    - label:
-          "Follow any steps from the resources provided by the pairing hint for
-          putting the DUT Commissionee into commissioning mode"
+          "Follow any DUT-specific steps for putting the DUT Commissionee into
+          commissioning mode"
       verification: |
           1. Follow vendor-specific steps from the pairing hint to put DUT into commissioning mode
 
           2. Verify DUT is advertising in commissioning mode. On DUT,
 
           $  ./chip-tool discover commissionables
+          Verify in TH as commissioner side:
+
           [1651192893436] [15304:442604] CHIP: [DL] Mdns: OnNewAddress interface: 24 ip:fe80::dea6:32ff:fe8d:6e32
           [1651192893436] [15304:442604] CHIP: [DIS]         Vendor ID: 65521
           [1651192893436] [15304:442604] CHIP: [DIS]         Product ID: 32769

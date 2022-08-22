@@ -98,9 +98,9 @@ static_library("EFR32") {
     "$dir_pw_kvs",
   ]
   if (chip_enable_openthread) {
-    public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
+    public_deps += [ "${chip_root}/third_party/openthread:openthread_device" ]
 
-    deps += [ "${chip_root}/third_party/silabs:openthread_cli" ]
+    deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
 
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",

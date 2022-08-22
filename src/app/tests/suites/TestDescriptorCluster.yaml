@@ -65,6 +65,7 @@ tests:
                   0x0040, # Fixed Label
                   0x0041, # User Label
                   0x0405, # Relative Humidity Measurement (why on EP0?)
+                  0xFFF1FC06, # Fault Injection
               ]
 
     - label: "Read attribute Client list"
