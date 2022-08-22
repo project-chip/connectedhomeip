@@ -65,7 +65,7 @@ The steps in this document were validated on Ubuntu 18.04 and 20.04.
 
     ```
     cd third_party/bouffalolab/bl602_sdk/repo/tools/flash_tool
-    
+
     ./bflb_iot_tool-ubuntu18 --chipname=BL602 --baudrate=115200  --port=/dev/ttyACM0 --pt=chips/bl602/partition/partition_cfg_4M.toml --dts=chips/bl602/device_tree/bl_factory_params_IoTKitA_40M.dts --firmware=../../../../../../out/bl602-light/chip-bl602-lighting-example.bin
     ```
 
@@ -90,7 +90,9 @@ Starting bl602 now....
 Booting BL602 Chip...
 ```
 
-3.To control the development board after successfully debugging the development board, press the BOOT button and you should see the following output in the terminal:
+3.To control the development board after successfully debugging the development
+board, press the BOOT button and you should see the following output in the
+terminal:
 
 ```
 [    404197][:588238200] Short press
@@ -104,7 +106,8 @@ Booting BL602 Chip...
 [    406220][:588238200] updating on/off = 1
 ```
 
-4.To restore the board to factory Settings, press and hold the BOOT button for 5 seconds, and you should see the following output in the terminal:
+4.To restore the board to factory Settings, press and hold the BOOT button for 5
+seconds, and you should see the following output in the terminal:
 
 ```
 [     37268][:588238200] LongLong press
