@@ -103,7 +103,7 @@ static const BitFlags<KeyUsageFlags> sKCandEO(sKC, sEO);
 static const BitFlags<KeyUsageFlags> sKCandDO(sKC, sDO);
 
 constexpr uint8_t sOID_Extension_SubjectAltName[] = { 0x55, 0x1d, 0x11 };
-constexpr char kExtension_SubjectAltName[]        = "test@chip.org";
+constexpr char kExtension_SubjectAltName[]        = "test@example.com";
 
 FutureExtension ext{ ByteSpan(sOID_Extension_SubjectAltName),
                      ByteSpan(reinterpret_cast<uint8_t *>(const_cast<char *>(kExtension_SubjectAltName)),
