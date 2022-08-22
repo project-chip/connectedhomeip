@@ -27,7 +27,11 @@ Device::Device(chip::Span<chip::DataVersion> dataVersions, chip::Span<EmberAfClu
                chip::EndpointId parentId) :
     mParentEndpointId(parentId),
     mDataVersions(dataVersions), mClusters(clusters), mClusterImpl(clusterImpl), mDeviceTypeList(deviceTypeList)
-{}
+{
+    mEndpointType.cluster      = clusters.data();
+    mEndpointType.clusterCount = (uint8_t) clusters.size();
+    mEndpointType.endpointSize = 0;
+}
 
 void Device::SetEndpointId(chip::EndpointId id)
 {

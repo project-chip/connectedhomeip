@@ -1,10 +1,8 @@
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/attribute-id.h>
+#pragma once
 
-#include <new>
+#include "BridgeGlobalStructs.h"
 
 namespace clusters {
-
 struct DemoClusterCluster : public CommonCluster
 {
 
@@ -89,7 +87,7 @@ struct DemoClusterAccess : public CommonAttributeAccessInterface
 
     switch(aPath.mAttributeId) {
     case 100:
-      mArmFailsafes.ListWriteBegin(aPath);
+      c->mArmFailsafes.ListWriteBegin(aPath);
       return;
     }
   }
@@ -102,47 +100,10 @@ struct DemoClusterAccess : public CommonAttributeAccessInterface
 
     switch(aPath.mAttributeId) {
     case 100:
-      mArmFailsafes.ListWriteEnd(aPath, aWriteWasSuccessful);
+      c->mArmFailsafes.ListWriteEnd(aPath, aWriteWasSuccessful);
       return;
     }
   }
-};
-
-struct ClusterInfo
-{
-  chip::ClusterId id;
-  const char *name;
-  uint16_t size;
-  CommonCluster* (*ctor)(void*);
-} static const kKnownClusters[] = {
-
-  {
-    10,
-    "DemoCluster",
-    sizeof(DemoClusterCluster),
-    [](void *mem) -> CommonCluster* {
-      return new(mem) DemoClusterCluster();
-    },
-  },
-};
-
-inline void BridgeRegisterAllAttributeOverrides()
-{
-
-  static DemoClusterAccess DemoCluster;
-  registerAttributeAccessOverride(&DemoCluster);
-}
-
-struct AttrInfo
-{
-  chip::ClusterId cluster;
-  chip::AttributeId attr;
-  const char *name;
-} static const kKnownAttributes[] = {
-
-  { 10, 5, "SingleFailSafe" },
-  { 10, 100, "ArmFailsafes" },
-  
 };
 
 }

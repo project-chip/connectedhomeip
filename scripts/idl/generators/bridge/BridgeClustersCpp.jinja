@@ -1,41 +1,8 @@
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/attribute-id.h>
+#pragma once
 
-#include <new>
+#include "BridgeGlobalStructs.h"
 
 namespace clusters {
-{% for struct in structs %}
-struct {{struct.name}}
-{
-  CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
-  {
-    chip::app::Clusters::detail::Structs::{{struct.name}}::DecodableType t;
-    CHIP_ERROR err = t.Decode(reader);
-    if(err == CHIP_NO_ERROR) {
-      {%-      for field in struct.fields %}
-      {{field.name}} = t.{{field.name}};
-      {%-      endfor  %}
-    }
-    return err;
-  }
-
-  CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
-  {
-    chip::app::Clusters::detail::Structs::{{struct.name}}::Type t;
-    {%-      for field in struct.fields %}
-    t.{{field.name}} = {{field.name}};
-    {%-      endfor  %}
-    return t.Encode(writer, tag);
-  }
-
-  {%-   for field in struct.fields %}
-  {{field | getField(None, idl)}} {{field.name}};
-  {%-  endfor  %}
-};
-{%- endfor %}
-
-{%- for cluster in clusters %}
-{%-   if cluster | dynamicCluster(idl) %}
 struct {{cluster.name}}Cluster : public CommonCluster
 {
   {%-   for struct in cluster.structs %}
@@ -158,7 +125,7 @@ struct {{cluster.name}}Access : public CommonAttributeAccessInterface
   {%-    if attr.is_writable %}
   {%-      if attr.definition.is_list %}
     case {{attr.definition.code}}:
-      m{{attr.definition.name | capitalcase}}.ListWriteBegin(aPath);
+      c->m{{attr.definition.name | capitalcase}}.ListWriteBegin(aPath);
       return;
   {%-      endif %}
   {%-    endif %}
@@ -177,64 +144,13 @@ struct {{cluster.name}}Access : public CommonAttributeAccessInterface
   {%-    if attr.is_writable %}
   {%-      if attr.definition.is_list %}
     case {{attr.definition.code}}:
-      m{{attr.definition.name | capitalcase}}.ListWriteEnd(aPath, aWriteWasSuccessful);
+      c->m{{attr.definition.name | capitalcase}}.ListWriteEnd(aPath, aWriteWasSuccessful);
       return;
   {%-      endif %}
   {%-    endif %}
   {%-  endfor  %}
     }
   }
-};
-{%-   endif %}
-{%- endfor %}
-
-struct ClusterInfo
-{
-  chip::ClusterId id;
-  const char *name;
-  uint16_t size;
-  CommonCluster* (*ctor)(void*);
-} static const kKnownClusters[] = {
-{% for cluster in clusters %}
-{%-   if cluster | dynamicCluster(idl) %}
-  {
-    {{cluster.code}},
-    "{{cluster.name}}",
-    sizeof({{cluster.name}}Cluster),
-    [](void *mem) -> CommonCluster* {
-      return new(mem) {{cluster.name}}Cluster();
-    },
-  },
-{%-   endif %}
-{%- endfor %}
-};
-
-inline void BridgeRegisterAllAttributeOverrides()
-{
-{% for cluster in clusters %}
-{%-   if cluster | dynamicCluster(idl) %}
-  static {{cluster.name}}Access {{cluster.name}};
-  registerAttributeAccessOverride(&{{cluster.name}});
-{%-   endif %}
-{%- endfor %}
-}
-
-struct AttrInfo
-{
-  chip::ClusterId cluster;
-  chip::AttributeId attr;
-  const char *name;
-} static const kKnownAttributes[] = {
-{% for cluster in clusters %}
-{%-   if cluster | dynamicCluster(idl) %}
-
-{%-      for attr in cluster.attributes %}
-  { {{cluster.code}}, {{attr.definition.code}}, "{{attr.definition.name | capitalcase}}" },
-{%-      endfor  %}
-
-{%-   endif %}
-{%- endfor %}
-  
 };
 
 }

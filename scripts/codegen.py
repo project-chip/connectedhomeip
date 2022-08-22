@@ -28,7 +28,7 @@ except:
 
 from idl.generators import FileSystemGeneratorStorage, GeneratorStorage
 from idl.generators.java import JavaGenerator
-from idl.generators.cpp import CppGenerator
+from idl.generators.bridge import BridgeGenerator
 
 
 class CodeGeneratorTypes(enum.Enum):
@@ -38,13 +38,13 @@ class CodeGeneratorTypes(enum.Enum):
     into underlying generators.
     """
     JAVA = enum.auto()
-    CPP = enum.auto()
+    BRIDGE = enum.auto()
 
     def CreateGenerator(self, *args, **kargs):
         if self == CodeGeneratorTypes.JAVA:
             return JavaGenerator(*args, **kargs)
-        elif self == CodeGeneratorTypes.CPP:
-            return CppGenerator(*args, **kargs)
+        elif self == CodeGeneratorTypes.BRIDGE:
+            return BridgeGenerator(*args, **kargs)
         else:
             raise Error("Unknown code generator type")
 
@@ -72,7 +72,7 @@ __LOG_LEVELS__ = {
 
 __GENERATORS__ = {
     'java': CodeGeneratorTypes.JAVA,
-    'cpp': CodeGeneratorTypes.CPP,
+    'bridge': CodeGeneratorTypes.BRIDGE,
 }
 
 

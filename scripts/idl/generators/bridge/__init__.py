@@ -141,9 +141,9 @@ def is_dynamic_cluster(cluster: Cluster, idl: Idl):
     return False
 
 
-class CppGenerator(CodeGenerator):
+class BridgeGenerator(CodeGenerator):
     """
-    Generation of cpp code for matter.
+    Generation of bridge cpp code for matter.
     """
 
     def __init__(self, storage: GeneratorStorage, idl: Idl):
@@ -167,12 +167,32 @@ class CppGenerator(CodeGenerator):
         """
         Renders C++
         """
+        for cluster in self.idl.clusters:
+            if not is_dynamic_cluster(cluster, self.idl):
+                continue
+
+            self.internal_render_one_output(
+                template_path="bridge/BridgeClustersCpp.jinja",
+                output_file_name="bridge/%s.h" % cluster.name,
+                vars={
+                    'cluster': cluster,
+                    'idl': self.idl,
+                }
+            )
 
         self.internal_render_one_output(
-            template_path="cpp/BridgeClustersCpp.jinja",
-            output_file_name="cpp/BridgeClustersImpl.h",
+            template_path="bridge/BridgeClustersCommon.jinja",
+            output_file_name="bridge/BridgeClustersImpl.h",
             vars={
                 'clusters': self.idl.clusters,
+                'idl': self.idl,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="bridge/BridgeClustersGlobalStructs.jinja",
+            output_file_name="bridge/BridgeGlobalStructs.h",
+            vars={
                 'idl': self.idl,
                 'structs': self.idl.structs,
             }

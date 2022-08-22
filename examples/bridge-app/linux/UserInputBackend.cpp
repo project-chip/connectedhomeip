@@ -2,8 +2,11 @@
 #include "DynamicDevice.h"
 #include "main.h"
 
+#include <platform/PlatformManager.h>
+
 #include <algorithm>
 #include <charconv>
+#include <future>
 #include <iostream>
 #include <iterator>
 #include <sstream>
@@ -343,6 +346,28 @@ void ParseValue(std::vector<uint8_t> * data, uint16_t size, const std::string & 
     case ZCL_DOUBLE_ATTRIBUTE_TYPE:
         wr.Put(chip::TLV::Tag(), atof(str.c_str()));
         break;
+    case ZCL_INT8S_ATTRIBUTE_TYPE:
+    case ZCL_INT16S_ATTRIBUTE_TYPE:
+    case ZCL_INT24S_ATTRIBUTE_TYPE:
+    case ZCL_INT32S_ATTRIBUTE_TYPE:
+    case ZCL_INT40S_ATTRIBUTE_TYPE:
+    case ZCL_INT48S_ATTRIBUTE_TYPE:
+    case ZCL_INT56S_ATTRIBUTE_TYPE:
+    case ZCL_INT64S_ATTRIBUTE_TYPE:
+        wr.Put(chip::TLV::Tag(), (int64_t) strtoll(str.c_str(), nullptr, 10));
+        break;
+
+    case ZCL_INT8U_ATTRIBUTE_TYPE:
+    case ZCL_INT16U_ATTRIBUTE_TYPE:
+    case ZCL_INT24U_ATTRIBUTE_TYPE:
+    case ZCL_INT32U_ATTRIBUTE_TYPE:
+    case ZCL_INT40U_ATTRIBUTE_TYPE:
+    case ZCL_INT48U_ATTRIBUTE_TYPE:
+    case ZCL_INT56U_ATTRIBUTE_TYPE:
+    case ZCL_INT64U_ATTRIBUTE_TYPE:
+        wr.Put(chip::TLV::Tag(), (uint64_t) strtoll(str.c_str(), nullptr, 10));
+        break;
+
     default:
         // Assume integer
         wr.Put(chip::TLV::Tag(), (int64_t) strtoll(str.c_str(), nullptr, 10));
@@ -401,6 +426,7 @@ void SetValue(const std::vector<std::string> & tokens)
 
     chip::TLV::TLVReader rd;
     rd.Init(data.data(), data.size());
+    rd.Next();
 
     if (!cluster->Push(attr->attributeId, rd))
     {
@@ -547,6 +573,19 @@ void Help(const std::vector<std::string> & tokens)
     }
 }
 
+struct Op
+{
+    std::vector<std::string> * tokens;
+    const Command * command;
+    std::promise<void> lock;
+};
+void ProcessLineOnMatterThread(intptr_t arg)
+{
+    Op * op = reinterpret_cast<Op *>(arg);
+    op->command->fn(*op->tokens);
+    op->lock.set_value();
+}
+
 void ProcessLine(std::vector<std::string> & tokens)
 {
     for (auto & cmd : commands)
@@ -554,7 +593,11 @@ void ProcessLine(std::vector<std::string> & tokens)
         if (tokens[0] == cmd.name)
         {
             tokens.erase(tokens.begin());
-            cmd.fn(tokens);
+
+            Op op{ &tokens, &cmd };
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(&ProcessLineOnMatterThread, reinterpret_cast<intptr_t>(&op));
+            // Wait for command completion
+            op.lock.get_future().wait();
             return;
         }
     }

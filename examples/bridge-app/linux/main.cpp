@@ -96,7 +96,6 @@ int AddDeviceEndpoint(Device * dev)
             while (1)
             {
                 // Todo: Update this to schedule the work rather than use this lock
-                DeviceLayer::StackLock lock;
                 dev->SetEndpointId(gCurrentEndpointId);
                 ret =
                     emberAfSetDynamicEndpoint(index, gCurrentEndpointId, dev->endpointType(), dev->versions(), dev->deviceTypes());

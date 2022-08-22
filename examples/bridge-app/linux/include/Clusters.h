@@ -261,7 +261,7 @@ struct CommonAttributeAccessInterface : public chip::app::AttributeAccessInterfa
     static CommonCluster * FindCluster(const chip::app::ConcreteClusterPath & path);
 };
 
-#include "cpp/BridgeClustersImpl.h"
+#include "bridge/BridgeClustersImpl.h"
 
 namespace clusters {
 struct BridgedDeviceBasicCluster : public CommonCluster

@@ -1,15 +1,13 @@
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/attribute-id.h>
+#pragma once
 
-#include <new>
+#include "BridgeGlobalStructs.h"
 
 namespace clusters {
-
-struct MyClusterCluster : public CommonCluster
+struct ThirdCluster : public CommonCluster
 {
 
 
-  static constexpr chip::ClusterId kClusterId = 123;
+  static constexpr chip::ClusterId kClusterId = 3;
 
   chip::ClusterId GetClusterId() override { return kClusterId; }
 
@@ -17,8 +15,8 @@ struct MyClusterCluster : public CommonCluster
   {
     switch(aPath.mAttributeId)
     {
-    case 1:
-      return mClusterAttr.Write(aPath, aDecoder);
+    case 10:
+      return mSomeEnum.Write(aPath, aDecoder);
     default:
       return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -27,29 +25,29 @@ struct MyClusterCluster : public CommonCluster
   template<typename T>
   void AddAllAttributes(T *list)
   {
-    list->Add(mClusterAttr);
+    list->Add(mSomeEnum);
   }
 
   chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
   {
     static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
-      { 1, ZCL_INT16U_ATTRIBUTE_TYPE, 2, ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
+      { 10, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
     };
     return chip::Span<const EmberAfAttributeMetadata>(kAllAttributes);
   }
 
 
-  Attribute<1, ATTRIBUTE_MASK_WRITABLE, PrimitiveType<uint16_t, 2, ZCL_INT16U_ATTRIBUTE_TYPE>> mClusterAttr;
+  Attribute<10, ATTRIBUTE_MASK_WRITABLE, PrimitiveType<uint8_t, 1, ZCL_ENUM8_ATTRIBUTE_TYPE>> mSomeEnum;
 };
 
-struct MyClusterAccess : public CommonAttributeAccessInterface
+struct ThirdAccess : public CommonAttributeAccessInterface
 {
-  MyClusterAccess() : CommonAttributeAccessInterface(chip::Optional<chip::EndpointId>(), MyClusterCluster::kClusterId) {}
+  ThirdAccess() : CommonAttributeAccessInterface(chip::Optional<chip::EndpointId>(), ThirdCluster::kClusterId) {}
 
-  MyClusterCluster* GetCluster(const chip::app::ConcreteClusterPath & aPath)
+  ThirdCluster* GetCluster(const chip::app::ConcreteClusterPath & aPath)
   {
     CommonCluster * cluster = FindCluster(aPath);
-    return cluster ? static_cast<MyClusterCluster*>(cluster) : nullptr;
+    return cluster ? static_cast<ThirdCluster*>(cluster) : nullptr;
   }
 
   CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override
@@ -59,8 +57,8 @@ struct MyClusterAccess : public CommonAttributeAccessInterface
       return CHIP_ERROR_NOT_IMPLEMENTED;
 
     switch(aPath.mAttributeId) {
-    case 1:
-      return c->mClusterAttr.Read(aPath, aEncoder);
+    case 10:
+      return c->mSomeEnum.Read(aPath, aEncoder);
     default:
       return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -93,42 +91,6 @@ struct MyClusterAccess : public CommonAttributeAccessInterface
     switch(aPath.mAttributeId) {
     }
   }
-};
-
-struct ClusterInfo
-{
-  chip::ClusterId id;
-  const char *name;
-  uint16_t size;
-  CommonCluster* (*ctor)(void*);
-} static const kKnownClusters[] = {
-
-  {
-    123,
-    "MyCluster",
-    sizeof(MyClusterCluster),
-    [](void *mem) -> CommonCluster* {
-      return new(mem) MyClusterCluster();
-    },
-  },
-};
-
-inline void BridgeRegisterAllAttributeOverrides()
-{
-
-  static MyClusterAccess MyCluster;
-  registerAttributeAccessOverride(&MyCluster);
-}
-
-struct AttrInfo
-{
-  chip::ClusterId cluster;
-  chip::AttributeId attr;
-  const char *name;
-} static const kKnownAttributes[] = {
-
-  { 123, 1, "ClusterAttr" },
-  
 };
 
 }

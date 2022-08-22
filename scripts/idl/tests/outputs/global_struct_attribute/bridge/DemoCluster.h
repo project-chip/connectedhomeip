@@ -1,33 +1,8 @@
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/attribute-id.h>
+#pragma once
 
-#include <new>
+#include "BridgeGlobalStructs.h"
 
 namespace clusters {
-
-struct LabelStruct
-{
-  CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
-  {
-    chip::app::Clusters::detail::Structs::LabelStruct::DecodableType t;
-    CHIP_ERROR err = t.Decode(reader);
-    if(err == CHIP_NO_ERROR) {
-      label = t.label;
-      value = t.value;
-    }
-    return err;
-  }
-
-  CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
-  {
-    chip::app::Clusters::detail::Structs::LabelStruct::Type t;
-    t.label = label;
-    t.value = value;
-    return t.Encode(writer, tag);
-  }
-  OctetString<16, ZCL_CHAR_STRING_ATTRIBUTE_TYPE> label;
-  OctetString<16, ZCL_CHAR_STRING_ATTRIBUTE_TYPE> value;
-};
 struct DemoClusterCluster : public CommonCluster
 {
 
@@ -112,7 +87,7 @@ struct DemoClusterAccess : public CommonAttributeAccessInterface
 
     switch(aPath.mAttributeId) {
     case 33:
-      mSomeLabels.ListWriteBegin(aPath);
+      c->mSomeLabels.ListWriteBegin(aPath);
       return;
     }
   }
@@ -125,47 +100,10 @@ struct DemoClusterAccess : public CommonAttributeAccessInterface
 
     switch(aPath.mAttributeId) {
     case 33:
-      mSomeLabels.ListWriteEnd(aPath, aWriteWasSuccessful);
+      c->mSomeLabels.ListWriteEnd(aPath, aWriteWasSuccessful);
       return;
     }
   }
-};
-
-struct ClusterInfo
-{
-  chip::ClusterId id;
-  const char *name;
-  uint16_t size;
-  CommonCluster* (*ctor)(void*);
-} static const kKnownClusters[] = {
-
-  {
-    18,
-    "DemoCluster",
-    sizeof(DemoClusterCluster),
-    [](void *mem) -> CommonCluster* {
-      return new(mem) DemoClusterCluster();
-    },
-  },
-};
-
-inline void BridgeRegisterAllAttributeOverrides()
-{
-
-  static DemoClusterAccess DemoCluster;
-  registerAttributeAccessOverride(&DemoCluster);
-}
-
-struct AttrInfo
-{
-  chip::ClusterId cluster;
-  chip::AttributeId attr;
-  const char *name;
-} static const kKnownAttributes[] = {
-
-  { 18, 32, "SingleLabel" },
-  { 18, 33, "SomeLabels" },
-  
 };
 
 }
