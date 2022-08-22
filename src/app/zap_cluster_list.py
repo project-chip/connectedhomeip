@@ -242,6 +242,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--zap_file',
                         help='Path to .zap file',
+                        required=True,
                         type=pathlib.Path)
 
     args = parser.parse_args()
