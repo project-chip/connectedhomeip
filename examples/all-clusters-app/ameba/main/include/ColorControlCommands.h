@@ -516,37 +516,168 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Emb
 {
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
 
-    Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-    Clusters::OnOff::Commands::On::Type onCommand;
-    Clusters::OnOff::Commands::Off::Type offCommand;
-    Clusters::OnOff::Commands::OffWithEffect::Type offwitheffectCommand;
-    Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type onwithrecallglobalsceneCommand;
-    Clusters::OnOff::Commands::OnWithTimedOff::Type onwithtimedoffCommand;
+    Clusters::ColorControl::Commands::MoveToHue::Type moveToHueCommand;
+    Clusters::ColorControl::Commands::MoveHue::Type moveHueCommand;
+    Clusters::ColorControl::Commands::StepHue::Type stepHueCommand;
+    Clusters::ColorControl::Commands::MoveToSaturation::Type moveToSaturationCommand;
+    Clusters::ColorControl::Commands::MoveSaturation::Type moveSaturationCommand;
+    Clusters::ColorControl::Commands::StepSaturation::Type stepSaturationCommand;
+    Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type moveToHueAndSaturationCommand;
+    Clusters::ColorControl::Commands::MoveToColor::Type moveToColorCommand;
+    Clusters::ColorControl::Commands::MoveColor::Type moveColorCommand;
+    Clusters::ColorControl::Commands::StepColor::Type stepColorCommand;
+    Clusters::ColorControl::Commands::MoveToColorTemperature::Type moveToColorTemperatureCommand;
+    Clusters::ColorControl::Commands::EnhancedMoveToHue::Type enhancedMoveToHueCommand;
+    Clusters::ColorControl::Commands::EnhancedMoveHue::Type enhancedMoveHueCommand;
+    Clusters::ColorControl::Commands::EnhancedStepHue::Type enhancedStepHueCommand;
+    Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type enhancedMoveToHueAndSaturationCommand;
+    Clusters::ColorControl::Commands::ColorLoopSet::Type colorLoopSetCommand;
+    Clusters::ColorControl::Commands::StopMoveStep::Type stopMoveStepCommand;
+    Clusters::ColorControl::Commands::MoveColorTemperature::Type moveColorTemperatureCommand;
+    Clusters::ColorControl::Commands::StepColorTemperature::Type stepColorTemperatureCommand;
 
     switch (data->commandId)
     {
-    case Clusters::OnOff::Commands::Toggle::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand);
+    case Clusters::ColorControl::Commands::MoveToHue::Id:
+        moveToHueCommand.hue = static_cast<uint8_t>(data->args[0]);
+        moveToHueCommand.direction = static_cast<EmberAfHueDirection>(data->args[1]);
+        moveToHueCommand.transitionTime = static_cast<uint16_t>(data->args[2]);
+        moveToHueCommand.optionsMask = static_cast<uint8_t>(data->args[3]);
+        moveToHueCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToHueCommand);
         break;
 
-    case Clusters::OnOff::Commands::On::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onCommand);
+    case Clusters::ColorControl::Commands::MoveHue::Id:
+        moveHueCommand.moveMode = static_cast<EmberAfHueMoveMode>(data->args[0]);
+        moveHueCommand.rate = static_cast<uint8_t>(data->args[1]);
+        moveHueCommand.optionsMask = static_cast<uint8_t>(data->args[2]);
+        moveHueCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveHueCommand);
         break;
 
-    case Clusters::OnOff::Commands::Off::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offCommand);
+    case Clusters::ColorControl::Commands::StepHue::Id:
+        stepHueCommand.stepMode = static_cast<EmberAfHueStepMode>(data->args[0]);
+        stepHueCommand.stepSize = static_cast<uint8_t>(data->args[1]);
+        stepHueCommand.transitionTime = static_cast<uint8_t>(data->args[2]);
+        stepHueCommand.optionsMask = static_cast<uint8_t>(data->args[3]);
+        stepHueCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepHueCommand);
         break;
 
-    case Clusters::OnOff::Commands::OffWithEffect::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offwitheffectCommand);
+    case Clusters::ColorControl::Commands::MoveToHueAndSaturation::Id:
+        moveToHueAndSaturationCommand.hue = static_cast<uint8_t>(data->args[0]);
+        moveToHueAndSaturationCommand.saturation = static_cast<uint8_t>(data->args[1]);
+        moveToHueAndSaturationCommand.transitionTime = static_cast<uint16_t>(data->args[2]);
+        moveToHueAndSaturationCommand.optionsMask = static_cast<uint8_t>(data->args[3]);
+        moveToHueAndSaturationCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToHueAndSaturationCommand);
         break;
 
-    case Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onwithrecallglobalsceneCommand);
+    case Clusters::ColorControl::Commands::MoveToColor::Id:
+        moveToColorCommand.colorX = static_cast<uint16_t>(data->args[0]);
+        moveToColorCommand.colorY = static_cast<uint16_t>(data->args[1]);
+        moveToColorCommand.transitionTime = static_cast<uint16_t>(data->args[2]);
+        moveToColorCommand.optionsMask = static_cast<uint8_t>(data->args[3]);
+        moveToColorCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorCommand);
         break;
 
-    case Clusters::OnOff::Commands::OnWithTimedOff::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onwithtimedoffCommand);
+    case Clusters::ColorControl::Commands::MoveColor::Id:
+        moveColorCommand.rateX = static_cast<uint16_t>(data->args[0]);
+        moveColorCommand.rateY = static_cast<uint16_t>(data->args[1]);
+        moveColorCommand.optionsMask = static_cast<uint8_t>(data->args[2]);
+        moveColorCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveColorCommand);
+        break;
+
+    case Clusters::ColorControl::Commands::StepColor::Id:
+        stepColorCommand.stepX = static_cast<uint16_t>(data->args[0]);
+        stepColorCommand.stepY = static_cast<uint16_t>(data->args[1]);
+        stepColorCommand.transitionTime = static_cast<uint16_t>(data->args[1]);
+        stepColorCommand.optionsMask = static_cast<uint8_t>(data->args[2]);
+        stepColorCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepColorCommand);
+        break;
+ 
+    case Clusters::ColorControl::Commands::MoveToColorTemperature::Id:
+        moveToColorTemperatureCommand.colorTemperature = static_cast<uint16_t>(data->args[0]);
+        moveToColorTemperatureCommand.transitionTime = static_cast<uint16_t>(data->args[1]);
+        moveToColorTemperatureCommand.optionsMask = static_cast<uint8_t>(data->args[2]);
+        moveToColorTemperatureCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorTemperatureCommand);
+        break;
+ 
+    case Clusters::ColorControl::Commands::EnhancedMoveToHue::Id:
+        enhancedMoveToHueCommand.enhancedHue = static_cast<uint16_t>(data->args[0]);
+        enhancedMoveToHueCommand.direction = static_cast<EmberAfHueDirection>(data->args[1]);
+        enhancedMoveToHueCommand.transitionTime = static_cast<uint16_t>(data->args[2]);
+        enhancedMoveToHueCommand.optionsMask = static_cast<uint8_t>(data->args[3]);
+        enhancedMoveToHueCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedMoveToHueCommand);
+        break;
+ 
+    case Clusters::ColorControl::Commands::EnhancedMoveHue::Id:
+        enhancedMoveHueCommand.moveMode = static_cast<EmberAfHueMoveMode>(data->args[0]);
+        enhancedMoveHueCommand.rate = static_cast<uint16_t>(data->args[1]);
+        enhancedMoveHueCommand.optionsMask = static_cast<uint8_t>(data->args[2]);
+        enhancedMoveHueCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedMoveHueCommand);
+        break;
+ 
+    case Clusters::ColorControl::Commands::EnhancedStepHue::Id:
+        enhancedStepHueCommand.stepMode = static_cast<EmberAfHueStepMode>(data->args[0]);
+        enhancedStepHueCommand.stepSize = static_cast<uint16_t>(data->args[1]);
+        enhancedStepHueCommand.transitionTime = static_cast<uint16_t>(data->args[2]);
+        enhancedStepHueCommand.optionsMask = static_cast<uint8_t>(data->args[3]);
+        enhancedStepHueCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedStepHueCommand);
+        break;
+ 
+    case Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id:
+        enhancedMoveToHueAndSaturationCommand.enhancedHue = static_cast<uint16_t>(data->args[0]);
+        enhancedMoveToHueAndSaturationCommand.saturation = static_cast<uint8_t>(data->args[1]);
+        enhancedMoveToHueAndSaturationCommand.transitionTime = static_cast<uint16_t>(data->args[2]);
+        enhancedMoveToHueAndSaturationCommand.optionsMask = static_cast<uint8_t>(data->args[3]);
+        enhancedMoveToHueAndSaturationCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedMoveToHueAndSaturationCommand);
+        break;
+ 
+    case Clusters::ColorControl::Commands::ColorLoopSet::Id:
+        colorLoopSetCommand.updateFlags = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(data->args[0]);
+        colorLoopSetCommand.action = static_cast<EmberAfColorLoopAction>(data->args[1]);
+        colorLoopSetCommand.direction = static_cast<EmberAfColorLoopDirection>(data->args[2]);
+        colorLoopSetCommand.time = static_cast<uint16_t>(data->args[3]);
+        colorLoopSetCommand.startHue = static_cast<uint16_t>(data->args[4]);
+        colorLoopSetCommand.optionsMask = static_cast<uint8_t>(data->args[5]);
+        colorLoopSetCommand.optionsOverride = static_cast<uint8_t>(data->args[6]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, colorLoopSetCommand);
+        break;
+ 
+    case Clusters::ColorControl::Commands::StopMoveStep::Id:
+        stopMoveStepCommand.optionsMask = static_cast<uint8_t>(data->args[0]);
+        stopMoveStepCommand.optionsOverride = static_cast<uint8_t>(data->args[1]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stopMoveStepCommand);
+        break;
+ 
+    case Clusters::ColorControl::Commands::MoveColorTemperature::Id:
+        moveColorTemperatureCommand.moveMode = static_cast<EmberAfHueMoveMode>(data->args[0]);
+        moveColorTemperatureCommand.rate = static_cast<uint16_t>(data->args[1]);
+        moveColorTemperatureCommand.colorTemperatureMinimumMireds = static_cast<uint16_t>(data->args[2]);
+        moveColorTemperatureCommand.colorTemperatureMaximumMireds = static_cast<uint16_t>(data->args[3]);
+        moveColorTemperatureCommand.optionsMask = static_cast<uint8_t>(data->args[4]);
+        moveColorTemperatureCommand.optionsOverride = static_cast<uint8_t>(data->args[5]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveColorTemperatureCommand);
+        break;
+ 
+    case Clusters::ColorControl::Commands::StepColorTemperature::Id:
+        stepColorTemperatureCommand.stepMode = static_cast<EmberAfHueStepMode>(data->args[0]);
+        stepColorTemperatureCommand.stepSize = static_cast<uint16_t>(data->args[1]);
+        stepColorTemperatureCommand.transitionTime = static_cast<uint16_t>(data->args[2]);
+        stepColorTemperatureCommand.colorTemperatureMinimumMireds = static_cast<uint16_t>(data->args[3]);
+        stepColorTemperatureCommand.colorTemperatureMaximumMireds = static_cast<uint16_t>(data->args[4]);
+        stepColorTemperatureCommand.optionsMask = static_cast<uint8_t>(data->args[5]);
+        stepColorTemperatureCommand.optionsOverride = static_cast<uint8_t>(data->args[6]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepColorTemperatureCommand);
         break;
     }
 }
@@ -573,6 +704,11 @@ CHIP_ERROR ColorControlSwitchCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR MoveToHueCommandHandler(int argc, char ** argv)
 {
+    if (argc != 5)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::MoveToHue::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -588,6 +724,11 @@ CHIP_ERROR MoveToHueCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR MoveHueCommandHandler(int argc, char ** argv)
 {
+    if (argc != 4)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::MoveHue::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -602,6 +743,11 @@ CHIP_ERROR MoveHueCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR StepHueCommandHandler(int argc, char ** argv)
 {
+    if (argc != 5)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::StepHue::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -617,6 +763,11 @@ CHIP_ERROR StepHueCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR MoveToSaturationCommandHandler(int argc, char ** argv)
 {
+    if (argc != 4)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::MoveToSaturation::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -631,6 +782,11 @@ CHIP_ERROR MoveToSaturationCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR MoveSaturationCommandHandler(int argc, char ** argv)
 {
+    if (argc != 4)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::MoveSaturation::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -645,6 +801,11 @@ CHIP_ERROR MoveSaturationCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR StepSaturationCommandHandler(int argc, char ** argv)
 {
+    if (argc != 5)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::StepSaturation::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -660,6 +821,11 @@ CHIP_ERROR StepSaturationCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR MoveToHueAndSaturationCommandHandler(int argc, char ** argv)
 {
+    if (argc != 5)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::MoveToHueAndSaturation::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -675,6 +841,11 @@ CHIP_ERROR MoveToHueAndSaturationCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR MoveToColorCommandHandler(int argc, char ** argv)
 {
+    if (argc != 5)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::MoveToColor::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -690,6 +861,11 @@ CHIP_ERROR MoveToColorCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR MoveColorCommandHandler(int argc, char ** argv)
 {
+    if (argc != 4)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::MoveColor::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -704,6 +880,11 @@ CHIP_ERROR MoveColorCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR StepColorCommandHandler(int argc, char ** argv)
 {
+    if (argc != 5)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::MoveColor::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -719,6 +900,11 @@ CHIP_ERROR StepColorCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR MoveToColorTemperatureCommandHandler(int argc, char ** argv)
 {
+    if (argc != 4)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::MoveColor::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -733,6 +919,11 @@ CHIP_ERROR MoveToColorTemperatureCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR EnhancedMoveToHueCommandHandler(int argc, char ** argv)
 {
+    if (argc != 5)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::EnhancedMoveToHue::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -748,6 +939,11 @@ CHIP_ERROR EnhancedMoveToHueCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR EnhancedMoveHueCommandHandler(int argc, char ** argv)
 {
+    if (argc != 4)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::EnhancedMoveHue::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -762,6 +958,11 @@ CHIP_ERROR EnhancedMoveHueCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR EnhancedStepHueCommandHandler(int argc, char ** argv)
 {
+    if (argc != 5)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::EnhancedStepHue::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -777,6 +978,11 @@ CHIP_ERROR EnhancedStepHueCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR EnhancedMoveToHueAndSaturationCommandHandler(int argc, char ** argv)
 {
+    if (argc != 5)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -792,6 +998,11 @@ CHIP_ERROR EnhancedMoveToHueAndSaturationCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR ColorLoopSetCommandHandler(int argc, char ** argv)
 {
+    if (argc != 7)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::ColorLoopSet::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -809,6 +1020,11 @@ CHIP_ERROR ColorLoopSetCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR StopMoveStepCommandHandler(int argc, char ** argv)
 {
+    if (argc != 2)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::StopMoveStep::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -821,6 +1037,11 @@ CHIP_ERROR StopMoveStepCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR MoveColorTemperatureCommandHandler(int argc, char ** argv)
 {
+    if (argc != 6)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::MoveColorTemperature::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -837,6 +1058,11 @@ CHIP_ERROR MoveColorTemperatureCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR StepColorTemperatureCommandHandler(int argc, char ** argv)
 {
+    if (argc != 7)
+    {
+        return ColorControlHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::ColorControl::Commands::StepColorTemperature::Id;
     data->clusterId           = Clusters::ColorControl::Id;
@@ -853,7 +1079,7 @@ CHIP_ERROR StepColorTemperatureCommandHandler(int argc, char ** argv)
 }
 
 /********************************************************
- * ColorControl switch shell functions
+ * ColorControl Read switch shell functions
  *********************************************************/
 
 CHIP_ERROR ColorControlReadHelpHandler(int argc, char ** argv)
@@ -1439,6 +1665,421 @@ CHIP_ERROR ColorControlReadStartUpColorTemperatureMireds(int argc, char ** argv)
     data->attributeId         = Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::Id;
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+/********************************************************
+ * Groups ColorControl switch shell functions
+ *********************************************************/
+
+CHIP_ERROR GroupsColorControlHelpHandler(int argc, char ** argv)
+{
+    sShellSwitchGroupsColorControlSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsColorControlSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    return sShellSwitchGroupsColorControlSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR GroupsMoveToHueCommandHandler(int argc, char ** argv)
+{
+    if (argc != 5)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::MoveToHue::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->args[4]             = atoi(argv[4]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsMoveHueCommandHandler(int argc, char ** argv)
+{
+    if (argc != 4)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::MoveHue::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsStepHueCommandHandler(int argc, char ** argv)
+{
+    if (argc != 5)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::StepHue::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->args[4]             = atoi(argv[4]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsMoveToSaturationCommandHandler(int argc, char ** argv)
+{
+    if (argc != 4)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::MoveToSaturation::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsMoveSaturationCommandHandler(int argc, char ** argv)
+{
+    if (argc != 4)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::MoveSaturation::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsStepSaturationCommandHandler(int argc, char ** argv)
+{
+    if (argc != 5)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::StepSaturation::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->args[4]             = atoi(argv[4]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsMoveToHueAndSaturationCommandHandler(int argc, char ** argv)
+{
+    if (argc != 5)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::MoveToHueAndSaturation::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->args[4]             = atoi(argv[4]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsMoveToColorCommandHandler(int argc, char ** argv)
+{
+    if (argc != 5)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::MoveToColor::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->args[4]             = atoi(argv[4]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsMoveColorCommandHandler(int argc, char ** argv)
+{
+    if (argc != 4)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::MoveColor::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsStepColorCommandHandler(int argc, char ** argv)
+{
+    if (argc != 5)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::MoveColor::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->args[4]             = atoi(argv[4]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsMoveToColorTemperatureCommandHandler(int argc, char ** argv)
+{
+    if (argc != 4)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::MoveColor::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsEnhancedMoveToHueCommandHandler(int argc, char ** argv)
+{
+    if (argc != 5)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::EnhancedMoveToHue::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->args[4]             = atoi(argv[4]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsEnhancedMoveHueCommandHandler(int argc, char ** argv)
+{
+    if (argc != 4)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::EnhancedMoveHue::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsEnhancedStepHueCommandHandler(int argc, char ** argv)
+{
+    if (argc != 5)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::EnhancedStepHue::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->args[4]             = atoi(argv[4]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsEnhancedMoveToHueAndSaturationCommandHandler(int argc, char ** argv)
+{
+    if (argc != 5)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->args[4]             = atoi(argv[4]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsColorLoopSetCommandHandler(int argc, char ** argv)
+{
+    if (argc != 7)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::ColorLoopSet::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->args[4]             = atoi(argv[4]);
+    data->args[5]             = atoi(argv[5]);
+    data->args[6]             = atoi(argv[6]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsStopMoveStepCommandHandler(int argc, char ** argv)
+{
+    if (argc != 2)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::StopMoveStep::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsMoveColorTemperatureCommandHandler(int argc, char ** argv)
+{
+    if (argc != 6)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::MoveColorTemperature::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->args[4]             = atoi(argv[4]);
+    data->args[5]             = atoi(argv[5]);
+    data->isGroup             = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsStepColorTemperatureCommandHandler(int argc, char ** argv)
+{
+    if (argc != 7)
+    {
+        return GroupsColorControlHelpHandler(argc, argv);
+    }
+
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::ColorControl::Commands::StepColorTemperature::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
+    data->args[3]             = atoi(argv[3]);
+    data->args[4]             = atoi(argv[4]);
+    data->args[5]             = atoi(argv[5]);
+    data->args[6]             = atoi(argv[6]);
+    data->isGroup             = true;
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;

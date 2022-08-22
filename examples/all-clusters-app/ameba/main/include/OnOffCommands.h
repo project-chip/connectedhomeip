@@ -166,6 +166,8 @@ void ProcessOnOffGroupBindingCommand(BindingCommandData * data, const EmberBindi
         break;
 
     case Clusters::OnOff::Commands::OffWithEffect::Id:
+        offwitheffectCommand.effectId = static_cast<EmberAfOnOffEffectIdentifier>(data->args[0]);
+        offwitheffectCommand.effectVariant = static_cast<EmberAfOnOffDelayedAllOffEffectVariant>(data->args[1]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offwitheffectCommand);
         break;
 
@@ -174,6 +176,9 @@ void ProcessOnOffGroupBindingCommand(BindingCommandData * data, const EmberBindi
         break;
 
     case Clusters::OnOff::Commands::OnWithTimedOff::Id:
+        onwithtimedoffCommand.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(data->args[0]);
+        onwithtimedoffCommand.onTime = static_cast<uint16_t>(data->args[1]);
+        onwithtimedoffCommand.offWaitTime = static_cast<uint16_t>(data->args[2]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onwithtimedoffCommand);
         break;
     }
@@ -404,9 +409,16 @@ CHIP_ERROR GroupToggleSwitchCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR GroupOffWithEffectSwitchCommandHandler(int argc, char ** argv)
 {
+    if (argc != 2)
+    {
+        return GroupsOnOffHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::OnOff::Commands::OffWithEffect::Id;
     data->clusterId           = Clusters::OnOff::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
     data->isGroup             = true;
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
@@ -426,9 +438,17 @@ CHIP_ERROR GroupOnWithRecallGlobalSceneSwitchCommandHandler(int argc, char ** ar
 
 CHIP_ERROR GroupOnWithTimedOffSwitchCommandHandler(int argc, char ** argv)
 {
+    if (argc != 2)
+    {
+        return GroupsOnOffHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::OnOff::Commands::OnWithTimedOff::Id;
     data->clusterId           = Clusters::OnOff::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
+    data->args[2]             = atoi(argv[2]);
     data->isGroup             = true;
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));

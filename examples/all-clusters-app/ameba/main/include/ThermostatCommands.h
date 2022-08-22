@@ -161,43 +161,20 @@ void ProcessThermostatGroupBindingCommand(BindingCommandData * data, const Ember
 {
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
 
-    Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-    Clusters::OnOff::Commands::On::Type onCommand;
-    Clusters::OnOff::Commands::Off::Type offCommand;
-    Clusters::OnOff::Commands::OffWithEffect::Type offwitheffectCommand;
-    Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type onwithrecallglobalsceneCommand;
-    Clusters::OnOff::Commands::OnWithTimedOff::Type onwithtimedoffCommand;
+    Clusters::Thermostat::Commands::SetpointRaiseLower::Type setpointRaiseLowerCommand;
 
     switch (data->commandId)
     {
-    case Clusters::OnOff::Commands::Toggle::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand);
-        break;
-
-    case Clusters::OnOff::Commands::On::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onCommand);
-        break;
-
-    case Clusters::OnOff::Commands::Off::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offCommand);
-        break;
-
-    case Clusters::OnOff::Commands::OffWithEffect::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offwitheffectCommand);
-        break;
-
-    case Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onwithrecallglobalsceneCommand);
-        break;
-
-    case Clusters::OnOff::Commands::OnWithTimedOff::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onwithtimedoffCommand);
+    case Clusters::Thermostat::Commands::SetpointRaiseLower::Id:
+        setpointRaiseLowerCommand.mode = static_cast<EmberAfSetpointAdjustMode>(data->args[0]);
+        setpointRaiseLowerCommand.amount = static_cast<int8_t>(data->args[1]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, setpointRaiseLowerCommand);
         break;
     }
 }
 
 /********************************************************
- * OnOff switch shell functions
+ * Thermostat switch shell functions
  *********************************************************/
 
 CHIP_ERROR ThermostatHelpHandler(int argc, char ** argv)
@@ -227,7 +204,7 @@ CHIP_ERROR SetpointRaiseLowerSwitchCommandHandler(int argc, char ** argv)
 }
 
 /********************************************************
- * OnOff Read switch shell functions
+ * Thermostat Read switch shell functions
  *********************************************************/
 
 CHIP_ERROR ThermostatReadHelpHandler(int argc, char ** argv)
@@ -406,6 +383,37 @@ CHIP_ERROR ThermostatReadSystemMode(int argc, char ** argv)
     data->attributeId         = Clusters::Thermostat::Attributes::SystemMode::Id;
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
+}
+
+/********************************************************
+ * Groups Thermostat switch shell functions
+ *********************************************************/
+
+CHIP_ERROR GroupsThermostatHelpHandler(int argc, char ** argv)
+{
+    sShellSwitchGroupsThermostatSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsThermostatSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        return GroupsThermostatHelpHandler(argc, argv);
+    }
+
+    return sShellSwitchGroupsThermostatSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR GroupsSetpointRaiseLowerSwitchCommandHandler(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->commandId           = Clusters::Thermostat::Commands::SetpointRaiseLower::Id;
+    data->clusterId           = Clusters::Thermostat::Id;
+    data->isGroup             = true;
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
