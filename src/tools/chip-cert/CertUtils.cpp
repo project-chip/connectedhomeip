@@ -772,7 +772,7 @@ bool WriteChipCert(const char * fileName, const ByteSpan & chipCert, CertFormat 
 }
 
 bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom,
-              uint32_t validDays, int pathLen, const FutureExtension * futureExts, uint8_t futureExtsCount, X509 * newCert,
+              uint32_t validDays, int pathLen, const FutureExtensionWithNID * futureExts, uint8_t futureExtsCount, X509 * newCert,
               EVP_PKEY * newKey, CertStructConfig & certConfig)
 {
     bool res  = true;
@@ -925,7 +925,7 @@ exit:
 }
 
 CHIP_ERROR MakeCertChipTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey,
-                           const struct tm & validFrom, uint32_t validDays, int pathLen, const FutureExtension * futureExts,
+                           const struct tm & validFrom, uint32_t validDays, int pathLen, const FutureExtensionWithNID * futureExts,
                            uint8_t futureExtsCount, X509 * x509Cert, EVP_PKEY * newKey, CertStructConfig & certConfig,
                            MutableByteSpan & chipCert)
 {
