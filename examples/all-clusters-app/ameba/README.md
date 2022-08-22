@@ -137,28 +137,66 @@ to be On or Off.
 
 -   Open the USB-TTL serial port and type `help` to view the available commands
 
-## Binding and Controlling a Lighting Device
+-   To know what are the available subcommands and what it does, simply enter the command that you are interested in
 
--   This example shows how to bind a Switch Device to a Lighting Device and
+              > switch      
+                help             Usage: switch <subcommand>
+                onoff            Usage: switch onoff <subcommand>
+                levelcontrol     Usage: switch levlecontrol <subcommand>
+                colorcontrol     Usage: switch colorcontrol <subcommand>
+                thermostat       Usage: switch thermostat <subcommand>
+                groups           Usage: switch groups <subcommand>
+                binding          Usage: switch binding <subcommand>
+                
+              > switch onoff
+                help            Usage: switch ononff <subcommand>
+                on              on Usage: switch onoff on
+                off             off Usage: switch onoff off
+                toggle          toggle Usage: switch onoff toggle
+                offWE           off-with-effect Usage: switch onoff offWE <EffectId> <EffectVariant>
+                onWRGS          on-with-recall-global-scene Usage: switch onoff onWRGS
+                onWTO           on-with-timed-off Usage: switch onoff onWTO <OnOffControl> <OnTime> <OffWaitTime>
+                read            Usage : switch levelcontrol read <attribute>
+
+## Binding and Controlling a Device (controllee)
+
+-   This example shows how to bind a Switch Device to a Controllee Device and
     control it through the Matter Shell. One binding client (Switch Device) and
-    one binding server (Lighting Device) is required.
+    one binding server (Controllee) is required.
 
--   Commission the switch (nodeID 1) and lighting device (nodeID 2) using
+-   Commission the switch (nodeID 1) and controllee device (nodeID 2) using
     chip-tool.
 
               $ ./chip-tool pairing ble-wifi 1 <SSID> <PASSWORD> 20202021 3840
               $ ./chip-tool pairing ble-wifi 2 <SSID> <PASSWORD> 20202021 3840
 
-*   After successful commissioning, configure the ACL in the lighting device to
+-   After successful commissioning, configure the ACL in the controllee device to
     allow access from switch device and chip-tool.
 
               $ ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1], "targets": null }]' 2 0
 
--   Bind the lighting device to the switch device.
+-   Bind the endpoint 1 OnOff cluster of the controllee device to the switch device.
 
               $ ./chip-tool binding write binding '[{"fabricIndex": 1, "node":2, "endpoint":1, "cluster":6}]' 1 1
 
--   Control the lighting device through the switch device's Matter Shell
+-   Send OnOff command to the device through the switch device's Matter Shell
 
               > switch onoff on
               > switch onoff off
+              
+-   You may also bind more than one cluster to the switch device. Below command binds the OnOff, LevelControl, ColorControl and Thermostat clusters to the switch device.
+
+              $ ./chip-tool binding write binding '[{"fabricIndex": 1, "node":2, "endpoint":1, "cluster":6}, {"fabricIndex": 1, "node":2, "endpoint":1, "cluster":8}, {"fabricIndex": 1, "node":2, "endpoint":1, "cluster":768}, {"fabricIndex": 1, "node":2, "endpoint":1, "cluster":513}]' 1 1
+              
+-   After binding the clusters, you may send these cluster commands to the controllee device through the switch device's Matter Shell. Follow the format shown in the description of the commands.
+
+              > switch onoff on
+              > switch levelcontrol movetolevel 100 0 0 0
+              > switch colorcontrol movetohue 100 0 0 0 0
+              > switch thermostat SPRL 0 0
+              
+-   You may also request to read cluster attributes from Matter Shell
+
+              > switch <cluster> read <attribute>
+              
+              
