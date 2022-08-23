@@ -131,7 +131,7 @@ if (use_silabs_thread_lib) {
       ":libopenthread-platform",
       ":openthread_core_config_efr32",
       "${segger_rtt_root}:segger_rtt",
-      "${sl_openthread_root}/include/openthread:openthread",
+      "${sl_openthread_root}/include/openthread:openthread-platform",
       "${sl_openthread_root}/src/core/:libopenthread_core_headers",
     ]
 

@@ -72,9 +72,9 @@ const ESP32Config::Key ESP32Config::kConfigKey_VendorId              = { kConfig
 const ESP32Config::Key ESP32Config::kConfigKey_VendorName            = { kConfigNamespace_ChipFactory, "vendor-name" };
 const ESP32Config::Key ESP32Config::kConfigKey_ProductId             = { kConfigNamespace_ChipFactory, "product-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_ProductName           = { kConfigNamespace_ChipFactory, "product-name" };
-const ESP32Config::Key ESP32Config::kConfigKey_UniqueId              = { kConfigNamespace_ChipFactory, "unique-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_SupportedCalTypes     = { kConfigNamespace_ChipFactory, "cal-types" };
 const ESP32Config::Key ESP32Config::kConfigKey_SupportedLocaleSize   = { kConfigNamespace_ChipFactory, "locale-sz" };
+const ESP32Config::Key ESP32Config::kConfigKey_RotatingDevIdUniqueId = { kConfigNamespace_ChipFactory, "rd-id-uid" };
 
 // Keys stored in the chip-config namespace
 const ESP32Config::Key ESP32Config::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
@@ -85,6 +85,7 @@ const ESP32Config::Key ESP32Config::kConfigKey_FailSafeArmed      = { kConfigNam
 const ESP32Config::Key ESP32Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "reg-location" };
 const ESP32Config::Key ESP32Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
+const ESP32Config::Key ESP32Config::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
 
 // Keys stored in the Chip-counters namespace
 const ESP32Config::Key ESP32Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
