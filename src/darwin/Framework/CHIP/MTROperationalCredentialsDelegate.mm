@@ -27,7 +27,10 @@
 #import "MTRLogging.h"
 #import "NSDataSpanConversion.h"
 
+#include <controller/CommissioningDelegate.h>
 #include <credentials/CHIPCert.h>
+#include <credentials/DeviceAttestationConstructor.h>
+#include <credentials/DeviceAttestationVendorReserved.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
@@ -112,9 +115,171 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateNOC(P256Keypair & signingK
     return NewNodeOperationalX509Cert(noc_request, pubkey, signingKeypair, noc);
 }
 
+CHIP_ERROR MTROperationalCredentialsDelegate::NOCChainGenerated(CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
+    const ByteSpan & rcac, Optional<Crypto::AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject)
+{
+    ReturnErrorCodeIf(mOnNOCCompletionCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion = mOnNOCCompletionCallback;
+    mOnNOCCompletionCallback = nullptr;
+
+    // Call-back into commissioner with the generated data.
+    dispatch_sync(mChipWorkQueue, ^{
+        onCompletion->mCall(onCompletion->mContext, status, noc, icac, rcac, ipk, adminSubject);
+    });
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR MTROperationalCredentialsDelegate::GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
     const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
     const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
+{
+    if (mNocChainIssuer != nil) {
+        return CallbackGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC, PAI, onCompletion);
+    } else {
+        return LocalGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC, PAI, onCompletion);
+    }
+}
+
+CHIP_ERROR MTROperationalCredentialsDelegate::CallbackGenerateNOCChain(const chip::ByteSpan & csrElements,
+    const chip::ByteSpan & csrNonce, const chip::ByteSpan & csrElementsSignature, const chip::ByteSpan & attestationChallenge,
+    const chip::ByteSpan & DAC, const chip::ByteSpan & PAI,
+    chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
+{
+    mOnNOCCompletionCallback = onCompletion;
+
+    TLVReader reader;
+    reader.Init(csrElements);
+
+    if (reader.GetType() == kTLVType_NotSpecified) {
+        ReturnErrorOnFailure(reader.Next());
+    }
+
+    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(reader.GetTag() == AnonymousTag(), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+
+    TLVType containerType;
+    ReturnErrorOnFailure(reader.EnterContainer(containerType));
+    ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, TLV::ContextTag(1)));
+
+    chip::ByteSpan csr;
+    reader.Get(csr);
+    reader.ExitContainer(containerType);
+
+    CSRInfo * csrInfo = [[CSRInfo alloc] initWithNonce:AsData(csrNonce)
+                                              elements:AsData(csrElements)
+                                     elementsSignature:AsData(csrElementsSignature)
+                                                   csr:AsData(csr)];
+
+    chip::ByteSpan certificationDeclarationSpan;
+    chip::ByteSpan attestationNonceSpan;
+    uint32_t timestampDeconstructed;
+    chip::ByteSpan firmwareInfoSpan;
+    chip::Credentials::DeviceAttestationVendorReservedDeconstructor vendorReserved;
+
+    __block chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters;
+    // Dereferencing mCppCommissioner as it would be set to point to a valid Cpp commissioner by now, as we are in the middle of
+    // commissioning
+    dispatch_sync(mChipWorkQueue, ^{
+        commissioningParameters = mCppCommissioner->GetCommissioningParameters();
+    });
+    VerifyOrReturnError(commissioningParameters.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
+    // Attestation Elements, nonce and signature will have a value in Commissioning Params as the CSR needs a signature or else we
+    // cannot trust it
+    ReturnErrorOnFailure(
+        chip::Credentials::DeconstructAttestationElements(commissioningParameters.Value().GetAttestationElements().Value(),
+            certificationDeclarationSpan, attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan, vendorReserved));
+
+    AttestationInfo * attestationInfo =
+        [[AttestationInfo alloc] initWithChallenge:AsData(attestationChallenge)
+                                             nonce:AsData(commissioningParameters.Value().GetAttestationNonce().Value())
+                                          elements:AsData(commissioningParameters.Value().GetAttestationElements().Value())
+                                 elementsSignature:AsData(commissioningParameters.Value().GetAttestationSignature().Value())
+                                               dac:AsData(DAC)
+                                               pai:AsData(PAI)
+                          certificationDeclaration:AsData(certificationDeclarationSpan)
+                                      firmwareInfo:AsData(firmwareInfoSpan)];
+
+    dispatch_sync(mNocChainIssuerQueue, ^{
+        [mNocChainIssuer onNOCChainGenerationNeeded:csrInfo
+                                    attestationInfo:attestationInfo
+                       onNOCChainGenerationComplete:^void(NSData * operationalCertificate, NSData * intermediateCertificate,
+                           NSData * rootCertificate, NSData * ipk, NSNumber * adminSubject, NSError * __autoreleasing * error) {
+                           onNOCChainGenerationComplete(
+                               operationalCertificate, intermediateCertificate, rootCertificate, ipk, adminSubject, error);
+                       }];
+    });
+
+    return CHIP_NO_ERROR;
+}
+
+void MTROperationalCredentialsDelegate::setNSError(CHIP_ERROR err, NSError * __autoreleasing * outError)
+{
+    if (outError) {
+        *outError = [MTRError errorForCHIPErrorCode:err];
+    }
+}
+
+void MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(NSData * operationalCertificate,
+    NSData * intermediateCertificate, NSData * rootCertificate, NSData * _Nullable ipk, NSNumber * _Nullable adminSubject,
+    NSError * __autoreleasing * error)
+{
+    if (operationalCertificate == nil || intermediateCertificate == nil || rootCertificate == nil) {
+        setNSError(CHIP_ERROR_INVALID_ARGUMENT, error);
+        return;
+    }
+
+    // use ipk and adminSubject from CommissioningParameters if not passed in.
+    // Dereferencing mCppCommissioner as it would be set to point to a valid Cpp commissioner by now, as we are in the middle of
+    // commissioning
+    __block chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters;
+    dispatch_sync(mChipWorkQueue, ^{
+        commissioningParameters = mCppCommissioner->GetCommissioningParameters();
+    });
+    if (!commissioningParameters.HasValue()) {
+        setNSError(CHIP_ERROR_INCORRECT_STATE, error);
+        return;
+    }
+
+    chip::Optional<chip::Crypto::AesCcm128KeySpan> ipkOptional;
+    uint8_t ipkValue[chip::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    chip::Crypto::AesCcm128KeySpan ipkTempSpan(ipkValue);
+    if (ipk != nil) {
+        if ([ipk length] != sizeof(ipkValue)) {
+            setNSError(CHIP_ERROR_INCORRECT_STATE, error);
+            return;
+        }
+        memcpy(&ipkValue[0], [ipk bytes], [ipk length]);
+        ipkOptional.SetValue(ipkTempSpan);
+    } else if (commissioningParameters.Value().GetIpk().HasValue()) {
+        ipkOptional.SetValue(commissioningParameters.Value().GetIpk().Value());
+    }
+
+    chip::Optional<chip::NodeId> adminSubjectOptional;
+    if (adminSubject != nil) {
+        adminSubjectOptional.SetValue(adminSubject.unsignedLongLongValue);
+    } else {
+        adminSubjectOptional = commissioningParameters.Value().GetAdminSubject();
+    }
+
+    // This could potentially be done as an async operation as a future optimization. But it ultimately calls
+    // DeviceCommissioner::OnDeviceNOCChainGeneration which sends the AddNoc message to the target. The call returns without
+    // blocking as it is.
+    CHIP_ERROR err = NOCChainGenerated(CHIP_NO_ERROR, AsByteSpan(operationalCertificate), AsByteSpan(intermediateCertificate),
+        AsByteSpan(rootCertificate), ipkOptional, adminSubjectOptional);
+
+    if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("Failed to SetNocChain for the device: %" CHIP_ERROR_FORMAT, err.Format());
+        setNSError(CHIP_ERROR_INCORRECT_STATE, error);
+    }
+}
+
+CHIP_ERROR MTROperationalCredentialsDelegate::LocalGenerateNOCChain(const chip::ByteSpan & csrElements,
+    const chip::ByteSpan & csrNonce, const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge,
+    const chip::ByteSpan & DAC, const chip::ByteSpan & PAI,
+    chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
 {
     chip::NodeId assignedId;
     if (mNodeIdRequested) {

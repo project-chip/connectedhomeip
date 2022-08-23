@@ -254,12 +254,14 @@ RUN case ${TARGETPLATFORM} in \
 RUN npm --prefix third_party/zap/repo/ ci
 RUN scripts/examples/gn_build_test_example.sh app1
 
+RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i no
+
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
 FROM ubuntu:22.04
 ENV TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update -y
-RUN apt-get install -y libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev avahi-utils iproute2
+RUN apt-get install -y libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev avahi-utils iproute2 libcairo2-dev libgirepository1.0-dev python3-pip
 WORKDIR /root/
 COPY --from=chip-build-cert-bins /root/.sdk-sha-version .sdk-sha-version
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/debug/chip-tool chip-tool
@@ -276,3 +278,8 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-provider-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-requestor-app chip-ota-requestor-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lock-app chip-lock-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/app1/chip-app1 chip-app1
+
+# Stage 3.1 Setup the Matter Python environment
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib
+COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing python_testing
+RUN pip install --no-cache-dir python_lib/controller/python/chip*.whl

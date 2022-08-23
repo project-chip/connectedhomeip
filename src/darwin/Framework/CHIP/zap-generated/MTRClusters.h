@@ -5297,6 +5297,10 @@ NS_ASSUME_NONNULL_BEGIN
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
             completionHandler:(StatusCompletion)completionHandler;
+- (void)failRandomlyAtFaultWithParams:(MTRFaultInjectionClusterFailRandomlyAtFaultParams *)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(StatusCompletion)completionHandler;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params;
 

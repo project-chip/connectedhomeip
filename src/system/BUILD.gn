@@ -177,7 +177,6 @@ static_library("system") {
     "SystemError.cpp",
     "SystemError.h",
     "SystemEvent.h",
-    "SystemFaultInjection.h",
     "SystemLayer.cpp",
     "SystemLayer.h",
     "SystemLayerImpl.h",
@@ -219,7 +218,10 @@ static_library("system") {
   }
 
   if (chip_with_nlfaultinjection) {
-    sources += [ "SystemFaultInjection.cpp" ]
+    sources += [
+      "SystemFaultInjection.cpp",
+      "SystemFaultInjection.h",
+    ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
 }

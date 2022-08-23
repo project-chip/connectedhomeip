@@ -31,22 +31,16 @@ tests:
 
     - label: "Note"
       verification: |
-          To Run the event test case we need to build event commands on DUT[All-cluster-ap] side.Below I mention the commands for how to build for linux arm64 it depends on the DUT what we use.I provided the link for build events.
-
-          https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#trigger-switch-events
-
-
-
-
-          Here I provide cmmds for build on linux arm64
-
-          1. ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build
-
-          2../scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang build
-
-          3.  ./out/linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang/chip-all-clusters-app-fuzzing
-
-          4. ./out/linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang/chip-all-clusters-app-fuzzing $(INPUT_FILE)
+          NOTE: https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#readme
+          Events to be executed as following
+          1. Compile app using below command in connectedhomeip folder
+          a. ./scripts/run_in_build_env.sh ./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build
+          b. ./scripts/run_in_build_env.sh ./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang build
+          2. Build respective app (all-clusters-app)
+          3. Commission DUT to TH
+          4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT
+          ps  -aef|grep all-clusters-app
+          5. Follow the Verification step below to generate the event in 2nd terminal of DUT
       disabled: true
 
     - label:

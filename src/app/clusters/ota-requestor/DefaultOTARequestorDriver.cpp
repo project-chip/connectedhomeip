@@ -388,6 +388,13 @@ void DefaultOTARequestorDriver::StopPeriodicQueryTimer()
     CancelDelayedAction(PeriodicQueryTimerHandler, this);
 }
 
+void DefaultOTARequestorDriver::RekickPeriodicQueryTimer(void)
+{
+    ChipLogProgress(SoftwareUpdate, "Rekicking the Periodic Query timer");
+    StopPeriodicQueryTimer();
+    StartPeriodicQueryTimer();
+}
+
 void DefaultOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer, void * appState)
 {
     DefaultOTARequestorDriver * driver = ToDriver(appState);

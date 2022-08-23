@@ -29,7 +29,7 @@ tests:
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
-          on TH(chip-tool),Verify that the DUT response The attribute is nullable, and null is also acceptable
+          on TH(chip-tool),Verify that the DUT response is an integer. Record this value for usage in steps 2b.
 
           [1649678983.679893][10871:10876] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065073
           [1649678983.680002][10871:10876] CHIP:TOO:   OnMode: 0

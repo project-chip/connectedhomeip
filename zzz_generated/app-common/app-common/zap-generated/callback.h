@@ -8919,6 +8919,12 @@ bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
 bool emberAfFaultInjectionClusterFailAtFaultCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::FaultInjection::Commands::FailAtFault::DecodableType & commandData);
+/**
+ * @brief Fault Injection Cluster FailRandomlyAtFault Command callback (from client)
+ */
+bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::FaultInjection::Commands::FailRandomlyAtFault::DecodableType & commandData);
 
 /** @brief Add To Current App Tasks
  *

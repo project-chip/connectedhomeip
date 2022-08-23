@@ -118,9 +118,15 @@ EFR32OpaqueKeypair::EFR32OpaqueKeypair()
 
 EFR32OpaqueKeypair::~EFR32OpaqueKeypair()
 {
-    // Free dynamic resource
+    // Free key resources
     if (mContext != nullptr)
     {
+        // Delete volatile keys, since nobody else can after we drop the key ID.
+        if (!mIsPersistent)
+        {
+            Delete();
+        }
+
         MemoryFree(mContext);
         mContext = nullptr;
     }
@@ -244,7 +250,7 @@ CHIP_ERROR EFR32OpaqueKeypair::Create(EFR32OpaqueKeyId opaque_id, EFR32OpaqueKey
 
     // Store the key ID and mark the key as valid
     mHasKey       = true;
-    mIsPersistent = key_id != kEFR32OpaqueKeyIdVolatile;
+    mIsPersistent = opaque_id != kEFR32OpaqueKeyIdVolatile;
 
 exit:
     psa_reset_key_attributes(&attr);
@@ -401,7 +407,9 @@ CHIP_ERROR EFR32OpaqueP256Keypair::Deserialize(P256SerializedKeypair & input)
 CHIP_ERROR EFR32OpaqueP256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
     MutableByteSpan csr(out_csr, csr_length);
-    return GenerateCertificateSigningRequest(this, csr);
+    CHIP_ERROR err = GenerateCertificateSigningRequest(this, csr);
+    csr_length     = (CHIP_NO_ERROR == err) ? csr.size() : 0;
+    return err;
 }
 
 CHIP_ERROR EFR32OpaqueP256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const

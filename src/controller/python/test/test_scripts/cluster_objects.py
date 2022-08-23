@@ -313,8 +313,6 @@ class ClusterObjectTests:
         await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
         await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
         await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
-        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
-        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=1))
 
     @classmethod
     async def _RetryForContent(cls, request, until, retryCount=10, intervalSeconds=1):
@@ -335,11 +333,19 @@ class ClusterObjectTests:
     @base.test_case
     async def TestGenerateUndefinedFabricScopedEventRequests(cls, devCtrl):
         logger.info("Running TestGenerateUndefinedFabricScopedEventRequests")
-        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
+        try:
+            res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
+            raise ValueError(f"Unexpected Failure")
+        except chip.interaction_model.InteractionModelError as ex:
+            logger.info(f"Recevied {ex} from server.")
         res = await devCtrl.ReadEvent(nodeid=NODE_ID, events=[
-            (1, Clusters.TestCluster.Events.TestEvent, 0),
+            (1, Clusters.TestCluster.Events.TestFabricScopedEvent, 0),
         ])
         logger.info(f"return result is {res}")
+        if len(res) != 0:
+            raise AssertionError("failure: not expect to receive fabric-scoped event when fabric is undefined")
+        else:
+            logger.info("TestGenerateUndefinedFabricScopedEventRequests: Success")
 
     @classmethod
     @base.test_case

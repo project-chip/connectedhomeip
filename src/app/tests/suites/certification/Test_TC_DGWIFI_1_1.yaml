@@ -40,13 +40,22 @@ tests:
               type: int16u
 
     - label: "TH reads the FeatureMap from DUT"
+      PICS: ( !DGWIFI.S.F00 && !DGWIFI.S.F01 )
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label: "TH reads the FeatureMap from DUT"
       PICS: DGWIFI.S.F00 || DGWIFI.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              minValue: 0
+              minValue: 1
               maxValue: 3
 
     - label: "TH reads AttributeList from DUT"
