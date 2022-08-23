@@ -18134,7 +18134,7 @@ class ColorControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="colorTempPhysicalMinMireds", Tag=0x0000400B, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorTempPhysicalMaxMireds", Tag=0x0000400C, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="coupleColorTempToLevelMinMireds", Tag=0x0000400D, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="startUpColorTemperatureMireds", Tag=0x00004010, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="startUpColorTemperatureMireds", Tag=0x00004010, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -18193,7 +18193,7 @@ class ColorControl(Cluster):
     colorTempPhysicalMinMireds: 'typing.Optional[uint]' = None
     colorTempPhysicalMaxMireds: 'typing.Optional[uint]' = None
     coupleColorTempToLevelMinMireds: 'typing.Optional[uint]' = None
-    startUpColorTemperatureMireds: 'typing.Optional[uint]' = None
+    startUpColorTemperatureMireds: 'typing.Union[None, Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -19501,9 +19501,9 @@ class ColorControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
