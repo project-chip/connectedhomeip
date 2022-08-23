@@ -71,11 +71,13 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         return ConvertCyResultToChip(result);
     }
 
-    // If user requested size zero, they are checking to see if key value exists, which previous read proves.
-    // If actual size is zero, there is no value to read. In either case this function can return.
-    if (actual_size == 0 || size == 0)
+    // If actual size is zero, there is no value to read, case this function can return.
+    if (actual_size == 0)
     {
-        *read_bytes_size = actual_size; // The calling matter api expects this to always be set
+        if (read_bytes_size != nullptr)
+        {
+            *read_bytes_size = actual_size; // The calling matter api expects this to always be set
+        }
         return CHIP_NO_ERROR;
     }
 
