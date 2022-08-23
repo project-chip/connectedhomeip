@@ -50,7 +50,11 @@ private:
 #if CONFIG_LED_TYPE_RMT
     uint8_t mHue;
     uint8_t mSaturation;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+    led_strip_handle_t mStrip;
+#else
     led_strip_t * mStrip;
+#endif
 #else
     gpio_num_t mGPIONum;
 #endif
