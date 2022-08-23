@@ -57,6 +57,7 @@ extern "C" {
 #include "sl_system_init.h"
 
 void initAntenna(void);
+void wifi_board_init(void);
 
 void init_efrPlatform(void)
 {
@@ -66,6 +67,9 @@ void init_efrPlatform(void)
 #if EFR32_LOG_ENABLED
     efr32InitLog();
 #endif
+
+    /* host init ( SPI and GPIO ) */
+    wifi_board_init();
 
 #if CHIP_ENABLE_OPENTHREAD
     sl_ot_sys_init();
