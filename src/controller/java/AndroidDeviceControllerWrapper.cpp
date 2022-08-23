@@ -70,7 +70,7 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
-    JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, const chip::CATValues & cats, chip::System::Layer * systemLayer,
+    JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats, chip::System::Layer * systemLayer,
     chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
     chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager, AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr,
     jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate,
@@ -238,7 +238,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         setupParams.hasExternallyOwnedOperationalKeypair = false;
 
         *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId,
-                                                                           /* fabricId = */ 1, cats, ephemeralKey.Pubkey(),
+                                                                           fabricId, cats, ephemeralKey.Pubkey(),
                                                                            rcacSpan, icacSpan, nocSpan);
 
         if (*errInfoOnFailure != CHIP_NO_ERROR)
