@@ -300,13 +300,13 @@ tests:
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.C.C00.Tx
       verification: |
-          On first controller chip tool, open commissioning window using ECM
+          On DUT_CR1 (chip tool) , open commissioning window using ECM
 
-            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
           ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
 
-          Verify Manual pairing code on TH1(all-clusters-app) Log
+          Verify Manual pairing code on DUT_CR1(chip-tool) Log
 
 
           [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
@@ -327,7 +327,7 @@ tests:
       verification: |
           On TH_CR2  using chip tool connect to the accessory
 
-            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
 
           ./chip-tool pairing code 1 36217551633  --commissioner-name beta
@@ -342,7 +342,7 @@ tests:
       verification: |
           On TH_CR2 , read fabrics list
 
-            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
           ./chip-tool operationalcredentials read fabrics 1234 0 --fabric-filtered 0  --commissioner-name beta
 
