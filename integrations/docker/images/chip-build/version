@@ -1,1 +1,1 @@
-0.5.93 Version bump reason: [ESP32] Update ESP-IDF to release v4.4.2
+0.5.94 Version bump reason: Install ccache to the chip-build image

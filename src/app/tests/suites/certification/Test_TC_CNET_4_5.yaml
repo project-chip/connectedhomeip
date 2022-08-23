@@ -26,6 +26,29 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "The cluster Identifier 49 (0x0031) is present in the ServerList
+          attribute"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label: "The FeatureMap attribute value is 1"
+      verification: |
+          "./chip-tool networkcommissioning read feature-map 1 0
+
+          Verify the "feature-map" on the TH(Chip-tool) Log:
+
+          [1653474932.055513][29920:29925] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 1600858167
+          [1653474932.055578][29920:29925] CHIP:TOO:   FeatureMap: 1
+          [1653474932.055675][29920:29925] CHIP:EM: Sending Standalone Ack for MessageCounter:1494059 on exchange 5482i"
+      disabled: true
+
     - label:
           "TH sends the AddOrUpdateWiFiNetwork command to the DUT with the
           following argument: SSID argument value as Userwifi_ssid Credentials

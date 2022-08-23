@@ -19,6 +19,7 @@ name:
 
 PICS:
     - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.QR_COMMISSIONING
 
 config:
     nodeId: 0x12344321

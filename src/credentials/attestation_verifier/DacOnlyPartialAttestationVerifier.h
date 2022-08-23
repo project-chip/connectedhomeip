@@ -21,11 +21,37 @@
 namespace chip {
 namespace Credentials {
 
+/**
+ * @brief
+ *   This class is based upon the DefaultDACVerifier but has all checks removed which require
+ * local availability of trust anchors that are not available from the commissionee, such as the
+ * PAA root certificates and the CSA keys used to sign the Certification Declaration (CD).
+ *
+ *   This class should only be used in conjunction with an OperationalCredentialsDelegate
+ * which performs the removed checks. For example, an OperationalCredentialsDelegate implementation
+ * might send the DAC chain and signed CD to custom code which obtains these keys from the DCL.
+ *
+ * Specifically, the following list of checks have been removed:
+ * (1) Make sure the PAA is valid and approved by CSA.
+ * (2) vid-scoped PAA check: if the PAA is vid scoped, then its vid must match the DAC vid.
+ * (3) cert chain check: verify PAI is signed by PAA, and DAC is signed by PAI.
+ * (4) PAA subject key id extraction: the PAA subject key must match the PAA key referenced in the PAI.
+ * (5) CD signature check: make sure a valid CSA CD key is used to sign the CD.
+ *
+ * Any other checks performed by the DefaultDACVerifier should be performed here too. Changes
+ * made to DefaultDACVerifier::VerifyAttestationInformation should be made to
+ * PartialDACVerifier::VerifyAttestationInformation.
+ */
 class PartialDACVerifier : public DefaultDACVerifier
 {
 public:
     PartialDACVerifier() {}
 
+    /**
+     * @brief
+     * The implementation should track DefaultDACVerifier::VerifyAttestationInformation but with the checks
+     * disabled that are outlined at the top of DacOnlyPartialAttestationVerifier.h.
+     */
     void VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
 

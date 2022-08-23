@@ -211,7 +211,7 @@ private:
 
             // first lowest tagNum for this vendorId/profileNum
             uint64_t minTagNum = UINT64_MAX;
-            size_t lowestIndex;
+            size_t lowestIndex = SIZE_MAX;
             for (i = starting; i < mNumEntriesUsed; i++)
             {
                 if (mElements[i].vendorId == minVendor && mElements[i].profileNum == minProfile)

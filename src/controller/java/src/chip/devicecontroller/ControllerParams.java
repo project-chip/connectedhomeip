@@ -86,7 +86,8 @@ public final class ControllerParams {
 
   /**
    * Returns parameters which uses the provided {@code operationalKeyConfig} as its operating
-   * credentials.
+   * credentials. You must set a vendor ID, 0xFFF4 is a test vendor ID
+   * ControllerParams.newBuilder().setControllerVendorId(0xFFF4).build()
    */
   public static Builder newBuilder(OperationalKeyConfig operationalKeyConfig) {
     return newBuilder()

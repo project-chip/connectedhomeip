@@ -205,7 +205,6 @@ requirements
 ##### Guides
 
 -   [Bouffalo Lab](/examples/lighting-app/bouffalolab/bl602/README.md)
--   [CYW30739 Lighting](/examples/lighting-app/cyw30739/README.md)
 -   [EFR32 Window Covering](/examples/window-app/efr32/README.md)
 -   [ESP32 All Clusters](/examples/all-clusters-app/esp32/README.md)
 -   [ESP32 Lighting](/examples/lighting-app/esp32/README.md)
@@ -215,7 +214,8 @@ requirements
 -   [nRF Connect Pump](/examples/pump-app/nrfconnect/README.md)
 -   [NXP Examples](./nxp_imx8m_linux_examples.md)
 -   [NXP](/examples/all-clusters-app/nxp/mw320/README.md)
--   [P6](/examples/all-clusters-app/p6/README.md)
+-   [Infineon CYW30739 Lighting](/examples/lighting-app/infineon/cyw30739/README.md)
+-   [Infineon PSoC6](/examples/all-clusters-app/infineon/psoc6/README.md)
 -   [Qorvo](/examples/lighting-app/qpg/README.md)
 -   [SiliconLabs](./silabs_efr32_building.md)
 -   [Simulated Linux](./simulated_device_linux.md)

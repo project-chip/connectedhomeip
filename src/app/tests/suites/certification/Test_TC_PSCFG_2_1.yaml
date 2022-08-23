@@ -20,27 +20,22 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Power Source Configuration"
     endpoint: 0
 
 tests:
     - label: "Commission DUT to TH"
-      verification: |
-          verification step to be updated.
-      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "TH reads the Sources attribute from the DUT"
       PICS: PSCFG.S.A0000
-      verification: |
-          ./chip-tool powersourceconfiguration read sources 1 0
-
-           verify on TH(chip-tool) that source attribute provides a list, and each entry in the list has to be  number of an endpoint having a Power Source cluster.
-
-          The response should look like this:
-
-          [1650273002.441884][8875:8880] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002E Attribute 0x0000_0000 DataVersion: 461632376
-          [1653564197.717105][36217:36222] CHIP:TOO:   Sources: 3 entries
-          [1653564197.717154][36217:36222] CHIP:TOO:     [1]: 2
-          [1653564197.717196][36217:36222] CHIP:TOO:     [2]: 1
-          [1653564197.717236][36217:36222] CHIP:TOO:     [3]: 0
-      disabled: true
+      command: "readAttribute"
+      attribute: "Sources"
+      response:
+          constraints:
+              type: list

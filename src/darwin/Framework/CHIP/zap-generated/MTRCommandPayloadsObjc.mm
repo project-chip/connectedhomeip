@@ -2943,6 +2943,41 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+@implementation MTRTimeSynchronizationClusterSetUtcTimeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _utcTime = @(0);
+
+        _granularity = @(0);
+
+        _timeSource = nil;
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRTimeSynchronizationClusterSetUtcTimeParams alloc] init];
+
+    other.utcTime = self.utcTime;
+    other.granularity = self.granularity;
+    other.timeSource = self.timeSource;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: utcTime:%@; granularity:%@; timeSource:%@; >",
+                                             NSStringFromClass([self class]), _utcTime, _granularity, _timeSource];
+    return descriptionString;
+}
+
+@end
 @implementation MTRAdministratorCommissioningClusterOpenCommissioningWindowParams
 - (instancetype)init
 {
@@ -8077,6 +8112,83 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
+@end
+@implementation MTRFaultInjectionClusterFailAtFaultParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _type = @(0);
+
+        _id = @(0);
+
+        _numCallsToSkip = @(0);
+
+        _numCallsToFail = @(0);
+
+        _takeMutex = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRFaultInjectionClusterFailAtFaultParams alloc] init];
+
+    other.type = self.type;
+    other.id = self.id;
+    other.numCallsToSkip = self.numCallsToSkip;
+    other.numCallsToFail = self.numCallsToFail;
+    other.takeMutex = self.takeMutex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: type:%@; id:%@; numCallsToSkip:%@; numCallsToFail:%@; takeMutex:%@; >",
+                  NSStringFromClass([self class]), _type, _id, _numCallsToSkip, _numCallsToFail, _takeMutex];
+    return descriptionString;
+}
+
+@end
+@implementation MTRFaultInjectionClusterFailRandomlyAtFaultParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _type = @(0);
+
+        _id = @(0);
+
+        _percentage = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone;
+{
+    auto other = [[MTRFaultInjectionClusterFailRandomlyAtFaultParams alloc] init];
+
+    other.type = self.type;
+    other.id = self.id;
+    other.percentage = self.percentage;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: type:%@; id:%@; percentage:%@; >", NSStringFromClass([self class]), _type, _id, _percentage];
     return descriptionString;
 }
 

@@ -38,13 +38,13 @@ class InfineonApp(Enum):
 
     def AppNamePrefix(self):
         if self == InfineonApp.LOCK:
-            return 'chip-p6-lock-example'
+            return 'chip-psoc6-lock-example'
         elif self == InfineonApp.LIGHT:
-            return 'chip-p6-lighting-example'
+            return 'chip-psoc6-lighting-example'
         elif self == InfineonApp.ALL_CLUSTERS:
-            return 'chip-p6-clusters-example'
+            return 'chip-psoc6-clusters-example'
         elif self == InfineonApp.ALL_CLUSTERS_MINIMAL:
-            return 'chip-p6-clusters-minimal-example'
+            return 'chip-psoc6-clusters-minimal-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -61,14 +61,14 @@ class InfineonApp(Enum):
             raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):
-        return os.path.join(root, 'examples', self.ExampleName(), 'p6')
+        return os.path.join(root, 'examples', self.ExampleName(), 'infineon/psoc6')
 
 
 class InfineonBoard(Enum):
-    P6BOARD = 1
+    PSOC6BOARD = 1
 
     def GnArgName(self):
-        if self == InfineonBoard.P6BOARD:
+        if self == InfineonBoard.PSOC6BOARD:
             return 'CY8CKIT-062S2-43012'
 
 
@@ -78,7 +78,7 @@ class InfineonBuilder(GnBuilder):
                  root,
                  runner,
                  app: InfineonApp = InfineonApp.LOCK,
-                 board: InfineonBoard = InfineonBoard.P6BOARD,
+                 board: InfineonBoard = InfineonBoard.PSOC6BOARD,
                  enable_ota_requestor: bool = False,
                  update_image: bool = False):
         super(InfineonBuilder, self).__init__(
@@ -86,7 +86,7 @@ class InfineonBuilder(GnBuilder):
             runner=runner)
 
         self.app = app
-        self.extra_gn_options = ['p6_board="%s"' % board.GnArgName()]
+        self.extra_gn_options = ['psoc6_board="%s"' % board.GnArgName()]
 
         if enable_ota_requestor:
             self.extra_gn_options.append('chip_enable_ota_requestor=true')

@@ -21,12 +21,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
-#ifdef DISPLAY_ENABLED
-#include "lcd.h"
-#ifdef QR_CODE_ENABLED
-#include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+
 #include "sl_simple_led_instances.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -132,6 +127,9 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+#ifdef DISPLAY_ENABLED
+    GetLCD().Init((uint8_t *) "Lighting-App");
+#endif
 
     err = BaseApplication::Init(&gIdentify);
     if (err != CHIP_NO_ERROR)
@@ -266,16 +264,13 @@ void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAc
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
     // Action initiated, update the light led
-    if (aAction == LightingManager::ON_ACTION)
-    {
-        EFR32_LOG("Turning light ON")
-        sLightLED.Set(true);
-    }
-    else if (aAction == LightingManager::OFF_ACTION)
-    {
-        EFR32_LOG("Turning light OFF")
-        sLightLED.Set(false);
-    }
+    bool lightOn = aAction == LightingManager::ON_ACTION;
+    EFR32_LOG("Turning light %s", (lightOn) ? "On" : "Off")
+    sLightLED.Set(lightOn);
+
+#ifdef DISPLAY_ENABLED
+    sAppTask.GetLCD().WriteDemoUI(lightOn);
+#endif
 
     if (aActor == AppEvent::kEventType_Button)
     {

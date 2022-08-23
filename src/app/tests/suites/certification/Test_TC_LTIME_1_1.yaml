@@ -26,7 +26,7 @@ config:
 tests:
     - label: "Note"
       verification: |
-          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
     - label: "Commission DUT to TH"
@@ -148,9 +148,4 @@ tests:
           [1659778463.618529][17263:17263] CHIP:DMG: },
           [1659778463.618601][17263:17263] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1659778463.618663][17263:17263] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-      disabled: true
-
-    - label: ""
-      verification: |
-          verification step to be updated.
       disabled: true

@@ -44,6 +44,15 @@ tests:
       response:
           value: 1
 
+    #Adding below step resolve the issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/499
+    - label:
+          "Precondition: write default value of OnOffTransitionTime attribute"
+      PICS: LVL.S.A0010
+      command: "writeAttribute"
+      attribute: "OnOffTransitionTime"
+      arguments:
+          value: 0
+
     - label: "TH writes 0 to the Options attribute"
       PICS: LVL.S.A000f
       command: "writeAttribute"
@@ -229,9 +238,9 @@ tests:
       command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
+              - name: "Level"
                 value: 100
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
                 value: 0
@@ -255,9 +264,9 @@ tests:
       command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
+              - name: "Level"
                 value: 120
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
                 value: 0
@@ -276,9 +285,9 @@ tests:
       command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
+              - name: "Level"
                 value: 140
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
                 value: 1
@@ -297,9 +306,9 @@ tests:
       command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
+              - name: "Level"
                 value: 160
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
                 value: 1
@@ -337,9 +346,9 @@ tests:
       command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
+              - name: "Level"
                 value: 100
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
                 value: 0
@@ -363,9 +372,9 @@ tests:
       command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
+              - name: "Level"
                 value: 120
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
                 value: 0
@@ -384,9 +393,9 @@ tests:
       command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
+              - name: "Level"
                 value: 140
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
                 value: 1
@@ -405,9 +414,9 @@ tests:
       command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
+              - name: "Level"
                 value: 160
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
                 value: 1
@@ -420,16 +429,3 @@ tests:
       attribute: "CurrentLevel"
       response:
           value: 160
-
-    - label: "Precondition send Off Command"
-      cluster: "On/Off"
-      PICS: OO.S.C00.Rsp
-      command: "Off"
-
-    - label: "Check on/off attribute value is false after off command"
-      cluster: "On/Off"
-      PICS: OO.S.A0000
-      command: "readAttribute"
-      attribute: "OnOff"
-      response:
-          value: 0

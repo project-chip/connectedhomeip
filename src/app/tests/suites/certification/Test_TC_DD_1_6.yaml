@@ -25,12 +25,26 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          Final label of DUT is ready to be scanned
+      disabled: true
+
     - label: "Scan the DUTs QR code using the TH QR code reader"
       verification: |
-          Vendor specific field testcase
+          1. Scan the QR code with a QR Code scanning device.
+          2. Vendor specific field testcase that should be manually verified using the requirements in the Expected Outcome.
       disabled: true
 
     - label: "Verify QR code version"
       verification: |
-          Vendor specific field verification
+          1. Manually verify the QR code version by referring to section 5.1.3.2 "QR Code Format" of the spec document to ensure it follows the ISO/IEC 18004:2015 (https://www.iso.org/standard/62021.html) specifications with accurate:
+          - Module size
+          - ECC Level
+          - Alphanumeric capacity
+          - Total available payload, excluding prefix (bits)
+          - Available payload for TLV data (bits)
+          2. Vendor specific field test case that should be manually verified using the requirements in the Expected Outcome.
+
+          Note: chip-tool is not used to verify this test step
       disabled: true

@@ -26,6 +26,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT is instructed to start advertising its presence as a commissioner
           in the network"
@@ -56,8 +61,7 @@ tests:
 
 
 
-          to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp
-          | grep _matterd
+          to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp | grep _matterd
 
           +;eth0;IPv6;_CM;_sub._matterd._udp;local
           +;eth0;IPv6;_L3840;_sub._matterd._udp;local

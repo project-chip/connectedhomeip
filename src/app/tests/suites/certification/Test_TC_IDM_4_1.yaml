@@ -26,11 +26,26 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+      disabled: true
+
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT sends a subscription request message to the target node/reference
           device for a single attribute of any data type supported."
+      PICS: MCORE.IDM.C.SubscribeRequest
       verification: |
-          In the case of chip tool as a client, here is an example command the client can subscribe to the TH
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           onoff subscribe on-off  10 80 1 1
 
@@ -60,7 +75,7 @@ tests:
           [1657446108.598559][11525:11525] CHIP:DMG: IM RH moving to [GeneratingReports]
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent Subscription report with unic subscriptionID
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent Subscription report with unic subscriptionID
           [1657884469.617473][2938:2943] CHIP:DMG: ReportDataMessage =
           [1657884469.617508][2938:2943] CHIP:DMG: {
           [1657884469.617538][2938:2943] CHIP:DMG:         SubscriptionId = 0x2d030a2b,
@@ -109,8 +124,12 @@ tests:
     - label:
           "DUT sends the subscription request message to TH TH sends a report
           data DUT sends the status response back to TH"
+      PICS: MCORE.IDM.C.SubscribeRequest
       verification: |
-          In the case of chip tool as a client, here is an example command the client can subscribe to the TH
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           onoff  subscribe on-off   10 80  1 1
 
@@ -126,7 +145,8 @@ tests:
           [1657446108.604672][11525:11525] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
           [1657446108.604755][11525:11525] CHIP:DMG: Refresh Subscribe Sync Timer with max 80 seconds
 
-          On DUT as a client side, verify that TH all-clusters-app sent Subscription report with unic subscriptionID
+
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent Subscription report with unic subscriptionID
           [1657884569.751004][2938:2943] CHIP:DMG: ReportDataMessage =
           [1657884569.751034][2938:2943] CHIP:DMG: {
           [1657884569.751059][2938:2943] CHIP:DMG:         SubscriptionId = 0x47cd6fdb,
@@ -177,8 +197,13 @@ tests:
           an attribute of data type boolean. Modify that attribute on the TH. TH
           should send the modified data to the DUT. Modify the attribute
           multiple times (3 times)."
+      PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_Bool
       verification: |
-          In the case of chip tool as a client, here is an example command the client can subscribe to the TH
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           basic subscribe local-config-disabled 10 100 1 0
 
@@ -206,7 +231,8 @@ tests:
 
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent Subscription report with unic subscriptionID
+
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent Subscription report with unic subscriptionID
           [1657884643.152038][2938:2943] CHIP:DMG: ReportDataMessage =
           [1657884643.152141][2938:2943] CHIP:DMG: {
           [1657884643.152206][2938:2943] CHIP:DMG:         SubscriptionId = 0x2e0592e3,
@@ -257,8 +283,12 @@ tests:
           an attribute of data type string. Modify that attribute on the TH. TH
           should send the modified data to the DUT. Modify the attribute
           multiple times (3 times)."
+      PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_String
       verification: |
-          In the case of chip tool as a client, here is an example command the client can subscribe to the TH
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           basic subscribe node-label 30 200  1 0
 
@@ -290,7 +320,8 @@ tests:
           [1657446721.226711][11525:11525] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
           [1657446721.226773][11525:11525] CHIP:DMG: IM RH moving to [GeneratingReports]
 
-          On DUT as a client side, verify that TH all-clusters-app sent Subscription report with unic subscriptionID
+
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent Subscription report with unic subscriptionID
           [1657884902.175205][2938:2943] CHIP:DMG: ReportDataMessage =
           [1657884902.175255][2938:2943] CHIP:DMG: {
           [1657884902.175299][2938:2943] CHIP:DMG:         SubscriptionId = 0x6a6457a1,
@@ -327,9 +358,12 @@ tests:
           an attribute of data type unsigned integer. Modify that attribute on
           the TH. TH should send the modified data to the DUT. Modify the
           attribute multiple times (3 times)."
+      PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_UnsignedInteger
       verification: |
-          In the case of chip tool as a client, here is an example command the client can subscribe to the TH
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           any subscribe-by-id 0x0008 0x0010 10 100  1 1
           On TH (On the reference app) Verify if DUT is responding with the below status response for the above command
@@ -404,7 +438,8 @@ tests:
           [1657448453.234577][11525:11525] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent Subscription report with unic subscriptionID
+
+          If the DUT has to provision to verify the logs, , verify that TH all-clusters-app sent Subscription report with unic subscriptionID
           [1657884955.073466][2938:2943] CHIP:DMG: ReportDataMessage =
           [1657884955.073516][2938:2943] CHIP:DMG: {
           [1657884955.073562][2938:2943] CHIP:DMG:         SubscriptionId = 0x6cee9660,
@@ -444,6 +479,7 @@ tests:
           an attribute of data type signed integer. Modify that attribute on the
           TH. TH should send the modified data to the DUT. Modify the attribute
           multiple times (3 times)"
+      PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_Integer
       verification: |
           DUT implementation required to verify subscribe an attribute of data type signed integer
       disabled: true
@@ -453,6 +489,7 @@ tests:
           an attribute of data type Floating Point. Modify that attribute on the
           TH. TH should send the modified data to the DUT. Modify the attribute
           multiple times (3 times)"
+      PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_FloatingPoint
       verification: |
           DUT implementation required to verify subscribe an attribute of data type floating point
       disabled: true
@@ -462,6 +499,7 @@ tests:
           an attribute of data type list. Modify that attribute on the TH. TH
           should send the modified data to the DUT. Modify the attribute
           multiple times (3 times)"
+      PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_List
       verification: |
           DUT implementation required to verify subscribe and list an attribute of data type list
       disabled: true
@@ -472,6 +510,7 @@ tests:
           of the maximum interval. After the maximum interval, TH sends a report
           data with the subscription id created during the subscription
           activation."
+      PICS: MCORE.IDM.C.SubscribeRequest
       verification: |
           This is not testable in normal scenario, and needs to be tested as part of Unit test.
       disabled: true
@@ -479,8 +518,12 @@ tests:
     - label:
           "DUT sends a subscription request message to the target node/reference
           device for multiple attributes(3 attributes)."
+      PICS: MCORE.IDM.C.SubscribeRequest.MultipleAttributes
       verification: |
-          In the case of chip tool as a client, here is an example command the client can subscribe to the TH
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+           Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
 
             any subscribe-by-id "6,8,3" "0,1,0" 10 100 "1" "1,1,1"
 
@@ -534,7 +577,8 @@ tests:
           [1657449168.674365][11525:11525] CHIP:DMG: Refresh Subscribe Sync Timer with max 100 seconds
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent Subscription report with unic subscriptionID
+
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent Subscription report with unic subscriptionID
           884990.165955][2938:2943] CHIP:DMG:                 },
           [1657884990.166021][2938:2943] CHIP:DMG:
           [1657884990.166072][2938:2943] CHIP:DMG:         ],

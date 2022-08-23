@@ -106,6 +106,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kErrorOperationalCredentialsInit]) {
             return nil;
         }
+        _operationalCredentialsDelegate->setChipWorkQueue(_chipWorkQueue);
     }
     return self;
 }
@@ -228,6 +229,8 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         chip::Controller::SetupParams commissionerParams;
 
         commissionerParams.pairingDelegate = _pairingDelegateBridge;
+
+        _operationalCredentialsDelegate->SetDeviceCommissioner(_cppCommissioner);
 
         commissionerParams.operationalCredentialsDelegate = _operationalCredentialsDelegate;
 
@@ -651,6 +654,17 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 {
     dispatch_async(_chipWorkQueue, ^{
         self->_pairingDelegateBridge->setDelegate(delegate, queue);
+    });
+}
+
+- (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer queue:(dispatch_queue_t)queue
+{
+    VerifyOrReturn([self checkIsRunning]);
+
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning]);
+
+        self->_operationalCredentialsDelegate->SetNocChainIssuer(nocChainIssuer, queue);
     });
 }
 
