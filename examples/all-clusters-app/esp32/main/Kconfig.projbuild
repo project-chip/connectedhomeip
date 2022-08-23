@@ -66,13 +66,6 @@ menu "Demo"
           bool "BLE / On-Network"
     endchoice
 
-    config ECHO_HOST_IP
-        string "IPV4 address"
-        default "127.0.0.1"
-        depends on USE_ECHO_CLIENT
-        help
-            The IPV4 Address of the ECHO Server.
-
     # NOTE: This config is not displayed as a input in the Kconfig menu, as its value is
     # entirely derived from the Device Type choice.  However the CONFIG_EXAMPLE_DISPLAY_TYPE
     # define that is produced is needed to configure the TFT library correctly.
