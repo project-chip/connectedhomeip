@@ -44,7 +44,10 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     CHIP_ERROR err;
 
     VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(value, CHIP_ERROR_INVALID_ARGUMENT);
+    if (0U != value_size)
+    {
+        VerifyOrReturnError(value, CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     err = CC13X2_26X2Config::ReadKVS(key, value, value_size, read_bytes_size, offset_bytes);
 
@@ -58,8 +61,6 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
     VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(value, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(value_size > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     return CC13X2_26X2Config::WriteKVS(key, value, value_size);
 }
