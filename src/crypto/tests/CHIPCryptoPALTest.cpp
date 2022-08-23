@@ -202,8 +202,8 @@ const AesCtrTestEntry theAesCtrTestVector[] = {
 
 constexpr size_t kAesCtrTestVectorSize = sizeof(theAesCtrTestVector) / sizeof(theAesCtrTestVector[0]);
 
-constexpr size_t KEY_LENGTH   = 16;
-constexpr size_t NONCE_LENGTH = 13;
+constexpr size_t KEY_LENGTH   = Crypto::kAES_CCM128_Key_Length;
+constexpr size_t NONCE_LENGTH = Crypto::kAES_CCM128_Nonce_Length;
 
 static void TestAES_CTR_128_Encrypt(nlTestSuite * inSuite, const AesCtrTestEntry * vector)
 {

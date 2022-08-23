@@ -78,6 +78,8 @@ constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
 
 constexpr size_t kAES_CCM128_Key_Length   = 128u / 8u;
 constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
+constexpr size_t kAES_CCM128_Nonce_Length = 13;
+constexpr size_t kAES_CCM128_Tag_Length   = 16;
 
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
@@ -622,9 +624,9 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
  * @brief A function that implements AES-CCM decryption
  *
  * This implements the AES-CTR-Encrypt/Decrypt() cryptographic primitives per sections
- * 3.7.1 and 3.7.2 of the specification. For an empty ciphertext, the user of the API
- * can provide an empty string, or a nullptr, and provide ciphertext_length as 0.
- * The output buffer, plaintext can also be an empty string, or a nullptr for this case.
+ * 3.7.1 and 3.7.2 of the specification. For an empty input, the user of the API
+ * can provide an empty string, or a nullptr, and provide input as 0.
+ * The output buffer can also be an empty string, or a nullptr for this case.
  *
  * @param input Input text to encrypt/decrypt
  * @param input_length Length of ciphertext
