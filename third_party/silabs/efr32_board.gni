@@ -44,6 +44,9 @@ if (efr32_board == "BRD4304A") {
 } else if (efr32_board == "BRD4161A") {
   efr32_family = "efr32mg12"
   efr32_mcu = "EFR32MG12P432F1024GL125"
+} else if (efr32_board == "BRD4162A") {
+  efr32_family = "efr32mg12"
+  efr32_mcu = "EFR32MG12P332F1024GL125"
 } else if (efr32_board == "BRD4163A") {
   efr32_family = "efr32mg12"
   efr32_mcu = "EFR32MG12P433F1024GL125"
