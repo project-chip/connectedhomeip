@@ -94,15 +94,40 @@ if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B" ||
 # WiFi settings
 if (chip_enable_wifi) {
   wifi_sdk_dir = "${chip_root}/third_party/silabs/matter_support/matter/wifi"
-  efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
-  efr32_lwip_defs += [
-    "LWIP_IPV4=1",
-    "LWIP_ARP=1",
-    "LWIP_ICMP=1",
-    "LWIP_DHCP=1",
-    "LWIP_IPV6_ND=1",
-    "LWIP_IGMP=1",
+  efr32_lwip_defs = [
+    "LWIP_NETIF_API=1",
+    "IP_REASSEMBLY=1",
+    "IP_FRAG=1",
+    "IP_OPTIONS_ALLOWED=1",
   ]
+  if (lwip_ipv4) {
+    efr32_lwip_defs += [
+      "LWIP_IPV4=1",
+      "LWIP_DHCP=1",
+      "LWIP_IGMP=1",
+      "LWIP_ARP=1",
+      "LWIP_ICMP=1",
+    ]
+  } else {
+    efr32_lwip_defs += [
+      "LWIP_IPV4=0",
+      "LWIP_DHCP=0",
+      "LWIP_IGMP=0",
+      "LWIP_ARP=0",
+      "LWIP_ICMP=0",
+    ]
+  }
+  if (lwip_ipv6) {
+    efr32_lwip_defs += [
+      "LWIP_ETHERNET=1",  # Required for IPV6
+      "LWIP_IPV6=1",
+    ]
+  } else {
+    efr32_lwip_defs += [
+      "LWIP_ETHERNET=0",  # Required for IPV6
+      "LWIP_IPV6=0",
+    ]
+  }
 
   if (use_rs911x) {
     wiseconnect_sdk_root =

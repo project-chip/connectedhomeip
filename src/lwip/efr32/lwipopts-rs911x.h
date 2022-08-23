@@ -50,7 +50,7 @@
 #define LWIP_DHCP_AUTOIP_COOP (0)
 #define LWIP_SOCKET_SET_ERRNO 0
 #define IP_REASS_MAX_PBUFS 0
-#define IP_REASSEMBLY 0
+#define IP_REASSEMBLY 1
 #define MEMP_NUM_REASSDATA 0
 #define LWIP_SO_RCVTIMEO 0
 #define SO_REUSE (1)
@@ -77,28 +77,25 @@
 
 #define MEMP_NUM_NETCONN (0)
 
-#ifndef LWIP_IPV4
-#define LWIP_IPV4 1
-#endif
-#ifndef LWIP_IPV6
-#define LWIP_IPV6 1
-#endif
 #ifndef LWIP_ARP
 #define LWIP_ARP (1)
-#endif
+#endif /* LWIP_ARP */
 #define LWIP_DNS (0)
 #ifndef LWIP_ICMP
 #define LWIP_ICMP (1)
-#endif
+#endif /* LWIP_ICMP */
 #ifndef LWIP_IGMP
 #define LWIP_IGMP (1)
-#endif
+#endif /* LWIP_IGMP */
 #ifndef LWIP_DHCP
 #define LWIP_DHCP (1)
-#endif
-#define LWIP_IPV6_REASS (0)
+#endif /* LWIP_DHCP */
+#define LWIP_IPV6_MLD (LWIP_IPV6)
+#define LWIP_ICMP6 (LWIP_IPV6)
+#define LWIP_IPV6_REASS (LWIP_IPV6)
+#define LWIP_IPV6_FRAG 1
 #define LWIP_IPV6_DHCP6 0
-#define LWIP_IPV6_AUTOCONFIG (1)
+#define LWIP_IPV6_AUTOCONFIG (LWIP_IPV6)
 #define LWIP_IPV6_ROUTER_SUPPORT 1
 #define LWIP_ND6_LISTEN_RA 1
 
@@ -120,7 +117,7 @@
 #define PBUF_POOL_BUFSIZE (1280)
 #define PBUF_CUSTOM_POOL_IDX_START (MEMP_PBUF_POOL_SMALL)
 #define PBUF_CUSTOM_POOL_IDX_END (MEMP_PBUF_POOL_LARGE)
-#else
+#else /* !(EFR32MG21) */
 #define MEMP_SEPARATE_POOLS (1)
 #define LWIP_PBUF_FROM_CUSTOM_POOLS (0)
 #define MEMP_USE_CUSTOM_POOLS (0)
@@ -128,7 +125,7 @@
 #define PBUF_POOL_BUFSIZE (1280) // IPv6 path MTU
 #define PBUF_CUSTOM_POOL_IDX_START (MEMP_PBUF_POOL_SMALL)
 #define PBUF_CUSTOM_POOL_IDX_END (MEMP_PBUF_POOL_LARGE)
-#endif
+#endif /* EFR32MG21 */
 
 #define TCP_MSS (1152)
 #define TCP_SND_BUF (2 * TCP_MSS)
@@ -140,9 +137,9 @@
 
 #if defined(EFR32MG21)
 #define TCPIP_THREAD_STACKSIZE (1536)
-#else
+#else /* !(EFR32MG21) */
 #define TCPIP_THREAD_STACKSIZE (2048)
-#endif
+#endif /* EFR32MG21 */
 
 #define TCPIP_THREAD_PRIO (2)
 
@@ -150,10 +147,8 @@
 
 #define LWIP_IPV6_NUM_ADDRESSES 5
 
-#ifndef LWIP_IPV6_ND
-#define LWIP_IPV6_ND 1
-#endif
-#define LWIP_ND6_QUEUEING 1
+#define LWIP_IPV6_ND (LWIP_IPV6)
+#define LWIP_ND6_QUEUEING (LWIP_IPV6)
 #define LWIP_NUM_ND6_QUEUE 3
 
 #define LWIP_MULTICAST_PING 0
@@ -184,6 +179,7 @@
 #define IP6_DEBUG (LWIP_DBG_OFF)
 #define RAW_DEBUG (LWIP_DBG_OFF)
 #define ICMP_DEBUG (LWIP_DBG_OFF)
+#define ICMP6_DEBUG (LWIP_DBG_OFF)
 #define UDP_DEBUG (LWIP_DBG_OFF)
 #define TCP_DEBUG (LWIP_DBG_OFF)
 #define TCP_INPUT_DEBUG (LWIP_DBG_OFF)
@@ -195,7 +191,7 @@
 #define TCP_QLEN_DEBUG (LWIP_DBG_OFF)
 #define TCP_RST_DEBUG (LWIP_DBG_OFF)
 #define PPP_DEBUG (LWIP_DBG_OFF)
-#endif
+#endif /* LWIP_DEBUG */
 
 #define LWIP_DBG_TYPES_ON                                                                                                          \
     (LWIP_DBG_ON | LWIP_DBG_TRACE) /* (LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH|LWIP_DBG_HALT) */
