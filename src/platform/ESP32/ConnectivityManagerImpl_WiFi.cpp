@@ -391,10 +391,10 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
     mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    mLastAPDemandTime             = System::Clock::kZero;
-    mWiFiAPMode                   = kWiFiAPMode_Disabled;
-    mWiFiAPState                  = kWiFiAPState_NotActive;
-    mWiFiAPIdleTimeout            = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
+    mLastAPDemandTime  = System::Clock::kZero;
+    mWiFiAPMode        = kWiFiAPMode_Disabled;
+    mWiFiAPState       = kWiFiAPState_NotActive;
+    mWiFiAPIdleTimeout = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
     mFlags.SetRaw(0);
