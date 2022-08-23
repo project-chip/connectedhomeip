@@ -153,7 +153,7 @@ tests:
     #issue #13029
     - label: "TH reads ActiveHardwareFaults attribute value from DUT."
       verification: |
-          ./chip-tool generaldiagnostics read active-hardware-faults 1 0 
+          ./chip-tool generaldiagnostics read active-hardware-faults 1 0
           On TH(chip-tool), verify that ActiveHardwareFaults attribute the attribute response should be empty. But when a hardware fault occurs, the return attribute value must match the value listed in the HardwareFault ENUM table 11.11.6.1
 
           [1654682785.894724][33006:33011] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0005 DataVersion: 804003636
@@ -162,7 +162,7 @@ tests:
 
 
           Please use Interactive mode to Verify subscription test cases
-          Here the command to enter interactive mode:--   ./chip-tool interactive start                
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           Verify in TH(chip-tool) log
 
@@ -182,16 +182,16 @@ tests:
           [1657539676.880410][10068:10073] CHIP:DMG:                                         Cluster = 0x33,
           [1657539676.880528][10068:10073] CHIP:DMG:                                         Attribute = 0x0000_0005,
           [1657539676.880639][10068:10073] CHIP:DMG:                                 }
-          [1657539676.880758][10068:10073] CHIP:DMG:                                         
+          [1657539676.880758][10068:10073] CHIP:DMG:
           [1657539676.880870][10068:10073] CHIP:DMG:                                 Data = [
-          [1657539676.880981][10068:10073] CHIP:DMG:                                                 
+          [1657539676.880981][10068:10073] CHIP:DMG:
           [1657539676.881097][10068:10073] CHIP:DMG:                                 ],
           [1657539676.881205][10068:10073] CHIP:DMG:                         },
-          [1657539676.881321][10068:10073] CHIP:DMG:                         
+          [1657539676.881321][10068:10073] CHIP:DMG:
           [1657539676.881415][10068:10073] CHIP:DMG:                 },
-          [1657539676.881523][10068:10073] CHIP:DMG:                 
+          [1657539676.881523][10068:10073] CHIP:DMG:
           [1657539676.881589][10068:10073] CHIP:DMG:         ],
-          [1657539676.881667][10068:10073] CHIP:DMG:         
+          [1657539676.881667][10068:10073] CHIP:DMG:
           [1657539676.881728][10068:10073] CHIP:DMG:         InteractionModelRevision = 1
           [1657539676.881816][10068:10073] CHIP:DMG: }
           [1657539676.882117][10068:10073] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0005 DataVersion: 1036432514
@@ -231,7 +231,7 @@ tests:
           [1654682886.109321][33026:33031] CHIP:EM: Sending Standalone Ack for MessageCounter:174138703 on exchange 49820i
 
           Please use Interactive mode to Verify subscription test cases
-          Here the command to enter interactive mode:--   ./chip-tool interactive start                        
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
           generaldiagnostics subscribe active-radio-faults 100 1000 1 0
 
           Verify in TH(chip-tool) Log
@@ -265,7 +265,7 @@ tests:
 
     - label: "TH reads ActiveNetworkFaults attribute value from DUT."
       verification: |
-          ./chip-tool generaldiagnostics read active-network-faults 1 0 
+          ./chip-tool generaldiagnostics read active-network-faults 1 0
 
           On TH(chip-tool), verify that ActiveNetworkFaults attribute value attribute response should be empty. But when a network fault occurs, the return attribute value must match the value listed in the NetworkFault ENUM table 11.11.6.3
 
@@ -274,8 +274,8 @@ tests:
           [1654683004.591526][33044:33049] CHIP:EM: Sending Standalone Ack for MessageCounter:113863817 on exchange 44900i
 
           Please use Interactive mode to Verify subscription test cases
-          Here the command to enter interactive mode:--   ./chip-tool interactive start                        
-          generaldiagnostics subscribe active-network-faults 100 1000 1 0 
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+          generaldiagnostics subscribe active-network-faults 100 1000 1 0
 
           Verify on TH(chip-tool)
           [1654683075.593822][33054:33059] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0007 DataVersion: 804003636
