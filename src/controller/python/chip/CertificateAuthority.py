@@ -45,7 +45,7 @@ class CertificateAuthority:
 
          Each CertificateAuthority instance is associated with a single instance of the OperationalCredentialsAdapter. This adapter instance implements
          the OperationalCredentialsDelegate and is meant to provide a Python adapter to the functions in that delegate. It relies on the in-built
-         ExampleOperationalCredentialsIssuer to then generate certificate material for the CA.  This instance also uses the 'CA index' to 
+         ExampleOperationalCredentialsIssuer to then generate certificate material for the CA.  This instance also uses the 'CA index' to
          store/look-up the associated credential material from the provided PersistentStorage object.
     '''
     @classmethod
@@ -74,10 +74,14 @@ class CertificateAuthority:
         self._Handle().pychip_OpCreds_InitializeDelegate.restype = c_void_p
         self._Handle().pychip_OpCreds_InitializeDelegate.argtypes = [ctypes.py_object, ctypes.c_uint32, ctypes.c_void_p]
 
+        self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed.restype = c_uint32
+        self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed.argtypes = [ctypes.c_void_p, ctypes.c_bool]
+
         if (persistentStorage is None):
             persistentStorage = self._chipStack.GetStorageManager()
 
         self._persistentStorage = persistentStorage
+        self._maximizeCertChains = False
 
         self._closure = self._chipStack.Call(
             lambda: self._Handle().pychip_OpCreds_InitializeDelegate(
@@ -181,6 +185,21 @@ class CertificateAuthority:
     def adminList(self) -> list[FabricAdmin.FabricAdmin]:
         return self._activeAdmins
 
+    @property
+    def maximizeCertChains(self) -> bool:
+        return self._maximizeCertChains
+
+    @maximizeCertChains.setter
+    def maximizeCertChains(self, enabled: bool):
+        res = self._chipStack.Call(
+            lambda: self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed(ctypes.c_void_p(self._closure), ctypes.c_bool(enabled))
+        )
+
+        if res != 0:
+            raise self._chipStack.ErrorToException(res)
+
+        self._maximizeCertChains = enabled
+
     def __del__(self):
         self.Shutdown()
 
@@ -243,7 +262,7 @@ class CertificateAuthorityManager:
             ca = self.NewCertificateAuthority(int(caIndex))
             ca.LoadFabricAdminsFromStorage()
 
-    def NewCertificateAuthority(self, caIndex: int = None):
+    def NewCertificateAuthority(self, caIndex: int = None, maximizeCertChains: bool = False):
         ''' Creates a new CertificateAuthority instance with the provided CA Index and the PersistentStorage
             instance previously setup in the constructor.
 
@@ -268,6 +287,7 @@ class CertificateAuthorityManager:
             self._persistentStorage.SetReplKey(key='caList', value=caList)
 
         ca = CertificateAuthority(chipStack=self._chipStack, caIndex=caIndex, persistentStorage=self._persistentStorage)
+        ca.maximizeCertChains = maximizeCertChains
         self._activeCaList.append(ca)
 
         return ca

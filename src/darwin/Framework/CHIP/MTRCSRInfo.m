@@ -1,7 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,23 +15,25 @@
  *    limitations under the License.
  */
 
-#pragma once
+#import "MTRCSRInfo.h"
 
-#include "AppConfig.h"
+NS_ASSUME_NONNULL_BEGIN
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+@implementation CSRInfo : NSObject
 
-#define MAX_STR_LEN 48
-
-void initLCD(void);
-void * LCDContext();
-int LCD_clear(void * pContext);
-int LCD_drawPixel(void * pContext, int32_t x, int32_t y);
-int LCD_update(void);
-void LCDWriteQRCode(uint8_t * str);
-
-#ifdef __cplusplus
+- (instancetype)initWithNonce:(NSData *)nonce
+                     elements:(NSData *)elements
+            elementsSignature:(NSData *)elementsSignature
+                          csr:(NSData *)csr
+{
+    if (self = [super init]) {
+        _nonce = nonce;
+        _elements = elements;
+        _elementsSignature = elementsSignature;
+        _csr = csr;
+    }
+    return self;
 }
-#endif
+@end
+
+NS_ASSUME_NONNULL_END

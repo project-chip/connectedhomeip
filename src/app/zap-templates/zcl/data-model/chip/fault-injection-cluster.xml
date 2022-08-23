@@ -39,5 +39,12 @@ limitations under the License.
       <arg name="TakeMutex" type="BOOLEAN"/>      
       <access op="invoke" role="manage"/>
     </command>
+    <command source="client" code="0x01" name="FailRandomlyAtFault" optional="false">
+      <description>Configure a fault to be triggered randomly, with a given probability defined as a percentage</description>
+      <arg name="Type" type="FaultType"/>      
+      <arg name="Id" type="INT32U"/>
+      <arg name="Percentage" type="INT8U"/>   
+      <access op="invoke" role="manage"/>
+    </command>    
   </cluster>
 </configurator>

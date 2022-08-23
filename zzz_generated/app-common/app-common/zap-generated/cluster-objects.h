@@ -19205,9 +19205,9 @@ struct TypeInfo
 namespace StartUpColorTemperatureMireds {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpColorTemperatureMireds::Id; }
@@ -19305,7 +19305,7 @@ struct TypeInfo
         Attributes::ColorTempPhysicalMaxMireds::TypeInfo::DecodableType colorTempPhysicalMaxMireds = static_cast<uint16_t>(0);
         Attributes::CoupleColorTempToLevelMinMireds::TypeInfo::DecodableType coupleColorTempToLevelMinMireds =
             static_cast<uint16_t>(0);
-        Attributes::StartUpColorTemperatureMireds::TypeInfo::DecodableType startUpColorTemperatureMireds = static_cast<uint16_t>(0);
+        Attributes::StartUpColorTemperatureMireds::TypeInfo::DecodableType startUpColorTemperatureMireds;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -28095,6 +28095,11 @@ struct Type;
 struct DecodableType;
 } // namespace FailAtFault
 
+namespace FailRandomlyAtFault {
+struct Type;
+struct DecodableType;
+} // namespace FailRandomlyAtFault
+
 } // namespace Commands
 
 namespace Commands {
@@ -28142,6 +28147,44 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace FailAtFault
+namespace FailRandomlyAtFault {
+enum class Fields
+{
+    kType       = 0,
+    kId         = 1,
+    kPercentage = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::FailRandomlyAtFault::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
+
+    FaultType type     = static_cast<FaultType>(0);
+    uint32_t id        = static_cast<uint32_t>(0);
+    uint8_t percentage = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::FailRandomlyAtFault::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
+
+    FaultType type     = static_cast<FaultType>(0);
+    uint32_t id        = static_cast<uint32_t>(0);
+    uint8_t percentage = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace FailRandomlyAtFault
 } // namespace Commands
 
 namespace Attributes {

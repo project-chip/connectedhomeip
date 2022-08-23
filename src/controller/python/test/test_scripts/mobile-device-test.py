@@ -77,6 +77,9 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
     logger.info("Testing multi-controller setup on the same fabric")
     FailIfNot(asyncio.run(test.TestMultiControllerFabric(nodeid=device_nodeid)), "Failed the multi-controller test")
 
+    logger.info("Testing CATs used on controllers")
+    FailIfNot(asyncio.run(test.TestControllerCATValues(nodeid=device_nodeid)), "Failed the controller CAT test")
+
     ok = asyncio.run(test.TestMultiFabric(ip=address,
                                           setuppin=20202021,
                                           nodeid=1))

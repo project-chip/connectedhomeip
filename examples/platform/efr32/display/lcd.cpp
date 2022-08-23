@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "demo-ui.h"
 #include "lcd.h"
 
 #include "dmd.h"
@@ -35,25 +36,36 @@
 #define QR_CODE_MODULE_SIZE 3
 #define QR_CODE_BORDER_SIZE 0
 
-static GLIB_Context_t glibContext;
 #ifdef QR_CODE_ENABLED
 static uint8_t qrCode[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
 static uint8_t workBuffer[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
 #endif // QR_CODE_ENABLED
 
-#ifdef QR_CODE_ENABLED
-static void LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h);
-#endif // QR_CODE_ENABLED
-
-void initLCD(void)
+CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
 {
     EMSTATUS status;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Check if Name is to long
+    if (name != nullptr)
+    {
+        if (APP_NAME_MAX_LENGTH < strlen((char *) name))
+        {
+            EFR32_LOG("App Name too long");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        else
+        {
+            strcpy((char *) mName, (char *) name);
+        }
+    }
 
     /* Enable the memory lcd */
     status = sl_board_enable_display();
-    if (status == SL_STATUS_OK)
+    if (status != SL_STATUS_OK)
     {
         EFR32_LOG("Board Display enable fail %d", status);
+        err = CHIP_ERROR_INTERNAL;
     }
 
     /* Initialize the DMD module for the DISPLAY device driver. */
@@ -61,6 +73,7 @@ void initLCD(void)
     if (DMD_OK != status)
     {
         EFR32_LOG("DMD init failed %d", status);
+        err = CHIP_ERROR_INTERNAL;
     }
 
     /* Initialize the glib context */
@@ -68,6 +81,7 @@ void initLCD(void)
     if (GLIB_OK != status)
     {
         EFR32_LOG("Glib context init failed %d", status);
+        err = CHIP_ERROR_INTERNAL;
     }
 
     glibContext.backgroundColor = White;
@@ -76,34 +90,57 @@ void initLCD(void)
     if (GLIB_OK != status)
     {
         EFR32_LOG("Glib clear failed %d", status);
+        err = CHIP_ERROR_INTERNAL;
     }
+    demoUIInit(&glibContext);
+
+    dState.mainState = initialState;
+
+    return err;
 }
 
 /* This function is necessary because currently glib.h cannot be used within a C++ context. */
-void * LCDContext()
+void * SilabsLCD::Context()
 {
     return (void *) &glibContext;
 }
 
-int LCD_clear(void * pContext)
+int SilabsLCD::Clear()
 {
-    return GLIB_clear((GLIB_Context_t *) pContext);
+    return GLIB_clear(&glibContext);
 }
 
-int LCD_drawPixel(void * pContext, int32_t x, int32_t y)
+int SilabsLCD::DrawPixel(void * pContext, int32_t x, int32_t y)
 {
     return GLIB_drawPixel((GLIB_Context_t *) pContext, x, y);
 }
 
-int LCD_update(void)
+int SilabsLCD::Update(void)
 {
     return DMD_updateDisplay();
 }
 
-#ifdef QR_CODE_ENABLED
-void LCDWriteQRCode(uint8_t * str)
+void SilabsLCD::WriteDemoUI(bool state)
 {
-    if (!qrcodegen_encodeText((const char *) str, workBuffer, qrCode, qrcodegen_Ecc_LOW, QR_CODE_VERSION, QR_CODE_VERSION,
+    if (mShowQRCode)
+    {
+        mShowQRCode = false;
+    }
+    dState.mainState = state;
+    WriteDemoUI();
+}
+
+void SilabsLCD::WriteDemoUI()
+{
+    Clear();
+    demoUIClearMainScreen(mName);
+    demoUIDisplayApp(dState.mainState);
+}
+
+#ifdef QR_CODE_ENABLED
+void SilabsLCD::WriteQRCode()
+{
+    if (!qrcodegen_encodeText((const char *) mQRCodeBuffer, workBuffer, qrCode, qrcodegen_Ecc_LOW, QR_CODE_VERSION, QR_CODE_VERSION,
                               qrcodegen_Mask_AUTO, true))
     {
         EFR32_LOG("qrcodegen_encodeText() failed");
@@ -133,7 +170,30 @@ void LCDWriteQRCode(uint8_t * str)
     DMD_updateDisplay();
 }
 
-void LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h)
+void SilabsLCD::SetQRCode(uint8_t * str, uint32_t size)
+{
+    if (size < chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1)
+    {
+        memcpy(mQRCodeBuffer, str, size);
+    }
+}
+
+void SilabsLCD::ShowQRCode(bool show, bool forceRefresh)
+{
+    if (show != mShowQRCode || forceRefresh)
+    {
+        (show) ? WriteQRCode() : WriteDemoUI();
+        mShowQRCode = show;
+    }
+}
+
+void SilabsLCD::ToggleQRCode(void)
+{
+    (mShowQRCode) ? WriteDemoUI() : WriteQRCode();
+    mShowQRCode = !mShowQRCode;
+}
+
+void SilabsLCD::LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h)
 {
     for (int i = 0; i < h; i++)
     {

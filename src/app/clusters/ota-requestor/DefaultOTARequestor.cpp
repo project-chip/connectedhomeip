@@ -767,6 +767,7 @@ CHIP_ERROR DefaultOTARequestor::SendQueryImageRequest(Messaging::ExchangeManager
         args.location.SetValue(CharSpan("XX", strlen("XX")));
     }
 
+    args.metadataForProvider = mMetadataForProvider;
     Controller::OtaSoftwareUpdateProviderCluster cluster(exchangeMgr, sessionHandle, mProviderLocation.Value().endpoint);
 
     return cluster.InvokeCommand(args, this, OnQueryImageResponse, OnQueryImageFailure);

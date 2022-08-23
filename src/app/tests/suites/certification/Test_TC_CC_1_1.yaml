@@ -14,6 +14,9 @@
 
 name: 25.1.1. [TC-CC-1.1] Global attributes with server as DUT
 
+PICS:
+    - CC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Color Control"

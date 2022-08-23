@@ -14,6 +14,9 @@
 
 name: 25.3.7. [TC-CC-4.3] Saturation Step functionality with server as DUT
 
+PICS:
+    - CC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Color Control"

@@ -39,7 +39,7 @@ tests:
     - label: "TH_CR1 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
-          Provision the device using chip tool on first controller
+          "1. Provision the TH_CE (all-cluster-app) device using TH_CR1 (chip-tool ) on the raspi"
       disabled: true
 
     - label:
@@ -48,13 +48,13 @@ tests:
           (Basic Commissioning Method)"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On first controller, usinadministratorcommissioningg chip tool open commissioning window.
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+          On TH_CR1 send the below command
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
-          On TH1(all-clusters-app) Log
+          Verify Success response On TH_CR1(CHIP-TOOL) Log
 
 
           CHIP:DMG: InvokeResponseMessage =
@@ -93,14 +93,15 @@ tests:
     - label: "TH_CR1 sends command to TH_CE to read the list of Fabrics"
       PICS: OPCREDS.C.A0001
       verification: |
-          On first controller, using chip tool read fabricList
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+          On TH_CR1 send the below command
 
           ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
 
           On TH1(all-clusters-app) Log
 
+          Verify 1 entry in the Fabrics list attributeOn TH_CR1(CHIP-TOOL) Log
 
            CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 3621507058
           [1649245801.244173][10091:10096] CHIP:TOO:   Fabrics: 1 entries
@@ -118,24 +119,25 @@ tests:
     - label: "DUT_CR2 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
-          On second Controller connect to the accessory.
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
-
+          On DUT_CR2 send the below command
 
           ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
 
-          Verify you got below message On TH2(all-clusters-app) Log
+           Verify whether you got below message in the log of DUT_CR2(CHIP-TOOL)
+
           Device commissioning completed with success
       disabled: true
 
     - label: "Verify TH_CE is now discoverable over DNS-SD with two SRV Records"
       verification: |
-          On the raspi , Verify if the DUT is broadcasting using
-
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
 
+          On the raspi , Verify if the TH_CE(All-cluster-app) is broadcasting
+
+          On TH_CR1 send the below command
 
           ubuntu@ubuntu:~/may10_cntrl2/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
           +   eth0 IPv6 E0AF53B23E580769-0000000000000002             _matter._tcp         local
@@ -157,67 +159,61 @@ tests:
           Information Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
-          On the 2nd controller write attribute and read attribute to and from TH_CE
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
-
+          On DUT_CR2 send the below command
 
           ./chip-tool basic write  node-label te5new 2 0 --commissioner-name beta
 
           On TH2(all-clusters-app) Log
 
+          Verify Write request on TH_CE(all-clusters-app) Log
 
-          CHIP:DMG: WriteResponseMessage =
-          [1649245940.788522][10110:10115] CHIP:DMG: {
-          [1649245940.788577][10110:10115] CHIP:DMG:         AttributeStatusIBs =
-          [1649245940.788653][10110:10115] CHIP:DMG:         [
-          [1649245940.788713][10110:10115] CHIP:DMG:                 AttributeStatusIB =
-          [1649245940.788787][10110:10115] CHIP:DMG:                 {
-          [1649245940.788852][10110:10115] CHIP:DMG:                         AttributePathIB =
-          [1649245940.788931][10110:10115] CHIP:DMG:                         {
-          [1649245940.789009][10110:10115] CHIP:DMG:                                 Endpoint = 0x0,
-          [1649245940.789143][10110:10115] CHIP:DMG:                                 Cluster = 0x28,
-          [1649245940.789228][10110:10115] CHIP:DMG:                                 Attribute = 0x0000_0005,
-          [1649245940.789313][10110:10115] CHIP:DMG:                         }
-          [1649245940.789388][10110:10115] CHIP:DMG:
-          [1649245940.789454][10110:10115] CHIP:DMG:                         StatusIB =
-          [1649245940.789519][10110:10115] CHIP:DMG:                         {
-          [1649245940.789588][10110:10115] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1649245940.789654][10110:10115] CHIP:DMG:                         },
-          [1649245940.789719][10110:10115] CHIP:DMG:
-          [1649245940.789778][10110:10115] CHIP:DMG:                 },
-          [1649245940.789841][10110:10115] CHIP:DMG:
-          [1649245940.789885][10110:10115] CHIP:DMG:         ],
-          [1649245940.789941][10110:10115] CHIP:DMG:
-          [1649245940.789984][10110:10115] CHIP:DMG:         InteractionModelRevision = 1
-          [1649245940.790033][10110:10115] CHIP:DMG: }
-          [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1660894021.901330][2871:2871] CHIP:EM: Handling via exchange: 9616r, Delegate: 0xaaaada21ffc0
+          [1660894021.901426][2871:2871] CHIP:IM: Received Write request
+          [1660894021.901484][2871:2871] CHIP:DMG: IM WH moving to [Initialized]
+          [1660894021.901613][2871:2871] CHIP:DMG: WriteRequestMessage =
+          [1660894021.901676][2871:2871] CHIP:DMG: {
+          [1660894021.901735][2871:2871] CHIP:DMG:         suppressResponse = false,
+          [1660894021.901802][2871:2871] CHIP:DMG:         timedRequest = false,
+          [1660894021.901864][2871:2871] CHIP:DMG:         AttributeDataIBs =
+          [1660894021.901940][2871:2871] CHIP:DMG:         [
+          [1660894021.902001][2871:2871] CHIP:DMG:                 AttributeDataIB =
+          [1660894021.902071][2871:2871] CHIP:DMG:                 {
+          [1660894021.902136][2871:2871] CHIP:DMG:                         AttributePathIB =
+          [1660894021.902219][2871:2871] CHIP:DMG:                         {
+          [1660894021.902302][2871:2871] CHIP:DMG:                                 Endpoint = 0x0,
 
 
-          Verify read attribute returns the updated value written
+          ./chip-tool basic read node-label 2 0 --commissioner-name beta
 
-          ./chip-tool basic read node-label 1 0 --commissioner-name beta
-
-          On TH2(all-clusters-app) Log
+          Verify read request on TH_CE(all-clusters-app) Log
 
 
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
-          [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te5new
-          [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
+          [1660894142.828718][2871:2871] CHIP:EM: Handling via exchange: 62454r, Delegate: 0xaaaada21ffc0
+          [1660894142.828834][2871:2871] CHIP:IM: Received Read request
+          [1660894142.829023][2871:2871] CHIP:DMG: ReadRequestMessage =
+          [1660894142.829097][2871:2871] CHIP:DMG: {
+          [1660894142.829153][2871:2871] CHIP:DMG:         AttributePathIBs =
+          [1660894142.829235][2871:2871] CHIP:DMG:         [
+          [1660894142.829306][2871:2871] CHIP:DMG:                 AttributePathIB =
+          [1660894142.829376][2871:2871] CHIP:DMG:                 {
+          [1660894142.829449][2871:2871] CHIP:DMG:                         Endpoint = 0x0,
+          [1660894142.829532][2871:2871] CHIP:DMG:                         Cluster = 0x28,
+          [1660894142.829627][2871:2871] CHIP:DMG:                         Attribute = 0x0000_0005,
       disabled: true
 
     - label:
           "DUT_CR2 sends command to TH_CE to read the list of Fabrics on TH_CE"
       PICS: OPCREDS.C.A0001
       verification: |
-          On second controller controller read fabricList
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
-
+          On DUT_CR2 send the below command
 
           ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0 --commissioner-name beta
 
-          On TH2(all-clusters-app) Log
+          Verify 2 entries in the Fabrics list attribute On DUT_CR2(chip-tool) Log
 
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 3229397217
@@ -246,52 +242,43 @@ tests:
           Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
-          On first controller, using chip-tool write attribute, Verify read attribute returns the updated value written.
-
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
 
           ./chip-tool basic write node-label te8 1 0
 
-          On TH1(all-clusters-app) Log
+          Verify the Write request On TH_CE(all-clusters-app) Log
 
 
-          CHIP:DMG: WriteResponseMessage =
-          [1649245940.788522][10110:10115] CHIP:DMG: {
-          [1649245940.788577][10110:10115] CHIP:DMG:         AttributeStatusIBs =
-          [1649245940.788653][10110:10115] CHIP:DMG:         [
-          [1649245940.788713][10110:10115] CHIP:DMG:                 AttributeStatusIB =
-          [1649245940.788787][10110:10115] CHIP:DMG:                 {
-          [1649245940.788852][10110:10115] CHIP:DMG:                         AttributePathIB =
-          [1649245940.788931][10110:10115] CHIP:DMG:                         {
-          [1649245940.789009][10110:10115] CHIP:DMG:                                 Endpoint = 0x0,
-          [1649245940.789143][10110:10115] CHIP:DMG:                                 Cluster = 0x28,
-          [1649245940.789228][10110:10115] CHIP:DMG:                                 Attribute = 0x0000_0005,
-          [1649245940.789313][10110:10115] CHIP:DMG:                         }
-          [1649245940.789388][10110:10115] CHIP:DMG:
-          [1649245940.789454][10110:10115] CHIP:DMG:                         StatusIB =
-          [1649245940.789519][10110:10115] CHIP:DMG:                         {
-          [1649245940.789588][10110:10115] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1649245940.789654][10110:10115] CHIP:DMG:                         },
-          [1649245940.789719][10110:10115] CHIP:DMG:
-          [1649245940.789778][10110:10115] CHIP:DMG:                 },
-          [1649245940.789841][10110:10115] CHIP:DMG:
-          [1649245940.789885][10110:10115] CHIP:DMG:         ],
-          [1649245940.789941][10110:10115] CHIP:DMG:
-          [1649245940.789984][10110:10115] CHIP:DMG:         InteractionModelRevision = 1
-          [1649245940.790033][10110:10115] CHIP:DMG: }
-          [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1660894538.804578][2871:2871] CHIP:EM: Handling via exchange: 64932r, Delegate: 0xaaaada21ffc0
+          [1660894538.804677][2871:2871] CHIP:IM: Received Write request
+          [1660894538.804737][2871:2871] CHIP:DMG: IM WH moving to [Initialized]
+          [1660894538.804867][2871:2871] CHIP:DMG: WriteRequestMessage =
+          [1660894538.804933][2871:2871] CHIP:DMG: {
+          [1660894538.804993][2871:2871] CHIP:DMG:         suppressResponse = false,
+          [1660894538.805059][2871:2871] CHIP:DMG:         timedRequest = false,
+          [1660894538.805120][2871:2871] CHIP:DMG:         AttributeDataIBs =
+          [1660894538.805196][2871:2871] CHIP:DMG:         [
 
-          Verify read attribute returns the updated value written
 
           ./chip-tool basic read node-label 1 0
 
-          On TH1(all-clusters-app) Log
+          Verify the Read request On TH_CE(all-clusters-app) Log
 
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
-          [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te8
-          [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
+          [1660894686.511690][2871:2871] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:155836021 on exchange 25703r
+          [1660894686.511817][2871:2871] CHIP:EM: Handling via exchange: 25703r, Delegate: 0xaaaada21ffc0
+          [1660894686.511920][2871:2871] CHIP:IM: Received Read request
+          [1660894686.512190][2871:2871] CHIP:DMG: ReadRequestMessage =
+          [1660894686.512259][2871:2871] CHIP:DMG: {
+          [1660894686.512314][2871:2871] CHIP:DMG:         AttributePathIBs =
+          [1660894686.512380][2871:2871] CHIP:DMG:         [
+          [1660894686.512441][2871:2871] CHIP:DMG:                 AttributePathIB =
+          [1660894686.512526][2871:2871] CHIP:DMG:                 {
+          [1660894686.512599][2871:2871] CHIP:DMG:                         Endpoint = 0x0,
+          [1660894686.512683][2871:2871] CHIP:DMG:                         Cluster = 0x28,
+          [1660894686.512772][2871:2871] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1660894142.829703][2871:2871] CHIP:DMG:                 }
+          [1660894142.829777][2871:2871] CHIP:DMG:
       disabled: true
 
     - label:
@@ -301,7 +288,7 @@ tests:
       verification: |
           On second controller read, write attribute and then read attribute to and from TH_CE
 
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
 
           ./chip-tool basic write node-label te5new 2 0 --commissioner-name beta
@@ -358,47 +345,17 @@ tests:
           (Basic Commissioning Method)"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On second controller using chip-tool open commissioning widow using BCM.
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
-
+          On DUT_CR2 send the below command
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000  --commissioner-name beta
 
-          On TH2(all-clusters-app) Log
+          Verify the Commissioning window is opened in TH_CE(all-clusters-app) Log
 
-
-          CHIP:DMG: InvokeResponseMessage =
-          [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
-          [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
-          [1650278416.248570][11064:11069] CHIP:DMG:         [
-          [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
-          [1650278416.248718][11064:11069] CHIP:DMG:                 {
-          [1650278416.248783][11064:11069] CHIP:DMG:                         CommandStatusIB =
-          [1650278416.248860][11064:11069] CHIP:DMG:                         {
-          [1650278416.248931][11064:11069] CHIP:DMG:                                 CommandPathIB =
-          [1650278416.249011][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249100][11064:11069] CHIP:DMG:                                         EndpointId = 0x0,
-          [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
-          [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
-          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
-          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
-          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
-          [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:
-          [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:
-          [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:
-          [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
-          [1650278416.250355][11064:11069] CHIP:DMG: },
-          [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
-          [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660901022.112389][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
     - label:
@@ -406,47 +363,18 @@ tests:
           using the Revoke Commissioning command"
       PICS: CADMIN.C.C02.Tx
       verification: |
-          On second controller using chip-tool run revoke command
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
-
+          On DUT_CR2 send the below command
 
           ./chip-tool administratorcommissioning revoke-commissioning 2 0 --timedInteractionTimeoutMs 1000 --commissioner-name beta
 
-          On TH2(all-clusters-app) Log
+          Verify the Commissioning window is closed in TH_CE(all-clusters-app) Log
 
-
-          CHIP:DMG: InvokeResponseMessage =
-          [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
-          [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
-          [1650278416.248570][11064:11069] CHIP:DMG:         [
-          [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
-          [1650278416.248718][11064:11069] CHIP:DMG:                 {
-          [1650278416.248783][11064:11069] CHIP:DMG:                         CommandStatusIB =
-          [1650278416.248860][11064:11069] CHIP:DMG:                         {
-          [1650278416.248931][11064:11069] CHIP:DMG:                                 CommandPathIB =
-          [1650278416.249011][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249100][11064:11069] CHIP:DMG:                                         EndpointId = 0x0,
-          [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
-          [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
-          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
-          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
-          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
-          [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:
-          [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:
-          [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:
-          [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
-          [1650278416.250355][11064:11069] CHIP:DMG: },
-          [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
-          [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1660901039.590962][3045:3045] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0002
+          [1660901039.591036][3045:3045] CHIP:ZCL: Received command to close commissioning window
+          [1660901039.591094][3045:3045] CHIP:SVR: Closing pairing window
+          [1660901039.591169][3045:3045] CHIP:IN: SecureSession[0xaaaab010d400]: Released - Type:1 LSID:14411
       disabled: true
 
     - label:
@@ -454,14 +382,13 @@ tests:
           with TH_CE"
       PICS: CADMIN.C
       verification: |
-          1. On third controller, using chip-tool connect to the accessory. Connect attempt should fail, i.e
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
-
+          On TH_CR3 send the below command
 
           ./chip-tool pairing onnetwork 3 20202021 --commissioner-name gamma
 
-          verify you got the following message in the TH3 (all-clusters-app) log
+          verify you got the following message in the TH_CR3(chip-tool) log
 
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
           CHIP:TOO: Secure Pairing Failed
@@ -473,50 +400,38 @@ tests:
           Information Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
-          On second controller, write attribute and read attribute to and from TH_CE
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
-
+          On DUT_CR2 send the below command
 
           ./chip-tool basic write node-label te5new 2 0 --commissioner-name beta
 
-          On TH2(all-clusters-app) Log
+          Verify the Write request On TH_CE(all-clusters-app) Log
 
+          [1660902144.913634][3045:3045] CHIP:EM: Handling via exchange: 22257r, Delegate: 0xaaaaadbeffc0
+          [1660902144.913728][3045:3045] CHIP:IM: Received Write request
+          [1660902144.913785][3045:3045] CHIP:DMG: IM WH moving to [Initialized]
+          [1660902144.913912][3045:3045] CHIP:DMG: WriteRequestMessage =
+          [1660902144.913977][3045:3045] CHIP:DMG: {
+          [1660902144.914038][3045:3045] CHIP:DMG:         suppressResponse = false,
+          [1660902144.914106][3045:3045] CHIP:DMG:         timedRequest = false,
+          [1660902144.914168][3045:3045] CHIP:DMG:         AttributeDataIBs =
 
-          CHIP:DMG: WriteResponseMessage =
-          [1649245940.788522][10110:10115] CHIP:DMG: {
-          [1649245940.788577][10110:10115] CHIP:DMG:         AttributeStatusIBs =
-          [1649245940.788653][10110:10115] CHIP:DMG:         [
-          [1649245940.788713][10110:10115] CHIP:DMG:                 AttributeStatusIB =
-          [1649245940.788787][10110:10115] CHIP:DMG:                 {
-          [1649245940.788852][10110:10115] CHIP:DMG:                         AttributePathIB =
-          [1649245940.788931][10110:10115] CHIP:DMG:                         {
-          [1649245940.789009][10110:10115] CHIP:DMG:                                 Endpoint = 0x0,
-          [1649245940.789143][10110:10115] CHIP:DMG:                                 Cluster = 0x28,
-          [1649245940.789228][10110:10115] CHIP:DMG:                                 Attribute = 0x0000_0005,
-          [1649245940.789313][10110:10115] CHIP:DMG:                         }
-          [1649245940.789388][10110:10115] CHIP:DMG:
-          [1649245940.789454][10110:10115] CHIP:DMG:                         StatusIB =
-          [1649245940.789519][10110:10115] CHIP:DMG:                         {
-          [1649245940.789588][10110:10115] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1649245940.789654][10110:10115] CHIP:DMG:                         },
-          [1649245940.789719][10110:10115] CHIP:DMG:
-          [1649245940.789778][10110:10115] CHIP:DMG:                 },
-          [1649245940.789841][10110:10115] CHIP:DMG:
-          [1649245940.789885][10110:10115] CHIP:DMG:         ],
-          [1649245940.789941][10110:10115] CHIP:DMG:
-          [1649245940.789984][10110:10115] CHIP:DMG:         InteractionModelRevision = 1
-          [1649245940.790033][10110:10115] CHIP:DMG: }
-          [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
-
-          Verify read attribute returns the updated value written
-
-          On TH2(all-clusters-app) Log
+          [1660902144.915374][3045:3045] CHIP:DMG:
 
           ./chip-tool basic read node-label 2 0 --commissioner-name beta
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
-          [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te5new
-          [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
+
+          Verify the Write request On TH_CE(all-clusters-app) Log
+
+          [1660902253.379018][3045:3045] CHIP:EM: Handling via exchange: 3197r, Delegate: 0xaaaaadbeffc0
+          [1660902253.379122][3045:3045] CHIP:IM: Received Read request
+          [1660902253.379306][3045:3045] CHIP:DMG: ReadRequestMessage =
+          [1660902253.379373][3045:3045] CHIP:DMG: {
+          [1660902253.379430][3045:3045] CHIP:DMG:         AttributePathIBs =
+          [1660902253.379496][3045:3045] CHIP:DMG:         [
+          [1660902253.379557][3045:3045] CHIP:DMG:                 AttributePathIB =
+          [1660902253.379634][3045:3045] CHIP:DMG:                 {
+          [1660902253.379703][3045:3045] CHIP:DMG:                         Endpoint = 0x0,
       disabled: true
 
     - label:
@@ -524,47 +439,17 @@ tests:
           BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On second controller using chip-tool open commissioning widow using BCM.
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
-
+          On DUT_CR2 send the below command
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 180 2 0 --timedInteractionTimeoutMs 1000 --commissioner-name beta
 
-          On TH2(all-clusters-app) Log
+          Verify the Commissioning window is opened in TH_CE(all-clusters-app) Log
 
-
-          CHIP:DMG: InvokeResponseMessage =
-          [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
-          [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
-          [1650278416.248570][11064:11069] CHIP:DMG:         [
-          [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
-          [1650278416.248718][11064:11069] CHIP:DMG:                 {
-          [1650278416.248783][11064:11069] CHIP:DMG:                         CommandStatusIB =
-          [1650278416.248860][11064:11069] CHIP:DMG:                         {
-          [1650278416.248931][11064:11069] CHIP:DMG:                                 CommandPathIB =
-          [1650278416.249011][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249100][11064:11069] CHIP:DMG:                                         EndpointId = 0x0,
-          [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
-          [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
-          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
-          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
-          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
-          [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:
-          [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:
-          [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:
-          [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
-          [1650278416.250355][11064:11069] CHIP:DMG: },
-          [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
-          [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1660902413.357922][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660902413.358025][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660902413.358116][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
     - label:
@@ -578,46 +463,17 @@ tests:
           BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On second controller using chip-tool open commissioning widow using BCM.
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
-
+          On DUT_CR2 send the below command
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000 --commissioner-name beta
 
-          On TH2(all-clusters-app) Log
+          Verify the Commissioning window is opened in TH_CE(all-clusters-app) Log
 
-          CHIP:DMG: InvokeResponseMessage =
-          [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
-          [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
-          [1650278416.248570][11064:11069] CHIP:DMG:         [
-          [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
-          [1650278416.248718][11064:11069] CHIP:DMG:                 {
-          [1650278416.248783][11064:11069] CHIP:DMG:                         CommandStatusIB =
-          [1650278416.248860][11064:11069] CHIP:DMG:                         {
-          [1650278416.248931][11064:11069] CHIP:DMG:                                 CommandPathIB =
-          [1650278416.249011][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249100][11064:11069] CHIP:DMG:                                         EndpointId = 0x0,
-          [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
-          [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
-          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
-          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
-          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
-          [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:
-          [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:
-          [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:
-          [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
-          [1650278416.250355][11064:11069] CHIP:DMG: },
-          [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
-          [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1660902623.744448][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660902623.744550][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660902623.744634][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
     - label:
@@ -625,19 +481,23 @@ tests:
           from step 15"
       PICS: CADMIN.C
       verification: |
-          Using your 1st Controller connect to the accessory.
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          Below are the example command using chip-tool with single RPI. Vendor should have the provision to use the equivalent command with their DUT and for the second and third commissioners.
+          On TH_CR1 send the below command
 
           ./chip-tool pairing onnetwork 1 20202021
 
-          On TH1(all-clusters-app) Log
+          Verify the OperationalCert error 9 in TH_CE(all-clusters-app) Log
 
+          [1660902716.613196][3045:3045] CHIP:DMG: Command handler moving to [AddedComma]
+          [1660902716.613274][3045:3045] CHIP:ZCL: OpCreds: Failed AddNOC request (err=../../examples/all-clusters-app/linux/third_party/connectedhomeip/src/credentials/FabricTable.cpp:1692: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists) with OperationalCert error 9
+          [1660902716.613394][3045:3045] CHIP:DMG: Decreasing reference count for CommandHandler, remaining 0
+          [1660902716.613497][3045:3045] CHIP:EM: Piggybacking Ack for MessageCounter:176866087 on exchange: 56605r
+
+          Trying to add a NOC for a fabric that already exists On TH_CR1(chip-tool) Log
 
           [1651786200275] [36301:315544] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1651786200275] [36301:315544] CHIP: [CTL] Device returned status 9 on receiving the NOC
           [1651786200275] [36301:315544] CHIP: [CTL] Add NOC failed with error ../../src/controller/CHIPDeviceController.cpp:1187: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists
           [1651786200275] [36301:315544] CHIP: [CTL] Error on commissioning step "SendNOC": "../../src/controller/CHIPDeviceController.cpp:1187: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists"
-
-          Verify that the commissioning process fails as TH_CE was already commissioned by TH_CR1 in step 1
       disabled: true

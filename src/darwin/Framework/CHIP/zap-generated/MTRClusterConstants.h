@@ -1702,6 +1702,7 @@ typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
 
     // Cluster FaultInjection commands
     MTRClusterFaultInjectionCommandFailAtFaultID = 0x00000000,
+    MTRClusterFaultInjectionCommandFailRandomlyAtFaultID = 0x00000001,
 
 };
 

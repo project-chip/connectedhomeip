@@ -26,6 +26,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          1 - 5.1 - Onboarding payload is printed on the device or in additional provided materials (ex: manual) through a QR Code, a manually entered code or as content in an NFC tag.
+      disabled: true
+
     - label:
           "Using the TH Onboarding payload reader, scan or read the Onboarding
           payload from DUT1"
@@ -33,6 +38,8 @@ tests:
           1. Parse payload for DUT1
 
           $  ./chip-tool payload parse-setup-payload MT:-24J0AFN00KA0648G00
+          Verify in TH as commissioner side:
+
           [1651194471211] [16050:465158] CHIP: [SPL] Parsing base38Representation: MT:-24J0AFN00KA0648G00
           [1651194471211] [16050:465158] CHIP: [SPL] CommissioningFlow: 0
           [1651194471211] [16050:465158] CHIP: [SPL] VendorID: 65521
@@ -58,6 +65,8 @@ tests:
           1. Parse payload for DUT2
 
           $  ./chip-tool payload parse-setup-payload MT:-24J0IRV01WCCN68G00
+          Verify in TH as commissioner side:
+
           [1651194577916] [16053:466154] CHIP: [SPL] Parsing base38Representation: MT:-24J0IRV01WCCN68G00
           [1651194577916] [16053:466154] CHIP: [SPL] CommissioningFlow: 0
           [1651194577916] [16053:466154] CHIP: [SPL] VendorID: 65521

@@ -30,6 +30,11 @@ tests:
           Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
+    - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
     - label: "DUT sends the ScanNetwork command to the TH"
       PICS: CNET.C.C00.Tx
       verification: |
@@ -60,7 +65,7 @@ tests:
       disabled: true
 
     - label: "DUT sends the AddOrUpdateWiFiNetwork command to the TH"
-      PICS: CNET.C.C03.Tx
+      PICS: CNET.C.C02.Tx
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network-network hex:<your network id in hex> 1 0
 

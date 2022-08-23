@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <slist.h>
 
@@ -56,11 +57,20 @@ private:
 
     static constexpr uint8_t mMaxEntryCount = 128;
 
-    struct KeyConfigIdEntry : public slist_node_t
+    struct KeyStorage
     {
-        KeyConfigIdEntry(uint8_t configID, const char * key, size_t keyLength);
+        KeyStorage(const char * key = nullptr, size_t keyLength = 0);
 
         bool IsMatchKey(const char * key) const;
+
+        size_t mValueSize;
+        char mKey[PersistentStorageDelegate::kKeyLengthMax];
+    };
+
+    struct KeyConfigIdEntry : public slist_node_t
+    {
+        KeyConfigIdEntry(uint8_t configID, const KeyStorage & keyStorage) : mConfigID(configID), mStorage(keyStorage) {}
+
         constexpr Config::Key GetValueConfigKey() const
         {
             return Internal::CYW30739ConfigKey(Config::kChipKvsValue_KeyBase, mConfigID);
@@ -71,9 +81,11 @@ private:
         }
         constexpr KeyConfigIdEntry * Next() const { return static_cast<KeyConfigIdEntry *>(next); }
         constexpr uint8_t NextConfigID() const { return mConfigID + 1; }
+        constexpr size_t GetValueSize() const { return mStorage.mValueSize; }
+        constexpr void SetValueSize(size_t valueSize) { mStorage.mValueSize = valueSize; }
 
         uint8_t mConfigID;
-        char mKey[CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH];
+        KeyStorage mStorage;
     };
 
     KeyConfigIdEntry * AllocateEntry(const char * key, size_t keyLength);
