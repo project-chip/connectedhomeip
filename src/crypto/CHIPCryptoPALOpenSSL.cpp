@@ -1254,6 +1254,8 @@ exit:
 
 CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr, size_t csr_length, P256PublicKey & pubkey)
 {
+    ReturnErrorOnFailure(VerifyCertificateSigningRequestFormat(csr, csr_length));
+
     ERR_clear_error();
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
