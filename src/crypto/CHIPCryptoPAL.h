@@ -643,7 +643,7 @@ CHIP_ERROR GenerateCertificateSigningRequest(const P256Keypair * keypair, Mutabl
 /**
  * @brief Common code to validate ASN.1 format/size of a CSR, used by VerifyCertificateSigningRequest.
  *
- * Ensures it's at not obviouslyu malformed and doesn't have trailing garbage.
+ * Ensures it's not obviously malformed and doesn't have trailing garbage.
  *
  * @param csr CSR in DER format
  * @param csr_length The length of the CSR buffer
