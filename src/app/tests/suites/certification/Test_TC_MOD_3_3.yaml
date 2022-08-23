@@ -24,17 +24,18 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Pre-conditions:"
-      verification: |
-          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
-      disabled: true
-
     - label: "Note"
       verification: |
-          1.To run this test case build the OTA Provider app in nRF connectedhomeip Docker . [
+          1.To run this test case build the OTA Provider app to be build in the nRF Environment setup . Follow this step to setup the nRF build environment using container.
+          https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/nrfconnect#using-docker-container-for-setup
+
+          Once the build  environmnet is ready , build teh OTA-Provider-App inside the container. Follow the below link to build the OTA-Provider app
           https://github.com/project-chip/connectedhomeip/tree/master/examples/ota-provider-app/linux
 
-          2. Build all-cluster-app in docker
+          2. Build all-cluster-app in docker  or Flash the pre-built folder from the delivered image
+
+          To build maually and flash follow steps explained in:
+          https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/nrfconnect#building
 
           west build -b nrf52840dk_nrf52840 -- -DCONF_FILE=prj_dfu.conf -DCONFIG_CHIP_LIB_SHELL=y
 
@@ -42,7 +43,11 @@ tests:
           3.Flash
           west flash --erase
 
-          4.OTA Image needs to build on docker
+          4.OTA Image needs to build on the docker environment as like in the first step inside the all-clusters-app folder.  Refer the below link to build the OTA image with new version.
+
+          https://github.com/project-chip/connectedhomeip/tree/master/examples/ota-requestor-app/linux#ota-requestor-app-linux
+
+          To build the ota image with new version for nRF, use the following command inside the all-clusters-app folder , which will build matter.ota
 
           west build -b nrf52840dk_nrf52840 -d build2 -- -DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 -DCONF_FILE=prj_dfu.conf -DCONFIG_CHIP_LIB_SHELL=y
       disabled: true
@@ -122,7 +127,11 @@ tests:
       verification: |
           To perform an OTA update on Thread device follow the cmmds below:
 
-          Step-1 : ./chip-ota-provider-app -f ~/chip_repos/connectedhomeip/examples/all-clusters-app/nrfconnect/build2/zephyr/matter.ota
+          Step-1 : Where we builded OTA provider app execute this cmmd . (In my case I ran connectedhomeip/out/debug ./chip-ota-provider-app -f  )
+
+          ./chip-ota-provider-app -f ~/chip_repos/connectedhomeip/examples/all-clusters-app/nrfconnect/build2/zephyr/matter.ota
+
+          Ran on chip-tool:
 
           Step-2: ./chip-tool pairing onnetwork 2 20202021
 

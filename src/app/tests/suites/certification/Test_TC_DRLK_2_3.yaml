@@ -14,6 +14,9 @@
 
 name: 111.2.3. [TC-DRLK-2.3] Verification for Unlock Door command [DUT-Server]
 
+PICS:
+    - DRLK.S
+
 config:
     nodeId: 0x12344321
     cluster: "Door Lock"

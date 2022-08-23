@@ -24,11 +24,37 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Mandatory cluster requirements for each device type can be found here.
+          github link
+          Use the correct json required for the DUT, this file is PIXIT.DESC.DeviceTypeConformanceList.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          TH and DUT are commissioned
+      disabled: true
+
     - label:
           "TH reads DeviceTypeList and PartsList attributes from DUT for
           Endpoint 0"
       PICS: DESC.S.A0000 && DESC.S.A0003
       verification: |
+          Send a read request to the DUT using chip-tool to read the partsList attribute in the descriptor cluster on Endpoint 0.
+          Make a note of all the items(Endpoint id’s) in the list. In the below example there are 2 endpoint id"s listed [1,2]
+
+          ./chip-tool descriptor read  parts-list 1 0
+
+          Verify PartsList response on the TH (Chip-tool) Log:
+
+          [1641456769.777217][16238:16244] CHIP:DMG:      SuppressResponse = true,
+          [1641456769.777267][16238:16244] CHIP:DMG: }
+          [1641456769.777839][16238:16244] CHIP:TOO: Descriptor.PartsList response: 2 entries
+          [1641456769.777925][16238:16244] CHIP:TOO:   [1]: 1
+          [1641456769.777978][16238:16244] CHIP:TOO:   [2]: 2
+          [1641456769.778080][16238:16244] CHIP:EM: Sending Standalone Ack for MessageCounter:2830202 on exchange 38042i
+
           ./chip-tool descriptor read device-list 1 0
 
           Verify DeviceList response on the TH (Chip-tool) Log:
@@ -46,6 +72,19 @@ tests:
           Endpoint supported by DUT (except Endpoint 0)."
       PICS: DESC.S.A0000 && DESC.S.A0003
       verification: |
+          For all the Endpoint id’s listed from the previous step run the following steps. The device type should correspond to the id value in the device_type.json
+          Chip tool outputs all values in integer,  convert to hex before comparing.
+
+
+          ./chip-tool descriptor read  parts-list 1 1
+
+          Verify  parts-list response on the TH(Chip-tool) Log:
+
+          [1660127331.634565][46437:46442] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 934889243
+          [1660127331.634631][46437:46442] CHIP:TOO:   parts list: 0 entries
+
+
+
           ./chip-tool descriptor read device-list 1 1
 
           Verify DeviceList response on the TH(Chip-tool) Log:
@@ -57,54 +96,114 @@ tests:
           [1657200303.724594][2509:2514] CHIP:TOO:       Type: 256
           [1657200303.724621][2509:2514] CHIP:TOO:       Revision: 1
           [1657200303.724647][2509:2514] CHIP:TOO:      }
+
+
+
+          ./chip-tool descriptor read  parts-list 1 2
+
+          Verify parts-list response on the TH(Chip-tool) Log:
+
+          [1660127879.565330][46472:46477] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1237610137
+          [1660127879.565473][46472:46477] CHIP:TOO:   parts list: 0 entries
+
+          ./chip-tool descriptor read device-list 1 2
+
+          Verify DeviceList response on the TH(Chip-tool) Log:
+
+          [1660127725.802512][46460:46465] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1237610137
+          [1660127725.802614][46460:46465] CHIP:TOO:   device list: 1 entries
+          [1660127725.802669][46460:46465] CHIP:TOO:     [1]: {
+          [1660127725.802707][46460:46465] CHIP:TOO:       Type: 256
+          [1660127725.802745][46460:46465] CHIP:TOO:       Revision: 1
+          [1660127725.802781][46460:46465] CHIP:TOO:      }
       disabled: true
 
     - label: "TH reads ServerList attribute."
       PICS: DESC.S.A0001
       verification: |
-          ./chip-tool descriptor read server-list 1 0
+          For all the Endpoint id’s listed in step 1a run the following steps. For all the server list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output.
+
+          ./chip-tool descriptor read server-list 1 1
 
           Verify server list on the TH (Chip-tool) Log:
 
-          [1654155402.956829][3701:3706] CHIP:TOO:   server list: 26 entries
-          [1654155402.956863][3701:3706] CHIP:TOO:     [1]: 3
-          [1654155402.956889][3701:3706] CHIP:TOO:     [2]: 4
-          [1654155402.956914][3701:3706] CHIP:TOO:     [3]: 29
-          [1654155402.956939][3701:3706] CHIP:TOO:     [4]: 30
-          [1654155402.956963][3701:3706] CHIP:TOO:     [5]: 31
-          [1654155402.956988][3701:3706] CHIP:TOO:     [6]: 40
-          [1654155402.957012][3701:3706] CHIP:TOO:     [7]: 42
-          [1654155402.957037][3701:3706] CHIP:TOO:     [8]: 43
-          [1654155402.957061][3701:3706] CHIP:TOO:     [9]: 44
-          [1654155402.957086][3701:3706] CHIP:TOO:     [10]: 45
-          [1654155402.957110][3701:3706] CHIP:TOO:     [11]: 46
-          [1654155402.957135][3701:3706] CHIP:TOO:     [12]: 47
-          [1654155402.957159][3701:3706] CHIP:TOO:     [13]: 48
-          [1654155402.957183][3701:3706] CHIP:TOO:     [14]: 49
-          [1654155402.957207][3701:3706] CHIP:TOO:     [15]: 50
-          [1654155402.957231][3701:3706] CHIP:TOO:     [16]: 51
-          [1654155402.957256][3701:3706] CHIP:TOO:     [17]: 52
-          [1654155402.957280][3701:3706] CHIP:TOO:     [18]: 53
-          [1654155402.957304][3701:3706] CHIP:TOO:     [19]: 54
-          [1654155402.957328][3701:3706] CHIP:TOO:     [20]: 55
-          [1654155402.957352][3701:3706] CHIP:TOO:     [21]: 60
-          [1654155402.957376][3701:3706] CHIP:TOO:     [22]: 62
-          [1654155402.957400][3701:3706] CHIP:TOO:     [23]: 63
-          [1654155402.957424][3701:3706] CHIP:TOO:     [24]: 64
-          [1654155402.957449][3701:3706] CHIP:TOO:     [25]: 65
-          [1654155402.957473][3701:3706] CHIP:TOO:     [26]: 1029
+          [1660149731.921734][49539:49544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 2312399478
+          [1660149731.921749][49539:49544] CHIP:TOO:   server list: 44 entries
+          [1660149731.921753][49539:49544] CHIP:TOO:     [1]: 3
+          [1660149731.921755][49539:49544] CHIP:TOO:     [2]: 4
+          [1660149731.921758][49539:49544] CHIP:TOO:     [3]: 5
+          [1660149731.921760][49539:49544] CHIP:TOO:     [4]: 6
+          [1660149731.921762][49539:49544] CHIP:TOO:     [5]: 7
+          [1660149731.921765][49539:49544] CHIP:TOO:     [6]: 8
+          [1660149731.921767][49539:49544] CHIP:TOO:     [7]: 15
+          [1660149731.921769][49539:49544] CHIP:TOO:     [8]: 29
+          [1660149731.921772][49539:49544] CHIP:TOO:     [9]: 30
+          [1660149731.921774][49539:49544] CHIP:TOO:     [10]: 37
+          [1660149731.921776][49539:49544] CHIP:TOO:     [11]: 47
+          [1660149731.921779][49539:49544] CHIP:TOO:     [12]: 59
+          [1660149731.921781][49539:49544] CHIP:TOO:     [13]: 64
+          [1660149731.921783][49539:49544] CHIP:TOO:     [14]: 65
+          [1660149731.921785][49539:49544] CHIP:TOO:     [15]: 69
+          [1660149731.921787][49539:49544] CHIP:TOO:     [16]: 80
+          [1660149731.921790][49539:49544] CHIP:TOO:     [17]: 257
+          [1660149731.921792][49539:49544] CHIP:TOO:     [18]: 258
+          [1660149731.921795][49539:49544] CHIP:TOO:     [19]: 259
+          [1660149731.921797][49539:49544] CHIP:TOO:     [20]: 512
+          [1660149731.921799][49539:49544] CHIP:TOO:     [21]: 513
+          [1660149731.921801][49539:49544] CHIP:TOO:     [22]: 514
+          [1660149731.921804][49539:49544] CHIP:TOO:     [23]: 516
+          [1660149731.921806][49539:49544] CHIP:TOO:     [24]: 768
+          [1660149731.921808][49539:49544] CHIP:TOO:     [25]: 1024
+          [1660149731.921810][49539:49544] CHIP:TOO:     [26]: 1026
+          [1660149731.921812][49539:49544] CHIP:TOO:     [27]: 1027
+          [1660149731.921814][49539:49544] CHIP:TOO:     [28]: 1028
+          [1660149731.921817][49539:49544] CHIP:TOO:     [29]: 1029
+          [1660149731.921819][49539:49544] CHIP:TOO:     [30]: 1030
+          [1660149731.921821][49539:49544] CHIP:TOO:     [31]: 1283
+          [1660149731.921824][49539:49544] CHIP:TOO:     [32]: 1284
+          [1660149731.921826][49539:49544] CHIP:TOO:     [33]: 1285
+          [1660149731.921828][49539:49544] CHIP:TOO:     [34]: 1286
+          [1660149731.921830][49539:49544] CHIP:TOO:     [35]: 1287
+          [1660149731.921832][49539:49544] CHIP:TOO:     [36]: 1288
+          [1660149731.921835][49539:49544] CHIP:TOO:     [37]: 1289
+          [1660149731.921837][49539:49544] CHIP:TOO:     [38]: 1290
+          [1660149731.921839][49539:49544] CHIP:TOO:     [39]: 1291
+          [1660149731.921841][49539:49544] CHIP:TOO:     [40]: 1292
+          [1660149731.921844][49539:49544] CHIP:TOO:     [41]: 1293
+          [1660149731.921846][49539:49544] CHIP:TOO:     [42]: 1294
+          [1660149731.921848][49539:49544] CHIP:TOO:     [43]: 2820
+          [1660149731.921851][49539:49544] CHIP:TOO:     [44]: 4294048773
+
+
+          ./chip-tool descriptor read server-list 1 2
+
+          [1660146145.982691][46811:46816] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 1051414887
+          [1660146145.982733][46811:46816] CHIP:TOO:   server list: 5 entries
+          [1660146145.982744][46811:46816] CHIP:TOO:     [1]: 4
+          [1660146145.982752][46811:46816] CHIP:TOO:     [2]: 6
+          [1660146145.982759][46811:46816] CHIP:TOO:     [3]: 29
+          [1660146145.982771][46811:46816] CHIP:TOO:     [4]: 47
+          [1660146145.982778][46811:46816] CHIP:TOO:     [5]: 1030
       disabled: true
 
     - label: "TH reads ClientList attribute"
       PICS: DESC.S.A0002
       verification: |
-          ./chip-tool descriptor read client-list 1 0
+          For all the Endpoint id’s listed in step 1a run the following steps. For all the client list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output.
+
+
+          ./chip-tool descriptor read client-list 1 1
+
+          Verify client list on the TH (Chip-tool) Log:
+          [1660195618.042544][2905:2910] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 2955150741
+          [1660195618.042605][2905:2910] CHIP:TOO:   client list: 0 entries
+
+           ./chip-tool descriptor read client-list 1 2
 
           Verify client list on the TH (Chip-tool) Log:
 
-          [1650281818.533446][9679:9684] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 1976976904
-          [1650281818.533514][9679:9684] CHIP:TOO:   client list: 1 entries
-          [1650281818.533563][9679:9684] CHIP:TOO:     [1]: 41
+          [1660146160.390200][46818:46823] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 1051414887
+          [1660146160.390211][46818:46823] CHIP:TOO:   client list: 0 entries
       disabled: true
 
     - label: "TH reads PartsList attribute."
@@ -127,5 +226,43 @@ tests:
           to make sure all mandatory (and applicable optional)
           attributes/commands are implemented."
       verification: |
-          verification step to be updated.
+          FOR ENDPOINTS 2
+
+
+          ./chip-tool descriptor read  parts-list 1 2
+
+          Verify parts-list response on the TH(Chip-tool) Log:
+
+          [1660127879.565330][46472:46477] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1237610137
+          [1660127879.565473][46472:46477] CHIP:TOO:   parts list: 0 entries
+
+          ./chip-tool descriptor read device-list 1 2
+
+          Verify DeviceList response on the TH(Chip-tool) Log:
+
+          [1660127725.802512][46460:46465] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1237610137
+          [1660127725.802614][46460:46465] CHIP:TOO:   device list: 1 entries
+          [1660127725.802669][46460:46465] CHIP:TOO:     [1]: {
+          [1660127725.802707][46460:46465] CHIP:TOO:       Type: 256
+          [1660127725.802745][46460:46465] CHIP:TOO:       Revision: 1
+          [1660127725.802781][46460:46465] CHIP:TOO:      }
+
+          ./chip-tool descriptor read server-list 1 2
+
+          Verify server list on the TH (Chip-tool) Log:
+
+          [1660146145.982691][46811:46816] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 1051414887
+          [1660146145.982733][46811:46816] CHIP:TOO:   server list: 5 entries
+          [1660146145.982744][46811:46816] CHIP:TOO:     [1]: 4
+          [1660146145.982752][46811:46816] CHIP:TOO:     [2]: 6
+          [1660146145.982759][46811:46816] CHIP:TOO:     [3]: 29
+          [1660146145.982771][46811:46816] CHIP:TOO:     [4]: 47
+          [1660146145.982778][46811:46816] CHIP:TOO:     [5]: 1030
+
+          ./chip-tool descriptor read client-list 1 2
+
+          Verify client list on the TH (Chip-tool) Log:
+
+          [1660146160.390200][46818:46823] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 1051414887
+          [1660146160.390211][46818:46823] CHIP:TOO:   client list: 0 entries
       disabled: true

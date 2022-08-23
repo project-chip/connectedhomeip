@@ -95,7 +95,7 @@ jobs:
         timeout-minutes: 15
         run: |
           scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_debug_rpc BRD4161A "is_debug=false" \
-            'import("//with_pw_rpc.gni")'
+            disable_lcd=true 'import("//with_pw_rpc.gni")'
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+rpc lighting-app \
             out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out /tmp/bloat_reports/
       - name: Build example EFR32+WF200 WiFi Lock app for BRD4161A

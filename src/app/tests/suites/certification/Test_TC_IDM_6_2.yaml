@@ -32,11 +32,6 @@ tests:
           Here the command to enter interactive mode:--   ./chip-tool interactive start
       disabled: true
 
-    - label: "Note"
-      verification: |
-          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
-      disabled: true
-
     - label:
           "TH sends Subscribe Request Message to DUT with EventRequests set to a
           specific event from a specific cluster on a specific endpoint on a

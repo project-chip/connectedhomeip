@@ -88,7 +88,6 @@ static_library("inet") {
     "InetArgParser.h",
     "InetError.cpp",
     "InetError.h",
-    "InetFaultInjection.h",
     "InetInterface.cpp",
     "InetInterface.h",
     "InetLayer.h",
@@ -132,7 +131,10 @@ static_library("inet") {
   }
 
   if (chip_with_nlfaultinjection) {
-    sources += [ "InetFaultInjection.cpp" ]
+    sources += [
+      "InetFaultInjection.cpp",
+      "InetFaultInjection.h",
+    ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
 

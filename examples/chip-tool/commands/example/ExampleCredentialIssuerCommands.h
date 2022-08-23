@@ -49,6 +49,33 @@ public:
         return mOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, cats, keypair.Pubkey(), rcac, icac, noc);
     }
 
+    void SetCredentialIssuerOption(CredentialIssuerOptions option, bool isEnabled) override
+    {
+        switch (option)
+        {
+        case CredentialIssuerOptions::kMaximizeCertificateSizes:
+            mUsesMaxSizedCerts = isEnabled;
+            mOpCredsIssuer.SetMaximallyLargeCertsUsed(mUsesMaxSizedCerts);
+            break;
+        default:
+            break;
+        }
+    }
+
+    bool GetCredentialIssuerOption(CredentialIssuerOptions option) override
+    {
+        switch (option)
+        {
+        case CredentialIssuerOptions::kMaximizeCertificateSizes:
+            return mUsesMaxSizedCerts;
+        default:
+            return false;
+        }
+    }
+
+protected:
+    bool mUsesMaxSizedCerts = false;
+
 private:
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 };

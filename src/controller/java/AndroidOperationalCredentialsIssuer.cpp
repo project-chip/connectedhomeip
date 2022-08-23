@@ -378,7 +378,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const Byte
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR N2J_CSRInfo(JNIEnv * env, jbyteArray nonce, jbyteArray elements, jbyteArray elementsSignature, jbyteArray csr,
+CHIP_ERROR N2J_CSRInfo(JNIEnv * env, jbyteArray nonce, jbyteArray elements, jbyteArray csrElementsSignature, jbyteArray csr,
                        jobject & outCSRInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -393,7 +393,7 @@ CHIP_ERROR N2J_CSRInfo(JNIEnv * env, jbyteArray nonce, jbyteArray elements, jbyt
     constructor = env->GetMethodID(infoClass, "<init>", "([B[B[B[B)V");
     VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outCSRInfo = (jobject) env->NewObject(infoClass, constructor, nonce, elements, elementsSignature, csr);
+    outCSRInfo = (jobject) env->NewObject(infoClass, constructor, nonce, elements, csrElementsSignature, csr);
 
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 exit:

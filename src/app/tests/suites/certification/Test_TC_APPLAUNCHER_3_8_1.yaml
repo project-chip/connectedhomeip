@@ -25,9 +25,12 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Preconditions:"
+    - label:
+          "Preconditions: Commission TH to DUT, if not done so already. In some
+          cases, such as with a Casting Video Player, the TH commissions the
+          DUT."
       verification: |
-          Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
+
       disabled: true
 
     - label: "DUT sends StopApp command to TH"
