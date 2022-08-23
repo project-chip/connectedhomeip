@@ -1,1 +1,1 @@
-0.5.95 Version bump reason: Fix nrfconnect Docker build
+0.5.96 Version bump reason: add libnl-dev libs to chip-build image
