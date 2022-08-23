@@ -68,7 +68,8 @@ void init_efrPlatform(void)
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
-    sl_ot_sys_init();
+    efr32RadioInit();
+    efr32AlarmInit();
 #endif // CHIP_ENABLE_OPENTHREAD
 }
 
