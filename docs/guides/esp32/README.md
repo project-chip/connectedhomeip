@@ -1,6 +1,11 @@
 ## Espressif (ESP32) Getting Started Guide
 
----
+```{toctree}
+:glob:
+:maxdepth: 1
+
+*
+```
 
 Please follow the steps below to create and test a fully functional Matter
 example on ESP32 series of SoCs
@@ -11,5 +16,3 @@ example on ESP32 series of SoCs
 -   [Flash and NVS encryption for securing factory data](flash_nvs_encryption.md)
 -   [RPC Console and Device Tracing](rpc_console.md)
 -   [Matter OTA](ota.md)
-
----

@@ -4,7 +4,7 @@ An example showing the use of Matter on the Infineon CY8CKIT-062S2-43012 board.
 
 <hr>
 
--   [Matter PSoC6 Lock Example](#chip-psoc6-lock-example)
+-   [Matter PSoC6 Lock Example](#matter-psoc6-lock-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
@@ -125,4 +125,4 @@ commands. These power cycle the BlueTooth hardware and disable BR/EDR mode.
 
 For the description of Software Update process with infineon PSoC6 example
 applications see
-[Infineon PSoC6 OTA Software Update](../../../docs/guides/infineon_psoc6_software_update.md)
+[Infineon PSoC6 OTA Software Update](../../../../docs/guides/infineon_psoc6_software_update.md)

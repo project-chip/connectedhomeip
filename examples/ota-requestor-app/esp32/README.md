@@ -13,7 +13,6 @@ guides to get started.
 -   [Prerequisite](#prerequisite)
 -   [Query for an OTA Image](#query-for-an-ota-image)
 -   [ESP32 OTA Requestor with Linux OTA Provider](#esp32-ota-requestor-with-linux-ota-provider)
--   [Generate OTA image](#generate-ota-image)
 -   [RPC console and Device Tracing](../../../docs/guides/esp32/rpc_console.md)
 
 ---

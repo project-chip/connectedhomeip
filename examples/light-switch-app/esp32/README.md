@@ -5,8 +5,6 @@ This example demonstrates the Matter Light-switch application on ESP platforms.
 ---
 
 -   [Matter ESP32 Light-switch Example](#matter-esp32-light-switch-example)
-    -   [Supported Devices](#supported-devices)
-    -   [Building the Example Application](#building-the-example-application)
     -   [Commissioning over BLE using chip-tool](#commissioning-over-ble-using-chip-tool)
     -   [Testing the example](#testing-the-example)
 
