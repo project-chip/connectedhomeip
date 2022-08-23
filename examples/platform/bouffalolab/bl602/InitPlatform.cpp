@@ -94,7 +94,7 @@ static void Platform_Light_Init(void)
     hosal_pwm_init(&pwmG);
 
     pwmB.port              = 2;
-    //pwmB.config.pin        = 17;
+    pwmB.config.pin        = 17;
     pwmB.config.duty_cycle = 0; // duty_cycle range is 0~10000 correspond to 0~100%
     pwmB.config.freq       = 1000;
     hosal_pwm_init(&pwmB);
