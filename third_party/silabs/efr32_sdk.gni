@@ -33,6 +33,11 @@ declare_args() {
   use_external_flash = true
 }
 
+# Explorer Kit does not have external flash
+if (efr32_board == "BRD2703A") {
+  use_external_flash = false
+}
+
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
 
 # Defines an efr32 SDK build target.
@@ -210,13 +215,14 @@ template("efr32_sdk") {
 
       if (defined(invoker.use_external_flash) && use_external_flash) {
         defines += [ "CONFIG_USE_EXTERNAL_FLASH" ]
+
+        _include_dirs += [ "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_usart" ]
       }
 
       _include_dirs += [
         "${efr32_sdk_root}/platform/emdrv/uartdrv/inc",
         "${efr32_sdk_root}/platform/emdrv/uartdrv/config",
         "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
-        "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_usart",
       ]
     }
 
@@ -531,13 +537,16 @@ template("efr32_sdk") {
         (defined(invoker.use_external_flash) && use_external_flash)) {
       sources += [
         "${efr32_sdk_root}/hardware/driver/memlcd/src/memlcd_usart/sl_memlcd_spi.c",
-        "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/src/sl_mx25_flash_shutdown_usart/sl_mx25_flash_shutdown.c",
         "${efr32_sdk_root}/platform/emdrv/uartdrv/src/uartdrv.c",
         "${efr32_sdk_root}/platform/emlib/src/em_eusart.c",
         "${efr32_sdk_root}/platform/emlib/src/em_leuart.c",
         "${efr32_sdk_root}/platform/emlib/src/em_usart.c",
         "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/autogen/sl_uartdrv_init.c",
       ]
+
+      if (defined(invoker.use_external_flash) && use_external_flash) {
+        sources += [ "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/src/sl_mx25_flash_shutdown_usart/sl_mx25_flash_shutdown.c" ]
+      }
     }
 
     if ((defined(invoker.show_qr_code) && invoker.show_qr_code) ||
