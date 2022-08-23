@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Crypto implementation: mbedtls, openssl, tinycrypt, boringssl, platform.
-  chip_crypto = ""
-  chip_with_se05x = 0
-}
+import("//build_overrides/chip.gni")
+import("${chip_root}/config/standalone/args.gni")
+chip_with_se05x=1 
+host="host_linux"

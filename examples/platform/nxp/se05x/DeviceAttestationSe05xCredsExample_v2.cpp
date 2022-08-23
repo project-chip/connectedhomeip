@@ -41,7 +41,7 @@ namespace Examples {
 
 namespace {
 
-class ExampleSe05xDACProvider : public DeviceAttestationCredentialsProvider
+class ExampleSe05xDACProviderv2 : public DeviceAttestationCredentialsProvider
 {
 public:
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & out_cd_buffer) override;
@@ -51,7 +51,7 @@ public:
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_signature_buffer) override;
 };
 
-CHIP_ERROR ExampleSe05xDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer)
+CHIP_ERROR ExampleSe05xDACProviderv2::GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer)
 {
 #if 0
     return CopySpanToMutableSpan(DevelopmentCerts::kDacCert, out_dac_buffer);
@@ -64,12 +64,12 @@ CHIP_ERROR ExampleSe05xDACProvider::GetDeviceAttestationCert(MutableByteSpan & o
 #endif
 }
 
-CHIP_ERROR ExampleSe05xDACProvider::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
+CHIP_ERROR ExampleSe05xDACProviderv2::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
 {
     return CopySpanToMutableSpan(ByteSpan(DevelopmentCerts::kPaiCert), out_pai_buffer);
 }
 
-CHIP_ERROR ExampleSe05xDACProvider::GetCertificationDeclaration(MutableByteSpan & out_cd_buffer)
+CHIP_ERROR ExampleSe05xDACProviderv2::GetCertificationDeclaration(MutableByteSpan & out_cd_buffer)
 {
     //-> format_version = 1
     //-> vendor_id = 0xFFF1
@@ -122,7 +122,7 @@ CHIP_ERROR ExampleSe05xDACProvider::GetCertificationDeclaration(MutableByteSpan 
     return CopySpanToMutableSpan(ByteSpan{ kCdForAllExamples }, out_cd_buffer);
 }
 
-CHIP_ERROR ExampleSe05xDACProvider::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
+CHIP_ERROR ExampleSe05xDACProviderv2::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
 {
     // TODO: We need a real example FirmwareInformation to be populated.
     out_firmware_info_buffer.reduce_size(0);
@@ -130,7 +130,7 @@ CHIP_ERROR ExampleSe05xDACProvider::GetFirmwareInformation(MutableByteSpan & out
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
+CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
                                                                  MutableByteSpan & out_signature_buffer)
 {
     Crypto::P256ECDSASignature signature;
@@ -153,9 +153,9 @@ CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan 
 
 } // namespace
 
-DeviceAttestationCredentialsProvider * GetExampleSe05xDACProvider()
+DeviceAttestationCredentialsProvider * GetExampleSe05xDACProviderv2()
 {
-    static ExampleSe05xDACProvider example_dac_provider;
+    static ExampleSe05xDACProviderv2 example_dac_provider;
 
     return &example_dac_provider;
 }

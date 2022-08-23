@@ -24,7 +24,6 @@ Following are the list operations supported by secure element.
 ```
 chip_with_se05x=1     ==> To enable Se05x
 host = "host_k32w"    ==> To set host
-chip_with_se05x_da=1  ==> To enable device attestation using se05x. Provision key at key id = '0xDADADADA'. Also enable `ENABLE_HSM_GENERATE_EC_KEY` in CHIPCryptoPALHsm_config.h file.
 ```
 
 ## Known Limitations:

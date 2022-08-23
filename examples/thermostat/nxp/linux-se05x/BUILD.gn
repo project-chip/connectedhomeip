@@ -12,8 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Crypto implementation: mbedtls, openssl, tinycrypt, boringssl, platform.
-  chip_crypto = ""
-  chip_with_se05x = 0
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+executable("thermostat-se05x-app") {
+  sources = [
+    "${chip_root}/examples/thermostat/linux/main.cpp",
+  ]
+
+  include_dirs = [ "${chip_root}/examples/platform/linux" ]
+
+  deps = [
+    "${chip_root}/examples/platform/nxp/se05x/linux:app-main",
+    "${chip_root}/examples/thermostat/thermostat-common",
+    "${chip_root}/src/lib",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = root_out_dir
 }
