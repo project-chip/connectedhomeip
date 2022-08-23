@@ -38,6 +38,7 @@
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
 {
     wifi_mode_t curWiFiMode;
@@ -53,6 +54,7 @@ CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
 
     return CHIP_NO_ERROR;
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
 CHIP_ERROR ESP32Utils::IsStationEnabled(bool & staEnabled)
 {
@@ -130,6 +132,7 @@ CHIP_ERROR ESP32Utils::EnableStationMode(void)
         return ESP32Utils::MapError(err);
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     // If station mode is not already enabled (implying the current mode is WIFI_MODE_AP), change
     // the mode to WIFI_MODE_APSTA.
     if (curWiFiMode == WIFI_MODE_AP)
@@ -144,15 +147,19 @@ CHIP_ERROR ESP32Utils::EnableStationMode(void)
             return ESP32Utils::MapError(err);
         }
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESP32Utils::SetAPMode(bool enabled)
 {
-    wifi_mode_t curWiFiMode, targetWiFiMode;
+    wifi_mode_t curWiFiMode;
+    wifi_mode_t targetWiFiMode = WIFI_MODE_STA;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     targetWiFiMode = (enabled) ? WIFI_MODE_APSTA : WIFI_MODE_STA;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
     // Get the current ESP WiFI mode.
     esp_err_t err = esp_wifi_get_mode(&curWiFiMode);

@@ -55,6 +55,7 @@ menu "Demo"
           bool "Bypass"
       config RENDEZVOUS_MODE_SOFTAP
           bool "Soft-AP"
+          select ESP_WIFI_SOFTAP_SUPPORT
       config RENDEZVOUS_MODE_BLE
           bool "BLE"
           depends on BT_ENABLED
@@ -62,6 +63,7 @@ menu "Demo"
           bool "On-Network"
       config RENDEZVOUS_MODE_SOFTAP_ON_NETWORK
           bool "Soft-AP / On-Network"
+          select ESP_WIFI_SOFTAP_SUPPORT
       config RENDEZVOUS_MODE_BLE_ON_NETWORK
           bool "BLE / On-Network"
     endchoice
