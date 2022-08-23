@@ -22,34 +22,34 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Occupancy Sensing"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
-          verification step to be updated.
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    - label: "TH reads OccupancySensorType attribute from DUT"
+    - label: "Reads mandatory attribute constrains: OccupancySensorType"
       PICS: OCC.S.A0001
-      verification: |
-          ./chip-tool occupancysensing read occupancy-sensor-type 1 1
+      command: "readAttribute"
+      attribute: "occupancy sensor type"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
 
-          Verify occupancy sensor type value on the TH(Chip-tool) Log:
-
-          [1648461912.765825][9300:9306] CHIP:DMG: }
-          [1648461912.766013][9300:9306] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 3082917122
-          [1648461912.766089][9300:9306] CHIP:TOO:   occupancy sensor type: 0
-      disabled: true
-
-    - label: "TH reads OccupancySensorTypeBitmap attribute from DUT"
+    - label: "Reads mandatory attribute constrains: OccupancySensorTypeBitmap"
       PICS: OCC.S.A0002
-      verification: |
-          ./chip-tool occupancysensing read occupancy-sensor-type-bitmap 1 1
-
-          Verify occupancy sensor type bitmap value on the TH(Chip-tool) Log:
-
-          [1648461918.499009][9307:9312] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0002 DataVersion: 3082917122
-          [1648461918.499082][9307:9312] CHIP:TOO:   occupancy sensor type bitmap: 1
-      disabled: true
+      command: "readAttribute"
+      attribute: "occupancy sensor type bitmap"
+      response:
+          constraints:
+              type: bitmap8
+              minValue: 1
+              maxValue: 7

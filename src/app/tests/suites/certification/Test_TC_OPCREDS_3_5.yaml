@@ -41,7 +41,8 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read nocs 1 0 --fabric-filtered 1
 
-          Verify in TH Log
+          Verify  NOC lists and verify the returned lists has single entry in TH(chip-tool) Log
+
           [1658736497.592132][3787:3792] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 999376603
           [1658736497.595396][3787:3792] CHIP:TOO:   NOCs: 1 entries
           [1658736497.595477][3787:3792] CHIP:TOO:     [1]: {
@@ -85,11 +86,12 @@ tests:
           true"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
-          To get csr nonce give below command 2 times
+          To get csr nonce give below command 2 times in TH(chip-tool)
            echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom)
 
           ./chip-tool operationalcredentials csrrequest hex:C11D6EAA00A54066220DA7F3FC5DC0F684C13D8B8FD3758B51163C2AEDD6F10F 1 0 --IsForUpdateNOC 0
 
+          Verify that the DUT returns a CSRResponse in TH(chip-tool) log
           [1658743641.233113][9670:9675] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0005
           [1658743641.233162][9670:9675] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0005
           [1658743641.233226][9670:9675] CHIP:TOO:   CSRResponse: {

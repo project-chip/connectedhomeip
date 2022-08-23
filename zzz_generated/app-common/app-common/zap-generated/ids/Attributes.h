@@ -1682,6 +1682,46 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace TimeSynchronization {
 namespace Attributes {
 
+namespace UTCTime {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace UTCTime
+
+namespace Granularity {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace Granularity
+
+namespace TimeSource {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace TimeSource
+
+namespace TrustedTimeNodeId {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace TrustedTimeNodeId
+
+namespace DefaultNtp {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace DefaultNtp
+
+namespace TimeZone {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace TimeZone
+
+namespace DstOffset {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace DstOffset
+
+namespace LocalTime {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace LocalTime
+
+namespace TimeZoneDatabase {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace TimeZoneDatabase
+
+namespace NtpServerPort {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace NtpServerPort
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -4914,6 +4954,32 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace TestCluster
+
+namespace FaultInjection {
+namespace Attributes {
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace FaultInjection
 
 } // namespace Clusters
 } // namespace app

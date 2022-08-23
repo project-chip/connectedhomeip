@@ -23,9 +23,24 @@ config:
     endpoint: 0
 
 tests:
+    - label: ""
+      verification: |
+          Validate these PICS items of attributes which are not allowed in this server cluster implementation - these PICS items should all be FALSE, if any of them is TRUE then FAIL the test
+
+          BRBINFO.S.A0000(DataModelRevision)
+
+          BRBINFO.S.A0004(ProductID)
+
+          BRBINFO.S.A0006(Location)
+
+          BRBINFO.S.A0010(LocalConfigDisabled)
+
+          BRBINFO.S.A0013(CapabilityMinima)
+      disabled: true
+
     - label: "Commission DUT to TH (if not already done)"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH reads the ClusterRevision from DUT"

@@ -41,7 +41,6 @@ tests:
               type: int16u
 
     - label: "TH reads the FeatureMap from DUT"
-      PICS: DGTHREAD.S.F00 || DGTHREAD.S.F01 || DGTHREAD.S.F02 || DGTHREAD.S.F03
       command: "readAttribute"
       attribute: "FeatureMap"
       response:

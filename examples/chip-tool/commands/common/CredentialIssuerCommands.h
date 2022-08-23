@@ -74,4 +74,23 @@ public:
     virtual CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
                                                   chip::Crypto::P256Keypair & keypair, chip::MutableByteSpan & rcac,
                                                   chip::MutableByteSpan & icac, chip::MutableByteSpan & noc) = 0;
+
+    // All options must start false
+    enum CredentialIssuerOptions : uint8_t
+    {
+        kMaximizeCertificateSizes = 0, // If set, certificate chains will be maximized for testing via padding
+    };
+
+    virtual void SetCredentialIssuerOption(CredentialIssuerOptions option, bool isEnabled)
+    {
+        // Do nothing
+        (void) option;
+        (void) isEnabled;
+    }
+
+    virtual bool GetCredentialIssuerOption(CredentialIssuerOptions option)
+    {
+        // All options always start false
+        return false;
+    }
 };

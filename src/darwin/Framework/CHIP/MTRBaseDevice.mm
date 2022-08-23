@@ -300,6 +300,13 @@ public:
     {
     }
 
+    ~SubscriptionCallback()
+    {
+        // Ensure we release the ReadClient before we tear down anything else,
+        // so it can call our OnDeallocatePaths properly.
+        mReadClient = nullptr;
+    }
+
     BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
 
     // We need to exist to get a ReadClient, so can't take this as a constructor argument.
@@ -766,6 +773,13 @@ public:
         , mOnSubscriptionEstablished(aOnSubscriptionEstablished)
         , mBufferedReadAdapter(*this)
     {
+    }
+
+    ~BufferedReadAttributeCallback()
+    {
+        // Ensure we release the ReadClient before we tear down anything else,
+        // so it can call our OnDeallocatePaths properly.
+        mReadClient = nullptr;
     }
 
     app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }

@@ -25,12 +25,18 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          1 - The DUT is switched on and the DUT is transport-connected (BLE, Wi-Fi or Ethernet)
+      disabled: true
+
     - label:
           "If TH knows the DUTs Discovery Capability Bitmask, it starts the
           commissioning process in any order of priority on all of the
           networking technologies that are supported by both the TH and the DUT"
       verification: |
           TH selects the DUT"s capability bitmask and start the commissiong process accordingly
+          No applicable TH or DUT logs.
       disabled: true
 
     - label:
@@ -42,6 +48,7 @@ tests:
       verification: |
           If (PICS_CHIP_DEV) BLE discovery tool should discover the DUT else it should not
           If !(PICS_CHIP_DEV) instruct DUT to start Advertising and scan again for commissionale devices using the BLE discovery tool
+          No applicable TH or DUT logs.
 
           1. Discover commissionables over BLE using a BLE discovery tool of choice.
           Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
@@ -52,12 +59,16 @@ tests:
     - label: "TH does not respond to DUT and DUT keeps sending ADVs"
       PICS: MCORE.COM.BLE
       verification: |
+          Verify in DUT as commissionee side:
+
           [5855][P][DIS]Advertise commission parameter vendorID=65521 productID=32773 discriminator=3840/15
       disabled: true
 
     - label: "TH does not respond to DUT and DUT keeps sending ADVs"
       PICS: MCORE.COM.BLE
       verification: |
+          No applicable TH or DUT logs.
+
           This step can be verified using a BLE discovery tool of choice.
           Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
           OR
@@ -67,9 +78,10 @@ tests:
     - label: "TH does not respond to DUT and DUT keeps sending ADVs"
       PICS: MCORE.COM.BLE
       verification: |
-          This step can be verified using  BLE discovery tool of choice (Try NRF Connect OR HCIDump)
+          This BLE advertisements can be verified using  BLE discovery tool of choice (Try NRF Connect OR HCIDump)
           ->For T0 and 30s we have to get advertisement range between 20ms to 60ms
           ->For 30s and 15mins we have to get advertisement range between 150ms to 1200ms
+          Verify in DUT as commissionee side:
 
           I: 3242 [DL]CHIPoBLE advertising started
           I: 3279 [DL]NFC Tag emulation started
@@ -86,6 +98,7 @@ tests:
 
 
           After 900s (that is 15min) advertisement stops
+          Verify in DUT as commissionee side:
 
           D: 903154 [DIS]Scheduling extended discovery timeout in 900s
           E: 903160 [DIS]Failed to finalize service update: Error CHIP:0x0000001C
@@ -97,6 +110,8 @@ tests:
     - label: "TH does not respond to DUT. User power cycles the DUT"
       PICS: MCORE.COM.BLE
       verification: |
+          1. Reboot the DUT commissionee
+
           sudo reboot
       disabled: true
 
@@ -106,6 +121,7 @@ tests:
       PICS: MCORE.COM.BLE
       verification: |
           Check timestamp, ADV stop after 15 mins
+          Verify in DUT as commissionee side:
 
           D: 903154 [DIS]Scheduling extended discovery timeout in 900s
           E: 903160 [DIS]Failed to finalize service update: Error CHIP:0x0000001C
@@ -140,6 +156,7 @@ tests:
           mandatory Commissionable Node Discovery service records over DNS-SD."
       verification: |
           $  ./chip-tool discover commissionables
+          Verify in TH as commissioner side:
 
           Example output using all-clusters-app"s advertisements:
           [1651256405894] [18453:593886] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
@@ -166,8 +183,9 @@ tests:
           MCORE.DD.TXT_KEY_RI && MCORE.DD.TXT_KEY_PH && MCORE.DD.TXT_KEY_PI
       verification: |
           $ ./chip-tool discover commissionables
+          Verify in TH as commissioner side:
 
-          Example output using all-clusters-app"s advertisements:
+          Example output using all-clusters-app"s advertisements found on the TH commissioner:
           [1657218902314] [29617:16663220] CHIP: [DL] Browsing for: _matterc._udp
           [1657218902488] [29617:16663220] CHIP: [DL] Mdns: OnBrowseAdd  name: 5B4185091B6CAD28, type: _matterc._udp., domain: local., interface: 7        [1657218902488] [29617:16663220] CHIP: [DL] Resolve type=_matterc._udp name=5B4185091B6CAD28 interface=7
           [1657218902489] [29617:16663220] CHIP: [DL] Mdns : OnNewInterface hostname:DCA6328D2B9F0000.local. fullname:5B4185091B6CAD28._matterc._udp.local. interface: 7        [1657218902490] [29617:16663220] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:fd54:23a1:c6de:4637:4c4:ee82:2a0f:b5e2
@@ -217,8 +235,9 @@ tests:
           Commissionable Node Discovery service record over DNS-SD."
       verification: |
           $  ./chip-tool discover commissionables
+          Verify in TH as commissioner side:
 
-          Example output using all-clusters-app"s advertisements:
+          Example output using all-clusters-app"s advertisements found on the TH commissioner:
           [1651256405894] [18453:593886] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
           [1651256405894] [18453:593886] CHIP: [DIS]         Vendor ID: 65521
           [1651256405894] [18453:593886] CHIP: [DIS]         Product ID: 32769
@@ -258,15 +277,16 @@ tests:
       verification: |
           $ dns-sd -B _services._dns-sd._udp
 
-          Example output using all-clusters-app"s advertisements:
+          Example output using all-clusters-app"s advertisements found on the TH commissioner:
           11:56:29.770  Add        3   7 .                    _sub.local.          _V65521
       disabled: true
 
     - label: "Place the DUT device into Commissioning mode"
       verification: |
           $  ./chip-tool discover commissionables
+          Verify in TH as commissioner side:
 
-          Example output using all-clusters-app"s advertisements:
+          Example output using all-clusters-app"s advertisements found on the TH commissioner:
           [1651256405894] [18453:593886] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
           [1651256405894] [18453:593886] CHIP: [DIS]         Vendor ID: 65521
           [1651256405894] [18453:593886] CHIP: [DIS]         Product ID: 32769
@@ -289,6 +309,7 @@ tests:
           _matterc._udp -r)"
       verification: |
           $ ./chip-tool discover commissionables
+          Verify in TH as commissioner side:
 
           [1657220492275] [29906:16679893] CHIP: [DL] Browsing for: _matterc._udp
           [1657220492275] [29906:16679893] CHIP: [DL] Mdns: OnBrowseAdd  name: 74AFA51731B2E373, type: _matterc._udp., domain: local., interface: 7        [1657220492275] [29906:16679893] CHIP: [DL] Resolve type=_matterc._udp name=74AFA51731B2E373 interface=7

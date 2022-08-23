@@ -520,7 +520,7 @@ def InfineonTargets():
     builder.AppendVariant(name="ota", enable_ota_requestor=True)
     builder.AppendVariant(name="updateimage", update_image=True)
 
-    target = Target('infineon-p6', InfineonBuilder, board=InfineonBoard.P6BOARD)
+    target = Target('infineon-psoc6', InfineonBuilder, board=InfineonBoard.PSOC6BOARD)
 
     builder.targets.append(target.Extend('lock', app=InfineonApp.LOCK))
     builder.targets.append(target.Extend('light', app=InfineonApp.LIGHT))

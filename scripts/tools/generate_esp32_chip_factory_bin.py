@@ -140,7 +140,7 @@ FACTORY_DATA = {
         'encoding': 'string',
         'value': None,
     },
-    'unique-id': {
+    'rd-id-uid': {
         'type': 'data',
         'encoding': 'hex2bin',
         'value': None,
@@ -260,7 +260,7 @@ def validate_args(args):
     check_str_range(args.product_name, 1, 32, 'Product name')
     check_str_range(args.hw_ver_str, 1, 64, 'Hardware version string')
     check_str_range(args.mfg_date, 8, 16, 'Manufacturing date')
-    check_str_range(args.unique_id, 32, 32, 'Unique id')
+    check_str_range(args.rd_id_uid, 32, 32, 'Rotating device Unique id')
 
     logging.info('Discriminator:{} Passcode:{}'.format(args.discriminator, args.passcode))
 
@@ -295,8 +295,8 @@ def populate_factory_data(args, spake2p_params):
 
     if args.serial_num is not None:
         FACTORY_DATA['serial-num']['value'] = args.serial_num
-    if args.unique_id is not None:
-        FACTORY_DATA['unique-id']['value'] = args.unique_id
+    if args.rd_id_uid is not None:
+        FACTORY_DATA['rd-id-uid']['value'] = args.rd_id_uid
     if args.mfg_date is not None:
         FACTORY_DATA['mfg-date']['value'] = args.mfg_date
     if args.vendor_id is not None:
@@ -460,8 +460,8 @@ def main():
     parser.add_argument('--hw-ver-str', type=str, required=False, help='Hardware version string')
     parser.add_argument('--mfg-date', type=str, required=False, help='Manufacturing date in format YYYY-MM-DD')
     parser.add_argument('--serial-num', type=str, required=False, help='Serial number')
-    parser.add_argument('--unique-id', type=str, required=False,
-                        help='128-bit unique identifier, provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"')
+    parser.add_argument('--rd-id-uid', type=str, required=False,
+                        help='128-bit unique identifier for generating rotating device identifier, provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"')
 
     # These will be used by DeviceInfoProvider
     parser.add_argument('--calendar-types', type=str, nargs='+', required=False,

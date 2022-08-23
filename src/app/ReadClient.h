@@ -200,8 +200,9 @@ public:
          * This function is invoked when using SendAutoResubscribeRequest, where the ReadClient was configured to auto re-subscribe
          * and the ReadPrepareParams was moved into this client for management. This will have to be free'ed appropriately by the
          * application. If SendAutoResubscribeRequest fails, this function will be called before it returns the failure. If
-         * SendAutoResubscribeRequest succeeds, this function will be called immediately before calling OnDone. If
-         * SendAutoResubscribeRequest is not called, this function will not be called.
+         * SendAutoResubscribeRequest succeeds, this function will be called immediately before calling OnDone, or
+         * when the ReadClient is destroyed, if that happens before OnDone. If  SendAutoResubscribeRequest is not called,
+         * this function will not be called.
          */
         virtual void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) {}
 
@@ -474,8 +475,9 @@ private:
      * AND if this ReadClient instance is tracking a subscription AND the applications decides to do so
      * in their implementation of Callback::OnResubscriptionNeeded().
      *
+     * If allowOnDone is false, will not call OnDone.
      */
-    void Close(CHIP_ERROR aError, bool allowResubscription = true);
+    void Close(CHIP_ERROR aError, bool allowResubscription = true, bool allowOnDone = true);
 
     void StopResubscription();
     void ClearActiveSubscriptionState();

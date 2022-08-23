@@ -1254,6 +1254,8 @@ exit:
 
 CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr, size_t csr_length, P256PublicKey & pubkey)
 {
+    ReturnErrorOnFailure(VerifyCertificateSigningRequestFormat(csr, csr_length));
+
     ERR_clear_error();
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -1669,7 +1671,9 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
         VerifyOrExit(asn1Time.ExportTo_UnixTime(unixEpoch),
                      (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
-        X509_VERIFY_PARAM_set_time(param, unixEpoch);
+        VerifyOrExit(CanCastTo<time_t>(unixEpoch),
+                     (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
+        X509_VERIFY_PARAM_set_time(param, static_cast<time_t>(unixEpoch));
     }
 
     status = X509_verify_cert(verifyCtx);

@@ -26,6 +26,13 @@ config:
     endpoint: 0
 
 tests:
+    - label:
+          "Precondition: This test case assumes that during Commissioning AddNOC
+          will be sent with ICACValue"
+      verification: |
+
+      disabled: true
+
     - label: "Factory Reset DUT"
       verification: |
           On both DUT and TH side use the below command
@@ -237,8 +244,8 @@ tests:
       disabled: true
 
     - label:
-          "From the NOCStruct values verify the following: ,NOC matches the NOC
-          sent to the DUT during commissioning process ,ICAC matches the ICAC
+          "From the NOCStruct values verify the following: NOC matches the NOC
+          sent to the DUT during commissioning process ICAC matches the ICAC
           sent to the DUT during commissioning process from AddNOC in
           pre-condition"
       verification: |
@@ -274,10 +281,10 @@ tests:
 
     - label:
           "Verify that TH1 is able to read the FabricDescriptorStruct values
-          ,Verify that Fabrics list does not have any entry as FabricID =
+          Verify that Fabrics list does not have any entry as FabricID =
           FabricID2"
       verification: |
-          Verify the FabricDescriptorStruct values has no entry og FabricID2
+          Verify the FabricDescriptorStruct values has no entry log FabricID2 on TH1
 
           [1657693240.722099][15129:15134] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 908345149
           [1657693240.722200][15129:15134] CHIP:TOO:   Fabrics: 1 entries
@@ -388,7 +395,7 @@ tests:
 
     - label:
           "From the NOCStruct values verify the following: NOC matches the NOC
-          sent to the DUT during commissioning process,ICAC matches the ICAC
+          sent to the DUT during commissioning process ICAC matches the ICAC
           sent to the DUT during commissioning process from AddNOC in
           pre-condition"
       verification: |

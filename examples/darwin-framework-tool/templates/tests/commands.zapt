@@ -16,7 +16,7 @@ public:
     TestList() : Command("list") {};
     CHIP_ERROR Run() override
     {
-        {{#chip_tests (getTests)}}printf("{{filename}}\n");{{/chip_tests}}
+        {{#chip_tests "ciTests.json"}}printf("{{filename}}\n");{{/chip_tests}}
 
         return CHIP_NO_ERROR;
     }
@@ -28,14 +28,14 @@ public:
     ManualTestList() : Command("list-manual") {};
     CHIP_ERROR Run() override
     {
-        {{#chip_tests (getManualTests)}}printf("{{filename}}\n");{{/chip_tests}}
+        {{#chip_tests "manualTests.json"}}printf("{{filename}}\n");{{/chip_tests}}
 
         return CHIP_NO_ERROR;
     }
 };
 
-{{>test_cluster tests=(getTests) credsIssuerConfigArg=false}}
-{{>test_cluster tests=(getManualTests) credsIssuerConfigArg=false}}
+{{>test_cluster tests="ciTests.json" credsIssuerConfigArg=false}}
+{{>test_cluster tests="manualTests.json" credsIssuerConfigArg=false}}
 
 #endif // CONFIG_ENABLE_YAML_TESTS
 
@@ -47,10 +47,10 @@ void registerCommandsTests(Commands & commands)
 #if CONFIG_ENABLE_YAML_TESTS
         make_unique<TestList>(),
         make_unique<ManualTestList>(),
-      {{#chip_tests (getTests)}}
+      {{#chip_tests "ciTests.json"}}
         make_unique<{{filename}}>(),
       {{/chip_tests}}
-      {{#chip_tests (getManualTests)}}
+      {{#chip_tests "manualTests.json"}}
         make_unique<{{filename}}>(),
       {{/chip_tests}}
 #endif // CONFIG_ENABLE_YAML_TESTS

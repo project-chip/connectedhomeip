@@ -28,6 +28,7 @@ tests:
           "DUT is Commissioned and put in Commissioning Mode using Open Basic
           Commissioning Window command and starts advertising Commissionable
           Node Discovery service using DNS-SD"
+      PICS: CADMIN.S.C01.Rsp
       verification: |
           ./chip-tool administratorcommissioning open-basic-commissioning-window 200 1 0 --timedInteractionTimeoutMs 1000
 
@@ -76,6 +77,7 @@ tests:
           MCORE.SC.DT_KEY&& MCORE.SC.DN_KEY && MCORE.SC.RI_KEY &&
           MCORE.SC.PH_KEY && MCORE.SC.PI_KEY
       verification: |
+          Run the below commands within the mentioned time interval used in open-commissioning-window in step-1.
           Run the below avahi browse command in the TH terminal
 
           avahi-browse -rt _matterc._udp
@@ -96,7 +98,7 @@ tests:
 
 
 
-          Service Domain 422F10CDC290A406.local
+          If we use Thread setup, then the Service Domain will be 422F10CDC290A406.local
           verify CM flag is 1
 
           to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp | grep _matterc
@@ -109,9 +111,10 @@ tests:
       disabled: true
 
     - label:
-          "DUT is rebooted and Commissioned again, then put in Commissioning
-          Mode using Open Basic Commissioning Window command, starting
-          advertising Commissionable Node Discovery service using DNS- SD"
+          "DUT is rebooted, then put in Commissioning Mode using Open Basic
+          Commissioning Window command, starting advertising Commissionable Node
+          Discovery service using DNS-SD"
+      PICS: CADMIN.S.C01.Rsp
       verification: |
           Reboot the device and commission the DUT again. Open the commissioning window using the below command in the TH (Chip-tool) terminal
 
@@ -172,7 +175,7 @@ tests:
 
           +   eth0 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
           = veth721e1d9 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
-             hostname = [E45F0149AE290000.local]
+           hostname = [E45F0149AE290000.local]
              address = [fe80::28e0:95ff:fed9:3085]
              port = [5540]
              txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
@@ -198,9 +201,15 @@ tests:
           +;eth0;IPv6;_CM;_sub._matterc._udp;local
       disabled: true
 
+    - label: "Wait for OBCW timeout to expire"
+      verification: |
+          Wait until open-basic-commissioning-window time to expire.
+      disabled: true
+
     - label:
           "DUT is Commissioned and instructed to enter in commissioning mode
           using Open Commissioning Window command"
+      PICS: CADMIN.S.C00.Rsp
       verification: |
           Run the below open-commissioning-window in TH Terminal
 
@@ -277,7 +286,7 @@ tests:
 
     - label: "Wait for OCW timeout to expire"
       verification: |
-          Wait until open-commissioning-window time to expire. (In our example above its 200 sec)
+          Wait until open-commissioning-window time to expire.
       disabled: true
 
     - label: "If (MCORE.SC.EXTENDED_DISCOVERY ) enable Extended Discovery"
@@ -289,7 +298,8 @@ tests:
           Reference Raspberrypi device is not supporting extended discovery.
       disabled: true
 
-    - label: "If (PICS_EXTENDED_DISCOVERY) check DNS-SD subtypes used by DUT"
+    - label:
+          "If (MCORE.SC.EXTENDED_DISCOVERY ) check DNS-SD subtypes used by DUT"
       PICS:
           MCORE.SC.EXTENDED_DISCOVERY && MCORE.COM.WIFI && MCORE.COM.ETH &&
           MCORE.COM.THR && MCORE.SC.VENDOR_SUBTYPE && MCORE.SC.DEVTYPE_SUBTYPE

@@ -126,7 +126,7 @@ void LEDWidget::DoSet(void)
         mStrip->refresh(mStrip, 100);
     }
 #else
-    ESP_LOGE(TAG, "DoSet to GPIO number %d", mGPIONum);
+    ESP_LOGI(TAG, "DoSet to GPIO number %d", mGPIONum);
     if (mGPIONum < GPIO_NUM_MAX)
     {
         ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, brightness);

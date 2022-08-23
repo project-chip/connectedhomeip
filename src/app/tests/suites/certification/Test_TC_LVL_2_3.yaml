@@ -28,6 +28,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verifaction: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
@@ -633,9 +638,9 @@ tests:
 
           TH all-clusters-minimal-app does not support optional attributes
           To verify this behaviour send the below mentioned commands and check the result as unsupported attribute
-           ./chip-tool levelcontrol write on-off-transition-time 5 1 1
-           ./chip-tool levelcontrol write on-transition-time 5 1 1
-           ./chip-tool levelcontrol write off-transition-time 5 1 1
-           ./chip-tool levelcontrol write default-move-rate 5 1 1
-           ./chip-tool levelcontrol write start-up-current-level 5 1 1
+          ./chip-tool levelcontrol write on-off-transition-time 5 1 1
+          ./chip-tool levelcontrol write on-transition-time 5 1 1
+          ./chip-tool levelcontrol write off-transition-time 5 1 1
+          ./chip-tool levelcontrol write default-move-rate 5 1 1
+          ./chip-tool levelcontrol write start-up-current-level 5 1 1
       disabled: true

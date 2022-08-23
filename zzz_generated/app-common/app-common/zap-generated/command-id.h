@@ -153,6 +153,9 @@
 // Commands for cluster: Ethernet Network Diagnostics
 #define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
 
+// Commands for cluster: Time Synchronization
+#define ZCL_SET_UTC_TIME_COMMAND_ID (0x00)
+
 // Commands for cluster: AdministratorCommissioning
 #define ZCL_OPEN_COMMISSIONING_WINDOW_COMMAND_ID (0x00)
 #define ZCL_OPEN_BASIC_COMMISSIONING_WINDOW_COMMAND_ID (0x01)
@@ -349,3 +352,7 @@
 #define ZCL_TEST_SIMPLE_OPTIONAL_ARGUMENT_REQUEST_COMMAND_ID (0x13)
 #define ZCL_TEST_EMIT_TEST_EVENT_REQUEST_COMMAND_ID (0x14)
 #define ZCL_TEST_EMIT_TEST_FABRIC_SCOPED_EVENT_REQUEST_COMMAND_ID (0x15)
+
+// Commands for cluster: Fault Injection
+#define ZCL_FAIL_AT_FAULT_COMMAND_ID (0x00)
+#define ZCL_FAIL_RANDOMLY_AT_FAULT_COMMAND_ID (0x01)

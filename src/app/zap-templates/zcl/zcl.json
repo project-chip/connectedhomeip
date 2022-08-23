@@ -26,6 +26,7 @@
         "diagnostic-logs-cluster.xml",
         "door-lock-cluster.xml",
         "ethernet-network-diagnostics-cluster.xml",
+        "fault-injection-cluster.xml",
         "fixed-label-cluster.xml",
         "flow-measurement-cluster.xml",
         "general-commissioning-cluster.xml",

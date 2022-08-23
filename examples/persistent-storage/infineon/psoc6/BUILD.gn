@@ -1,0 +1,92 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/psoc6.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${psoc6_sdk_build_root}/psoc6_executable.gni")
+import("${psoc6_sdk_build_root}/psoc6_sdk.gni")
+
+assert(current_os == "freertos")
+
+psoc6_project_dir = "${chip_root}/examples/persistent-storage/infineon/psoc6"
+examples_plat_dir = "${chip_root}/examples/platform/infineon/psoc6"
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+}
+
+psoc6_sdk_sources("persistent_storage_app_sdk_sources") {
+  include_dirs = [
+    "${chip_root}/src/platform/Infineon/PSOC6",
+    "${psoc6_project_dir}/include",
+    "${examples_plat_dir}",
+  ]
+
+  defines = [
+    "BOARD_ID=${psoc6_board}",
+    "P6_LOG_ENABLED=1",
+  ]
+
+  sources = [ "${psoc6_project_dir}/include/CHIPProjectConfig.h" ]
+
+  public_configs =
+      [ "${chip_root}/third_party/infineon/psoc6:psoc6_sdk_config" ]
+}
+
+psoc6_executable("persistent_storage_app") {
+  include_dirs = []
+  defines = []
+  output_name = "chip-psoc6-persistent-storage-example.out"
+
+  public_deps = [
+    ":persistent_storage_app_sdk_sources",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  include_dirs += [
+    "include",
+    "${examples_plat_dir}",
+    "${psoc6_project_dir}/include",
+    "${chip_root}/examples/persistent-storage",
+  ]
+
+  sources = [
+    "${chip_root}/examples/persistent-storage/KeyValueStorageTest.cpp",
+    "${examples_plat_dir}/init_psoc6Platform.cpp",
+    "${psoc6_project_dir}/include/CHIPProjectConfig.h",
+    "main.cpp",
+  ]
+
+  output_dir = root_out_dir
+
+  if (chip_print_memory_usage) {
+    ldflags = [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+}
+
+group("psoc6") {
+  deps = [ ":persistent_storage_app" ]
+}
+
+group("default") {
+  deps = [ ":psoc6" ]
+}

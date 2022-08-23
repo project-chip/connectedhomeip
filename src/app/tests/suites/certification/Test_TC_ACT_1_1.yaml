@@ -53,7 +53,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1]
+              contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
     - label: "Read the optional attribute(SetupURL) in AttributeList"
       PICS: ACT.S.A0002
@@ -62,7 +62,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1, 2]
+              contains: [2]
 
     # Checking only type check all attributes are optional
     - label: "Read the global attribute: AcceptedCommandList"

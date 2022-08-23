@@ -77,6 +77,8 @@ public:
         return mExampleOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, cats, pubKey, rcac, icac, noc);
     }
 
+    void SetMaximallyLargeCertsUsed(bool enabled) { mExampleOpCredsIssuer.SetMaximallyLargeCertsUsed(enabled); }
+
 private:
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
@@ -97,7 +99,6 @@ private:
 } // namespace Controller
 } // namespace chip
 
-extern chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter();
 extern chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 extern chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 
@@ -291,17 +292,13 @@ struct OpCredsContext
     void * mPyContext;
 };
 
-void * pychip_OpCreds_InitializeDelegate(void * pyContext, uint32_t fabricCredentialsIndex)
+void * pychip_OpCreds_InitializeDelegate(void * pyContext, uint32_t fabricCredentialsIndex,
+                                         Controller::Python::StorageAdapter * storageAdapter)
 {
     auto context      = Platform::MakeUnique<OpCredsContext>();
     context->mAdapter = Platform::MakeUnique<Controller::Python::OperationalCredentialsAdapter>(fabricCredentialsIndex);
 
-    if (pychip_Storage_GetStorageAdapter() == nullptr)
-    {
-        return nullptr;
-    }
-
-    if (context->mAdapter->Initialize(*pychip_Storage_GetStorageAdapter()) != CHIP_NO_ERROR)
+    if (context->mAdapter->Initialize(*storageAdapter) != CHIP_NO_ERROR)
     {
         return nullptr;
     }
@@ -326,7 +323,8 @@ void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::C
 ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * context,
                                                          chip::Controller::DeviceCommissioner ** outDevCtrl, FabricId fabricId,
                                                          chip::NodeId nodeId, chip::VendorId adminVendorId,
-                                                         const char * paaTrustStorePath, bool useTestCommissioner)
+                                                         const char * paaTrustStorePath, bool useTestCommissioner,
+                                                         CASEAuthTag * caseAuthTags, uint32_t caseAuthTagLen)
 {
     ChipLogDetail(Controller, "Creating New Device Controller");
 
@@ -339,6 +337,7 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     {
         paaTrustStorePath = "./credentials/development/paa-root-certs";
     }
+
     ChipLogProgress(Support, "Using device attestation PAA trust store path %s.", paaTrustStorePath);
 
     // Initialize device attestation verifier
@@ -361,8 +360,18 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     ReturnErrorCodeIf(!rcac.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
     MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
 
-    err = context->mAdapter->GenerateNOCChain(nodeId, fabricId, chip::kUndefinedCATs, ephemeralKey.Pubkey(), rcacSpan, icacSpan,
-                                              nocSpan);
+    CATValues catValues;
+
+    if (caseAuthTagLen > kMaxSubjectCATAttributeCount)
+    {
+        ChipLogError(Controller, "Too many of CASE Tags (%u) exceeds kMaxSubjectCATAttributeCount",
+                     static_cast<unsigned>(caseAuthTagLen));
+        return CHIP_ERROR_INVALID_ARGUMENT.AsInteger();
+    }
+
+    memcpy(catValues.values.data(), caseAuthTags, caseAuthTagLen * sizeof(CASEAuthTag));
+
+    err = context->mAdapter->GenerateNOCChain(nodeId, fabricId, catValues, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     Controller::SetupParams initParams;
@@ -404,6 +413,15 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     *outDevCtrl = devCtrl.release();
+
+    return CHIP_NO_ERROR.AsInteger();
+}
+
+ChipError::StorageType pychip_OpCreds_SetMaximallyLargeCertsUsed(OpCredsContext * context, bool enabled)
+{
+    VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, CHIP_ERROR_INCORRECT_STATE.AsInteger());
+
+    context->mAdapter->SetMaximallyLargeCertsUsed(enabled);
 
     return CHIP_NO_ERROR.AsInteger();
 }

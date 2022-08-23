@@ -43,13 +43,11 @@ chip_with_lwip = false
 
 chip_build_tests = false
 
+openthread_root = "${chip_root}/third_party/openthread/ot-efr32/openthread"
 openthread_core_config_platform_check_file =
     "openthread-core-efr32-config-check.h"
 openthread_project_core_config_file = "OpenThreadConfig.h"
 openthread_core_config_deps = [ "${chip_root}/examples/platform/efr32:openthread_core_config_efr32_chip_examples" ]
-
-openthread_external_platform =
-    "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"
 
 chip_config_memory_management = "platform"
 
