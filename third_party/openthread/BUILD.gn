@@ -8,7 +8,7 @@ declare_args() {
   chip_openthread_target = ""
 }
 
-group("openthread") {
+group("openthread-platform") {
   if (chip_openthread_target != "") {
     public_deps = [ chip_openthread_target ]
   } else {
@@ -19,7 +19,7 @@ group("openthread") {
   }
 }
 
-group("openthread_device") {
+group("openthread") {
   if (chip_openthread_target != "") {
     public_deps = [ chip_openthread_target ]
   } else {
