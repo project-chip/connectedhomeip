@@ -431,7 +431,7 @@ void PacketBuffer::AddRef()
     pbuf_ref(this);
 #else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
     LOCK_BUF_POOL();
-    assert(this->ref < UINT16_MAX);
+    VerifyOrDieWithMsg(this->ref < UINT16_MAX, chipSystemLayer, "packet buffer refcount overflow");
     ++this->ref;
     UNLOCK_BUF_POOL();
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
