@@ -13792,9 +13792,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeStartUpColorTemperatureMiredsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                             NSError * _Nullable error))completionHandler;
-- (void)writeAttributeStartUpColorTemperatureMiredsWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeStartUpColorTemperatureMiredsWithValue:(NSNumber * _Nullable)value
                                            completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeStartUpColorTemperatureMiredsWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeStartUpColorTemperatureMiredsWithValue:(NSNumber * _Nullable)value
                                                       params:(MTRWriteParams * _Nullable)params
                                            completionHandler:(StatusCompletion)completionHandler;
 /**

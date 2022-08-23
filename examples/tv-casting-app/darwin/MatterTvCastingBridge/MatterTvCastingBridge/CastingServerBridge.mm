@@ -309,7 +309,7 @@
 
     _mediaPlayback_pauseResponseCallback = responseCallback;
     dispatch_async(_chipWorkQueue, ^{
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_Pause([](CHIP_ERROR err) {
+        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_StopPlayback([](CHIP_ERROR err) {
             [CastingServerBridge getSharedInstance].mediaPlayback_stopPlaybackResponseCallback(CHIP_NO_ERROR == err);
         });
         dispatch_async(clientQueue, ^{
