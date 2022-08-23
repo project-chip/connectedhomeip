@@ -171,12 +171,6 @@ private:
                                    const ConcreteReadAttributePath & aPath);
 
     /**
-     * Check all active subscription, if the subscription has no paths that intersect with global dirty set,
-     * it would clear dirty flag for that subscription
-     *
-     */
-    void UpdateReadHandlerDirty(ReadHandler & aReadHandler);
-    /**
      * Send Report via ReadHandler
      *
      */
