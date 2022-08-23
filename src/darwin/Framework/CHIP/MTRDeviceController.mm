@@ -703,6 +703,37 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     return result;
 }
 
+- (nullable NSData *)generateAttestationChallengeForDeviceId:(uint64_t)deviceId
+{
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    if (![self isRunning]) {
+        [self checkForError:errorCode logMsg:kErrorNotRunning error:nil];
+        return nil;
+    }
+
+    __block NSData * attestationChallenge;
+    dispatch_sync(_chipWorkQueue, ^{
+        if ([self isRunning]) {
+            chip::CommissioneeDeviceProxy * deviceProxy;
+            errorCode = self.cppCommissioner->GetDeviceBeingCommissioned(deviceId, &deviceProxy);
+            if (errorCode != CHIP_NO_ERROR) {
+                [self checkForError:errorCode logMsg:@"Invalid Attestation Challenge device ID." error:nil];
+                return;
+            }
+
+            NSMutableData * challengeBuffer = [[NSMutableData alloc] initWithLength:chip::Crypto::kAES_CCM128_Key_Length];
+            chip::ByteSpan challenge((uint8_t *) [challengeBuffer mutableBytes], chip::Crypto::kAES_CCM128_Key_Length);
+
+            errorCode = deviceProxy->GetAttestationChallenge(challenge);
+            MTR_LOG_ERROR("GetAttestationChallenge: %s", chip::ErrorStr(errorCode));
+
+            attestationChallenge = [NSData dataWithBytes:challenge.data() length:challenge.size()];
+        }
+    });
+
+    return attestationChallenge;
+}
+
 - (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg
 {
     if (condition) {
