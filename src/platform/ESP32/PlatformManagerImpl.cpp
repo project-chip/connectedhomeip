@@ -84,8 +84,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         wifi_init_config_t cfg;
         uint8_t ap_mac[6];
         wifi_mode_t mode;
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
         esp_netif_create_default_wifi_ap();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
         esp_netif_create_default_wifi_sta();
 
         esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);

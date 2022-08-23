@@ -387,6 +387,7 @@ menu "CHIP Device Layer"
     menu "WiFi AP Options"
 
         config ENABLE_WIFI_AP
+            depends on ESP_WIFI_SOFTAP_SUPPORT
             bool "Enable CHIP WIFI AP"
             default y
             help
