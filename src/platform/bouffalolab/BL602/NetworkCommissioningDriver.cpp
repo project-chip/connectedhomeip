@@ -230,7 +230,8 @@ CHIP_ERROR BLWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     {
         memset(WiFiSSIDStr, 0, sizeof(WiFiSSIDStr));
         memcpy(WiFiSSIDStr, ssid.data(), ssid.size());
-        err = (CHIP_ERROR) wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, WiFiSSIDStr);
+        //err = (CHIP_ERROR) wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, WiFiSSIDStr);
+        err = (CHIP_ERROR) wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, NULL, WiFiSSIDStr, 0, 0);
     }
     else
     {
@@ -245,9 +246,9 @@ CHIP_ERROR BLWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 
 void BLWiFiDriver::OnScanWiFiNetworkDone()
 {
-    int ap_num;
+    int ap_num = 0;
 
-    ap_num = wifi_mgmr_get_scan_ap_num();
+    //ap_num = wifi_mgmr_get_scan_ap_num();
     if (!ap_num)
     {
         ChipLogProgress(DeviceLayer, "No AP found");
@@ -260,7 +261,7 @@ void BLWiFiDriver::OnScanWiFiNetworkDone()
     }
 
     wifi_mgmr_ap_item_t * ScanResult = (wifi_mgmr_ap_item_t *) pvPortMalloc(ap_num * sizeof(wifi_mgmr_ap_item_t));
-    wifi_mgmr_get_scan_result(ScanResult, ap_num);
+    //wifi_mgmr_get_scan_result(ScanResult, ap_num);
 
     if (ScanResult)
     {
@@ -309,7 +310,7 @@ CHIP_ERROR GetConfiguredNetwork(Network & network)
     uint8_t ssid[64];
     uint16_t ssid_len;
 
-    ssid_len = wifi_mgmr_profile_ssid_get(ssid);
+    //ssid_len = wifi_mgmr_profile_ssid_get(ssid);
     if (!ssid_len || ssid_len > DeviceLayer::Internal::kMaxWiFiSSIDLength)
     {
         return CHIP_ERROR_INTERNAL;
@@ -356,7 +357,7 @@ CHIP_ERROR BLWiFiDriver::SetLastDisconnectReason(const ChipDeviceEvent * event)
 
     uint16_t status_code, reason_code;
 
-    wifi_mgmr_conn_result_get(&status_code, &reason_code);
+    //wifi_mgmr_conn_result_get(&status_code, &reason_code);
     mLastDisconnectedReason = reason_code;
 
     return CHIP_NO_ERROR;

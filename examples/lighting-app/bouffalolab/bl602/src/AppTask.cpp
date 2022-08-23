@@ -42,7 +42,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <InitPlatform.h>
-#include <async_log.h>
+//#include <async_log.h>
 #include <bl_sys_ota.h>
 #include <easyflash.h>
 #include <hal_sys.h>
@@ -92,7 +92,7 @@ BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 
 AppTask AppTask::sAppTask;
-static DeviceCallbacks EchoCallbacks;
+//static DeviceCallbacks EchoCallbacks;
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -153,7 +153,6 @@ CHIP_ERROR AppTask::Init()
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 
     InitButtons();
-
 #if PW_RPC_ENABLED
     chip::rpc::Init();
 #endif
@@ -168,7 +167,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err;
 
     log_info("App Task entered\r\n");
-    enable_async_log();
+    //enable_async_log();
 
     err = sWiFiNetworkCommissioningInstance.Init();
     if (CHIP_NO_ERROR != err)

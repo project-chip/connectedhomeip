@@ -204,8 +204,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
 {
     static uint8_t macAddress[kMaxHardwareAddrSize];
 
-    wifi_mgmr_get_bssid(macAddress);
-    BssId = ByteSpan(macAddress, 6);
+    //wifi_mgmr_get_bssid(macAddress);
+    //BssId = ByteSpan(macAddress, 6);
 
     return CHIP_NO_ERROR;
 }
@@ -214,8 +214,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityTyp
 {
     int authmode;
 
-    authmode     = mgmr_get_security_type();
-    securityType = MapAuthModeToSecurityType(authmode);
+    //authmode     = mgmr_get_security_type();
+    //securityType = MapAuthModeToSecurityType(authmode);
     return CHIP_NO_ERROR;
 }
 
@@ -229,21 +229,21 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
 {
     channelNumber = 0;
 
-    channelNumber = mgmr_get_current_channel_num();
+    //channelNumber = mgmr_get_current_channel_num();
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    rssi = mgmr_get_rssi();
+    //rssi = mgmr_get_rssi();
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
 {
-    beaconLostCount = wifi_mgmr_beacon_loss_cnt();
+    //beaconLostCount = wifi_mgmr_beacon_loss_cnt();
     return CHIP_NO_ERROR;
 }
 
@@ -255,25 +255,25 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentM
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
 {
-    packetMulticastRxCount = wifi_mgmr_tx_multicast_cnt_get();
+    //packetMulticastRxCount = wifi_mgmr_tx_multicast_cnt_get();
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
 {
-    packetMulticastTxCount = wifi_mgmr_tx_multicast_cnt_get();
+    //packetMulticastTxCount = wifi_mgmr_tx_multicast_cnt_get();
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
 {
-    packetUnicastRxCount = wifi_mgmr_rx_unicast_cnt_get();
+    //packetUnicastRxCount = wifi_mgmr_rx_unicast_cnt_get();
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
 {
-    packetUnicastTxCount = wifi_mgmr_tx_unicast_cnt_get();
+    //packetUnicastTxCount = wifi_mgmr_tx_unicast_cnt_get();
     return CHIP_NO_ERROR;
 }
 
@@ -290,7 +290,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
 {
-    beaconRxCount = wifi_mgmr_beacon_recv_cnt();
+    //beaconRxCount = wifi_mgmr_beacon_recv_cnt();
     return CHIP_NO_ERROR;
 }
 

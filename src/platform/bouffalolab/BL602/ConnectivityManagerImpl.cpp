@@ -49,7 +49,6 @@
 #include <task.h>
 
 #include <lwip/netifapi.h>
-#include <mdns_server.h>
 #include <wifi_mgmr_ext.h>
 
 #include <FreeRTOS.h>

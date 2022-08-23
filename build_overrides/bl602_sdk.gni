@@ -14,5 +14,5 @@
 
 declare_args() {
   # Root directory for bl602 SDK build files.
-  bl602_sdk_build_root = "//third_party/bouffalolab/bl602_sdk"
+  bl602_sdk_build_root = "//third_party/bouffalolab/bl602"
 }

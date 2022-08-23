@@ -273,3 +273,7 @@
 [submodule "third_party/boringssl/repo/src"]
 	path = third_party/boringssl/repo/src
 	url = https://github.com/google/boringssl.git
+[submodule "boufalolab_repo"]
+	path = third_party/bouffalolab/repo
+	url = https://github.com/bouffalolab/bl_iot_sdk.git
+	branch = master
