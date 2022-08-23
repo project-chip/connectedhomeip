@@ -131,7 +131,7 @@ limitations under the License.
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
             <include cluster="OTA Software Update Provider" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="OTA Software Update Requestor" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="OTA Software Update Requestor" client="true" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -147,7 +147,7 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Actions" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Actions" client="false" server="true" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -166,8 +166,8 @@ limitations under the License.
             <include cluster="Bridged Device Basic" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>REACHABLE</requireAttribute>
             </include>
-            <include cluster="Power Source Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Power Source" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Power Source Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
