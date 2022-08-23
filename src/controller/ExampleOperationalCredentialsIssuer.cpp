@@ -52,10 +52,11 @@ CHIP_ERROR IssueX509Cert(uint32_t now, uint32_t validity, ChipDN issuerDn, ChipD
                          const Crypto::P256PublicKey & subjectPublicKey, Crypto::P256Keypair & issuerKeypair,
                          MutableByteSpan & outX509Cert)
 {
-    constexpr size_t kDERCertDnEncodingOverhead = 11;
-    constexpr size_t kTLVCertDnEncodingOverhead = 3;
-    constexpr size_t kMaxCertPaddingLength      = 150;
-    constexpr size_t kTLVDesiredSize            = kMaxCHIPCertLength - 50;
+    constexpr size_t kDERCertFutureExtEncodingOverhead = 12;
+    constexpr size_t kTLVCertFutureExtEncodingOverhead = kDERCertFutureExtEncodingOverhead + 5;
+    constexpr size_t kMaxCertPaddingLength             = 200;
+    constexpr size_t kTLVDesiredSize                   = kMaxCHIPCertLength;
+    constexpr uint8_t sOID_Extension_SubjectAltName[]  = { 0x55, 0x1d, 0x11 };
 
     Platform::ScopedMemoryBuffer<uint8_t> derBuf;
     ReturnErrorCodeIf(!derBuf.Alloc(kMaxDERCertLength), CHIP_ERROR_NO_MEMORY);
@@ -84,7 +85,7 @@ CHIP_ERROR IssueX509Cert(uint32_t now, uint32_t validity, ChipDN issuerDn, ChipD
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (maximizeSize && (desiredDn.RDNCount() < CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES))
+    if (maximizeSize)
     {
         Platform::ScopedMemoryBuffer<uint8_t> paddedTlvBuf;
         ReturnErrorCodeIf(!paddedTlvBuf.Alloc(kMaxCHIPCertLength + kMaxCertPaddingLength), CHIP_ERROR_NO_MEMORY);
@@ -99,15 +100,8 @@ CHIP_ERROR IssueX509Cert(uint32_t now, uint32_t validity, ChipDN issuerDn, ChipD
         ReturnErrorCodeIf(!fillerBuf.Alloc(kMaxCertPaddingLength), CHIP_ERROR_NO_MEMORY);
         memset(fillerBuf.Get(), 'A', kMaxCertPaddingLength);
 
-        int derPaddingLen = static_cast<int>(kMaxDERCertLength - kDERCertDnEncodingOverhead - derSpan.size());
-        int tlvPaddingLen = static_cast<int>(kTLVDesiredSize - kTLVCertDnEncodingOverhead - paddedTlvSpan.size());
-        if (certType == CertType::kRcac)
-        {
-            // For RCAC the issuer/subject DN are the same so padding will be present in both
-            derPaddingLen = (derPaddingLen - static_cast<int>(kDERCertDnEncodingOverhead)) / 2;
-            tlvPaddingLen = (tlvPaddingLen - static_cast<int>(kTLVCertDnEncodingOverhead)) / 2;
-        }
-
+        int derPaddingLen = static_cast<int>(kMaxDERCertLength - kDERCertFutureExtEncodingOverhead - derSpan.size());
+        int tlvPaddingLen = static_cast<int>(kTLVDesiredSize - kTLVCertFutureExtEncodingOverhead - paddedTlvSpan.size());
         size_t paddingLen = 0;
         if (derPaddingLen >= 1 && tlvPaddingLen >= 1)
         {
@@ -119,24 +113,25 @@ CHIP_ERROR IssueX509Cert(uint32_t now, uint32_t validity, ChipDN issuerDn, ChipD
             paddedDerSpan = MutableByteSpan{ paddedDerBuf.Get(), kMaxDERCertLength + kMaxCertPaddingLength };
             paddedTlvSpan = MutableByteSpan{ paddedTlvBuf.Get(), kMaxCHIPCertLength + kMaxCertPaddingLength };
 
-            ChipDN certDn = desiredDn;
-            // Fill the padding in the DomainNameQualifier DN
-            certDn.AddAttribute_DNQualifier(CharSpan(fillerBuf.Get(), paddingLen), false);
+            Optional<FutureExtension> futureExt;
+            FutureExtension ext = { ByteSpan(sOID_Extension_SubjectAltName),
+                                    ByteSpan(reinterpret_cast<uint8_t *>(fillerBuf.Get()), paddingLen) };
+            futureExt.SetValue(ext);
 
             switch (certType)
             {
             case CertType::kRcac: {
-                X509CertRequestParams rcacRequest = { serialNumber, now, now + validity, certDn, certDn };
+                X509CertRequestParams rcacRequest = { serialNumber, now, now + validity, desiredDn, desiredDn, futureExt };
                 ReturnErrorOnFailure(NewRootX509Cert(rcacRequest, issuerKeypair, paddedDerSpan));
                 break;
             }
             case CertType::kIcac: {
-                X509CertRequestParams icacRequest = { serialNumber, now, now + validity, certDn, issuerDn };
+                X509CertRequestParams icacRequest = { serialNumber, now, now + validity, desiredDn, issuerDn, futureExt };
                 ReturnErrorOnFailure(NewICAX509Cert(icacRequest, subjectPublicKey, issuerKeypair, paddedDerSpan));
                 break;
             }
             case CertType::kNoc: {
-                X509CertRequestParams nocRequest = { serialNumber, now, now + validity, certDn, issuerDn };
+                X509CertRequestParams nocRequest = { serialNumber, now, now + validity, desiredDn, issuerDn, futureExt };
                 ReturnErrorOnFailure(NewNodeOperationalX509Cert(nocRequest, subjectPublicKey, issuerKeypair, paddedDerSpan));
                 break;
             }
@@ -146,10 +141,10 @@ CHIP_ERROR IssueX509Cert(uint32_t now, uint32_t validity, ChipDN issuerDn, ChipD
 
             ReturnErrorOnFailure(ConvertX509CertToChipCert(paddedDerSpan, paddedTlvSpan));
 
-            ChipLogProgress(Controller, "Generated maximized certificate with %u DER bytes, %u TLV bytes",
-                            static_cast<unsigned>(paddedDerSpan.size()), static_cast<unsigned>(paddedTlvSpan.size()));
             if (paddedDerSpan.size() <= kMaxDERCertLength && paddedTlvSpan.size() <= kMaxCHIPCertLength)
             {
+                ChipLogProgress(Controller, "Generated maximized certificate with %u DER bytes, %u TLV bytes",
+                                static_cast<unsigned>(paddedDerSpan.size()), static_cast<unsigned>(paddedTlvSpan.size()));
                 return CopySpanToMutableSpan(paddedDerSpan, outX509Cert);
             }
         }
