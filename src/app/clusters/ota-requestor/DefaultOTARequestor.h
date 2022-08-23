@@ -92,6 +92,10 @@ public:
 
     void GetProviderLocation(Optional<ProviderLocationType> & providerLocation) override { providerLocation = mProviderLocation; }
 
+    // Set the metadata value for the provider to be used in the next query and OTA update process
+    // NOTE: Does not persist across reboot.
+    void SetMetadataForProvider(ByteSpan metadataForProvider) override { mMetadataForProvider.SetValue(metadataForProvider); }
+
     // Add a default OTA provider to the cached list
     CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation) override;
 
@@ -319,6 +323,7 @@ private:
     BDXDownloader * mBdxDownloader           = nullptr; // TODO: this should be OTADownloader
     BDXMessenger mBdxMessenger;                         // TODO: ideally this is held by the application
     uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
+    Optional<ByteSpan> mMetadataForProvider;
     ByteSpan mUpdateToken;
     uint32_t mCurrentVersion = 0;
     uint32_t mTargetVersion  = 0;
