@@ -223,7 +223,7 @@ public:
 
     virtual pw::Status TriggerOta(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
-#if CONFIG_CHIP_OTA_REQUESTOR
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
                 chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
@@ -238,10 +238,33 @@ public:
             },
             reinterpret_cast<intptr_t>(nullptr));
         return pw::OkStatus();
-#else
+#else  // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         ChipLogError(AppServer, "Trigger OTA requested, but OTA requestor not compiled in.");
         return pw::Status::Unimplemented();
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    }
+
+    virtual pw::Status SetOtaMetadataForProvider(const chip_rpc_MetadataForProvider & request, pw_protobuf_Empty & response)
+    {
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+        chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
+        if (requestor == nullptr)
+        {
+            ChipLogError(SoftwareUpdate, "Can't get the CASESessionManager");
+            return pw::Status::Unavailable();
+        }
+        else if (sizeof(metadataForProviderBuffer) < request.tlv.size)
+        {
+            return pw::Status::ResourceExhausted();
+        }
+        memcpy(metadataForProviderBuffer, request.tlv.bytes, request.tlv.size);
+        DeviceLayer::StackLock lock;
+        requestor->SetMetadataForProvider(chip::ByteSpan(metadataForProviderBuffer, request.tlv.size));
+        return pw::OkStatus();
+#else  // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+        ChipLogError(AppServer, "OTA set metadata for provider requested, but OTA requestor not compiled in.");
+        return pw::Status::Unimplemented();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     }
 
     virtual pw::Status SetPairingState(const chip_rpc_PairingState & request, pw_protobuf_Empty & response)
@@ -415,6 +438,10 @@ public:
     }
 
 private:
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    static constexpr size_t kMaxMetadataForProviderLength = 512; // length defined in chip spec 11.20.6.7
+    uint8_t metadataForProviderBuffer[kMaxMetadataForProviderLength];
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     Internal::CommissionableDataProviderRpcWrapper mCommissionableDataProvider;
 };
 
