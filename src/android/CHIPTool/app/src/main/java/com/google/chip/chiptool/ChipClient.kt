@@ -20,6 +20,7 @@ package com.google.chip.chiptool
 import android.content.Context
 import android.util.Log
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ControllerParams
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
 import chip.platform.AndroidBleManager
 import chip.platform.AndroidChipPlatform
@@ -38,12 +39,14 @@ object ChipClient {
   private const val TAG = "ChipClient"
   private lateinit var chipDeviceController: ChipDeviceController
   private lateinit var androidPlatform: AndroidChipPlatform
+  /* 0xFFF4 is a test vendor ID, replace with your assigned company ID */
+  private const val VENDOR_ID = 0xFFF4
 
   fun getDeviceController(context: Context): ChipDeviceController {
     getAndroidChipPlatform(context)
 
     if (!this::chipDeviceController.isInitialized) {
-      chipDeviceController = ChipDeviceController()
+      chipDeviceController = ChipDeviceController(ControllerParams.newBuilder().setControllerVendorId(VENDOR_ID).build())
     }
     return chipDeviceController
   }
