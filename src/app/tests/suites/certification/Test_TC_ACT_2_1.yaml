@@ -81,7 +81,7 @@ tests:
     - label: "Read EndpointLists attribute of Actions server"
       PICS: ACT.S.A0001
       verification: |
-          ./chip-tool bridgedactions read endpoint-list 1 1
+          ./chip-tool actions read endpoint-lists 1 1
 
           On TH(chip-tool), verify the EndpointListStructs in TH Log:
 
@@ -153,7 +153,7 @@ tests:
     - label: "Read ActionList attribute of Actions server"
       PICS: ACT.S.A0000
       verification: |
-          ./chip-tool bridgedactions read action-list 1 1
+          ./chip-tool actions read action-list 1 1
 
           Verify  ActionStructs in TH(chip-tool) Log:
 
@@ -340,7 +340,7 @@ tests:
     - label: "Read SetupURL attribute"
       PICS: ACT.S.A0002
       verification: |
-          ./chip-tool bridgedactions read setup-url 1 1
+          ./chip-tool actions read setup-url 1 1
 
           Verify in TH(chip-tool) log
 

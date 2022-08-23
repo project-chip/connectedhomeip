@@ -70,7 +70,7 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify on TH(chip-tool),  current modes provides a list of modes
+          Verify on TH(chip-tool),  current modes provides a  mode Record for usage in steps 3.
 
           [1649678800.298128][10854:10861] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
 
@@ -98,7 +98,7 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify on TH(chip-tool),  current modes provides a list ofmodes
+          Verify on TH(chip-tool),  current modes provides integer provided in step 3a, not the integer from step 2
 
           [1649678800.298128][10854:10861] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
 

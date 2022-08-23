@@ -33,6 +33,7 @@ pw_create_python_source_tree("chip_rpc_distribution") {
   packages = [ "py:chip_rpc" ]
   generate_setup_cfg = {
     common_config_file = "common_setup.cfg"
+    append_date_to_version = true
   }
   extra_files = [ "py/pyproject.toml > pyproject.toml" ]
 }

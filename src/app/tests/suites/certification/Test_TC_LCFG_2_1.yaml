@@ -46,7 +46,7 @@ tests:
 
     - label: "TH writes xx-XX to SupportedLocales attribute"
       verification: |
-          ./chip-tool any write-by-id 0x002B 1 ""xx-XX"" 1 0
+          ./chip-tool any write-by-id 0x002B 1 '"xx-XX"' 1 0
           On TH(chip-tool) verify that DUT responds as UNSUPPORTED_WRITE
 
           [1653996674.832226][7281:7286] CHIP:DMG: WriteClient moving to [AwaitingDe]

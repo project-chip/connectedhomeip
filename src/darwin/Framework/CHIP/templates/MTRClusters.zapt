@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 {{#chip_cluster_commands}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedDataValueDictionaries expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler;
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler;
 {{#unless (hasArguments)}}
 - (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler;
 {{/unless}}

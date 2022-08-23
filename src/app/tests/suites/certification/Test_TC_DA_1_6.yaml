@@ -26,15 +26,14 @@ config:
 tests:
     - label: "Note"
       verification: |
-          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+          Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
-    - label:
-          "Pre-Conditions 1. Device Attestation is completed 2. PAI, DAC
-          certificates are obtained and validated against externally obtained
-          PAA certificate 3. Operations happen within the Fail-Safe Context"
+    - label: "Pre-Conditions"
       verification: |
-          verification step to be updated.
+          1. Device Attestation is completed
+          2. PAI, DAC certificates are obtained and validated against externally obtained PAA certificate
+          3. Operations happen within the Fail-Safe Context
       disabled: true
 
     - label: "DUT completes the attestation procedure"

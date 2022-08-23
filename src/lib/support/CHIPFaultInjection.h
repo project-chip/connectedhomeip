@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      Header file for the fault-injection utilities for Inet.
+ *      Header file for the fault-injection utilities for CHIP.
  */
 
 #pragma once
@@ -26,7 +26,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPEventLoggingConfig.h>
 
-#if CHIP_CONFIG_TEST && CHIP_WITH_NLFAULTINJECTION
+#if CHIP_WITH_NLFAULTINJECTION
 
 #include <nlfaultinjection.hpp>
 
@@ -128,10 +128,10 @@ DLL_EXPORT void FuzzExchangeHeader(uint8_t * p, int32_t arg);
 #define CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS 4
 #define CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS_RMP 5
 
-#else // CHIP_CONFIG_TEST
+#else // CHIP_WITH_NLFAULTINJECTION
 
 #define CHIP_FAULT_INJECT(aFaultID, aStatements)
 #define CHIP_FAULT_INJECT_WITH_ARGS(aFaultID, aProtectedStatements, aUnprotectedStatements)
 #define CHIP_FAULT_INJECT_MAX_ARG(aFaultID, aMaxArg, aProtectedStatements, aUnprotectedStatements)
 
-#endif // CHIP_CONFIG_TEST
+#endif // CHIP_WITH_NLFAULTINJECTION

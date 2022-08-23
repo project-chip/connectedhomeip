@@ -387,6 +387,7 @@ menu "CHIP Device Layer"
     menu "WiFi AP Options"
 
         config ENABLE_WIFI_AP
+            depends on ESP_WIFI_SOFTAP_SUPPORT
             bool "Enable CHIP WIFI AP"
             default y
             help
@@ -835,6 +836,12 @@ menu "CHIP Device Layer"
             default "nvs"
             help
                 Label of the partition to store key-values in the "chip-counters" namespace.
+        
+        config CHIP_KVS_NAMESPACE_PARTITION_LABEL
+            string "chip-kvs namespace partition label"
+            default "nvs"
+            help
+                Label of the partition to store key-values in the "chip-kvs" namespace.
 
     endmenu
 

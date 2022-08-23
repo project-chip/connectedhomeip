@@ -21,12 +21,9 @@ config:
     nodeId: 0x12344321
     cluster: "Target Navigator"
     endpoint: 1
-    targetvalue1:
+    targetvalue:
         type: int8u
         defaultValue: 1
-    targetvalue2:
-        type: int8u
-        defaultValue: 2
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -62,11 +59,11 @@ tests:
       arguments:
           values:
               - name: "Target"
-                value: targetvalue1
+                value: targetvalue
 
     - label: "Reads the CurrentTarget attribute"
       PICS: TGTNAV.S.A0001 && TGTNAV.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentTarget"
       response:
-          value: targetvalue1
+          value: targetvalue

@@ -320,9 +320,9 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
         if (exchangeMgr)
         {
             // After the first failure notify session manager to refresh device data
-            if (entry->sendCount == 1)
+            if (entry->sendCount == 1 && mSessionUpdateDelegate != nullptr)
             {
-                entry->ec->GetSessionHandle()->DispatchSessionEvent(&SessionDelegate::OnFirstMessageDeliveryFailed);
+                mSessionUpdateDelegate->UpdatePeerAddress(entry->ec->GetSessionHandle()->GetPeer());
             }
         }
     }
@@ -407,6 +407,11 @@ void ReliableMessageMgr::StartTimer()
 void ReliableMessageMgr::StopTimer()
 {
     mSystemLayer->CancelTimer(Timeout, this);
+}
+
+void ReliableMessageMgr::RegisterSessionUpdateDelegate(SessionUpdateDelegate * sessionUpdateDelegate)
+{
+    mSessionUpdateDelegate = sessionUpdateDelegate;
 }
 
 #if CHIP_CONFIG_TEST

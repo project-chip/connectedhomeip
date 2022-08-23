@@ -26,6 +26,17 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Preconditions"
+      verification: |
+          1 - 5.5 - Commissioner is on a network. - The network can either be WiFi or Thread.
+          2 - 5.5 - Commissionee is not connected to an operational network
+      disabled: true
+
     - label:
           "Commissioner has regulatory and fabric information available and has
           accurate date, time and timezone"
@@ -757,4 +768,9 @@ tests:
           CHIP:CTL: Received CommissioningComplete response
           CHIP:CTL: Rendezvous cleanup
           CHIP:TOO: Device commissioning completed with success
+      disabled: true
+
+    - label: ""
+      verification: |
+          verification step to be updated.
       disabled: true

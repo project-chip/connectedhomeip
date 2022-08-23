@@ -61,7 +61,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
 
 spiffs_create_partition_image(img_storage ${CMAKE_SOURCE_DIR}/spiffs_image FLASH_IN_PROJECT)
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 14)
-target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")
+target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )

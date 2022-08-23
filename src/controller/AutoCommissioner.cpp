@@ -203,6 +203,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         // skip scan step
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kScanNetworks:
+        return CommissioningStage::kNeedsNetworkCreds;
+    case CommissioningStage::kNeedsNetworkCreds:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
         return CommissioningStage::kSendPAICertificateRequest;
@@ -536,17 +538,6 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     }
     mParams.SetCompletionStatus(completionStatus);
 
-    if (mCommissioningPaused)
-    {
-        mPausedStage = nextStage;
-
-        if (GetDeviceProxyForStep(nextStage) == nullptr)
-        {
-            ChipLogError(Controller, "Invalid device for commissioning");
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-        return CHIP_NO_ERROR;
-    }
     return PerformStep(nextStage);
 }
 
@@ -572,28 +563,6 @@ CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage),
                                             GetCommandTimeout(proxy, nextStage));
     return CHIP_NO_ERROR;
-}
-
-void AutoCommissioner::PauseCommissioning()
-{
-    mCommissioningPaused = true;
-}
-
-CHIP_ERROR AutoCommissioner::ResumeCommissioning()
-{
-    VerifyOrReturnError(mCommissioningPaused, CHIP_ERROR_INCORRECT_STATE);
-    mCommissioningPaused = false;
-
-    // if no new step was attempted
-    if (mPausedStage == CommissioningStage::kError)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    CommissioningStage nextStage = mPausedStage;
-    mPausedStage                 = CommissioningStage::kError;
-
-    return PerformStep(nextStage);
 }
 
 void AutoCommissioner::ReleaseDAC()

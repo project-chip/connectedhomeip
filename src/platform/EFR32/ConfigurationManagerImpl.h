@@ -40,7 +40,7 @@ public:
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
 
-    uint32_t GetBootReason(void);
+    CHIP_ERROR GetBootReason(uint32_t & bootReason);
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount);
     CHIP_ERROR IncreaseBootCount(void);
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);

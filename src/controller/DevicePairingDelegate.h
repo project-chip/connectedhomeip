@@ -86,7 +86,13 @@ public:
 
     /**
      * @brief
-     *  Called with the NetworkScanResponse returned from the target
+     *  Called with the NetworkScanResponse returned from the target.
+     *
+     * The DeviceCommissioner will be waiting in the kNeedsNetworkCreds step and not advancing the commissioning process.
+     *
+     * The implementation should set the network credentials on the CommissioningParameters of the CommissioningDelegate
+     * using CommissioningDelegate.SetCommissioningParameters(), and then call DeviceCommissioner.NetworkCredentialsReady()
+     * in order to resume the commissioning process.
      */
     virtual void
     OnScanNetworksSuccess(const app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse)
@@ -95,6 +101,12 @@ public:
     /**
      * @brief
      *  Called when the NetworkScan request fails.
+     *
+     * The DeviceCommissioner will be waiting in the kNeedsNetworkCreds step and not advancing the commissioning process.
+     *
+     * The implementation should set the network credentials on the CommissioningParameters of the CommissioningDelegate
+     * using CommissioningDelegate.SetCommissioningParameters(), and then call DeviceCommissioner.NetworkCredentialsReady()
+     * in order to resume the commissioning process.
      */
     virtual void OnScanNetworksFailure(CHIP_ERROR error) {}
 };

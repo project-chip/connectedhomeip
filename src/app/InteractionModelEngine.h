@@ -74,7 +74,8 @@ namespace app {
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
                                public CommandHandler::Callback,
-                               public ReadHandler::ManagementCallback
+                               public ReadHandler::ManagementCallback,
+                               public FabricTable::Delegate
 {
 public:
     /**
@@ -131,7 +132,7 @@ public:
      * @retval #CHIP_ERROR_KEY_NOT_FOUND If the subscription is not found.
      * @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR ShutdownSubscription(SubscriptionId aSubscriptionId);
+    CHIP_ERROR ShutdownSubscription(const ScopedNodeId & aPeerNodeId, SubscriptionId aSubscriptionId);
 
     /**
      * Tears down active subscriptions for a given peer node ID.
@@ -142,12 +143,6 @@ public:
      * Tears down all active subscriptions.
      */
     void ShutdownAllSubscriptions();
-
-    /**
-     * Expire active transactions and release related objects for the given fabric index.
-     * This is used for releasing transactions that won't be closed when a fabric is removed.
-     */
-    void CloseTransactionsFromFabricIndex(FabricIndex aFabricIndex);
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
@@ -288,6 +283,9 @@ public:
      * @retval the minimal value of guaranteed subscriptions per fabic.
      */
     uint16_t GetMinGuaranteedSubscriptionsPerFabric() const;
+
+    // virtual method from FabricTable::Delegate
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //

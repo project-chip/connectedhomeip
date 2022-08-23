@@ -40,7 +40,3 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 7
 
 // ========== Platform-specific Configuration Overrides =========
-
-#ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS
-#define CHIP_SYSTEM_CONFIG_NUM_TIMERS 16
-#endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS

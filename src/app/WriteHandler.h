@@ -76,6 +76,11 @@ public:
      */
     void Abort();
 
+    /**
+     *  Clean up state when we are done sending the write response.
+     */
+    void Close();
+
     bool IsFree() const { return mState == State::Uninitialized; }
 
     ~WriteHandler() override = default;
@@ -133,10 +138,6 @@ private:
     void MoveToState(const State aTargetState);
     void ClearState();
     const char * GetStateStr() const;
-    /**
-     *  Clean up state when we are done sending the write response.
-     */
-    void Close();
 
     void DeliverListWriteBegin(const ConcreteAttributePath & aPath);
     void DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool writeWasSuccessful);

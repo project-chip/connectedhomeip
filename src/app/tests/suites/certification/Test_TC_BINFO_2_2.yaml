@@ -24,6 +24,19 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          1. DUT and TH can interact with each other. DUT is commissioned.
+
+          2. BINFO.S.A0009(SoftwareVersion) - TH reads SoftwareVersion attribute from DUT and saves for future use
+
+          3. BINFO.S.A0011(Reachable) - TH reads Reachable attribute from DUT and saves for future use(should be true)
+
+          4. BINFO.S.E00(StartUp) && BINFO.S.E01(ShutDown) && BINFO.S.E02(Leave) - TH subscribes to StartUp, ShutDown, Leave and ReachableChanged events on the Basic Information cluster of the DUT
+
+          5. TH saves the FabricIndex during commissioning
+      disabled: true
+
     - label: "Reboot the DUT TH reads the StartUp event from DUT"
       PICS: BINFO.S.E00
       verification: |
@@ -63,7 +76,7 @@ tests:
           2.  run below command in interactive mode shell and  Turn down the DUT
 
 
-          verify that ShutDown event as priority set has CRITICAL on TH(chip-tool)
+          verify that ShutDown event as priority set has CRITICAL on TH(Chip-tool)
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0001
           [1653050528.900202][119367:119372] CHIP:TOO:          Event number: 5

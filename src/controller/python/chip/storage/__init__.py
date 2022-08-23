@@ -51,11 +51,7 @@ def _OnSyncGetKeyValueCb(storageObj, key: str, value, size, is_found):
     this method to the requirements of
     PersistentStorageDelegate::SyncGetKeyValue.
     '''
-    try:
-        keyValue = storageObj.GetSdkKey(key.decode("utf-8"))
-    except Exception as ex:
-        keyValue = None
-
+    keyValue = storageObj.GetSdkKey(key.decode("utf-8"))
     if (keyValue is not None):
         sizeOfValue = size[0]
         sizeToCopy = min(sizeOfValue, len(keyValue))
@@ -85,37 +81,94 @@ def _OnSyncDeleteKeyValueCb(storageObj, key):
 
 
 class PersistentStorage:
+    ''' Class that provided persistent storage to back both native Python and
+        SDK configuration key/value pairs.
 
-    def __init__(self, path: str):
-        self._path = path
+        Configuration native to the Python libraries is organized under the top-level
+        'repl-config' key while configuration native to the SDK and owned by the various
+        C++ logic is organized under the top-level 'sdk-config' key.
+
+        This interfaces with a C++ adapter that implements the PersistentStorageDelegate interface
+        and can be passed into C++ logic that needs an instance of that interface.
+    '''
+    @classmethod
+    def logger(cls):
+        return logging.getLogger('PersistentStorage')
+
+    def __init__(self, path: str = None, jsonData: Dict = None):
+        ''' Initializes the object with either a path to a JSON file that contains the configuration OR
+            a JSON dictionary that contains an in-memory representation of the configuration.
+
+            In either case, if there are no valid configurations that already exist, empty Python
+            and SDK configuration records will be created upon construction.
+        '''
+        if (path is None and jsonData is None):
+            raise ValueError("Need to provide at least one of path or jsonData")
+
+        if (path is not None and jsonData is not None):
+            raise ValueError("Can't provide both a valid path and jsonData")
+
+        if (path is not None):
+            self.logger().warn(f"Initializing persistent storage from file: {path}")
+        else:
+            self.logger().warn(f"Initializing persistent storage from dict")
+
         self._handle = chip.native.GetLibraryHandle()
         self._isActive = True
+        self._path = path
 
-        try:
-            self._file = open(path, 'r')
-            self._file.seek(0, 2)
-            size = self._file.tell()
-            self._file.seek(0)
+        if (self._path):
+            try:
+                self._file = open(path, 'r')
+                self._file.seek(0, 2)
+                size = self._file.tell()
+                self._file.seek(0)
 
-            if (size != 0):
-                logging.critical(f"Loading configuration from {path}...")
-                self.jsonData = json.load(self._file)
-            else:
-                logging.warn(
-                    f"No valid configuration present at {path} - clearing out configuration")
-                self.jsonData = {'repl-config': {}, 'sdk-config': {}}
+                if (size != 0):
+                    self.logger().warn(f"Loading configuration from {path}...")
+                    self._jsonData = json.load(self._file)
+                else:
+                    self._jsonData = {}
 
-        except Exception as ex:
-            logging.error(ex)
-            logging.warn(
-                f"Could not load configuration from {path} - resetting configuration...")
-            self.jsonData = {'repl-config': {}, 'sdk-config': {}}
+            except Exception as ex:
+                logging.error(ex)
+                logging.critical(f"Could not load configuration from {path} - resetting configuration...")
+                self._jsonData = {}
+        else:
+            self._jsonData = jsonData
 
+        if ('sdk-config' not in self._jsonData):
+            logging.warn(f"No valid SDK configuration present - clearing out configuration")
+            self._jsonData['sdk-config'] = {}
+
+        if ('repl-config' not in self._jsonData):
+            logging.warn(f"No valid REPL configuration present - clearing out configuration")
+            self._jsonData['repl-config'] = {}
+
+        # Clear out the file so that calling 'Commit' will re-open the file at that time in write mode.
         self._file = None
-        self._handle.pychip_Storage_InitializeStorageAdapter(ctypes.py_object(
+
+        self._handle.pychip_Storage_InitializeStorageAdapter.restype = c_void_p
+        self._handle.pychip_Storage_InitializeStorageAdapter.argtypes = [ctypes.py_object,
+                                                                         _SyncSetKeyValueCbFunct, _SyncGetKeyValueCbFunct, _SyncDeleteKeyValueCbFunct]
+
+        self._closure = self._handle.pychip_Storage_InitializeStorageAdapter(ctypes.py_object(
             self), _OnSyncSetKeyValueCb, _OnSyncGetKeyValueCb, _OnSyncDeleteKeyValueCb)
 
-    def Sync(self):
+    def GetSdkStorageObject(self):
+        ''' Returns a ctypes c_void_p reference to the SDK-side adapter instance.
+        '''
+        return self._closure
+
+    def Commit(self):
+        ''' Commits the cached JSON configuration to file (if one was provided in the constructor).
+            Otherwise, this is a no-op.
+        '''
+        self.logger().info("Committing...")
+
+        if (self._path is None):
+            return
+
         if (self._file is None):
             try:
                 self._file = open(self._path, 'w')
@@ -126,28 +179,38 @@ class PersistentStorage:
                 return
 
         self._file.seek(0)
-        json.dump(self.jsonData, self._file, ensure_ascii=True, indent=4)
+        json.dump(self._jsonData, self._file, ensure_ascii=True, indent=4)
         self._file.truncate()
         self._file.flush()
 
     def SetReplKey(self, key: str, value):
-        logging.info(f"SetReplKey: {key} = {value}")
+        ''' Set a REPL key to a specific value. Creates the key if one doesn't exist already.
+        '''
+        self.logger().info(f"SetReplKey: {key} = {value}")
 
         if (key is None or key == ''):
             raise ValueError("Invalid Key")
 
         if (value is None):
-            del(self.jsonData['repl-config'][key])
+            del(self._jsonData['repl-config'][key])
         else:
-            self.jsonData['repl-config'][key] = value
+            self._jsonData['repl-config'][key] = value
 
-        self.Sync()
+        self.Commit()
 
     def GetReplKey(self, key: str):
-        return copy.deepcopy(self.jsonData['repl-config'][key])
+        ''' Retrieves the value of a REPL key. Returns 'None' if the key
+            doesn't exist.
+        '''
+        if (key not in self._jsonData['repl-config']):
+            return None
+
+        return copy.deepcopy(self._jsonData['repl-config'][key])
 
     def SetSdkKey(self, key: str, value: bytes):
-        logging.info(f"SetSdkKey: {key} = {value}")
+        ''' Set an SDK key to a specific value. Creates the key if one doesn't exist already.
+        '''
+        self.logger().info(f"SetSdkKey: {key} = {value}")
 
         if (key is None or key == ''):
             raise ValueError("Invalid Key")
@@ -155,27 +218,44 @@ class PersistentStorage:
         if (value is None):
             raise ValueError('value is not expected to be None')
         else:
-            self.jsonData['sdk-config'][key] = base64.b64encode(
+            self._jsonData['sdk-config'][key] = base64.b64encode(
                 value).decode("utf-8")
 
-        self.Sync()
+        self.Commit()
 
     def GetSdkKey(self, key: str):
-        return base64.b64decode(self.jsonData['sdk-config'][key])
+        ''' Returns the SDK key if one exist. Otherwise, returns 'None'.
+        '''
+        if (key not in self._jsonData['sdk-config']):
+            return None
+
+        return base64.b64decode(self._jsonData['sdk-config'][key])
 
     def DeleteSdkKey(self, key: str):
-        del(self.jsonData['sdk-config'][key])
-        self.Sync()
+        ''' Deletes an SDK key if one exists.
+        '''
+        self.logger().info(f"DeleteSdkKey: {key}")
 
-    def GetUnderlyingStorageAdapter(self):
-        return self._storageAdapterObj
+        del(self._jsonData['sdk-config'][key])
+        self.Commit()
 
     def Shutdown(self):
+        ''' Shuts down the object by free'ing up the associated adapter instance.
+
+            You cannot interact with this object there-after.
+        '''
+        self._handle.pychip_Storage_ShutdownAdapter.argtypes = [c_void_p]
         builtins.chipStack.Call(
-            lambda: self._handle.pychip_Storage_ShutdownAdapter()
+            lambda: self._handle.pychip_Storage_ShutdownAdapter(self._closure)
         )
 
         self._isActive = False
+
+    @property
+    def jsonData(self) -> Dict:
+        ''' Returns a copy of the internal cached JSON data.
+        '''
+        return copy.deepcopy(self._jsonData)
 
     def __del__(self):
         if (self._isActive):

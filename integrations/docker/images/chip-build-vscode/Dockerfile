@@ -66,6 +66,11 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/* \
     && : # last line
 
+# Required for the Bouffalolab platform
+RUN set -x \
+    && pip3 install bflb-iot-tool \
+    && : # last line
+
 ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r21b

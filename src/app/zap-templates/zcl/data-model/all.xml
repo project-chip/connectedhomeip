@@ -19,6 +19,7 @@
    <xi:include href="chip/diagnostic-logs-cluster.xml" />
    <xi:include href="chip/door-lock-cluster.xml" />
    <xi:include href="chip/ethernet-network-diagnostics-cluster.xml" />
+   <xi:include href="chip/fault-injection-cluster.xml" />   
    <xi:include href="chip/fixed-label-cluster.xml" />
    <xi:include href="chip/flow-measurement-cluster.xml" />
    <xi:include href="chip/general-commissioning-cluster.xml" />

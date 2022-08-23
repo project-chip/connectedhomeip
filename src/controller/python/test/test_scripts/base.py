@@ -36,9 +36,11 @@ from chip.utils import CommissioningBuildingBlocks
 from chip.ChipStack import *
 import chip.native
 import chip.FabricAdmin
+import chip.CertificateAuthority
 import copy
 import secrets
 import faulthandler
+import ipdb
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -193,8 +195,9 @@ class BaseTestHelper:
         chip.native.Init()
 
         self.chipStack = ChipStack('/tmp/repl_storage.json')
-        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(vendorId=0XFFF1,
-                                                        fabricId=1, adminIndex=1)
+        self.certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self.chipStack)
+        self.certificateAuthority = self.certificateAuthorityManager.NewCertificateAuthority()
+        self.fabricAdmin = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
         self.devCtrl = self.fabricAdmin.NewController(
             nodeid, paaTrustStorePath, testCommissioner)
         self.controllerNodeId = nodeid
@@ -384,6 +387,34 @@ class BaseTestHelper:
             return True
         return False
 
+    async def TestControllerCATValues(self, nodeid: int):
+        ''' This tests controllers using CAT Values
+        '''
+        # Allocate a new controller instance with a CAT tag.
+        newControllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=self.fabricAdmin, adminDevCtrl=self.devCtrl, controllerNodeIds=[300], targetNodeId=nodeid, privilege=None, catTags=[0x0001_0001])
+
+        # Read out an attribute using the new controller. It has no privileges, so this should fail with an UnsupportedAccess error.
+        res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+            self.logger.error(f"1: Received data instead of an error:{res}")
+            return False
+
+        # Grant the new controller privilege by adding the CAT tag to the subject.
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=nodeid, targetCatTags=[0x0001_0001])
+
+        # Read out the attribute again - this time, it should succeed.
+        res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+            self.logger.error(f"2: Received something other than data:{res}")
+            return False
+
+        # Reset the privilege back to pre-test.
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=None, targetNodeId=nodeid)
+
+        newControllers[0].Shutdown()
+
+        return True
+
     async def TestMultiControllerFabric(self, nodeid: int):
         ''' This tests having multiple controller instances on the same fabric.
         '''
@@ -463,7 +494,8 @@ class BaseTestHelper:
         self.logger.info("Waiting for attribute read for CommissionedFabrics")
         startOfTestFabricCount = await self._GetCommissonedFabricCount(nodeid)
 
-        tempFabric = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1)
+        tempCertificateAuthority = self.certificateAuthorityManager.NewCertificateAuthority()
+        tempFabric = tempCertificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
         tempDevCtrl = tempFabric.NewController(self.controllerNodeId, self.paaTrustStorePath)
 
         self.logger.info("Starting AddNOC using same node ID")
@@ -628,8 +660,7 @@ class BaseTestHelper:
         await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000)
 
         self.logger.info("Creating 2nd Fabric Admin")
-        self.fabricAdmin2 = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1,
-                                                         fabricId=2, adminIndex=2)
+        self.fabricAdmin2 = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
 
         self.logger.info("Creating Device Controller on 2nd Fabric")
         self.devCtrl2 = self.fabricAdmin2.NewController(
@@ -646,15 +677,15 @@ class BaseTestHelper:
         self.logger.info(
             "Shutting down controllers & fabrics and re-initing stack...")
 
-        ChipDeviceCtrl.ChipDeviceController.ShutdownAll()
-        chip.FabricAdmin.FabricAdmin.ShutdownAll()
+        self.certificateAuthorityManager.Shutdown()
 
         self.logger.info("Shutdown completed, starting new controllers...")
 
-        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(vendorId=0XFFF1,
-                                                        fabricId=1, adminIndex=1)
-        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1,
-                                                    fabricId=2, adminIndex=2)
+        self.certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self.chipStack)
+        self.certificateAuthority = self.certificateAuthorityManager.NewCertificateAuthority()
+        self.fabricAdmin = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+
+        fabricAdmin2 = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
 
         self.devCtrl = self.fabricAdmin.NewController(
             self.controllerNodeId, self.paaTrustStorePath)

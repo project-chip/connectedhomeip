@@ -287,6 +287,34 @@ enum ActivityChange
 enum OtaState
 {
     kOtaSpaceAvailable = 0,
+    /**
+     * This state indicates that Node is currently downloading a software update.
+     */
+    kOtaDownloadInProgress,
+    /**
+     * This state indicates that Node has successfully downloaded a software update.
+     */
+    kOtaDownloadComplete,
+    /**
+     * This state indicates that Node has failed to download a software update.
+     */
+    kOtaDownloadFailed,
+    /**
+     * This state indicates that Node has aborted the download of a software update.
+     */
+    kOtaDownloadAborted,
+    /**
+     * This state indicate that Node is currently in the process of verifying and applying a software update.
+     */
+    kOtaApplyInProgress,
+    /**
+     * This state indicates that Node has successfully applied a software update.
+     */
+    kOtaApplyComplete,
+    /**
+     * This state indicates that Node has failed to apply a software update.
+     */
+    kOtaApplyFailed,
 };
 
 inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)

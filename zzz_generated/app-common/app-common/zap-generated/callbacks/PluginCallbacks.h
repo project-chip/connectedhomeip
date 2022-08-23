@@ -159,3 +159,5 @@ void __attribute__((weak)) MatterElectricalMeasurementPluginClientInitCallback()
 void MatterElectricalMeasurementPluginServerInitCallback();
 void __attribute__((weak)) MatterTestClusterPluginClientInitCallback() {}
 void MatterTestClusterPluginServerInitCallback();
+void __attribute__((weak)) MatterFaultInjectionPluginClientInitCallback() {}
+void MatterFaultInjectionPluginServerInitCallback();

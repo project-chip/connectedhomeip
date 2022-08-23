@@ -26,6 +26,13 @@ config:
     endpoint: 0
 
 tests:
+    - label: ""
+      verification: |
+          Preconditions
+          1 - User must indicate the intention for commissioning using a display or other UI elements.
+          2 - TH is not advertising Commissioner Discovery Service at start
+      disabled: true
+
     - label:
           "DUT start scanning for available commissioners using Commissioner
           Discovery"
@@ -35,6 +42,8 @@ tests:
 
     - label: "TH is instructed to advertise Commissioner Discovery service"
       verification: |
+          chip-tv-app is used as TH
+
           ubuntu@ubuntu:~/may23_DUT/connectedhomeip/examples/tv-app/linux/out/tv-app$ sudo ./chip-tv-app
 
           Verify in tv-app side
@@ -49,10 +58,11 @@ tests:
           "DUT start scanning for available commissioners using Commissioner
           Discovery"
       verification: |
+          In certification QA we are using chip-tv-casting-app as a reference app, In case of certification testing, DUT (app) vendor to provide instructions on how to scan for commissioners
+
           connectedhomeip/examples/tv-casting-app/linux/out/tv-casting-app$ sudo ./chip-tv-casting-app
 
-
-          Verify in tv-casting-app side
+          Verify for the commissioner advertisements from the TH in tv-casting-app side
 
           CHIP:SVR: Discovered Commissioner #0
           [1653478433.097515][3785:3785] CHIP:DIS:         Hostname: E45F010F19FF0000        [1653478433.097546][3785:3785] CHIP:DIS:         IP Address #1: fe80::d83a:21ff:fe24:b6d6
@@ -96,15 +106,28 @@ tests:
 
     - label: "TH start the commissioning procedure with DUT"
       verification: |
-          ./chip-tool pairing ethernet 1 20202021 3840   fe80::e65f:1ff:fe0f:2755  5640
+          Into the shell, enter "cast request 0" to send a user-directed-commissioning request to the DUT on tv-casting-app side
 
-          Verify in TH log:
+          > cast request 0
+          [1653179218011] [47890:1899175] CHIP: [DL] request
+          [1653179218011] [47890:1899175] CHIP: [SVR]   ------- PrepareForCommissioning
+          [1653179218011] [47890:1899175] CHIP: [SVR] Server initializing...
 
-          [1653559159.021348][4240:4246] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
-          [1653559159.021432][4240:4246] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          [1653559159.021499][4240:4246] CHIP:CTL: Successfully finished commissioning step "SendComplete"
-          [1653559159.021554][4240:4246] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1653559159.021611][4240:4246] CHIP:CTL: Performing next commissioning step "Cleanup"
-          [1653559159.021725][4240:4246] CHIP:CTL: Successfully finished commissioning step "Cleanup"
-          [1653559159.021790][4240:4246] CHIP:TOO: Device commissioning completed with success
+
+          UX will vary by product maker. The following is the tv-app shell output:
+
+          [1653179219087] [89108:1898759] CHIP: [CTL] ------PROMPT USER: Test TV casting app is requesting permission to cast to this TV, approve? [0x0000_FFF1,0x0000_8001,E0707BB1AFFA6F23,020096D16895275F1B49A07221F0E588E06B]
+
+          [1653179219087] [89108:1898759] CHIP: [CTL] ------Via Shell Enter: controller ux ok|cancel
+
+
+          Into the DUT UX, accept request for commissioning. Manufacturer may utilize a custom method for obtaining user consent other than an on-screen prompt.
+
+          The following is the tv-app shell command to accept the request
+
+          > controller ux ok
+
+          The commissioning success completion is indicated in the TH with the following shell output:
+
+          [1653088463910] [86837:1122544] CHIP: [SVR] Commissioning completed successfully
       disabled: true
