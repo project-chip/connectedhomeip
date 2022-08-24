@@ -22,6 +22,9 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    IDF_CCACHE_ENABLE: 1
+
 jobs:
     esp32:
         name: ESP32
@@ -31,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.5.91
+            image: connectedhomeip/chip-build-esp32:0.5.96
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -64,6 +67,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Build some M5Stack variations
               timeout-minutes: 60
               run: |
@@ -117,7 +121,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.5.91
+            image: connectedhomeip/chip-build-esp32:0.5.96
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
