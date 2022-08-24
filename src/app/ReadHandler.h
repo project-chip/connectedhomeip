@@ -198,9 +198,7 @@ private:
     enum class ReadHandlerFlags : uint8_t
     {
         // mHoldReport is used to prevent subscription data delivery while we are
-        // waiting for the min reporting interval to elapse.  If we have to send a
-        // report immediately due to an urgent event being queued,
-        // UnblockUrgentEventDelivery can be used to force mHoldReport to false.
+        // waiting for the min reporting interval to elapse.
         HoldReport = (1 << 0),
 
         // mHoldSync is used to prevent subscription empty report delivery while we
@@ -219,7 +217,6 @@ private:
         PrimingReports     = (1 << 3),
         ActiveSubscription = (1 << 4),
         FabricFiltered     = (1 << 5),
-
         // For subscriptions, we record the dirty set generation when we started to generate the last report.
         // The mCurrentReportsBeginGeneration records the generation at the start of the current report.  This only/
         // has a meaningful value while IsReporting() is true.
@@ -227,6 +224,8 @@ private:
         // mPreviousReportsBeginGeneration will be set to mCurrentReportsBeginGeneration after we send the last
         // chunk of the current report.  Anything that was dirty with a generation earlier than
         // mPreviousReportsBeginGeneration has had its value sent to the client.
+        // when receiving initial request, it needs mark current handler as dirty.
+        // when there is urgent event, it needs mark current handler as dirty.
         ForceDirty = (1 << 6),
 
         // Don't need the response for report data if true
@@ -300,8 +299,7 @@ private:
     {
         return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
     }
-    void ClearDirty() { mFlags.Clear(ReadHandlerFlags::ForceDirty); }
-
+    void ClearForceDirtyFlag() { mFlags.Clear(ReadHandlerFlags::ForceDirty); }
     NodeId GetInitiatorNodeId() const
     {
         auto session = GetSession();
@@ -319,11 +317,7 @@ private:
 
     auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
 
-    void UnblockUrgentEventDelivery()
-    {
-        mFlags.Clear(ReadHandlerFlags::HoldReport);
-        mFlags.Set(ReadHandlerFlags::ForceDirty);
-    }
+    void UnblockUrgentEventDelivery() { mFlags.Set(ReadHandlerFlags::ForceDirty); }
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }

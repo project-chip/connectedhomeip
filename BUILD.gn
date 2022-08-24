@@ -271,8 +271,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Set this to true to enable efr32 builds by default.
     enable_efr32_builds = false
 
-    # Set this to true to enable p6 builds by default.
-    enable_p6_builds = false
+    # Set this to true to enable psoc6 builds by default.
+    enable_psoc6_builds = false
 
     # Set this to true to enable Qorvo qpg builds by default.
     enable_qpg_builds = false
@@ -364,8 +364,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Build the efr32 lock app example.
     enable_efr32_lock_app_build = enable_efr32_builds
 
-    # Build the p6 lock app example.
-    enable_p6_lock_app_build = enable_p6_builds
+    # Build the psoc6 lock app example.
+    enable_psoc6_lock_app_build = enable_psoc6_builds
 
     # Build the qpgxxxx lock app example.
     enable_qpg_lock_app_build = enable_qpg_builds && !is_debug
@@ -610,12 +610,12 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     extra_build_deps += [ ":efr32_lock_app" ]
   }
 
-  if (enable_p6_lock_app_build) {
-    group("p6_lock_app") {
-      deps = [ "${chip_root}/examples/lock-app/p6(${chip_root}/config/p6/toolchain:p6_lock_app)" ]
+  if (enable_psoc6_lock_app_build) {
+    group("psoc6_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/infineon/psoc6(${chip_root}/config/psoc6/toolchain:psoc6_lock_app)" ]
     }
 
-    extra_build_deps += [ ":p6_lock_app" ]
+    extra_build_deps += [ ":psoc6_lock_app" ]
   }
 
   if (enable_qpg_lock_app_build) {

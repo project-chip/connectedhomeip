@@ -35,6 +35,14 @@
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#ifdef DISPLAY_ENABLED
+#include "demo-ui.h"
+#include "lcd.h"
+#ifdef QR_CODE_ENABLED
+#include "qrcodegen.h"
+#endif // QR_CODE_ENABLED
+#endif // DISPLAY_ENABLED
+
 /**********************************************************
  * Defines
  *********************************************************/
@@ -72,6 +80,13 @@ public:
      * @param event AppEvent to post
      */
     static void PostEvent(const AppEvent * event);
+
+#ifdef DISPLAY_ENABLED
+    /**
+     * @brief Return LCD object
+     */
+    static SilabsLCD & GetLCD(void);
+#endif
 
     /**
      * @brief Event handler when a button is pressed
@@ -165,8 +180,7 @@ protected:
     static void LightEventHandler();
 
     /**********************************************************
-     * Private Attributes declaration
+     * Protected Attributes declaration
      *********************************************************/
-
     bool mSyncClusterToButtonAction;
 };

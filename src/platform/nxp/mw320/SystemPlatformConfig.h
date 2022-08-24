@@ -58,7 +58,3 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_LWIP_ERROR_MAX 3000128
 
 // ========== Platform-specific Configuration Overrides =========
-
-#ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS
-#define CHIP_SYSTEM_CONFIG_NUM_TIMERS 16
-#endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS

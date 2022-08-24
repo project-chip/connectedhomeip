@@ -561,6 +561,12 @@ public:
      */
     CHIP_ERROR NetworkCredentialsReady();
 
+    /**
+     * @brief
+     *  This function returns the current CommissioningStage for this commissioner.
+     */
+    CommissioningStage GetCommissioningStage() { return mCommissioningStage; }
+
 #if CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     /**
@@ -648,6 +654,11 @@ public:
     void SetDeviceAttestationVerifier(Credentials::DeviceAttestationVerifier * deviceAttestationVerifier)
     {
         mDeviceAttestationVerifier = deviceAttestationVerifier;
+    }
+
+    Optional<CommissioningParameters> GetCommissioningParameters()
+    {
+        return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
     }
 
 private:

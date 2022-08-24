@@ -26,9 +26,14 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          1 - Commissioner is on an operational network and has accurate date, time, timezone, regulatory, and fabric information available.
+      disabled: true
+
     - label: "TH receives Onboarding Payload from the DUT"
       verification: |
-          1. Parse the DUT"s QR Code using the TH commissioner: chip-tool
+          1. Parse the DUT commissionee QR Code using the TH commissioner: chip-tool
           $ ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
           [1657230447725] [31078:16782733] CHIP: [SPL] Parsing base38Representation: MT:-24J029Q00KA0648G00
           [1657230447725] [31078:16782733] CHIP: [SPL] Version:       0
@@ -43,24 +48,36 @@ tests:
       disabled: true
 
     - label:
-          "TH fetches commissioning data from Distributed Compliance Ledger
-          (DCL)"
+          "Follow any custom steps, guided by a service provided by the DUTs
+          manufacturer for initial device setup, then place the DUT Commissionee
+          into commissioning mode."
       verification: |
-          1. TH fetches the DCL from DUT"s DCL
-          2. Verify that DCL contains the criteria:
-          - CommissioningCustomFlow field = 2
-          - CommissioningModeInitialStepsHint bit 0 (Power Cycle) = 0 and bit 1 (Device Manufacturer URL) = 1
-          - CommissioningCustomFlowURL populated with a URL that uses https schema
-      disabled: true
+          1. Follow DUT vendor-specific steps to put DUT into commissioning mode
 
-    - label:
-          "TH uses the provided URL to guide user on how to put DUT in a state
-          that allows commissioning"
-      verification: |
-          1. Follow steps from DCL"s URL given
+          2. Verify DUT is advertising in commissioning mode. On DUT,
+
+          $  ./chip-tool discover commissionables
+          Verify in TH as commissioner side:
+
+          [1651192893436] [15304:442604] CHIP: [DL] Mdns: OnNewAddress interface: 24 ip:fe80::dea6:32ff:fe8d:6e32
+          [1651192893436] [15304:442604] CHIP: [DIS]         Vendor ID: 65521
+          [1651192893436] [15304:442604] CHIP: [DIS]         Product ID: 32769
+          [1651192893436] [15304:442604] CHIP: [DIS]         Long Discriminator: 3840
+          [1651192893436] [15304:442604] CHIP: [DIS]         Pairing Hint: 33
+          [1651192893436] [15304:442604] CHIP: [DIS]         Hostname: DCA6328D6E320000        [1651192893436] [15304:442604] CHIP: [DIS]         Instance Name: 914762134DA8E7D1
+          [1651192893436] [15304:442604] CHIP: [DIS]         IP Address #1: fe80::dea6:32ff:fe8d:6e32
+          [1651192893436] [15304:442604] CHIP: [DIS]         Port: 5540
+          [1651192893436] [15304:442604] CHIP: [DIS]         Commissioning Mode: 1
+          [1651192893436] [15304:442604] CHIP: [DIS]         Mrp Interval idle: 5000 ms
+          [1651192893436] [15304:442604] CHIP: [DIS]         Mrp Interval active: 300 ms
       disabled: true
 
     - label: "DUT is commissioned by the TH"
       verification: |
           1. Verify that the DUT is commissioned to the TH commissioner successfully
+
+          Verify on the TH as commissioner side:
+          CHIP:CTL: Received CommissioningComplete response
+          CHIP:CTL: Rendezvous cleanup
+          CHIP:TOO: Device commissioning completed with success
       disabled: true

@@ -91,8 +91,9 @@ chip_data_model("chef-common") {
   is_server = true
 }
 
-# ThunderBoards  (No LCD)
-if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B") {
+# ThunderBoards and Explorer Kit (No LCD)
+if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B" ||
+    efr32_board == "BRD2703A") {
   show_qr_code = false
   disable_lcd = true
 }
@@ -207,6 +208,7 @@ efr32_executable("chef_app") {
   if (chip_enable_openthread) {
     deps += [
       "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread:openthread-platform",
       "${examples_plat_dir}:efr-matter-shell",
     ]
   }
@@ -246,7 +248,11 @@ efr32_executable("chef_app") {
   }
 
   if (!disable_lcd) {
-    sources += [ "${examples_plat_dir}/display/lcd.c" ]
+    sources += [
+      "${examples_plat_dir}/display/demo-ui.c",
+      "${examples_plat_dir}/display/lcd.cpp",
+    ]
+    include_dirs += [ "${examples_plat_dir}/display" ]
     defines += [ "DISPLAY_ENABLED" ]
     if (show_qr_code) {
       defines += [ "QR_CODE_ENABLED" ]

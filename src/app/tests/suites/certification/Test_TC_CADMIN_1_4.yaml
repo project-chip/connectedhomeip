@@ -16,6 +16,7 @@ name: 24.1.4. [TC-CADMIN-1.4] Node Behavior using BCM [DUT - Commissionee]
 
 PICS:
     - CADMIN.S
+    - CADMIN.S.F00
 
 config:
     nodeId: 0x12344321

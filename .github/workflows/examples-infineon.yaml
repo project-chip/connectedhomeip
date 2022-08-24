@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build example - Infineon P6
+name: Build example - Infineon
 
 on:
     push:
@@ -33,7 +33,8 @@ jobs:
 
         container:
             image: connectedhomeip/chip-build-infineon:0.5.91
-
+            volumes:
+                - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
             - uses: Wandalen/wretry.action@v1.0.15
               name: Checkout
@@ -44,7 +45,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform p6
+              run: scripts/checkout_submodules.py --shallow --platform infineon
 
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}
@@ -63,65 +64,97 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
-            - name: Build lock-app example
+            - name: Build PSoC6 lock-app example
               timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                     "scripts/build/build_examples.py \
                         --enable-flashbundle --no-log-timestamps \
-                        --target infineon-p6-lock \
+                        --target infineon-psoc6-lock \
                         build \
                         --copy-artifacts-to out/artifacts \
                     "
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                      p6 default lock-app \
-                      out/infineon-p6-lock/chip-p6-lock-example.out
-            - name: Build all-clusters-app example
+                      psoc6 cy8ckit_062s2_43012 lock \
+                      out/artifacts/infineon-psoc6-lock/chip-psoc6-lock-example.out \
+                      /tmp/bloat_reports/
+            - name: Build PSoC6 all-clusters-app example
               timeout-minutes: 20
               run: |
                   scripts/run_in_build_env.sh \
                     "scripts/build/build_examples.py \
                         --enable-flashbundle --no-log-timestamps \
-                        --target infineon-p6-all-clusters \
+                        --target infineon-psoc6-all-clusters \
                         build \
                         --copy-artifacts-to out/artifacts \
                     "
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                      p6 default all-clusters-app \
-                      out/infineon-p6-all-clusters/chip-p6-clusters-example.out
-            - name: Build all-clusters-minimal-app example
+                      psoc6 cy8ckit_062s2_43012 all-clusters \
+                      out/artifacts/infineon-psoc6-all-clusters/chip-psoc6-clusters-example.out \
+                      /tmp/bloat_reports/
+            - name: Build PSoC6 all-clusters-minimal-app example
               timeout-minutes: 20
               run: |
                   scripts/run_in_build_env.sh \
                     "scripts/build/build_examples.py \
                         --enable-flashbundle --no-log-timestamps \
-                        --target infineon-p6-all-clusters-minimal \
+                        --target infineon-psoc6-all-clusters-minimal \
                         build \
                         --copy-artifacts-to out/artifacts \
                     "
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                      p6 default all-clusters-minimal-app \
-                      out/infineon-p6-all-clusters-minimal/chip-p6-clusters-minimal-example.out
-            - name: Build lighting-app example
+                      psoc6 cy8ckit_062s2_43012 all-clusters-minimal \
+                      out/artifacts/infineon-psoc6-all-clusters-minimal/chip-psoc6-clusters-minimal-example.out \
+                      /tmp/bloat_reports/
+            - name: Build PSoC6 lighting-app example
               timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                     "scripts/build/build_examples.py \
                         --enable-flashbundle --no-log-timestamps \
-                        --target infineon-p6-light \
+                        --target infineon-psoc6-light \
                         build \
                         --copy-artifacts-to out/artifacts \
                     "
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                      p6 default light-app \
-                      out/infineon-p6-light/chip-p6-lighting-example.out
+                      psoc6 cy8ckit_062s2_43012 light \
+                      out/artifacts/infineon-psoc6-light/chip-psoc6-lighting-example.out \
+                      /tmp/bloat_reports/
+
+            - name: Build example CYW30739 Apps
+              timeout-minutes: 30
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                      --target-glob 'cyw30739-cyw930739m2evb_01-{light,lock,ota-requestor-no-progress-logging}' \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                    "
+            - name: Get light size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 cyw930739m2evb_01 light \
+                    out/artifacts/cyw30739-cyw930739m2evb_01-light/chip-cyw30739-lighting-example.elf \
+                    /tmp/bloat_reports/
+            - name: Get lock size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 cyw930739m2evb_01 lock \
+                    out/artifacts/cyw30739-cyw930739m2evb_01-lock/chip-cyw30739-lock-example.elf \
+                    /tmp/bloat_reports/
+            - name: Get ota-requestor size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 cyw930739m2evb_01 ota-requestor-no-progress-logging \
+                    out/artifacts/cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging/chip-cyw30739-ota-requestor-example.elf \
+                    /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
               with:
-                  name: Size,P6-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+                  name: Size,Infineon-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
                   path: |
-                      out/infineon-p6-lock/p6-default-lock-app-sizes.json
-                      out/infineon-p6-all-clusters/p6-default-all-clusters-app-sizes.json
-                      out/infineon-p6-all-clusters-minimal/p6-default-all-clusters-minimal-app-sizes.json
-                      out/infineon-p6-light/p6-default-light-app-sizes.json
+                      /tmp/bloat_reports/

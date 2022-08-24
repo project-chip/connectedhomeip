@@ -52,17 +52,10 @@ static_library("shell_common") {
 
   if (chip_enable_openthread &&
       (current_os == "freertos" || current_os == "zephyr")) {
-    if (chip_openthread_ftd) {
-      public_deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
-      ]
-    } else {
-      public_deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
-      ]
-    }
+    public_deps += [
+      "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread:openthread_cli",
+    ]
   }
 
   if (chip_shell_cmd_server) {

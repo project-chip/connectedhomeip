@@ -185,6 +185,7 @@ chip_python_wheel_action("chip-core") {
     {
       src_dir = "."
       sources = [
+        "chip/CertificateAuthority.py",
         "chip/ChipBleBase.py",
         "chip/ChipBleUtility.py",
         "chip/ChipBluezMgr.py",

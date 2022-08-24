@@ -208,8 +208,6 @@ public:
      */
     void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    bool IsConnecting() const { return mState == State::Connecting; }
-
     bool IsForAddressUpdate() const { return mPerformingAddressUpdate; }
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
@@ -288,11 +286,9 @@ private:
     /// This is used when a node address is required.
     chip::AddressResolve::NodeLookupHandle mAddressLookupHandle;
 
-    ReliableMessageProtocolConfig mRemoteMRPConfig = GetDefaultMRPConfig();
-
     bool mPerformingAddressUpdate = false;
 
-    CHIP_ERROR EstablishConnection();
+    CHIP_ERROR EstablishConnection(const ReliableMessageProtocolConfig & config);
 
     /*
      * This checks to see if an existing CASE session exists to the peer within the SessionManager

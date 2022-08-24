@@ -47,6 +47,7 @@
 #include <controller/CommissioningWindowOpener.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
+#include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/PlatformManager.h>
@@ -77,6 +78,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
+@property (readonly) chip::Credentials::PartialDACVerifier * partialDACVerifier;
 @property (readonly) MTRDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) MTROperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) MTRP256KeypairBridge signingKeypairBridge;
@@ -106,6 +108,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kErrorOperationalCredentialsInit]) {
             return nil;
         }
+        _operationalCredentialsDelegate->setChipWorkQueue(_chipWorkQueue);
     }
     return self;
 }
@@ -228,6 +231,8 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         chip::Controller::SetupParams commissionerParams;
 
         commissionerParams.pairingDelegate = _pairingDelegateBridge;
+
+        _operationalCredentialsDelegate->SetDeviceCommissioner(_cppCommissioner);
 
         commissionerParams.operationalCredentialsDelegate = _operationalCredentialsDelegate;
 
@@ -651,6 +656,22 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 {
     dispatch_async(_chipWorkQueue, ^{
         self->_pairingDelegateBridge->setDelegate(delegate, queue);
+    });
+}
+
+- (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer queue:(dispatch_queue_t)queue
+{
+    VerifyOrReturn([self checkIsRunning]);
+
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning]);
+
+        if (nocChainIssuer != nil) {
+            self->_operationalCredentialsDelegate->SetNocChainIssuer(nocChainIssuer, queue);
+            self->_cppCommissioner->SetDeviceAttestationVerifier(_partialDACVerifier);
+        } else {
+            self->_cppCommissioner->SetDeviceAttestationVerifier(chip::Credentials::GetDeviceAttestationVerifier());
+        }
     });
 }
 

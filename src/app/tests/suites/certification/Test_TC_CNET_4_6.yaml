@@ -26,6 +26,23 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Commission TH and DUT on Thread setup"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "The cluster Identifier 49 (0x0031) is present in the ServerList
+          attribute"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label: "The FeatureMap attribute value is 2"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
     - label:
           "TH sends the AddOrUpdateThreadNetwork command to the DUT with the
           following argument: OperationalDataset argument value as Userth_op
@@ -36,7 +53,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning add-or-update-thread-network hex:1232034768527434274  51 0
+          ./chip-tool networkcommissioning add-or-update-thread-network hex:1011101122222229 51 0
 
           Verify  "FAILSAFE_REQUIRED status code"  on the TH(Chip-tool) Log:
 
@@ -54,7 +71,7 @@ tests:
 
           Below is an example:
 
-          /chip-tool networkcommissioning remove-network hex:1232034768527434274 51 0
+          ./chip-tool networkcommissioning remove-network hex:1011101122222229 51 0
 
           Verify  "FAILSAFE_REQUIRED status code"  on the TH(Chip-tool) Log:
 
@@ -72,7 +89,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning connect-network hex:1232034768527434274 51 0
+          ./chip-tool networkcommissioning connect-network hex:1011101122222229 51 0
 
           Verify  "FAILSAFE_REQUIRED status code"  on the TH(chip-tool) Log:
 

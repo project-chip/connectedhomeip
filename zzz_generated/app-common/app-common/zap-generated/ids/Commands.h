@@ -477,6 +477,16 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace EthernetNetworkDiagnostics
 
+namespace TimeSynchronization {
+namespace Commands {
+
+namespace SetUtcTime {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SetUtcTime
+
+} // namespace Commands
+} // namespace TimeSynchronization
+
 namespace AdministratorCommissioning {
 namespace Commands {
 
@@ -1222,6 +1232,20 @@ static constexpr CommandId Id = 0x00000015;
 
 } // namespace Commands
 } // namespace TestCluster
+
+namespace FaultInjection {
+namespace Commands {
+
+namespace FailAtFault {
+static constexpr CommandId Id = 0x00000000;
+} // namespace FailAtFault
+
+namespace FailRandomlyAtFault {
+static constexpr CommandId Id = 0x00000001;
+} // namespace FailRandomlyAtFault
+
+} // namespace Commands
+} // namespace FaultInjection
 
 } // namespace Clusters
 } // namespace app

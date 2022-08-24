@@ -24,6 +24,12 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          This test can be verified using TC-SU-2.3 from the OTA Software Update section. Pls refer to OTA section for steps.
+          This test can also be verified with DUT sending a ReceiveInit message to the TH.
+      disabled: true
+
     - label:
           "TH sends the first Block message to DUT + DUT sends a BlockAck
           message back to TH."

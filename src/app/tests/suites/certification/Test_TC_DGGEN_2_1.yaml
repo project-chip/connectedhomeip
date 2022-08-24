@@ -154,9 +154,63 @@ tests:
     - label: "TH reads ActiveHardwareFaults attribute value from DUT."
       verification: |
           ./chip-tool generaldiagnostics read active-hardware-faults 1 0
+          On TH(chip-tool), verify that ActiveHardwareFaults attribute the attribute response should be empty. But when a hardware fault occurs, the return attribute value must match the value listed in the HardwareFault ENUM table 11.11.6.1
+
           [1654682785.894724][33006:33011] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0005 DataVersion: 804003636
           [1654682785.894846][33006:33011] CHIP:TOO:   ActiveHardwareFaults: 0 entries
           [1654682785.894952][33006:33011] CHIP:EM: Sending Standalone Ack for MessageCounter:30803984 on exchange 62441i
+
+
+          Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+
+          Verify in TH(chip-tool) log
+
+          [1657539676.878976][10068:10073] CHIP:DMG: ReportDataMessage =
+          [1657539676.879047][10068:10073] CHIP:DMG: {
+          [1657539676.879109][10068:10073] CHIP:DMG:         SubscriptionId = 0xd985fd71,
+          [1657539676.879215][10068:10073] CHIP:DMG:         AttributeReportIBs =
+          [1657539676.879302][10068:10073] CHIP:DMG:         [
+          [1657539676.879366][10068:10073] CHIP:DMG:                 AttributeReportIB =
+          [1657539676.879490][10068:10073] CHIP:DMG:                 {
+          [1657539676.879588][10068:10073] CHIP:DMG:                         AttributeDataIB =
+          [1657539676.879833][10068:10073] CHIP:DMG:                         {
+          [1657539676.879952][10068:10073] CHIP:DMG:                                 DataVersion = 0x3dc6b482,
+          [1657539676.880061][10068:10073] CHIP:DMG:                                 AttributePathIB =
+          [1657539676.880175][10068:10073] CHIP:DMG:                                 {
+          [1657539676.880291][10068:10073] CHIP:DMG:                                         Endpoint = 0x0,
+          [1657539676.880410][10068:10073] CHIP:DMG:                                         Cluster = 0x33,
+          [1657539676.880528][10068:10073] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1657539676.880639][10068:10073] CHIP:DMG:                                 }
+          [1657539676.880758][10068:10073] CHIP:DMG:
+          [1657539676.880870][10068:10073] CHIP:DMG:                                 Data = [
+          [1657539676.880981][10068:10073] CHIP:DMG:
+          [1657539676.881097][10068:10073] CHIP:DMG:                                 ],
+          [1657539676.881205][10068:10073] CHIP:DMG:                         },
+          [1657539676.881321][10068:10073] CHIP:DMG:
+          [1657539676.881415][10068:10073] CHIP:DMG:                 },
+          [1657539676.881523][10068:10073] CHIP:DMG:
+          [1657539676.881589][10068:10073] CHIP:DMG:         ],
+          [1657539676.881667][10068:10073] CHIP:DMG:
+          [1657539676.881728][10068:10073] CHIP:DMG:         InteractionModelRevision = 1
+          [1657539676.881816][10068:10073] CHIP:DMG: }
+          [1657539676.882117][10068:10073] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0005 DataVersion: 1036432514
+          [1657539676.882225][10068:10073] CHIP:TOO:   ActiveHardwareFaults: 0 entries
+          [1657539676.882319][10068:10073] CHIP:DMG: MoveToState ReadClient[0xffff70009ef0]: Moving to [AwaitingSu]
+          [1657539676.882445][10068:10073] CHIP:EM: Piggybacking Ack for MessageCounter:144228832 on exchange: 14723i
+          [1657539676.882594][10068:10073] CHIP:IN: Prepared secure message 0xffff700046b8 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 14723i with MessageCounter:6634271.
+          [1657539676.882686][10068:10073] CHIP:IN: Sending encrypted msg 0xffff700046b8 with MessageCounter:6634271 to 0x0000000000000001 (1) at monotonic time: 00000000016FEF43 msec
+          [1657539676.884825][10068:10073] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:144228833 on exchange 14723i
+          [1657539676.884920][10068:10073] CHIP:EM: Found matching exchange: 14723i, Delegate: 0xffff70009ef0
+          [1657539676.885002][10068:10073] CHIP:EM: Rxd Ack; Removing MessageCounter:6634271 from Retrans Table on exchange 14723i
+          [1657539676.885062][10068:10073] CHIP:EM: Removed CHIP MessageCounter:6634271 from RetransTable on exchange 14723i
+          [1657539676.885171][10068:10073] CHIP:DMG: SubscribeResponseMessage =
+          [1657539676.885237][10068:10073] CHIP:DMG: {
+          [1657539676.885298][10068:10073] CHIP:DMG:         SubscriptionId = 0xd985fd71,
+          [1657539676.885407][10068:10073] CHIP:DMG:         MaxInterval = 0x64,
+          [1657539676.885477][10068:10073] CHIP:DMG:         InteractionModelRevision = 1
+          [1657539676.885549][10068:10073] CHIP:DMG: }
+          [1657539676.885617][10068:10073] CHIP:DMG: Subscription established with SubscriptionID = 0xd985fd71 MinInterval = 20s MaxInterval = 100s Peer = 01:0000000000000001
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && DGGEN.S.A0005
@@ -170,13 +224,17 @@ tests:
     - label: "TH reads ActiveRadioFaults attribute value from DUT."
       verification: |
           ./chip-tool generaldiagnostics read active-radio-faults 1 0
+          On TH(chip-tool), verify that ActiveRadioFaults attribute response should be empty. But when a radio fault occurs, the return attribute value must match the value listed in the RadioFault ENUM table. 11.11.6.2.
+
           [1654682886.109092][33026:33031] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0006 DataVersion: 804003636
           [1654682886.109197][33026:33031] CHIP:TOO:   ActiveRadioFaults: 0 entries
           [1654682886.109321][33026:33031] CHIP:EM: Sending Standalone Ack for MessageCounter:174138703 on exchange 49820i
 
+          Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+          generaldiagnostics subscribe active-radio-faults 100 1000 1 0
 
-          ./chip-tool generaldiagnostics subscribe active-radio-faults 100 1000 1 0
-
+          Verify in TH(chip-tool) Log
           [1654682933.931539][33037:33042] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0006 DataVersion: 804003636
           [1654682933.931617][33037:33042] CHIP:TOO:   ActiveRadioFaults: 0 entries
           [1654682933.931659][33037:33042] CHIP:DMG: MoveToState ReadClient[0xffff7c0042e0]: Moving to [AwaitingSu]
@@ -209,12 +267,56 @@ tests:
       verification: |
           ./chip-tool generaldiagnostics read active-network-faults 1 0
 
+          On TH(chip-tool), verify that ActiveNetworkFaults attribute value attribute response should be empty. But when a network fault occurs, the return attribute value must match the value listed in the NetworkFault ENUM table 11.11.6.3
+
           [1654683004.591353][33044:33049] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0007 DataVersion: 804003636
           [1654683004.591438][33044:33049] CHIP:TOO:   ActiveNetworkFaults: 0 entries
           [1654683004.591526][33044:33049] CHIP:EM: Sending Standalone Ack for MessageCounter:113863817 on exchange 44900i
+
+          Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+          generaldiagnostics subscribe active-network-faults 100 1000 1 0
+
+          Verify on TH(chip-tool)
+          [1654683075.593822][33054:33059] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0007 DataVersion: 804003636
+          [1654683075.593966][33054:33059] CHIP:TOO:   ActiveNetworkFaults: 0 entries
+          [1654683075.594038][33054:33059] CHIP:DMG: MoveToState ReadClient[0xffff80004340]: Moving to [AwaitingSu]
+          [1654683075.594125][33054:33059] CHIP:EM: Piggybacking Ack for MessageCounter:222691244 on exchange: 29895i
+          [1654683075.594231][33054:33059] CHIP:IN: Prepared secure message 0xaaaadcf2ae78 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 29895i with MessageCounter:9439431.
+          [1654683075.594299][33054:33059] CHIP:IN: Sending encrypted msg 0xaaaadcf2ae78 with MessageCounter:9439431 to 0x0000000000000001 (1) at monotonic time: 0000000000CFB459 msec
+          [1654683075.595402][33054:33059] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:222691245 on exchange 29895i
+          [1654683075.595461][33054:33059] CHIP:EM: Found matching exchange: 29895i, Delegate: 0xffff80004340
+          [1654683075.595522][33054:33059] CHIP:EM: Rxd Ack; Removing MessageCounter:9439431 from Retrans Table on exchange 29895i
+          [1654683075.595568][33054:33059] CHIP:EM: Removed CHIP MessageCounter:9439431 from RetransTable on exchange 29895i
+          [1654683075.595649][33054:33059] CHIP:DMG: SubscribeResponseMessage =
+          [1654683075.595700][33054:33059] CHIP:DMG: {
+          [1654683075.595743][33054:33059] CHIP:DMG:         SubscriptionId = 0x41507073,
+          [1654683075.595792][33054:33059] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
+          [1654683075.595840][33054:33059] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
+          [1654683075.595886][33054:33059] CHIP:DMG:         InteractionModelRevision = 1
+          [1654683075.595929][33054:33059] CHIP:DMG: }
+          [1654683075.595984][33054:33059] CHIP:DMG: Subscription established with SubscriptionID = 0x41507073 MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && DGGEN.S.A0007
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "TH reads TestEventTriggersEnabled attribute value"
+      verification: |
+          ./chip-tool generaldiagnostics read   test-event-triggers-enabled  1 0
+          On TH (chip-tool), verify that TestEventTriggersEnabled attribute value should be data type bool
+
+          [1655188892.957794][2868:2873] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0008 DataVersion: 3562689442
+          [1655188892.957869][2868:2873] CHIP:TOO:   TestEventTriggersEnabled: FALSE
+          [1655188892.957999][2868:2873] CHIP:EM: Sending Standalone Ack for MessageCounter:133140817 on exchange 23176i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && DGGEN.S.A0008
       arguments:
           values:
               - name: "message"
