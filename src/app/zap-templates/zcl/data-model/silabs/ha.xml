@@ -243,7 +243,7 @@ limitations under the License.
     </attribute>
     <!-- COLOR_POINT_B_INTENSITY -->
     <attribute side="server" code="0x400D" define="COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="true">CoupleColorTempToLevelMinMireds</attribute>
-    <attribute side="server" code="0x4010" define="START_UP_COLOR_TEMPERATURE_MIREDS" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+    <attribute side="server" code="0x4010" define="START_UP_COLOR_TEMPERATURE_MIREDS" type="INT16U" min="0x0000" max="0xFEFF" writable="true" isNullable="true" optional="true">
       <description>StartUpColorTemperatureMireds</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
