@@ -30,7 +30,7 @@ tests:
           numTrustedRootsOriginal"
       verification: |
           ./chip-tool  operationalcredentials read  trusted-root-certificates 1 0
-          On TH1 verify that  TH reads TrustedRootCertificates entries from DUT
+          On TH1 verify the TrustedRootCertificates entries from DUT
 
           [1658482014.176273][26852:26857] CHIP:DMG: }
           [1658482014.176359][26852:26857] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687668
@@ -45,7 +45,7 @@ tests:
       PICS: CGEN.S.A0001
       verification: |
           ./chip-tool generalcommissioning read  basic-commissioning-info 1 0
-          On TH1 verify that TH reads BasicCommissioningInfo attribute from DUT
+          On TH1 verify the BasicCommissioningInfo attribute from DUT
 
           [1658482413.950617][27013:27018] CHIP:DMG: }
           [1658482413.950753][27013:27018] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0001 DataVersion: 2195123768
@@ -63,7 +63,7 @@ tests:
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe   900 1 1 0
-          On TH1 verify that  TH reads ArmFailSafe command from DUT
+          On TH1 verify the ArmFailSafe command from DUT
 
           [1658482454.092676][27036:27041] CHIP:DMG: },
           [1658482454.092739][27036:27041] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
@@ -81,7 +81,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-          On TH1 Verify that the breadcrumb attribute value
+          On TH1 Verify the breadcrumb attribute value
           [1658482504.991161][27058:27064] CHIP:DMG: }
           [1658482504.991205][27058:27064] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2195123769
           [1658482504.991215][27058:27064] CHIP:TOO:   Breadcrumb: 1
@@ -121,7 +121,7 @@ tests:
           Operational Credentials cluster"
       verification: |
           ./chip-tool  operationalcredentials read  trusted-root-certificates 1 0
-          On TH1 verify that TrustedRootCertificates entries from DUT
+          On TH1 verify the TrustedRootCertificates entries from DUT
           [1658482718.809139][27144:27149] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687668
           [1658482718.809271][27144:27149] CHIP:TOO:   TrustedRootCertificates: 2 entries
           [1658482718.809327][27144:27149] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69370A3501290118240260300414A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF3300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40E878725378AEA74A5F6CB6267CB9F7ACD0DACF26741FB24356379D850DD5F23A746281C845FD76D89E97AB188E9BF8A98047B43E3E868A5A8B8E50BAE62F116F18
@@ -134,7 +134,7 @@ tests:
           "TH1 waits for PIXIT.CGEN.FailsafeExpiryLengthSeconds to ensure the
           failsafe timer has expired"
       verification: |
-          The expiry length is mentioned in above step as 900 secs so wait till 60secs and proced for next step
+          The expiry length is mentioned in above step as 900 secs so wait till 900secs and proced for next step
       disabled: true
 
     - label:
@@ -142,7 +142,7 @@ tests:
           Operational Credentials cluster"
       verification: |
           ./chip-tool  operationalcredentials read  trusted-root-certificates 1 0
-          On TH1 verify that TrustedRootCertificates entries from DUT
+          On TH1 verify the TrustedRootCertificates entries from DUT
           [1658483361.121153][27343:27348] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687668
           [1658483361.121212][27343:27348] CHIP:TOO:   TrustedRootCertificates: 1 entries
           [1658483361.121257][27343:27348] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69370A3501290118240260300414A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF3300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40E878725378AEA74A5F6CB6267CB9F7ACD0DACF26741FB24356379D850DD5F23A746281C845FD76D89E97AB188E9BF8A98047B43E3E868A5A8B8E50BAE62F116F18
@@ -154,7 +154,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-          On TH1 Verify that the breadcrumb attribute value
+          On TH1 Verify the breadcrumb attribute value
           [1658483428.627422][27375:27380] CHIP:DMG: }
           [1658483428.627566][27375:27380] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2195123770
           [1658483428.627610][27375:27380] CHIP:TOO:   Breadcrumb: 0
@@ -164,6 +164,51 @@ tests:
     - label: "TH1 repeats steps 3 through 5"
       verification: |
           TH1 repeats steps 3 through 5
+
+          To repeat Step 3 please send below mentioned command
+           ./chip-tool generalcommissioning  arm-fail-safe   900 1 1 0
+          On TH1 verify that  TH reads ArmFailSafe command from DUT
+
+          [1658482454.092676][27036:27041] CHIP:DMG: },
+          [1658482454.092739][27036:27041] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1658482454.092777][27036:27041] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1658482454.092821][27036:27041] CHIP:TOO:   ArmFailSafeResponse: {
+          [1658482454.092853][27036:27041] CHIP:TOO:     errorCode: 0
+          [1658482454.092866][27036:27041] CHIP:TOO:     debugText:
+          [1658482454.092878][27036:27041] CHIP:TOO:    }
+          [1658482454.092910][27036:27041] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658482454.092955][27036:27041] CHIP:EM: Sending Standalone Ack for MessageCounter:147679912 on exchange 8754i
+
+          To repeat Step 4 please send below mentioned command
+          ./chip-tool generalcommissioning read breadcrumb 1 0
+
+          On TH1 Verify that the breadcrumb attribute value
+          [1658482504.991161][27058:27064] CHIP:DMG: }
+          [1658482504.991205][27058:27064] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2195123769
+          [1658482504.991215][27058:27064] CHIP:TOO:   Breadcrumb: 1
+          [1658482504.991243][27058:27064] CHIP:EM: Sending Standalone Ack for MessageCounter:52534281 on exchange 8370i
+
+          To repeat Step 5 please send below mentioned command
+          To generate TrustedRootCertificate, need to buld chip-cert in connectedhomeip by giving below mentioned commands
+          1. gn gen --check out/debug
+          2. ninja -v -C out/debug chip-cert
+          Once build completes
+          3. cd out/debug
+          4.  ./chip-cert gen-cert --type r --subject-chip-id CACACACA00000001 --valid-from ""2020-10-15 14:23:43"" --lifetime 7305 --out-key Chip-Root-Key.txt --out Chip-Root-Cert.txt --out-format chip-hex
+          5. cat Chip-Root-Cert.txt
+
+          While adding new add-trusted-root-certificate  please use the above generated new root key
+
+          ./chip-tool  operationalcredentials add-trusted-root-certificate  hex:1530010828c376ebc17f21512402013703271401000000cacacaca182604ef171b2726056eb5b94c3706271401000000cacacaca182407012408013009410452c19fd9d329a738fd65722a8309fa68bcaa9ffe87d8114b802c922e5066d0b2f0573b89b38bf98fc9c424ab8ffdabcb18d42e623d82a02d0ca0c062ccadb4bc370a350129011824026030041457934de5405e9a40eacb86ee647e583141ae78f430051457934de5405e9a40eacb86ee647e583141ae78f418300b40a0b0d57bddbc7bcf44480a8b7bd0231d54ccacd68d90efb67b7aa3206adbd268725092992a0388c8e934504178613c5b932d422eed7463f38fd82aaa429b574a18 1 0
+
+
+          on TH1, Verify that the DUT responds with SUCCESS
+
+
+          [1658482609.069728][27095:27100] CHIP:DMG:         InteractionModelRevision = 1
+          [1658482609.069733][27095:27100] CHIP:DMG: },
+          [1658482609.069760][27095:27100] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000B Status=0x0
+          [1658482609.069779][27095:27100] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label:
@@ -172,7 +217,7 @@ tests:
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe  0 1 1 0
-          On TH1 verify that   ArmFailSafe command from DUT
+          On TH1 verify the  ArmFailSafeResponse with ErrorCode as "OK"(0) and DebugText argument is of type string with max length 512 or empty from DUT
           [1658483503.637026][27397:27402] CHIP:DMG: },
           [1658483503.637054][27397:27402] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1658483503.637074][27397:27402] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -187,6 +232,21 @@ tests:
     - label: "Repeat steps 8 through 9"
       verification: |
           Repeat steps 8 through 9
+          To repeat Step 8 please send below mentioned command
+          ./chip-tool  operationalcredentials read  trusted-root-certificates 1 0
+          On TH1 verify the TrustedRootCertificates entries from DUT
+          [1658483361.121153][27343:27348] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687668
+          [1658483361.121212][27343:27348] CHIP:TOO:   TrustedRootCertificates: 1 entries
+          [1658483361.121257][27343:27348] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941045B7F0549925832A9A1294607ADC4695EA3477D3DC9E584431F53A60FC57629C6A616814389C479D3E059D931600F62CA328087462582A350AD015B32756DDC69370A3501290118240260300414A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF3300514A1BBCB2500D57101023ACB4AFD7EBD4FC0487AF318300B40E878725378AEA74A5F6CB6267CB9F7ACD0DACF26741FB24356379D850DD5F23A746281C845FD76D89E97AB188E9BF8A98047B43E3E868A5A8B8E50BAE62F116F18
+          [1658483361.121342][27343:27348] CHIP:EM: Sending Standalone Ack for MessageCounter:8407614 on exchange 22615i
+
+          To repeat Step 9 please send below mentioned command
+          ./chip-tool generalcommissioning read breadcrumb 1 0
+          On TH1 Verify  the breadcrumb attribute value
+          [1658483428.627422][27375:27380] CHIP:DMG: }
+          [1658483428.627566][27375:27380] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2195123770
+          [1658483428.627610][27375:27380] CHIP:TOO:   Breadcrumb: 0
+          [1658483428.627696][27375:27380] CHIP:EM: Sending Standalone Ack for MessageCounter:242324966 on exchange 46358i
       disabled: true
 
     - label:
@@ -223,8 +283,8 @@ tests:
 
     - label: "TH2 opens a PASE session with the DUT"
       verification: |
-          ./chip-tool pairing  code 1 36116400648
-          On TH2 verify that the PASE established successfully
+          ./chip-tool pairing  code 2 36116400648 --commissioner-name beta
+          while pairing On TH2 verify that the PASE established successfully
           [1658483765.114083][8082:8087] CHIP:CTL: Stopping commissioning discovery over DNS-SD
           [1658483765.114107][8082:8087] CHIP:TOO: Pairing Success
           [1658483765.114130][8082:8087] CHIP:TOO: PASE establishment successful
@@ -263,7 +323,7 @@ tests:
           as nocs"
       verification: |
           ./chip-tool  operationalcredentials read  nocs  1 0 --fabric-filtered 0
-          On TH1 verify that  TH reads nocs entries from DUT
+          On TH1 verify the nocs entries from DUT
           [1658484050.459056][27576:27582] CHIP:DMG: }
           [1658484050.459316][27576:27582] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 527687672
           [1658484050.459362][27576:27582] CHIP:TOO:   NOCs: 2 entries
@@ -358,7 +418,7 @@ tests:
           cluster using a non-fabric-filtered read"
       verification: |
           ./chip-tool  operationalcredentials read  nocs  1 0
-          On TH1 verify that  TH reads nocs entries from DUT
+          On TH1 verify the nocs entries from DUT
           [1658484226.587652][27658:27663] CHIP:DMG: }
           [1658484226.587884][27658:27663] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687672
           [1658484226.587936][27658:27663] CHIP:TOO:   TrustedRootCertificates: 2 entries
@@ -372,7 +432,7 @@ tests:
           cluster using a non-fabric-filtered read"
       verification: |
           ./chip-tool operationalcredentials read fabrics    1  0 --fabric-filtered 0
-          On TH1 verify that  TH reads fabrics list from DUT
+          On TH1 verify the fabrics list from DUT
           [1658484405.562192][27710:27716] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 527687672
           [1658484405.562321][27710:27716] CHIP:TOO:   Fabrics: 2 entries
           [1658484405.562395][27710:27716] CHIP:TOO:     [1]: {
@@ -399,7 +459,7 @@ tests:
           Operational Credentials cluster"
       verification: |
           ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
-          On TH1 verify that  TH reads TrustedRootCertificates entries from DUT
+          On TH1 verify the TrustedRootCertificates entries from DUT
           [1658484601.144043][28501:28506] CHIP:DMG:         InteractionModelRevision = 1
           [1658484601.144050][28501:28506] CHIP:DMG: }
           [1658484601.144213][28501:28506] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687672
@@ -414,7 +474,12 @@ tests:
 
     - label: "TH2 fully commissions the DUT"
       verification: |
-          verification step to be updated.
+          While pairing between DUT and TH2, On TH2 verify that commissioning completes successfully
+          [1660748637.271112][21572:21577] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1660748637.271128][21572:21577] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          [1660748637.271139][21572:21577] CHIP:CTL: Successfully finished commissioning step "SendComplete"
+          [1660748637.271146][21572:21577] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1660748637.271156][21572:21577] CHIP:CTL: Performing next commissioning step "Cleanup"
       disabled: true
 
     - label:
@@ -429,10 +494,10 @@ tests:
           Once build completes
           3. cd out/debug
           4.  ./chip-cert gen-cert --type r --subject-chip-id CACACACA00000001 --valid-from "2020-10-15 14:23:43" --lifetime 7305 --out-key Chip-Root-Key.txt --out Chip-Root-Cert.txt --out-format chip-hex
-          5. cat Chip-Root-Key.txt
+          5. cat Chip-Root-Cert.txt
 
 
-          ./chip-tool  operationalcredentials add-trusted-root-certificate    04614D01D2897082D7F85832CE00AC787A5A221A6F7B19C4202C069E3D70DDC615E5B9436919266360AC847F2FAB3EAEE3902B43812A13D18C061CC5028EADB775583DCB1008E4CEBFF810EEB2BC60FF7A3CF954C57101798443DA39E75F5FFDEA 2 0
+          ./chip-tool  operationalcredentials add-trusted-root-certificate    04614D01D2897082D7F85832CE00AC787A5A221A6F7B19C4202C069E3D70DDC615E5B9436919266360AC847F2FAB3EAEE3902B43812A13D18C061CC5028EADB775583DCB1008E4CEBFF810EEB2BC60FF7A3CF954C57101798443DA39E75F5FFDEA 2 0 --commissioner-name beta
           On TH2 verify that DUT responds with FAILSAFE_REQUIRED
           [1658484766.785916][8132:8137] CHIP:DMG:
           [1658484766.785961][8132:8137] CHIP:DMG:         InteractionModelRevision = 1
@@ -447,7 +512,7 @@ tests:
           cluster using a non-fabric-filtered read"
       verification: |
           ./chip-tool operationalcredentials read fabrics    1  0 --fabric-filtered 0
-          On TH1 verify that  TH reads fabrics list from DUT
+          On TH1 verify the fabrics list from DUT
           [1658484969.071455][28631:28636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 527687672
           [1658484969.071527][28631:28636] CHIP:TOO:   NOCs: 2 entries
           [1658484969.071587][28631:28636] CHIP:TOO:     [1]: {
@@ -470,7 +535,7 @@ tests:
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe   60 1 1 0
-          On TH1 verify that  TH reads ArmFailSafe command from DUT
+          On TH1 verify the ArmFailSafe command from DUT
           [1658485224.066397][28732:28737] CHIP:DMG:         InteractionModelRevision = 1
           [1658485224.066407][28732:28737] CHIP:DMG: },
           [1658485224.066441][28732:28737] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
@@ -505,7 +570,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
 
-          On TH1 verify that  TH reads TrustedRootCertificates entries from DUT
+          On TH1 verify the TrustedRootCertificates entries from DUT
           [1658485696.739931][28920:28925] CHIP:DMG:         InteractionModelRevision = 1
           [1658485696.739936][28920:28925] CHIP:DMG: }
           [1658485696.740122][28920:28925] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687672
@@ -522,7 +587,7 @@ tests:
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe   900 1 1 0
-          On TH1 verify that  TH reads ArmFailSafe command from DUT
+          On TH1 verify the ArmFailSafe command from DUT
           [1658486181.080260][29218:29223] CHIP:DMG: },
           [1658486181.080289][29218:29223] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1658486181.080319][29218:29223] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -558,8 +623,8 @@ tests:
           value as 1"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          ./chip-tool generalcommissioning  arm-fail-safe   900 1 2 0
-          On TH2 verify that  TH reads ArmFailSafe command from DUT
+          ./chip-tool generalcommissioning  arm-fail-safe   900 1 2 0 --commissioner-name beta
+          On TH2 verify the ArmFailSafe command from DUT
           [1658486289.473526][8200:8205] CHIP:DMG:         InteractionModelRevision = 1
           [1658486289.473563][8200:8205] CHIP:DMG: },
           [1658486289.473639][8200:8205] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
@@ -578,7 +643,7 @@ tests:
       PICS: CGEN.S.C00.Rsp
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe 0 1 1 0
-          On TH1 verify that  TH reads ArmFailSafe command from DUT
+          On TH1 verify the ArmFailSafe command from DUT
           [1658486510.232274][29388:29393] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1658486510.232302][29388:29393] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1658486510.232334][29388:29393] CHIP:TOO:   ArmFailSafeResponse: {
@@ -595,7 +660,7 @@ tests:
       PICS: CGEN.S.C00.Rsp
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe 900 1 1 0
-          On TH1 verify that  TH reads ArmFailSafe command from DUT
+          On TH1 verify the ArmFailSafe command from DUT
           [1658486418.024554][29343:29348] CHIP:DMG:         InteractionModelRevision = 1
           [1658486418.024559][29343:29348] CHIP:DMG: },
           [1658486418.024588][29343:29348] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
@@ -625,7 +690,7 @@ tests:
           Once build completes
           3. cd out/debug
           4.  ./chip-cert gen-cert --type r --subject-chip-id CACACACA00000001 --valid-from "2020-10-15 14:23:43" --lifetime 7305 --out-key Chip-Root-Key.txt --out Chip-Root-Cert.txt --out-format chip-hex
-          5. cat Chip-Root-Key.txt
+          5. cat Chip-Root-Cert.txt
 
 
 
@@ -643,7 +708,7 @@ tests:
           Operational Credentials cluster"
       verification: |
           ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
-          On TH1 verify that  TH reads TrustedRootCertificates entries from DUT
+          On TH1 verify the TrustedRootCertificates entries from DUT
 
           [1658487613.357548][30232:30237] CHIP:DMG: }
           [1658487613.358000][30232:30237] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687672
@@ -669,7 +734,7 @@ tests:
       PICS: CGEN.S.C00.Rsp
       verification: |
           ./chip-tool generalcommissioning  arm-fail-safe   900 0 1  0
-          On TH1 verify that  TH reads ArmFailSafe command from DUT
+          On TH1 verify the ArmFailSafe command from DUT
 
           [1658487663.593485][30268:30273] CHIP:DMG:         InteractionModelRevision = 1
           [1658487663.593506][30268:30273] CHIP:DMG: },
@@ -697,7 +762,7 @@ tests:
           Operational Credentials cluster"
       verification: |
           ./chip-tool operationalcredentials read  trusted-root-certificates   1  0
-          On TH1 verify that  TH reads TrustedRootCertificates entries from DUT
+          On TH1 verify the TrustedRootCertificates entries from DUT
           [1658489869.278413][31188:31193] CHIP:DMG: }
           [1658489869.278997][31188:31193] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 527687672
           [1658489869.279090][31188:31193] CHIP:TOO:   TrustedRootCertificates: 2 entries

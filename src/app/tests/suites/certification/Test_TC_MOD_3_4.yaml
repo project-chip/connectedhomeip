@@ -26,11 +26,6 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Pre-conditions:"
-      verification: |
-          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
-      disabled: true
-
     - label: "Note"
       verification: |
           To Execute the TC-MOD-3.4 test case using reboot in raspi device we followed the below suggested way:
@@ -38,9 +33,9 @@ tests:
           To run a reboot test case on raspi, run the app with --KVS flag with a file in local directory and pass that file to the command to launch the app. Steps
 
 
-          step-1:  create a file using touch command , something like touch mytest.txt
-          step-2:  chmod 777 mytest.txt
-          step-3:  launch the app sudo ./out/all-clusters-app/chip-all-clusters-app --KVS ./mytest.txt
+            step-1:  create a file using touch command , something like touch mytest.txt
+            step-2:  chmod 777 mytest.txt
+            step-3:  launch the app sudo ./out/all-clusters-app/chip-all-clusters-app --KVS ./mytest.txt
 
           if you launch the app with the above commands and provision the app, even when you reboot the app with 'sudo reboot' , next time you launch the app with 'sudo ./out/all-clusters-app/chip-all-clusters-app --KVS ./mytest.txt' , you can run read/write attribs and commands without reprovisioning the device.
       disabled: true

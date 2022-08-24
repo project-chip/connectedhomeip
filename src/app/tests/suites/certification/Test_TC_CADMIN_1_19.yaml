@@ -34,7 +34,7 @@ tests:
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
-          "1. Provision the device using 1st controller chip tool(use above instructions) ,
+          "1. Provision the device using TH_CR1 -chip tool(use above instructions) ,
           "
       disabled: true
 
@@ -43,11 +43,11 @@ tests:
           timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
-          On 1st controller chip tool, open commissioning window using ECM
-
-          Below is the example when using chip tool as controller
+          On TH_CR1 (chip tool), open commissioning window using ECM
 
           ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
+
+          Verify Manual pairing code on TH_CR1 (chip-tool) Log
 
           [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
           [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
@@ -65,12 +65,12 @@ tests:
     - label: "THn starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       verification: |
-          On nth controller using chip tool connect to the accessory
+          On TH_CR1+1 controller using chip tool connect to the accessory
 
 
-          ./chip-tool pairing code 2 36217551633
+          ./chip-tool pairing code 2 36217551633  --commissioner-name beta
 
-          Verify you got below message
+          Verify you got below message on TH_CR1+1(chip-tool) log
           Device commissioning completed with success
       disabled: true
 
@@ -79,7 +79,13 @@ tests:
           to reach an index value of SupportedFabrics on DUT_CE"
       PICS: CADMIN.S.C00.Rsp
       verification: |
-          Repeat step 3 until  CommissionedFabrics=SupportedFabrics
+          Repeat step 3 until  CommissionedFabrics=SupportedFabrics  (Supported fabrics value obtained in the precondition)
+
+          Use the following command to verify the currentcommissioned fabric (Output number may vary depends on the number successful commissioning )
+
+          ./chip-tool operationalcredentials read commissioned-fabrics 1 0
+
+          [1660907933.677983][33780:33785] CHIP:TOO:   CommissionedFabrics: 16
       disabled: true
 
     - label:
@@ -87,10 +93,11 @@ tests:
           with DUT_CE"
       PICS: CADMIN.S
       verification: |
-          On nth controller using chip tool connect to the accessory
+          On THnth controller using chip tool connect to the accessory
 
+          ./chip-tool pairing code 6 36217551633 --commissioner-name 4
 
-          ./chip-tool pairing code 6 36217551633 --commissioner-name beta
+          Verify DUT_CE responds with NOCResponse with a StatusCode of 0x05 on THn (chip-tool) log
 
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1649756670.402192][10794:10799] CHIP:CTL: Device returned status 5 on receiving the NOC
@@ -101,7 +108,21 @@ tests:
     - label: "TH_CR1 removes FabricIndex1"
       PICS: OPCREDS.S.C0a.Rsp
       verification: |
-          on 1st controller using chip tool, remove fabric with FabricIndex=1
+          on TH_CR1 using chip tool, remove fabric with FabricIndex=1
 
           ./chip-tool operationalcredentials remove-fabric 1 1 0
+
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          CHIP:TOO:   NOCResponse: {
+          CHIP:TOO:     statusCode: 0
+          CHIP:TOO:     fabricIndex: 1
+          CHIP:TOO:    }
+          CHIP:DMG: ICR moving to [AwaitingDe]
+
+          Verify CommissionedFabrics=SupportedFabrics-1 on  TH_CR1(chip-tool) log
+
+          ./chip-tool operationalcredentials read commissioned-fabrics 1 0
+
+          [1660907933.677983][33780:33785] CHIP:TOO:   CommissionedFabrics: 15
       disabled: true
