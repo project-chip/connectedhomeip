@@ -201,8 +201,9 @@ jobs:
                             "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
                         esac
 
-                        scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
-                        scripts/tests/gn_tests.sh
+                        rm -rf ./out/sanitizers
+                        BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
+                        BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
                     done
             - name: Clang-tidy validation
               timeout-minutes: 45
@@ -210,7 +211,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --no-log-timestamps \
-                       --compile-database out/ubsan/compile_commands.json \
+                       --compile-database out/sanitizers/compile_commands.json \
                        check \
                     "
             - name: Build using build_examples.py
