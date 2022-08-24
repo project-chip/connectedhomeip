@@ -101,7 +101,7 @@ tests:
 
           [1656497453.684077][25847:25853] CHIP:DMG:        status = 0x00 (SUCCESS),
 
-          ./chip-tool doorlock set-credential 0 "{ "credentialType" : 1 , "credentialIndex" : 1 }" 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
@@ -518,7 +518,7 @@ tests:
           123456 UserIndex as 1 UserStatus as 0 UserType as 0"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       verification: |
-          ./chip-tool doorlock clear-credential  "{ "credentialType" : 1 , "credentialIndex" : 1 }"  1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }'  1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
@@ -540,7 +540,7 @@ tests:
           [1659778601.601785][3414:3419] CHIP:DMG:                        },
           [1659778601.601823][3414:3419] CHIP:DMG:
 
-          ./chip-tool doorlock set-credential 0 "{ "credentialType" : 1 , "credentialIndex" : 1 }" 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends Set Credential Response command with status as SUCCESS" on the TH(Chip-tool) Log:
 
@@ -593,7 +593,7 @@ tests:
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.C26.Rsp
       verification: |
-          ./chip-tool doorlock clear-credential  "{ "credentialType" : 1 , "credentialIndex" : 1 }"  1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }'  1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
