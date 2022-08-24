@@ -397,10 +397,6 @@ public class ChipDeviceController {
    */
   public native long generateCompressedFabricId(byte[] rcac, byte[] noc);
 
-  public void updateDevice(long fabricId, long deviceId) {
-    updateDevice(deviceControllerPtr, fabricId, deviceId);
-  }
-
   /**
    * Get commmissionible Node. Commmissionible Node results are able to get using {@link
    * ChipDeviceController.getDiscoveredDevice}.
@@ -638,8 +634,6 @@ public class ChipDeviceController {
   private native NetworkLocation getNetworkLocation(long deviceControllerPtr, long deviceId);
 
   private native long getCompressedFabricId(long deviceControllerPtr);
-
-  private native void updateDevice(long deviceControllerPtr, long fabricId, long deviceId);
 
   private native void discoverCommissionableNodes(long deviceControllerPtr);
 

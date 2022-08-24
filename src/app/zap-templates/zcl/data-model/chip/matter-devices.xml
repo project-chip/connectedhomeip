@@ -2043,6 +2043,12 @@ limitations under the License.
         <deviceId editable="false">0xF002</deviceId>
         <clusters lockOthers="true">
             <include cluster="Network Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>            
         </clusters>
     </deviceType>
 </configurator>
