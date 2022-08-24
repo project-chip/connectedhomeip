@@ -42,11 +42,11 @@
 #include <stdint.h>
 
 #include <limits.h>
+#include <limits>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <utility>
-#include <limits>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/mem.h>
@@ -432,7 +432,8 @@ void PacketBuffer::AddRef()
     pbuf_ref(this);
 #else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
     LOCK_BUF_POOL();
-    VerifyOrDieWithMsg(this->ref < std::numeric_limits<decltype(this->ref)>::max(), chipSystemLayer, "packet buffer refcount overflow");
+    VerifyOrDieWithMsg(this->ref < std::numeric_limits<decltype(this->ref)>::max(), chipSystemLayer,
+                       "packet buffer refcount overflow");
     ++this->ref;
     UNLOCK_BUF_POOL();
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
