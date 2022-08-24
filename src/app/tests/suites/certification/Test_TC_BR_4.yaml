@@ -34,7 +34,6 @@ tests:
           1. Test Harness simulating a bridge with some bridged devices; can use the bridge-app for this purpose
 
           2.DUT (client and commissioner)
-
       disabled: true
 
     - label:
@@ -752,7 +751,7 @@ tests:
           [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
       disabled: true
 
-    - label: ""
+    - label: "Verify DUT contains the (supported) devices from the above list"
       PICS: MCORE.DEVLIST.UseDevices
       verification: |
           Verify DUT contains the (supported) devices from the above list
@@ -1404,7 +1403,10 @@ tests:
           [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
       disabled: true
 
-    - label: ""
+    - label:
+          "Verify DUT has (during step 1a) read the NodeLabel attribute from the
+          Bridged Device Basic Information cluster on various endpoints ,Verify
+          DUT contains the names for the (supported) devices from the above list"
       PICS: MCORE.DEVLIST.UseDeviceNames
       verification: |
           NodeLabel is supported for endpoints 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
@@ -1707,7 +1709,10 @@ tests:
           [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
       disabled: true
 
-    - label: ""
+    - label:
+          "Verify DUT has read or reads OnOff attribute from the On/Off cluster
+          for the various endpoints containing an On/Off light ,Verify DUT
+          contains the state for the (supported) devices from the above list"
       PICS: MCORE.DEVLIST.UseDeviceState
       verification: |
           Read onoff attribute from OnOff cluster with applicable EP (refer step 1a )
@@ -1768,7 +1773,12 @@ tests:
           [1659973152.264922][3652:3652] CHIP:DMG: <RE:Run> Cluster 6, Attribute 0 is dirty
       disabled: true
 
-    - label: ""
+    - label:
+          "Verify DUT has read or reads MeasuredValue attribute from the
+          Temperature Measurement cluster for the various endpoints containing a
+          Temperature Sensor (or receives updates because of a previously set up
+          subscription) ,Verify DUT contains the state for the (supported)
+          device from the above list"
       PICS: MCORE.DEVLIST.UseDeviceState
       verification: |
           ./chip-tool temperaturemeasurement read measured-value 1 4
@@ -1816,7 +1826,11 @@ tests:
           [1659351542.393552][12212:12217] CHIP:EM: Sending Standalone Ack for MessageCounter:120981971 on exchange 25924i
       disabled: true
 
-    - label: ""
+    - label:
+          "Verify DUT has read or reads BatChargeLevel attribute from the Power
+          Source cluster from the relevant endpoint (or receives updates because
+          of a previously set up subscription) ,Verify DUT contains the state of
+          the battery of the (supported) devices from the above list"
       PICS: MCORE.DEVLIST.UseBatInfo
       verification: |
           ./chip-tool powersource read bat-charge-level 1 9
@@ -1843,11 +1857,6 @@ tests:
           [1659973227.631126][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1659973227.631231][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
           [1659973227.631262][3652:3652] CHIP:DMG: <RE:Run> Cluster 402, Attribute 0 is dirty
-      disabled: true
-
-    - label: ""
-      verification: |
-          verification step to be updated.
       disabled: true
 
     - label:
@@ -1878,11 +1887,6 @@ tests:
           [1659973152.264756][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1659973152.264871][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
           [1659973152.264922][3652:3652] CHIP:DMG: <RE:Run> Cluster 6, Attribute 0 is dirty
-      disabled: true
-
-    - label: ""
-      verification: |
-          verification step to be updated.
       disabled: true
 
     - label:
@@ -1946,7 +1950,7 @@ tests:
           [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
       disabled: true
 
-    - label: ""
+    - label: "Verify DUT contains the added device in the list of devices"
       PICS: MCORE.DEVLIST.UseDeviceNames
       verification: |
           Verify on DUT(chip-tool) Log
@@ -2066,7 +2070,7 @@ tests:
           [1659972694.733520][3652:3652] CHIP:DMG: AccessControl: allowed
       disabled: true
 
-    - label: ""
+    - label: "Verify DUT contains the added device in the list of devices"
       PICS: MCORE.DEVLIST.UseDevices
       verification: |
           Verify on DUT(chip-tool) Log

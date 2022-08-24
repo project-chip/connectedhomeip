@@ -21,7 +21,7 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
-    timeout: 150
+    timeout: 200
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -135,7 +135,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 120
+          constraints:
+              minValue: 102
+              maxValue: 120
 
     - label: "Wait 5s"
       cluster: "DelayCommands"

@@ -122,7 +122,7 @@ tests:
     - label:
           "TH sends a Step command to the DUT with StepMode =0x00 (up), StepSize
           =150 and TransitionTime =300"
-      PICS: LVL.S.C02.Rsp && LVL.S.M.VarRate
+      PICS: LVL.S.C02.Rsp
       command: "Step"
       arguments:
           values:
@@ -138,6 +138,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: LVL.S.M.VarRate
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -155,6 +156,7 @@ tests:
               maxValue: 115
 
     - label: "Wait 10s"
+      PICS: LVL.S.M.VarRate
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -172,6 +174,7 @@ tests:
               maxValue: 173
 
     - label: "Wait 10s"
+      PICS: LVL.S.M.VarRate
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -189,6 +192,7 @@ tests:
               maxValue: 200
 
     - label: "Wait 5000ms"
+      PICS: LVL.S.M.VarRate
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

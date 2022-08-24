@@ -29,6 +29,11 @@ tests:
           Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
+    - label: "Pre-Conditions"
+      verification: |
+          Commission TH to DUT
+      disabled: true
+
     - label: "DUT reads DeviceTypeList from TH."
       PICS: DESC.C.A0000
       verification: |
@@ -38,12 +43,23 @@ tests:
 
           verify the " device-list response" on the TH (all-cluster-app) log:
 
-          [1657095358.858070][3443:3448] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2880250959
-          [1657095358.858130][3443:3448] CHIP:TOO:   device list: 1 entries
-          [1657095358.858213][3443:3448] CHIP:TOO:     [1]: {
-          [1657095358.858255][3443:3448] CHIP:TOO:       Type: 22
-          [1657095358.858283][3443:3448] CHIP:TOO:       Revision: 1
-          [1657095358.858310][3443:3448] CHIP:TOO:      }
+          [1660049876.238277][36511:36511] CHIP:IM: Received Read request
+          [1660049876.238408][36511:36511] CHIP:DMG: ReadRequestMessage =
+          [1660049876.238477][36511:36511] CHIP:DMG: {
+          [1660049876.238525][36511:36511] CHIP:DMG: 	AttributePathIBs =
+          [1660049876.238602][36511:36511] CHIP:DMG: 	[
+          [1660049876.238677][36511:36511] CHIP:DMG: 		AttributePathIB =
+          [1660049876.238766][36511:36511] CHIP:DMG: 		{
+          [1660049876.238857][36511:36511] CHIP:DMG: 			Endpoint = 0x0,
+          [1660049876.238963][36511:36511] CHIP:DMG: 			Cluster = 0x1d,
+          [1660049876.239062][36511:36511] CHIP:DMG: 			Attribute = 0x0000_0000,
+          [1660049876.239156][36511:36511] CHIP:DMG: 		}
+          [1660049876.239246][36511:36511] CHIP:DMG:
+          [1660049876.239331][36511:36511] CHIP:DMG: 	],
+          [1660049876.239408][36511:36511] CHIP:DMG:
+          [1660049876.239490][36511:36511] CHIP:DMG: 	isFabricFiltered = true,
+          [1660049876.239568][36511:36511] CHIP:DMG: 	InteractionModelRevision = 1
+          [1660049876.239639][36511:36511] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads ServerList from the TH"
@@ -54,33 +70,23 @@ tests:
           verify the " server-list response" on the TH (all-cluster-app) log:
 
           [1657095388.496869][3451:3456] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 2880250959
-          [1657095388.496964][3451:3456] CHIP:TOO:   server list: 26 entries
-          [1657095388.496996][3451:3456] CHIP:TOO:     [1]: 3
-          [1657095388.497023][3451:3456] CHIP:TOO:     [2]: 4
-          [1657095388.497049][3451:3456] CHIP:TOO:     [3]: 29
-          [1657095388.497074][3451:3456] CHIP:TOO:     [4]: 30
-          [1657095388.497098][3451:3456] CHIP:TOO:     [5]: 31
-          [1657095388.497123][3451:3456] CHIP:TOO:     [6]: 40
-          [1657095388.497147][3451:3456] CHIP:TOO:     [7]: 42
-          [1657095388.497172][3451:3456] CHIP:TOO:     [8]: 43
-          [1657095388.497197][3451:3456] CHIP:TOO:     [9]: 44
-          [1657095388.497221][3451:3456] CHIP:TOO:     [10]: 45
-          [1657095388.497246][3451:3456] CHIP:TOO:     [11]: 46
-          [1657095388.497271][3451:3456] CHIP:TOO:     [12]: 47
-          [1657095388.497295][3451:3456] CHIP:TOO:     [13]: 48
-          [1657095388.497320][3451:3456] CHIP:TOO:     [14]: 49
-          [1657095388.497344][3451:3456] CHIP:TOO:     [15]: 50
-          [1657095388.497369][3451:3456] CHIP:TOO:     [16]: 51
-          [1657095388.497394][3451:3456] CHIP:TOO:     [17]: 52
-          [1657095388.497418][3451:3456] CHIP:TOO:     [18]: 53
-          [1657095388.497443][3451:3456] CHIP:TOO:     [19]: 54
-          [1657095388.497468][3451:3456] CHIP:TOO:     [20]: 55
-          [1657095388.497493][3451:3456] CHIP:TOO:     [21]: 60
-          [1657095388.497517][3451:3456] CHIP:TOO:     [22]: 62
-          [1657095388.497542][3451:3456] CHIP:TOO:     [23]: 63
-          [1657095388.497567][3451:3456] CHIP:TOO:     [24]: 64
-          [1657095388.497591][3451:3456] CHIP:TOO:     [25]: 65
-          [1657095388.497616][3451:3456] CHIP:TOO:     [26]: 1029
+          [1660049905.629940][36511:36511] CHIP:IM: Received Read request
+          [1660049905.630388][36511:36511] CHIP:DMG: ReadRequestMessage =
+          [1660049905.630834][36511:36511] CHIP:DMG: {
+          [1660049905.631175][36511:36511] CHIP:DMG: 	AttributePathIBs =
+          [1660049905.631815][36511:36511] CHIP:DMG: 	[
+          [1660049905.632509][36511:36511] CHIP:DMG: 		AttributePathIB =
+          [1660049905.633291][36511:36511] CHIP:DMG: 		{
+          [1660049905.634105][36511:36511] CHIP:DMG: 			Endpoint = 0x0,
+          [1660049905.634422][36511:36511] CHIP:DMG: 			Cluster = 0x1d,
+          [1660049905.634714][36511:36511] CHIP:DMG: 			Attribute = 0x0000_0001,
+          [1660049905.635065][36511:36511] CHIP:DMG: 		}
+          [1660049905.635366][36511:36511] CHIP:DMG:
+          [1660049905.635466][36511:36511] CHIP:DMG: 	],
+          [1660049905.635925][36511:36511] CHIP:DMG:
+          [1660049905.636339][36511:36511] CHIP:DMG: 	isFabricFiltered = true,
+          [1660049905.636431][36511:36511] CHIP:DMG: 	InteractionModelRevision = 1
+          [1660049905.636651][36511:36511] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads ClientList from the TH"
@@ -89,10 +95,23 @@ tests:
           ./chip-tool descriptor read client-list 1 0
 
           verify the " client-list response" on the TH (all-cluster-app) log:
-
-          [1657095415.492647][3459:3464] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 2880250959
-          [1657095415.492717][3459:3464] CHIP:TOO:   client list: 1 entries
-          [1657095415.492749][3459:3464] CHIP:TOO:     [1]: 41
+          [1660049929.094511][36511:36511] CHIP:IM: Received Read request
+          [1660049929.094621][36511:36511] CHIP:DMG: ReadRequestMessage =
+          [1660049929.094659][36511:36511] CHIP:DMG: {
+          [1660049929.094680][36511:36511] CHIP:DMG: 	AttributePathIBs =
+          [1660049929.094706][36511:36511] CHIP:DMG: 	[
+          [1660049929.094729][36511:36511] CHIP:DMG: 		AttributePathIB =
+          [1660049929.094761][36511:36511] CHIP:DMG: 		{
+          [1660049929.094788][36511:36511] CHIP:DMG: 			Endpoint = 0x0,
+          [1660049929.094821][36511:36511] CHIP:DMG: 			Cluster = 0x1d,
+          [1660049929.094855][36511:36511] CHIP:DMG: 			Attribute = 0x0000_0002,
+          [1660049929.094886][36511:36511] CHIP:DMG: 		}
+          [1660049929.094914][36511:36511] CHIP:DMG:
+          [1660049929.094940][36511:36511] CHIP:DMG: 	],
+          [1660049929.094966][36511:36511] CHIP:DMG:
+          [1660049929.094993][36511:36511] CHIP:DMG: 	isFabricFiltered = true,
+          [1660049929.095019][36511:36511] CHIP:DMG: 	InteractionModelRevision = 1
+          [1660049929.095041][36511:36511] CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads PartsList from the TH"
@@ -102,8 +121,21 @@ tests:
 
           verify the " parts-list response" on the TH (all-cluster-app) log:
 
-          [1657095439.967554][3470:3475] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2880250959
-          [1657095439.967633][3470:3475] CHIP:TOO:   parts list: 2 entries
-          [1657095439.967668][3470:3475] CHIP:TOO:     [1]: 1
-          [1657095439.967697][3470:3475] CHIP:TOO:     [2]: 2
+          [1660049948.708577][36511:36511] CHIP:IM: Received Read request
+          [1660049948.708668][36511:36511] CHIP:DMG: ReadRequestMessage =
+          [1660049948.708701][36511:36511] CHIP:DMG: {
+          [1660049948.708723][36511:36511] CHIP:DMG: 	AttributePathIBs =
+          [1660049948.708748][36511:36511] CHIP:DMG: 	[
+          [1660049948.708771][36511:36511] CHIP:DMG: 		AttributePathIB =
+          [1660049948.708832][36511:36511] CHIP:DMG: 		{
+          [1660049948.708925][36511:36511] CHIP:DMG: 			Endpoint = 0x0,
+          [1660049948.709818][36511:36511] CHIP:DMG: 			Cluster = 0x1d,
+          [1660049948.710771][36511:36511] CHIP:DMG: 			Attribute = 0x0000_0003,
+          [1660049948.711682][36511:36511] CHIP:DMG: 		}
+          [1660049948.712502][36511:36511] CHIP:DMG:
+          [1660049948.713252][36511:36511] CHIP:DMG: 	],
+          [1660049948.713823][36511:36511] CHIP:DMG:
+          [1660049948.714389][36511:36511] CHIP:DMG: 	isFabricFiltered = true,
+          [1660049948.714998][36511:36511] CHIP:DMG: 	InteractionModelRevision = 1
+          [1660049948.715573][36511:36511] CHIP:DMG: },
       disabled: true

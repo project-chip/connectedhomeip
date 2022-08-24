@@ -35,7 +35,7 @@ tests:
           "The cluster Identifier 49 (0x0031) is present in the ServerList
           attribute"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "The FeatureMap attribute value is 1"
