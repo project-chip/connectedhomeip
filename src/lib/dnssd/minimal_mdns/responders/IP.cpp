@@ -16,18 +16,24 @@
  */
 #include "IP.h"
 
+#include <lib/dnssd/minimal_mdns/AddressPolicy.h>
 #include <lib/dnssd/minimal_mdns/records/IP.h>
 
 namespace mdns {
 namespace Minimal {
 
+using chip::Platform::UniquePtr;
+
 void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                                     const ResponseConfiguration & configuration)
 {
     chip::Inet::IPAddress addr;
-    for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
+    UniquePtr<IpAddressIterator> ips = Policies::GetIpAddressesForEndpoint(source->Interface);
+    VerifyOrDie(ips);
+
+    while (ips->Next(addr))
     {
-        if ((it.GetInterfaceId() == source->Interface) && (it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv4())
+        if (addr.IsIPv4())
         {
             IPResourceRecord record(GetQName(), addr);
             configuration.Adjust(record);
@@ -39,15 +45,14 @@ void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, Res
 void IPv6Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                                     const ResponseConfiguration & configuration)
 {
-    for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
-    {
-        if (it.GetInterfaceId() != source->Interface)
-        {
-            continue;
-        }
+    chip::Inet::IPAddress addr;
+    UniquePtr<IpAddressIterator> ips = Policies::GetIpAddressesForEndpoint(source->Interface);
 
-        chip::Inet::IPAddress addr;
-        if ((it.GetInterfaceId() == source->Interface) && (it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv6())
+    VerifyOrDie(ips);
+
+    while (ips->Next(addr))
+    {
+        if (addr.IsIPv6())
         {
             IPResourceRecord record(GetQName(), addr);
             configuration.Adjust(record);
