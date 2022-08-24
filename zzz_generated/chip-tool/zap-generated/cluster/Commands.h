@@ -11499,8 +11499,9 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
                                               credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(
             Id, "color-point-bintensity", 0, UINT8_MAX, Attributes::ColorPointBIntensity::Id, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "start-up-color-temperature-mireds", 0, UINT16_MAX,
-                                              Attributes::StartUpColorTemperatureMireds::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(
+            Id, "start-up-color-temperature-mireds", 0, UINT16_MAX, Attributes::StartUpColorTemperatureMireds::Id,
+            credsIssuerConfig),                                                                                                 //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "current-hue", Attributes::CurrentHue::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "current-saturation", Attributes::CurrentSaturation::Id, credsIssuerConfig),        //
