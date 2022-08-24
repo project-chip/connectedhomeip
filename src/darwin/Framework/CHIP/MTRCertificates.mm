@@ -197,19 +197,21 @@ using namespace chip::Credentials;
     return nil;
 }
 
-+ (nullable NSData *)convertToCHIPCertFromX509Cert:(NSData *)x509Certificate {
++ (nullable NSData *)convertToCHIPCertFromX509Cert:(NSData *)x509Certificate
+{
 
-  chip::ByteSpan x509CertBytes = chip::ByteSpan((uint8_t *) x509Certificate.bytes, x509Certificate.length);
+    chip::ByteSpan x509CertBytes = chip::ByteSpan((uint8_t *) x509Certificate.bytes, x509Certificate.length);
 
-  NSMutableData * chipCertBuffer = [[NSMutableData alloc] initWithLength:chip::Credentials::kMaxCHIPCertLength];
-  chip::MutableByteSpan chipCertBytes((uint8_t *) chipCertBuffer.mutableBytes, chip::Credentials::kMaxCHIPCertLength);
+    NSMutableData * chipCertBuffer = [[NSMutableData alloc] initWithLength:chip::Credentials::kMaxCHIPCertLength];
+    chip::MutableByteSpan chipCertBytes((uint8_t *) chipCertBuffer.mutableBytes, chip::Credentials::kMaxCHIPCertLength);
 
-  CHIP_ERROR errorCode = chip::Credentials::ConvertX509CertToChipCert(x509CertBytes, chipCertBytes);
-  MTR_LOG_ERROR("ConvertX509CertToChipCert: %{public}s", chip::ErrorStr(errorCode));
+    CHIP_ERROR errorCode = chip::Credentials::ConvertX509CertToChipCert(x509CertBytes, chipCertBytes);
+    MTR_LOG_ERROR("ConvertX509CertToChipCert: %{public}s", chip::ErrorStr(errorCode));
 
-  if (errorCode != CHIP_NO_ERROR) return nil;
+    if (errorCode != CHIP_NO_ERROR)
+        return nil;
 
-  return [NSData dataWithBytes:chipCertBytes.data() length:chipCertBytes.size()];
+    return [NSData dataWithBytes:chipCertBytes.data() length:chipCertBytes.size()];
 }
 
 @end
