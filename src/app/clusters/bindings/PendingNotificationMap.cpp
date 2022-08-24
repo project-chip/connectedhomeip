@@ -81,7 +81,8 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
 CHIP_ERROR PendingNotificationMap::AddPendingNotification(uint8_t bindingEntryId, PendingNotificationContext * context)
 {
     RemoveEntry(bindingEntryId);
-    if (mNumEntries == EMBER_BINDING_TABLE_SIZE) {
+    if (mNumEntries == EMBER_BINDING_TABLE_SIZE)
+    {
         // We know that the RemoveEntry above did not do anything so we don't need to try restoring it.
         return CHIP_ERROR_NO_MEMORY;
     }
