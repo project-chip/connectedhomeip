@@ -35,7 +35,7 @@ chip_openthread_ftd = false
 chip_progress_logging = false
 
 # Dsiable verbose logs for all-clusters app to save Flash
-chip_detail_logging = false
+chip_detail_logging = true
 chip_automation_logging = false
 
 # BLE options

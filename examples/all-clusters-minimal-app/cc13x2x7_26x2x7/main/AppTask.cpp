@@ -340,12 +340,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
-            // Disable BLE advertisements
-            if (ConnectivityMgr().IsBLEAdvertisingEnabled())
-            {
-                ConnectivityMgr().SetBLEAdvertisingEnabled(false);
-                PLAT_LOG("Disabled BLE Advertisements");
-            }
+            chip::Server::GetInstance().ScheduleFactoryReset();
         }
         break;
 
@@ -360,13 +355,19 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
             {
                 if (Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
                 {
-                    PLAT_LOG("Enabled BLE Advertisement");
+                    PLAT_LOG("Enabled BLE Advertisements");
                 }
                 else
                 {
                     PLAT_LOG("OpenBasicCommissioningWindow() failed");
                 }
             }
+	    else
+	    {
+                // Disable BLE advertisements
+                ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+                PLAT_LOG("Disabled BLE Advertisements");
+	    }
         }
         break;
 
