@@ -256,10 +256,8 @@ void UDPEndPointImplLwIP::CloseImpl()
         // event pending in the event queue (SystemLayer::ScheduleLambda), we
         // schedule a release call to the end of the queue, to ensure that the
         // queued pointer to UDPEndPointImplLwIP is not dangling.
-        if (mDelayRelease == true)
+        if (mDelayReleaseCount == 0)
         {
-            mDelayRelease = false;
-
             Retain();
             CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Release(); });
             if (err != CHIP_NO_ERROR)
@@ -283,8 +281,8 @@ void UDPEndPointImplLwIP::Free()
 
 void UDPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && msg, IPPacketInfo * pktInfo)
 {
-    // Clear mDelayRelease flag so that we don't need to delay release of current UDPEndPoint.
-    mDelayRelease = false;
+    // Decrease mDelayReleaseCount so that we don't need to delay release of current UDPEndPoint if it reaches 0.
+    mDelayReleaseCount--;
 
     if ((mState == State::kListening) && (OnMessageReceived != nullptr))
     {
@@ -398,38 +396,29 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     pktInfo->SrcPort     = port;
     pktInfo->DestPort    = pcb->local_port;
 
-<<<<<<< HEAD
+    // Increase mDelayReleaseCount to delay release of this UDP EndPoint while the HandleDataReceived call is
+    // pending on it.
+    ep->mDelayReleaseCount++;
+
     CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda(
         [ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
             ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p), pktInfo);
         });
-=======
-    // Set mDelayRelease flag to delay release of this UDP EndPoint until HandleDataReceived is
-    // called on this UDP EndPoint.
-    ep->mDelayRelease = true;
-
-    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo] {
-        ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p), pktInfo);
-    });
->>>>>>> 5c4b712f6 (Don't delay the release of Lwip UDPEndPoint if there is no pending LwIPReceiveUDPMessage)
 
     if (err == CHIP_NO_ERROR)
     {
         // If ScheduleLambda() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
         static_cast<void>(std::move(buf).UnsafeRelease());
-<<<<<<< HEAD
         // Similarly, ScheduleLambda now has ownership of pktInfo.
         pktInfo.release();
-=======
     }
     else
     {
-        ep->mDelayRelease = false;
+        ep->mDelayReleaseCount--;
 
         // If ScheduleLambda() succeeded, `pktInfo` will be deleted in `HandleDataReceived`.
         // Otherwise we delete it here.
         Platform::Delete(pktInfo);
->>>>>>> 5c4b712f6 (Don't delay the release of Lwip UDPEndPoint if there is no pending LwIPReceiveUDPMessage)
     }
 }
 
