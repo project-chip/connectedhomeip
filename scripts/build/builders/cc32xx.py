@@ -24,7 +24,7 @@ class cc32xxApp(Enum):
 
     def ExampleName(self):
         if self == cc32xxApp.LOCK:
-            return 'lock'
+            return 'lock-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
