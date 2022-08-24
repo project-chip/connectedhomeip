@@ -60,6 +60,7 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/network/lwip/src/include/lwip/apps",
       "${bl602_sdk_root}/components/network/lwip/lwip-port",
       "${bl602_sdk_root}/components/network/lwip/lwip-port/FreeRTOS",
+
       #"${bl602_sdk_root}/components/network/lwip_mdns",
 
       "${bl602_sdk_root}/components/platform/hosal",
@@ -249,7 +250,6 @@ template("bl602_sdk") {
       "OS_USING_FREERTOS",
       "BL602_MATTER_SUPPORT",
       "TD_DIAGNOSIS_STA",
-
     ]
 
     if (bl602_board == "BL-HWC-G1") {
@@ -294,6 +294,7 @@ template("bl602_sdk") {
     cflags_cc = [ "-fpermissive" ]
     cflags_cc += [ "-std=c++17" ]
     cflags_cc += [ "-D _GNU_SOURCE" ]
+
     #cflags_cc += [ "-fcommon" ]
     #cflags_cc += [ "-fno-rtti" ]
     #cflags_cc += [ "-Wnon-virtual-dtor" ]
@@ -449,6 +450,7 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/network/lwip/src/netif/slipif.c",
       "${bl602_sdk_root}/components/network/lwip/src/netif/zepif.c",
       "${bl602_sdk_root}/components/network/lwip_dhcpd/dhcp_server_raw.c",
+
       #"${bl602_sdk_root}/components/network/lwip_mdns/mdns_server.c",
       "${bl602_sdk_root}/components/network/sntp/sntp.c",
       "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_cmds.c",
@@ -482,7 +484,6 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_pwm.c",
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_rtc.c",
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_sec.c",
-      "${bl602_sdk_root}/components/platform/hosal/sec_common/bl_sec_sha.c",
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_sys.c",
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_timer.c",
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_uart.c",
@@ -497,6 +498,7 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hosal_dma.c",
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hosal_pwm.c",
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hosal_uart.c",
+      "${bl602_sdk_root}/components/platform/hosal/sec_common/bl_sec_sha.c",
       "${bl602_sdk_root}/components/platform/soc/bl602/bl602/evb/src/boot/gcc/start.S",
       "${bl602_sdk_root}/components/platform/soc/bl602/bl602/evb/src/strntoumax.c",
       "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Common/platform_print/platform_device.c",
@@ -555,20 +557,20 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/utils/src/utils_rbtree.c",
 
       #rebase add
-      "${bl602_sdk_root}/components/utils/src/utils_tlv_bl.c",
+      "${bl602_sdk_root}/components/network/wifi_hosal/port/wifi_hosal_bl602.c",
+      "${bl602_sdk_root}/components/network/wifi_hosal/wifi_hosal.c",
       "${bl602_sdk_root}/components/os/bl_os_adapter/bl_os_adapter/bl_os_hal.c",
+      "${bl602_sdk_root}/components/platform/hosal/sec_common/bl_sec_aes.c",
+      "${bl602_sdk_root}/components/platform/hosal/sec_common/bl_sec_pka.c",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_supplicant_api.c",
       "${bl602_sdk_root}/components/utils/src/utils_getopt.c",
       "${bl602_sdk_root}/components/utils/src/utils_string.c",
-      "${bl602_sdk_root}/components/network/wifi_hosal/wifi_hosal.c",
-      "${bl602_sdk_root}/components/platform/hosal/sec_common/bl_sec_pka.c",
-      "${bl602_sdk_root}/components/network/wifi_hosal/port/wifi_hosal_bl602.c",
-      "${bl602_sdk_root}/components/platform/hosal/sec_common/bl_sec_aes.c",
-      "${bl602_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_supplicant_api.c",
+      "${bl602_sdk_root}/components/utils/src/utils_tlv_bl.c",
 
       #bl602 portable
-      "${chip_root}/third_party/bouffalolab/bl602/portable/debug.c",
       "${chip_root}/third_party/bouffalolab/bl602/portable/async_log.c",
       "${chip_root}/third_party/bouffalolab/bl602/portable/bfl_main.c",
+      "${chip_root}/third_party/bouffalolab/bl602/portable/debug.c",
 
       #wap_supplicant
       "${bl602_sdk_root}/components/security/wpa_supplicant/port/os_bl.c",
