@@ -39,6 +39,7 @@ tests:
       verification: |
           While commissioning TH Saves the CountryCode Information from SetRegulatoryConfig command
 
+
           ./chip-tool pairing ble-wifi 1 GRLPrivate_EXT matter123 20202021 3840
 
           TH END:
@@ -48,6 +49,15 @@ tests:
 
           DUT END:
           [1641381202.306840][4431:4431] CHIP:DL: NVS set: chip-config/regulatory-location = 0 (0x0)
+
+          After pairing, Verify the countrycode Information by reading location atrribute from TH to DUT.
+          ./chip-tool basic read location 1 0
+
+          On TH,  Verify that TH reads Location from the DUT successfully,  the name should be string and length is less than or equal to 2 bytes.
+          [1656495999.760797][2249:2254] CHIP:DMG: }
+          [1656495999.761084][2249:2254] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 941124320
+          [1656495999.761187][2249:2254] CHIP:TOO:   Location: XX
+          [1656495999.761371][2249:2254] CHIP:EM: Sending Standalone Ack for MessageCounter:7663506 on exchange 28126i
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT

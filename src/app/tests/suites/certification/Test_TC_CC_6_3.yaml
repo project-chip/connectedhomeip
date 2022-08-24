@@ -244,13 +244,13 @@ tests:
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTemperatureMiredsStep3b
 
-    - label: "Wait 10s"
+    - label: "Wait 5s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10000
+                value: 5000
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp

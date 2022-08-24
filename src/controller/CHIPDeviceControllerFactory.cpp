@@ -419,19 +419,6 @@ void DeviceControllerSystemState::Shutdown()
         mTransportMgr = nullptr;
     }
 
-#if CONFIG_DEVICE_LAYER
-    //
-    // We can safely call PlatformMgr().Shutdown(), which like DeviceController::Shutdown(),
-    // expects to be called with external thread synchronization and will not try to acquire the
-    // stack lock.
-    //
-    // Actually stopping the event queue is a separable call that applications will have to sequence.
-    // Consumers are expected to call PlaformMgr().StopEventLoopTask() before calling
-    // DeviceController::Shutdown() in the CONFIG_DEVICE_LAYER configuration
-    //
-    DeviceLayer::PlatformMgr().Shutdown();
-#endif
-
     if (mExchangeMgr != nullptr)
     {
         mExchangeMgr->Shutdown();
@@ -483,6 +470,19 @@ void DeviceControllerSystemState::Shutdown()
         // so that SetupController/Commissioner can use it
         mFabrics = nullptr;
     }
+
+#if CONFIG_DEVICE_LAYER
+    //
+    // We can safely call PlatformMgr().Shutdown(), which like DeviceController::Shutdown(),
+    // expects to be called with external thread synchronization and will not try to acquire the
+    // stack lock.
+    //
+    // Actually stopping the event queue is a separable call that applications will have to sequence.
+    // Consumers are expected to call PlaformMgr().StopEventLoopTask() before calling
+    // DeviceController::Shutdown() in the CONFIG_DEVICE_LAYER configuration
+    //
+    DeviceLayer::PlatformMgr().Shutdown();
+#endif
 }
 
 } // namespace Controller

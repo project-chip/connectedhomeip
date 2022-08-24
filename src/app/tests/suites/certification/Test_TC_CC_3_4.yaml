@@ -29,6 +29,15 @@ tests:
           For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
+    - label: "Precondition"
+      verification: |
+          1. Commission DUT to TH
+
+          2. Set DUT OnOff to On
+
+          3. DUT supports CC.C.F00(HS)
+      disabled: true
+
     - label: "DUT sends MoveToHue command to TH"
       PICS: CC.C.C00.Rsp
       verification: |

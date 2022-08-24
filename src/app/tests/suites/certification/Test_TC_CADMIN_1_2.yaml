@@ -286,14 +286,15 @@ tests:
           Information Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
-          On second controller read, write attribute and then read attribute to and from TH_CE
+          On DUT_CR2 read, write attribute and then read attribute to and from TH_CE
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
+          On DUT_CR2 send the below command
 
           ./chip-tool basic write node-label te5new 2 0 --commissioner-name beta
 
-          On TH2(all-clusters-app) Log
+          Verify the success response On DUT_CR2(Chip-tool) Log
 
 
           CHIP:DMG: WriteResponseMessage =
@@ -326,7 +327,7 @@ tests:
 
           ./chip-tool basic read node-label 2 0 --commissioner-name beta
 
-          On TH2(all-clusters-app) Log
+          Verify the NodeLabel response On DUT_CR2(Chip-tool) Log
 
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
