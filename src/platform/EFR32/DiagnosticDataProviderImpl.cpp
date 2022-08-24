@@ -264,7 +264,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         ifp->name          = CharSpan::fromCharString(ifp->Name);
         ifp->isOperational = true;
         Inet::InterfaceType interfaceType;
-        if (interfaceIterator.GetInterfaceType(interfaceType) == CHIP_NO_ERROR)
+        CHIP_ERROR err = interfaceIterator.GetInterfaceType(interfaceType);
+        if (err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED)
         {
             switch (interfaceType)
             {
@@ -282,6 +283,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 break;
             case Inet::InterfaceType::Cellular:
                 ifp->type = EMBER_ZCL_INTERFACE_TYPE_CELLULAR;
+                break;
+            default:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
                 break;
             }
         }
