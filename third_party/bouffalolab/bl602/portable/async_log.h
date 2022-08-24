@@ -1,6 +1,8 @@
 #ifndef __ASYNC_LOT_H_
 #define __ASYNC_LOT_H_
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
