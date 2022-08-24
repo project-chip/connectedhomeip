@@ -188,9 +188,10 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
         {
             if (iter->type == EMBER_UNICAST_BINDING)
             {
-                mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
+                error = mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
+                SuccessOrExit(error);
                 error = EstablishConnection(ScopedNodeId(iter->nodeId, iter->fabricIndex));
-                SuccessOrExit(error == CHIP_NO_ERROR);
+                SuccessOrExit(error);
             }
             else if (iter->type == EMBER_MULTICAST_BINDING)
             {
