@@ -177,6 +177,10 @@ void InitOTARequestor(void)
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 }
 
+const char* mw320_get_verstr(void)
+{
+    return VERSION_STR;
+}
 // ota --
 
 namespace {

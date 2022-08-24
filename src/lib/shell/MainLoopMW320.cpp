@@ -18,6 +18,7 @@
 #include "streamer.h"
 #include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <app/server/Server.h>
 
 #include <ctype.h>
 #include <stdio.h>
@@ -144,8 +145,48 @@ exit:
 
 } // namespace
 
+extern const char* mw320_get_verstr(void);
 namespace chip {
 namespace Shell {
+
+// ++++
+static void AtExitShell(void);
+
+static CHIP_ERROR ShutdownHandler(int argc, char ** argv)
+{
+    streamer_printf(streamer_get(), "Shutdown and Goodbye\r\n");
+    chip::Server::GetInstance().DispatchShutDownAndStopEventLoop();
+    AtExitShell();
+    exit(0);
+    return CHIP_NO_ERROR;
+}
+
+static void AtExitShell(void)
+{
+    PRINTF("%s(), PlatformMgr().Shutdown() \r\n", __FUNCTION__);
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+}
+
+static CHIP_ERROR VersionHandler(int argc, char ** argv)
+{
+    //streamer_printf(streamer_get(), "CHIP %s\r\n", CHIP_VERSION_STRING);
+    streamer_printf(streamer_get(), "CHIP %s\r\n", mw320_get_verstr());
+    return CHIP_NO_ERROR;
+}
+
+static void RegisterMetaCommands(void)
+{
+    static shell_command_t sCmds[] = {
+        { &ShutdownHandler, "shutdown", "Exit the shell application" },
+        { &VersionHandler, "version", "Output the software version" },
+    };
+
+    std::atexit(AtExitShell);
+
+    Engine::Root().RegisterCommands(sCmds, ArraySize(sCmds));
+}
+
+// ----
 
 void Engine::RunMainLoop()
 {
@@ -155,6 +196,7 @@ void Engine::RunMainLoop()
     char line[CHIP_SHELL_MAX_LINE_SIZE];
 
     Engine::Root().RegisterDefaultCommands();
+    RegisterMetaCommands();
 
     while (true)
     {
