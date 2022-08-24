@@ -50,6 +50,14 @@
 
 #include "AppMain.h"
 
+#ifdef PW_RPC_ENABLED
+#include "bridge_service.h"
+#include "Rpc.h"
+#include "pw_rpc_system_server/rpc_server.h"
+static chip::rpc::Bridge bridge_service;
+#endif
+
+
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -163,6 +171,12 @@ chip::Span<Action *> GetActionListInfo(chip::EndpointId parentId)
 
 void ApplicationInit()
 {
+#ifdef PW_RPC_ENABLED
+    chip::rpc::Init();
+
+    pw::rpc::system_server::Server().RegisterService(bridge_service);
+#endif
+
     clusters::BridgeRegisterAllAttributeOverrides();
 
     gFirstDynamicEndpointId = static_cast<chip::EndpointId>(

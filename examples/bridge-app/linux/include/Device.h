@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <lib/support/Span.h>
 #include <app-common/app-common/zap-generated/cluster-enums.h>
+#include <lib/support/Span.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -70,7 +70,7 @@ private:
     chip::Span<ClusterImpl *> mClusterImpl;
     chip::Span<const EmberAfDeviceType> mDeviceTypeList;
     EmberAfEndpointType mEndpointType;
-    const char * mDeviceName = "";
+    std::string mDeviceName;
 };
 
 class Action

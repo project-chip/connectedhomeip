@@ -15,8 +15,6 @@
 
 namespace {
 
-std::vector<std::unique_ptr<Device>> g_devices;
-std::vector<std::unique_ptr<DynamicDeviceImpl>> g_device_impls;
 std::unique_ptr<DynamicDeviceImpl> g_pending;
 
 // Pseudo-index representing the device being built.
@@ -169,8 +167,8 @@ void FinishDevice(const std::vector<std::string> & tokens)
     for (auto * c : g_pending->clusters())
         c->SetCallback(&g_write_cb);
 
-    auto dev = std::make_unique<Device>(g_pending->CreateDevice());
-    int ep   = AddDeviceEndpoint(dev.get());
+    int ep = AddDevice(std::move(g_pending));
+
     if (ep < 0)
     {
         printf("Failed to add device\n");
@@ -178,14 +176,6 @@ void FinishDevice(const std::vector<std::string> & tokens)
     else
     {
         printf("Added device at index %d\n", ep);
-        size_t index = (size_t) ep;
-        if (g_devices.size() <= index)
-        {
-            g_devices.resize(index + 1);
-            g_device_impls.resize(index + 1);
-        }
-        g_devices[index]      = std::move(dev);
-        g_device_impls[index] = std::move(g_pending);
     }
 }
 
@@ -198,19 +188,10 @@ void RemoveDevice(const std::vector<std::string> & tokens)
         printf("Error: %s.\nExpected index of a device\n", err);
         return;
     }
-    if (index >= g_devices.size())
+    if (!RemoveDeviceAt(index))
     {
         printf("%d is an invalid index\n", index);
-        return;
     }
-
-    RemoveDeviceEndpoint(g_devices[index].get());
-
-    for (auto & room : gRooms)
-        room.RemoveEndpoint(g_devices[index]->GetEndpointId());
-
-    g_devices[index]      = nullptr;
-    g_device_impls[index] = nullptr;
 }
 
 void AddType(const std::vector<std::string> & tokens)

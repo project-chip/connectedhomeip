@@ -42,7 +42,7 @@ void Device::SetEndpointId(chip::EndpointId id)
 
 const char * Device::GetName()
 {
-    return mDeviceName;
+    return mDeviceName.c_str();
 }
 
 void Device::SetName(const char * name)
