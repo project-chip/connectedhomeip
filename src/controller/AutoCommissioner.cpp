@@ -139,6 +139,12 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     }
     mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
 
+    if (params.GetPASEOnlyCommissioning().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting PASE-only commissioning from parameters");
+        mParams.SetPASEOnlyCommissioning(params.GetPASEOnlyCommissioning().Value());
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -252,6 +258,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         else
         {
+            if (mParams.GetPASEOnlyCommissioning().ValueOr(false))
+            {
+                return CommissioningStage::kCleanup;
+            }
             return CommissioningStage::kFindOperational;
         }
     case CommissioningStage::kWiFiNetworkSetup:
@@ -280,14 +290,22 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         {
             return CommissioningStage::kThreadNetworkEnable;
         }
+        else if (mParams.GetPASEOnlyCommissioning().ValueOr(false))
+        {
+            return CommissioningStage::kCleanup;
+        }
         else
         {
             return CommissioningStage::kFindOperational;
         }
     case CommissioningStage::kThreadNetworkEnable:
+        if (mParams.GetPASEOnlyCommissioning().ValueOr(false))
+        {
+            return CommissioningStage::kCleanup;
+        }
         return CommissioningStage::kFindOperational;
     case CommissioningStage::kFindOperational:
-        return CommissioningStage::kSendComplete;
+        return CommissioningStage::kCleanup;
     case CommissioningStage::kSendComplete:
         return CommissioningStage::kCleanup;
 

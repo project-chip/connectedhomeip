@@ -379,7 +379,7 @@ JNI_METHOD(void, commissionDevice)
 
     ChipLogProgress(Controller, "commissionDevice() called");
 
-    CommissioningParameters commissioningParams = CommissioningParameters();
+    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
     if (networkCredentials != nullptr)
     {
         err = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
@@ -417,7 +417,7 @@ JNI_METHOD(void, pairDevice)
 #endif
                                                 .SetPeerAddress(Transport::PeerAddress::BLE());
 
-    CommissioningParameters commissioningParams = CommissioningParameters();
+    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
     wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
 
     if (csrNonce != nullptr)
@@ -451,7 +451,8 @@ JNI_METHOD(void, pairDeviceWithAddress)
             .SetDiscriminator(discriminator)
             .SetSetupPINCode(pinCode)
             .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), port));
-    CommissioningParameters commissioningParams = CommissioningParameters();
+
+    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
     if (csrNonce != nullptr)
     {
         JniByteArray jniCsrNonce(env, csrNonce);
