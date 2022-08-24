@@ -137,9 +137,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * @param[in] iterations      The number of iterations to use when generating the verifier
  * @param[in] salt            The 16-byte salt for verifier computation
  */
-- (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode
-                              iterations:(uint32_t)iterations
-                                    salt:(NSData *)salt;
+- (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt;
 
 /**
  * Shutdown the controller. Calls to shutdown after the first one are NO-OPs.
