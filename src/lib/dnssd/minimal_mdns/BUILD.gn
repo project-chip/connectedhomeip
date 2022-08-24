@@ -51,11 +51,11 @@ config("config") {
 }
 
 source_set("policy_header") {
-  sources = ["AddressPolicy.h"]
+  sources = [ "AddressPolicy.h" ]
 }
 
 static_library("default_policy") {
-  sources = ["AddressPolicy_DefaultImpl.cpp"]
+  sources = [ "AddressPolicy_DefaultImpl.cpp" ]
 
   public_deps = [
     ":policy_header",

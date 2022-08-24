@@ -82,7 +82,8 @@ public:
 #endif
 
         for (mIterator.Next(); SkipCurrentInterface(); mIterator.Next())
-        {}
+        {
+        }
         return true;
     }
 
