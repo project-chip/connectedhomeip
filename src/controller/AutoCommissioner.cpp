@@ -305,7 +305,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         return CommissioningStage::kFindOperational;
     case CommissioningStage::kFindOperational:
-        return CommissioningStage::kCleanup;
+        return CommissioningStage::kSendComplete;
     case CommissioningStage::kSendComplete:
         return CommissioningStage::kCleanup;
 
