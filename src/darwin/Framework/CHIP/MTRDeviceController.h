@@ -140,7 +140,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode
                               iterations:(uint32_t)iterations
                                     salt:(NSData *)salt;
-                                    
+
 /**
  * Shutdown the controller. Calls to shutdown after the first one are NO-OPs.
  */
