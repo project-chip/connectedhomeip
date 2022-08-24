@@ -321,7 +321,7 @@ tests:
 
           ./chip-tool pairing onnetwork 3 20202021 --commissioner-name gamma
 
-          verify you got the following message in the TH_CR3(all-clusters-app) log
+          verify you got the following message in the TH_CR3(Chip-tool) log
 
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
           CHIP:TOO: Secure Pairing Failed
