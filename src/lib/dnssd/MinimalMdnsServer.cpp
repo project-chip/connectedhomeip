@@ -15,82 +15,10 @@
  *    limitations under the License.
  */
 #include "MinimalMdnsServer.h"
+#include "AllInterfacesListenIterator.h"
 
 namespace chip {
 namespace Dnssd {
-namespace {
-
-using namespace mdns::Minimal;
-
-class AllInterfaces : public ListenIterator
-{
-private:
-public:
-    AllInterfaces() { SkipToFirstValidInterface(); }
-
-    bool Next(chip::Inet::InterfaceId * id, chip::Inet::IPAddressType * type) override
-    {
-        if (!mIterator.HasCurrent())
-        {
-            return false;
-        }
-
-#if INET_CONFIG_ENABLE_IPV4
-        if (mState == State::kIpV4)
-        {
-            *id    = mIterator.GetInterfaceId();
-            *type  = chip::Inet::IPAddressType::kIPv4;
-            mState = State::kIpV6;
-            return true;
-        }
-#endif
-
-        *id   = mIterator.GetInterfaceId();
-        *type = chip::Inet::IPAddressType::kIPv6;
-#if INET_CONFIG_ENABLE_IPV4
-        mState = State::kIpV4;
-#endif
-
-        for (mIterator.Next(); SkipCurrentInterface(); mIterator.Next())
-        {
-        }
-        return true;
-    }
-
-private:
-#if INET_CONFIG_ENABLE_IPV4
-    enum class State
-    {
-        kIpV4,
-        kIpV6,
-    };
-    State mState = State::kIpV4;
-#endif
-    chip::Inet::InterfaceIterator mIterator;
-
-    void SkipToFirstValidInterface()
-    {
-        do
-        {
-            if (!SkipCurrentInterface())
-            {
-                break;
-            }
-        } while (mIterator.Next());
-    }
-
-    bool SkipCurrentInterface()
-    {
-        if (!mIterator.HasCurrent())
-        {
-            return false; // nothing to try.
-        }
-
-        return !Internal::IsCurrentInterfaceUsable(mIterator);
-    }
-};
-
-} // namespace
 
 GlobalMinimalMdnsServer & GlobalMinimalMdnsServer::Instance()
 {

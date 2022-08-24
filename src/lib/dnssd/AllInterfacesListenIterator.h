@@ -24,6 +24,8 @@
 namespace chip {
 namespace Dnssd {
 
+namespace Internal {
+
 /// Checks if the current interface is powered on
 /// and not local loopback.
 template <typename T>
@@ -56,9 +58,10 @@ bool IsCurrentInterfaceUsable(T & iterator)
     return true;
 }
 
+} // namespace Internal
+
 class AllInterfaces : public mdns::Minimal::ListenIterator
 {
-private:
 public:
     AllInterfaces() { SkipToFirstValidInterface(); }
 
@@ -92,15 +95,13 @@ public:
     }
 
 private:
+#if INET_CONFIG_ENABLE_IPV4
     enum class State
     {
         kIpV4,
         kIpV6,
     };
-#if INET_CONFIG_ENABLE_IPV4
     State mState = State::kIpV4;
-#else
-    State mState = State::kIpV6;
 #endif
     chip::Inet::InterfaceIterator mIterator;
 
@@ -122,7 +123,7 @@ private:
             return false; // nothing to try.
         }
 
-        return !IsCurrentInterfaceUsable(mIterator);
+        return !Internal::IsCurrentInterfaceUsable(mIterator);
     }
 };
 
