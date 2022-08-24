@@ -364,12 +364,12 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
                     PLAT_LOG("OpenBasicCommissioningWindow() failed");
                 }
             }
-	    else
-	    {
+            else
+            {
                 // Disable BLE advertisements
                 ConnectivityMgr().SetBLEAdvertisingEnabled(false);
                 PLAT_LOG("Disabled BLE Advertisements");
-	    }
+            }
         }
         break;
 
