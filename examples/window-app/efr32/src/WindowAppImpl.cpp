@@ -137,12 +137,11 @@ WindowApp & WindowApp::Instance()
     return WindowAppImpl::sInstance;
 }
 
-WindowAppImpl::WindowAppImpl()
 #ifdef DISPLAY_ENABLED
-    :
-    mIconTimer("Timer:icon", LCD_ICON_TIMEOUT, OnIconTimeout, this)
+WindowAppImpl::WindowAppImpl() : mIconTimer("Timer:icon", LCD_ICON_TIMEOUT, OnIconTimeout, this) {}
+#else
+WindowAppImpl::WindowAppImpl() {}
 #endif
-{}
 
 void WindowAppImpl::OnTaskCallback(void * parameter)
 {
