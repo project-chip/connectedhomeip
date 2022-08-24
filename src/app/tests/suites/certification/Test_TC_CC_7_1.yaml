@@ -21,7 +21,7 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
-    timeout: 150
+    timeout: 200
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"

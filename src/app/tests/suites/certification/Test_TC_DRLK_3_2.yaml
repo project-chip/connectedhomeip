@@ -29,6 +29,13 @@ tests:
           For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
+    - label: "Note"
+      verification: |
+          1. TH is commissioned with the DUT
+
+          2.Steps 4- 12 need a User added to the lock
+      disabled: true
+
     - label: "DUT sends Lock Door command to TH."
       PICS: DRLK.C.C00.Tx
       verification: |

@@ -128,7 +128,7 @@ tests:
           "TH sends a MoveToLevel command to the DUT with Level = 200 and
           TransitionTime = 300 (30 s). This means the level should increase by
           150 units in 30s, so 5 units/s"
-      PICS: LVL.S.C00.Rsp && LVL.S.M.VarRate
+      PICS: LVL.S.C00.Rsp
       command: "MoveToLevel"
       arguments:
           values:
@@ -142,6 +142,7 @@ tests:
                 value: 0
 
     - label: "Wait 10000ms"
+      PICS: LVL.S.M.VarRate
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -159,6 +160,7 @@ tests:
               maxValue: 115
 
     - label: "Wait 10000ms"
+      PICS: LVL.S.M.VarRate
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -176,6 +178,7 @@ tests:
               maxValue: 173
 
     - label: "Wait 10000ms"
+      PICS: LVL.S.M.VarRate
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -193,6 +196,7 @@ tests:
               maxValue: 200
 
     - label: "Wait 5000ms"
+      PICS: LVL.S.M.VarRate
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
