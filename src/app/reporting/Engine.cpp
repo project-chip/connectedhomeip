@@ -653,8 +653,7 @@ void Engine::Run()
 
     bool allReadClean = true;
 
-    imEngine->mReadHandlers.ForEachActiveObject([this, &allReadClean](ReadHandler * handler) {
-        UpdateReadHandlerDirty(*handler);
+    imEngine->mReadHandlers.ForEachActiveObject([&allReadClean](ReadHandler * handler) {
         if (handler->IsDirty())
         {
             allReadClean = false;
@@ -850,41 +849,6 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
     return CHIP_NO_ERROR;
 }
 
-void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
-{
-    if (!aReadHandler.IsDirty())
-    {
-        return;
-    }
-
-    if (!aReadHandler.IsType(ReadHandler::InteractionType::Subscribe))
-    {
-        return;
-    }
-
-    bool intersected = false;
-    for (auto object = aReadHandler.GetAttributePathList(); object != nullptr; object = object->mpNext)
-    {
-        mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
-            if (path->Intersects(object->mValue) && path->mGeneration > aReadHandler.mPreviousReportsBeginGeneration)
-            {
-                intersected = true;
-                return Loop::Break;
-            }
-            return Loop::Continue;
-        });
-        if (intersected)
-        {
-            break;
-        }
-    }
-    if (!intersected)
-    {
-        aReadHandler.ClearDirty();
-        ChipLogDetail(InteractionModel, "clear read handler dirty in UpdateReadHandlerDirty!");
-    }
-}
-
 CHIP_ERROR Engine::SendReport(ReadHandler * apReadHandler, System::PacketBufferHandle && aPayload, bool aHasMoreChunks)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -974,8 +938,8 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBy
 
     if (isUrgentEvent)
     {
-        ChipLogDetail(DataManagement, "urgent event schedule run");
-        return ScheduleRun();
+        ChipLogDetail(DataManagement, "urgent event would be sent after min interval");
+        return CHIP_NO_ERROR;
     }
 
     return ScheduleBufferPressureEventDelivery(aBytesWritten);
