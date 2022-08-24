@@ -122,7 +122,7 @@ jobs:
                   retention-days: 5
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
-        timeout-minutes: 120
+        timeout-minutes: 150
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -185,16 +185,9 @@ jobs:
             - name: Setup Build, Run Build and Run Tests
               timeout-minutes: 90
               run: |
-                  for BUILD_TYPE  in gcc_release clang; do
-                      case $BUILD_TYPE in
-                          "gcc_release") GN_ARGS='is_debug=false';;
-                          "clang") GN_ARGS='is_clang=true';;
-                      esac
-
-                      BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
-                      scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
-                      BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
-                  done
+                  BUILD_TYPE=gcc_release scripts/build/gn_gen.sh --args="is_debug=false" --export-compile-commands
+                  scripts/run_in_build_env.sh "ninja -C ./out/gcc_release"
+                  BUILD_TYPE=gcc_release scripts/tests/gn_tests.sh
             - name: Clang-tidy validation
               timeout-minutes: 45
               run: |
