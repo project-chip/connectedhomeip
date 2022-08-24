@@ -95,7 +95,7 @@ tests:
 
     - label: "TH1 enables DUT as Controller"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT is triggered to send On command to its binding node entries"

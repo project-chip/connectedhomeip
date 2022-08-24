@@ -44,11 +44,11 @@ tests:
           scenario)"
       PICS: DRLK.S.E00 && DRLK.S.DetectLockJammed
       verification: |
-          To trigger the event give below command by opening an another terminal of DUT
+          To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in lock-app to generate the event, Vendor Dut should have capability to generate this event)
 
-          echo "{"Cmd": "SendDoorLockAlarm", "Params": { "EndpointId": 1, "AlarmCode": 0 } }" > /tmp/chip_lock_app_fifo-<PID>  (PID of lock-app)
+          echo '{"Cmd": "SendDoorLockAlarm", "Params": { "EndpointId": 1, "AlarmCode": 0 } }' > /tmp/chip_lock_app_fifo-<PID>  (PID of lock-app)
           For example :
-           echo "{"Cmd": "SendDoorLockAlarm", "Params": { "EndpointId": 1, "AlarmCode": 0 } }" > /tmp/chip_lock_app_fifo-3940
+           echo '{"Cmd": "SendDoorLockAlarm", "Params": { "EndpointId": 1, "AlarmCode": 0 } }' > /tmp/chip_lock_app_fifo-3940 (PID may vary based on the actual DUT)
       disabled: true
 
     - label: "TH reads the DoorLockAlarm event from DUT"
@@ -70,8 +70,8 @@ tests:
     - label: "Trigger the DUT to generate DoorStateChange Event"
       PICS: DRLK.S.F05 && DRLK.S.E01
       verification: |
-          To trigger the event give below command in another terminal of DUT
-          echo "{"Cmd": "SetDoorState", "Params": { "EndpointId": 1, "DoorState": 1 } }" > /tmp/chip_lock_app_fifo-4055    (4055 - value changes)
+          To trigger the event give the below command in another terminal of DUT
+          echo '{"Cmd": "SetDoorState", "Params": { "EndpointId": 1, "DoorState": 1 } }' > /tmp/chip_lock_app_fifo-4055    (4055 - value changes)
       disabled: true
 
     - label: "TH reads the DoorStateChange event from DUT"
@@ -101,7 +101,7 @@ tests:
 
           [1656497453.684077][25847:25853] CHIP:DMG:        status = 0x00 (SUCCESS),
 
-          ./chip-tool doorlock set-credential 0 "{ "credentialType" : 1 , "credentialIndex" : 1 }" 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
@@ -518,7 +518,7 @@ tests:
           123456 UserIndex as 1 UserStatus as 0 UserType as 0"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       verification: |
-          ./chip-tool doorlock clear-credential  "{ "credentialType" : 1 , "credentialIndex" : 1 }"  1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }'  1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
@@ -540,7 +540,7 @@ tests:
           [1659778601.601785][3414:3419] CHIP:DMG:                        },
           [1659778601.601823][3414:3419] CHIP:DMG:
 
-          ./chip-tool doorlock set-credential 0 "{ "credentialType" : 1 , "credentialIndex" : 1 }" 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends Set Credential Response command with status as SUCCESS" on the TH(Chip-tool) Log:
 
@@ -593,7 +593,7 @@ tests:
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.C26.Rsp
       verification: |
-          ./chip-tool doorlock clear-credential  "{ "credentialType" : 1 , "credentialIndex" : 1 }"  1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }'  1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 

@@ -40,7 +40,9 @@
 #include <system/SystemTimer.h>
 
 #include "esp_log.h"
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "esp_nimble_hci.h"
+#endif
 #include "host/ble_hs.h"
 #include "host/ble_hs_pvcy.h"
 #include "host/ble_uuid.h"
@@ -152,7 +154,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
     mNumGAPCons = 0;
-    memset(mCons, 0, sizeof(mCons));
+    memset(reinterpret_cast<void *>(mCons), 0, sizeof(mCons));
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     memset(mDeviceName, 0, sizeof(mDeviceName));
 
@@ -613,9 +615,10 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     {
         mSubscribedConIds[i] = BLE_CONNECTION_UNINITIALIZED;
     }
-
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
     err = MapBLEError(esp_nimble_hci_and_controller_init());
     SuccessOrExit(err);
+#endif
 
     nimble_port_init();
 

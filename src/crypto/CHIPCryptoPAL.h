@@ -641,7 +641,22 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
 CHIP_ERROR GenerateCertificateSigningRequest(const P256Keypair * keypair, MutableByteSpan & csr_span);
 
 /**
+ * @brief Common code to validate ASN.1 format/size of a CSR, used by VerifyCertificateSigningRequest.
+ *
+ * Ensures it's not obviously malformed and doesn't have trailing garbage.
+ *
+ * @param csr CSR in DER format
+ * @param csr_length The length of the CSR buffer
+ * @return CHIP_ERROR_UNSUPPORTED_CERT_FORMAT on invalid format, CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR VerifyCertificateSigningRequestFormat(const uint8_t * csr, size_t csr_length);
+
+/**
  * @brief Verify the Certificate Signing Request (CSR). If successfully verified, it outputs the public key from the CSR.
+ *
+ * The CSR is valid if the format is correct, the signature validates with the embedded public
+ * key, and there is no trailing garbage data.
+ *
  * @param csr CSR in DER format
  * @param csr_length The length of the CSR
  * @param pubkey The public key from the verified CSR
