@@ -32,6 +32,9 @@ declare_args() {
   # This enables verbose logging of sent/received mDNS messages. However, will incur extra RAM and
   # time.
   chip_minmdns_high_verbosity = false
+
+  # Compile in the default minmdns policy for endpoint and ip address fetching
+  chip_minmdns_default_policy = true
 }
 
 config("config") {
@@ -92,6 +95,10 @@ static_library("minimal_mdns") {
     "${chip_root}/src/lib/dnssd/minimal_mdns/responders",
     "${chip_root}/src/platform",
   ]
+
+  if (chip_minmdns_default_policy) {
+    public_deps += [ ":default_policy" ]
+  }
 
   public_configs = [ ":config" ]
 }
