@@ -20,7 +20,7 @@
 #pragma once
 
 // ---- Window Example App Config ----
-#define APP_TASK_NAME "APP"
+#define APP_TASK_NAME "Window App"
 
 // EFR Logging
 #ifdef __cplusplus

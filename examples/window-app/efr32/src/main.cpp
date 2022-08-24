@@ -59,15 +59,16 @@ int main(void)
     WindowApp & app = WindowApp::Instance();
 
     EFR32_LOG("Starting App");
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    err = app.Init();
+    // chip::DeviceLayer::PlatformMgr().LockChipStack();
+    // err = app.Init();
+    err = app.StartAppTask();
     // Initialize device attestation config
 #ifdef EFR32_ATTESTATION_CREDENTIALS
     SetDeviceAttestationCredentialsProvider(EFR32::GetEFR32DacProvider());
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    // chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     if (err != CHIP_NO_ERROR)
     {

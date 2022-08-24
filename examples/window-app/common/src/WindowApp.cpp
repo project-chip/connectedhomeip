@@ -109,6 +109,8 @@ WindowApp::Cover * WindowApp::GetCover(chip::EndpointId endpoint)
     return nullptr;
 }
 
+CHIP_ERROR WindowApp::StartAppTask() { return CHIP_NO_ERROR;}
+
 CHIP_ERROR WindowApp::Init()
 {
     ConfigurationMgr().LogDeviceConfig();
@@ -136,6 +138,8 @@ CHIP_ERROR WindowApp::Run()
 #else
     oldState.isWiFiProvisioned = !ConnectivityMgr().IsWiFiStationProvisioned();
 #endif
+
+    EFR32_LOG(">>>> App Started >>>>");
     while (true)
     {
         ProcessEvents();
