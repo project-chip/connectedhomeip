@@ -50,6 +50,19 @@ config("config") {
   }
 }
 
+source_set("policy_header") {
+  sources = ["AddressPolicy.h"]
+}
+
+static_library("default_policy") {
+  sources = ["AddressPolicy_DefaultImpl.cpp"]
+
+  public_deps = [
+    ":policy_header",
+    "${chip_root}/src/inet",
+  ]
+}
+
 static_library("minimal_mdns") {
   sources = [
     "Logging.h",
@@ -72,6 +85,7 @@ static_library("minimal_mdns") {
   }
 
   public_deps = [
+    ":policy_header",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd/minimal_mdns/core",
