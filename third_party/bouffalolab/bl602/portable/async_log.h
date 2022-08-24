@@ -5,8 +5,7 @@
 extern "C" {
 #endif
 
-
-int async_log_push(const void* buf, const uint16_t len);
+int async_log_push(const void * buf, const uint16_t len);
 void log_async_init(void);
 void enable_async_log(void);
 int async_log(void);

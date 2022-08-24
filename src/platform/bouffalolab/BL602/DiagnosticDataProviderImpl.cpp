@@ -30,11 +30,11 @@
 
 extern "C" {
 #include <bl602_hal/bl_sys.h>
+#include <bl60x_fw_api.h>
 #include <bl_efuse.h>
 #include <bl_main.h>
 #include <wifi_mgmr.h>
 #include <wifi_mgmr_ext.h>
-#include <bl60x_fw_api.h>
 }
 
 extern uint8_t _heap_size;
@@ -214,8 +214,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityTyp
 {
     int authmode;
 
-    //authmode     = mgmr_get_security_type();
-    //securityType = MapAuthModeToSecurityType(authmode);
+    // authmode     = mgmr_get_security_type();
+    // securityType = MapAuthModeToSecurityType(authmode);
     return CHIP_NO_ERROR;
 }
 
@@ -229,21 +229,21 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
 {
     channelNumber = 0;
 
-    //channelNumber = mgmr_get_current_channel_num();
+    // channelNumber = mgmr_get_current_channel_num();
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    //rssi = mgmr_get_rssi();
+    // rssi = mgmr_get_rssi();
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
 {
-    wifi_diagnosis_info_t *info;
+    wifi_diagnosis_info_t * info;
 
     info = bl_diagnosis_get();
     if (info)
@@ -262,7 +262,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentM
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
 {
-    wifi_diagnosis_info_t *info;
+    wifi_diagnosis_info_t * info;
 
     info = bl_diagnosis_get();
     if (info)
@@ -275,7 +275,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & 
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
 {
-    wifi_diagnosis_info_t *info;
+    wifi_diagnosis_info_t * info;
 
     info = bl_diagnosis_get();
     if (info)
@@ -288,7 +288,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & 
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
 {
-    wifi_diagnosis_info_t *info;
+    wifi_diagnosis_info_t * info;
 
     info = bl_diagnosis_get();
     if (info)
@@ -301,7 +301,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & pa
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
 {
-    wifi_diagnosis_info_t *info;
+    wifi_diagnosis_info_t * info;
 
     info = bl_diagnosis_get();
     if (info)
@@ -325,7 +325,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
 {
-    wifi_diagnosis_info_t *info;
+    wifi_diagnosis_info_t * info;
 
     info = bl_diagnosis_get();
     if (info)
@@ -337,4 +337,5 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxC
 }
 
 } // namespace DeviceLayer
-wifi_diagnosis_info_t *info;} // namespace chip
+wifi_diagnosis_info_t * info;
+} // namespace chip

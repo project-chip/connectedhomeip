@@ -92,7 +92,7 @@ BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 
 AppTask AppTask::sAppTask;
-//static DeviceCallbacks EchoCallbacks;
+// static DeviceCallbacks EchoCallbacks;
 
 CHIP_ERROR AppTask::StartAppTask()
 {

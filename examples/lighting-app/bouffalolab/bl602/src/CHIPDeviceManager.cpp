@@ -43,7 +43,7 @@ using namespace ::chip::DeviceLayer;
 
 void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
-    //CHIPDeviceManagerCallbacks * cb = reinterpret_cast<CHIPDeviceManagerCallbacks *>(arg);
+    // CHIPDeviceManagerCallbacks * cb = reinterpret_cast<CHIPDeviceManagerCallbacks *>(arg);
     DeviceCallbacks * cb = reinterpret_cast<DeviceCallbacks *>(arg);
     if (cb != nullptr)
     {
