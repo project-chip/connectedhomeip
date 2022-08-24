@@ -42,7 +42,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <InitPlatform.h>
-//#include <async_log.h>
+#include <async_log.h>
 #include <bl_sys_ota.h>
 #include <easyflash.h>
 #include <hal_sys.h>
@@ -167,7 +167,8 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err;
 
     log_info("App Task entered\r\n");
-    //enable_async_log();
+    log_async_init();
+    enable_async_log();
 
     err = sWiFiNetworkCommissioningInstance.Init();
     if (CHIP_NO_ERROR != err)
