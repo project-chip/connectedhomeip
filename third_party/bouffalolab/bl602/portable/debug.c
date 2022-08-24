@@ -223,10 +223,10 @@ static char *cvt(double arg, int ndigits, int *decpt, int *sign, char *buf, int 
   arg = modf(arg, &fi);
   p1 = &buf[CVTBUFSIZE];
 
-  if (fi != 0) 
+  if (fi != 0)
   {
     p1 = &buf[CVTBUFSIZE];
-    while (fi != 0) 
+    while (fi != 0)
     {
       fj = modf(fi / 10, &fi);
       *--p1 = (int)((fj + 0.03) * 10) + '0';
@@ -236,7 +236,7 @@ static char *cvt(double arg, int ndigits, int *decpt, int *sign, char *buf, int 
   }
   else if (arg > 0)
   {
-    while ((fj = arg * 10) < 1) 
+    while ((fj = arg * 10) < 1)
     {
       arg = fj;
       r2--;
@@ -245,7 +245,7 @@ static char *cvt(double arg, int ndigits, int *decpt, int *sign, char *buf, int 
   p1 = &buf[ndigits];
   if (eflag == 0) p1 += r2;
   *decpt = r2;
-  if (p1 < &buf[0]) 
+  if (p1 < &buf[0])
   {
     buf[0] = '\0';
     return buf;
@@ -256,7 +256,7 @@ static char *cvt(double arg, int ndigits, int *decpt, int *sign, char *buf, int 
     arg = modf(arg, &fj);
     *p++ = (int) fj + '0';
   }
-  if (p1 >= &buf[CVTBUFSIZE]) 
+  if (p1 >= &buf[CVTBUFSIZE])
   {
     buf[CVTBUFSIZE - 1] = '\0';
     return buf;
@@ -293,8 +293,8 @@ char *fcvtbuf(double arg, int ndigits, int *decpt, int *sign, char *buf)
   return cvt(arg, ndigits, decpt, sign, buf, 0);
 }
 
-static void ee_bufcpy(char *d, char *s, int count); 
- 
+static void ee_bufcpy(char *d, char *s, int count);
+
 void ee_bufcpy(char *pd, char *ps, int count) {
 	char *pe=ps+count;
 	while (ps!=pe)
@@ -416,7 +416,7 @@ static void decimal_point(char *buffer)
   if (*buffer)
   {
     int n = strnlen(buffer,256);
-    while (n > 0) 
+    while (n > 0)
     {
       buffer[n + 1] = buffer[n];
       n--;

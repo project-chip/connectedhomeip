@@ -287,7 +287,7 @@ static void system_early_init(void)
 void bfl_main()
 {
     TaskHandle_t aos_loop_proc_task;
-    
+
     bl_sys_early_init();
     /*Init UART In the first place*/
     hosal_uart_init(&uart_stdio);

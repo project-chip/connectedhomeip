@@ -28,7 +28,7 @@ int async_log_push(const void* buf, const uint16_t len)
     int xBytesSent;
 
     const TickType_t xBlockTime = pdMS_TO_TICKS(10);
-    xBytesSent = xStreamBufferSend(xStreamBuffer, (void *)buf, len, 0); 
+    xBytesSent = xStreamBufferSend(xStreamBuffer, (void *)buf, len, 0);
 
     if (xBytesSent != len) {
         return -1;
