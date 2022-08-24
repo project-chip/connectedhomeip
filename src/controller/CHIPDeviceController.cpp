@@ -1516,7 +1516,7 @@ void DeviceCommissioner::DisarmDone()
 
     // Signal completion - this will reset mDeviceBeingCommissioned.
     CommissioningStageComplete(CHIP_NO_ERROR);
-    SendCommissioningCompleteCallbacks(commissionee->GetDeviceId(), commissioningCompletionStatus);
+    SendCommissioningCompleteCallbacks(mDeviceBeingCommissioned->GetDeviceId(), commissioningCompletionStatus);
 
     // If we've disarmed the failsafe, it's because we're starting again, so kill the pase connection.
     if (commissionee != nullptr)
