@@ -84,5 +84,7 @@ private:
     // Get QR Code and emulate its content using NFC tag
     char mQRCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     Timer mIconTimer;
+    #ifdef DISPLAY_ENABLED
     LcdIcon mIcon = LcdIcon::None;
+    #endif
 };

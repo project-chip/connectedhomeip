@@ -16,13 +16,15 @@
  */
 
 #include <AppConfig.h>
+#ifdef DISPLAY_ENABLED
 #include <LcdPainter.h>
+#include <lcd.h>
+#endif // DISPLAY_ENABLED
 //#include <WindowApp.h>
 #include <WindowAppImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
 #include <app/server/OnboardingCodesUtil.h>
-#include <lcd.h>
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
@@ -155,7 +157,9 @@ void WindowAppImpl::OnTaskCallback(void * parameter)
 
 void WindowAppImpl::OnIconTimeout(WindowApp::Timer & timer)
 {
+    #ifdef DISPLAY_ENABLED
     sInstance.mIcon = LcdIcon::None;
+    #endif
     sInstance.UpdateLCD();
 }
 
@@ -366,12 +370,16 @@ void WindowAppImpl::DispatchEvent(const WindowApp::Event & event)
         break;
     case EventId::CoverChange:
         mIconTimer.Start();
+        #ifdef DISPLAY_ENABLED
         mIcon = (GetCover().mEndpoint == 1) ? LcdIcon::One : LcdIcon::Two;
+        #endif
         UpdateLCD();
         break;
     case EventId::TiltModeChange:
         mIconTimer.Start();
+        #ifdef DISPLAY_ENABLED
         mIcon = mTiltMode ? LcdIcon::Tilt : LcdIcon::Lift;
+        #endif
         UpdateLCD();
         break;
     default:

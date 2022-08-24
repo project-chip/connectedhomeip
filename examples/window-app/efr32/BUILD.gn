@@ -86,7 +86,7 @@ if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B") {
 # WiFi settings
 if (chip_enable_wifi) {
   # disabling LCD for MG24 for wifi
-  if (efr32_board == "BRD4186A" || efr32_board == "BRD4187A") {
+  if (efr32_board == "BRD4186C" || efr32_board == "BRD4187C") {
     show_qr_code = false
     disable_lcd = true
   }
