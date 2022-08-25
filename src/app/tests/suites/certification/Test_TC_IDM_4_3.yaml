@@ -183,7 +183,7 @@ tests:
           status response with an inactive subscription. Change the value of the
           attribute which has been subscribed on the DUT."
       verification: |
-          This tester needs to be tested by changing the controls available in the DUT and then read the value.  And can"t be tested with RPI& has dependency of Vendor specific DUT support.
+          Out of scope for V1.0
       disabled: true
 
     - label:
