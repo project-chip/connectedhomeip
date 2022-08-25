@@ -48,7 +48,7 @@ static_library("cc32xx") {
 
   include_dirs = [ 
     "ifmod/", 
-    "../../" ]
+    "../../app/server" ]
   deps = []
 
   public_deps = [
