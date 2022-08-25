@@ -281,9 +281,6 @@ void UDPEndPointImplLwIP::Free()
 
 void UDPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && msg, IPPacketInfo * pktInfo)
 {
-    // Decrease mDelayReleaseCount so that we don't need to delay release of current UDPEndPoint if it reaches 0.
-    mDelayReleaseCount--;
-
     if ((mState == State::kListening) && (OnMessageReceived != nullptr))
     {
         if (pktInfo != nullptr)
