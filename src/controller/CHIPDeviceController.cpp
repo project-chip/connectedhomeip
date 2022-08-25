@@ -1551,6 +1551,11 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
 {
     // Once this stage is complete, reset mDeviceBeingCommissioned - this will be reset when the delegate calls the next step.
     MATTER_TRACE_EVENT_SCOPE("CommissioningStageComplete", "DeviceCommissioner");
+    if (mDeviceBeingCommissioned == nullptr)
+    {
+        ChipLogProgress(Controller, "CommissioningStageComplete with null mDeviceBeingCommissioned");
+        return;
+    }
     NodeId nodeId            = mDeviceBeingCommissioned->GetDeviceId();
     DeviceProxy * proxy      = mDeviceBeingCommissioned;
     mDeviceBeingCommissioned = nullptr;
