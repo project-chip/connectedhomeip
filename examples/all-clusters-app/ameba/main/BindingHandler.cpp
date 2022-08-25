@@ -17,6 +17,7 @@
  */
 
 #include "BindingHandler.h"
+#include "IdentifyCommand.h"
 #include "OnOffCommands.h"
 #include "LevelControlCommands.h"
 #include "ColorControlCommands.h"
@@ -61,6 +62,9 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
         {
             switch (data->clusterId)
             {
+            case Clusters::Identify::Id:
+                ProcessIdentifyUnicastBindingRead(data, binding, peer_device);
+                break;
             case Clusters::OnOff::Id:
                 ProcessOnOffUnicastBindingRead(data, binding, peer_device);
                 break;
@@ -82,6 +86,9 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
         {
             switch (data->clusterId)
             {
+            case Clusters::Identify::Id:
+                ProcessIdentifyGroupBindingCommand(data, binding);
+                break;
             case Clusters::OnOff::Id:
                 ProcessOnOffGroupBindingCommand(data, binding);
                 break;
@@ -100,6 +107,9 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
         {
             switch (data->clusterId)
             {
+            case Clusters::Identify::Id:
+                ProcessIdentifyUnicastBindingCommand(data, binding, peer_device);
+                break;
             case Clusters::OnOff::Id:
                 ProcessOnOffUnicastBindingCommand(data, binding, peer_device);
                 break;
@@ -235,12 +245,26 @@ static void RegisterSwitchCommands()
 
     static const shell_command_t sSwitchSubCommands[] = {
         { &SwitchHelpHandler, "help", "Usage: switch <subcommand>" },
+        { &IdentifySwitchCommandHandler, "identify", " Usage: switch identify <subcommand>" },
         { &OnOffSwitchCommandHandler, "onoff", " Usage: switch onoff <subcommand>" },
         { &LevelControlSwitchCommandHandler, "levelcontrol", " Usage: switch levlecontrol <subcommand>" },
         { &ColorControlSwitchCommandHandler, "colorcontrol", " Usage: switch colorcontrol <subcommand>" },
         { &ThermostatSwitchCommandHandler, "thermostat", " Usage: switch thermostat <subcommand>" },
         { &GroupsSwitchCommandHandler, "groups", "Usage: switch groups <subcommand>" },
         { &BindingSwitchCommandHandler, "binding", "Usage: switch binding <subcommand>" }
+    };
+
+    static const shell_command_t sSwitchIdentifySubCommands[] = {
+        { &IdentifyHelpHandler, "help", "Usage: switch identify <subcommand>" },
+        { &IdentifyCommandHandler, "identify", "identify Usage: switch identify identify" },
+        { &TriggerEffectSwitchCommandHandler, "triggereffect", "triggereffect Usage: switch identify triggereffect" },
+        { &IdentifyRead, "read", "Usage : switch identify read <attribute>" }
+    };
+
+    static const shell_command_t sSwitchIdentifyReadSubCommands[] = {
+        { &IdentifyReadHelpHandler, "help", "Usage : switch identify read <attribute>" },
+        { &IdentifyReadIdentifyTime, "identifytime", "Read identifytime attribute" },
+        { &IdentifyReadIdentifyType, "identifytype", "Read identifytype attribute" },
     };
 
     static const shell_command_t sSwitchOnOffSubCommands[] = {
@@ -251,7 +275,7 @@ static void RegisterSwitchCommands()
         { &OffWithEffectSwitchCommandHandler, "offWE", "off-with-effect Usage: switch onoff offWE <EffectId> <EffectVariant>" },
         { &OnWithRecallGlobalSceneSwitchCommandHandler, "onWRGS", "on-with-recall-global-scene Usage: switch onoff onWRGS" },
         { &OnWithTimedOffSwitchCommandHandler, "onWTO", "on-with-timed-off Usage: switch onoff onWTO <OnOffControl> <OnTime> <OffWaitTime>" },
-        { &OnOffRead, "read", "Usage : switch levelcontrol read <attribute>" }
+        { &OnOffRead, "read", "Usage : switch onoff read <attribute>" }
     };
 
     static const shell_command_t sSwitchOnOffReadSubCommands[] = {
@@ -408,6 +432,12 @@ static void RegisterSwitchCommands()
         { &GroupsThermostatSwitchCommandHandler, "thermostat", "Usage: switch groups thermostat <subcommand>" } ,
     };
 
+    static const shell_command_t sSwitchGroupsIdentifySubCommands[] = {
+        { &GroupsIdentifyHelpHandler, "help", "Usage: switch groups onoff <subcommand>" },
+        { &GroupIdentifyCommandHandler, "identify", "Sends identify command to bound group" },
+        { &GroupTriggerEffectSwitchCommandHandler, "triggereffect", "Sends triggereffect command to group" },
+    };
+
     static const shell_command_t sSwitchGroupsOnOffSubCommands[] = {
         { &GroupsOnOffHelpHandler, "help", "Usage: switch groups onoff <subcommand>" },
         { &GroupOnSwitchCommandHandler, "on", "Sends on command to bound group" },
@@ -467,10 +497,16 @@ static void RegisterSwitchCommands()
     static const shell_command_t sSwitchCommand = { &SwitchCommandHandler, "switch",
                                                     "Light-switch commands. Usage: switch <subcommand>" };
 
+    // Register groups command
+    sShellSwitchGroupsIdentifySubCommands.RegisterCommands(sSwitchGroupsIdentifySubCommands, ArraySize(sSwitchGroupsIdentifySubCommands));
     sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwitchGroupsOnOffSubCommands, ArraySize(sSwitchGroupsOnOffSubCommands));
     sShellSwitchGroupsLevelControlSubCommands.RegisterCommands(sSwitchGroupsLevelControlSubCommands, ArraySize(sSwitchGroupsLevelControlSubCommands));
     sShellSwitchGroupsColorControlSubCommands.RegisterCommands(sSwitchGroupsColorControlSubCommands, ArraySize(sSwitchGroupsColorControlSubCommands));
     sShellSwitchGroupsThermostatSubCommands.RegisterCommands(sSwitchGroupsThermostatSubCommands, ArraySize(sSwitchGroupsThermostatSubCommands));
+
+    // Register commands
+    sShellSwitchIdentifySubCommands.RegisterCommands(sSwitchIdentifySubCommands, ArraySize(sSwitchIdentifySubCommands));
+    sShellSwitchIdentifyReadSubCommands.RegisterCommands(sSwitchIdentifyReadSubCommands, ArraySize(sSwitchIdentifyReadSubCommands));
     sShellSwitchOnOffSubCommands.RegisterCommands(sSwitchOnOffSubCommands, ArraySize(sSwitchOnOffSubCommands));
     sShellSwitchOnOffReadSubCommands.RegisterCommands(sSwitchOnOffReadSubCommands, ArraySize(sSwitchOnOffReadSubCommands));
     sShellSwitchLevelControlSubCommands.RegisterCommands(sSwitchLevelControlSubCommands, ArraySize(sSwitchLevelControlSubCommands));
