@@ -391,7 +391,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             CancelFunctionTimer();
             mFunction = kFunction_NoneSelected;
 
-#ifdef DISPLAY_ENABLED
+#ifdef QR_CODE_ENABLED
             // TOGGLE QRCode/LCD demo UI
             slLCD.ToggleQRCode();
 #endif
