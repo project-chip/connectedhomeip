@@ -53,9 +53,8 @@ in the all-clusters application, but stubs are provided.
 
 Long presses (greater than 1000ms) of the user buttons are used for controlling
 BLE advertisements and resets. The left button (`BTN-1`) is used to perform a
-factory reset of the device.
-The Right button (`BTN-2`) is used to disable BLE advertisements (if enabled)
-or enable advertisements (if disabled).
+factory reset of the device. The Right button (`BTN-2`) is used to disable BLE
+advertisements (if enabled) or enable advertisements (if disabled).
 
 ## Building
 
