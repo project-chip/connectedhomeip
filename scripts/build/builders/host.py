@@ -223,6 +223,10 @@ class HostBuilder(GnBuilder):
         self.app = app
         self.board = board
         self.extra_gn_options = []
+        self.build_env = {}
+
+        if board == HostBoard.ARM64:
+            self.build_env['PKG_CONFIG_PATH'] = os.path.join(self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
 
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
@@ -245,10 +249,15 @@ class HostBuilder(GnBuilder):
         if use_asan:
             self.extra_gn_options.append('is_asan=true')
 
-        self.use_dmalloc = use_dmalloc
         if use_dmalloc:
             self.extra_gn_options.append('chip_config_memory_debug_checks=true')
             self.extra_gn_options.append('chip_config_memory_debug_dmalloc=true')
+
+            # this is from `dmalloc -b -l DMALLOC_LOG -i 1 high`
+            self.build_env['DMALLOC_OPTIONS']='debug=0x4f4ed03,inter=1,log=DMALLOC_LOG'
+
+            # glib interop with dmalloc
+            self.build_env['G_SLICE']='always-malloc'
 
         if not separate_event_loop:
             self.extra_gn_options.append('config_use_separate_eventloop=false')
@@ -333,30 +342,7 @@ class HostBuilder(GnBuilder):
             raise Exception('Unknown host board type: %r' % self)
 
     def GnBuildEnv(self):
-        env = {}
-
-        if self.use_dmalloc:
-            # this is from `dmalloc -b -l DMALLOC_LOG -i 1 high`
-            env['DMALLOC_OPTIONS']='debug=0x4f4ed03,inter=1,log=DMALLOC_LOG'
-
-            # glib interop with dmalloc
-            env['G_SLICE']='always-malloc'
-
-        if self.board == HostBoard.NATIVE:
-            pass
-        elif self.board == HostBoard.FAKE:
-            pass
-        elif self.board == HostBoard.ARM64:
-            env['PKG_CONFIG_PATH'] = os.path.join(
-                    self.SysRootPath('SYSROOT_AARCH64'),
-                    'lib/aarch64-linux-gnu/pkgconfig')
-        else:
-            raise Exception('Unknown host board type: %r' % self)
-
-        if not env:
-            return None
-
-        return env
+        return self.build_env
 
     def SysRootPath(self, name):
         if name not in os.environ:
