@@ -674,7 +674,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
     status = psa_driver_wrapper_verify_message(&attr, Uint8::to_const_uchar(*this), Length(), PSA_ALG_ECDSA(PSA_ALG_SHA_256), msg,
                                                msg_length, signature.ConstBytes(), signature.Length());
 
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INVALID_SIGNATURE);
 exit:
     _log_PSA_error(status);
     psa_reset_key_attributes(&attr);
