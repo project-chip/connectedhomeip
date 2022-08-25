@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    113.2.8. [TC-DRLK-2.8] Verification for the following Commands - Set User,
+    116.2.8. [TC-DRLK-2.8] Verification for the following Commands - Set User,
     Get User, Get User Response, Clear User [DUT-Server]
+
+PICS:
+    - DRLK.S
 
 config:
     nodeId: 0x12344321
@@ -23,14 +26,20 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Pre-Conditions"
+      verification: |
+          1 TH is commissioned with the DUT
+
+          2 Lock device is the DUT
+      disabled: true
+
     - label:
           "TH reads NumberOfTotalUsers Supported attribute and saves for future
           use."
-      PICS: DRLK.C.F08 && DRLK.S.A0011
+      PICS: DRLK.S.F08 && DRLK.S.A0011
       verification: |
           ./chip-tool doorlock read number-of-total-users-supported 1 1
-
-          Verify on the TH Log:
+          Verify " NumberOfTotal UsersSupported" on the TH(Chip-tool) Log:
 
           [1654694451.295683][4985:4990] CHIP:DMG:
           [1654694451.295743][4985:4990] CHIP:DMG:        SuppressResponse = true,
@@ -47,8 +56,7 @@ tests:
       PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
       verification: |
           ./chip-tool doorlock set-user 0 1 xxx 6452 1 0 0 1 1  --timedInteractionTimeoutMs 1000
-
-          Verify on the TH Log:
+          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
           [1655114915.892667][26101:26106] CHIP:DMG: {
           [1655114915.892724][26101:26106] CHIP:DMG:      suppressResponse = false,
@@ -85,8 +93,7 @@ tests:
       PICS: DRLK.S.F08 && DRLK.S.C1b.Rsp && DRLK.S.C1c.Tx
       verification: |
           ./chip-tool doorlock get-user 1 1 1
-
-          Verify on the TH Log:
+          Verify " DUT responds with Get User Response" on the TH(Chip-tool) Log:
 
           [1655114978.939527][26110:26115] CHIP:DMG: },
           [1655114978.939725][26110:26115] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001C
@@ -108,11 +115,11 @@ tests:
     - label:
           "TH sends Set User Command to DUT with the following values:
           OperationType as 0 UserIndex as 2 UserName as xxx UserUniqueID as 6452
-          UserStatus as 1 UserType as 10 (invalid value) CredentialRule as 3"
+          UserStatus as 1 UserType as 10 (Invalid value) CredentialRule as 3"
       PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
       verification: |
           ./chip-tool doorlock set-user 0 2 xxx 6451 1 10 3 1 1 --timedInteractionTimeoutMs 1000
-          Verify on the TH Log:
+          Verify " DUT sends INVALID_COMMAND " on the TH(Chip-tool) Log:
 
           [1657607954.930591][7988:7993] CHIP:DMG: {
           [1657607954.930618][7988:7993] CHIP:DMG:        suppressResponse = false,
@@ -148,29 +155,30 @@ tests:
 
     - label:
           "TH sends Set User Command to DUT with the following values:
-          OperationType as 0 UserIndex as 1 UserName as xxx UserUniqueID as 8965
-          UserStatus as 1 UserType as 0 CredentialRule as 0"
+          OperationType as 0 UserIndex as 1 (Same as step 2) UserName as xxx
+          UserUniqueID as 8965 UserStatus as 1 UserType as 0 CredentialRule as 0"
       PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
       verification: |
           ./chip-tool doorlock set-user 0 1 xxx 8965 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify on the TH Log:
+          Verify " DUT sends OCCUPIED Status " on the TH(Chip-tool) Log:
 
-
-          [1654694864.885349][5080:5085] CHIP:DMG:
-          [1654694864.885405][5080:5085] CHIP:DMG:                                StatusIB =
-          [1654694864.885462][5080:5085] CHIP:DMG:                                {
-          [1654694864.885525][5080:5085] CHIP:DMG:                                        status = 0x01 (FAILURE),
-          [1654694864.885580][5080:5085] CHIP:DMG:                                },
-          [1654694864.885649][5080:5085] CHIP:DMG:
-          [1654694864.885705][5080:5085] CHIP:DMG:                        },
-          [1654694864.885768][5080:5085] CHIP:DMG:
-          [1654694864.885815][5080:5085] CHIP:DMG:                },
-          [1654694864.885870][5080:5085] CHIP:DMG:
-          [1654694864.885914][5080:5085] CHIP:DMG:        ],
-          [1654694864.885968][5080:5085] CHIP:DMG:
-          [1654694864.886012][5080:5085] CHIP:DMG:        InteractionModelRevision = 1
-          [1654694864.886056][5080:5085] CHIP:DMG: },
+          [1659349025.616076][17010:17015] CHIP:DMG:                              StatusIB =
+          [1659349025.616117][17010:17015] CHIP:DMG:                              {
+          [1659349025.616157][17010:17015] CHIP:DMG:                                      status = 0x01 (FAILURE),
+          [1659349025.616199][17010:17015] CHIP:DMG:                                      cluster-status = 0x3,
+          [1659349025.616234][17010:17015] CHIP:DMG:                              },
+          [1659349025.616270][17010:17015] CHIP:DMG:
+          [1659349025.616302][17010:17015] CHIP:DMG:                      },
+          [1659349025.616341][17010:17015] CHIP:DMG:
+          [1659349025.616371][17010:17015] CHIP:DMG:              },
+          [1659349025.616407][17010:17015] CHIP:DMG:
+          [1659349025.616435][17010:17015] CHIP:DMG:      ],
+          [1659349025.616469][17010:17015] CHIP:DMG:
+          [1659349025.616495][17010:17015] CHIP:DMG:      InteractionModelRevision = 1
+          [1659349025.616521][17010:17015] CHIP:DMG: },
+          [1659349025.616588][17010:17015] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001A Status=0x1
+          [1659349025.616625][17010:17015] CHIP:TOO: Error: IM Error 0x00000603: Cluster-specific error: 0x03
       disabled: true
 
     - label:
@@ -180,8 +188,7 @@ tests:
       PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
       verification: |
           ./chip-tool doorlock set-user 0 2 null null null null null 1 1 --timedInteractionTimeoutMs 1000
-
-          Verify on the TH Log:
+          Verify " DUT sends SUCCESS response " on the TH(Chip-tool) Log:
 
           [1655115257.604810][26135:26140] CHIP:DMG: {
           [1655115257.604859][26135:26140] CHIP:DMG:      suppressResponse = false,
@@ -216,8 +223,8 @@ tests:
     - label: "TH sends Get User Command to DUT with UserIndex as 2"
       verification: |
           ./chip-tool doorlock get-user 2 1 1
+          Verify " DUT responds with Get User Response " on the TH(Chip-tool) Log:
 
-          Verify on the TH Log:
 
           [1655375970.047000][3043:3048] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001C
           [1655375970.047078][3043:3048] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_001C
@@ -242,8 +249,7 @@ tests:
       PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
       verification: |
           ./chip-tool doorlock set-user 2 2 null null null null null 1 1 --timedInteractionTimeoutMs 1000
-
-          Verify on the TH Log:
+          Verify "  DUT sends SUCCESS response " on the TH(Chip-tool) Log:
 
           [1654695125.813357][5126:5131] CHIP:DMG:                                StatusIB =
           [1654695125.813426][5126:5131] CHIP:DMG:                                {
@@ -260,33 +266,11 @@ tests:
           [1654695125.814095][5126:5131] CHIP:DMG: },
       disabled: true
 
-    - label: "TH sends Get User Command with User Index as 2"
-      verification: |
-          ./chip-tool doorlock get-user 2 1 1
-
-          Verify on the TH Log:
-
-          [1655123677.092511][27390:27395] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_001C
-          [1655123677.092651][27390:27395] CHIP:TOO:   GetUserResponse: {
-          [1655123677.092729][27390:27395] CHIP:TOO:     userIndex: 2
-          [1655123677.092788][27390:27395] CHIP:TOO:     userName:
-          [1655123677.092844][27390:27395] CHIP:TOO:     userUniqueId: null
-          [1655123677.092904][27390:27395] CHIP:TOO:     userStatus: 1
-          [1655123677.092963][27390:27395] CHIP:TOO:     userType: 0
-          [1655123677.093020][27390:27395] CHIP:TOO:     credentialRule: 0
-          [1655123677.093078][27390:27395] CHIP:TOO:     credentials: null
-          [1655123677.093135][27390:27395] CHIP:TOO:     creatorFabricIndex: 1
-          [1655123677.093193][27390:27395] CHIP:TOO:     lastModifiedFabricIndex: 1
-          [1655123677.093250][27390:27395] CHIP:TOO:     nextUserIndex: null
-          [1655123677.093306][27390:27395] CHIP:TOO:    }
-      disabled: true
-
     - label: "TH sends Get User Command to DUT with the UserIndex as 2"
       PICS: DRLK.S.F08 && DRLK.S.C1b.Rsp && DRLK.S.C1c.Tx
       verification: |
           ./chip-tool doorlock get-user 2 1 1
-
-          Verify on the TH Log:
+          Verify " DUT sends Get User Response " on the TH(Chip-tool) Log:
 
           [1655123677.092511][27390:27395] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_001C
           [1655123677.092651][27390:27395] CHIP:TOO:   GetUserResponse: {
@@ -307,8 +291,7 @@ tests:
       PICS: DRLK.S.F08 && DRLK.S.C1d.Rsp
       verification: |
           ./chip-tool doorlock clear-user 1 1 1  --timedInteractionTimeoutMs 1000
-
-          Verify on the TH Log:
+          Verify "DUT sends SUCCESS response " on the TH(Chip-tool) Log:
 
           [1654696621.722147][5296:5301] CHIP:DMG:                                StatusIB =
           [1654696621.722202][5296:5301] CHIP:DMG:                                {
@@ -329,8 +312,7 @@ tests:
       PICS: DRLK.S.F08 && DRLK.S.C1b.Rsp && DRLK.S.C1c.Tx
       verification: |
           ./chip-tool doorlock get-user 1 1 1  --timedInteractionTimeoutMs 1000
-
-          Verify on the TH Log:
+          Verify " DUT sends Get User Response with NULL Values" on the TH(Chip-tool) Log:
 
           [1655376097.413458][3073:3078] CHIP:DMG: },
           [1655376097.413564][3073:3078] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001C

@@ -56,7 +56,7 @@ public final class ChipIdLookup {
       return "AccessControl";
     }
     if (clusterId == 37L) {
-      return "BridgedActions";
+      return "Actions";
     }
     if (clusterId == 40L) {
       return "Basic";
@@ -219,6 +219,9 @@ public final class ChipIdLookup {
     }
     if (clusterId == 4294048773L) {
       return "TestCluster";
+    }
+    if (clusterId == 4294048774L) {
+      return "FaultInjection";
     }
     return "";
   }
@@ -539,10 +542,10 @@ public final class ChipIdLookup {
         return "ActionList";
       }
       if (attributeId == 1L) {
-        return "EndpointList";
+        return "EndpointLists";
       }
       if (attributeId == 2L) {
-        return "SetupUrl";
+        return "SetupURL";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -1214,7 +1217,7 @@ public final class ChipIdLookup {
         return "SecurityPolicy";
       }
       if (attributeId == 60L) {
-        return "ChannelMask";
+        return "ChannelPage0Mask";
       }
       if (attributeId == 61L) {
         return "OperationalDatasetComponents";
@@ -3087,6 +3090,24 @@ public final class ChipIdLookup {
       }
       return "";
     }
+    if (clusterId == 4294048774L) {
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
     return "";
   }
 
@@ -3218,6 +3239,9 @@ public final class ChipIdLookup {
     if (clusterId == 53L) {
       if (eventId == 0L) {
         return "ConnectionStatus";
+      }
+      if (eventId == 1L) {
+        return "NetworkFaultChange";
       }
       return "";
     }
@@ -3456,6 +3480,9 @@ public final class ChipIdLookup {
       if (eventId == 2L) {
         return "TestFabricScopedEvent";
       }
+      return "";
+    }
+    if (clusterId == 4294048774L) {
       return "";
     }
     return "";

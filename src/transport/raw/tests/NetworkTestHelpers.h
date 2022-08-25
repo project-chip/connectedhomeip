@@ -64,7 +64,8 @@ class LoopbackTransportDelegate
 public:
     virtual ~LoopbackTransportDelegate() {}
 
-    // Called by the loopback transport when it drops a message due to a nonzero mNumMessagesToDrop.
+    // Called by the loopback transport when it drops one of a configurable number of messages (mDroppedMessageCount) after a
+    // configurable allowed number of messages (mNumMessagesToAllowBeforeDropping)
     virtual void OnMessageDropped() {}
 };
 
@@ -98,23 +99,37 @@ public:
         }
     }
 
+    static constexpr uint32_t kUnlimitedMessageCount = std::numeric_limits<uint32_t>::max();
+
     CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override
     {
         ReturnErrorOnFailure(mMessageSendError);
         mSentMessageCount++;
+        bool dropMessage = false;
+        if (mNumMessagesToAllowBeforeDropping > 0)
+        {
+            --mNumMessagesToAllowBeforeDropping;
+        }
+        else if (mNumMessagesToDrop > 0)
+        {
+            dropMessage = true;
+            --mNumMessagesToDrop;
+        }
 
-        if (mNumMessagesToDrop == 0)
+        if (dropMessage)
+        {
+            ChipLogProgress(Test, "Dropping message...");
+            mDroppedMessageCount++;
+            if (mDelegate != nullptr)
+            {
+                mDelegate->OnMessageDropped();
+            }
+        }
+        else
         {
             System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
             mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
             mSystemLayer->ScheduleWork(OnMessageReceived, this);
-        }
-        else
-        {
-            mNumMessagesToDrop--;
-            mDroppedMessageCount++;
-            if (mDelegate != nullptr)
-                mDelegate->OnMessageDropped();
         }
 
         return CHIP_NO_ERROR;
@@ -124,10 +139,11 @@ public:
 
     void Reset()
     {
-        mNumMessagesToDrop   = 0;
-        mDroppedMessageCount = 0;
-        mSentMessageCount    = 0;
-        mMessageSendError    = CHIP_NO_ERROR;
+        mNumMessagesToDrop                = 0;
+        mDroppedMessageCount              = 0;
+        mSentMessageCount                 = 0;
+        mNumMessagesToAllowBeforeDropping = 0;
+        mMessageSendError                 = CHIP_NO_ERROR;
     }
 
     struct PendingMessageItem
@@ -143,11 +159,12 @@ public:
     System::Layer * mSystemLayer = nullptr;
     std::queue<PendingMessageItem> mPendingMessageQueue;
     Transport::PeerAddress mTxAddress;
-    uint32_t mNumMessagesToDrop           = 0;
-    uint32_t mDroppedMessageCount         = 0;
-    uint32_t mSentMessageCount            = 0;
-    CHIP_ERROR mMessageSendError          = CHIP_NO_ERROR;
-    LoopbackTransportDelegate * mDelegate = nullptr;
+    uint32_t mNumMessagesToDrop                = 0;
+    uint32_t mDroppedMessageCount              = 0;
+    uint32_t mSentMessageCount                 = 0;
+    uint32_t mNumMessagesToAllowBeforeDropping = 0;
+    CHIP_ERROR mMessageSendError               = CHIP_NO_ERROR;
+    LoopbackTransportDelegate * mDelegate      = nullptr;
 };
 
 } // namespace Test

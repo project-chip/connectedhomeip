@@ -221,9 +221,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable());
-    SuccessOrExit(err);
-
     chip::Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
@@ -297,7 +294,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             .groupDataProvider = mGroupsProvider,
             .mrpLocalConfig    = GetLocalMRPConfig(),
         },
-        .devicePool        = &mDevicePool,
+        .sessionSetupPool        = &mSessionSetupPool,
     };
 
     err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
@@ -305,6 +302,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage,
                                                     mCertificateValidityPolicy, mGroupsProvider);
+    SuccessOrExit(err);
+
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mCASESessionManager);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot

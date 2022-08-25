@@ -91,8 +91,9 @@ chip_data_model("chef-common") {
   is_server = true
 }
 
-# BRD4166A --> ThunderBoard Sense 2 (No LCD)
-if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
+# ThunderBoards and Explorer Kit (No LCD)
+if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B" ||
+    efr32_board == "BRD2703A") {
   show_qr_code = false
   disable_lcd = true
 }
@@ -179,6 +180,7 @@ efr32_executable("chef_app") {
   defines = []
 
   sources = [
+    "${examples_plat_dir}/BaseApplication.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/efr32_utils.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
@@ -205,21 +207,10 @@ efr32_executable("chef_app") {
   # OpenThread Settings
   if (chip_enable_openthread) {
     deps += [
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+      "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread:openthread-platform",
       "${examples_plat_dir}:efr-matter-shell",
     ]
-    if (chip_openthread_ftd) {
-      deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
-      ]
-    } else {
-      deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
-      ]
-    }
   }
 
   if (chip_enable_ota_requestor) {
@@ -257,7 +248,11 @@ efr32_executable("chef_app") {
   }
 
   if (!disable_lcd) {
-    sources += [ "${examples_plat_dir}/display/lcd.c" ]
+    sources += [
+      "${examples_plat_dir}/display/demo-ui.c",
+      "${examples_plat_dir}/display/lcd.cpp",
+    ]
+    include_dirs += [ "${examples_plat_dir}/display" ]
     defines += [ "DISPLAY_ENABLED" ]
     if (show_qr_code) {
       defines += [ "QR_CODE_ENABLED" ]

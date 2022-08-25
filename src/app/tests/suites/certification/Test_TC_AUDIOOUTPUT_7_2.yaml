@@ -14,6 +14,9 @@
 
 name: 19.9.2. [TC-AUDIOOUTPUT-7.2] Rename Output Verification
 
+PICS:
+    - AUDIOOUTPUT.S
+
 config:
     nodeId: 0x12344321
     cluster: "Audio Output"
@@ -35,10 +38,10 @@ tests:
       response:
           saveAs: audioOutputListValues
           constraints:
-              type: OutPutInfo
+              type: list
 
     - label: "Sends a RenameOutput command"
-      PICS: AUDIOOUTPUT.S.C0001
+      PICS: AUDIOOUTPUT.S.C01.Rsp
       command: "RenameOutput"
       arguments:
           values:
@@ -62,7 +65,7 @@ tests:
           [1651061821.366651][156898:156903] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && AUDIOOUTPUT.S.A0001
+      PICS: PICS_USER_PROMPT && AUDIOOUTPUT.S.A0001 && AUDIOOUTPUT.S.C01.Rsp
       arguments:
           values:
               - name: "message"

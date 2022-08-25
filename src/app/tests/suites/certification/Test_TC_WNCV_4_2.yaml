@@ -16,12 +16,15 @@ name:
     Window Covering [TC-WNCV-4.2] GoToTiltPercentage Long-Run Verification with
     server as DUT
 
+PICS:
+    - WNCV.S
+
 config:
     nodeId: 0x12344321
     cluster: "Window Covering"
     endpoint: 1
     fullMotionDuration:
-        type: INT16U
+        type: int16u
         defaultValue: 6000
 
 tests:
@@ -57,7 +60,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000f
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           constraints:
               notValue: 0
@@ -133,7 +136,7 @@ tests:
 
     ######## GoToTiltPercentage Long-Run for 60.2 percent #######
     ### Step 4x ->  Check GoToTiltPercentage 60.20% Long-Run effects
-    - label: "4a: TH sends GoToTiltPercentage command with 60.20 percent to DUT"
+    - label: "4a: TH sends GoToTiltPercentage command with 60.05 percent to DUT"
       command: "GoToTiltPercentage"
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.C08.Rsp
       arguments:

@@ -43,6 +43,7 @@
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 
+#include <lib/asn1/ASN1.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
@@ -699,7 +700,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     ERR_clear_error();
 
     static_assert(P256ECDSASignature::Capacity() >= kP256_ECDSA_Signature_Length_Raw, "P256ECDSASignature must be large enough");
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
     nid = _nidForCurve(MapECName(mPublicKey.Type()));
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -918,7 +919,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     EC_KEY * ec_key = EC_KEY_dup(to_const_EC_KEY(&mKeypair));
     VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
 
     local_key = EVP_PKEY_new();
     VerifyOrExit(local_key != nullptr, error = CHIP_ERROR_INTERNAL);
@@ -1198,7 +1199,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     X509_NAME * subject = X509_NAME_new();
     VerifyOrExit(subject != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
 
     result = X509_REQ_set_version(x509_req, 0);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
@@ -1253,6 +1254,8 @@ exit:
 
 CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr, size_t csr_length, P256PublicKey & pubkey)
 {
+    ReturnErrorOnFailure(VerifyCertificateSigningRequestFormat(csr, csr_length));
+
     ERR_clear_error();
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -1651,6 +1654,28 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     status = X509_STORE_CTX_init(verifyCtx, store, x509LeafCertificate, chain);
     VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
 
+    // Set time used in the X509 certificate chain validation to the notBefore time of the leaf certificate.
+    // That way the X509_verify_cert() validates that intermediate and root certificates were
+    // valid at the time of the leaf certificate generation.
+    {
+        X509_VERIFY_PARAM * param = X509_STORE_CTX_get0_param(verifyCtx);
+        chip::ASN1::ASN1UniversalTime asn1Time;
+        char * asn1TimeStr = reinterpret_cast<char *>(X509_get_notBefore(x509LeafCertificate)->data);
+        uint32_t unixEpoch;
+
+        VerifyOrExit(param != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
+
+        VerifyOrExit(CHIP_NO_ERROR == asn1Time.ImportFrom_ASN1_TIME_string(CharSpan(asn1TimeStr, strlen(asn1TimeStr))),
+                     (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
+
+        VerifyOrExit(asn1Time.ExportTo_UnixTime(unixEpoch),
+                     (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
+
+        VerifyOrExit(CanCastTo<time_t>(unixEpoch),
+                     (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
+        X509_VERIFY_PARAM_set_time(param, static_cast<time_t>(unixEpoch));
+    }
+
     status = X509_verify_cert(verifyCtx);
     VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kChainInvalid, err = CHIP_ERROR_CERT_NOT_TRUSTED));
 
@@ -1668,55 +1693,52 @@ exit:
     return err;
 }
 
-CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, const ByteSpan & toBeEvaluatedCertificate)
+CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & candidateCertificate, const ByteSpan & issuerCertificate)
 {
-    CHIP_ERROR error                                = CHIP_NO_ERROR;
-    X509 * x509ReferenceCertificate                 = nullptr;
-    X509 * x509toBeEvaluatedCertificate             = nullptr;
-    const unsigned char * pReferenceCertificate     = referenceCertificate.data();
-    const unsigned char * pToBeEvaluatedCertificate = toBeEvaluatedCertificate.data();
-    ASN1_TIME * refNotBeforeTime                    = nullptr;
-    ASN1_TIME * tbeNotBeforeTime                    = nullptr;
-    ASN1_TIME * tbeNotAfterTime                     = nullptr;
-    int result                                      = 0;
-    int days                                        = 0;
-    int seconds                                     = 0;
+    CHIP_ERROR error                            = CHIP_NO_ERROR;
+    X509 * x509CandidateCertificate             = nullptr;
+    X509 * x509issuerCertificate                = nullptr;
+    const unsigned char * pCandidateCertificate = candidateCertificate.data();
+    const unsigned char * pIssuerCertificate    = issuerCertificate.data();
+    ASN1_TIME * candidateNotBeforeTime          = nullptr;
+    ASN1_TIME * issuerNotBeforeTime             = nullptr;
+    ASN1_TIME * issuerNotAfterTime              = nullptr;
+    int result                                  = 0;
+    int days                                    = 0;
+    int seconds                                 = 0;
 
-    VerifyOrReturnError(!referenceCertificate.empty() && !toBeEvaluatedCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    VerifyOrReturnError(!referenceCertificate.empty() && CanCastTo<long>(referenceCertificate.size()) &&
-                            !toBeEvaluatedCertificate.empty() && CanCastTo<long>(toBeEvaluatedCertificate.size()),
+    VerifyOrReturnError(!candidateCertificate.empty() && CanCastTo<long>(candidateCertificate.size()) &&
+                            !issuerCertificate.empty() && CanCastTo<long>(issuerCertificate.size()),
                         CHIP_ERROR_INVALID_ARGUMENT);
 
-    x509ReferenceCertificate = d2i_X509(nullptr, &pReferenceCertificate, static_cast<long>(referenceCertificate.size()));
-    VerifyOrExit(x509ReferenceCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
+    x509CandidateCertificate = d2i_X509(nullptr, &pCandidateCertificate, static_cast<long>(candidateCertificate.size()));
+    VerifyOrExit(x509CandidateCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
-    x509toBeEvaluatedCertificate =
-        d2i_X509(nullptr, &pToBeEvaluatedCertificate, static_cast<long>(toBeEvaluatedCertificate.size()));
-    VerifyOrExit(x509toBeEvaluatedCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
+    x509issuerCertificate = d2i_X509(nullptr, &pIssuerCertificate, static_cast<long>(issuerCertificate.size()));
+    VerifyOrExit(x509issuerCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
-    refNotBeforeTime = X509_get_notBefore(x509ReferenceCertificate);
-    tbeNotBeforeTime = X509_get_notBefore(x509toBeEvaluatedCertificate);
-    tbeNotAfterTime  = X509_get_notAfter(x509toBeEvaluatedCertificate);
-    VerifyOrExit(refNotBeforeTime && tbeNotBeforeTime && tbeNotAfterTime, error = CHIP_ERROR_INTERNAL);
+    candidateNotBeforeTime = X509_get_notBefore(x509CandidateCertificate);
+    issuerNotBeforeTime    = X509_get_notBefore(x509issuerCertificate);
+    issuerNotAfterTime     = X509_get_notAfter(x509issuerCertificate);
+    VerifyOrExit(candidateNotBeforeTime && issuerNotBeforeTime && issuerNotAfterTime, error = CHIP_ERROR_INTERNAL);
 
-    result = ASN1_TIME_diff(&days, &seconds, tbeNotBeforeTime, refNotBeforeTime);
+    result = ASN1_TIME_diff(&days, &seconds, issuerNotBeforeTime, candidateNotBeforeTime);
     VerifyOrExit(result == 1, error = CHIP_ERROR_CERT_EXPIRED);
     result = _compareDaysAndSeconds(days, seconds);
 
-    // check if referenceCertificate is issued at or after tbeCertificate's notBefore timestamp
+    // check if candidateCertificate is issued at or after tbeCertificate's notBefore timestamp
     VerifyOrExit(result >= 0, error = CHIP_ERROR_CERT_EXPIRED);
 
-    result = ASN1_TIME_diff(&days, &seconds, tbeNotAfterTime, refNotBeforeTime);
+    result = ASN1_TIME_diff(&days, &seconds, issuerNotAfterTime, candidateNotBeforeTime);
     VerifyOrExit(result == 1, error = CHIP_ERROR_CERT_EXPIRED);
     result = _compareDaysAndSeconds(days, seconds);
 
-    // check if referenceCertificate is issued at or before tbeCertificate's notAfter timestamp
+    // check if candidateCertificate is issued at or before tbeCertificate's notAfter timestamp
     VerifyOrExit(result <= 0, error = CHIP_ERROR_CERT_EXPIRED);
 
 exit:
-    X509_free(x509ReferenceCertificate);
-    X509_free(x509toBeEvaluatedCertificate);
+    X509_free(x509CandidateCertificate);
+    X509_free(x509issuerCertificate);
 
     return error;
 }

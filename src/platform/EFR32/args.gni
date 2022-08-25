@@ -17,6 +17,7 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/examples/platform/efr32/args.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 
 # ARM architecture flags will be set based on efr32_family.
 arm_platform_config = "${efr32_sdk_build_root}/efr32_arm.gni"
@@ -24,6 +25,11 @@ arm_platform_config = "${efr32_sdk_build_root}/efr32_arm.gni"
 mbedtls_target = "${efr32_sdk_build_root}:efr32_sdk"
 
 openthread_external_mbedtls = mbedtls_target
+
+# default to platform crypto implementation but allow commandline override
+if (chip_crypto == "") {
+  chip_crypto = "platform"
+}
 
 chip_device_platform = "efr32"
 
@@ -37,13 +43,11 @@ chip_with_lwip = false
 
 chip_build_tests = false
 
+openthread_root = "${chip_root}/third_party/openthread/ot-efr32/openthread"
 openthread_core_config_platform_check_file =
     "openthread-core-efr32-config-check.h"
 openthread_project_core_config_file = "OpenThreadConfig.h"
 openthread_core_config_deps = [ "${chip_root}/examples/platform/efr32:openthread_core_config_efr32_chip_examples" ]
-
-openthread_external_platform =
-    "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"
 
 chip_config_memory_management = "platform"
 

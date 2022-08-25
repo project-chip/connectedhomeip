@@ -1,0 +1,18 @@
+{{> header}}
+
+#import <Foundation/Foundation.h>
+
+#import "MTRClusters.h"
+#import "MTRDevice.h"
+#import "MTRDevice_Internal.h"
+
+#include <controller-clusters/zap-generated/CHIPClusters.h>
+
+{{#chip_client_clusters includeAll=true}}
+
+@interface MTRCluster{{asUpperCamelCase name}} ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice *device;
+@end
+
+{{/chip_client_clusters}}

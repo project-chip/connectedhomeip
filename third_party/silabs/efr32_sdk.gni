@@ -24,10 +24,18 @@ declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = "${chip_root}/third_party/silabs/gecko_sdk"
   sdk_support_root = "${chip_root}/third_party/silabs/matter_support"
+
+  #Build openthread with prebuilt silabs lib
+  use_silabs_thread_lib = false
   enable_openthread_cli = true
   kvs_max_entries = 75
 
   use_external_flash = true
+}
+
+# Explorer Kit does not have external flash
+if (efr32_board == "BRD2703A") {
+  use_external_flash = false
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -138,6 +146,11 @@ template("efr32_sdk") {
       "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/autogen",
     ]
 
+    # Note that we're setting the mbedTLS and PSA configuration files through a
+    # define. This means the build system by default does not pick up changes in
+    # the content of these, only when changing the filename itself.
+    # To fix this, these files are also manually depended upon in the source set
+    # declared in efr32_mbedtls_config further down this file.
     defines = [
       "MBEDTLS_CONFIG_FILE=\"efr32-chip-mbedtls-config.h\"",
       "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=\"efr32-mbedtls-psa-crypto-config.h\"",
@@ -202,23 +215,24 @@ template("efr32_sdk") {
 
       if (defined(invoker.use_external_flash) && use_external_flash) {
         defines += [ "CONFIG_USE_EXTERNAL_FLASH" ]
+
+        _include_dirs += [ "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_usart" ]
       }
 
       _include_dirs += [
         "${efr32_sdk_root}/platform/emdrv/uartdrv/inc",
         "${efr32_sdk_root}/platform/emdrv/uartdrv/config",
         "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
-        "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_usart",
       ]
     }
 
     if (efr32_family == "efr32mg12") {
       _include_dirs += [
-        "${efr32_sdk_root}/hardware/kit/EFR32MG12_${efr32_board}/config",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Include",
         "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg1x",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg1x/config",
+        "${efr32_sdk_root}/platform/service/device_init/config/s1/",
       ]
 
       libs += [
@@ -231,12 +245,12 @@ template("efr32_sdk") {
       defines += [ "EFR32MG12" ]
     } else if (efr32_family == "efr32mg21") {
       _include_dirs += [
-        "${efr32_sdk_root}/hardware/kit/EFR32MG21_${efr32_board}/config",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG21/Include",
         "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg2x",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg21",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg21/config",
+        "${efr32_sdk_root}/platform/service/device_init/config/s2/",
       ]
 
       libs += [
@@ -252,12 +266,12 @@ template("efr32_sdk") {
       ]
     } else if (efr32_family == "efr32mg24") {
       _include_dirs += [
-        "${efr32_sdk_root}/hardware/kit/EFR32MG24_${efr32_board}/config",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Include",
         "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg2x",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24/config",
+        "${efr32_sdk_root}/platform/service/device_init/config/s2/",
       ]
 
       libs += [
@@ -308,6 +322,19 @@ template("efr32_sdk") {
     }
   }
 
+  source_set("efr32_mbedtls_config") {
+    # We're setting the mbedTLS config flags here as the efr32_sdk target
+    # acts as the mbedTLS target for EFR32 builds. We need this for the build
+    # system to recompile mbedTLS (= the SDK) when the mbedTLS config gets
+    # edited.
+    sources = [
+      "${chip_root}/src/platform/EFR32/efr32-chip-mbedtls-config.h",
+      "${chip_root}/src/platform/EFR32/efr32-mbedtls-psa-crypto-config.h",
+    ]
+
+    public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
+  }
+
   source_set(sdk_target_name) {
     sources = [
       "${chip_root}/third_party/mbedtls/repo/include/mbedtls/platform.h",
@@ -321,7 +348,9 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/driver/button/src/sl_button.c",
       "${efr32_sdk_root}/platform/driver/button/src/sl_simple_button.c",
       "${efr32_sdk_root}/platform/driver/leddrv/src/sl_led.c",
+      "${efr32_sdk_root}/platform/driver/leddrv/src/sl_pwm_led.c",
       "${efr32_sdk_root}/platform/driver/leddrv/src/sl_simple_led.c",
+      "${efr32_sdk_root}/platform/driver/leddrv/src/sl_simple_rgb_pwm_led.c",
       "${efr32_sdk_root}/platform/emdrv/dmadrv/src/dmadrv.c",
       "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/src/gpiointerrupt.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default.c",
@@ -345,6 +374,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/radio/rail_lib/hal/efr32/hal_efr.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/pa_conversions_efr32.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti/sl_rail_util_pti.c",
+      "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfrco.c",
       "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_nvic.c",
       "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager.c",
       "${efr32_sdk_root}/platform/service/legacy_hal/src/token_legacy.c",
@@ -507,13 +537,16 @@ template("efr32_sdk") {
         (defined(invoker.use_external_flash) && use_external_flash)) {
       sources += [
         "${efr32_sdk_root}/hardware/driver/memlcd/src/memlcd_usart/sl_memlcd_spi.c",
-        "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/src/sl_mx25_flash_shutdown_usart/sl_mx25_flash_shutdown.c",
         "${efr32_sdk_root}/platform/emdrv/uartdrv/src/uartdrv.c",
         "${efr32_sdk_root}/platform/emlib/src/em_eusart.c",
         "${efr32_sdk_root}/platform/emlib/src/em_leuart.c",
         "${efr32_sdk_root}/platform/emlib/src/em_usart.c",
         "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/autogen/sl_uartdrv_init.c",
       ]
+
+      if (defined(invoker.use_external_flash) && use_external_flash) {
+        sources += [ "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/src/sl_mx25_flash_shutdown_usart/sl_mx25_flash_shutdown.c" ]
+      }
     }
 
     if ((defined(invoker.show_qr_code) && invoker.show_qr_code) ||
@@ -600,6 +633,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Source/system_efr32mg24.c",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/pa_curves_efr32.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dcdc_s2.c",
+        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dpll_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s2.c",
@@ -636,6 +670,7 @@ template("efr32_sdk") {
     }
 
     public_deps = [
+      ":efr32_mbedtls_config",
       "${segger_rtt_root}:segger_rtt",
       "${segger_rtt_root}:segger_rtt_printf",
       "${segger_rtt_root}:segger_rtt_syscalls",

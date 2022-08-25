@@ -28,6 +28,7 @@
 #include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/cc13x2_26x2/CC13X2_26X2Config.h>
 
@@ -156,10 +157,7 @@ CHIP_ERROR CC13X2_26X2Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t 
     VerifyOrExit(sNvoctpFps.readItem(key.nvID, 0, (uint16_t) len, buf) == NVINTF_SUCCESS,
                  err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
-    if (outLen)
-    {
-        outLen = len;
-    }
+    outLen = len;
 
 exit:
     return err;
@@ -168,7 +166,7 @@ exit:
 /* Iterate through the key range to find a key that matches. */
 static uint8_t FindKVSSubID(const char * key, uint16_t & subID)
 {
-    char key_scratch[32]; // 32 characters seems large enough for a key
+    char key_scratch[PersistentStorageDelegate::kKeyLengthMax + 1];
     NVINTF_nvProxy_t nvProxy = { 0 };
     uint8_t status           = NVINTF_SUCCESS;
 
@@ -212,20 +210,23 @@ CHIP_ERROR CC13X2_26X2Config::ReadKVS(const char * key, void * value, size_t val
     val_item.subID = subID;
 
     len = sNvoctpFps.getItemLen(val_item);
-    VerifyOrExit(len > 0, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // key not found
 
-    if ((offset_bytes + value_size) > len)
+    if (value_size >= (len - offset_bytes))
     {
-        // trying to read up to the end of the element
+        // reading to end of element
         read_len = len - offset_bytes;
     }
     else
     {
         read_len = value_size;
+        err      = CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    VerifyOrExit(sNvoctpFps.readItem(val_item, (uint16_t) offset_bytes, read_len, value) == NVINTF_SUCCESS,
-                 err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    if (read_len > 0)
+    {
+        VerifyOrExit(sNvoctpFps.readItem(val_item, (uint16_t) offset_bytes, read_len, value) == NVINTF_SUCCESS,
+                     err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    }
 
     if (read_bytes_size)
     {
@@ -267,21 +268,13 @@ CHIP_ERROR CC13X2_26X2Config::WriteKVS(const char * key, const void * value, siz
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t subID;
 
-    if (FindKVSSubID(key, subID) == NVINTF_SUCCESS)
-    {
-        NVINTF_itemID_t val_item = CC13X2_26X2Config::kConfigKey_KVS_value.nvID;
-        // key already exists, update value
-        val_item.subID = subID;
-        VerifyOrExit(sNvoctpFps.updateItem(val_item, (uint16_t) value_size, (void *) value) == NVINTF_SUCCESS,
-                     err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
-    }
-    else
-    {
-        // key does not exist, likely case
-        intptr_t lock_key = sNvoctpFps.lockNV();
+    NVINTF_itemID_t key_item = CC13X2_26X2Config::kConfigKey_KVS_key.nvID;
+    NVINTF_itemID_t val_item = CC13X2_26X2Config::kConfigKey_KVS_value.nvID;
 
-        NVINTF_itemID_t key_item = CC13X2_26X2Config::kConfigKey_KVS_key.nvID;
-        NVINTF_itemID_t val_item = CC13X2_26X2Config::kConfigKey_KVS_value.nvID;
+    if (FindKVSSubID(key, subID) != NVINTF_SUCCESS)
+    {
+        // key item not found, find an empty subID
+        intptr_t lock_key = sNvoctpFps.lockNV();
 
         /* Iterate through the subID range to find an unused subID in the
          * keyspace.  SubID is a 10 bit value, reference
@@ -292,26 +285,39 @@ CHIP_ERROR CC13X2_26X2Config::WriteKVS(const char * key, const void * value, siz
             key_item.subID = i;
             if (sNvoctpFps.getItemLen(key_item) == 0U)
             {
-                val_item.subID = i;
+                subID = i;
                 break;
             }
         }
+        sNvoctpFps.unlockNV(lock_key);
+
         // write they key item
-        if (sNvoctpFps.writeItem(key_item, (uint16_t) strlen(key), (void *) key) == NVINTF_SUCCESS)
-        {
-            if (sNvoctpFps.writeItem(val_item, (uint16_t) value_size, (void *) value) != NVINTF_SUCCESS)
-            {
-                // try to delete the key item
-                sNvoctpFps.deleteItem(key_item);
-                err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-            }
-        }
-        else
+        VerifyOrExit(sNvoctpFps.writeItem(key_item, (uint16_t) strlen(key), (void *) key) == NVINTF_SUCCESS,
+                     err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    }
+
+    key_item.subID = subID;
+    val_item.subID = subID;
+
+    if (value_size == 0U)
+    {
+        // delete the value item if it exists
+        int8_t ret = sNvoctpFps.deleteItem(val_item);
+        if (ret != NVINTF_SUCCESS && ret != NVINTF_NOTFOUND)
         {
             err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
-        sNvoctpFps.unlockNV(lock_key);
     }
+    else
+    {
+        if (sNvoctpFps.writeItem(val_item, (uint16_t) value_size, (void *) value) != NVINTF_SUCCESS)
+        {
+            // try to delete the key item
+            sNvoctpFps.deleteItem(key_item);
+            err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+        }
+    }
+
 exit:
     return err;
 }
@@ -328,25 +334,31 @@ exit:
 
 CHIP_ERROR CC13X2_26X2Config::ClearKVS(const char * key)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     uint16_t subID;
     NVINTF_itemID_t key_item = CC13X2_26X2Config::kConfigKey_KVS_key.nvID;
     NVINTF_itemID_t val_item = CC13X2_26X2Config::kConfigKey_KVS_value.nvID;
 
     if (FindKVSSubID(key, subID) == NVINTF_SUCCESS)
     {
+        int8_t ret;
+
         key_item.subID = subID;
         val_item.subID = subID;
-        // delete the value item
-        if (sNvoctpFps.deleteItem(val_item) != NVINTF_SUCCESS)
+        // delete the value item if it exists
+        ret = sNvoctpFps.deleteItem(val_item);
+        if (ret != NVINTF_SUCCESS && ret != NVINTF_NOTFOUND)
         {
             err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
-        // delete the key item
-        if (sNvoctpFps.deleteItem(key_item) != NVINTF_SUCCESS)
+        // delete the key item if it exists
+        ret = sNvoctpFps.deleteItem(key_item);
+        if (ret != NVINTF_SUCCESS && ret != NVINTF_NOTFOUND)
         {
             err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
+
+        err = CHIP_NO_ERROR;
     }
 
     return err;

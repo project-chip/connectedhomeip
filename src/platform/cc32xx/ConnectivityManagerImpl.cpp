@@ -19,6 +19,12 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
@@ -31,6 +37,7 @@
 
 #include <platform/cc32xx/CC32XXConfig.h>
 
+#include <app/server/Dnssd.h>
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
 #include <lwip/nd6.h>
@@ -40,10 +47,8 @@
 
 extern "C" {
 #include <ti/net/slnetconn.h>
-
 #define SLNETCONN_TIMEOUT 0xffff // "infinite" Timeout
 
-extern int LWIP_IF_start();
 extern void SlNetConnEventHandler(uint32_t ifID, SlNetConnStatus_e netStatus, void * data);
 }
 
@@ -61,6 +66,7 @@ using namespace ::chip::System;
 using namespace ::chip::TLV;
 
 extern "C" void cc32xxLog(const char * aFormat, ...);
+static struct netif * m_pNetIf = NULL;
 
 namespace chip {
 namespace DeviceLayer {
@@ -135,22 +141,26 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
-
-    cc32xxLog("ConnectivityManagerImpl::_Init()\n\r");
-
     int rc;
-    cc32xxLog("Start Wi-Fi\r\n");
-    /* Try to connect to AP and go through provisioning (if needed) */
-    rc = SlNetConn_start(SLNETCONN_SERVICE_LVL_MAC, SlNetConnEventHandler, SLNETCONN_TIMEOUT, 0);
-    assert(rc == 0);
-
-    cc32xxLog("Start LWIP IF\n\r");
-    rc = LWIP_IF_start();
-    if (rc != 0)
+    cc32xxLog("Start LWIP");
+    rc = LWIP_IF_init(_OnLwipEvent, false);
+    if (rc == 0)
     {
-        cc32xxLog("LWIP IF not started, error = ", rc);
+        m_pNetIf = LWIP_IF_addInterface();
     }
+    if (m_pNetIf == NULL)
+    {
+        cc32xxLog("LWIP IF not started, error = %d", rc);
+    }
+    else
+    {
+        cc32xxLog("Start Wi-Fi");
+        /* Try to connect to AP and go through provisioning (if needed) */
+        rc = SlNetConn_start(SLNETCONN_SERVICE_LVL_MAC, SlNetConnEventHandler, SLNETCONN_TIMEOUT, 0);
+        assert(rc == 0);
 
+        LWIP_IF_setLinkUp(m_pNetIf);
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -183,10 +193,22 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 }
 
 // ==================== ConnectivityManager Private Methods ====================
-
-void ConnectivityManagerImpl::DriveStationState()
+void ConnectivityManagerImpl::_OnLwipEvent(struct netif * pNetIf, NetIfStatus_e status, void * pParams)
 {
-    cc32xxLog("ConnectivityManagerImpl::DriveStationState()\n\r");
+    switch (status)
+    {
+    case E_NETIF_STATUS_IP_ACQUIRED:
+        PlatformMgr().ScheduleWork(_OnIpAcquired);
+        break;
+    default:
+        break;
+    }
+}
+
+void ConnectivityManagerImpl::_OnIpAcquired(intptr_t arg)
+{
+    cc32xxLog("ConnectivityManagerImpl::OnIpAcquired() : Start DNS Server");
+    chip::app::DnssdServer::Instance().StartServer();
 }
 
 void ConnectivityManagerImpl::OnStationConnected()

@@ -14,6 +14,10 @@
 
 name: 45.2.1. [TC-DGETH-2.1] Attributes with server as DUT
 
+PICS:
+    - DGETH.S
+    - DGETH.S.A
+
 config:
     nodeId: 0x12344321
     cluster: "Ethernet Network Diagnostics"
@@ -44,7 +48,7 @@ tests:
       attribute: "FullDuplex"
       response:
           constraints:
-              type: bool
+              type: boolean
 
     #issue #13648
     - label: "Read PacketRxCount attribute constraints"
@@ -53,7 +57,7 @@ tests:
       attribute: "PacketRxCount"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label:
           "Read PacketRxCount value from DUT and verify the number of packets
@@ -80,7 +84,7 @@ tests:
       attribute: "PacketTxCount"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label:
           "Read PacketTxCount value from DUT and verify the number of packets
@@ -107,7 +111,7 @@ tests:
       attribute: "TxErrCount"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label:
           "Read TxErrCount value from DUT and verify value indicates the number
@@ -134,7 +138,7 @@ tests:
       attribute: "CollisionCount"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label:
           "Read CollisionCount value from DUT and verify value indicates the
@@ -162,7 +166,7 @@ tests:
       attribute: "OverrunCount"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label:
           "Read OverrunCount value from DUT and verify value indicates the
@@ -189,7 +193,7 @@ tests:
       attribute: "CarrierDetect"
       response:
           constraints:
-              type: bool
+              type: boolean
 
     - label:
           "Read CarrierDetect value from DUT and verify value indicates the
@@ -217,7 +221,7 @@ tests:
       attribute: "TimeSinceReset"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label:
           "Read TimeSinceReset value from DUT and verify the value indicates the

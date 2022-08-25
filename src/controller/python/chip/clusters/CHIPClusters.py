@@ -480,8 +480,8 @@ class ChipClusters:
                     "args": {
                         "level": "int",
                         "transitionTime": "int",
-                        "optionMask": "int",
-                        "optionOverride": "int",
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             0x00000001: {
@@ -490,8 +490,8 @@ class ChipClusters:
                     "args": {
                         "moveMode": "int",
                         "rate": "int",
-                        "optionMask": "int",
-                        "optionOverride": "int",
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             0x00000002: {
@@ -501,16 +501,16 @@ class ChipClusters:
                         "stepMode": "int",
                         "stepSize": "int",
                         "transitionTime": "int",
-                        "optionMask": "int",
-                        "optionOverride": "int",
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             0x00000003: {
                     "commandId": 0x00000003,
                     "commandName": "Stop",
                     "args": {
-                        "optionMask": "int",
-                        "optionOverride": "int",
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             0x00000004: {
@@ -519,6 +519,8 @@ class ChipClusters:
                     "args": {
                         "level": "int",
                         "transitionTime": "int",
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             0x00000005: {
@@ -527,6 +529,8 @@ class ChipClusters:
                     "args": {
                         "moveMode": "int",
                         "rate": "int",
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             0x00000006: {
@@ -536,12 +540,16 @@ class ChipClusters:
                         "stepMode": "int",
                         "stepSize": "int",
                         "transitionTime": "int",
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             0x00000007: {
                     "commandId": 0x00000007,
                     "commandName": "StopWithOnOff",
                     "args": {
+                        "optionsMask": "int",
+                        "optionsOverride": "int",
                     },
                 },
             },
@@ -904,8 +912,8 @@ class ChipClusters:
                 },
             },
     }
-    _BRIDGED_ACTIONS_CLUSTER_INFO = {
-            "clusterName": "BridgedActions",
+    _ACTIONS_CLUSTER_INFO = {
+            "clusterName": "Actions",
             "clusterId": 0x00000025,
             "commands": {
             0x00000000: {
@@ -1018,13 +1026,13 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "EndpointList",
+                    "attributeName": "EndpointLists",
                     "attributeId": 0x00000001,
                     "type": "",
                     "reportable": True,
                 },
                 0x00000002: {
-                    "attributeName": "SetupUrl",
+                    "attributeName": "SetupURL",
                     "attributeId": 0x00000002,
                     "type": "str",
                     "reportable": True,
@@ -2549,7 +2557,7 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x0000003C: {
-                    "attributeName": "ChannelMask",
+                    "attributeName": "ChannelPage0Mask",
                     "attributeId": 0x0000003C,
                     "type": "bytes",
                     "reportable": True,
@@ -7494,6 +7502,55 @@ class ChipClusters:
                 },
             },
     }
+    _FAULT_INJECTION_CLUSTER_INFO = {
+            "clusterName": "FaultInjection",
+            "clusterId": 0xFFF1FC06,
+            "commands": {
+            0x00000000: {
+                    "commandId": 0x00000000,
+                    "commandName": "FailAtFault",
+                    "args": {
+                        "type": "int",
+                        "id": "int",
+                        "numCallsToSkip": "int",
+                        "numCallsToFail": "int",
+                        "takeMutex": "bool",
+                    },
+                },
+            },
+            "attributes": {
+                0x0000FFF8: {
+                    "attributeName": "GeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFF9: {
+                    "attributeName": "AcceptedCommandList",
+                    "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFC: {
+                    "attributeName": "FeatureMap",
+                    "attributeId": 0x0000FFFC,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                    "reportable": True,
+                },
+            },
+    }
 
     _CLUSTER_ID_DICT = {
     0x00000003: _IDENTIFY_CLUSTER_INFO,
@@ -7506,7 +7563,7 @@ class ChipClusters:
     0x0000001D: _DESCRIPTOR_CLUSTER_INFO,
     0x0000001E: _BINDING_CLUSTER_INFO,
     0x0000001F: _ACCESS_CONTROL_CLUSTER_INFO,
-    0x00000025: _BRIDGED_ACTIONS_CLUSTER_INFO,
+    0x00000025: _ACTIONS_CLUSTER_INFO,
     0x00000028: _BASIC_CLUSTER_INFO,
     0x00000029: _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
     0x0000002A: _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
@@ -7561,6 +7618,7 @@ class ChipClusters:
     0x0000050E: _ACCOUNT_LOGIN_CLUSTER_INFO,
     0x00000B04: _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
     0xFFF1FC05: _TEST_CLUSTER_CLUSTER_INFO,
+    0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
     }
 
     _CLUSTER_NAME_DICT = {
@@ -7574,7 +7632,7 @@ class ChipClusters:
         "Descriptor": _DESCRIPTOR_CLUSTER_INFO,
         "Binding": _BINDING_CLUSTER_INFO,
         "AccessControl": _ACCESS_CONTROL_CLUSTER_INFO,
-        "BridgedActions": _BRIDGED_ACTIONS_CLUSTER_INFO,
+        "Actions": _ACTIONS_CLUSTER_INFO,
         "Basic": _BASIC_CLUSTER_INFO,
         "OtaSoftwareUpdateProvider": _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
         "OtaSoftwareUpdateRequestor": _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
@@ -7629,6 +7687,7 @@ class ChipClusters:
         "AccountLogin": _ACCOUNT_LOGIN_CLUSTER_INFO,
         "ElectricalMeasurement": _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
         "TestCluster": _TEST_CLUSTER_CLUSTER_INFO,
+        "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,
     }
 
     def __init__(self, chipstack):

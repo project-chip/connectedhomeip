@@ -34,7 +34,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterDescriptorID = 0x0000001D,
     MTRClusterBindingID = 0x0000001E,
     MTRClusterAccessControlID = 0x0000001F,
-    MTRClusterBridgedActionsID = 0x00000025,
+    MTRClusterActionsID = 0x00000025,
     MTRClusterBasicID = 0x00000028,
     MTRClusterOtaSoftwareUpdateProviderID = 0x00000029,
     MTRClusterOtaSoftwareUpdateRequestorID = 0x0000002A,
@@ -93,6 +93,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterAccountLoginID = 0x0000050E,
     MTRClusterElectricalMeasurementID = 0x00000B04,
     MTRClusterTestClusterID = 0xFFF1FC05,
+    MTRClusterFaultInjectionID = 0xFFF1FC06,
 };
 
 #pragma mark - Attributes IDs
@@ -231,15 +232,15 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterAccessControlAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterAccessControlAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
-    // Cluster BridgedActions attributes
-    MTRClusterBridgedActionsAttributeActionListID = 0x00000000,
-    MTRClusterBridgedActionsAttributeEndpointListID = 0x00000001,
-    MTRClusterBridgedActionsAttributeSetupUrlID = 0x00000002,
-    MTRClusterBridgedActionsAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterBridgedActionsAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterBridgedActionsAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterBridgedActionsAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterBridgedActionsAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
+    // Cluster Actions attributes
+    MTRClusterActionsAttributeActionListID = 0x00000000,
+    MTRClusterActionsAttributeEndpointListsID = 0x00000001,
+    MTRClusterActionsAttributeSetupURLID = 0x00000002,
+    MTRClusterActionsAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
+    MTRClusterActionsAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
+    MTRClusterActionsAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
+    MTRClusterActionsAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
+    MTRClusterActionsAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster Basic attributes
     MTRClusterBasicAttributeDataModelRevisionID = 0x00000000,
@@ -481,7 +482,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterThreadNetworkDiagnosticsAttributePendingTimestampID = 0x00000039,
     MTRClusterThreadNetworkDiagnosticsAttributeDelayID = 0x0000003A,
     MTRClusterThreadNetworkDiagnosticsAttributeSecurityPolicyID = 0x0000003B,
-    MTRClusterThreadNetworkDiagnosticsAttributeChannelMaskID = 0x0000003C,
+    MTRClusterThreadNetworkDiagnosticsAttributeChannelPage0MaskID = 0x0000003C,
     MTRClusterThreadNetworkDiagnosticsAttributeOperationalDatasetComponentsID = 0x0000003D,
     MTRClusterThreadNetworkDiagnosticsAttributeActiveNetworkFaultsListID = 0x0000003E,
     MTRClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
@@ -527,6 +528,16 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterEthernetNetworkDiagnosticsAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster TimeSynchronization attributes
+    MTRClusterTimeSynchronizationAttributeUTCTimeID = 0x00000000,
+    MTRClusterTimeSynchronizationAttributeGranularityID = 0x00000001,
+    MTRClusterTimeSynchronizationAttributeTimeSourceID = 0x00000002,
+    MTRClusterTimeSynchronizationAttributeTrustedTimeNodeIdID = 0x00000003,
+    MTRClusterTimeSynchronizationAttributeDefaultNtpID = 0x00000004,
+    MTRClusterTimeSynchronizationAttributeTimeZoneID = 0x00000005,
+    MTRClusterTimeSynchronizationAttributeDstOffsetID = 0x00000006,
+    MTRClusterTimeSynchronizationAttributeLocalTimeID = 0x00000007,
+    MTRClusterTimeSynchronizationAttributeTimeZoneDatabaseID = 0x00000008,
+    MTRClusterTimeSynchronizationAttributeNtpServerPortID = 0x00000009,
     MTRClusterTimeSynchronizationAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
     MTRClusterTimeSynchronizationAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterTimeSynchronizationAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
@@ -1356,6 +1367,13 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterTestClusterAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterTestClusterAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
+    // Cluster FaultInjection attributes
+    MTRClusterFaultInjectionAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
+    MTRClusterFaultInjectionAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
+    MTRClusterFaultInjectionAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
+    MTRClusterFaultInjectionAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
+    MTRClusterFaultInjectionAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
+
 };
 
 #pragma mark - Commands IDs
@@ -1417,19 +1435,19 @@ typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
     MTRClusterLevelControlCommandStopWithOnOffID = 0x00000007,
     MTRClusterLevelControlCommandMoveToClosestFrequencyID = 0x00000008,
 
-    // Cluster BridgedActions commands
-    MTRClusterBridgedActionsCommandInstantActionID = 0x00000000,
-    MTRClusterBridgedActionsCommandInstantActionWithTransitionID = 0x00000001,
-    MTRClusterBridgedActionsCommandStartActionID = 0x00000002,
-    MTRClusterBridgedActionsCommandStartActionWithDurationID = 0x00000003,
-    MTRClusterBridgedActionsCommandStopActionID = 0x00000004,
-    MTRClusterBridgedActionsCommandPauseActionID = 0x00000005,
-    MTRClusterBridgedActionsCommandPauseActionWithDurationID = 0x00000006,
-    MTRClusterBridgedActionsCommandResumeActionID = 0x00000007,
-    MTRClusterBridgedActionsCommandEnableActionID = 0x00000008,
-    MTRClusterBridgedActionsCommandEnableActionWithDurationID = 0x00000009,
-    MTRClusterBridgedActionsCommandDisableActionID = 0x0000000A,
-    MTRClusterBridgedActionsCommandDisableActionWithDurationID = 0x0000000B,
+    // Cluster Actions commands
+    MTRClusterActionsCommandInstantActionID = 0x00000000,
+    MTRClusterActionsCommandInstantActionWithTransitionID = 0x00000001,
+    MTRClusterActionsCommandStartActionID = 0x00000002,
+    MTRClusterActionsCommandStartActionWithDurationID = 0x00000003,
+    MTRClusterActionsCommandStopActionID = 0x00000004,
+    MTRClusterActionsCommandPauseActionID = 0x00000005,
+    MTRClusterActionsCommandPauseActionWithDurationID = 0x00000006,
+    MTRClusterActionsCommandResumeActionID = 0x00000007,
+    MTRClusterActionsCommandEnableActionID = 0x00000008,
+    MTRClusterActionsCommandEnableActionWithDurationID = 0x00000009,
+    MTRClusterActionsCommandDisableActionID = 0x0000000A,
+    MTRClusterActionsCommandDisableActionWithDurationID = 0x0000000B,
 
     // Cluster Basic commands
     MTRClusterBasicCommandMfgSpecificPingID = 0x10020000,
@@ -1481,6 +1499,9 @@ typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
 
     // Cluster EthernetNetworkDiagnostics commands
     MTRClusterEthernetNetworkDiagnosticsCommandResetCountsID = 0x00000000,
+
+    // Cluster TimeSynchronization commands
+    MTRClusterTimeSynchronizationCommandSetUtcTimeID = 0x00000000,
 
     // Cluster AdministratorCommissioning commands
     MTRClusterAdministratorCommissioningCommandOpenCommissioningWindowID = 0x00000000,
@@ -1679,6 +1700,10 @@ typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
     MTRClusterTestClusterCommandTestEmitTestEventRequestID = 0x00000014,
     MTRClusterTestClusterCommandTestEmitTestFabricScopedEventRequestID = 0x00000015,
 
+    // Cluster FaultInjection commands
+    MTRClusterFaultInjectionCommandFailAtFaultID = 0x00000000,
+    MTRClusterFaultInjectionCommandFailRandomlyAtFaultID = 0x00000001,
+
 };
 
 #pragma mark - Events IDs
@@ -1688,9 +1713,9 @@ typedef NS_ENUM(uint32_t, MTRClusterEventIDType) {
     MTRClusterAccessControlEventAccessControlEntryChangedID = 0x00000000,
     MTRClusterAccessControlEventAccessControlExtensionChangedID = 0x00000001,
 
-    // Cluster BridgedActions events
-    MTRClusterBridgedActionsEventStateChangedID = 0x00000000,
-    MTRClusterBridgedActionsEventActionFailedID = 0x00000001,
+    // Cluster Actions events
+    MTRClusterActionsEventStateChangedID = 0x00000000,
+    MTRClusterActionsEventActionFailedID = 0x00000001,
 
     // Cluster Basic events
     MTRClusterBasicEventStartUpID = 0x00000000,
@@ -1714,6 +1739,7 @@ typedef NS_ENUM(uint32_t, MTRClusterEventIDType) {
 
     // Cluster ThreadNetworkDiagnostics events
     MTRClusterThreadNetworkDiagnosticsEventConnectionStatusID = 0x00000000,
+    MTRClusterThreadNetworkDiagnosticsEventNetworkFaultChangeID = 0x00000001,
 
     // Cluster WiFiNetworkDiagnostics events
     MTRClusterWiFiNetworkDiagnosticsEventDisconnectionID = 0x00000000,

@@ -13,7 +13,14 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: "[TC-BOOL-3.1] Attributes with client as DUT"
+name: 68.3.1. [TC-BOOL-3.1] Attributes with Client as DUT
+
+PICS:
+    - BOOL.C
+    - BOOL.C.AM-READ
+    - BOOL.C.AO-READ
+    - BOOL.C.AM-WRITE
+    - BOOL.C.AO-WRITE
 
 config:
     nodeId: 0x12344321
@@ -21,36 +28,63 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Verify on TH all-clusters-app
           ./chip-tool booleanstate read state-value 1 1
 
-          [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
-          [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: TRUE
+          Verify read command is received on TH(all-clusters-app) Log successfully
+
+          [1658847009.838448][28392:28392] CHIP:IM: Received Read request
+          [1658847009.838537][28392:28392] CHIP:DMG: ReadRequestMessage =
+          [1658847009.838570][28392:28392] CHIP:DMG: {
+          [1658847009.838598][28392:28392] CHIP:DMG:         AttributePathIBs =
+          [1658847009.838630][28392:28392] CHIP:DMG:         [
+          [1658847009.838660][28392:28392] CHIP:DMG:                 AttributePathIB =
+          [1658847009.838694][28392:28392] CHIP:DMG:                 {
+          [1658847009.838728][28392:28392] CHIP:DMG:                         Endpoint = 0x1,
+          [1658847009.838766][28392:28392] CHIP:DMG:                         Cluster = 0x45,
+          [1658847009.838806][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1658847009.838843][28392:28392] CHIP:DMG:                 }
+          [1658847009.838878][28392:28392] CHIP:DMG:
+          [1658847009.838909][28392:28392] CHIP:DMG:         ],
+          [1658847009.838943][28392:28392] CHIP:DMG:
+          [1658847009.838975][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658847009.839006][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
+          [1658847009.839034][28392:28392] CHIP:DMG: },
+          [1658847009.839120][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658847009.839332][28392:28392] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658847009.839386][28392:28392] CHIP:DMG: <RE:Run> Cluster 45, Attribute 0 is dirty
+          [1658847009.839426][28392:28392] CHIP:DMG: Reading attribute: Cluster=0x0000_0045 Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1658847009.839474][28392:28392] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0045 e=1 p=v
+          [1658847009.839528][28392:28392] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          This cluster doesn't have any  optional attribute
+          This cluster doesn"t have any  optional attribute
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
@@ -59,9 +93,9 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          Verify in TH all-clusters-app
-
           ./chip-tool booleanstate read attribute-list 1 1
+
+          Verify none of the optional attributes of the server-side of the cluster is listed  on TH(all-clusters-app) Log
           [1654244313219] [91456:3997555] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_FFFB DataVersion: 2739318439
           [1654244313220] [91456:3997555] CHIP: [TOO]   AttributeList: 6 entries
           [1654244313220] [91456:3997555] CHIP: [TOO]     [1]: 0
@@ -72,20 +106,44 @@ tests:
           [1654244313220] [91456:3997555] CHIP: [TOO]     [6]: 65533
 
            ./chip-tool booleanstate read state-value 1 1
-          [1654244423171] [91468:3998115] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000 DataVersion: 2739318439
-          [1654244423171] [91468:3998115] CHIP: [TOO]   StateValue: FALSE
+
+          Verify read command is received on TH (all-clusters-minimal-app) Log
+
+          [1658847009.838448][28392:28392] CHIP:IM: Received Read request
+          [1658847009.838537][28392:28392] CHIP:DMG: ReadRequestMessage =
+          [1658847009.838570][28392:28392] CHIP:DMG: {
+          [1658847009.838598][28392:28392] CHIP:DMG:         AttributePathIBs =
+          [1658847009.838630][28392:28392] CHIP:DMG:         [
+          [1658847009.838660][28392:28392] CHIP:DMG:                 AttributePathIB =
+          [1658847009.838694][28392:28392] CHIP:DMG:                 {
+          [1658847009.838728][28392:28392] CHIP:DMG:                         Endpoint = 0x1,
+          [1658847009.838766][28392:28392] CHIP:DMG:                         Cluster = 0x45,
+          [1658847009.838806][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1658847009.838843][28392:28392] CHIP:DMG:                 }
+          [1658847009.838878][28392:28392] CHIP:DMG:
+          [1658847009.838909][28392:28392] CHIP:DMG:         ],
+          [1658847009.838943][28392:28392] CHIP:DMG:
+          [1658847009.838975][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658847009.839006][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
+          [1658847009.839034][28392:28392] CHIP:DMG: },
+          [1658847009.839120][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658847009.839332][28392:28392] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658847009.839386][28392:28392] CHIP:DMG: <RE:Run> Cluster 45, Attribute 0 is dirty
+          [1658847009.839426][28392:28392] CHIP:DMG: Reading attribute: Cluster=0x0000_0045 Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1658847009.839474][28392:28392] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0045 e=1 p=v
+          [1658847009.839528][28392:28392] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          This cluster doesn't have any  optional attribute
+          This cluster doesn"t have any  optional attribute
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any  optional attribute
+          This cluster doesn"t have any  optional attribute
       disabled: true

@@ -58,8 +58,6 @@ executable("chip-tv-app") {
     "include/cluster-init.cpp",
     "include/content-launcher/ContentLauncherManager.cpp",
     "include/content-launcher/ContentLauncherManager.h",
-    "include/endpoint-configuration/EndpointConfigurationStorage.cpp",
-    "include/endpoint-configuration/EndpointConfigurationStorage.h",
     "include/keypad-input/KeypadInputManager.cpp",
     "include/keypad-input/KeypadInputManager.h",
     "include/low-power/LowPowerManager.cpp",

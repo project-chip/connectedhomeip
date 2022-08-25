@@ -14,6 +14,9 @@
 
 name: 50.2.2. [TC-DGTHREAD-2.2] Attributes-Tx [DUT- Server]
 
+PICS:
+    - DGTHREAD.S
+
 config:
     nodeId: 0x12344321
     cluster: "Thread Network Diagnostics"
@@ -34,7 +37,7 @@ tests:
       attribute: "TxTotalCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -44,7 +47,7 @@ tests:
       attribute: "TxUnicastCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -54,7 +57,7 @@ tests:
       attribute: "TxBroadcastCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -64,7 +67,7 @@ tests:
       attribute: "TxAckRequestedCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -74,7 +77,7 @@ tests:
       attribute: "TxAckedCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -84,7 +87,7 @@ tests:
       attribute: "TxNoAckRequestedCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -94,7 +97,7 @@ tests:
       attribute: "TxDataCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -104,7 +107,7 @@ tests:
       attribute: "TxDataPollCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -114,7 +117,7 @@ tests:
       attribute: "TxBeaconCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -124,7 +127,7 @@ tests:
       attribute: "TxBeaconRequestCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -134,7 +137,7 @@ tests:
       attribute: "TxOtherCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -144,7 +147,7 @@ tests:
       attribute: "TxRetryCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -154,7 +157,7 @@ tests:
       attribute: "TxDirectMaxRetryExpiryCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -164,7 +167,7 @@ tests:
       attribute: "TxIndirectMaxRetryExpiryCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -174,7 +177,7 @@ tests:
       attribute: "TxErrCcaCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -184,7 +187,7 @@ tests:
       attribute: "TxErrAbortCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -194,6 +197,6 @@ tests:
       attribute: "TxErrBusyChannelCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF

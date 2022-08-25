@@ -15,40 +15,93 @@
 
 name: 105.1.1. [TC-LUNIT-1.1] Global Attributes [DUT as Client]
 
+PICS:
+    - LUNIT.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label: "Commission DUT to TH"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
-    - label: "DUT reads from the TH the(0xFFFD) ClusterRevision attribute"
+    - label: "{DUTread} (0xFFFD) ClusterRevision attribute"
+      PICS: LUNIT.C.Afffd
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool unitlocalization read  cluster-revision 1 0
-          [1651186310867] [11123:114108] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFFD DataVersion: 486381485
-          [1651186310867] [11123:114108] CHIP: [TOO]   ClusterRevision: 1
+          Verify DUT receives  cluster-revision attribute response on the TH(all-clusters-app) Log:
+          [1659785279.519464][4122:4122] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:239393541 on exchange 51048r
+          [1659785279.519511][4122:4122] CHIP:EM: Handling via exchange: 51048r, Delegate: 0xaaaaeaa68fa0
+          [1659785279.519548][4122:4122] CHIP:IM: Received Read request
+          [1659785279.519625][4122:4122] CHIP:DMG: ReadRequestMessage =
+          [1659785279.519652][4122:4122] CHIP:DMG: {
+          [1659785279.519679][4122:4122] CHIP:DMG: 	AttributePathIBs =
+          [1659785279.519705][4122:4122] CHIP:DMG: 	[
+          [1659785279.519729][4122:4122] CHIP:DMG: 		AttributePathIB =
+          [1659785279.519759][4122:4122] CHIP:DMG: 		{
+          [1659785279.519790][4122:4122] CHIP:DMG: 			Endpoint = 0x0,
+          [1659785279.519822][4122:4122] CHIP:DMG: 			Cluster = 0x2d,
+          [1659785279.519853][4122:4122] CHIP:DMG: 			Attribute = 0x0000_FFFD,
+          [1659785279.519877][4122:4122] CHIP:DMG: 		}
+          [1659785279.519904][4122:4122] CHIP:DMG:
+          [1659785279.519932][4122:4122] CHIP:DMG: 	],
+          [1659785279.519960][4122:4122] CHIP:DMG:
+          [1659785279.519986][4122:4122] CHIP:DMG: 	isFabricFiltered = true,
+          [1659785279.520011][4122:4122] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659785279.520034][4122:4122] CHIP:DMG: },
+          [1659785279.520108][4122:4122] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659785279.520189][4122:4122] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
       disabled: true
 
-    - label: "DUT reads from the TH the(0xFFFC) FeatureMap attribute"
+    - label: "{DUTread} (0xFFFC) FeatureMap attribute"
+      PICS: LUNIT.C.Afffc
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool unitlocalization read  feature-map 1 0
-          [1651186357789] [11140:114768] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFFC DataVersion: 486381485
-          [1651186357789] [11140:114768] CHIP: [TOO]   FeatureMap: 1
+          Verify DUT receives feature-map attribute response on the TH(all-clusters-app) Log:
+
+          [1659785328.533426][4122:4122] CHIP:IM: Received Read request
+          [1659785328.533548][4122:4122] CHIP:DMG: ReadRequestMessage =
+          [1659785328.533596][4122:4122] CHIP:DMG: {
+          [1659785328.533637][4122:4122] CHIP:DMG:         AttributePathIBs =
+          [1659785328.533685][4122:4122] CHIP:DMG:         [
+          [1659785328.533730][4122:4122] CHIP:DMG:                 AttributePathIB =
+          [1659785328.533785][4122:4122] CHIP:DMG:                 {
+          [1659785328.533837][4122:4122] CHIP:DMG:                         Endpoint = 0x0,
+          [1659785328.533894][4122:4122] CHIP:DMG:                         Cluster = 0x2d,
+          [1659785328.533958][4122:4122] CHIP:DMG:                         Attribute = 0x0000_FFFC,
+          [1659785328.534017][4122:4122] CHIP:DMG:                 }
+          [1659785328.534072][4122:4122] CHIP:DMG:
+          [1659785328.534124][4122:4122] CHIP:DMG:         ],
+          [1659785328.534176][4122:4122] CHIP:DMG:
+          [1659785328.534224][4122:4122] CHIP:DMG:         isFabricFiltered = true,
+          [1659785328.534275][4122:4122] CHIP:DMG:         InteractionModelRevision = 1
+          [1659785328.534319][4122:4122] CHIP:DMG: },
+          [1659785328.534443][4122:4122] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659785328.534578][4122:4122] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659785328.534629][4122:4122] CHIP:DMG: <RE:Run> Cluster 2d, Attribute fffc is dirty
       disabled: true
 
-    - label: "DUT reads from the TH the(0xFFFB) AttributeList attribute"
+    - label: "{DUTread} (0xFFFB) AttributeList attribute"
+      PICS: LUNIT.C.Afffb
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool unitlocalization read attribute-list 1 0
+
+          Verify DUT receives attribute-list attribute response on the TH(all-clusters-app) Log:
           [1652335691.917681][3124:3129] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFFB DataVersion: 3157629909
           [1652335691.917762][3124:3129] CHIP:TOO:   AttributeList: 6 entries
           [1652335691.917802][3124:3129] CHIP:TOO:     [1]: 0
@@ -59,26 +112,63 @@ tests:
           [1652335691.917957][3124:3129] CHIP:TOO:     [6]: 65533
       disabled: true
 
-    - label: "DUT reads from the TH the(0xFFFA) EventList attribute"
+    - label: "{DUTread} (0xFFFA) EventList attribute"
+      PICS: LUNIT.C.Afffa
       verification: |
           out of scope for V1.0
       disabled: true
 
-    - label: "DUT reads from the TH the(0xFFF9) AcceptedCommandList attribute"
+    - label: "{DUTread} (0xFFF9) AcceptedCommandList attribute"
+      PICS: LUNIT.C.Afff9
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool unitlocalization read accepted-command-list 1 0
-
-          [1651186469211] [11184:116328] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFF9 DataVersion: 486381485
-          [1651186469211] [11184:116328] CHIP: [TOO]   AcceptedCommandList: 0 entries
+          Verify DUT receives AcceptedCommandList attribute response on the TH(all-clusters-app) Log:
+          [1659785385.381041][4122:4122] CHIP:EM: Handling via exchange: 60781r, Delegate: 0xaaaaeaa68fa0
+          [1659785385.381113][4122:4122] CHIP:IM: Received Read request
+          [1659785385.381253][4122:4122] CHIP:DMG: ReadRequestMessage =
+          [1659785385.381309][4122:4122] CHIP:DMG: {
+          [1659785385.381354][4122:4122] CHIP:DMG: 	AttributePathIBs =
+          [1659785385.381415][4122:4122] CHIP:DMG: 	[
+          [1659785385.381466][4122:4122] CHIP:DMG: 		AttributePathIB =
+          [1659785385.381523][4122:4122] CHIP:DMG: 		{
+          [1659785385.381583][4122:4122] CHIP:DMG: 			Endpoint = 0x0,
+          [1659785385.381650][4122:4122] CHIP:DMG: 			Cluster = 0x2d,
+          [1659785385.381717][4122:4122] CHIP:DMG: 			Attribute = 0x0000_FFFB,
+          [1659785385.381780][4122:4122] CHIP:DMG: 		}
+          [1659785385.381842][4122:4122] CHIP:DMG:
+          [1659785385.381900][4122:4122] CHIP:DMG: 	],
+          [1659785385.381959][4122:4122] CHIP:DMG:
+          [1659785385.382019][4122:4122] CHIP:DMG: 	isFabricFiltered = true,
+          [1659785385.382072][4122:4122] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659785385.382121][4122:4122] CHIP:DMG: },
+          [1659785385.382261][4122:4122] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
-    - label: "DUT reads from the TH the(0xFFF8) GeneratedCommandList attribute"
+    - label: "{DUTread} (0xFFF8) GeneratedCommandList attribute"
+      PICS: LUNIT.C.Afff8
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool unitlocalization read generated-command-list 1 0
-          [1651191485645] [13481:177154] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFF8 DataVersion: 486381492
-          [1651191485646] [13481:177154] CHIP: [TOO]   GeneratedCommandList: 0 entries
+          Verify DUT receives GeneratedCommandList attribute response on the TH(all-clusters-app) Log:
+          [1659785447.481659][4122:4122] CHIP:IM: Received Read request
+          [1659785447.481736][4122:4122] CHIP:DMG: ReadRequestMessage =
+          [1659785447.481763][4122:4122] CHIP:DMG: {
+          [1659785447.481785][4122:4122] CHIP:DMG: 	AttributePathIBs =
+          [1659785447.481813][4122:4122] CHIP:DMG: 	[
+          [1659785447.481837][4122:4122] CHIP:DMG: 		AttributePathIB =
+          [1659785447.481864][4122:4122] CHIP:DMG: 		{
+          [1659785447.481892][4122:4122] CHIP:DMG: 			Endpoint = 0x0,
+          [1659785447.481923][4122:4122] CHIP:DMG: 			Cluster = 0x2d,
+          [1659785447.481958][4122:4122] CHIP:DMG: 			Attribute = 0x0000_FFF8,
+          [1659785447.481985][4122:4122] CHIP:DMG: 		}
+          [1659785447.482014][4122:4122] CHIP:DMG:
+          [1659785447.482039][4122:4122] CHIP:DMG: 	],
+          [1659785447.482067][4122:4122] CHIP:DMG:
+          [1659785447.482093][4122:4122] CHIP:DMG: 	isFabricFiltered = true,
+          [1659785447.482118][4122:4122] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659785447.482142][4122:4122] CHIP:DMG: },
+          [1659785447.482215][4122:4122] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true

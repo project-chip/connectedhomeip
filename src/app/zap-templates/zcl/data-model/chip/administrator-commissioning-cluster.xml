@@ -19,9 +19,9 @@ limitations under the License.
 
   <enum name="StatusCode" type="ENUM8">
     <cluster code="0x003c"/>
-     <item name="Busy" value="0x01"/>
-     <item name="PAKEParameterError" value="0x02"/>
-     <item name="WindowNotOpen" value="0x03"/>
+     <item name="Busy" value="0x02"/>
+     <item name="PAKEParameterError" value="0x03"/>
+     <item name="WindowNotOpen" value="0x04"/>
   </enum>
 
   <enum name="CommissioningWindowStatus" type="ENUM8">
@@ -38,9 +38,9 @@ limitations under the License.
     <define>ADMINISTRATOR_COMMISSIONING_CLUSTER</define>
     <description>Commands to trigger a Node to allow a new Administrator to commission it.</description>
 
-    <attribute side="server" code="0x0000" define="WINDOW_STATUS" type="INT8U" writable="false" optional="false">WindowStatus</attribute>
-    <attribute side="server" code="0x0001" define="ADMIN_FABRIC_INDEX" type="fabric_idx" writable="false" optional="false">AdminFabricIndex</attribute>
-    <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="INT16U" writable="false" optional="false">AdminVendorId</attribute>
+    <attribute side="server" code="0x0000" define="WINDOW_STATUS" type="CommissioningWindowStatus" writable="false" optional="false">WindowStatus</attribute>
+    <attribute side="server" code="0x0001" define="ADMIN_FABRIC_INDEX" type="fabric_idx" writable="false" isNullable="true" optional="false">AdminFabricIndex</attribute>
+    <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="INT16U" writable="false" isNullable="true" optional="false">AdminVendorId</attribute>
 
     <command source="client" code="0x00" name="OpenCommissioningWindow" mustUseTimedInvoke="true" optional="false">
       <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method.</description>

@@ -121,13 +121,13 @@ public:
     ~AccessControlCluster() {}
 };
 
-class DLL_EXPORT BridgedActionsCluster : public ClusterBase
+class DLL_EXPORT ActionsCluster : public ClusterBase
 {
 public:
-    BridgedActionsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::BridgedActions::Id, endpoint)
+    ActionsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Actions::Id, endpoint)
     {}
-    ~BridgedActionsCluster() {}
+    ~ActionsCluster() {}
 };
 
 class DLL_EXPORT BasicCluster : public ClusterBase
@@ -629,6 +629,15 @@ public:
         ClusterBase(exchangeManager, session, app::Clusters::TestCluster::Id, endpoint)
     {}
     ~TestClusterCluster() {}
+};
+
+class DLL_EXPORT FaultInjectionCluster : public ClusterBase
+{
+public:
+    FaultInjectionCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::FaultInjection::Id, endpoint)
+    {}
+    ~FaultInjectionCluster() {}
 };
 
 } // namespace Controller

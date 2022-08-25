@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.13. [TC-CNET-4.15] [Wi-Fi] NetworkIDNotFound returned in
+    12.4.13. [TC-CNET-4.15] [Wi-Fi] NetworkIDNotFound returned in
     LastNetworkingStatus field validation [DUT-Server]
+
+PICS:
+    - CNET.S.F00
 
 config:
     nodeId: 0x12344321
@@ -23,33 +26,42 @@ config:
     endpoint: 0
 
 tests:
-    - label:
-          "TH reads Network attribute from the DUT * TH saves the single entrys
-          NetworkID value as 'userwifi_ssid' value for the future use"
+    - label: "Factory Reset the DUT"
       verification: |
-          ./chip-tool networkcommissioning read networks 1 0
+          verification step to be updated.
+      disabled: true
 
-          Verify on the TH Log:
-
-          [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true,
-          [1645772651.445149][3856:3861] CHIP:DMG:         InteractionModelRevision = 1
-          [1645772651.445209][3856:3861] CHIP:DMG: }
-          [1645772651.445754][3856:3861] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001DataVersion: 92121563
-          [1645772651.445875][3856:3861] CHIP:TOO:   Networks: 1 entries
-          [1645772651.446057][3856:3861] CHIP:TOO:     [1]: {
-          [1645772651.446120][3856:3861] CHIP:TOO:       NetworkID: 47524C50726976617465
-          [1650389742.394958][9809:9814] CHIP:TOO:       Connected: TRUE
-          [1645772651.446228][3856:3861] CHIP:TOO:      }
-          [1645772651.446431][3856:3861] CHIP:EM: Sending Standalone Ack for MessageCounter:12695576 on exchange 11133i
+    - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
+      verification: |
+          verification step to be updated.
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeco nds
-          field set to 900"
+          "The cluster Identifier 49 (0x0031) is present in the ServerList
+          attribute"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label: "The FeatureMap attribute value is 1"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "MaxNetworks attribute value is at least 1 which is saved as
+          MaxNetworksValue for future use"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label:
+          "TH sends  ArmFailSafe  command to the  DUT with
+          the  ExpiryLengthSeco  nds field set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
 
-          Verify on the TH Log:
+          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
 
           [1650383264.543046][44233:44238] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1650383264.543109][44233:44238] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -62,14 +74,18 @@ tests:
       disabled: true
 
     - label:
-          "TH sends RemoveNetwork Command to the DUT with NetworkID field set to
-          PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_SSID, which does not match the
-          provisioned network, and Breadcrumb field set to 1"
-      PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
+          "TH sends  RemoveNetwork  Command to the  DUT with  NetworkID
+          field  set to  PIXIT.CNET.WIFI_  2ND_ACCESSPOIN  T_SSID, which  does
+          not match  the provisioned  network, and  Breadcrumb field  set to 1"
+      PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
-          ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
+          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
 
-          Verify on the TH Log:
+          Below is an example:
+
+           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
+
+          Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
 
           [1650383270.888700][44239:44244] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1650383270.888774][44239:44244] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
@@ -86,9 +102,13 @@ tests:
           provisioned network, and Breadcrumb field set to 1"
       PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
       verification: |
+          ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
+
+          Below is an example:
+
           ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
 
-          Verify on the TH Log:
+          Verify "ConnectNetworkResponse and its arguments" on the TH(Chip-tool) Log:
 
           [1650383278.349428][44245:44250] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1650383278.349490][44245:44250] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007

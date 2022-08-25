@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    19.8.6. [TC-MEDIAPLAYBACK-6.7] Optional Media Playback Verification (DUT as
+    3.8.6. [TC-MEDIAPLAYBACK-6.7] Optional Media Playback Verification (DUT as
     Client)
+
+PICS:
+    - MEDIAPLAYBACK.C
 
 config:
     nodeId: 0x12344321
@@ -24,201 +27,225 @@ config:
 
 tests:
     - label: "DUT sends Play command to TH"
-      PICS: MEDIAPLAYBACK.C.C0000
+      PICS: MEDIAPLAYBACK.C.C00.Tx
       verification: |
-          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool mediaplayback play 1 1
+          ./chip-tool mediaplayback  play 1 3
+          ./chip-tv-casting-app mediaplayback  play 1 3
 
-          [1653155763765] [89108:1728729] CHIP: [DMG] InvokeRequestMessage =
-          [1653155763765] [89108:1728729] CHIP: [DMG] {
-          [1653155763765] [89108:1728729] CHIP: [DMG] 	suppressResponse = false,
-          [1653155763765] [89108:1728729] CHIP: [DMG] 	timedRequest = false,
-          [1653155763765] [89108:1728729] CHIP: [DMG] 	InvokeRequests =
-          [1653155763765] [89108:1728729] CHIP: [DMG] 	[
-          [1653155763765] [89108:1728729] CHIP: [DMG] 		CommandDataIB =
-          [1653155763765] [89108:1728729] CHIP: [DMG] 		{
-          [1653155763765] [89108:1728729] CHIP: [DMG] 			CommandPathIB =
-          [1653155763765] [89108:1728729] CHIP: [DMG] 			{
-          [1653155763765] [89108:1728729] CHIP: [DMG] 				EndpointId = 0x1,
-          [1653155763765] [89108:1728729] CHIP: [DMG] 				ClusterId = 0x506,
-          [1653155763765] [89108:1728729] CHIP: [DMG] 				CommandId = 0x0,
-          [1653155763765] [89108:1728729] CHIP: [DMG] 			},
-          [1653155763765] [89108:1728729] CHIP: [DMG]
-          [1653155763765] [89108:1728729] CHIP: [DMG] 			CommandData =
-          [1653155763765] [89108:1728729] CHIP: [DMG] 			{
-          [1653155763765] [89108:1728729] CHIP: [DMG] 			},
-          [1653155763765] [89108:1728729] CHIP: [DMG] 		},
-          [1653155763765] [89108:1728729] CHIP: [DMG]
-          [1653155763765] [89108:1728729] CHIP: [DMG] 	],
-          [1653155763765] [89108:1728729] CHIP: [DMG]
-          [1653155763765] [89108:1728729] CHIP: [DMG] 	InteractionModelRevision = 1
-          [1653155763765] [89108:1728729] CHIP: [DMG] },
+
+          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
+
+          [1658531093554] [21924:321344] CHIP: [DMG] InvokeRequestMessage =
+          [1658531093554] [21924:321344] CHIP: [DMG] {
+          [1658531093554] [21924:321344] CHIP: [DMG]         suppressResponse = false,
+          [1658531093554] [21924:321344] CHIP: [DMG]         timedRequest = false,
+          [1658531093554] [21924:321344] CHIP: [DMG]         InvokeRequests =
+          [1658531093554] [21924:321344] CHIP: [DMG]         [
+          [1658531093554] [21924:321344] CHIP: [DMG]                 CommandDataIB =
+          [1658531093554] [21924:321344] CHIP: [DMG]                 {
+          [1658531093554] [21924:321344] CHIP: [DMG]                         CommandPathIB =
+          [1658531093554] [21924:321344] CHIP: [DMG]                         {
+          [1658531093554] [21924:321344] CHIP: [DMG]                                 EndpointId = 0x3,
+          [1658531093554] [21924:321344] CHIP: [DMG]                                 ClusterId = 0x506,
+          [1658531093554] [21924:321344] CHIP: [DMG]                                 CommandId = 0x0,
+          [1658531093554] [21924:321344] CHIP: [DMG]                         },
+          [1658531093554] [21924:321344] CHIP: [DMG]
+          [1658531093554] [21924:321344] CHIP: [DMG]                         CommandFields =
+          [1658531093554] [21924:321344] CHIP: [DMG]                         {
+          [1658531093554] [21924:321344] CHIP: [DMG]                         },
+          [1658531093554] [21924:321344] CHIP: [DMG]                 },
+          [1658531093554] [21924:321344] CHIP: [DMG]
+          [1658531093554] [21924:321344] CHIP: [DMG]         ],
+          [1658531093554] [21924:321344] CHIP: [DMG]
+          [1658531093554] [21924:321344] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658531093554] [21924:321344] CHIP: [DMG] },
       disabled: true
 
-    - label: "DUT sends Start Over command to TH"
-      PICS: MEDIAPLAYBACK.C.C0003
+    - label: "DUT sends StartOver command to TH"
+      PICS: MEDIAPLAYBACK.C.C03.Tx
       verification: |
-          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool mediaplayback start-over 1 1
+          ./chip-tool mediaplayback start-over 1 3
+          ./chip-tv-casting-app mediaplayback start-over 1 3
 
-          [1653155863805] [89108:1730610] CHIP: [DMG] InvokeRequestMessage =
-          [1653155863805] [89108:1730610] CHIP: [DMG] {
-          [1653155863805] [89108:1730610] CHIP: [DMG] 	suppressResponse = false,
-          [1653155863805] [89108:1730610] CHIP: [DMG] 	timedRequest = false,
-          [1653155863805] [89108:1730610] CHIP: [DMG] 	InvokeRequests =
-          [1653155863805] [89108:1730610] CHIP: [DMG] 	[
-          [1653155863805] [89108:1730610] CHIP: [DMG] 		CommandDataIB =
-          [1653155863805] [89108:1730610] CHIP: [DMG] 		{
-          [1653155863805] [89108:1730610] CHIP: [DMG] 			CommandPathIB =
-          [1653155863805] [89108:1730610] CHIP: [DMG] 			{
-          [1653155863805] [89108:1730610] CHIP: [DMG] 				EndpointId = 0x1,
-          [1653155863805] [89108:1730610] CHIP: [DMG] 				ClusterId = 0x506,
-          [1653155863805] [89108:1730610] CHIP: [DMG] 				CommandId = 0x3,
-          [1653155863805] [89108:1730610] CHIP: [DMG] 			},
-          [1653155863805] [89108:1730610] CHIP: [DMG]
-          [1653155863805] [89108:1730610] CHIP: [DMG] 			CommandData =
-          [1653155863805] [89108:1730610] CHIP: [DMG] 			{
-          [1653155863805] [89108:1730610] CHIP: [DMG] 			},
-          [1653155863805] [89108:1730610] CHIP: [DMG] 		},
-          [1653155863805] [89108:1730610] CHIP: [DMG]
-          [1653155863805] [89108:1730610] CHIP: [DMG] 	],
-          [1653155863805] [89108:1730610] CHIP: [DMG]
-          [1653155863805] [89108:1730610] CHIP: [DMG] 	InteractionModelRevision = 1
-          [1653155863805] [89108:1730610] CHIP: [DMG] },
+
+          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
+
+          [1658531129608] [21924:322334] CHIP: [DMG] InvokeRequestMessage =
+          [1658531129608] [21924:322334] CHIP: [DMG] {
+          [1658531129608] [21924:322334] CHIP: [DMG]         suppressResponse = false,
+          [1658531129608] [21924:322334] CHIP: [DMG]         timedRequest = false,
+          [1658531129608] [21924:322334] CHIP: [DMG]         InvokeRequests =
+          [1658531129608] [21924:322334] CHIP: [DMG]         [
+          [1658531129608] [21924:322334] CHIP: [DMG]                 CommandDataIB =
+          [1658531129608] [21924:322334] CHIP: [DMG]                 {
+          [1658531129608] [21924:322334] CHIP: [DMG]                         CommandPathIB =
+          [1658531129608] [21924:322334] CHIP: [DMG]                         {
+          [1658531129608] [21924:322334] CHIP: [DMG]                                 EndpointId = 0x3,
+          [1658531129608] [21924:322334] CHIP: [DMG]                                 ClusterId = 0x506,
+          [1658531129608] [21924:322334] CHIP: [DMG]                                 CommandId = 0x3,
+          [1658531129608] [21924:322334] CHIP: [DMG]                         },
+          [1658531129608] [21924:322334] CHIP: [DMG]
+          [1658531129608] [21924:322334] CHIP: [DMG]                         CommandFields =
+          [1658531129608] [21924:322334] CHIP: [DMG]                         {
+          [1658531129608] [21924:322334] CHIP: [DMG]                         },
+          [1658531129608] [21924:322334] CHIP: [DMG]                 },
+          [1658531129608] [21924:322334] CHIP: [DMG]
+          [1658531129608] [21924:322334] CHIP: [DMG]         ],
+          [1658531129609] [21924:322334] CHIP: [DMG]
+          [1658531129609] [21924:322334] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658531129609] [21924:322334] CHIP: [DMG] },
       disabled: true
 
     - label: "DUT sends Next command to TH"
-      PICS: MEDIAPLAYBACK.C.C0005
+      PICS: MEDIAPLAYBACK.C.C05.Tx
       verification: |
-          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool mediaplayback next 1 1
+          ./chip-tool mediaplayback  next 1 3
+          ./chip-tv-casting-app mediaplayback  next 1 3
 
-          [1653155883955] [89108:1731475] CHIP: [DMG] InvokeRequestMessage =
-          [1653155883955] [89108:1731475] CHIP: [DMG] {
-          [1653155883955] [89108:1731475] CHIP: [DMG] 	suppressResponse = false,
-          [1653155883955] [89108:1731475] CHIP: [DMG] 	timedRequest = false,
-          [1653155883955] [89108:1731475] CHIP: [DMG] 	InvokeRequests =
-          [1653155883955] [89108:1731475] CHIP: [DMG] 	[
-          [1653155883955] [89108:1731475] CHIP: [DMG] 		CommandDataIB =
-          [1653155883955] [89108:1731475] CHIP: [DMG] 		{
-          [1653155883955] [89108:1731475] CHIP: [DMG] 			CommandPathIB =
-          [1653155883955] [89108:1731475] CHIP: [DMG] 			{
-          [1653155883955] [89108:1731475] CHIP: [DMG] 				EndpointId = 0x1,
-          [1653155883956] [89108:1731475] CHIP: [DMG] 				ClusterId = 0x506,
-          [1653155883956] [89108:1731475] CHIP: [DMG] 				CommandId = 0x5,
-          [1653155883956] [89108:1731475] CHIP: [DMG] 			},
-          [1653155883956] [89108:1731475] CHIP: [DMG]
-          [1653155883956] [89108:1731475] CHIP: [DMG] 			CommandData =
-          [1653155883956] [89108:1731475] CHIP: [DMG] 			{
-          [1653155883956] [89108:1731475] CHIP: [DMG] 			},
-          [1653155883956] [89108:1731475] CHIP: [DMG] 		},
-          [1653155883956] [89108:1731475] CHIP: [DMG]
-          [1653155883956] [89108:1731475] CHIP: [DMG] 	],
-          [1653155883956] [89108:1731475] CHIP: [DMG]
-          [1653155883956] [89108:1731475] CHIP: [DMG] 	InteractionModelRevision = 1
-          [1653155883956] [89108:1731475] CHIP: [DMG] },
+
+          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
+
+          [1658531176900] [21924:322847] CHIP: [DMG] InvokeRequestMessage =
+          [1658531176900] [21924:322847] CHIP: [DMG] {
+          [1658531176900] [21924:322847] CHIP: [DMG]         suppressResponse = false,
+          [1658531176900] [21924:322847] CHIP: [DMG]         timedRequest = false,
+          [1658531176900] [21924:322847] CHIP: [DMG]         InvokeRequests =
+          [1658531176900] [21924:322847] CHIP: [DMG]         [
+          [1658531176900] [21924:322847] CHIP: [DMG]                 CommandDataIB =
+          [1658531176900] [21924:322847] CHIP: [DMG]                 {
+          [1658531176900] [21924:322847] CHIP: [DMG]                         CommandPathIB =
+          [1658531176900] [21924:322847] CHIP: [DMG]                         {
+          [1658531176900] [21924:322847] CHIP: [DMG]                                 EndpointId = 0x3,
+          [1658531176900] [21924:322847] CHIP: [DMG]                                 ClusterId = 0x506,
+          [1658531176900] [21924:322847] CHIP: [DMG]                                 CommandId = 0x5,
+          [1658531176900] [21924:322847] CHIP: [DMG]                         },
+          [1658531176900] [21924:322847] CHIP: [DMG]
+          [1658531176900] [21924:322847] CHIP: [DMG]                         CommandFields =
+          [1658531176900] [21924:322847] CHIP: [DMG]                         {
+          [1658531176900] [21924:322847] CHIP: [DMG]                         },
+          [1658531176900] [21924:322847] CHIP: [DMG]                 },
+          [1658531176900] [21924:322847] CHIP: [DMG]
+          [1658531176900] [21924:322847] CHIP: [DMG]         ],
+          [1658531176900] [21924:322847] CHIP: [DMG]
+          [1658531176900] [21924:322847] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658531176900] [21924:322847] CHIP: [DMG] },
       disabled: true
 
     - label: "DUT sends Previous command to TH"
-      PICS: MEDIAPLAYBACK.C.C0004
+      PICS: MEDIAPLAYBACK.C.C04.Tx
       verification: |
-          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool mediaplayback previous 1 1
+          ./chip-tool mediaplayback  previous 1 3
+          ./chip-tv-casting-app mediaplayback  previous 1 3
 
-          [1653155908464] [89108:1731410] CHIP: [DMG] InvokeRequestMessage =
-          [1653155908464] [89108:1731410] CHIP: [DMG] {
-          [1653155908464] [89108:1731410] CHIP: [DMG] 	suppressResponse = false,
-          [1653155908464] [89108:1731410] CHIP: [DMG] 	timedRequest = false,
-          [1653155908464] [89108:1731410] CHIP: [DMG] 	InvokeRequests =
-          [1653155908464] [89108:1731410] CHIP: [DMG] 	[
-          [1653155908464] [89108:1731410] CHIP: [DMG] 		CommandDataIB =
-          [1653155908464] [89108:1731410] CHIP: [DMG] 		{
-          [1653155908464] [89108:1731410] CHIP: [DMG] 			CommandPathIB =
-          [1653155908464] [89108:1731410] CHIP: [DMG] 			{
-          [1653155908464] [89108:1731410] CHIP: [DMG] 				EndpointId = 0x1,
-          [1653155908464] [89108:1731410] CHIP: [DMG] 				ClusterId = 0x506,
-          [1653155908464] [89108:1731410] CHIP: [DMG] 				CommandId = 0x4,
-          [1653155908464] [89108:1731410] CHIP: [DMG] 			},
-          [1653155908464] [89108:1731410] CHIP: [DMG]
-          [1653155908464] [89108:1731410] CHIP: [DMG] 			CommandData =
-          [1653155908464] [89108:1731410] CHIP: [DMG] 			{
-          [1653155908464] [89108:1731410] CHIP: [DMG] 			},
-          [1653155908464] [89108:1731410] CHIP: [DMG] 		},
-          [1653155908464] [89108:1731410] CHIP: [DMG]
-          [1653155908464] [89108:1731410] CHIP: [DMG] 	],
-          [1653155908464] [89108:1731410] CHIP: [DMG]
-          [1653155908464] [89108:1731410] CHIP: [DMG] 	InteractionModelRevision = 1
-          [1653155908464] [89108:1731410] CHIP: [DMG] },
+
+          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
+
+          [1658531212499] [21924:323521] CHIP: [DMG] InvokeRequestMessage =
+          [1658531212499] [21924:323521] CHIP: [DMG] {
+          [1658531212499] [21924:323521] CHIP: [DMG]         suppressResponse = false,
+          [1658531212499] [21924:323521] CHIP: [DMG]         timedRequest = false,
+          [1658531212499] [21924:323521] CHIP: [DMG]         InvokeRequests =
+          [1658531212499] [21924:323521] CHIP: [DMG]         [
+          [1658531212499] [21924:323521] CHIP: [DMG]                 CommandDataIB =
+          [1658531212499] [21924:323521] CHIP: [DMG]                 {
+          [1658531212499] [21924:323521] CHIP: [DMG]                         CommandPathIB =
+          [1658531212499] [21924:323521] CHIP: [DMG]                         {
+          [1658531212499] [21924:323521] CHIP: [DMG]                                 EndpointId = 0x3,
+          [1658531212499] [21924:323521] CHIP: [DMG]                                 ClusterId = 0x506,
+          [1658531212499] [21924:323521] CHIP: [DMG]                                 CommandId = 0x4,
+          [1658531212499] [21924:323521] CHIP: [DMG]                         },
+          [1658531212499] [21924:323521] CHIP: [DMG]
+          [1658531212499] [21924:323521] CHIP: [DMG]                         CommandFields =
+          [1658531212499] [21924:323521] CHIP: [DMG]                         {
+          [1658531212499] [21924:323521] CHIP: [DMG]                         },
+          [1658531212499] [21924:323521] CHIP: [DMG]                 },
+          [1658531212499] [21924:323521] CHIP: [DMG]
+          [1658531212499] [21924:323521] CHIP: [DMG]         ],
+          [1658531212499] [21924:323521] CHIP: [DMG]
+          [1658531212499] [21924:323521] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658531212499] [21924:323521] CHIP: [DMG] },
       disabled: true
 
-    - label: "DUT sends Skip Forward command to TH"
-      PICS: MEDIAPLAYBACK.C.C0008
+    - label: "DUT sends SkipForward command to TH"
+      PICS: MEDIAPLAYBACK.C.C08.Tx
       verification: |
-          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool mediaplayback skip-forward 2000 1 1
+          ./chip-tool mediaplayback skip-forward 10000 1 3
+          ./chip-tv-casting-app mediaplayback skip-forward 10000 1 3
 
-          [1653155942341] [89108:1732693] CHIP: [DMG] InvokeRequestMessage =
-          [1653155942341] [89108:1732693] CHIP: [DMG] {
-          [1653155942341] [89108:1732693] CHIP: [DMG] 	suppressResponse = false,
-          [1653155942341] [89108:1732693] CHIP: [DMG] 	timedRequest = false,
-          [1653155942341] [89108:1732693] CHIP: [DMG] 	InvokeRequests =
-          [1653155942341] [89108:1732693] CHIP: [DMG] 	[
-          [1653155942341] [89108:1732693] CHIP: [DMG] 		CommandDataIB =
-          [1653155942341] [89108:1732693] CHIP: [DMG] 		{
-          [1653155942341] [89108:1732693] CHIP: [DMG] 			CommandPathIB =
-          [1653155942341] [89108:1732693] CHIP: [DMG] 			{
-          [1653155942341] [89108:1732693] CHIP: [DMG] 				EndpointId = 0x1,
-          [1653155942341] [89108:1732693] CHIP: [DMG] 				ClusterId = 0x506,
-          [1653155942341] [89108:1732693] CHIP: [DMG] 				CommandId = 0x8,
-          [1653155942342] [89108:1732693] CHIP: [DMG] 			},
-          [1653155942342] [89108:1732693] CHIP: [DMG]
-          [1653155942342] [89108:1732693] CHIP: [DMG] 			CommandData =
-          [1653155942342] [89108:1732693] CHIP: [DMG] 			{
-          [1653155942342] [89108:1732693] CHIP: [DMG] 				0x0 = 2000,
-          [1653155942342] [89108:1732693] CHIP: [DMG] 			},
-          [1653155942342] [89108:1732693] CHIP: [DMG] 		},
-          [1653155942342] [89108:1732693] CHIP: [DMG]
-          [1653155942342] [89108:1732693] CHIP: [DMG] 	],
-          [1653155942342] [89108:1732693] CHIP: [DMG]
-          [1653155942342] [89108:1732693] CHIP: [DMG] 	InteractionModelRevision = 1
-          [1653155942342] [89108:1732693] CHIP: [DMG] },
+
+          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
+
+          [1658531247634] [21924:323905] CHIP: [DMG] InvokeRequestMessage =
+          [1658531247634] [21924:323905] CHIP: [DMG] {
+          [1658531247634] [21924:323905] CHIP: [DMG]         suppressResponse = false,
+          [1658531247634] [21924:323905] CHIP: [DMG]         timedRequest = false,
+          [1658531247634] [21924:323905] CHIP: [DMG]         InvokeRequests =
+          [1658531247634] [21924:323905] CHIP: [DMG]         [
+          [1658531247634] [21924:323905] CHIP: [DMG]                 CommandDataIB =
+          [1658531247634] [21924:323905] CHIP: [DMG]                 {
+          [1658531247634] [21924:323905] CHIP: [DMG]                         CommandPathIB =
+          [1658531247634] [21924:323905] CHIP: [DMG]                         {
+          [1658531247634] [21924:323905] CHIP: [DMG]                                 EndpointId = 0x3,
+          [1658531247634] [21924:323905] CHIP: [DMG]                                 ClusterId = 0x506,
+          [1658531247634] [21924:323905] CHIP: [DMG]                                 CommandId = 0x8,
+          [1658531247634] [21924:323905] CHIP: [DMG]                         },
+          [1658531247634] [21924:323905] CHIP: [DMG]
+          [1658531247635] [21924:323905] CHIP: [DMG]                         CommandFields =
+          [1658531247635] [21924:323905] CHIP: [DMG]                         {
+          [1658531247635] [21924:323905] CHIP: [DMG]                                 0x0 = 10000,
+          [1658531247635] [21924:323905] CHIP: [DMG]                         },
+          [1658531247635] [21924:323905] CHIP: [DMG]                 },
+          [1658531247635] [21924:323905] CHIP: [DMG]
+          [1658531247635] [21924:323905] CHIP: [DMG]         ],
+          [1658531247635] [21924:323905] CHIP: [DMG]
+          [1658531247635] [21924:323905] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658531247635] [21924:323905] CHIP: [DMG] },
       disabled: true
 
-    - label: "DUT sends Skip Backward command to TH"
-      PICS: MEDIAPLAYBACK.C.C0009
+    - label: "DUT sends SkipBackward command to TH"
+      PICS: MEDIAPLAYBACK.C.C09.Tx
       verification: |
-          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool mediaplayback skip-backward 2000 1 1
+          ./chip-tool mediaplayback skip-backward 10000 1 3
+          ./chip-tv-casting-app mediaplayback skip-backward 10000 1 3
 
-          [1653155967344] [89108:1733002] CHIP: [DMG] InvokeRequestMessage =
-          [1653155967344] [89108:1733002] CHIP: [DMG] {
-          [1653155967344] [89108:1733002] CHIP: [DMG] 	suppressResponse = false,
-          [1653155967344] [89108:1733002] CHIP: [DMG] 	timedRequest = false,
-          [1653155967344] [89108:1733002] CHIP: [DMG] 	InvokeRequests =
-          [1653155967344] [89108:1733002] CHIP: [DMG] 	[
-          [1653155967344] [89108:1733002] CHIP: [DMG] 		CommandDataIB =
-          [1653155967344] [89108:1733002] CHIP: [DMG] 		{
-          [1653155967344] [89108:1733002] CHIP: [DMG] 			CommandPathIB =
-          [1653155967344] [89108:1733002] CHIP: [DMG] 			{
-          [1653155967344] [89108:1733002] CHIP: [DMG] 				EndpointId = 0x1,
-          [1653155967344] [89108:1733002] CHIP: [DMG] 				ClusterId = 0x506,
-          [1653155967344] [89108:1733002] CHIP: [DMG] 				CommandId = 0x9,
-          [1653155967344] [89108:1733002] CHIP: [DMG] 			},
-          [1653155967344] [89108:1733002] CHIP: [DMG]
-          [1653155967344] [89108:1733002] CHIP: [DMG] 			CommandData =
-          [1653155967344] [89108:1733002] CHIP: [DMG] 			{
-          [1653155967344] [89108:1733002] CHIP: [DMG] 				0x0 = 2000,
-          [1653155967344] [89108:1733002] CHIP: [DMG] 			},
-          [1653155967344] [89108:1733002] CHIP: [DMG] 		},
-          [1653155967344] [89108:1733002] CHIP: [DMG]
-          [1653155967344] [89108:1733002] CHIP: [DMG] 	],
-          [1653155967344] [89108:1733002] CHIP: [DMG]
-          [1653155967344] [89108:1733002] CHIP: [DMG] 	InteractionModelRevision = 1
-          [1653155967344] [89108:1733002] CHIP: [DMG] },
+
+          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
+
+          [1658531281369] [21924:323905] CHIP: [DMG] InvokeRequestMessage =
+          [1658531281369] [21924:323905] CHIP: [DMG] {
+          [1658531281369] [21924:323905] CHIP: [DMG]         suppressResponse = false,
+          [1658531281369] [21924:323905] CHIP: [DMG]         timedRequest = false,
+          [1658531281369] [21924:323905] CHIP: [DMG]         InvokeRequests =
+          [1658531281369] [21924:323905] CHIP: [DMG]         [
+          [1658531281369] [21924:323905] CHIP: [DMG]                 CommandDataIB =
+          [1658531281369] [21924:323905] CHIP: [DMG]                 {
+          [1658531281369] [21924:323905] CHIP: [DMG]                         CommandPathIB =
+          [1658531281369] [21924:323905] CHIP: [DMG]                         {
+          [1658531281369] [21924:323905] CHIP: [DMG]                                 EndpointId = 0x3,
+          [1658531281369] [21924:323905] CHIP: [DMG]                                 ClusterId = 0x506,
+          [1658531281369] [21924:323905] CHIP: [DMG]                                 CommandId = 0x9,
+          [1658531281369] [21924:323905] CHIP: [DMG]                         },
+          [1658531281369] [21924:323905] CHIP: [DMG]
+          [1658531281369] [21924:323905] CHIP: [DMG]                         CommandFields =
+          [1658531281369] [21924:323905] CHIP: [DMG]                         {
+          [1658531281369] [21924:323905] CHIP: [DMG]                                 0x0 = 10000,
+          [1658531281369] [21924:323905] CHIP: [DMG]                         },
+          [1658531281369] [21924:323905] CHIP: [DMG]                 },
+          [1658531281369] [21924:323905] CHIP: [DMG]
+          [1658531281369] [21924:323905] CHIP: [DMG]         ],
+          [1658531281369] [21924:323905] CHIP: [DMG]
+          [1658531281369] [21924:323905] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658531281369] [21924:323905] CHIP: [DMG] },
       disabled: true

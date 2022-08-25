@@ -133,13 +133,13 @@ void emberAfBindingClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfAccessControlClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Bridged Actions Cluster Init
+/** @brief Actions Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBridgedActionsClusterInitCallback(chip::EndpointId endpoint);
+void emberAfActionsClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Basic Cluster Init
  *
@@ -604,6 +604,14 @@ void emberAfElectricalMeasurementClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfTestClusterClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Fault Injection Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfFaultInjectionClusterInitCallback(chip::EndpointId endpoint);
 
 // Cluster Server/Client Init Functions
 
@@ -1668,34 +1676,34 @@ void emberAfAccessControlClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfAccessControlClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Bridged Actions Cluster
+// Actions Cluster
 //
 
-/** @brief Bridged Actions Cluster Server Init
+/** @brief Actions Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBridgedActionsClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfActionsClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Bridged Actions Cluster Client Init
+/** @brief Actions Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBridgedActionsClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfActionsClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief Bridged Actions Cluster Server Attribute Changed
+/** @brief Actions Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterBridgedActionsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterActionsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Bridged Actions Cluster Server Message Sent
+/** @brief Actions Cluster Server Message Sent
  *
  * Server Message Sent
  *
@@ -1705,11 +1713,10 @@ void MatterBridgedActionsClusterServerAttributeChangedCallback(const chip::app::
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfBridgedActionsClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                           EmberStatus status);
+void emberAfActionsClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                    uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief Bridged Actions Cluster Client Message Sent
+/** @brief Actions Cluster Client Message Sent
  *
  * Client Message Sent
  *
@@ -1719,11 +1726,10 @@ void emberAfBridgedActionsClusterServerMessageSentCallback(const chip::MessageSe
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfBridgedActionsClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                           EmberStatus status);
+void emberAfActionsClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                    uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief Bridged Actions Cluster Server Pre Attribute Changed
+/** @brief Actions Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -1733,10 +1739,10 @@ void emberAfBridgedActionsClusterClientMessageSentCallback(const chip::MessageSe
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterBridgedActionsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterActionsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Bridged Actions Cluster Client Pre Attribute Changed
+/** @brief Actions Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -1746,24 +1752,24 @@ MatterBridgedActionsClusterServerPreAttributeChangedCallback(const chip::app::Co
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterBridgedActionsClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterActionsClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Bridged Actions Cluster Server Tick
+/** @brief Actions Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfBridgedActionsClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfActionsClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief Bridged Actions Cluster Client Tick
+/** @brief Actions Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfBridgedActionsClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfActionsClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Basic Cluster
@@ -7356,6 +7362,104 @@ void emberAfTestClusterClusterServerTickCallback(chip::EndpointId endpoint);
  */
 void emberAfTestClusterClusterClientTickCallback(chip::EndpointId endpoint);
 
+//
+// Fault Injection Cluster
+//
+
+/** @brief Fault Injection Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfFaultInjectionClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Fault Injection Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfFaultInjectionClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Fault Injection Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterFaultInjectionClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Fault Injection Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfFaultInjectionClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                           EmberStatus status);
+
+/** @brief Fault Injection Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfFaultInjectionClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                           EmberStatus status);
+
+/** @brief Fault Injection Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterFaultInjectionClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Fault Injection Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterFaultInjectionClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Fault Injection Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfFaultInjectionClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Fault Injection Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfFaultInjectionClusterClientTickCallback(chip::EndpointId endpoint);
+
 // Cluster Commands Callback
 
 /**
@@ -7624,77 +7728,77 @@ bool emberAfLevelControlClusterMoveToClosestFrequencyCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::DecodableType & commandData);
 /**
- * @brief Bridged Actions Cluster InstantAction Command callback (from client)
+ * @brief Actions Cluster InstantAction Command callback (from client)
  */
-bool emberAfBridgedActionsClusterInstantActionCallback(
+bool emberAfActionsClusterInstantActionCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BridgedActions::Commands::InstantAction::DecodableType & commandData);
+    const chip::app::Clusters::Actions::Commands::InstantAction::DecodableType & commandData);
 /**
- * @brief Bridged Actions Cluster InstantActionWithTransition Command callback (from client)
+ * @brief Actions Cluster InstantActionWithTransition Command callback (from client)
  */
-bool emberAfBridgedActionsClusterInstantActionWithTransitionCallback(
+bool emberAfActionsClusterInstantActionWithTransitionCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::DecodableType & commandData);
+    const chip::app::Clusters::Actions::Commands::InstantActionWithTransition::DecodableType & commandData);
 /**
- * @brief Bridged Actions Cluster StartAction Command callback (from client)
+ * @brief Actions Cluster StartAction Command callback (from client)
  */
-bool emberAfBridgedActionsClusterStartActionCallback(
+bool emberAfActionsClusterStartActionCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BridgedActions::Commands::StartAction::DecodableType & commandData);
+    const chip::app::Clusters::Actions::Commands::StartAction::DecodableType & commandData);
 /**
- * @brief Bridged Actions Cluster StartActionWithDuration Command callback (from client)
+ * @brief Actions Cluster StartActionWithDuration Command callback (from client)
  */
-bool emberAfBridgedActionsClusterStartActionWithDurationCallback(
+bool emberAfActionsClusterStartActionWithDurationCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::DecodableType & commandData);
+    const chip::app::Clusters::Actions::Commands::StartActionWithDuration::DecodableType & commandData);
 /**
- * @brief Bridged Actions Cluster StopAction Command callback (from client)
+ * @brief Actions Cluster StopAction Command callback (from client)
  */
-bool emberAfBridgedActionsClusterStopActionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BridgedActions::Commands::StopAction::DecodableType & commandData);
+bool emberAfActionsClusterStopActionCallback(chip::app::CommandHandler * commandObj,
+                                             const chip::app::ConcreteCommandPath & commandPath,
+                                             const chip::app::Clusters::Actions::Commands::StopAction::DecodableType & commandData);
 /**
- * @brief Bridged Actions Cluster PauseAction Command callback (from client)
+ * @brief Actions Cluster PauseAction Command callback (from client)
  */
-bool emberAfBridgedActionsClusterPauseActionCallback(
+bool emberAfActionsClusterPauseActionCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BridgedActions::Commands::PauseAction::DecodableType & commandData);
+    const chip::app::Clusters::Actions::Commands::PauseAction::DecodableType & commandData);
 /**
- * @brief Bridged Actions Cluster PauseActionWithDuration Command callback (from client)
+ * @brief Actions Cluster PauseActionWithDuration Command callback (from client)
  */
-bool emberAfBridgedActionsClusterPauseActionWithDurationCallback(
+bool emberAfActionsClusterPauseActionWithDurationCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::DecodableType & commandData);
+    const chip::app::Clusters::Actions::Commands::PauseActionWithDuration::DecodableType & commandData);
 /**
- * @brief Bridged Actions Cluster ResumeAction Command callback (from client)
+ * @brief Actions Cluster ResumeAction Command callback (from client)
  */
-bool emberAfBridgedActionsClusterResumeActionCallback(
+bool emberAfActionsClusterResumeActionCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BridgedActions::Commands::ResumeAction::DecodableType & commandData);
+    const chip::app::Clusters::Actions::Commands::ResumeAction::DecodableType & commandData);
 /**
- * @brief Bridged Actions Cluster EnableAction Command callback (from client)
+ * @brief Actions Cluster EnableAction Command callback (from client)
  */
-bool emberAfBridgedActionsClusterEnableActionCallback(
+bool emberAfActionsClusterEnableActionCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BridgedActions::Commands::EnableAction::DecodableType & commandData);
+    const chip::app::Clusters::Actions::Commands::EnableAction::DecodableType & commandData);
 /**
- * @brief Bridged Actions Cluster EnableActionWithDuration Command callback (from client)
+ * @brief Actions Cluster EnableActionWithDuration Command callback (from client)
  */
-bool emberAfBridgedActionsClusterEnableActionWithDurationCallback(
+bool emberAfActionsClusterEnableActionWithDurationCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::DecodableType & commandData);
+    const chip::app::Clusters::Actions::Commands::EnableActionWithDuration::DecodableType & commandData);
 /**
- * @brief Bridged Actions Cluster DisableAction Command callback (from client)
+ * @brief Actions Cluster DisableAction Command callback (from client)
  */
-bool emberAfBridgedActionsClusterDisableActionCallback(
+bool emberAfActionsClusterDisableActionCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BridgedActions::Commands::DisableAction::DecodableType & commandData);
+    const chip::app::Clusters::Actions::Commands::DisableAction::DecodableType & commandData);
 /**
- * @brief Bridged Actions Cluster DisableActionWithDuration Command callback (from client)
+ * @brief Actions Cluster DisableActionWithDuration Command callback (from client)
  */
-bool emberAfBridgedActionsClusterDisableActionWithDurationCallback(
+bool emberAfActionsClusterDisableActionWithDurationCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::DecodableType & commandData);
+    const chip::app::Clusters::Actions::Commands::DisableActionWithDuration::DecodableType & commandData);
 /**
  * @brief Basic Cluster MfgSpecificPing Command callback (from client)
  */
@@ -7872,6 +7976,12 @@ bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(
 bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
+/**
+ * @brief Time Synchronization Cluster SetUtcTime Command callback (from client)
+ */
+bool emberAfTimeSynchronizationClusterSetUtcTimeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TimeSynchronization::Commands::SetUtcTime::DecodableType & commandData);
 /**
  * @brief AdministratorCommissioning Cluster OpenCommissioningWindow Command callback (from client)
  */
@@ -8803,6 +8913,18 @@ bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
 bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData);
+/**
+ * @brief Fault Injection Cluster FailAtFault Command callback (from client)
+ */
+bool emberAfFaultInjectionClusterFailAtFaultCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::FaultInjection::Commands::FailAtFault::DecodableType & commandData);
+/**
+ * @brief Fault Injection Cluster FailRandomlyAtFault Command callback (from client)
+ */
+bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::FaultInjection::Commands::FailRandomlyAtFault::DecodableType & commandData);
 
 /** @brief Add To Current App Tasks
  *

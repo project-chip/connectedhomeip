@@ -15,6 +15,9 @@
 
 name: 80.3.2. [TC-MOD-3.2] StartUpMode Verification (DUT as Server)
 
+PICS:
+    - MOD.S.A0004
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -22,37 +25,42 @@ config:
 
 tests:
     - label: "TH reads the StartUpMode attribute from the DUT"
+      PICS: MOD.S.A0004
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
 
-          Verify on the TH Log:
+          on TH(chip-tool),Verify that the DUT response is the integer. Record this value for usage in step 2.
 
           [1645777708.406864][4841:4846] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003DataVersion: 3781469721
           [1645777708.406933][4841:4846] CHIP:TOO:   StartUpMode: 0
       disabled: true
 
     - label: "TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify on the TH Log:
+          on TH(chip-tool),Verify that the DUT response is the integer. Record this value for usage in step 2b.
 
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
-          [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 4
+          [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 0
       disabled: true
 
     - label:
           "If the StartUpMode and CurrentMode attributes have the same value,
-          proceed to step 2c, Otherwise proceed to step 3a"
+          proceed to step 2c, Otherwise proceed to step 3a."
+      PICS: MOD.S.A0003 && MOD.S.A0004
       verification: |
+          NOTE:
           If the StartUpMode and CurrentMode attributes have the same value, proceed to step 2c, Otherwise proceed to step 3a.
       disabled: true
 
     - label: "TH reads the SupportedModes attribute from the DUT"
+      PICS: MOD.S.A0002
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          Verify on the TH Log:
+          on TH(chip-tool),Verify that the DUT response provides a list of supported modes
 
           [1654153500.212649][3409:3414] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 2392545814
           [1654153500.212776][3409:3414] CHIP:TOO:   SupportedModes: 3 entries
@@ -89,24 +97,26 @@ tests:
           "Select a value from the list in step 2c with a different value than
           the StartUpMode value read in step 1. TH sends a ChangeToMode command
           to the DUT with the selected value."
+      PICS: MOD.S.A0002 && MOD.S.C00.Rsp
       verification: |
           ./chip-tool modeselect change-to-mode 4 1 1
 
-          Verify on the TH Log:
+          on TH(chip-tool),Verify that the DUT responds with a successful (value 0x00) status response.
 
           [1645778189.045030][4888:4893] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
       disabled: true
 
-    - label: "Physically power cycle the device"
+    - label: "Physically power cycle the device."
       verification: |
           Physically power cycle the device.
       disabled: true
 
     - label: "TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify on the TH Log:
+          on TH(chip-tool),Verify that the DUT response is the integer recorded in step 1.
 
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
           [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 0

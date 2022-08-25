@@ -15,6 +15,9 @@
 
 name: 55.3.1. [TC-DLOG-3.1] Diagnostic Logs Cluster Commands Checks[DUT-Client]
 
+PICS:
+    - DLOG.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

@@ -90,10 +90,10 @@
 #define CHIP_PRINTCLUSTER_ACCESS_CONTROL_CLUSTER
 #endif
 
-#if defined(ZCL_USING_BRIDGED_ACTIONS_CLUSTER_SERVER) || defined(ZCL_USING_BRIDGED_ACTIONS_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER { ZCL_BRIDGED_ACTIONS_CLUSTER_ID, "Bridged Actions" },
+#if defined(ZCL_USING_ACTIONS_CLUSTER_SERVER) || defined(ZCL_USING_ACTIONS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ACTIONS_CLUSTER { ZCL_ACTIONS_CLUSTER_ID, "Actions" },
 #else
-#define CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER
+#define CHIP_PRINTCLUSTER_ACTIONS_CLUSTER
 #endif
 
 #if defined(ZCL_USING_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BASIC_CLUSTER_CLIENT)
@@ -452,6 +452,12 @@
 #define CHIP_PRINTCLUSTER_TEST_CLUSTER
 #endif
 
+#if defined(ZCL_USING_FAULT_INJECTION_CLUSTER_SERVER) || defined(ZCL_USING_FAULT_INJECTION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER { ZCL_FAULT_INJECTION_CLUSTER_ID, "Fault Injection" },
+#else
+#define CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER
+#endif
+
 #define CLUSTER_IDS_TO_NAMES                                                                                                       \
     CHIP_PRINTCLUSTER_IDENTIFY_CLUSTER                                                                                             \
     CHIP_PRINTCLUSTER_GROUPS_CLUSTER                                                                                               \
@@ -464,7 +470,7 @@
     CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_BINDING_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_ACCESS_CONTROL_CLUSTER                                                                                       \
-    CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER                                                                                      \
+    CHIP_PRINTCLUSTER_ACTIONS_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
     CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER                                                                                        \
@@ -522,6 +528,7 @@
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
-    CHIP_PRINTCLUSTER_TEST_CLUSTER
+    CHIP_PRINTCLUSTER_TEST_CLUSTER                                                                                                 \
+    CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER
 
 #define MAX_CLUSTER_NAME_LENGTH 39

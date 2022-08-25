@@ -13,7 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 62.2.1. [TC-PS-2.1] Attributes with server as DUT
+name: 62.2.2. [TC-PS-2.2] Event reporting with server as DUT
+
+PICS:
+    - PS.S
 
 config:
     nodeId: 0x12344321
@@ -23,27 +26,27 @@ config:
 tests:
     - label: "Commission DUT to TH"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "Bring the DUT into a state without any wired faults."
       PICS: PS.S.A000a
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "TH reads the ActiveWiredFaults attribute from the DUT"
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
           ./chip-tool powersource read active-wired-faults 1 1
 
-
+          Verify on TH logs:
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label: "Set up subscription to WiredFaultChange event"
-      PICS: PS.S.E00
+      PICS: PS.S.E00 && PS.M.ManualWiredFault
       verification: |
           ./chip-tool interactive start
 
@@ -79,9 +82,9 @@ tests:
       disabled: true
 
     - label: "TH reads the ActiveWiredFaults attribute from the DUT"
-      PICS: PS.S.A000a
+      PICS: PS.S.A000a && PS.M.ManualWiredFault
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
           ./chip-tool powersource read active-wired-faults 1 1
 
@@ -91,7 +94,7 @@ tests:
       disabled: true
 
     - label: "Bring the DUT back into a clean state."
-      PICS: PS.S.E00
+      PICS: PS.S.E00 && PS.M.ManualWiredFault
       verification: |
           DUT ACTION REQUIRED
       disabled: true
@@ -99,22 +102,22 @@ tests:
     - label: "Bring the DUT into a state without any battery faults."
       PICS: PS.S.A0012
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "TH reads the ActiveBatFaults attribute from the DUT"
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
           ./chip-tool powersource read active-battery-faults 12345 1
 
-
           Verify on the TH Log:
+
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label: "Set up subscription to BatFaultChange event"
-      PICS: PS.S.E01
+      PICS: PS.S.E01 && PS.M.ManualBatFault
       verification: |
           ./chip-tool interactive start
            powersource subscribe-event-by-id  0 100 1  1
@@ -149,9 +152,9 @@ tests:
       disabled: true
 
     - label: "TH reads the ActiveBatFaults attribute from the DUT"
-      PICS: PS.S.A0012
+      PICS: PS.S.A0012 && PS.M.ManualBatFault
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
           ./chip-tool powersource read active-battery-faults 1 1
 
@@ -160,7 +163,7 @@ tests:
       disabled: true
 
     - label: "Bring the DUT back into a clean state."
-      PICS: PS.S.E01
+      PICS: PS.S.E01 && PS.M.ManualWiredFault
       verification: |
           DUT ACTION REQUIRED
       disabled: true
@@ -168,12 +171,12 @@ tests:
     - label: "Bring the DUT into a state without any charge faults."
       PICS: PS.S.A001e
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "TH reads the ActiveBatChargeFaults attribute from the DUT"
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
           ./chip-tool powersource read active-battery-charge-faults 1 1
 
@@ -182,7 +185,7 @@ tests:
       disabled: true
 
     - label: "Set up subscription to BatChargeFaultChange event"
-      PICS: PS.S.E02
+      PICS: PS.S.E02 && PS.M.ManualBatChargeFault
       verification: |
           ./chip-tool interactive start
 
@@ -218,9 +221,10 @@ tests:
       disabled: true
 
     - label: "TH reads the ActiveBatChargeFaults attribute from the DUT"
-      PICS: PS.S.A001e
+      PICS: PS.S.A001e && PS.M.ManualBatChargeFault
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+
           ./chip-tool powersource read active-battery-charge-faults 1 1
 
           Verify on the TH Log:
@@ -228,7 +232,7 @@ tests:
       disabled: true
 
     - label: "Bring the DUT back into a clean state."
-      PICS: PS.S.E02
+      PICS: PS.S.E02 && PS.M.ManualBatChargeFault
       verification: |
           DUT ACTION REQUIRED
       disabled: true

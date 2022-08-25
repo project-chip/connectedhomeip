@@ -14,21 +14,43 @@
 
 name: 24.1.4. [TC-CADMIN-1.4] Node Behavior using BCM [DUT - Commissionee]
 
+PICS:
+    - CADMIN.S
+    - CADMIN.S.F00
+
 config:
     nodeId: 0x12344321
     timeout: 300
     nodeId2:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0xCAFE
     endpoint: 0
     discriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 3840
     payload:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"
 
 tests:
+    - label: "Precondition: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Precondition: Reset Devices to factory defaults"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -69,7 +91,7 @@ tests:
       PICS: BINFO.S.A0005
       response:
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
@@ -135,11 +157,11 @@ tests:
       response:
           value: "chiptest"
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label:
-          "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
+          "TH_CR2 writes the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       identity: "beta"
       command: "writeAttribute"
@@ -150,7 +172,7 @@ tests:
           value: "chiptest"
 
     - label:
-          "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
+          "TH_CR2 reads the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       identity: "beta"
       command: "readAttribute"
@@ -160,7 +182,7 @@ tests:
       response:
           value: "chiptest"
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH_CR2 opens a commissioning window on DUT_CE using BCM"

@@ -88,7 +88,7 @@
 #define ZCL_STOP_WITH_ON_OFF_COMMAND_ID (0x07)
 #define ZCL_MOVE_TO_CLOSEST_FREQUENCY_COMMAND_ID (0x08)
 
-// Commands for cluster: Bridged Actions
+// Commands for cluster: Actions
 #define ZCL_INSTANT_ACTION_COMMAND_ID (0x00)
 #define ZCL_INSTANT_ACTION_WITH_TRANSITION_COMMAND_ID (0x01)
 #define ZCL_START_ACTION_COMMAND_ID (0x02)
@@ -152,6 +152,9 @@
 
 // Commands for cluster: Ethernet Network Diagnostics
 #define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
+
+// Commands for cluster: Time Synchronization
+#define ZCL_SET_UTC_TIME_COMMAND_ID (0x00)
 
 // Commands for cluster: AdministratorCommissioning
 #define ZCL_OPEN_COMMISSIONING_WINDOW_COMMAND_ID (0x00)
@@ -349,3 +352,7 @@
 #define ZCL_TEST_SIMPLE_OPTIONAL_ARGUMENT_REQUEST_COMMAND_ID (0x13)
 #define ZCL_TEST_EMIT_TEST_EVENT_REQUEST_COMMAND_ID (0x14)
 #define ZCL_TEST_EMIT_TEST_FABRIC_SCOPED_EVENT_REQUEST_COMMAND_ID (0x15)
+
+// Commands for cluster: Fault Injection
+#define ZCL_FAIL_AT_FAULT_COMMAND_ID (0x00)
+#define ZCL_FAIL_RANDOMLY_AT_FAULT_COMMAND_ID (0x01)

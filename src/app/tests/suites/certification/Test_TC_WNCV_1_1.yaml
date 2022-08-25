@@ -14,6 +14,9 @@
 
 name: Window Covering [TC-WNCV-1.1] Global attributes with server as DUT
 
+PICS:
+    - WNCV.S
+
 config:
     nodeId: 0x12344321
     cluster: "Window Covering"
@@ -37,7 +40,7 @@ tests:
       response:
           value: 5
           constraints:
-              type: uint16
+              type: int16u
               minValue: 5
               maxValue: 200
 
@@ -47,7 +50,7 @@ tests:
       attribute: "FeatureMap"
       response:
           constraints:
-              type: uint32
+              type: bitmap32
               minValue: 0
               maxValue: 32768
 
@@ -69,6 +72,50 @@ tests:
               type: list
               contains: [26]
 
+    - label:
+          "Read the Feature dependent(WNCV.S.F00 & WNCV.S.F02 & WNCV.S.F03)
+          attribute in AttributeList"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.F03 && WNCV.S.Afffb
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16, 17]
+
+    - label:
+          "Read the Feature dependent(WNCV.S.F00 & WNCV.S.F02 ) attribute in
+          AttributeList"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.Afffb
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [11, 14]
+
+    - label:
+          "Read the Feature dependent(WNCV.S.F01 & WNCV.S.F04 & WNCV.S.F03)
+          attribute in AttributeList"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.F03 && WNCV.S.Afffb
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [18, 19]
+
+    - label:
+          "Read the Feature dependent(WNCV.S.F01 & WNCV.S.F04 ) attribute in
+          AttributeList"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.Afffb
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [12, 15]
+
     - label: "TH reads from the DUT the (0xFFF9) AcceptedCommandList attribute"
       PICS: WNCV.S.Afff9
       command: "readAttribute"
@@ -78,6 +125,39 @@ tests:
               type: list
               contains: [0, 1, 2]
 
+    - label:
+          "TH reads Feature dependent(WNCV.S.F00 & WNCV.S.F02) command in
+          AcceptedCommandList"
+      PICS: WNCV.S.Afff9 && WNCV.S.F00 && WNCV.S.F02
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
+
+    - label:
+          "TH reads Feature dependent(WNCV.S.F01 & WNCV.S.F03) command in
+          AcceptedCommandList"
+      PICS: WNCV.S.Afff9 && WNCV.S.F01 && WNCV.S.F03
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [7]
+
+    - label:
+          "TH reads Feature dependent(WNCV.S.F01 & WNCV.S.F04) command in
+          AcceptedCommandList"
+      PICS: WNCV.S.Afff9 && WNCV.S.F01 && WNCV.S.F04
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [8]
+
     - label: "TH reads from the DUT the (0xFFF8) GeneratedCommandList attribute"
       PICS: WNCV.S.Afff8
       command: "readAttribute"
@@ -86,17 +166,18 @@ tests:
           value: []
           constraints:
               type: list
-
-    #issue #15011 disabled steps below Global attributes missing from YAML framework
-    - label: "TH reads from the DUT the (0xFFFA) EventList attribute"
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && WNCV.S.Afffa
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

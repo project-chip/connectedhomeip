@@ -14,6 +14,9 @@
 
 name: 51.2.3. [TC-DGWIFI-2.3] Command received functionality with server as DUT
 
+PICS:
+    - DGWIFI.S
+
 config:
     nodeId: 0x12344321
     cluster: "WiFi Network Diagnostics"
@@ -41,7 +44,7 @@ tests:
       attribute: "BeaconLostCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0
               maxValue: 4294967295
 
@@ -51,7 +54,7 @@ tests:
       attribute: "BeaconRxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0
               maxValue: 4294967295
 
@@ -61,7 +64,7 @@ tests:
       attribute: "PacketMulticastRxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0
               maxValue: 4294967295
 
@@ -71,7 +74,7 @@ tests:
       attribute: "PacketMulticastTxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0
               maxValue: 4294967295
 
@@ -81,7 +84,7 @@ tests:
       attribute: "PacketUnicastRxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0
               maxValue: 4294967295
 
@@ -91,6 +94,6 @@ tests:
       attribute: "PacketUnicastTxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0
               maxValue: 4294967295

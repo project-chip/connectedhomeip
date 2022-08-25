@@ -15,6 +15,9 @@
 
 name: 3.1.1.  [TC-SU-1.1] Invoke AnnounceOTAProvider from Admin(DUT) to OTA-R
 
+PICS:
+    - MCORE.ACL.Administrator
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -22,13 +25,13 @@ config:
 
 tests:
     - label: "Commission OTA-P/TH2 to DUT/same fabric as in test setup."
-      PICS: OTAC.C.M.AnnounceOTAProvider
+      PICS: OTAR.C.M.AnnounceOTAProvider
       verification: |
           ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Requestor logs:
+          Verify on the OTA Requestor logs receives AnnounceOTAProvider:
 
           [1645743053311] [97809:20280821] CHIP: [SWU] OTA Requestor received AnnounceOTAProvider
           [1645743053311] [97809:20280821] CHIP: [SWU]   FabricIndex: 1

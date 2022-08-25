@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -194,7 +194,7 @@ bool Cmd_ResignCert(int argc, char * argv[])
     res = ReadCert(gInCertFileName, cert.get(), inCertFmt);
     VerifyTrueOrExit(res);
 
-    res = ReadKey(gCAKeyFileName, caKey.get());
+    res = ReadKey(gCAKeyFileName, caKey);
     VerifyTrueOrExit(res);
 
     if (!gSelfSign)

@@ -16,27 +16,61 @@
 name:
     19.4.6. [TC-APPLAUNCHER-3.8.1] Stop Application Verification (DUT as Client)
 
+PICS:
+    - APPLAUNCHER.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
-    - label: "DUT sends StopApp command to TH"
-      PICS: APPLAUNCHER.C.C0001
+    - label:
+          "Preconditions: Commission TH to DUT, if not done so already. In some
+          cases, such as with a Casting Video Player, the TH commissions the
+          DUT."
       verification: |
-          product maker needs to provide instructions for how to trigger the command:
-          Refer to device or application documentation for special argument values to each command, and/or additional steps required to put device into in correct state to exhibit test behavior.
+
+      disabled: true
+
+    - label: "DUT sends StopApp command to TH"
+      PICS: APPLAUNCHER.C.C01.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
+
+          ./chip-tool applicationlauncher stop-app "{"catalogVendorId": 123, "applicationId": "exampleid"}" 1 1
+          ./chip-tv-casting-app applicationlauncher stop-app "{"catalogVendorId": 123, "applicationId": "exampleid"}" 1 1
 
 
-          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
+          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
 
-          ./chip-tool applicationlauncher stop-app '{"catalogVendorId": 123, "applicationId": "exampleid"}' 1 1
-
-
-          [1646163695248] [9384:3955170] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_050C Command 0x0000_0003
-          [1646163695249] [9384:3955170] CHIP: [TOO]   LauncherResponse: {
-          [1646163695249] [9384:3955170] CHIP: [TOO]     status: 0
-          [1646163695249] [9384:3955170] CHIP: [TOO]     data: 64617461
-          [1646163695249] [9384:3955170] CHIP: [TOO]    }
+          [1658530412627] [21469:308294] CHIP: [DMG] InvokeRequestMessage =
+          [1658530412627] [21469:308294] CHIP: [DMG] {
+          [1658530412627] [21469:308294] CHIP: [DMG]         suppressResponse = false,
+          [1658530412627] [21469:308294] CHIP: [DMG]         timedRequest = false,
+          [1658530412627] [21469:308294] CHIP: [DMG]         InvokeRequests =
+          [1658530412628] [21469:308294] CHIP: [DMG]         [
+          [1658530412628] [21469:308294] CHIP: [DMG]                 CommandDataIB =
+          [1658530412628] [21469:308294] CHIP: [DMG]                 {
+          [1658530412628] [21469:308294] CHIP: [DMG]                         CommandPathIB =
+          [1658530412628] [21469:308294] CHIP: [DMG]                         {
+          [1658530412628] [21469:308294] CHIP: [DMG]                                 EndpointId = 0x1,
+          [1658530412628] [21469:308294] CHIP: [DMG]                                 ClusterId = 0x50c,
+          [1658530412628] [21469:308294] CHIP: [DMG]                                 CommandId = 0x1,
+          [1658530412628] [21469:308294] CHIP: [DMG]                         },
+          [1658530412628] [21469:308294] CHIP: [DMG]
+          [1658530412628] [21469:308294] CHIP: [DMG]                         CommandFields =
+          [1658530412628] [21469:308294] CHIP: [DMG]                         {
+          [1658530412628] [21469:308294] CHIP: [DMG]                                 0x0 =
+          [1658530412628] [21469:308294] CHIP: [DMG]                                 {
+          [1658530412628] [21469:308294] CHIP: [DMG]                                         0x0 = 123,
+          [1658530412628] [21469:308294] CHIP: [DMG]                                         0x1 = "exampleid",
+          [1658530412628] [21469:308294] CHIP: [DMG]                                 },
+          [1658530412628] [21469:308294] CHIP: [DMG]                         },
+          [1658530412628] [21469:308294] CHIP: [DMG]                 },
+          [1658530412628] [21469:308294] CHIP: [DMG]
+          [1658530412628] [21469:308294] CHIP: [DMG]         ],
+          [1658530412628] [21469:308294] CHIP: [DMG]
+          [1658530412628] [21469:308294] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658530412628] [21469:308294] CHIP: [DMG] },
       disabled: true

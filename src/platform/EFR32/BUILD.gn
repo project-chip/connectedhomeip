@@ -17,10 +17,17 @@ import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/crypto/crypto.gni")
+
 assert(chip_device_platform == "efr32")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
+}
+
+if (chip_crypto == "platform") {
+  import("//build_overrides/mbedtls.gni")
 }
 
 static_library("EFR32") {
@@ -65,6 +72,22 @@ static_library("EFR32") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
+  # Add platform crypto implementation
+  if (chip_crypto == "platform") {
+    sources += [
+      "CHIPCryptoPALPsaEfr32.cpp",
+      "Efr32OpaqueKeypair.h",
+      "Efr32PsaOpaqueKeypair.cpp",
+      "Efr32PsaOperationalKeystore.cpp",
+      "Efr32PsaOperationalKeystore.h",
+    ]
+
+    public_deps += [
+      "${chip_root}/src/crypto",
+      "${mbedtls_root}:mbedtls",
+    ]
+  }
+
   # Add pigweed KVS
   deps = [
     "$dir_pw_kvs:crc16",
@@ -74,15 +97,10 @@ static_library("EFR32") {
     "$dir_pw_checksum",
     "$dir_pw_kvs",
   ]
-
   if (chip_enable_openthread) {
-    if (chip_openthread_ftd) {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
-    } else {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
-    }
+    public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
+
+    deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
 
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",

@@ -15,22 +15,31 @@
 
 name: 59.3.2. [TC-I-3.2] Functionality with Client as DUT
 
+PICS:
+    - I.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT issues an Identify command to the Test Harness, with the
           IdentifyTime argument set to 0x003C (60 seconds) or a reasonable time
           that is supported by the DUT."
       PICS: I.C.C00.Tx
       verification: |
-          On TestHarnes (all-cluster-app) a received Identify command with f.e. 60 as IdentifyTime looks like this:
-          Verify in TH all-clusters-app log
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
 
           ./chip-tool identify identify 60 1 1
+          Verify DUT receives  Identify command response on the TH(all-clusters-app) Log:
           [1646010972.583498][33190:33190] CHIP:EM: Handling via exchange: 60250r, Delegate: 0xaaaace1730c8
           [1646010972.583578][33190:33190] CHIP:DMG: InvokeRequestMessage =
           [1646010972.583611][33190:33190] CHIP:DMG: {
@@ -60,6 +69,13 @@ tests:
           [1646010972.584359][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=o
           [1646010972.584430][33190:33190] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0003 Command=0x0000_0000
           [1646010972.584474][33190:33190] CHIP:DMG: Endpoint 1, Cluster 0x0000_0003 update version to d4fdf424
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+          [1658144469.552560][8995:9000] CHIP:DMG:
+          [1658144469.552589][8995:9000] CHIP:DMG:                                 StatusIB =
+          [1658144469.552626][8995:9000] CHIP:DMG:                                 {
+          [1658144469.552663][8995:9000] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1658144469.552698][8995:9000] CHIP:DMG:                                 },
       disabled: true
 
     - label:
@@ -75,11 +91,9 @@ tests:
           IdentifyTime argument set to 0x0000 (Stop)."
       PICS: I.C.C00.Tx
       verification: |
-          On TestHarnes (all-cluster-app) a received Identify command with an IdentifyTime of 0 looks like this:
-
-          Verify in TH all-clusters-app log
-
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
           ./chip-tool identify identify 0 1 1
+          Verify DUT receives  Identify command response on the TH(all-clusters-app) Log:
           [1646011311.206353][33190:33190] CHIP:EM: Handling via exchange: 12024r, Delegate: 0xaaaace1730c8
           [1646011311.206436][33190:33190] CHIP:DMG: InvokeRequestMessage =
           [1646011311.206462][33190:33190] CHIP:DMG: {
@@ -117,11 +131,10 @@ tests:
           supported EffectIdentifier argument and EffectVariant set to 0."
       PICS: I.C.C40.Tx
       verification: |
-          On TestHarnes (all-cluster-app) a received Identify command with f.e. 1 as EffectIdentifier looks like this:
-
-          Verify in TH all-clusters-app log
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool identify trigger-effect 0 0 1 1
+          Verify DUT receives  Identify command response on the TH(all-clusters-app) Log:
           [1646011549.034604][33190:33190] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:3605482 on exchange 36067r
           [1646011549.034646][33190:33190] CHIP:EM: Handling via exchange: 36067r, Delegate: 0xaaaace1730c8
           [1646011549.034790][33190:33190] CHIP:DMG: InvokeRequestMessage =

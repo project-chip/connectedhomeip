@@ -42,6 +42,14 @@
 
 // FIXME: EFR32 currently set to CHIP (Does this use Entropy.cpp ?)
 
+#if CHIP_HAVE_CONFIG_H
+#include <crypto/CryptoBuildConfig.h>
+#endif
+#if !defined(CHIP_CONFIG_SHA256_CONTEXT_SIZE) && (CHIP_CRYPTO_PLATFORM == 1)
+#include "psa/crypto.h"
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE (sizeof(psa_hash_operation_t))
+#endif
+
 // ==================== General Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
@@ -49,7 +57,7 @@
 #endif // CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
 
 #ifndef CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
-#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 8
+#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 20
 #endif // CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
 
 #ifndef CHIP_LOG_FILTERING

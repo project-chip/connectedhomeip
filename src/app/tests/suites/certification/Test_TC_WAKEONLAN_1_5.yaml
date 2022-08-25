@@ -16,6 +16,9 @@ name:
     19.1.5. [TC-WAKEONLAN-1.5] Global attributes - Wake on LAN Cluster (DUT as
     Server)
 
+PICS:
+    - WAKEONLAN.S
+
 config:
     nodeId: 0x12344321
     cluster: "Wake on LAN"
@@ -30,13 +33,13 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
           value: 1
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
@@ -44,7 +47,7 @@ tests:
       response:
           value: 0
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
@@ -53,6 +56,15 @@ tests:
           constraints:
               type: list
               contains: [65528, 65529, 65531, 65531, 65533]
+
+    - label: "Read the optional attribute(MACAddress) in AttributeList"
+      PICS: WAKEONLAN.S.A0000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
@@ -69,19 +81,18 @@ tests:
           value: []
           constraints:
               type: list
-
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

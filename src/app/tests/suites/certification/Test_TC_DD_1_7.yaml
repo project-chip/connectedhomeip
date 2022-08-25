@@ -15,13 +15,22 @@
 
 name: 3.1.7. [TC-DD-1.7] Setup Code Format and Label [DUT - Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.MANUAL_PC
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          1 - 5.1.4.2 - Manual Pairing Code is printed on the device or in additional provided materials (ex: manual)"
+      disabled: true
+
     - label: "Verify using instruments"
       verification: |
-          Vendor specific field testcase
+          Vendor specific field testcase that should be manually verified using the requirements in the Expected Outcome.
       disabled: true

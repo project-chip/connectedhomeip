@@ -242,8 +242,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_LISTENER_ALREADY_STOPPED.AsInteger():
         desc = "Listener already stopped";
         break;
-    case CHIP_ERROR_UNKNOWN_TOPIC.AsInteger():
-        desc = "Unknown Topic";
+    case CHIP_ERROR_INVALID_SUBSCRIPTION.AsInteger():
+        desc = "Invalid Subscription Id";
         break;
     case CHIP_ERROR_TIMEOUT.AsInteger():
         desc = "Timeout";
@@ -545,8 +545,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND.AsInteger():
         desc = "Value not found in the persisted storage";
         break;
-    case CHIP_ERROR_PROFILE_STRING_CONTEXT_ALREADY_REGISTERED.AsInteger():
-        desc = "String context already registered";
+    case CHIP_ERROR_IM_FABRIC_DELETED.AsInteger():
+        desc = "The fabric is deleted, and the corresponding IM resources are released";
         break;
     case CHIP_ERROR_PROFILE_STRING_CONTEXT_NOT_REGISTERED.AsInteger():
         desc = "String context not registered";

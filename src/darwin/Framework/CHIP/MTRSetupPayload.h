@@ -19,14 +19,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, MTRRendezvousInformationFlags) {
-    MTRRendezvousInformationNone = 0, // Device does not support any method for rendezvous
-    MTRRendezvousInformationSoftAP = 1 << 0, // Device supports WiFi softAP
-    MTRRendezvousInformationBLE = 1 << 1, // Device supports BLE
-    MTRRendezvousInformationOnNetwork = 1 << 2, // Device supports On Network setup
+typedef NS_ENUM(NSUInteger, MTRDiscoveryCapabilities) {
+    MTRDiscoveryCapabilitiesNone = 0, // Device does not support any method for rendezvous
+    MTRDiscoveryCapabilitiesSoftAP = 1 << 0, // Device supports WiFi softAP
+    MTRDiscoveryCapabilitiesBLE = 1 << 1, // Device supports BLE
+    MTRDiscoveryCapabilitiesOnNetwork = 1 << 2, // Device supports On Network setup
 
-    MTRRendezvousInformationAllMask
-    = MTRRendezvousInformationSoftAP | MTRRendezvousInformationBLE | MTRRendezvousInformationOnNetwork,
+    MTRDiscoveryCapabilitiesAllMask
+    = MTRDiscoveryCapabilitiesSoftAP | MTRDiscoveryCapabilitiesBLE | MTRDiscoveryCapabilitiesOnNetwork,
 };
 
 typedef NS_ENUM(NSUInteger, MTRCommissioningFlow) {
@@ -43,24 +43,30 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 };
 
 @interface MTROptionalQRCodeInfo : NSObject
-@property (nonatomic, strong) NSNumber * infoType;
-@property (nonatomic, strong) NSNumber * tag;
-@property (nonatomic, strong) NSNumber * integerValue;
-@property (nonatomic, strong) NSString * stringValue;
+@property (nonatomic, copy) NSNumber * infoType;
+@property (nonatomic, copy) NSNumber * tag;
+@property (nonatomic, copy) NSNumber * integerValue;
+@property (nonatomic, copy) NSString * stringValue;
 @end
 
 @interface MTRSetupPayload : NSObject
 
-@property (nonatomic, strong) NSNumber * version;
-@property (nonatomic, strong) NSNumber * vendorID;
-@property (nonatomic, strong) NSNumber * productID;
+@property (nonatomic, copy) NSNumber * version;
+@property (nonatomic, copy) NSNumber * vendorID;
+@property (nonatomic, copy) NSNumber * productID;
 @property (nonatomic, assign) MTRCommissioningFlow commissioningFlow;
-@property (nonatomic, assign) MTRRendezvousInformationFlags rendezvousInformation;
-@property (nonatomic, strong) NSNumber * discriminator;
-@property (nonatomic) BOOL hasShortDiscriminator;
-@property (nonatomic, strong) NSNumber * setUpPINCode;
+/**
+ * rendezvousInformation is nil when the discovery capabilities bitmask is
+ * unknown.
+ *
+ * Otherwise its value is made up of the MTRDiscoveryCapabilities flags.
+ */
+@property (nonatomic, copy, nullable) NSNumber * rendezvousInformation;
+@property (nonatomic, copy) NSNumber * discriminator;
+@property (nonatomic, assign) BOOL hasShortDiscriminator;
+@property (nonatomic, copy) NSNumber * setUpPINCode;
 
-@property (nonatomic, strong) NSString * serialNumber;
+@property (nonatomic, copy) NSString * serialNumber;
 - (nullable NSArray<MTROptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
 
 /**

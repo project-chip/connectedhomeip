@@ -15,21 +15,49 @@
 
 name: 113.3.1. [TC-DRLK-3.1] Attributes check [DUT - Client]
 
+PICS:
+    - DRLK.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label: "DUT reads LockState from the TH."
       PICS: DRLK.C.A0000
       verification: |
           ./chip-tool doorlock read lock-state 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " LockState response" on TH(lock-app):
 
-          [1657113545.198148][28806:28811] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0000 DataVersion: 402106506
-          [1657113545.198916][28806:28811] CHIP:TOO:   LockState: 1
+          [1658396085.236841][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396085.236875][2474:2474] CHIP:DMG: {
+          [1658396085.236903][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396085.236935][2474:2474] CHIP:DMG:        [
+          [1658396085.236966][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396085.237001][2474:2474] CHIP:DMG:                {
+          [1658396085.237036][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396085.237079][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396085.237119][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0000,
+          [1658396085.237156][2474:2474] CHIP:DMG:                }
+          [1658396085.237191][2474:2474] CHIP:DMG:
+          [1658396085.237223][2474:2474] CHIP:DMG:        ],
+          [1658396085.237254][2474:2474] CHIP:DMG:
+          [1658396085.237281][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396085.237314][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396085.237338][2474:2474] CHIP:DMG: },
+          [1658396085.237426][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396085.237546][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396085.237585][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 0 is dirty
+          [1658396085.237613][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1658396085.237648][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396085.237688][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads LockType from the TH."
@@ -37,10 +65,30 @@ tests:
       verification: |
           ./chip-tool doorlock read lock-type 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " LockType response" on TH(lock-app):
 
-          [1657113589.548146][28831:28836] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0001 DataVersion: 402106506
-          [1657113589.548217][28831:28836] CHIP:TOO:   LockType: 0
+          [1658396151.006061][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396151.006101][2474:2474] CHIP:DMG: {
+          [1658396151.006134][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396151.006170][2474:2474] CHIP:DMG:        [
+          [1658396151.006204][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396151.006245][2474:2474] CHIP:DMG:                {
+          [1658396151.006285][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396151.006336][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396151.006380][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0001,
+          [1658396151.006419][2474:2474] CHIP:DMG:                }
+          [1658396151.006458][2474:2474] CHIP:DMG:
+          [1658396151.006494][2474:2474] CHIP:DMG:        ],
+          [1658396151.006532][2474:2474] CHIP:DMG:
+          [1658396151.006567][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396151.006602][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396151.006637][2474:2474] CHIP:DMG: },
+          [1658396151.006733][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396151.006857][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396151.006894][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 1 is dirty
+          [1658396151.006923][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0001 (expanded=0)
+          [1658396151.006957][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396151.007000][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads ActuatorEnabled from the TH."
@@ -48,10 +96,30 @@ tests:
       verification: |
           ./chip-tool doorlock read actuator-enabled 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " ActuatorEnabled response" on TH(lock-app):
 
-          [1657113617.511116][28842:28847] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0002 DataVersion: 402106506
-          [1657113617.511157][28842:28847] CHIP:TOO:   ActuatorEnabled: TRUE
+          [1658396183.485143][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396183.485180][2474:2474] CHIP:DMG: {
+          [1658396183.485210][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396183.485246][2474:2474] CHIP:DMG:        [
+          [1658396183.485279][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396183.485322][2474:2474] CHIP:DMG:                {
+          [1658396183.485361][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396183.485405][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396183.485453][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0002,
+          [1658396183.485497][2474:2474] CHIP:DMG:                }
+          [1658396183.485537][2474:2474] CHIP:DMG:
+          [1658396183.485574][2474:2474] CHIP:DMG:        ],
+          [1658396183.485611][2474:2474] CHIP:DMG:
+          [1658396183.485647][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396183.485681][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396183.485716][2474:2474] CHIP:DMG: },
+          [1658396183.485810][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396183.485931][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396183.485969][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 2 is dirty
+          [1658396183.485998][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0002 (expanded=0)
+          [1658396183.486035][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396183.486079][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads DoorState from the TH."
@@ -59,10 +127,31 @@ tests:
       verification: |
           ./chip-tool doorlock read door-state 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " DoorState response" on TH(lock-app):
 
-          [1657113645.147622][28866:28871] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0003 DataVersion: 402106506
-          [1657113645.147707][28866:28871] CHIP:TOO:   DoorState: 0
+
+          [1658396220.948165][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396220.948203][2474:2474] CHIP:DMG: {
+          [1658396220.948236][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396220.948273][2474:2474] CHIP:DMG:        [
+          [1658396220.948305][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396220.948343][2474:2474] CHIP:DMG:                {
+          [1658396220.948381][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396220.948428][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396220.948470][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0003,
+          [1658396220.948506][2474:2474] CHIP:DMG:                }
+          [1658396220.948543][2474:2474] CHIP:DMG:
+          [1658396220.948577][2474:2474] CHIP:DMG:        ],
+          [1658396220.948614][2474:2474] CHIP:DMG:
+          [1658396220.948650][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396220.948684][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396220.948716][2474:2474] CHIP:DMG: },
+          [1658396220.948811][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396220.948932][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396220.948971][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 3 is dirty
+          [1658396220.948999][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0003 (expanded=0)
+          [1658396220.949036][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396220.949077][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads DoorOpenEvents from the TH."
@@ -71,6 +160,27 @@ tests:
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read door-open-events 1 1
+
+          Verify the " DoorOpenEvents response" on TH(lock-app):
+
+
+          [1658396275.165657][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396275.165687][2474:2474] CHIP:DMG: {
+          [1658396275.165711][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396275.165742][2474:2474] CHIP:DMG:        [
+          [1658396275.165768][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396275.165800][2474:2474] CHIP:DMG:                {
+          [1658396275.165833][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396275.165874][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396275.165911][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0004,
+          [1658396275.165944][2474:2474] CHIP:DMG:                }
+          [1658396275.165980][2474:2474] CHIP:DMG:
+          [1658396275.166009][2474:2474] CHIP:DMG:        ],
+          [1658396275.166037][2474:2474] CHIP:DMG:
+          [1658396275.166064][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396275.166089][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396275.166116][2474:2474] CHIP:DMG: },
+          [1658396275.166193][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label: "DUT reads DoorClosedEvents from the TH."
@@ -78,7 +188,28 @@ tests:
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read door-closed-events 1 1
+           ./chip-tool doorlock read door-closed-events 1 1
+
+          Verify the " DoorClosedEvents response" on TH(lock-app):
+
+
+          [1658396372.169968][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396372.170004][2474:2474] CHIP:DMG: {
+          [1658396372.170028][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396372.170056][2474:2474] CHIP:DMG:        [
+          [1658396372.170081][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396372.170113][2474:2474] CHIP:DMG:                {
+          [1658396372.170146][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396372.170183][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396372.170220][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0005,
+          [1658396372.170253][2474:2474] CHIP:DMG:                }
+          [1658396372.170285][2474:2474] CHIP:DMG:
+          [1658396372.170313][2474:2474] CHIP:DMG:        ],
+          [1658396372.170342][2474:2474] CHIP:DMG:
+          [1658396372.170368][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396372.170394][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396372.170417][2474:2474] CHIP:DMG: },
+          [1658396372.170492][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label: "DUT reads OpenPeriod from the TH."
@@ -87,6 +218,28 @@ tests:
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read open-period 1 1
+
+          Verify the " OpenPeriod response" on TH(lock-app):
+
+
+          [1658396440.655877][2474:2474] CHIP:IM: Received Read request
+          [1658396440.655980][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396440.656018][2474:2474] CHIP:DMG: {
+          [1658396440.656046][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396440.656079][2474:2474] CHIP:DMG:        [
+          [1658396440.656109][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396440.656149][2474:2474] CHIP:DMG:                {
+          [1658396440.656188][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396440.656226][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396440.656262][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0006,
+          [1658396440.656296][2474:2474] CHIP:DMG:                }
+          [1658396440.656333][2474:2474] CHIP:DMG:
+          [1658396440.656366][2474:2474] CHIP:DMG:        ],
+          [1658396440.656401][2474:2474] CHIP:DMG:
+          [1658396440.656433][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396440.656464][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396440.656496][2474:2474] CHIP:DMG: },
+          [1658396440.656584][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label: "DUT reads NumberOfTotalUsersSupportedfrom the TH."
@@ -94,10 +247,32 @@ tests:
       verification: |
           ./chip-tool doorlock read  number-of-total-users-supported 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
 
-          [1657113856.382649][28946:28951] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0011 DataVersion: 402106506
-          [1657113856.382703][28946:28951] CHIP:TOO:   NumberOfTotalUsersSupported: 10
+          Verify the " NumberofTotalUsers response" on TH(lock-app):
+
+          [1658396514.220665][2474:2474] CHIP:IM: Received Read request
+          [1658396514.220755][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396514.220786][2474:2474] CHIP:DMG: {
+          [1658396514.220809][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396514.220836][2474:2474] CHIP:DMG:        [
+          [1658396514.220860][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396514.220891][2474:2474] CHIP:DMG:                {
+          [1658396514.220920][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396514.220953][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396514.220985][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0011,
+          [1658396514.221018][2474:2474] CHIP:DMG:                }
+          [1658396514.221046][2474:2474] CHIP:DMG:
+          [1658396514.221071][2474:2474] CHIP:DMG:        ],
+          [1658396514.221099][2474:2474] CHIP:DMG:
+          [1658396514.221125][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396514.221150][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396514.221173][2474:2474] CHIP:DMG: },
+          [1658396514.221246][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396514.221343][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396514.221372][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 11 is dirty
+          [1658396514.221394][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0011 (expanded=0)
+          [1658396514.221421][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396514.221453][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads NumberofPINUsers Supported from the TH."
@@ -105,10 +280,32 @@ tests:
       verification: |
           ./chip-tool doorlock read number-of-pinusers-supported 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " NumberofPINUsers Supported response" on TH(lock-app):
 
-          [1657113891.828338][28969:28974] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0012 DataVersion: 402106506
-          [1657113891.828383][28969:28974] CHIP:TOO:   NumberOfPINUsersSupported: 10
+
+          [1658396558.156859][2474:2474] CHIP:IM: Received Read request
+          [1658396558.156965][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396558.157003][2474:2474] CHIP:DMG: {
+          [1658396558.157034][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396558.157070][2474:2474] CHIP:DMG:        [
+          [1658396558.157103][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396558.157147][2474:2474] CHIP:DMG:                {
+          [1658396558.157189][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396558.157230][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396558.157268][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0012,
+          [1658396558.157318][2474:2474] CHIP:DMG:                }
+          [1658396558.157359][2474:2474] CHIP:DMG:
+          [1658396558.157393][2474:2474] CHIP:DMG:        ],
+          [1658396558.157427][2474:2474] CHIP:DMG:
+          [1658396558.157460][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396558.157492][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396558.157521][2474:2474] CHIP:DMG: },
+          [1658396558.157610][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396558.157726][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396558.157763][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 12 is dirty
+          [1658396558.157789][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0012 (expanded=0)
+          [1658396558.157825][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396558.157864][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads NumberofRFIDUsersSupported from the TH."
@@ -116,10 +313,32 @@ tests:
       verification: |
           ./chip-tool doorlock read number-of-rfidusers-supported 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " NumberofRFIDUsersSupported response" on TH(lock-app):
 
-          [1657113948.356532][28985:28990] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0013 DataVersion: 402106506
-          [1657113948.356608][28985:28990] CHIP:TOO:   NumberOfRFIDUsersSupported: 10
+
+          [1658396603.146106][2474:2474] CHIP:IM: Received Read request
+          [1658396603.146272][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396603.146340][2474:2474] CHIP:DMG: {
+          [1658396603.146396][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396603.146458][2474:2474] CHIP:DMG:        [
+          [1658396603.146518][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396603.146584][2474:2474] CHIP:DMG:                {
+          [1658396603.146655][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396603.146739][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396603.146806][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0013,
+          [1658396603.146884][2474:2474] CHIP:DMG:                }
+          [1658396603.146956][2474:2474] CHIP:DMG:
+          [1658396603.147019][2474:2474] CHIP:DMG:        ],
+          [1658396603.147084][2474:2474] CHIP:DMG:
+          [1658396603.147148][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396603.147256][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396603.147320][2474:2474] CHIP:DMG: },
+          [1658396603.147484][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396603.147681][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396603.147750][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 13 is dirty
+          [1658396603.147800][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0013 (expanded=0)
+          [1658396603.147865][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396603.147937][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads NumberofWeekDaysSchedulesSupported from the TH."
@@ -127,10 +346,31 @@ tests:
       verification: |
           ./chip-tool doorlock read  number-of-week-day-schedules-supported-per-user 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " NumberofWeekDaysSchedulesSupported response" on TH(lock-app):
 
-          [1657113966.626983][28995:29000] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0014 DataVersion: 402106506
-          [1657113966.627023][28995:29000] CHIP:TOO:   NumberOfWeekDaySchedulesSupportedPerUser: 10
+          [1658396646.712226][2474:2474] CHIP:IM: Received Read request
+          [1658396646.712332][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396646.712372][2474:2474] CHIP:DMG: {
+          [1658396646.712460][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396646.712652][2474:2474] CHIP:DMG:        [
+          [1658396646.712693][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396646.712735][2474:2474] CHIP:DMG:                {
+          [1658396646.712776][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396646.712819][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396646.712862][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0014,
+          [1658396646.712902][2474:2474] CHIP:DMG:                }
+          [1658396646.712940][2474:2474] CHIP:DMG:
+          [1658396646.712977][2474:2474] CHIP:DMG:        ],
+          [1658396646.713016][2474:2474] CHIP:DMG:
+          [1658396646.713051][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396646.713086][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396646.713121][2474:2474] CHIP:DMG: },
+          [1658396646.713221][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396646.713349][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396646.713384][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 14 is dirty
+          [1658396646.713410][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0014 (expanded=0)
+          [1658396646.713446][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396646.713486][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads NumberofYearDaysSchedulesSupported from the TH."
@@ -138,10 +378,31 @@ tests:
       verification: |
           ./chip-tool doorlock read number-of-year-day-schedules-supported-per-user 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " NumberofYearDaysSchedulesSupported response" on TH(lock-app):
 
-          [1657113998.451205][29017:29022] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0015 DataVersion: 402106506
-          [1657113998.451271][29017:29022] CHIP:TOO:   NumberOfYearDaySchedulesSupportedPerUser: 10
+          [1658396684.635487][2474:2474] CHIP:IM: Received Read request
+          [1658396684.635603][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396684.635651][2474:2474] CHIP:DMG: {
+          [1658396684.635680][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396684.635724][2474:2474] CHIP:DMG:        [
+          [1658396684.635752][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396684.635798][2474:2474] CHIP:DMG:                {
+          [1658396684.635832][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396684.635877][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396684.635913][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0015,
+          [1658396684.635957][2474:2474] CHIP:DMG:                }
+          [1658396684.635992][2474:2474] CHIP:DMG:
+          [1658396684.636031][2474:2474] CHIP:DMG:        ],
+          [1658396684.636072][2474:2474] CHIP:DMG:
+          [1658396684.636103][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396684.636141][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396684.636169][2474:2474] CHIP:DMG: },
+          [1658396684.636263][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396684.636395][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396684.636428][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 15 is dirty
+          [1658396684.636462][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0015 (expanded=0)
+          [1658396684.636494][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396684.636532][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads NumberofHolidaySchedulesSupported from the TH."
@@ -149,10 +410,32 @@ tests:
       verification: |
           ./chip-tool doorlock read number-of-holiday-schedules-supported 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " NumberofHolidaySchedulesSupported response" on TH(lock-app):
 
-          [1657114043.379215][29033:29038] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0016 DataVersion: 402106506
-          [1657114043.379273][29033:29038] CHIP:TOO:   NumberOfHolidaySchedulesSupported: 10
+
+          [1658396723.251493][2474:2474] CHIP:IM: Received Read request
+          [1658396723.251602][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396723.251642][2474:2474] CHIP:DMG: {
+          [1658396723.251671][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396723.251708][2474:2474] CHIP:DMG:        [
+          [1658396723.251742][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396723.251784][2474:2474] CHIP:DMG:                {
+          [1658396723.251828][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396723.251878][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396723.251917][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0016,
+          [1658396723.251960][2474:2474] CHIP:DMG:                }
+          [1658396723.252000][2474:2474] CHIP:DMG:
+          [1658396723.252034][2474:2474] CHIP:DMG:        ],
+          [1658396723.252072][2474:2474] CHIP:DMG:
+          [1658396723.252107][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396723.252141][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396723.252174][2474:2474] CHIP:DMG: },
+          [1658396723.252269][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396723.252395][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396723.252434][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 16 is dirty
+          [1658396723.252462][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0016 (expanded=0)
+          [1658396723.252499][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396723.252542][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads MaxPINCodedLength from the TH."
@@ -160,22 +443,59 @@ tests:
       verification: |
           ./chip-tool doorlock read  max-pincode-length 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " MaxPINCodeLength response" on TH(lock-app):
 
-          [1657114142.125282][29063:29068] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0017 DataVersion: 402106506
-          [1657114142.125328][29063:29068] CHIP:TOO:   MaxPINCodeLength: 8
+          [1658396788.539408][2474:2474] CHIP:IM: Received Read request
+          [1658396788.539498][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396788.539522][2474:2474] CHIP:DMG: {
+          [1658396788.539545][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396788.539573][2474:2474] CHIP:DMG:        [
+          [1658396788.539598][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396788.539630][2474:2474] CHIP:DMG:                {
+          [1658396788.539660][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396788.539701][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396788.539735][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0017,
+          [1658396788.539771][2474:2474] CHIP:DMG:                }
+          [1658396788.539803][2474:2474] CHIP:DMG:
+          [1658396788.539831][2474:2474] CHIP:DMG:        ],
+          [1658396788.539860][2474:2474] CHIP:DMG:
+          [1658396788.539887][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396788.539913][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396788.539940][2474:2474] CHIP:DMG: },
+          [1658396788.540017][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396788.540127][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396788.540159][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 17 is dirty
+          [1658396788.540180][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0017 (expanded=0)
+          [1658396788.540209][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396788.540244][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads MinPINCodedLength from the TH."
       PICS: DRLK.C.F00 && DRLK.C.A0018
       verification: |
-          ./chip-tool doorlock read  max-pincode-length 1 1
+          ./chip-tool doorlock read  min-pincode-length 1 1
 
-          verify TH(On a reference app) receives the right Read Request Message for the data sent in the above command
+          Verify the " MinPINCodeLength response" on TH(lock-app):
 
-          [1657608158.190170][8009:8014] CHIP:DMG: }
-          [1657608158.190344][8009:8014] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0018 DataVersion: 1971810340
-          [1657608158.190505][8009:8014] CHIP:TOO:   MinPINCodeLength: 6
+          [1659617377.367323][5361:5361] CHIP:IM: Received Read request
+          [1659617377.367422][5361:5361] CHIP:DMG: ReadRequestMessage =
+          [1659617377.367454][5361:5361] CHIP:DMG: {
+          [1659617377.367481][5361:5361] CHIP:DMG:        AttributePathIBs =
+          [1659617377.367513][5361:5361] CHIP:DMG:        [
+          [1659617377.367542][5361:5361] CHIP:DMG:                AttributePathIB =
+          [1659617377.367575][5361:5361] CHIP:DMG:                {
+          [1659617377.367609][5361:5361] CHIP:DMG:                        Endpoint = 0x1,
+          [1659617377.367651][5361:5361] CHIP:DMG:                        Cluster = 0x101,
+          [1659617377.367690][5361:5361] CHIP:DMG:                        Attribute = 0x0000_0018,
+          [1659617377.367726][5361:5361] CHIP:DMG:                }
+          [1659617377.367760][5361:5361] CHIP:DMG:
+          [1659617377.367791][5361:5361] CHIP:DMG:        ],
+          [1659617377.367825][5361:5361] CHIP:DMG:
+          [1659617377.367856][5361:5361] CHIP:DMG:        isFabricFiltered = true,
+          [1659617377.367887][5361:5361] CHIP:DMG:        InteractionModelRevision = 1
+          [1659617377.367915][5361:5361] CHIP:DMG: },
+          [1659617377.368004][5361:5361] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659617377.368111][5361:5361] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0
       disabled: true
 
     - label: "DUT reads MaxRFIDCodedLength from the TH."
@@ -183,10 +503,32 @@ tests:
       verification: |
           ./chip-tool doorlock read  max-rfidcode-length 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " MaxRFIDCodeLength response" on TH(lock-app):
 
-          [1657114184.402483][29094:29099] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0019 DataVersion: 402106506
-          [1657114184.402536][29094:29099] CHIP:TOO:   MaxRFIDCodeLength: 20
+
+          [1658396857.935901][2474:2474] CHIP:IM: Received Read request
+          [1658396857.935991][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396857.936023][2474:2474] CHIP:DMG: {
+          [1658396857.936048][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396857.936079][2474:2474] CHIP:DMG:        [
+          [1658396857.936107][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396857.936141][2474:2474] CHIP:DMG:                {
+          [1658396857.936174][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396857.936210][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396857.936243][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0019,
+          [1658396857.936277][2474:2474] CHIP:DMG:                }
+          [1658396857.936309][2474:2474] CHIP:DMG:
+          [1658396857.936338][2474:2474] CHIP:DMG:        ],
+          [1658396857.936368][2474:2474] CHIP:DMG:
+          [1658396857.936395][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396857.936422][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396857.936449][2474:2474] CHIP:DMG: },
+          [1658396857.936526][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396857.936629][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396857.936660][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 19 is dirty
+          [1658396857.936682][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0019 (expanded=0)
+          [1658396857.936712][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396857.936747][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads MinRFIDCodedLength from the TH."
@@ -194,10 +536,32 @@ tests:
       verification: |
           ./chip-tool doorlock read  min-rfidcode-length 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " MinRFIDCodeLength response" on TH(lock-app):
 
-          [1657114393.807851][29229:29234] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_001A DataVersion: 402106506
-          [1657114393.807897][29229:29234] CHIP:TOO:   MinRFIDCodeLength: 10
+
+          [1658396897.419273][2474:2474] CHIP:IM: Received Read request
+          [1658396897.419380][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396897.419414][2474:2474] CHIP:DMG: {
+          [1658396897.419440][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396897.419518][2474:2474] CHIP:DMG:        [
+          [1658396897.419557][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396897.419604][2474:2474] CHIP:DMG:                {
+          [1658396897.419667][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396897.419737][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396897.419802][2474:2474] CHIP:DMG:                        Attribute = 0x0000_001A,
+          [1658396897.419853][2474:2474] CHIP:DMG:                }
+          [1658396897.419895][2474:2474] CHIP:DMG:
+          [1658396897.419932][2474:2474] CHIP:DMG:        ],
+          [1658396897.419974][2474:2474] CHIP:DMG:
+          [1658396897.420013][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396897.420051][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396897.420086][2474:2474] CHIP:DMG: },
+          [1658396897.420187][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396897.420320][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396897.420363][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 1a is dirty
+          [1658396897.420394][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_001A (expanded=0)
+          [1658396897.420435][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396897.420481][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads CredentialRulesSupport from the TH."
@@ -205,10 +569,32 @@ tests:
       verification: |
           ./chip-tool doorlock read credential-rules-support 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " CredentialRulesSupport response" on TH(lock-app):
 
-          [1657114427.238351][29248:29253] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_001B DataVersion: 402106506
-          [1657114427.238420][29248:29253] CHIP:TOO:   CredentialRulesSupport: 1
+
+          [1658396928.746032][2474:2474] CHIP:IM: Received Read request
+          [1658396928.746125][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396928.746158][2474:2474] CHIP:DMG: {
+          [1658396928.746185][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396928.746217][2474:2474] CHIP:DMG:        [
+          [1658396928.746245][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396928.746281][2474:2474] CHIP:DMG:                {
+          [1658396928.746319][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396928.746356][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396928.746392][2474:2474] CHIP:DMG:                        Attribute = 0x0000_001B,
+          [1658396928.746424][2474:2474] CHIP:DMG:                }
+          [1658396928.746458][2474:2474] CHIP:DMG:
+          [1658396928.746487][2474:2474] CHIP:DMG:        ],
+          [1658396928.746518][2474:2474] CHIP:DMG:
+          [1658396928.746548][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396928.746577][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396928.746602][2474:2474] CHIP:DMG: },
+          [1658396928.746684][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396928.746791][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396928.746823][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 1b is dirty
+          [1658396928.746847][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_001B (expanded=0)
+          [1658396928.746880][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396928.746919][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads Language from the TH."
@@ -216,10 +602,32 @@ tests:
       verification: |
           ./chip-tool doorlock read language  1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " Language response" on TH(lock-app):
 
-          [1657114468.770966][29267:29272] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0021 DataVersion: 402106506
-          [1657114468.770978][29267:29272] CHIP:TOO:   Language: en
+
+          [1658396957.776405][2474:2474] CHIP:IM: Received Read request
+          [1658396957.776584][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396957.776640][2474:2474] CHIP:DMG: {
+          [1658396957.776677][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396957.776728][2474:2474] CHIP:DMG:        [
+          [1658396957.776762][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396957.776805][2474:2474] CHIP:DMG:                {
+          [1658396957.776857][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396957.776900][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396957.776958][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0021,
+          [1658396957.777007][2474:2474] CHIP:DMG:                }
+          [1658396957.777048][2474:2474] CHIP:DMG:
+          [1658396957.777095][2474:2474] CHIP:DMG:        ],
+          [1658396957.777132][2474:2474] CHIP:DMG:
+          [1658396957.777175][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396957.777206][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396957.777251][2474:2474] CHIP:DMG: },
+          [1658396957.777355][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658396957.777495][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658396957.777542][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 21 is dirty
+          [1658396957.777570][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0021 (expanded=0)
+          [1658396957.777605][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658396957.777645][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads LEDSettings from the TH."
@@ -228,6 +636,28 @@ tests:
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read ledsettings 1 1
+
+          Verify the " LEDSettings response" on TH(lock-app):
+
+
+          [1658396991.974233][2474:2474] CHIP:IM: Received Read request
+          [1658396991.974321][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658396991.974353][2474:2474] CHIP:DMG: {
+          [1658396991.974376][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658396991.974403][2474:2474] CHIP:DMG:        [
+          [1658396991.974429][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658396991.974463][2474:2474] CHIP:DMG:                {
+          [1658396991.974492][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658396991.974528][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658396991.974564][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0022,
+          [1658396991.974594][2474:2474] CHIP:DMG:                }
+          [1658396991.974626][2474:2474] CHIP:DMG:
+          [1658396991.974655][2474:2474] CHIP:DMG:        ],
+          [1658396991.974685][2474:2474] CHIP:DMG:
+          [1658396991.974711][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658396991.974740][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658396991.974764][2474:2474] CHIP:DMG: },
+          [1658396991.974842][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label: "DUT reads AutoRelockTime from the TH."
@@ -235,10 +665,31 @@ tests:
       verification: |
           ./chip-tool doorlock read  auto-relock-time 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " AutoRelockTime response" on TH(lock-app):
 
-          [1657114601.853723][29321:29326] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0023 DataVersion: 402106506
-          [1657114601.853767][29321:29326] CHIP:TOO:   AutoRelockTime: 60
+          [1658397055.576504][2474:2474] CHIP:IM: Received Read request
+          [1658397055.576666][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397055.576720][2474:2474] CHIP:DMG: {
+          [1658397055.576751][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397055.576788][2474:2474] CHIP:DMG:        [
+          [1658397055.576820][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397055.576874][2474:2474] CHIP:DMG:                {
+          [1658397055.576916][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397055.576969][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397055.577014][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0023,
+          [1658397055.577069][2474:2474] CHIP:DMG:                }
+          [1658397055.577121][2474:2474] CHIP:DMG:
+          [1658397055.577160][2474:2474] CHIP:DMG:        ],
+          [1658397055.577212][2474:2474] CHIP:DMG:
+          [1658397055.577251][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397055.577299][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397055.577333][2474:2474] CHIP:DMG: },
+          [1658397055.577449][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658397055.577584][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658397055.577633][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 23 is dirty
+          [1658397055.577663][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0023 (expanded=0)
+          [1658397055.577701][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658397055.577744][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads SoundVolume from the TH."
@@ -246,10 +697,31 @@ tests:
       verification: |
           ./chip-tool doorlock read sound-volume 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " SoundVolume response" on TH(lock-app):
 
-          [1657114636.889863][29337:29342] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0024 DataVersion: 402106506
-          [1657114636.889920][29337:29342] CHIP:TOO:   SoundVolume: 0
+          [1658397087.000491][2474:2474] CHIP:IM: Received Read request
+          [1658397087.000600][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397087.000640][2474:2474] CHIP:DMG: {
+          [1658397087.000668][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397087.000704][2474:2474] CHIP:DMG:        [
+          [1658397087.000738][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397087.000778][2474:2474] CHIP:DMG:                {
+          [1658397087.000818][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397087.000860][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397087.000901][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0024,
+          [1658397087.000943][2474:2474] CHIP:DMG:                }
+          [1658397087.000986][2474:2474] CHIP:DMG:
+          [1658397087.001023][2474:2474] CHIP:DMG:        ],
+          [1658397087.001062][2474:2474] CHIP:DMG:
+          [1658397087.001098][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397087.001132][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397087.001164][2474:2474] CHIP:DMG: },
+          [1658397087.001261][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658397087.001387][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658397087.001426][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 24 is dirty
+          [1658397087.001454][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0024 (expanded=0)
+          [1658397087.001492][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658397087.001533][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads OperatingMode from the TH."
@@ -257,10 +729,32 @@ tests:
       verification: |
           ./chip-tool doorlock read operating-mode 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " OperatingMode response" on TH(lock-app):
 
-          [1657114681.290521][29356:29361] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0025 DataVersion: 402106506
-          [1657114681.290590][29356:29361] CHIP:TOO:   OperatingMode: 0
+
+          [1658397117.082297][2474:2474] CHIP:IM: Received Read request
+          [1658397117.082385][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397117.082416][2474:2474] CHIP:DMG: {
+          [1658397117.082442][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397117.082472][2474:2474] CHIP:DMG:        [
+          [1658397117.082500][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397117.082533][2474:2474] CHIP:DMG:                {
+          [1658397117.082564][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397117.082603][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397117.082634][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0025,
+          [1658397117.082667][2474:2474] CHIP:DMG:                }
+          [1658397117.082699][2474:2474] CHIP:DMG:
+          [1658397117.082728][2474:2474] CHIP:DMG:        ],
+          [1658397117.082759][2474:2474] CHIP:DMG:
+          [1658397117.082787][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397117.082811][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397117.082836][2474:2474] CHIP:DMG: },
+          [1658397117.082915][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658397117.083023][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658397117.083055][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 25 is dirty
+          [1658397117.083077][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0025 (expanded=0)
+          [1658397117.083108][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658397117.083143][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads SupportedOperatingModes from the TH."
@@ -268,10 +762,32 @@ tests:
       verification: |
           ./chip-tool doorlock read supported-operating-modes 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " SupportedOperatingModes response" on TH(lock-app):
 
-          [1657114711.926451][29378:29383] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0026 DataVersion: 402106506
-          [1657114711.926527][29378:29383] CHIP:TOO:   SupportedOperatingModes: 65526
+
+          [1658397177.691320][2474:2474] CHIP:IM: Received Read request
+          [1658397177.691424][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397177.691479][2474:2474] CHIP:DMG: {
+          [1658397177.691510][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397177.691556][2474:2474] CHIP:DMG:        [
+          [1658397177.691590][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397177.691637][2474:2474] CHIP:DMG:                {
+          [1658397177.691677][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397177.691734][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397177.691780][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0026,
+          [1658397177.691832][2474:2474] CHIP:DMG:                }
+          [1658397177.691871][2474:2474] CHIP:DMG:
+          [1658397177.691926][2474:2474] CHIP:DMG:        ],
+          [1658397177.691975][2474:2474] CHIP:DMG:
+          [1658397177.692011][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397177.692058][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397177.692090][2474:2474] CHIP:DMG: },
+          [1658397177.692210][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658397177.692347][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658397177.692386][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 26 is dirty
+          [1658397177.692427][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0026 (expanded=0)
+          [1658397177.692465][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658397177.692507][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads DefaultConfigurationRegister from the TH."
@@ -279,7 +795,26 @@ tests:
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read default-configuration-register 1 1
+          Verify the " DefaultConfigurationRegister response" on TH(lock-app):
+
+          [1658397211.423665][2474:2474] CHIP:IM: Received Read request
+          [1658397211.423769][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397211.423820][2474:2474] CHIP:DMG: {
+          [1658397211.423853][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397211.423888][2474:2474] CHIP:DMG:        [
+          [1658397211.423921][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397211.423973][2474:2474] CHIP:DMG:                {
+          [1658397211.424018][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397211.424073][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397211.424128][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0027,
+          [1658397211.424169][2474:2474] CHIP:DMG:                }
+          [1658397211.424220][2474:2474] CHIP:DMG:
+          [1658397211.424258][2474:2474] CHIP:DMG:        ],
+          [1658397211.424308][2474:2474] CHIP:DMG:
+          [1658397211.424344][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397211.424390][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397211.424425][2474:2474] CHIP:DMG: },
+          [1658397211.424545][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label: "DUT reads EnableLocalProgramming from the TH."
@@ -288,6 +823,27 @@ tests:
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read enable-local-programming 1 1
+          Verify the " EnableLocalProgramming response" on TH(lock-app):
+
+
+          [1658397282.356078][2474:2474] CHIP:IM: Received Read request
+          [1658397282.356166][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397282.356195][2474:2474] CHIP:DMG: {
+          [1658397282.356304][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397282.356343][2474:2474] CHIP:DMG:        [
+          [1658397282.356369][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397282.356401][2474:2474] CHIP:DMG:                {
+          [1658397282.356434][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397282.356469][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397282.356503][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0028,
+          [1658397282.356534][2474:2474] CHIP:DMG:                }
+          [1658397282.356566][2474:2474] CHIP:DMG:
+          [1658397282.356595][2474:2474] CHIP:DMG:        ],
+          [1658397282.356626][2474:2474] CHIP:DMG:
+          [1658397282.356653][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397282.356681][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397282.356706][2474:2474] CHIP:DMG: },
+          [1658397282.356787][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label: "DUT reads EnableOneTouchLocking from the TH."
@@ -296,11 +852,31 @@ tests:
           ./chip-tool doorlock read enable-one-touch-locking 1 1
 
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " EnableOneTouchLocking response" on TH(lock-app):
 
-
-          [1657114773.902097][29404:29409] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0029 DataVersion: 402106506
-          [1657114773.902146][29404:29409] CHIP:TOO:   EnableOneTouchLocking: FALSE
+          [1658397340.678069][2474:2474] CHIP:IM: Received Read request
+          [1658397340.678177][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397340.678215][2474:2474] CHIP:DMG: {
+          [1658397340.678246][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397340.678283][2474:2474] CHIP:DMG:        [
+          [1658397340.678317][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397340.678359][2474:2474] CHIP:DMG:                {
+          [1658397340.678403][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397340.678446][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397340.678488][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0029,
+          [1658397340.678528][2474:2474] CHIP:DMG:                }
+          [1658397340.678566][2474:2474] CHIP:DMG:
+          [1658397340.678599][2474:2474] CHIP:DMG:        ],
+          [1658397340.678636][2474:2474] CHIP:DMG:
+          [1658397340.678671][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397340.678705][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397340.678736][2474:2474] CHIP:DMG: },
+          [1658397340.678834][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658397340.678957][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658397340.678996][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 29 is dirty
+          [1658397340.679024][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0029 (expanded=0)
+          [1658397340.679060][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658397340.679102][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads EnableInsideStatusLED from the TH."
@@ -309,6 +885,28 @@ tests:
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read enable-inside-status-led 1 1
+
+          Verify the " EnableInsideStatusLED response" on TH(lock-app):
+
+
+          [1658397372.051159][2474:2474] CHIP:IM: Received Read request
+          [1658397372.051277][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397372.051311][2474:2474] CHIP:DMG: {
+          [1658397372.051335][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397372.051365][2474:2474] CHIP:DMG:        [
+          [1658397372.051393][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397372.051423][2474:2474] CHIP:DMG:                {
+          [1658397372.051454][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397372.051490][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397372.051523][2474:2474] CHIP:DMG:                        Attribute = 0x0000_002A,
+          [1658397372.051552][2474:2474] CHIP:DMG:                }
+          [1658397372.051583][2474:2474] CHIP:DMG:
+          [1658397372.051614][2474:2474] CHIP:DMG:        ],
+          [1658397372.051646][2474:2474] CHIP:DMG:
+          [1658397372.051676][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397372.051703][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397372.051729][2474:2474] CHIP:DMG: },
+          [1658397372.051812][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label: "DUT reads EnablePrivacyModeButton from the TH."
@@ -316,10 +914,32 @@ tests:
       verification: |
           ./chip-tool doorlock read enable-privacy-mode-button 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " EnablePrivacyModeButton response" on TH(lock-app):
 
-          [1657114818.216949][29433:29438] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_002B DataVersion: 402106506
-          [1657114818.217002][29433:29438] CHIP:TOO:   EnablePrivacyModeButton: FALSE
+
+          [1658397429.117175][2474:2474] CHIP:IM: Received Read request
+          [1658397429.117286][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397429.117322][2474:2474] CHIP:DMG: {
+          [1658397429.117352][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397429.117387][2474:2474] CHIP:DMG:        [
+          [1658397429.117419][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397429.117455][2474:2474] CHIP:DMG:                {
+          [1658397429.117494][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397429.117540][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397429.117578][2474:2474] CHIP:DMG:                        Attribute = 0x0000_002B,
+          [1658397429.117609][2474:2474] CHIP:DMG:                }
+          [1658397429.117647][2474:2474] CHIP:DMG:
+          [1658397429.117755][2474:2474] CHIP:DMG:        ],
+          [1658397429.117794][2474:2474] CHIP:DMG:
+          [1658397429.117826][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397429.117858][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397429.117887][2474:2474] CHIP:DMG: },
+          [1658397429.117973][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658397429.118091][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658397429.118126][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 2b is dirty
+          [1658397429.118152][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_002B (expanded=0)
+          [1658397429.118186][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658397429.118226][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads LocalProgrammingFeatures from the TH."
@@ -328,6 +948,28 @@ tests:
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
            ./chip-tool doorlock read  local-programming-features 1 1
+
+          Verify the " LocalProgrammingFeatures response" on TH(lock-app):
+
+
+          [1658397475.940127][2474:2474] CHIP:IM: Received Read request
+          [1658397475.940231][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397475.940270][2474:2474] CHIP:DMG: {
+          [1658397475.940301][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397475.940337][2474:2474] CHIP:DMG:        [
+          [1658397475.940373][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397475.940411][2474:2474] CHIP:DMG:                {
+          [1658397475.940449][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397475.940494][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397475.940536][2474:2474] CHIP:DMG:                        Attribute = 0x0000_002C,
+          [1658397475.940574][2474:2474] CHIP:DMG:                }
+          [1658397475.940615][2474:2474] CHIP:DMG:
+          [1658397475.940649][2474:2474] CHIP:DMG:        ],
+          [1658397475.940686][2474:2474] CHIP:DMG:
+          [1658397475.940722][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397475.940756][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397475.940788][2474:2474] CHIP:DMG: },
+          [1658397475.940881][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label: "DUT reads WrongCodeEntryLimit from the TH."
@@ -335,10 +977,31 @@ tests:
       verification: |
           ./chip-tool doorlock read   wrong-code-entry-limit 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " WrongCodeEntryLimit response" on TH(lock-app):
 
-          [1657114874.511811][29464:29469] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0030 DataVersion: 402106506
-          [1657114874.511886][29464:29469] CHIP:TOO:   WrongCodeEntryLimit: 3
+          [1658397556.997182][2474:2474] CHIP:IM: Received Read request
+          [1658397556.997294][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397556.997338][2474:2474] CHIP:DMG: {
+          [1658397556.997368][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397556.997405][2474:2474] CHIP:DMG:        [
+          [1658397556.997437][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397556.997483][2474:2474] CHIP:DMG:                {
+          [1658397556.997521][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397556.997563][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397556.997605][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0030,
+          [1658397556.997644][2474:2474] CHIP:DMG:                }
+          [1658397556.997683][2474:2474] CHIP:DMG:
+          [1658397556.997717][2474:2474] CHIP:DMG:        ],
+          [1658397556.997754][2474:2474] CHIP:DMG:
+          [1658397556.997790][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397556.997824][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397556.997853][2474:2474] CHIP:DMG: },
+          [1658397556.997949][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658397556.998071][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658397556.998109][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 30 is dirty
+          [1658397556.998138][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0030 (expanded=0)
+          [1658397556.998178][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658397556.998221][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads UserCodedTemporaryDisableTime from the TH."
@@ -346,10 +1009,32 @@ tests:
       verification: |
           ./chip-tool doorlock read user-code-temporary-disable-time 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " UserCodedTemporaryDisableTime response" on TH(lock-app):
 
-          [1657114902.456719][29473:29478] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0031 DataVersion: 402106506
-          [1657114902.456787][29473:29478] CHIP:TOO:   UserCodeTemporaryDisableTime: 10
+
+          [1658397634.527661][2474:2474] CHIP:IM: Received Read request
+          [1658397634.527764][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397634.527801][2474:2474] CHIP:DMG: {
+          [1658397634.527832][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397634.527866][2474:2474] CHIP:DMG:        [
+          [1658397634.527899][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397634.527936][2474:2474] CHIP:DMG:                {
+          [1658397634.527974][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397634.528022][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397634.528064][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0031,
+          [1658397634.528102][2474:2474] CHIP:DMG:                }
+          [1658397634.528142][2474:2474] CHIP:DMG:
+          [1658397634.528175][2474:2474] CHIP:DMG:        ],
+          [1658397634.528212][2474:2474] CHIP:DMG:
+          [1658397634.528247][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397634.528282][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397634.528314][2474:2474] CHIP:DMG: },
+          [1658397634.528406][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658397634.528526][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658397634.528565][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 31 is dirty
+          [1658397634.528593][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0031 (expanded=0)
+          [1658397634.528632][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658397634.528675][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads SendPINOverTheAir from the TH."
@@ -358,6 +1043,29 @@ tests:
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read send-pinover-the-air 1 1
+
+          Verify the " SendPINOverTheAir response" on TH(lock-app):
+
+
+
+          [1658397669.782668][2474:2474] CHIP:IM: Received Read request
+          [1658397669.782749][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397669.782777][2474:2474] CHIP:DMG: {
+          [1658397669.782799][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397669.782825][2474:2474] CHIP:DMG:        [
+          [1658397669.782848][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397669.782881][2474:2474] CHIP:DMG:                {
+          [1658397669.782910][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397669.782943][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397669.782972][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0032,
+          [1658397669.783000][2474:2474] CHIP:DMG:                }
+          [1658397669.783028][2474:2474] CHIP:DMG:
+          [1658397669.783055][2474:2474] CHIP:DMG:        ],
+          [1658397669.783083][2474:2474] CHIP:DMG:
+          [1658397669.783109][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397669.783136][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397669.783160][2474:2474] CHIP:DMG: },
+          [1658397669.783290][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label: "DUT reads RequirePINForRemoteOperation from the TH."
@@ -365,10 +1073,32 @@ tests:
       verification: |
           ./chip-tool doorlock read require-pinfor-remote-operation 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " RequirePINForRemoteOperation response" on TH(lock-app):
 
-          [1657114973.073491][29496:29501] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0033 DataVersion: 402106506
-          [1657114973.073530][29496:29501] CHIP:TOO:   RequirePINforRemoteOperation: FALSE
+
+          [1658397733.214110][2474:2474] CHIP:IM: Received Read request
+          [1658397733.214214][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397733.214263][2474:2474] CHIP:DMG: {
+          [1658397733.214292][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397733.214323][2474:2474] CHIP:DMG:        [
+          [1658397733.214350][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397733.214396][2474:2474] CHIP:DMG:                {
+          [1658397733.214432][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397733.214479][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397733.214516][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0033,
+          [1658397733.214556][2474:2474] CHIP:DMG:                }
+          [1658397733.214590][2474:2474] CHIP:DMG:
+          [1658397733.214628][2474:2474] CHIP:DMG:        ],
+          [1658397733.214660][2474:2474] CHIP:DMG:
+          [1658397733.214699][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397733.214728][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397733.214764][2474:2474] CHIP:DMG: },
+          [1658397733.214861][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658397733.214995][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658397733.215040][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 33 is dirty
+          [1658397733.215065][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_0033 (expanded=0)
+          [1658397733.215098][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658397733.215145][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "DUT reads ExpiringUserTimeOut from the TH"
@@ -377,6 +1107,27 @@ tests:
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read expiring-user-timeout 1 1
+
+          Verify the " ExpiringUserTimeOut response" on TH(lock-app):
+
+          [1658397771.129301][2474:2474] CHIP:IM: Received Read request
+          [1658397771.129390][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397771.129426][2474:2474] CHIP:DMG: {
+          [1658397771.129453][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397771.129484][2474:2474] CHIP:DMG:        [
+          [1658397771.129515][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397771.129551][2474:2474] CHIP:DMG:                {
+          [1658397771.129589][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397771.129628][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397771.129665][2474:2474] CHIP:DMG:                        Attribute = 0x0000_0035,
+          [1658397771.129704][2474:2474] CHIP:DMG:                }
+          [1658397771.129736][2474:2474] CHIP:DMG:
+          [1658397771.129764][2474:2474] CHIP:DMG:        ],
+          [1658397771.129796][2474:2474] CHIP:DMG:
+          [1658397771.129825][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397771.129854][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397771.129881][2474:2474] CHIP:DMG: },
+          [1658397771.129964][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label: "DUT reads NumberOfCredentialsSupportedPerUser attribute from TH"
@@ -384,8 +1135,29 @@ tests:
       verification: |
           ./chip-tool doorlock read number-of-credentials-supported-per-user 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " NumberOfCredentialsSupportedPerUser response" on TH(lock-app):
 
-          [1657115136.041272][29683:29688] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_001C DataVersion: 402106506
-          [1657115136.041380][29683:29688] CHIP:TOO:   NumberOfCredentialsSupportedPerUser: 5
+          [1658397824.221419][2474:2474] CHIP:IM: Received Read request
+          [1658397824.221545][2474:2474] CHIP:DMG: ReadRequestMessage =
+          [1658397824.221618][2474:2474] CHIP:DMG: {
+          [1658397824.221654][2474:2474] CHIP:DMG:        AttributePathIBs =
+          [1658397824.221690][2474:2474] CHIP:DMG:        [
+          [1658397824.221720][2474:2474] CHIP:DMG:                AttributePathIB =
+          [1658397824.221758][2474:2474] CHIP:DMG:                {
+          [1658397824.221795][2474:2474] CHIP:DMG:                        Endpoint = 0x1,
+          [1658397824.221835][2474:2474] CHIP:DMG:                        Cluster = 0x101,
+          [1658397824.221876][2474:2474] CHIP:DMG:                        Attribute = 0x0000_001C,
+          [1658397824.221912][2474:2474] CHIP:DMG:                }
+          [1658397824.221948][2474:2474] CHIP:DMG:
+          [1658397824.221980][2474:2474] CHIP:DMG:        ],
+          [1658397824.222014][2474:2474] CHIP:DMG:
+          [1658397824.222048][2474:2474] CHIP:DMG:        isFabricFiltered = true,
+          [1658397824.222079][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658397824.222108][2474:2474] CHIP:DMG: },
+          [1658397824.222196][2474:2474] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658397824.222312][2474:2474] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658397824.222348][2474:2474] CHIP:DMG: <RE:Run> Cluster 101, Attribute 1c is dirty
+          [1658397824.222375][2474:2474] CHIP:DMG: Reading attribute: Cluster=0x0000_0101 Endpoint=1 AttributeId=0x0000_001C (expanded=0)
+          [1658397824.222409][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
+          [1658397824.222448][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true

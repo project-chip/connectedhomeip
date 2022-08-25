@@ -216,7 +216,7 @@ typedef struct _ActionStruct
     uint8_t Type;
     uint16_t EndpointListID;
     uint16_t SupportedCommands;
-    uint8_t Status;
+    uint8_t State;
 } ActionStruct;
 
 // Struct for ApplicationBasicApplication
@@ -277,6 +277,14 @@ typedef struct _DlCredential
     uint8_t CredentialType;
     uint16_t CredentialIndex;
 } DlCredential;
+
+// Struct for DstOffsetType
+typedef struct _DstOffsetType
+{
+    int32_t Offset;
+    uint64_t ValidStarting;
+    uint64_t ValidUntil;
+} DstOffsetType;
 
 // Struct for EndpointListStruct
 typedef struct _EndpointListStruct
@@ -547,6 +555,14 @@ typedef struct _ThreadMetrics
     uint32_t StackFreeMinimum;
     uint32_t StackSize;
 } ThreadMetrics;
+
+// Struct for TimeZoneType
+typedef struct _TimeZoneType
+{
+    int32_t Offset;
+    uint64_t ValidAt;
+    chip::CharSpan Name;
+} TimeZoneType;
 
 // Struct for WiFiInterfaceScanResult
 typedef struct _WiFiInterfaceScanResult

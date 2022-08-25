@@ -15,21 +15,31 @@
 
 name: 74.3.1. [TC-SWTCH-3.1] Global attributes with client as DUT
 
+PICS:
+    - SWTCH.C
+    - SWTCH.C.AM-READ
+    - SWTCH.C.AO-READ
+    - SWTCH.C.AM-WRITE
+    - SWTCH.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          verify on Reference app receives the right response for the data sent in the above commands
-
-          Verify in TH all-clusters-app log
-
           ./chip-tool switch read number-of-positions 1 1
+
+          verify on TH all-cluster-app  number-of-positions attribute receives the right ReadRequest for the data sent in the above command:
 
           [1650539419.579618][3678:3678] CHIP:IM: Received Read request
           [1650539419.579683][3678:3678] CHIP:DMG: ReadRequestMessage =
@@ -51,7 +61,7 @@ tests:
 
           ./chip-tool switch read current-position 1 1
 
-          Verify in TH all-clusters-app log
+          verify on TH all-cluster-app current-position attribute receives the right ReadRequest for the data sent in the above command:
 
           [1650539484.199120][3678:3678] CHIP:DMG: ReadRequestMessage =
           [1650539484.199188][3678:3678] CHIP:DMG: {
@@ -79,7 +89,7 @@ tests:
 
           ./chip-tool switch read multi-press-max 1 1
 
-          Verify in TH all-clusters-app log
+          verify on TH all-cluster-app multi-press-max  attribute receives the right ReadRequest for the data sent in the above command:
 
           [1646209889.768919][2190:2190] CHIP:DMG: ReadRequestMessage =
           [1646209889.768984][2190:2190] CHIP:DMG: {
@@ -104,14 +114,14 @@ tests:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
@@ -120,34 +130,57 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          verify on Reference app receives the right response for the data sent in the above
-
           ./chip-tool switch read feature-map 1 1
 
-          Verify in TH all-clusters-app log
+          verify on TH  all-clusters-minimal-app feature-map attribute receives the right ReadRequest for the data sent in the above command
 
-          [1656477949231] [49485:5731390] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFFC DataVersion: 2281340739
-          [1656477949232] [49485:5731390] CHIP: [TOO]   FeatureMap: 1
+          [1659597205.359182][2409:2409] CHIP:IM: Received Read request
+          [1659597205.359281][2409:2409] CHIP:DMG: ReadRequestMessage =
+          [1659597205.359315][2409:2409] CHIP:DMG: {
+          [1659597205.359344][2409:2409] CHIP:DMG:         AttributePathIBs =
+          [1659597205.359378][2409:2409] CHIP:DMG:         [
+          [1659597205.359409][2409:2409] CHIP:DMG:                 AttributePathIB =
+          [1659597205.359447][2409:2409] CHIP:DMG:                 {
+          [1659597205.359487][2409:2409] CHIP:DMG:                         Endpoint = 0x1,
+          [1659597205.359530][2409:2409] CHIP:DMG:                         Cluster = 0x3b,
+          [1659597205.359572][2409:2409] CHIP:DMG:                         Attribute = 0x0000_FFFC,
+          [1659597205.359615][2409:2409] CHIP:DMG:                 }
+          [1659597205.359654][2409:2409] CHIP:DMG:
+          [1659597205.359689][2409:2409] CHIP:DMG:         ],
+          [1659597205.359726][2409:2409] CHIP:DMG:
+          [1659597205.359760][2409:2409] CHIP:DMG:         isFabricFiltered = true,
+          [1659597205.359792][2409:2409] CHIP:DMG:         InteractionModelRevision = 1
+          [1659597205.359822][2409:2409] CHIP:DMG: },
+          [1659597205.359912][2409:2409] CHIP:DMG: IM RH moving to [GeneratingReports]1
 
            ./chip-tool switch read attribute-list 1 1
 
-          Verify in TH all-clusters-app log
+          verify on TH  all-clusters-minimal-app attribute-list receives the right ReadRequest for the data sent in the above command
 
-          [1656477995952] [49490:5731598] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFFB DataVersion: 2281340739
-          [1656477995952] [49490:5731598] CHIP: [TOO]   AttributeList: 7 entries
-          [1656477995952] [49490:5731598] CHIP: [TOO]     [1]: 0
-          [1656477995952] [49490:5731598] CHIP: [TOO]     [2]: 1
-          [1656477995952] [49490:5731598] CHIP: [TOO]     [3]: 65528
-          [1656477995952] [49490:5731598] CHIP: [TOO]     [4]: 65529
-          [1656477995952] [49490:5731598] CHIP: [TOO]     [5]: 65531
-          [1656477995952] [49490:5731598] CHIP: [TOO]     [6]: 65532
-          [1656477995952] [49490:5731598] CHIP: [TOO]     [7]: 65533
+          [1659597229.124241][2409:2409] CHIP:IM: Received Read request
+          [1659597229.124312][2409:2409] CHIP:DMG: ReadRequestMessage =
+          [1659597229.124335][2409:2409] CHIP:DMG: {
+          [1659597229.124353][2409:2409] CHIP:DMG:         AttributePathIBs =
+          [1659597229.124376][2409:2409] CHIP:DMG:         [
+          [1659597229.124396][2409:2409] CHIP:DMG:                 AttributePathIB =
+          [1659597229.124428][2409:2409] CHIP:DMG:                 {
+          [1659597229.124455][2409:2409] CHIP:DMG:                         Endpoint = 0x1,
+          [1659597229.124484][2409:2409] CHIP:DMG:                         Cluster = 0x3b,
+          [1659597229.124512][2409:2409] CHIP:DMG:                         Attribute = 0x0000_FFFB,
+          [1659597229.124538][2409:2409] CHIP:DMG:                 }
+          [1659597229.124564][2409:2409] CHIP:DMG:
+          [1659597229.124588][2409:2409] CHIP:DMG:         ],
+          [1659597229.124612][2409:2409] CHIP:DMG:
+          [1659597229.124635][2409:2409] CHIP:DMG:         isFabricFiltered = true,
+          [1659597229.124656][2409:2409] CHIP:DMG:         InteractionModelRevision = 1
+          [1659597229.124676][2409:2409] CHIP:DMG: },
+          [1659597229.124740][2409:2409] CHIP:DMG: IM RH moving to [GeneratingReports
 
 
 
           ./chip-tool switch read number-of-positions 1 1
 
-          Verify in TH all-clusters-app log
+          verify on TH  all-clusters-minimal-app number-of-positions attribute receives the right ReadRequest for the data sent in the above command
 
           [1650539419.579618][3678:3678] CHIP:IM: Received Read request
           [1650539419.579683][3678:3678] CHIP:DMG: ReadRequestMessage =
@@ -169,7 +202,7 @@ tests:
 
           ./chip-tool switch read current-position 1 1
 
-          Verify in TH all-clusters-app log
+          verify on TH  all-clusters-minimal-app current-position  attribute receives the right ReadRequest for the data sent in the above command
 
           [1650539484.199120][3678:3678] CHIP:DMG: ReadRequestMessage =
           [1650539484.199188][3678:3678] CHIP:DMG: {
@@ -193,47 +226,15 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          verify on Reference app receives the right response for the data sent in the above commands
+          TH all-clusters-minimal-app does not support optional attributes
+
 
           ./chip-tool switch read multi-press-max 1 1
-
-          Verify in TH all-clusters-app log
-
-          [1656477918495] [49481:5731213] CHIP: [DMG] ReportDataMessage =
-          [1656477918495] [49481:5731213] CHIP: [DMG] {
-          [1656477918495] [49481:5731213] CHIP: [DMG]         AttributeReportIBs =
-          [1656477918495] [49481:5731213] CHIP: [DMG]         [
-          [1656477918495] [49481:5731213] CHIP: [DMG]                 AttributeReportIB =
-          [1656477918495] [49481:5731213] CHIP: [DMG]                 {
-          [1656477918495] [49481:5731213] CHIP: [DMG]                         AttributeStatusIB =
-          [1656477918495] [49481:5731213] CHIP: [DMG]                         {
-          [1656477918495] [49481:5731213] CHIP: [DMG]                                 AttributePathIB =
-          [1656477918495] [49481:5731213] CHIP: [DMG]                                 {
-          [1656477918495] [49481:5731213] CHIP: [DMG]                                         Endpoint = 0x1,
-          [1656477918495] [49481:5731213] CHIP: [DMG]                                         Cluster = 0x3b,
-          [1656477918495] [49481:5731213] CHIP: [DMG]                                         Attribute = 0x0000_0002,
-          [1656477918495] [49481:5731213] CHIP: [DMG]                                 }
-          [1656477918495] [49481:5731213] CHIP: [DMG]
-          [1656477918495] [49481:5731213] CHIP: [DMG]                                 StatusIB =
-          [1656477918495] [49481:5731213] CHIP: [DMG]                                 {
-          [1656477918495] [49481:5731213] CHIP: [DMG]                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1656477918495] [49481:5731213] CHIP: [DMG]                                 },
-          [1656477918495] [49481:5731213] CHIP: [DMG]
-          [1656477918495] [49481:5731213] CHIP: [DMG]                         },
-          [1656477918495] [49481:5731213] CHIP: [DMG]
-          [1656477918495] [49481:5731213] CHIP: [DMG]                 },
-          [1656477918495] [49481:5731213] CHIP: [DMG]
-          [1656477918495] [49481:5731213] CHIP: [DMG]         ],
-          [1656477918495] [49481:5731213] CHIP: [DMG]
-          [1656477918495] [49481:5731213] CHIP: [DMG]         SuppressResponse = true,
-          [1656477918495] [49481:5731213] CHIP: [DMG]         InteractionModelRevision = 1
-          [1656477918495] [49481:5731213] CHIP: [DMG] }
-          [1656477918495] [49481:5731213] CHIP: [TOO] Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true

@@ -13,7 +13,14 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 31.3.1. [TC-FLW-3.1] Attributes with Client as DUT
+name: 3.3.1. [TC-FLW-3.1] Attributes with client as DUT
+
+PICS:
+    - FLW.C
+    - FLW.C.AM-READ
+    - FLW.C.AO-READ
+    - FLW.C.AM-WRITE
+    - FLW.C.AO-WRITE
 
 config:
     nodeId: 0x12344321
@@ -21,35 +28,96 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
           ./chip-tool flowmeasurement read measured-value 1 1
-          Verify TH all-clusters-app Log
-          Verify the measured-value should be in range of uint16
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_0000 DataVersion: 1049406897
-          [1649660205.780337][7845:7850] CHIP:TOO:   MeasuredValue: 0
+          Verify read command is received on TH(all-clusters-app) log
+
+          [1658853801.750840][29347:29347] CHIP:IM: Received Read request
+          [1658853801.750918][29347:29347] CHIP:DMG: ReadRequestMessage =
+          [1658853801.750945][29347:29347] CHIP:DMG: {
+          [1658853801.750968][29347:29347] CHIP:DMG:         AttributePathIBs =
+          [1658853801.750993][29347:29347] CHIP:DMG:         [
+          [1658853801.751017][29347:29347] CHIP:DMG:                 AttributePathIB =
+          [1658853801.751044][29347:29347] CHIP:DMG:                 {
+          [1658853801.751072][29347:29347] CHIP:DMG:                         Endpoint = 0x1,
+          [1658853801.751105][29347:29347] CHIP:DMG:                         Cluster = 0x404,
+          [1658853801.751137][29347:29347] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1658853801.751167][29347:29347] CHIP:DMG:                 }
+          [1658853801.751195][29347:29347] CHIP:DMG:
+          [1658853801.751220][29347:29347] CHIP:DMG:         ],
+          [1658853801.751248][29347:29347] CHIP:DMG:
+          [1658853801.751275][29347:29347] CHIP:DMG:         isFabricFiltered = true,
+          [1658853801.751300][29347:29347] CHIP:DMG:         InteractionModelRevision = 1
+          [1658853801.751323][29347:29347] CHIP:DMG: },
+          [1658853801.751396][29347:29347] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658853801.751480][29347:29347] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658853801.751510][29347:29347] CHIP:DMG: <RE:Run> Cluster 404, Attribute 0 is dirty
+          [1658853801.751532][29347:29347] CHIP:DMG: Reading attribute: Cluster=0x0000_0404 Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+
 
 
 
 
           "./chip-tool flowmeasurement read min-measured-value 1 1
-          Verify TH all-clusters-app Log
-          Verify the min-measured-value should be in range of uint16
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_0001 DataVersion: 1049406897
-          [1649660217.629973][7852:7857] CHIP:TOO:   MinMeasuredValue: 0"
+          Verify read command is received on TH(all-clusters-app) log
+
+          [1658853849.969073][29347:29347] CHIP:IM: Received Read request
+          [1658853849.969151][29347:29347] CHIP:DMG: ReadRequestMessage =
+          [1658853849.969192][29347:29347] CHIP:DMG: {
+          [1658853849.969214][29347:29347] CHIP:DMG:         AttributePathIBs =
+          [1658853849.969240][29347:29347] CHIP:DMG:         [
+          [1658853849.969272][29347:29347] CHIP:DMG:                 AttributePathIB =
+          [1658853849.969301][29347:29347] CHIP:DMG:                 {
+          [1658853849.969337][29347:29347] CHIP:DMG:                         Endpoint = 0x1,
+          [1658853849.969369][29347:29347] CHIP:DMG:                         Cluster = 0x404,
+          [1658853849.969410][29347:29347] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1658853849.969447][29347:29347] CHIP:DMG:                 }
+          [1658853849.969476][29347:29347] CHIP:DMG:
+          [1658853849.969511][29347:29347] CHIP:DMG:         ],
+          [1658853849.969539][29347:29347] CHIP:DMG:
+          [1658853849.969574][29347:29347] CHIP:DMG:         isFabricFiltered = true,
+          [1658853849.969600][29347:29347] CHIP:DMG:         InteractionModelRevision = 1
+          [1658853849.969628][29347:29347] CHIP:DMG: },
+          [1658853849.969697][29347:29347] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658853849.969791][29347:29347] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658853849.969831][29347:29347] CHIP:DMG: <RE:Run> Cluster 404, Attribute 1 is dirty
 
 
 
           "./chip-tool flowmeasurement read max-measured-value 1 1
-          Verify TH all-clusters-app Log
-          Verify the min-measured-value should be in range of uint16
 
-           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_0002 DataVersion: 1049406897
-          [1649660223.190482][7858:7863] CHIP:TOO:   MaxMeasuredValue: 0"
+          Verify read command is received on TH(all-clusters-app) log
+
+          [1658853898.416395][29347:29347] CHIP:IM: Received Read request
+          [1658853898.416472][29347:29347] CHIP:DMG: ReadRequestMessage =
+          [1658853898.416513][29347:29347] CHIP:DMG: {
+          [1658853898.416536][29347:29347] CHIP:DMG:         AttributePathIBs =
+          [1658853898.416571][29347:29347] CHIP:DMG:         [
+          [1658853898.416596][29347:29347] CHIP:DMG:                 AttributePathIB =
+          [1658853898.416633][29347:29347] CHIP:DMG:                 {
+          [1658853898.416662][29347:29347] CHIP:DMG:                         Endpoint = 0x1,
+          [1658853898.416703][29347:29347] CHIP:DMG:                         Cluster = 0x404,
+          [1658853898.416746][29347:29347] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1658853898.416776][29347:29347] CHIP:DMG:                 }
+          [1658853898.416813][29347:29347] CHIP:DMG:
+          [1658853898.416839][29347:29347] CHIP:DMG:         ],
+          [1658853898.416876][29347:29347] CHIP:DMG:
+          [1658853898.416903][29347:29347] CHIP:DMG:         isFabricFiltered = true,
+          [1658853898.416937][29347:29347] CHIP:DMG:         InteractionModelRevision = 1
+          [1658853898.416960][29347:29347] CHIP:DMG: },
+          [1658853898.417051][29347:29347] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658853898.417141][29347:29347] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658853898.417179][29347:29347] CHIP:DMG: <RE:Run> Cluster 404, Attribute 2 is dirty
       disabled: true
 
     - label:
@@ -57,25 +125,43 @@ tests:
           a manufacturer specific order"
       verification: |
           chip-tool flowmeasurement read tolerance 1 1
-          Verify TH all-clusters-app Log
-          Verify the measured-value should be in range 0 to 2048
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_0003 DataVersion: 1049406897
-          [1649660232.522084][7865:7870] CHIP:TOO:   Tolerance: 0
+          Verify read command is received on TH(all-clusters-app) log
+
+          [1658853991.266232][29347:29347] CHIP:IM: Received Read request
+          [1658853991.266328][29347:29347] CHIP:DMG: ReadRequestMessage =
+          [1658853991.266382][29347:29347] CHIP:DMG: {
+          [1658853991.266413][29347:29347] CHIP:DMG:         AttributePathIBs =
+          [1658853991.266461][29347:29347] CHIP:DMG:         [
+          [1658853991.266494][29347:29347] CHIP:DMG:                 AttributePathIB =
+          [1658853991.266545][29347:29347] CHIP:DMG:                 {
+          [1658853991.266584][29347:29347] CHIP:DMG:                         Endpoint = 0x1,
+          [1658853991.266640][29347:29347] CHIP:DMG:                         Cluster = 0x404,
+          [1658853991.266694][29347:29347] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1658853991.266736][29347:29347] CHIP:DMG:                 }
+          [1658853991.266785][29347:29347] CHIP:DMG:
+          [1658853991.266820][29347:29347] CHIP:DMG:         ],
+          [1658853991.266869][29347:29347] CHIP:DMG:
+          [1658853991.266905][29347:29347] CHIP:DMG:         isFabricFiltered = true,
+          [1658853991.266952][29347:29347] CHIP:DMG:         InteractionModelRevision = 1
+          [1658853991.266984][29347:29347] CHIP:DMG: },
+          [1658853991.267091][29347:29347] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658853991.267218][29347:29347] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658853991.267257][29347:29347] CHIP:DMG: <RE:Run> Cluster 404, Attribute 3 is dirty
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
@@ -84,9 +170,9 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          verify on Reference app receives the right response for the data sent in the above commands
-
           ./chip-tool flowmeasurement read attribute-list 1 1
+
+          Verify a list of supported attributes which contains mandatory on TH(all-clusters-minimal-app) log
 
           [1656478164937] [49517:5732586] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_FFFB DataVersion: 3423686907
           [1656478164937] [49517:5732586] CHIP: [TOO]   AttributeList: 8 entries
@@ -101,45 +187,104 @@ tests:
 
           ./chip-tool flowmeasurement read feature-map 1 1
 
+          Verify featuremap value is 0 on TH(all-clusters-minimal-app) log
+
           [1656478242820] [49526:5733040] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_FFFC DataVersion: 3423686907
           [1656478242820] [49526:5733040] CHIP: [TOO]   FeatureMap: 0
 
 
+          "./chip-tool flowmeasurement read measured-value 1 1
 
-          ./chip-tool flowmeasurement read measured-value 1 1
-          Verify TH all-clusters-app Log
-          Verify the measured-value should be in range of uint16
+          Verify read command is received on TH(all-clusters-minimal-app) log
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_0000 DataVersion: 1049406897
-          [1649660205.780337][7845:7850] CHIP:TOO:   MeasuredValue: 0
+          [1658853801.750840][29347:29347] CHIP:IM: Received Read request
+          [1658853801.750918][29347:29347] CHIP:DMG: ReadRequestMessage =
+          [1658853801.750945][29347:29347] CHIP:DMG: {
+          [1658853801.750968][29347:29347] CHIP:DMG:         AttributePathIBs =
+          [1658853801.750993][29347:29347] CHIP:DMG:         [
+          [1658853801.751017][29347:29347] CHIP:DMG:                 AttributePathIB =
+          [1658853801.751044][29347:29347] CHIP:DMG:                 {
+          [1658853801.751072][29347:29347] CHIP:DMG:                         Endpoint = 0x1,
+          [1658853801.751105][29347:29347] CHIP:DMG:                         Cluster = 0x404,
+          [1658853801.751137][29347:29347] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1658853801.751167][29347:29347] CHIP:DMG:                 }
+          [1658853801.751195][29347:29347] CHIP:DMG:
+          [1658853801.751220][29347:29347] CHIP:DMG:         ],
+          [1658853801.751248][29347:29347] CHIP:DMG:
+          [1658853801.751275][29347:29347] CHIP:DMG:         isFabricFiltered = true,
+          [1658853801.751300][29347:29347] CHIP:DMG:         InteractionModelRevision = 1
+          [1658853801.751323][29347:29347] CHIP:DMG: },
+          [1658853801.751396][29347:29347] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658853801.751480][29347:29347] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658853801.751510][29347:29347] CHIP:DMG: <RE:Run> Cluster 404, Attribute 0 is dirty
+          [1658853801.751532][29347:29347] CHIP:DMG: Reading attribute: Cluster=0x0000_0404 Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
 
 
 
 
-          "./chip-tool flowmeasurement read min-measured-value 1 1
-          Verify TH all-clusters-app Log
-          Verify the min-measured-value should be in range of uint16
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_0001 DataVersion: 1049406897
-          [1649660217.629973][7852:7857] CHIP:TOO:   MinMeasuredValue: 0"
+          ""./chip-tool flowmeasurement read min-measured-value 1 1
+
+          Verify read command is received on TH(all-clusters-minimal-app) log
+
+          [1658853849.969073][29347:29347] CHIP:IM: Received Read request
+          [1658853849.969151][29347:29347] CHIP:DMG: ReadRequestMessage =
+          [1658853849.969192][29347:29347] CHIP:DMG: {
+          [1658853849.969214][29347:29347] CHIP:DMG:         AttributePathIBs =
+          [1658853849.969240][29347:29347] CHIP:DMG:         [
+          [1658853849.969272][29347:29347] CHIP:DMG:                 AttributePathIB =
+          [1658853849.969301][29347:29347] CHIP:DMG:                 {
+          [1658853849.969337][29347:29347] CHIP:DMG:                         Endpoint = 0x1,
+          [1658853849.969369][29347:29347] CHIP:DMG:                         Cluster = 0x404,
+          [1658853849.969410][29347:29347] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1658853849.969447][29347:29347] CHIP:DMG:                 }
+          [1658853849.969476][29347:29347] CHIP:DMG:
+          [1658853849.969511][29347:29347] CHIP:DMG:         ],
+          [1658853849.969539][29347:29347] CHIP:DMG:
+          [1658853849.969574][29347:29347] CHIP:DMG:         isFabricFiltered = true,
+          [1658853849.969600][29347:29347] CHIP:DMG:         InteractionModelRevision = 1
+          [1658853849.969628][29347:29347] CHIP:DMG: },
+          [1658853849.969697][29347:29347] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658853849.969791][29347:29347] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658853849.969831][29347:29347] CHIP:DMG: <RE:Run> Cluster 404, Attribute 1 is dirty
 
 
 
-          "./chip-tool flowmeasurement read max-measured-value 1 1
-          Verify TH all-clusters-app Log
-          Verify the min-measured-value should be in range of uint16
+          ""./chip-tool flowmeasurement read max-measured-value 1 1
 
-           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_0002 DataVersion: 1049406897
-          [1649660223.190482][7858:7863] CHIP:TOO:   MaxMeasuredValue: 0"
+          Verify read command is received on TH(all-clusters-minimal-app) log
+
+          [1658853898.416395][29347:29347] CHIP:IM: Received Read request
+          [1658853898.416472][29347:29347] CHIP:DMG: ReadRequestMessage =
+          [1658853898.416513][29347:29347] CHIP:DMG: {
+          [1658853898.416536][29347:29347] CHIP:DMG:         AttributePathIBs =
+          [1658853898.416571][29347:29347] CHIP:DMG:         [
+          [1658853898.416596][29347:29347] CHIP:DMG:                 AttributePathIB =
+          [1658853898.416633][29347:29347] CHIP:DMG:                 {
+          [1658853898.416662][29347:29347] CHIP:DMG:                         Endpoint = 0x1,
+          [1658853898.416703][29347:29347] CHIP:DMG:                         Cluster = 0x404,
+          [1658853898.416746][29347:29347] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1658853898.416776][29347:29347] CHIP:DMG:                 }
+          [1658853898.416813][29347:29347] CHIP:DMG:
+          [1658853898.416839][29347:29347] CHIP:DMG:         ],
+          [1658853898.416876][29347:29347] CHIP:DMG:
+          [1658853898.416903][29347:29347] CHIP:DMG:         isFabricFiltered = true,
+          [1658853898.416937][29347:29347] CHIP:DMG:         InteractionModelRevision = 1
+          [1658853898.416960][29347:29347] CHIP:DMG: },
+          [1658853898.417051][29347:29347] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658853898.417141][29347:29347] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1658853898.417179][29347:29347] CHIP:DMG: <RE:Run> Cluster 404, Attribute 2 is dirty
+          "
       disabled: true
 
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Verify TH all-clusters-app Log
+          Verify read command is received on TH(all-clusters-minimal-app) log
 
           ./chip-tool flowmeasurement read tolerance 1 1
+
            General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
@@ -147,5 +292,5 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true

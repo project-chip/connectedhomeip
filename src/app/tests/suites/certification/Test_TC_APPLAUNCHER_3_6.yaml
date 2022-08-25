@@ -14,6 +14,9 @@
 
 name: 19.4.2. [TC-APPLAUNCHER-3.6] Current App Verification
 
+PICS:
+    - APPLAUNCHER.S
+
 config:
     nodeId: 0x12344321
     cluster: "Application Launcher"

@@ -16,7 +16,9 @@
 
 #pragma once
 
-#include <transport/SessionHandle.h>
+#include <inttypes.h>
+
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
 
@@ -57,14 +59,6 @@ public:
      *   If they desire to do so, it MUST be done asynchronously.
      */
     virtual void OnSessionReleased() = 0;
-
-    /**
-     * @brief
-     *   Called when the first message delivery in an exchange fails, so actions aiming to recover connection can be performed.
-     *
-     *   Note: the implementation must not do anything that will destroy the session or change the SessionHolder.
-     */
-    virtual void OnFirstMessageDeliveryFailed() {}
 
     /**
      * @brief

@@ -130,12 +130,12 @@ public:
 
     virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input) override;
 
-    virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) override;
+    virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const override;
 
     virtual CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key,
                                           P256ECDHDerivedSecret & out_secret) const override;
 
-    CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) override;
+    CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) const override;
 
     const P256PublicKeyHSM & Pubkey() const override { return mPublicKeyHSM; }
 
@@ -144,8 +144,6 @@ public:
     void SetKeyId(uint32_t id) { keyid = id; }
 
     uint32_t GetKeyId(void) { return keyid; }
-
-    CHIP_ERROR CreateOperationalKey(FabricIndex fabricIdx);
 
 private:
     uint32_t keyid;

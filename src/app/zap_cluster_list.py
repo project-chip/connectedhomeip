@@ -22,7 +22,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'BINARY_INPUT_BASIC_CLUSTER': [],
     'BINDING_CLUSTER': ['bindings'],
     'BOOLEAN_STATE_CLUSTER': [],
-    'BRIDGED_ACTIONS_CLUSTER': [],
+    'ACTIONS_CLUSTER': [],
     'BRIDGED_DEVICE_BASIC_CLUSTER': ['bridged-device-basic-information-server'],
     'CHANNEL_CLUSTER': ['channel-server'],
     'COLOR_CONTROL_CLUSTER': ['color-control-server'],
@@ -34,6 +34,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'DOOR_LOCK_CLUSTER': ['door-lock-server'],
     'ELECTRICAL_MEASUREMENT_CLUSTER': [],
     'ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER': ['ethernet-network-diagnostics-server'],
+    'FAULT_INJECTION_CLUSTER': ['fault-injection-server'],
     'FAN_CONTROL_CLUSTER': ['fan-control-server'],
     'FIXED_LABEL_CLUSTER': ['fixed-label-server'],
     'FLOW_MEASUREMENT_CLUSTER': [],
@@ -106,7 +107,7 @@ CLIENT_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'BINARY_INPUT_BASIC_CLUSTER': [],
     'BINDING_CLUSTER': [],
     'BOOLEAN_STATE_CLUSTER': [],
-    'BRIDGED_ACTIONS_CLUSTER': [],
+    'ACTIONS_CLUSTER': [],
     'BRIDGED_DEVICE_BASIC_CLUSTER': [],
     'CHANNEL_CLUSTER': [],
     'COLOR_CONTROL_CLUSTER': [],
@@ -118,6 +119,7 @@ CLIENT_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'DOOR_LOCK_CLUSTER': [],
     'ELECTRICAL_MEASUREMENT_CLUSTER': [],
     'ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER': [],
+    'FAULT_INJECTION_CLUSTER': [],
     'FAN_CONTROL_CLUSTER': [],
     'FIXED_LABEL_CLUSTER': [],
     'FLOW_MEASUREMENT_CLUSTER': [],
@@ -240,6 +242,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--zap_file',
                         help='Path to .zap file',
+                        required=True,
                         type=pathlib.Path)
 
     args = parser.parse_args()

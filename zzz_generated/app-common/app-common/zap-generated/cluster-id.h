@@ -55,8 +55,8 @@ static constexpr chip::ClusterId ZCL_BINDING_CLUSTER_ID = 0x001E;
 // Definitions for cluster: Access Control
 static constexpr chip::ClusterId ZCL_ACCESS_CONTROL_CLUSTER_ID = 0x001F;
 
-// Definitions for cluster: Bridged Actions
-static constexpr chip::ClusterId ZCL_BRIDGED_ACTIONS_CLUSTER_ID = 0x0025;
+// Definitions for cluster: Actions
+static constexpr chip::ClusterId ZCL_ACTIONS_CLUSTER_ID = 0x0025;
 
 // Definitions for cluster: Basic
 static constexpr chip::ClusterId ZCL_BASIC_CLUSTER_ID = 0x0028;
@@ -231,3 +231,6 @@ static constexpr chip::ClusterId ZCL_ELECTRICAL_MEASUREMENT_CLUSTER_ID = 0x0B04;
 
 // Definitions for cluster: Test Cluster
 static constexpr chip::ClusterId ZCL_TEST_CLUSTER_ID = 0xFFF1FC05;
+
+// Definitions for cluster: Fault Injection
+static constexpr chip::ClusterId ZCL_FAULT_INJECTION_CLUSTER_ID = 0xFFF1FC06;

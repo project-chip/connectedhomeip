@@ -14,109 +14,111 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    24.1.22. [TC-CADMIN-1.22] max number of Commissioned Fabrics and
-    SupportedFabrics rollover using BCM [DUT - Commissioner]
+    30.1.22. [TC-CADMIN-1.22] Open commissioning window - durations max and
+    max+1 [ECM] [DUT - Commissionee]
+
+PICS:
+    - CADMIN.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    timeout: 950
     endpoint: 0
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
 
 tests:
-    - label: "Reset DUT_CE to factory defaults"
-      verification: |
+    - label: "Precondition: Reset Devices to factory defaults"
+      cluster: "SystemCommands"
+      PICS: PICS_SDK_CI_ONLY
+      command: "FactoryReset"
 
-      disabled: true
+    - label: "Precondition: Reset Devices to factory defaults"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
-      verification: |
-          "1. Provision the device using 1st controller chip tool(use above instructions) ,
-          "
-      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C00.Rsp
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 900
+              - name: "PAKEVerifier"
+                value: PakeVerifier
+              - name: "discriminator"
+                value: discriminator
+              - name: "iterations"
+                value: 1000
+              - name: "salt"
+                value: "SPAKE2P Key Salt"
+
+    - label: "Wait for commissioning Window to 901 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 901000
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+          "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      PICS: CADMIN.S.A0000
+      response:
+          value: 0
+
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C00.Rsp
-      verification: |
-          On 1st controller chip tool, open commissioning window
-
-          Below is the example when using chip tool as controller
-
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0  --timedInteractionTimeoutMs 1000
-
-          CHIP:DMG: InvokeResponseMessage =
-          [1649756654.928453][3385:3390] CHIP:DMG: {
-          [1649756654.928511][3385:3390] CHIP:DMG:         suppressResponse = false,
-          [1649756654.928571][3385:3390] CHIP:DMG:         InvokeResponseIBs =
-          [1649756654.928647][3385:3390] CHIP:DMG:         [
-          [1649756654.928708][3385:3390] CHIP:DMG:                 InvokeResponseIB =
-          [1649756654.928794][3385:3390] CHIP:DMG:                 {
-          [1649756654.928864][3385:3390] CHIP:DMG:                         CommandStatusIB =
-          [1649756654.928948][3385:3390] CHIP:DMG:                         {
-          [1649756654.929021][3385:3390] CHIP:DMG:                                 CommandPathIB =
-          [1649756654.929109][3385:3390] CHIP:DMG:                                 {
-          [1649756654.929191][3385:3390] CHIP:DMG:                                         EndpointId = 0x0,
-          [1649756654.929284][3385:3390] CHIP:DMG:                                         ClusterId = 0x3c,
-          [1649756654.929376][3385:3390] CHIP:DMG:                                         CommandId = 0x1,
-          [1649756654.929459][3385:3390] CHIP:DMG:                                 },
-          [1649756654.929551][3385:3390] CHIP:DMG:
-          [1649756654.929632][3385:3390] CHIP:DMG:                                 StatusIB =
-          [1649756654.929720][3385:3390] CHIP:DMG:                                 {
-          [1649756654.929804][3385:3390] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1649756654.929878][3385:3390] CHIP:DMG:                                 },
-          [1649756654.929946][3385:3390] CHIP:DMG:
-          [1649756654.930017][3385:3390] CHIP:DMG:                         },
-          [1649756654.930109][3385:3390] CHIP:DMG:
-          [1649756654.930176][3385:3390] CHIP:DMG:                 },
-          [1649756654.930256][3385:3390] CHIP:DMG:
-          [1649756654.930314][3385:3390] CHIP:DMG:         ],
-          [1649756654.930389][3385:3390] CHIP:DMG:
-          [1649756654.930448][3385:3390] CHIP:DMG:         InteractionModelRevision = 1
-          [1649756654.930555][3385:3390] CHIP:DMG: },
-          [1649756654.930703][3385:3390] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
-          [1649756654.930801][3385:3390] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
-
-    - label: "THn starts a commissioning process with DUT_CE"
-      verification: |
-          On nth controller using chip tool connect to the accessory
-
-
-          ./chip-tool pairing onnetwork 1 20202021
-
-          Verify you got below message
-          Device commissioning completed with success
-      disabled: true
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 901
+              - name: "PAKEVerifier"
+                value: PakeVerifier
+              - name: "discriminator"
+                value: discriminator
+              - name: "iterations"
+                value: 1000
+              - name: "salt"
+                value: "SPAKE2P Key Salt"
+      response:
+          error: INVALID_COMMAND
 
     - label:
-          "Repeat Step 3 and Step 4 an additional (SupportedFabrics - 2) times
-          to reach an index value of SupportedFabrics on DUT_CE"
-      PICS: CADMIN.S.C00.Rsp
-      verification: |
-          Repeat step 3 until  CommissionedFabrics=SupportedFabrics
-      disabled: true
-
-    - label:
-          "THn starts a commissioning process and opens a commissioning window
-          with DUT_CE"
-      PICS: CADMIN.S.C00.Rsp
-      verification: |
-          On nth controller using chip tool connect to the accessory
-
-
-          ./chip-tool pairing onnetwork 1 20202021
-
-          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1649756670.402192][10794:10799] CHIP:CTL: Device returned status 5 on receiving the NOC
-          [1649756670.402221][10794:10799] CHIP:CTL: Add NOC failed with error ../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1110: CHIP Error 0x0000000B: No memory
-          [1649756670.402241][10794:10799] CHIP:CTL: Failed to perform commissioning step 12
-      disabled: true
-
-    - label: "TH_CR1 removes FabricIndex1"
-      PICS: OPCREDS.S.C0a.Rsp
-      verification: |
-          on 1st controller using chip tool, remove fabric with FabricIndex=1
-
-          ./chip-tool operationalcredentials remove-fabric 1 1 0
-      disabled: true
+          "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      PICS: CADMIN.S.A0000
+      response:
+          value: 0

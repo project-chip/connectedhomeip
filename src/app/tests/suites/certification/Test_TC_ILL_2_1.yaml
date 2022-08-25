@@ -14,6 +14,9 @@
 
 name: 69.2.1. [TC-ILL-2.1] Attributes with server as DUT
 
+PICS:
+    - ILL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Illuminance Measurement"
@@ -28,23 +31,13 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads MeasuredValue attribute from DUT"
-      PICS: ILL.S.A0000
-      command: "readAttribute"
-      attribute: "MeasuredValue"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65534
-
     - label: "TH reads MinMeasuredValue attribute from DUT"
       PICS: ILL.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 1
               maxValue: 65533
 
@@ -54,8 +47,18 @@ tests:
       attribute: "MaxMeasuredValue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 2
+              maxValue: 65534
+
+    - label: "TH reads MeasuredValue attribute from DUT"
+      PICS: ILL.S.A0000
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
               maxValue: 65534
 
     - label: "TH reads Tolerance attribute from DUT"
@@ -64,7 +67,7 @@ tests:
       attribute: "Tolerance"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 2048
 

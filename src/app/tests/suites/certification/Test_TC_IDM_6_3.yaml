@@ -15,12 +15,20 @@
 
 name: 3.6.3. [TC-IDM-6.3] Events Read Interaction from DUT to TH. [{DUT_Client}]
 
+PICS:
+    - MCORE.IDM.C.ReadRequest
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label: "DUT sends Read Request Message to the TH for a supported event."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
@@ -29,8 +37,10 @@ tests:
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
           sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+           On TH(Reference app) verify  the Read Request Message received has these fields
+           EventRequests, EventFilters and FabricFiltered
 
-          On TH(Reference app) verify that Read Request Message received has these fields  EventRequests, EventFilters, and FabricFiltered.
+          If the DUT has to provision to verify the logs,   verify that Read Request Message received has these fields  EventRequests, EventFilters, and FabricFiltered.
 
 
 

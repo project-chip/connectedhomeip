@@ -15,57 +15,54 @@
 
 name: 3.2.2. [TC-DGWIFI-3.2]Command Generated [DUT as Client]
 
+PICS:
+    - DGWIFI.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label: "Commission TH to DUT"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "DUT sends ResetCounts command to TH"
       PICS: DGWIFI.S.C00.Rsp
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-          Verify Command data recieved from running the below command is a success
-
           ./chip-tool wifinetworkdiagnostics reset-counts 1 0
 
-          Verify in TH all-clusters-app log
+          verify the " reset-count command receives request response" on the TH (all-cluster-app) log:
 
-          CHIP:DMG: InvokeResponseMessage =
-          [1649664146.639743][8173:8178] CHIP:DMG: {
-          [1649664146.639789][8173:8178] CHIP:DMG:         suppressResponse = false,
-          [1649664146.639836][8173:8178] CHIP:DMG:         InvokeResponseIBs =
-          [1649664146.639895][8173:8178] CHIP:DMG:         [
-          [1649664146.639941][8173:8178] CHIP:DMG:                 InvokeResponseIB =
-          [1649664146.640006][8173:8178] CHIP:DMG:                 {
-          [1649664146.640059][8173:8178] CHIP:DMG:                         CommandStatusIB =
-          [1649664146.640119][8173:8178] CHIP:DMG:                         {
-          [1649664146.640175][8173:8178] CHIP:DMG:                                 CommandPathIB =
-          [1649664146.640238][8173:8178] CHIP:DMG:                                 {
-          [1649664146.640302][8173:8178] CHIP:DMG:                                         EndpointId = 0x0,
-          [1649664146.640373][8173:8178] CHIP:DMG:                                         ClusterId = 0x36,
-          [1649664146.640438][8173:8178] CHIP:DMG:                                         CommandId = 0x0,
-          [1649664146.640500][8173:8178] CHIP:DMG:                                 },
-          [1649664146.640574][8173:8178] CHIP:DMG:
-          [1649664146.640632][8173:8178] CHIP:DMG:                                 StatusIB =
-          [1649664146.640693][8173:8178] CHIP:DMG:                                 {
-          [1649664146.640762][8173:8178] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1649664146.640824][8173:8178] CHIP:DMG:                                 },
-          [1649664146.640886][8173:8178] CHIP:DMG:
-          [1649664146.640943][8173:8178] CHIP:DMG:                         },
-          [1649664146.641007][8173:8178] CHIP:DMG:
-          [1649664146.641058][8173:8178] CHIP:DMG:                 },
-          [1649664146.641126][8173:8178] CHIP:DMG:
-          [1649664146.641174][8173:8178] CHIP:DMG:         ],
-          [1649664146.641230][8173:8178] CHIP:DMG:
-          [1649664146.641275][8173:8178] CHIP:DMG:         InteractionModelRevision = 1
-          [1649664146.641318][8173:8178] CHIP:DMG: },
-          [1649664146.641424][8173:8178] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0036 Command=0x0000_0000 Status=0x0
-          [1649664146.641499][8173:8178] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1659960382.148753][4826:4826] CHIP:DMG: InvokeRequestMessage =
+          [1659960382.148777][4826:4826] CHIP:DMG: {
+          [1659960382.148798][4826:4826] CHIP:DMG:         suppressResponse = false,
+          [1659960382.148822][4826:4826] CHIP:DMG:         timedRequest = false,
+          [1659960382.148856][4826:4826] CHIP:DMG:         InvokeRequests =
+          [1659960382.148889][4826:4826] CHIP:DMG:         [
+          [1659960382.148921][4826:4826] CHIP:DMG:                 CommandDataIB =
+          [1659960382.148948][4826:4826] CHIP:DMG:                 {
+          [1659960382.148981][4826:4826] CHIP:DMG:                         CommandPathIB =
+          [1659960382.149013][4826:4826] CHIP:DMG:                         {
+          [1659960382.149051][4826:4826] CHIP:DMG:                                 EndpointId = 0x0,
+          [1659960382.149081][4826:4826] CHIP:DMG:                                 ClusterId = 0x36,
+          [1659960382.149119][4826:4826] CHIP:DMG:                                 CommandId = 0x0,
+          [1659960382.149149][4826:4826] CHIP:DMG:                         },
+          [1659960382.149178][4826:4826] CHIP:DMG:
+          [1659960382.149212][4826:4826] CHIP:DMG:                         CommandFields =
+          [1659960382.149239][4826:4826] CHIP:DMG:                         {
+          [1659960382.149276][4826:4826] CHIP:DMG:                         },
+          [1659960382.149302][4826:4826] CHIP:DMG:                 },
+          [1659960382.149337][4826:4826] CHIP:DMG:
+          [1659960382.149358][4826:4826] CHIP:DMG:         ],
+          [1659960382.149392][4826:4826] CHIP:DMG:
+          [1659960382.149413][4826:4826] CHIP:DMG:         InteractionModelRevision = 1
+          [1659960382.149433][4826:4826] CHIP:DMG: },
       disabled: true

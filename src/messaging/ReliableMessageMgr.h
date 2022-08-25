@@ -33,6 +33,7 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/SessionUpdateDelegate.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -101,7 +102,7 @@ public:
     /**
      *  Calculate the backoff timer for the retransmission.
      *
-     *  @param[in]   backoffBase    The base interval to use for the backoff calculation, either the active or idle interval.
+     *  @param[in]   baseInterval   The base interval to use for the backoff calculation, either the active or idle interval.
      *  @param[in]   sendCount      Count of how many times this message
      *                              has been retransmitted so far (0 if it has
      *                              been sent only once with no retransmits,
@@ -109,7 +110,7 @@ public:
      *
      *  @retval  The backoff time value, including jitter.
      */
-    static System::Clock::Timestamp GetBackoff(System::Clock::Timestamp backoffBase, uint8_t sendCount);
+    static System::Clock::Timestamp GetBackoff(System::Clock::Timestamp baseInterval, uint8_t sendCount);
 
     /**
      *  Start retranmisttion of cached encryped packet for current entry.
@@ -171,6 +172,16 @@ public:
      */
     void StopTimer();
 
+    /**
+     *  Registers a delegate to perform an address lookup and update all active sessions.
+     *
+     *  @param[in] sessionUpdateDelegate - Pointer to delegate to perform address lookup
+     *             that will update all active session. A null pointer is allowed if you
+     *             no longer have a valid delegate.
+     *
+     */
+    void RegisterSessionUpdateDelegate(SessionUpdateDelegate * sessionUpdateDelegate);
+
 #if CHIP_CONFIG_TEST
     // Functions for testing
     int TestGetCountRetransTable();
@@ -194,6 +205,8 @@ private:
 
     // ReliableMessageProtocol Global tables for timer context
     ObjectPool<RetransTableEntry, CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE> mRetransTable;
+
+    SessionUpdateDelegate * mSessionUpdateDelegate = nullptr;
 };
 
 } // namespace Messaging

@@ -186,9 +186,9 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
                                                    LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
 
-    if (LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.HasAny())
+    if (LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.HasValue())
     {
-        rendezvousFlags = LinuxDeviceOptions::GetInstance().payload.rendezvousInformation;
+        rendezvousFlags = LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.Value();
     }
 
     err = GetPayloadContents(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
@@ -315,11 +315,11 @@ void ChipLinuxAppMainLoop()
     initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
 #endif
 
+    // We need to set DeviceInfoProvider before Server::Init to setup the storage of DeviceInfoProvider properly.
+    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
-
-    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
-    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the

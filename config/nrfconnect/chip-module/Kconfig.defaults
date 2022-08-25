@@ -194,6 +194,10 @@ config NVS_LOOKUP_CACHE
     bool
     default y
 
+config NVS_LOOKUP_CACHE_SIZE
+    int
+    default 512
+
 # Increase the default RX stack size
 config IEEE802154_NRF5_RX_STACK_SIZE
     int
@@ -204,6 +208,10 @@ config IEEE802154_NRF5_RX_STACK_SIZE
 config NET_L2_OPENTHREAD
     bool
     default y
+
+choice OPENTHREAD_STACK_VERSION
+	default OPENTHREAD_THREAD_VERSION_1_3
+endchoice
 
 # Enable mbedTLS from nrf_security library
 
@@ -286,6 +294,10 @@ config MBEDTLS_SHA384_C
     default n
 
 config MBEDTLS_SHA512_C
+    bool
+    default n
+
+config PSA_WANT_ALG_SHA_512
     bool
     default n
 

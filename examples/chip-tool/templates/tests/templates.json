@@ -2,15 +2,19 @@
     "name": "CHIP Tool Tests templates",
     "version": "chip-v1",
     "helpers": [
-        "../../../../src/app/zap-templates/partials/helper.js",
-        "../../../../src/app/zap-templates/common/StringHelper.js",
-        "../../../../src/app/zap-templates/templates/app/helper.js",
-        "../../../../src/app/zap-templates/templates/chip/helper.js",
-        "../../../../src/app/zap-templates/common/ClusterTestGeneration.js",
-        "../helper.js",
-        "helper.js",
-        "tests.js"
+        "partials/helper.js",
+        "common/StringHelper.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "common/ClusterTestGeneration.js",
+        "chip-tool/templates/helper.js",
+        "chip-tool/templates/tests/helper.js"
     ],
+    "resources": {
+        "pics-metafile": "../../../../src/app/tests/suites/certification/PICS.yaml",
+        "certification-metadir": "../../../../src/app/tests/suites/certification",
+        "test-metadir": "../../../../src/app/tests/suites"
+    },
     "override": "../../../../src/app/zap-templates/common/override.js",
     "partials": [
         {
@@ -56,6 +60,10 @@
         {
             "name": "valueEquals",
             "path": "partials/value_equals.zapt"
+        },
+        {
+            "name": "octetStringValue",
+            "path": "partials/octet_string_value.zapt"
         }
     ],
     "templates": [

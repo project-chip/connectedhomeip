@@ -36,6 +36,7 @@
 
 #include <aos/kernel.h>
 #include <aos/yloop.h>
+#include <bl60x_fw_api.h>
 #include <bl_sec.h>
 #include <event_device.h>
 #include <hal_wifi.h>
@@ -60,123 +61,143 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
     return 0;
 }
 
-void event_cb_wifi_event(input_event_t * event, void * private_data)
+static void WifiStaDisconect(void)
+{
+    uint16_t reason = NetworkCommissioning::BLWiFiDriver::GetInstance().GetLastDisconnectReason();
+    uint8_t associationFailureCause =
+        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kUnknown);
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+
+    if (ConnectivityManagerImpl::mWiFiStationState == ConnectivityManager::kWiFiStationState_Disconnecting)
+    {
+        return;
+    }
+
+    switch (reason)
+    {
+    case WLAN_FW_TX_ASSOC_FRAME_ALLOCATE_FAIILURE:
+    case WLAN_FW_ASSOCIATE_FAIILURE:
+    case WLAN_FW_4WAY_HANDSHAKE_ERROR_PSK_TIMEOUT_FAILURE:
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAssociationFailed);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
+    case WLAN_FW_TX_AUTH_FRAME_ALLOCATE_FAIILURE:
+    case WLAN_FW_AUTHENTICATION_FAIILURE:
+    case WLAN_FW_AUTH_ALGO_FAIILURE:
+    case WLAN_FW_DEAUTH_BY_AP_WHEN_NOT_CONNECTION:
+    case WLAN_FW_DEAUTH_BY_AP_WHEN_CONNECTION:
+    case WLAN_FW_4WAY_HANDSHAKE_TX_DEAUTH_FRAME_TRANSMIT_FAILURE:
+    case WLAN_FW_4WAY_HANDSHAKE_TX_DEAUTH_FRAME_ALLOCATE_FAIILURE:
+    case WLAN_FW_AUTH_OR_ASSOC_RESPONSE_TIMEOUT_FAILURE:
+    case WLAN_FW_DISCONNECT_BY_USER_WITH_DEAUTH:
+    case WLAN_FW_DISCONNECT_BY_USER_NO_DEAUTH:
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAuthenticationFailed);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
+    case WLAN_FW_SCAN_NO_BSSID_AND_CHANNEL:
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kSsidNotFound);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
+    case WLAN_FW_BEACON_LOSS:
+    case WLAN_FW_JOIN_NETWORK_SECURITY_NOMATCH:
+    case WLAN_FW_JOIN_NETWORK_WEPLEN_ERROR:
+    case WLAN_FW_DISCONNECT_BY_FW_PS_TX_NULLFRAME_FAILURE:
+    case WLAN_FW_CREATE_CHANNEL_CTX_FAILURE_WHEN_JOIN_NETWORK:
+    case WLAN_FW_ADD_STA_FAILURE:
+    case WLAN_FW_JOIN_NETWORK_FAILURE:
+        break;
+
+    default:
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
+    }
+
+    if (delegate)
+    {
+        delegate->OnDisconnectionDetected(reason);
+        delegate->OnConnectionStatusChanged(
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kNotConnected));
+    }
+
+    NetworkCommissioning::BLWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
+    ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManagerImpl::kWiFiStationState_Disconnecting);
+}
+
+static void WifiStaConnected(void)
+{
+    char ap_ssid[64];
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+
+    if (ConnectivityManagerImpl::mWiFiStationState == ConnectivityManager::kWiFiStationState_Connected)
+    {
+        return;
+    }
+
+    memset(ap_ssid, 0, sizeof(ap_ssid));
+    wifi_mgmr_sta_ssid_get(ap_ssid);
+    wifi_mgmr_ap_item_t * ap_info = mgmr_get_ap_info_handle();
+    wifi_mgmr_get_scan_result_filter(ap_info, ap_ssid);
+
+    ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManagerImpl::kWiFiStationState_Connected);
+    ConnectivityMgrImpl().WifiStationStateChange();
+    ConnectivityMgrImpl().OnStationConnected();
+    if (delegate)
+    {
+        delegate->OnConnectionStatusChanged(
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kConnected));
+    }
+}
+
+void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
 {
     static char * ssid;
     static char * password;
+    int ret;
 
     switch (event->code)
     {
     case CODE_WIFI_ON_INIT_DONE: {
         wifi_mgmr_start_background(&conf);
-        log_info("CODE_WIFI_ON_INIT_DONE DONE.\r\n");
     }
     break;
     case CODE_WIFI_ON_MGMR_DONE: {
-        log_info("[APP] [EVT] MGMR DONE %lld\r\n", aos_now_ms());
     }
     break;
     case CODE_WIFI_ON_SCAN_DONE: {
-        log_info("[APP] [EVT] SCAN Done %lld, SCAN Result: %s\r\n", aos_now_ms(),
-                 WIFI_SCAN_DONE_EVENT_OK == event->value ? "OK" : "Busy now");
-
-        // wifi_mgmr_cli_scanlist();
         NetworkCommissioning::BLWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
     }
     break;
     case CODE_WIFI_ON_DISCONNECT: {
-        printf("[APP] [EVT] disconnect %lld, Reason: %s\r\n", aos_now_ms(), wifi_mgmr_status_code_str(event->value));
-    }
-    break;
-    case CODE_WIFI_ON_CONNECTING: {
-        log_info("[APP] [EVT] Connecting %lld\r\n", aos_now_ms());
-        ConnectivityManagerImpl::mWiFiStationState = ConnectivityManager::kWiFiStationState_Connecting;
+        log_info("[APP] [EVT] disconnect %lld, Reason: %s\r\n", aos_now_ms(), wifi_mgmr_status_code_str(event->value));
+        WifiStaDisconect();
     }
     break;
     case CODE_WIFI_CMD_RECONNECT: {
         log_info("[APP] [EVT] Reconnect %lld\r\n", aos_now_ms());
     }
     break;
-    case CODE_WIFI_ON_CONNECTED: {
-        log_info("[APP] [EVT] connected %lld\r\n", aos_now_ms());
-        ConnectivityManagerImpl::mWiFiStationState = ConnectivityManager::kWiFiStationState_Connecting_Succeeded;
-    }
-    break;
-    case CODE_WIFI_ON_PRE_GOT_IP: {
-        log_info("[APP] [EVT] connected %lld\r\n", aos_now_ms());
-    }
-    break;
     case CODE_WIFI_ON_GOT_IP: {
         log_info("[APP] [EVT] GOT IP %lld\r\n", aos_now_ms());
         log_info("[SYS] Memory left is %d Bytes\r\n", xPortGetFreeHeapSize());
 
-        ConnectivityManagerImpl::mWiFiStationState = ConnectivityManager::kWiFiStationState_Connected;
-        ConnectivityMgrImpl().WifiStationStateChange();
-        ConnectivityMgrImpl().OnStationConnected();
+        WifiStaConnected();
     }
     break;
-    case CODE_WIFI_ON_PROV_SSID: {
-        log_info("[APP] [EVT] [PROV] [SSID] %lld: %s\r\n", aos_now_ms(), event->value ? (const char *) event->value : "UNKNOWN");
-        if (ssid)
-        {
-            vPortFree(ssid);
-            ssid = NULL;
-        }
-        ssid = (char *) event->value;
-    }
-    break;
-    case CODE_WIFI_ON_PROV_BSSID: {
-        log_info("[APP] [EVT] [PROV] [BSSID] %lld: %s\r\n", aos_now_ms(), event->value ? (const char *) event->value : "UNKNOWN");
-        if (event->value)
-        {
-            vPortFree((void *) event->value);
-        }
-    }
-    break;
-    case CODE_WIFI_ON_PROV_PASSWD: {
-        log_info("[APP] [EVT] [PROV] [PASSWD] %lld: %s\r\n", aos_now_ms(), event->value ? (const char *) event->value : "UNKNOWN");
-        if (password)
-        {
-            vPortFree(password);
-            password = NULL;
-        }
-        password = (char *) event->value;
-    }
-    break;
-    case CODE_WIFI_ON_PROV_CONNECT: {
-        log_info("[APP] [EVT] [PROV] [CONNECT] %lld\r\n", aos_now_ms());
-#if defined(CONFIG_BT_MESH_SYNC)
-        if (event->value)
-        {
-            struct _wifi_conn * conn_info = (struct _wifi_conn *) event->value;
-            break;
-        }
-#endif
-        log_info("connecting to %s:%s...\r\n", ssid, password);
-    }
-    break;
-    case CODE_WIFI_ON_PROV_DISCONNECT: {
-        log_info("[APP] [EVT] [PROV] [DISCONNECT] %lld\r\n", aos_now_ms());
-#if defined(CONFIG_BT_MESH_SYNC)
-        // wifi_mgmr_sta_disconnect();
-        vTaskDelay(1000);
-// wifi_mgmr_sta_disable(NULL);
-#endif
-        ConnectivityManagerImpl::mWiFiStationState = ConnectivityManager::kWiFiStationState_NotConnected;
-    }
-    break;
-#if defined(CONFIG_BT_MESH_SYNC)
-    case CODE_WIFI_ON_PROV_SCAN_START: {
-        log_info("[APP] [EVT] [PROV] [SCAN] %lld\r\n", aos_now_ms());
-        // wifiprov_scan((void *)event->value);
-    }
-    break;
-    case CODE_WIFI_ON_PROV_STATE_GET: {
-        log_info("[APP] [EVT] [PROV] [STATE] %lld\r\n", aos_now_ms());
-        // wifiprov_wifi_state_get((void *)event->value);
-    }
-    break;
-#endif /*CONFIG_BT_MESH_SYNC*/
     default: {
         log_info("[APP] [EVT] Unknown code %u, %lld\r\n", event->code, aos_now_ms());
         /*nothing*/
@@ -187,18 +208,15 @@ void event_cb_wifi_event(input_event_t * event, void * private_data)
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
+    static uint8_t stack_wifi_init = 0;
 
     // Initialize the configuration system.
     err = Internal::BL602Config::Init();
-    log_error("err: %d\r\n", err);
     SuccessOrExit(err);
 
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
-    aos_register_event_filter(EV_WIFI, event_cb_wifi_event, NULL);
-
-    /*wifi fw stack and thread stuff*/
-    static uint8_t stack_wifi_init = 0;
+    aos_register_event_filter(EV_WIFI, OnWiFiPlatformEvent, NULL);
 
     if (1 == stack_wifi_init)
     {
@@ -220,6 +238,31 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 exit:
     return err;
+}
+
+void PlatformManagerImpl::_Shutdown()
+{
+    uint64_t upTime = 0;
+
+    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalOperationalHours = 0;
+
+        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        {
+            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
+        }
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
+    }
+
+    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 
 } // namespace DeviceLayer

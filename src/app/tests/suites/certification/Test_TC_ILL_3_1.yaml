@@ -15,60 +15,148 @@
 
 name: 71.3.1. [TC-ILL-3.1] Attributes with Client as DUT
 
+PICS:
+    - ILL.C
+    - ILL.C.AM-READ
+    - ILL.C.AO-READ
+    - ILL.C.AM-WRITE
+    - ILL.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          verify on Reference app receives the right response for the data sent in the above commands
-
-          Verify in TH all-clusters-app log
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           sudo ./chip-tool illuminancemeasurement read min-measured-value 1 1
-          [1657175568.648126][4333:4338] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0001 DataVersion: 891386989
-          [1657175568.648195][4333:4338] CHIP:TOO:   MinMeasuredValue: 1
-          [1657175568.648282][4333:4338] CHIP:EM: Sending Standalone Ack for MessageCounter:69575282 on exchange 26638i
+          Verify DUT receives  min-measured-value attribute response on the TH(all-clusters-app) Log:
+
+          [1658142106.966504][13946:13946] CHIP:IM: Received Read request
+          [1658142106.966671][13946:13946] CHIP:DMG: ReadRequestMessage =
+          [1658142106.966738][13946:13946] CHIP:DMG: {
+          [1658142106.966821][13946:13946] CHIP:DMG:         AttributePathIBs =
+          [1658142106.966887][13946:13946] CHIP:DMG:         [
+          [1658142106.966947][13946:13946] CHIP:DMG:                 AttributePathIB =
+          [1658142106.967035][13946:13946] CHIP:DMG:                 {
+          [1658142106.967105][13946:13946] CHIP:DMG:                         Endpoint = 0x1,
+          [1658142106.967209][13946:13946] CHIP:DMG:                         Cluster = 0x400,
+          [1658142106.967254][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1658142106.967281][13946:13946] CHIP:DMG:                 }
+          [1658142106.967320][13946:13946] CHIP:DMG:
+          [1658142106.967346][13946:13946] CHIP:DMG:         ],
+          [1658142106.967384][13946:13946] CHIP:DMG:
+          [1658142106.967413][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142106.967447][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658142106.967471][13946:13946] CHIP:DMG: },
+          [1658142106.967568][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658142106.967676][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
           sudo ./chip-tool illuminancemeasurement read max-measured-value 1 1
-          [1657175591.550983][4340:4345] CHIP:DMG: }
-          [1657175591.551117][4340:4345] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0002 DataVersion: 891386989
-          [1657175591.551181][4340:4345] CHIP:TOO:   MaxMeasuredValue: 65534
-          [1657175591.551268][4340:4345] CHIP:EM: Sending Standalone Ack for MessageCounter:169065797 on exchange 26197i
+          Verify DUT receives  max-measured-value attribute response on the TH(all-clusters-app) Log:
+          [1658142397.298817][13946:13946] CHIP:IM: Received Read request
+          [1658142397.298895][13946:13946] CHIP:DMG: ReadRequestMessage =
+          [1658142397.298932][13946:13946] CHIP:DMG: {
+          [1658142397.298960][13946:13946] CHIP:DMG:         AttributePathIBs =
+          [1658142397.298986][13946:13946] CHIP:DMG:         [
+          [1658142397.299020][13946:13946] CHIP:DMG:                 AttributePathIB =
+          [1658142397.299047][13946:13946] CHIP:DMG:                 {
+          [1658142397.299085][13946:13946] CHIP:DMG:                         Endpoint = 0x1,
+          [1658142397.299125][13946:13946] CHIP:DMG:                         Cluster = 0x400,
+          [1658142397.299158][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1658142397.299195][13946:13946] CHIP:DMG:                 }
+          [1658142397.299223][13946:13946] CHIP:DMG:
+          [1658142397.299258][13946:13946] CHIP:DMG:         ],
+          [1658142397.299286][13946:13946] CHIP:DMG:
+          [1658142397.299321][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142397.299346][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658142397.299378][13946:13946] CHIP:DMG: },
+          [1658142397.299462][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658142397.299556][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+
 
           sudo ./chip-tool illuminancemeasurement read measured-value 1 1
-          [1657175536.880440][4326:4331] CHIP:DMG: }
-          [1657175536.880678][4326:4331] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0000 DataVersion: 891386989
-          [1657175536.883792][4326:4331] CHIP:TOO:   MeasuredValue: 0
-          [1657175536.883934][4326:4331] CHIP:EM: Sending Standalone Ack for MessageCounter:262171904 on exchange 9006i
+          Verify DUT receives  measured-value attribute response on the TH(all-clusters-app) Log:
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          [1658142471.266188][13946:13946] CHIP:IM: Received Read request
+          [1658142471.266273][13946:13946] CHIP:DMG: ReadRequestMessage =
+          [1658142471.266303][13946:13946] CHIP:DMG: {
+          [1658142471.266329][13946:13946] CHIP:DMG:         AttributePathIBs =
+          [1658142471.266358][13946:13946] CHIP:DMG:         [
+          [1658142471.266386][13946:13946] CHIP:DMG:                 AttributePathIB =
+          [1658142471.266417][13946:13946] CHIP:DMG:                 {
+          [1658142471.266449][13946:13946] CHIP:DMG:                         Endpoint = 0x1,
+          [1658142471.266486][13946:13946] CHIP:DMG:                         Cluster = 0x400,
+          [1658142471.266521][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1658142471.266558][13946:13946] CHIP:DMG:                 }
+          [1658142471.266593][13946:13946] CHIP:DMG:
+          [1658142471.266624][13946:13946] CHIP:DMG:         ],
+          [1658142471.266656][13946:13946] CHIP:DMG:
+          [1658142471.266686][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142471.266714][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658142471.266740][13946:13946] CHIP:DMG: },
+          [1658142471.266826][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658142471.266939][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
       disabled: true
 
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          verify on Reference app receives the right response for the data sent in the above commands
-
-          Verify in TH all-clusters-app log
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool illuminancemeasurement read tolerance 1 1
-          [1657175695.088331][4349:4354] CHIP:DMG: }
-          [1657175695.088479][4349:4354] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0003 DataVersion: 891386989
-          [1657175695.088540][4349:4354] CHIP:TOO:   Tolerance: 0
-          [1657175695.088624][4349:4354] CHIP:EM: Sending Standalone Ack for MessageCounter:263371247 on exchange 59872i
+          Verify DUT receives tolerance attribute response on the TH(all-clusters-app) Log:
+          [1658142553.001113][13946:13946] CHIP:IM: Received Read request
+          [1658142553.001197][13946:13946] CHIP:DMG: ReadRequestMessage =
+          [1658142553.001258][13946:13946] CHIP:DMG: {
+          [1658142553.001284][13946:13946] CHIP:DMG:         AttributePathIBs =
+          [1658142553.001314][13946:13946] CHIP:DMG:         [
+          [1658142553.001342][13946:13946] CHIP:DMG:                 AttributePathIB =
+          [1658142553.001373][13946:13946] CHIP:DMG:                 {
+          [1658142553.001424][13946:13946] CHIP:DMG:                         Endpoint = 0x1,
+          [1658142553.001465][13946:13946] CHIP:DMG:                         Cluster = 0x400,
+          [1658142553.001501][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1658142553.001536][13946:13946] CHIP:DMG:                 }
+          [1658142553.001568][13946:13946] CHIP:DMG:
+          [1658142553.001598][13946:13946] CHIP:DMG:         ],
+          [1658142553.001630][13946:13946] CHIP:DMG:
+          [1658142553.001660][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142553.001690][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658142553.001717][13946:13946] CHIP:DMG: },
+          [1658142553.001801][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
 
 
           ./chip-tool illuminancemeasurement read light-sensor-type 1 1
-          [1657175720.644987][4357:4362] CHIP:DMG: }
-          [1657175720.645166][4357:4362] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0004 DataVersion: 891386989
-          [1657175720.645232][4357:4362] CHIP:TOO:   LightSensorType: null
-          [1657175720.645342][4357:4362] CHIP:EM: Sending Standalone Ack for MessageCounter:146392428 on exchange 31713i
-
-           as per Spec, when we read LightSensorType attribute we can get null value as default
+          Verify DUT receives  light-sensor-type attribute response on the TH(all-clusters-app) Log:
+          [1658142581.619138][13946:13946] CHIP:IM: Received Read request
+          [1658142581.619214][13946:13946] CHIP:DMG: ReadRequestMessage =
+          [1658142581.619265][13946:13946] CHIP:DMG: {
+          [1658142581.619288][13946:13946] CHIP:DMG:         AttributePathIBs =
+          [1658142581.619314][13946:13946] CHIP:DMG:         [
+          [1658142581.619338][13946:13946] CHIP:DMG:                 AttributePathIB =
+          [1658142581.619365][13946:13946] CHIP:DMG:                 {
+          [1658142581.619393][13946:13946] CHIP:DMG:                         Endpoint = 0x1,
+          [1658142581.619425][13946:13946] CHIP:DMG:                         Cluster = 0x400,
+          [1658142581.619456][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0004,
+          [1658142581.619485][13946:13946] CHIP:DMG:                 }
+          [1658142581.619512][13946:13946] CHIP:DMG:
+          [1658142581.619537][13946:13946] CHIP:DMG:         ],
+          [1658142581.619565][13946:13946] CHIP:DMG:
+          [1658142581.619591][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142581.619616][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658142581.619639][13946:13946] CHIP:DMG: },
+          [1658142581.619714][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label:
@@ -91,49 +179,92 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          verify on Reference app receives the right response for the data sent in the above commands
-
-          Verify in TH all-clusters-app log
-
-          ./chip-tool illuminancemeasurement read attribute-list  1 1
-          [1654244881165] [91524:4000266] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_FFFB DataVersion: 3952837688
-          [1654244881165] [91524:4000266] CHIP: [TOO]   AttributeList: 8 entries
-          [1654244881165] [91524:4000266] CHIP: [TOO]     [1]: 0
-          [1654244881165] [91524:4000266] CHIP: [TOO]     [2]: 1
-          [1654244881165] [91524:4000266] CHIP: [TOO]     [3]: 2
-          [1654244881165] [91524:4000266] CHIP: [TOO]     [4]: 65528
-          [1654244881165] [91524:4000266] CHIP: [TOO]     [5]: 65529
-          [1654244881165] [91524:4000266] CHIP: [TOO]     [6]: 65531
-          [1654244881165] [91524:4000266] CHIP: [TOO]     [7]: 65532
-          [1654244881165] [91524:4000266] CHIP: [TOO]     [8]: 65533
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           sudo ./chip-tool illuminancemeasurement read min-measured-value 1 1
-          [1657175568.648126][4333:4338] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0001 DataVersion: 891386989
-          [1657175568.648195][4333:4338] CHIP:TOO:   MinMeasuredValue: 1
-          [1657175568.648282][4333:4338] CHIP:EM: Sending Standalone Ack for MessageCounter:69575282 on exchange 26638i
+          Verify DUT receives  min-measured-value attribute response on the TH(all-clusters-minimal-app) Log:
+
+          [1658142106.966504][13946:13946] CHIP:IM: Received Read request
+          [1658142106.966671][13946:13946] CHIP:DMG: ReadRequestMessage =
+          [1658142106.966738][13946:13946] CHIP:DMG: {
+          [1658142106.966821][13946:13946] CHIP:DMG:         AttributePathIBs =
+          [1658142106.966887][13946:13946] CHIP:DMG:         [
+          [1658142106.966947][13946:13946] CHIP:DMG:                 AttributePathIB =
+          [1658142106.967035][13946:13946] CHIP:DMG:                 {
+          [1658142106.967105][13946:13946] CHIP:DMG:                         Endpoint = 0x1,
+          [1658142106.967209][13946:13946] CHIP:DMG:                         Cluster = 0x400,
+          [1658142106.967254][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1658142106.967281][13946:13946] CHIP:DMG:                 }
+          [1658142106.967320][13946:13946] CHIP:DMG:
+          [1658142106.967346][13946:13946] CHIP:DMG:         ],
+          [1658142106.967384][13946:13946] CHIP:DMG:
+          [1658142106.967413][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142106.967447][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658142106.967471][13946:13946] CHIP:DMG: },
+          [1658142106.967568][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658142106.967676][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+
+
 
           sudo ./chip-tool illuminancemeasurement read max-measured-value 1 1
-          [1657175591.550983][4340:4345] CHIP:DMG: }
-          [1657175591.551117][4340:4345] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0002 DataVersion: 891386989
-          [1657175591.551181][4340:4345] CHIP:TOO:   MaxMeasuredValue: 65534
-          [1657175591.551268][4340:4345] CHIP:EM: Sending Standalone Ack for MessageCounter:169065797 on exchange 26197i
+          Verify DUT receives  max-measured-value attribute response on the TH(all-clusters-minimal-app) Log:
+          [1658142397.298817][13946:13946] CHIP:IM: Received Read request
+          [1658142397.298895][13946:13946] CHIP:DMG: ReadRequestMessage =
+          [1658142397.298932][13946:13946] CHIP:DMG: {
+          [1658142397.298960][13946:13946] CHIP:DMG:         AttributePathIBs =
+          [1658142397.298986][13946:13946] CHIP:DMG:         [
+          [1658142397.299020][13946:13946] CHIP:DMG:                 AttributePathIB =
+          [1658142397.299047][13946:13946] CHIP:DMG:                 {
+          [1658142397.299085][13946:13946] CHIP:DMG:                         Endpoint = 0x1,
+          [1658142397.299125][13946:13946] CHIP:DMG:                         Cluster = 0x400,
+          [1658142397.299158][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1658142397.299195][13946:13946] CHIP:DMG:                 }
+          [1658142397.299223][13946:13946] CHIP:DMG:
+          [1658142397.299258][13946:13946] CHIP:DMG:         ],
+          [1658142397.299286][13946:13946] CHIP:DMG:
+          [1658142397.299321][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142397.299346][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658142397.299378][13946:13946] CHIP:DMG: },
+          [1658142397.299462][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658142397.299556][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+
 
           sudo ./chip-tool illuminancemeasurement read measured-value 1 1
-          [1657175536.880440][4326:4331] CHIP:DMG: }
-          [1657175536.880678][4326:4331] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0000 DataVersion: 891386989
-          [1657175536.883792][4326:4331] CHIP:TOO:   MeasuredValue: 0
-          [1657175536.883934][4326:4331] CHIP:EM: Sending Standalone Ack for MessageCounter:262171904 on exchange 9006i"
+          Verify DUT receives  measured-value attribute response on the TH(all-clusters-minimal-app) Log:
+          [1658142471.266188][13946:13946] CHIP:IM: Received Read request
+          [1658142471.266273][13946:13946] CHIP:DMG: ReadRequestMessage =
+          [1658142471.266303][13946:13946] CHIP:DMG: {
+          [1658142471.266329][13946:13946] CHIP:DMG:         AttributePathIBs =
+          [1658142471.266358][13946:13946] CHIP:DMG:         [
+          [1658142471.266386][13946:13946] CHIP:DMG:                 AttributePathIB =
+          [1658142471.266417][13946:13946] CHIP:DMG:                 {
+          [1658142471.266449][13946:13946] CHIP:DMG:                         Endpoint = 0x1,
+          [1658142471.266486][13946:13946] CHIP:DMG:                         Cluster = 0x400,
+          [1658142471.266521][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1658142471.266558][13946:13946] CHIP:DMG:                 }
+          [1658142471.266593][13946:13946] CHIP:DMG:
+          [1658142471.266624][13946:13946] CHIP:DMG:         ],
+          [1658142471.266656][13946:13946] CHIP:DMG:
+          [1658142471.266686][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658142471.266714][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658142471.266740][13946:13946] CHIP:DMG: },
+          [1658142471.266826][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658142471.266939][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
       disabled: true
 
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Verify in TH all-clusters-app log
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
            ./chip-tool illuminancemeasurement read  tolerance  1 1
+
+          on TH all-clusters-minimal-app verify status response a  UNSUPPORTED_ATTRIBUTE
            General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
           ./chip-tool illuminancemeasurement read light-sensor-type 1 1
+          on TH all-clusters-minimal-app verify status response a  UNSUPPORTED_ATTRIBUTE
            General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 

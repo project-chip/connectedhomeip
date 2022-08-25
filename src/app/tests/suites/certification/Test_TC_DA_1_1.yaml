@@ -17,6 +17,9 @@ name:
     4.1.1. [TC-DA-1.1] The NOC SHALL be wiped on Factory Reset [DUT -
     Commissionee]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -27,19 +30,22 @@ tests:
       verification: |
           sudo ./chip-all-clusters-app --wifi
 
-          Verify in TH log:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
+
+          Verify in TH log:
 
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
 
     - label:
-          "TH1 does a non-fabric-filtered read of Fabrics attribute list from
-          DUT TH1 saves the NOCs list for future usage."
+          "TH1 does a non-fabric filtered read of the NOCs attribute from the
+          Node Operational Credentials cluster and saves the returned list as
+          noc_th1"
       verification: |
           ./chip-tool operationalcredentials read fabrics 1 0
 
-          Verify in TH log:
+          Verify that there is a single entry in the list TH (chip-tool) Log
+
           [1655471672.386120][13377:13382] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2667297992
           [1655471672.386213][13377:13382] CHIP:TOO:   Fabrics: 1 entries
           [1655471672.386291][13377:13382] CHIP:TOO:     [1]: {
@@ -50,6 +56,23 @@ tests:
           [1655471672.386675][13377:13382] CHIP:TOO:       Label:
           [1655471672.386716][13377:13382] CHIP:TOO:       FabricIndex: 1
           [1655471672.386750][13377:13382] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "TH1 does a non-fabric-filtered read of the Fabrics attribute from the
+          Node Operational Credentials cluster"
+      verification: |
+          ./chip-tool operationalcredentials read nocs 1 0
+
+          Verify there is single entry and Fabric ID matches FabricID of TH1 on TH(chip-tool) log:
+
+          [1658392350.745452][3254:3259] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 1660110003
+          [1658392350.748972][3254:3259] CHIP:TOO:   NOCs: 1 entries
+          [1658392350.749041][3254:3259] CHIP:TOO:     [1]: {
+          [1658392350.749086][3254:3259] CHIP:TOO:       Noc: 1530010101240201370324130118260480228127260580254D3A37062415012411011824070124080130094104C983D16057AA6B80F551CE7686F96EA2D2C0787A2C22B1D746B13A85C67A2BEAAF9485C72F12F770D59FC0E1FF59D21EF988209249C07B229F84CFD4F51E9611370A3501280118240201360304020401183004142BC90AF48A63F83F7E8F2BAFB6703795028429BB3005149B9F5879F33019C19B6796BD02FD13D044E2AA2818300B4061D02714DC750BE3524C8DE04AFC971CC1B25AE98C366809D1257052B91DA6B252A3CF035DD55980B4E3C865FD933B2F19151379122A50599E8A869A0EC29AD318
+          [1658392350.749133][3254:3259] CHIP:TOO:       Icac: 1530010100240201370324140018260480228127260580254D3A37062413011824070124080130094104AD24B19A35BD1B1808EFF5F46C6D3AC98B57FF0F55BC5AF7BB6B09905A1B66AD1DFBC2511EBF4DC40033A4676EF056A498F599DA98507A14F82490D6EE0B22C5370A35012901182402603004149B9F5879F33019C19B6796BD02FD13D044E2AA283005141590E75A2828F170F5670E51629ACFF8E4D37B9218300B40FACB9C9CD92EB1C595C21C17371E15D1E2F7F58CF3E9A17636CDEDAF1EF18D6F88CB0C3D45682FDEBEA58F5926DCC72872DB545B77F4961292B849D05AA659AF18
+          [1658392350.749168][3254:3259] CHIP:TOO:       FabricIndex: 1
+          [1658392350.749194][3254:3259] CHIP:TOO:      }
       disabled: true
 
     - label:
@@ -69,7 +92,8 @@ tests:
       verification: |
           To commission DUT to TH2 follow below procedure
           1../chip-tool  pairing open-commissioning-window 1 1 400 2000 3840  on TH
-          Verify in TH Log:
+
+          Verify manual parin code on TH1 (chip-tool) Log:
           CHIP:IN: Sending encrypted msg 0xaaaad3464d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 5805157 msec
           [1635691999.946536][3822:3827] CHIP:DMG: ICR moving to [CommandSen]
           [1635691999.946586][3822:3827] CHIP:CTL: Manual pairing code: [35407541839]
@@ -80,9 +104,9 @@ tests:
           [1635691999.946983][3822:3827] CHIP:EM: Flushed pending ack for MessageCounter:3234931243 on exchange 35324i
 
 
-          2. manualcode will be provided by TH when we pass above command pass manualcode in TH2 to commission by using "./chip-tool pairing code 2 36199720672" considering 36199720672 as manualcode generated in TH
+          2. Verify TH2 is commissioned  by using "./chip-tool pairing code 2 36199720672" considering 36199720672 as manualcode generated in TH1
 
-          Verify whether you got below message in the log of TH
+          Verify whether you got below message on TH2 (chip-tool) log
           Device commissioning completed with success
       disabled: true
 
@@ -92,7 +116,8 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read fabrics 2 0
 
-          Verify in TH Log:
+          Verify there is single entry and FabricID matches the FabricID of TH2 on TH2 (chip-tool) log
+
           [1655471672.386120][13377:13382] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2667297992
           [1655471672.386213][13377:13382] CHIP:TOO:   Fabrics: 1 entries
           [1655471672.386291][13377:13382] CHIP:TOO:     [1]: {
@@ -110,7 +135,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read nocs 2 0
 
-          Verify in TH Log:
+          Verify there is single entry on TH2 (chip-tool) log
 
           [1655471146.098327][13302:13307] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2667297991
           [1655471146.098416][13302:13307] CHIP:TOO:   NOCs: 1 entries
@@ -119,4 +144,8 @@ tests:
           [1655471146.098591][13302:13307] CHIP:TOO:       Icac: 1530010100240201370324140018260480228127260580254D3A37062413011824070124080130094104B267483D9981A2C15E7DE8C63298FEB6DC19EAA9AEA41D9D659CD3BBBD25B943B3186716C82B297091D64B1620E8FB2C6FD095F509684E074C5B479E583CE295370A3501290118240260300414B5AED0B2C2CDBB9D4D0124755B56278B081FD4AD3005146EDE812590A5E6E4463798EB06AC3BD5284DFAAE18300B404A48E0B45704A98739C0C656B0F1A4252AEED8E1EBA5FD1032C79A4B26BF8A314EFDD7C835947DEB4B3E9F6D0BF2A561CEE54B45F311773301D4B5CFFF2F76D918
           [1655471146.098630][13302:13307] CHIP:TOO:       FabricIndex: 2
           [1655471146.098660][13302:13307] CHIP:TOO:      }
+
+          "
+
+          Verify the NOC entry of TH1 and NOC entry of TH2 are different in TH
       disabled: true

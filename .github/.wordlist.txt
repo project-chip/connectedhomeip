@@ -22,6 +22,7 @@ acdbc
 ACKed
 ACL
 ACLs
+actdiag
 AdapterAddress
 AdapterName
 adb
@@ -42,11 +43,16 @@ AdvSendAdvert
 AE
 aef
 AES
+AlarmCode
 algs
 alloc
 Ameba
 amebad
+AmebaD
 amebaiot
+AmebaZ
+amebaz2
+AmebaZ2
 announcementReason
 AnnounceOTAProvider
 AnnounceOtaProviderRequest
@@ -77,6 +83,9 @@ argc
 args
 argv
 armeabi
+armino
+Armino
+ARMINO
 ARMmbed
 armv
 ASAN
@@ -125,8 +134,10 @@ BDX
 BDXDownloader
 BeagleBone
 befc
+BEKEN
 betaprogram
 BinaryInputBasic
+Binfmt
 bitbake
 bld
 BLE
@@ -137,6 +148,7 @@ BLEManagerImpl
 BlePlatformDelegate
 Blinls
 bloaty
+blockdiag
 blocklist
 blockquote
 bluetoothd
@@ -149,7 +161,6 @@ bouffalolab
 BRD
 breakpoint
 bredr
-BridgedActions
 BridgedDeviceBasic
 bridgedLightEndpoint
 bringup
@@ -161,7 +172,9 @@ btmgmt
 BTN
 BTP
 btvirt
+BuildKit
 buildwithmatter
+buildX
 burndown
 ButtonIsr
 BytesMain
@@ -179,6 +192,7 @@ CatalogVendorId
 CBB
 cbd
 CBOR
+Ccache
 ccf
 CCMP
 CCS
@@ -222,6 +236,7 @@ ChlorineConcentrationMeasurement
 ChlorodibromomethaneConcentrationMeasurement
 ChloroformConcentrationMeasurement
 chmod
+chown
 chrpath
 CIPD
 CircleCI
@@ -373,6 +388,7 @@ DeviceCommissioner
 DeviceCommon
 DeviceController
 DeviceId
+DeviceInstanceInfoProvider
 DeviceLayer
 DeviceNetworkProvisioningDelegate
 DeviceNetworkProvisioningDelegateImpl
@@ -420,6 +436,7 @@ Dockerfile
 Dockerfiles
 Don'ts
 DoorLock
+DoorState
 doru
 DOTBR
 DOVERLAY
@@ -486,6 +503,7 @@ EthyleneOxideConcentrationMeasurement
 EvalCode
 EvalCodeWithName
 EvalFrameDefault
+EVB
 evk
 exceptfds
 ExchangeContext
@@ -859,6 +877,7 @@ multilib
 Multiprotocol
 multithreaded
 mutexes
+mv
 MX
 mydir
 MyPASSWORD
@@ -905,6 +924,7 @@ nullptr
 NUM
 NVM
 NVS
+nwdiag
 nwk
 NXP
 objcopy
@@ -1121,6 +1141,7 @@ rsn
 RSSI
 RST
 rsync
+rtd
 RTL
 rtld
 RTOS
@@ -1154,6 +1175,7 @@ semver
 SendButton
 SendNewInputEvent
 sendto
+seqdiag
 SERIALDEVICE
 SerialNumber
 ServiceId
@@ -1168,6 +1190,7 @@ SetRequestorInstance
 SetUpPINCode
 SetupQRCode
 sexualized
+sfv
 SHA
 ShadeConfiguration
 showDocumentation
@@ -1198,6 +1221,7 @@ SoftwareVersion
 softwareVersionStr
 SoftwareVersionString
 softwareVersionValid
+sphinxcontrib
 SPI
 spiflash
 spinel
@@ -1230,6 +1254,7 @@ submodules
 subprocess
 SubscribeResponse
 SubscriptionId
+substeps
 subtype
 sudo
 SulfateConcentrationMeasurement
@@ -1456,6 +1481,7 @@ xFFFF
 xfffff
 xFFFFFFEFFFFFFFFF
 xtensa
+xvzf
 xwayland
 xyz
 xz
@@ -1476,6 +1502,7 @@ zclsubscribe
 zclwrite
 ZephyrConfig
 zephyrproject
+zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread

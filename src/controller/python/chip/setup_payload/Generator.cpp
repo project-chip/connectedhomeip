@@ -40,7 +40,7 @@ extern "C" ChipError::StorageType pychip_SetupPayload_PrintOnboardingCodes(uint3
     payload.vendorID     = vendorId;
     payload.productID    = productId;
     payload.discriminator.SetLongValue(discriminator);
-    payload.rendezvousInformation = rendezvousFlags.SetRaw(capabilities);
+    payload.rendezvousInformation.SetValue(rendezvousFlags.SetRaw(capabilities));
 
     switch (customFlow)
     {

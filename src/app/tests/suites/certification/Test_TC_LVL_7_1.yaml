@@ -17,30 +17,76 @@ name:
     22.6.2. [TC-LVL-7.1] Verification of MoveToClosestFrequency command (DUT as
     Server)
 
+PICS:
+    - LVL.S
+    - LVL.S.F02
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "TH writes 0x00 to the Options attribute"
+      PICS: LVL.S.A000f
+      verification: |
+          ./chip-tool onoff on 1 1
+          On TH(chip-tool)  verify that DUT sends a success response
+          [1658731148.428641][2894:2899] CHIP:DMG:         InteractionModelRevision = 1
+          [1658731148.428665][2894:2899] CHIP:DMG: },
+          [1658731148.428723][2894:2899] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
+          [1658731148.428766][2894:2899] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658731148.428828][2894:2899] CHIP:EM: Sending Standalone Ack for MessageCounter:77812182 on exchange 38946i
+      disabled: true
+
+    - label: "TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      verification: |
+          ./chip-tool levelcontrol write  options 0x00 1 1
+          On TH(chip-tool)  verify that DUT sends a success response
+          [1658732283.094610][3087:3092] CHIP:DMG: WriteResponseMessage =
+          [1658732283.094656][3087:3092] CHIP:DMG: {
+          [1658732283.094696][3087:3092] CHIP:DMG:         AttributeStatusIBs =
+          [1658732283.094863][3087:3092] CHIP:DMG:         [
+          [1658732283.094914][3087:3092] CHIP:DMG:                 AttributeStatusIB =
+          [1658732283.094965][3087:3092] CHIP:DMG:                 {
+          [1658732283.095012][3087:3092] CHIP:DMG:                         AttributePathIB =
+          [1658732283.095068][3087:3092] CHIP:DMG:                         {
+          [1658732283.095129][3087:3092] CHIP:DMG:                                 Endpoint = 0x1,
+          [1658732283.095197][3087:3092] CHIP:DMG:                                 Cluster = 0x8,
+          [1658732283.095259][3087:3092] CHIP:DMG:                                 Attribute = 0x0000_000F,
+          [1658732283.095322][3087:3092] CHIP:DMG:                         }
+          [1658732283.095385][3087:3092] CHIP:DMG:
+          [1658732283.095446][3087:3092] CHIP:DMG:                         StatusIB =
+          [1658732283.095505][3087:3092] CHIP:DMG:                         {
+          [1658732283.095564][3087:3092] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658732283.095626][3087:3092] CHIP:DMG:                         },
+          [1658732283.095682][3087:3092] CHIP:DMG:
+          [1658732283.095731][3087:3092] CHIP:DMG:                 },
+          [1658732283.095786][3087:3092] CHIP:DMG:
+          [1658732283.095830][3087:3092] CHIP:DMG:         ],
+          [1658732283.095883][3087:3092] CHIP:DMG:
+          [1658732283.095927][3087:3092] CHIP:DMG:         InteractionModelRevision = 1
+          [1658732283.095970][3087:3092] CHIP:DMG: }
+      disabled: true
+
     - label: "TH reads the MinLevel attribute from the DUT"
       PICS: LVL.S.A0002
       verification: |
-          Verify in TH Log
+          ./chip-tool levelcontrol read min-level 1 1
 
-           ./chip-tool levelcontrol read min-level 1 1
-
-          [1654065563.003862][10039:10044] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0002 DataVersion: 540248549
-          [1654065563.003916][10039:10044] CHIP:TOO:   min level: 0
-          [1654065563.003992][10039:10044] CHIP:EM: Sending Standalone Ack for MessageCounter:10228121 on exchange 38337i
+          On TH, Record the MinLevel attribute value for usage in later steps
+          [1658919507.800574][3717:3722] CHIP:DMG: }
+          [1658919507.800774][3717:3722] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0002 DataVersion: 3233313015
+          [1658919507.800931][3717:3722] CHIP:TOO:   min level: 1
+          [1658919507.801058][3717:3722] CHIP:EM: Sending Standalone Ack for MessageCounter:165803473 on exchange 38651i
       disabled: true
 
     - label: "TH reads the MaxLevel attribute from the DUT"
       PICS: LVL.S.A0003
       verification: |
-          Verify in TH Log
-
           ./chip-tool levelcontrol read max-level 1 1
+          On TH(chip-tool)  Record the MaxLevel attribute value for usage in later steps
 
 
           [1654065684.869569][10048:10053] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0003 DataVersion: 540248549
@@ -49,15 +95,14 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a MoveToLevelWithOnOff command to DUT, with the Level field
-          set to a value between the MinLevel and MaxLevel values (if present,
-          otherwise between 0x01 and 0xFE) and the TransitionTime field set to
-          0x0000 (move immediately)."
-      PICS: LVL.S.C04.Rsp
+          "TH sends a MoveToLevel command to DUT, with the Level field set to a
+          value between the MinLevel and MaxLevel values (if present, otherwise
+          between 0x01 and 0xFE) and the TransitionTime field set to 0x0000
+          (move immediately)."
+      PICS: LVL.S.C00.Rsp
       verification: |
-          Verify in TH Log
-
-          ./chip-tool levelcontrol move-to-level-with-on-off  253 0 1 1
+          ./chip-tool levelcontrol move-to-level  253 0 0 0 1 1
+          On TH(chip-tool) verify that DUT sends a success response
 
           [1654065833.084144][10181:10186] CHIP:DMG: InvokeResponseMessage =
           [1654065833.084161][10181:10186] CHIP:DMG: {
@@ -92,11 +137,10 @@ tests:
       disabled: true
 
     - label: "TH reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.C04.Rsp && LVL.S.A0000
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000
       verification: |
-          Verify in TH Log
-
           ./chip-tool levelcontrol read current-level 1 1
+          On TH(chip-tool) verify that the CurrentLevel attribute has the value given in 1c
 
           [1654065859.401140][10188:10193] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0000 DataVersion: 540248551
           [1654065859.401197][10188:10193] CHIP:TOO:   current level: 253
@@ -106,11 +150,8 @@ tests:
     - label: "TH reads the CurrentFrequency attribute."
       PICS: LVL.S.A0004
       verification: |
-          Verify in TH Log
-
-
           ./chip-tool levelcontrol read current-frequency 1 1
-
+          On TH(chip-tool) verify the CurrentFrequency attribute value
           [1654065889.927185][10196:10201] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0004 DataVersion: 540248551
           [1654065889.927213][10196:10201] CHIP:TOO:   current frequency: 0
           [1654065889.927247][10196:10201] CHIP:EM: Sending Standalone Ack for MessageCounter:9499985 on exchange 53579i
@@ -119,9 +160,8 @@ tests:
     - label: "TH reads the MinFrequency attribute."
       PICS: LVL.S.A0005
       verification: |
-          Verify in TH Log
-
-           ./chip-tool levelcontrol read min-frequency 1 1
+          ./chip-tool levelcontrol read min-frequency 1 1
+          On TH(chip-tool) verify the MinFrequency attribute value
 
           [1654066011.412756][10228:10233] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0005 DataVersion: 540248551
           [1654066011.412814][10228:10233] CHIP:TOO:   min frequency: 0
@@ -131,9 +171,8 @@ tests:
     - label: "TH reads the MaxFrequency attribute."
       PICS: LVL.S.A0006
       verification: |
-          Verify in TH Log
-
-           ./chip-tool levelcontrol read max-frequency 1 1
+          ./chip-tool levelcontrol read max-frequency 1 1
+          On TH(chip-tool) verify the MaxFrequency attribute value
 
           [1654066035.586373][10241:10246] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0006 DataVersion: 540248551
           [1654066035.586435][10241:10246] CHIP:TOO:   max frequency: 0
@@ -146,9 +185,7 @@ tests:
           fmax"
       PICS: LVL.S.C08.Rsp
       verification: |
-          Optional command based on Feature support
-
-          Frequency feature for level control cluster is not supporting in chip-tool
+          Frequency feature is Optional & is not verifiable at this moment. Please skip this step
       disabled: true
 
     - label: "TH reads the CurrentFrequency attribute."
@@ -163,8 +200,6 @@ tests:
       PICS: LVL.S.C08.Rsp
       verification: |
           Optional command based on Feature support
-
-          Frequency feature for level control cluster is not supporting in chip-tool
       disabled: true
 
     - label: "TH reads the CurrentFrequency attribute."
@@ -178,9 +213,7 @@ tests:
           field set to fmin - 1"
       PICS: LVL.S.C08.Rsp
       verification: |
-          Optional command based on Feature support
-
-          Frequency feature for level control cluster is not supporting in chip-tool
+          Frequency feature is Optional & is not verifiable at this moment. Please skip this step
       disabled: true
 
     - label: "TH reads the CurrentFrequency attribute."

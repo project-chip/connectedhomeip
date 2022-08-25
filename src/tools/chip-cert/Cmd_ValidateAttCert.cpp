@@ -205,17 +205,9 @@ bool Cmd_ValidateAttCert(int argc, char * argv[])
         return false;
     }
 
-    // Verify certificate validity information
-    {
-        VerifyOrExit(IsCertificateValidAtCurrentTime(dac) == CHIP_NO_ERROR,
-                     attestationError = AttestationVerificationResult::kDacExpired);
-
-        VerifyOrExit(IsCertificateValidAtIssuance(dac, pai) == CHIP_NO_ERROR,
-                     attestationError = AttestationVerificationResult::kPaiExpired);
-
-        VerifyOrExit(IsCertificateValidAtIssuance(dac, paa) == CHIP_NO_ERROR,
-                     attestationError = AttestationVerificationResult::kPaaExpired);
-    }
+    // Verify certificate is valid at the current time
+    VerifyOrExit(IsCertificateValidAtCurrentTime(dac) == CHIP_NO_ERROR,
+                 attestationError = AttestationVerificationResult::kDacExpired);
 
     // Verify that VID and PID in the certificates match.
     {

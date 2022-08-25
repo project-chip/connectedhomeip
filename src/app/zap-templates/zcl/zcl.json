@@ -15,7 +15,7 @@
         "basic-information-cluster.xml",
         "binding-cluster.xml",
         "boolean-state-cluster.xml",
-        "bridged-actions-cluster.xml",
+        "actions-cluster.xml",
         "bridged-device-basic.xml",
         "chip-ota.xml",
         "chip-types.xml",
@@ -26,6 +26,7 @@
         "diagnostic-logs-cluster.xml",
         "door-lock-cluster.xml",
         "ethernet-network-diagnostics-cluster.xml",
+        "fault-injection-cluster.xml",
         "fixed-label-cluster.xml",
         "flow-measurement-cluster.xml",
         "general-commissioning-cluster.xml",
@@ -233,8 +234,10 @@
             "RxErrOtherCount",
             "ActiveTimestamp",
             "PendingTimestamp",
-            "delay",
-            "ChannelMask"
+            "Delay",
+            "SecurityPolicy",
+            "ChannelPage0Mask",
+            "OperationalDatasetComponents"
         ],
         "WiFi Network Diagnostics": [
             "bssid",
@@ -253,5 +256,11 @@
         ]
     },
     "defaultReportingPolicy": "mandatory",
-    "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"]
+    "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
+    "fabricHandling": {
+        "automaticallyCreateFields": true,
+        "indexFieldId": 254,
+        "indexFieldName": "FabricIndex",
+        "indexType": "fabric_idx"
+    }
 }

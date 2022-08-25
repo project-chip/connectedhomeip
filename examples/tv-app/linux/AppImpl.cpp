@@ -86,11 +86,12 @@ MyPincodeService gMyPincodeService;
 
 class MyPostCommissioningListener : public PostCommissioningListener
 {
-    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, OperationalDeviceProxy * device) override
+    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
+                                SessionHandle & sessionHandle) override
     {
 
-        ContentAppPlatform::GetInstance().ManageClientAccess(device, vendorId, GetDeviceCommissioner()->GetNodeId(),
-                                                             OnSuccessResponse, OnFailureResponse);
+        ContentAppPlatform::GetInstance().ManageClientAccess(
+            exchangeMgr, sessionHandle, vendorId, GetDeviceCommissioner()->GetNodeId(), OnSuccessResponse, OnFailureResponse);
     }
 
     /* Callback when command results in success */
@@ -118,6 +119,11 @@ class MyPostCommissioningListener : public PostCommissioningListener
 
 MyPostCommissioningListener gMyPostCommissioningListener;
 ContentAppFactoryImpl gFactory;
+
+ContentAppFactoryImpl * GetContentAppFactoryImpl()
+{
+    return &gFactory;
+}
 
 namespace chip {
 namespace AppPlatform {
@@ -381,6 +387,24 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
                     vendorApp.applicationId);
 
     return nullptr;
+}
+
+void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
+{
+    mAdminVendorIds.push_back(vendorId);
+}
+
+Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)
+{
+    for (size_t i = 0; i < mAdminVendorIds.size(); ++i)
+    {
+        auto & vendor = mAdminVendorIds.at(i);
+        if (vendorId == vendor)
+        {
+            return Access::Privilege::kAdminister;
+        }
+    }
+    return Access::Privilege::kOperate;
 }
 
 } // namespace AppPlatform

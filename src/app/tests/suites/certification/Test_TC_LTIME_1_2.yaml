@@ -11,83 +11,105 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 4.1.2. [TC-LTIME-1.2] Global Attributes [DUT as Server]
+name: 108.1.2. [TC-LTIME-1.2] Global Attributes [DUT as Server]
+
+PICS:
+    - LTIME.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Time Format Localization"
     endpoint: 0
 
 tests:
-    - label: "Commission TH to DUT"
-      verification: |
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
+    - label: "TH reads the ClusterRevision from DUT"
+      PICS: LTIME.S.Afffd
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
-    - label: "TH reads from the DUT the (0xFFFD) ClusterRevision attribute"
-      verification: |
-          ./chip-tool timeformatlocalization read  cluster-revision 1 0
-          On TH, verify that DUT sends ClusterRevision attribute value as 1
+    - label: "TH reads the FeatureMap from DUT"
+      PICS: LTIME.S.Afffc
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              minValue: 0
+              maxValue: 1
 
-          [1651185991606] [10988:109915] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFD DataVersion: 3316530441
-          [1651185991606] [10988:109915] CHIP: [TOO]   ClusterRevision: 1
-      disabled: true
+    - label: "TH reads AttributeList from DUT"
+      PICS: LTIME.S.Afffb
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "TH reads from the DUT the (0xFFFC) FeatureMap attribute"
-      verification: |
-          ./chip-tool timeformatlocalization read feature-map 1 0
+    - label:
+          "TH reads optional attribute(ActiveCalendarType) in AttributeList from
+          DUT"
+      PICS: LTIME.S.Afffb && LTIME.S.A0001
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
 
-          On TH, verify that DUT sends  FeatureMap attribute value as 1
+    - label:
+          "TH reads optional attribute(SupportedCalendarTypes) in AttributeList
+          from DUT"
+      PICS: LTIME.S.Afffb && LTIME.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
 
-          [1653400472.682259][11385:11390] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFC DataVersion: 4156010624
-          [1653400472.682314][11385:11390] CHIP:TOO:   FeatureMap: 0
-          [1653400472.682416][11385:11390] CHIP:EM: Sending Standalone Ack for MessageCounter:10442089 on exchange 10027i
-      disabled: true
+    - label: "TH reads AcceptedCommandList from DUT"
+      PICS: LTIME.S.Afff9
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-    - label: "TH reads from the DUT the (0xFFFB) AttributeList attribute"
-      verification: |
-          ./chip-tool timeformatlocalization read attribute-list 1 0
-
-
-          On TH, verify that DUT  sends a list of supported attributes
-
-          [1653999139.214139][7477:7482] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFB DataVersion: 3201720795
-          [1653999139.214208][7477:7482] CHIP:TOO:   AttributeList: 8 entries
-          [1653999139.214241][7477:7482] CHIP:TOO:     [1]: 0
-          [1653999139.214267][7477:7482] CHIP:TOO:     [2]: 1
-          [1653999139.214293][7477:7482] CHIP:TOO:     [3]: 2
-          [1653999139.214320][7477:7482] CHIP:TOO:     [4]: 65528
-          [1653999139.214345][7477:7482] CHIP:TOO:     [5]: 65529
-          [1653999139.214371][7477:7482] CHIP:TOO:     [6]: 65531
-          [1653999139.214397][7477:7482] CHIP:TOO:     [7]: 65532
-          [1653999139.214422][7477:7482] CHIP:TOO:     [8]: 65533
-          [1653999139.214522][7477:7482] CHIP:EM: Sending Standalone Ack for MessageCounter:5643805 on exchange 4737i
-      disabled: true
-
-    - label: "TH reads from the DUT the (0xFFFA) EventList attribute"
-      verification: |
-          Out of scope for V1.0
-      disabled: true
-
-    - label: "TH reads from the DUT the (0xFFF9) AcceptedCommandList attribute"
-      verification: |
-          ./chip-tool timeformatlocalization read accepted-command-list 1 0
-
-          On TH, verify that DUT  responsds as list of Accepted Command as 0 entries.
-
-          [1651186189564] [11076:112595] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFF9 DataVersion: 3316530441
-          [1651186189564] [11076:112595] CHIP: [TOO]   AcceptedCommandList: 0 entries
-      disabled: true
-
-    - label: "TH reads from the DUT the (0xFFF8) GeneratedCommandList attribute"
-      verification: |
-          ./chip-tool timeformatlocalization read generated-command-list 1 0
-
-
-          On TH, verify that DUT  responsds as list of GeneratedCommandList as 0 entries.
-
-          [1651191789962] [13591:180646] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFF8 DataVersion: 3316530441
-          [1651191789963] [13591:180646] CHIP: [TOO]   GeneratedCommandList: 0 entries
-      disabled: true
+    - label: "TH reads GeneratedCommandList from DUT"
+      PICS: LTIME.S.Afff8
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

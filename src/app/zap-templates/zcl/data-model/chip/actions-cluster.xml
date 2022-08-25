@@ -1,0 +1,190 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <bitmap name="CommandBits" type="BITMAP16">
+    <cluster code="0x0025"/>
+    <field mask="0x0001" name="InstantAction"/>
+    <field mask="0x0002" name="InstantActionWithTransition"/>
+    <field mask="0x0004" name="StartAction"/>
+    <field mask="0x0008" name="StartActionWithDuration"/>
+    <field mask="0x0010" name="StopAction"/>
+    <field mask="0x0020" name="PauseAction"/>
+    <field mask="0x0040" name="PauseActionWithDuration"/>
+    <field mask="0x0080" name="ResumeAction"/>
+    <field mask="0x0100" name="EnableAction"/>
+    <field mask="0x0200" name="EnableActionWithDuration"/>
+    <field mask="0x0400" name="DisableAction"/>
+    <field mask="0x0800" name="DisableActionWithDuration"/>
+  </bitmap>
+
+  <enum name="ActionErrorEnum" type="ENUM8">
+    <cluster code="0x0025"/>
+    <item value="0" name="unknown"/>
+    <item value="1" name="interrupted"/>
+  </enum>
+
+  <enum name="ActionStateEnum" type="ENUM8">
+    <cluster code="0x0025"/>
+    <item value="0" name="Inactive"/>
+    <item value="1" name="Active"/>
+    <item value="2" name="Paused"/>
+    <item value="3" name="Disabled"/>
+  </enum>
+
+  <enum name="ActionTypeEnum" type="ENUM8">
+    <cluster code="0x0025"/>
+    <item value="0" name="other"/>
+    <item value="1" name="scene"/>
+    <item value="2" name="sequence"/>
+    <item value="3" name="automation"/>
+    <item value="4" name="exception"/>
+    <item value="5" name="notification"/>
+    <item value="6" name="alarm"/>
+  </enum>
+
+  <enum name="EndpointListTypeEnum" type="ENUM8">
+    <cluster code="0x0025"/>
+    <item value="0" name="other"/>
+    <item value="1" name="room"/>
+    <item value="2" name="zone"/>
+  </enum>
+
+  <struct name="ActionStruct">
+    <cluster code="0x0025"/>
+    <item name="ActionID"          type="INT16U"/>
+    <item name="Name"              type="CHAR_STRING" length="32"/>
+    <item name="Type"              type="ActionTypeEnum"/>
+    <item name="EndpointListID"    type="INT16U"/>
+    <item name="SupportedCommands" type="CommandBits"/>
+    <item name="State"             type="ActionStateEnum"/>
+  </struct>
+
+  <struct name="EndpointListStruct">
+    <cluster code="0x0025"/>
+    <item name="EndpointListID" type="INT16U"/>
+    <item name="Name"           type="CHAR_STRING" length="32"/>
+    <item name="Type"           type="EndpointListTypeEnum"/>
+    <item name="Endpoints"      type="ENDPOINT_NO" array="true" length="256"/>
+  </struct>
+
+  <cluster>
+    <domain>General</domain>
+    <name>Actions</name>
+    <code>0x0025</code>
+    <define>ACTIONS_CLUSTER</define>
+    <description>This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information.</description>
+
+    <attribute side="server" code="0x0000" define="ACTION_LIST" type="ARRAY" entryType="ActionStruct" length="256" writable="false" optional="false">ActionList</attribute>
+    <attribute side="server" code="0x0001" define="ENDPOINT_LIST" type="ARRAY" entryType="EndpointListStruct" length="256" writable="false" optional="false">EndpointLists</attribute>
+    <attribute side="server" code="0x0002" define="SETUP_URL" type="LONG_CHAR_STRING" length="512" writable="false" optional="true">SetupURL</attribute>
+
+    <command source="client" code="0x00" name="InstantAction" optional="true">
+      <description>This command triggers an action (state change) on the involved endpoints.</description>
+      <arg name="ActionID" type="INT16U"/>
+      <arg name="InvokeID" type="INT32U" optional="true"/>
+    </command>
+
+    <command source="client" code="0x01" name="InstantActionWithTransition" optional="true">
+      <description>This command triggers an action (state change) on the involved endpoints, with a specified time to transition from the current state to the new state.</description>
+      <arg name="ActionID" type="INT16U"/>
+      <arg name="InvokeID" type="INT32U" optional="true"/>
+      <arg name="TransitionTime" type="INT16U"/>
+    </command>
+
+    <command source="client" code="0x02" name="StartAction" optional="true">
+      <description>This command triggers the commencement of an action on the involved endpoints.</description>
+      <arg name="ActionID" type="INT16U"/>
+      <arg name="InvokeID" type="INT32U" optional="true"/>
+    </command>
+
+    <command source="client" code="0x03" name="StartActionWithDuration" optional="true">
+      <description>This command triggers the commencement of an action (with a duration) on the involved endpoints.</description>
+      <arg name="ActionID" type="INT16U"/>
+      <arg name="InvokeID" type="INT32U" optional="true"/>
+      <arg name="Duration" type="INT32U"/>
+    </command>
+
+    <command source="client" code="0x04" name="StopAction" optional="true">
+      <description>This command stops the ongoing action on the involved endpoints.</description>
+      <arg name="ActionID" type="INT16U"/>
+      <arg name="InvokeID" type="INT32U" optional="true"/>
+    </command>
+
+    <command source="client" code="0x05" name="PauseAction" optional="true">
+      <description>This command pauses an ongoing action.</description>
+      <arg name="ActionID" type="INT16U"/>
+      <arg name="InvokeID" type="INT32U" optional="true"/>
+    </command>
+
+    <command source="client" code="0x06" name="PauseActionWithDuration" optional="true">
+      <description>This command pauses an ongoing action with a duration.</description>
+      <arg name="ActionID" type="INT16U"/>
+      <arg name="InvokeID" type="INT32U" optional="true"/>
+      <arg name="Duration" type="INT32U"/>
+    </command>
+
+    <command source="client" code="0x07" name="ResumeAction" optional="true">
+      <description>This command resumes a previously paused action.</description>
+      <arg name="ActionID" type="INT16U"/>
+      <arg name="InvokeID" type="INT32U" optional="true"/>
+    </command>
+
+    <command source="client" code="0x08" name="EnableAction" optional="true">
+      <description>This command enables a certain action or automation.</description>
+      <arg name="ActionID" type="INT16U"/>
+      <arg name="InvokeID" type="INT32U" optional="true"/>
+    </command>
+
+    <command source="client" code="0x09" name="EnableActionWithDuration" optional="true">
+      <description>This command enables a certain action or automation with a duration.</description>
+      <arg name="ActionID" type="INT16U"/>
+      <arg name="InvokeID" type="INT32U" optional="true"/>
+      <arg name="Duration" type="INT32U"/>
+    </command>
+
+    <command source="client" code="0x0A" name="DisableAction" optional="true">
+      <description>This command disables a certain action or automation.</description>
+      <arg name="ActionID" type="INT16U"/>
+      <arg name="InvokeID" type="INT32U" optional="true"/>
+    </command>
+
+    <command source="client" code="0x0B" name="DisableActionWithDuration" optional="true">
+      <description>This command disables a certain action or automation with a duration.</description>
+      <arg name="ActionID" type="INT16U"/>
+      <arg name="InvokeID" type="INT32U" optional="true"/>
+      <arg name="Duration" type="INT32U"/>
+    </command>
+
+    <event side="server" code="0x00" priority="info" name="StateChanged" optional="false">
+      <description>This event SHALL be generated when there is a change in the Status of an ActionID.</description>
+      <field id="0" name="ActionID" type="INT16U" />
+      <field id="1" name="InvokeID" type="INT32U" />
+      <field id="2" name="NewState" type="ActionStateEnum" />
+    </event>
+
+    <event side="server" code="0x01" priority="info" name="ActionFailed" optional="false">
+      <description>This event SHALL be generated when there is some error which prevents the action from its normal planned execution.</description>
+      <field id="0" name="ActionID" type="INT16U" />
+      <field id="1" name="InvokeID" type="INT32U" />
+      <field id="2" name="NewState" type="ActionStateEnum" />
+      <field id="3" name="Error"    type="ActionErrorEnum" />
+    </event>
+
+  </cluster>
+</configurator>

@@ -16,12 +16,15 @@ name:
     Window Covering [TC-WNCV-4.1] GoToLiftPercentage Long-Run Verification with
     server as DUT
 
+PICS:
+    - WNCV.S
+
 config:
     nodeId: 0x12344321
     cluster: "Window Covering"
     endpoint: 1
     fullMotionDuration:
-        type: INT16U
+        type: int16u
         defaultValue: 6000
 
 tests:

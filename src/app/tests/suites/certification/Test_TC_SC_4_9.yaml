@@ -13,7 +13,12 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 14.4.9. [TC-SC-4.9] Operational Discovery - RIO support
+name:
+    15.4.9. [TC-SC-4.9] Operational Discovery - RIO support [DUT as
+    Commissionee]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
 
 config:
     nodeId: 0x12344321
@@ -21,76 +26,65 @@ config:
     endpoint: 0
 
 tests:
-    - label:
-          "Starts a commissioning process with DUT_CE including an access
-          control list entry on DUT_CE that gives Operate Privilege to TH_CR2
-          against every endpoint of DUT_CE"
+    - label: "Using TH_CR1, commission the DUT_CE onto the Matter network"
       verification: |
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{"cluster": null, "endpoint": 0, "deviceType": null}]}, {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects": null, "targets": [{"cluster": null, "endpoint": 1, "deviceType": null}]}]' 77 0
+          Using chip-tool (TH_CR1) provision the device using cmd
 
-          Verify on the TH Log:
+          ./out/debug/chip-tool pairing ble-wifi node-id ssid password setup-pin-code discriminator
+      disabled: true
 
-          [1652330385.328196][3240:3245] CHIP:DMG:                        StatusIB =
-          [1652330385.328229][3240:3245] CHIP:DMG:                        {
-          [1652330385.328264][3240:3245] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1652330385.328298][3240:3245] CHIP:DMG:                        },
+    - label: "Bring the TH_CR2 onto the thread network"
+      verification: |
+          Build openthread posix app with RCP and have it join the thread network that the BR is part of. If you don"t have the app, follow the below Instructions to build the posix app
+
+          if you have the RCP connected to the raspi, launch the ot-cli app with RCP
+          $ sudo ./build/posix/src/posix/ot-cli "spinel+hdlc+uart:///dev/ttyACM0?uart-baudrate=115200" -v
+          ./build/posix/src/posix/ot-cli[68007]: Running OPENTHREAD/thread-reference-20200818-1820-g095f530bd; POSIX; Jul 18 2022 22:44:35
+          ./build/posix/src/posix/ot-cli[68007]: Thread version: 4
+          ./build/posix/src/posix/ot-cli[68007]: Thread interface:
+          ./build/posix/src/posix/ot-cli[68007]: RCP version: OPENTHREAD/thread-reference-20200818-1615-gfdf3c3034; NRF52840; Jul 17 2022 17:10:13
+          > dataset set active <PROVIDE THE DATASET OF THE BR THAT YOU NEED TO JOIN>
+          > dataset commit active
+          > ifconfig up
+          > thread start
+
+          With the above set of commands, the RCP should join the thread network hosted by the BR.
+          >srp client autostart enable
+
+
+          Instructions to build the posix app.
+          1. Get Nordic nRF52840 dongle.
+          2. Attach it to the raspi/Ubuntu machine
+          Follow the instructions at https://github.com/openthread/openthread/blob/main/src/posix/README.md
+          3. git clone --recursive git@github.com:openthread/openthread.git
+          4. cd openthread/
+          5. ./script/bootstrap
+          6. ./bootstrap
+          7. ./script/cmake-build posix
+          8. follow the instructions to build the RCP dongle (or get the RCP image from README file in the test harness and flash it on the RCP)
+          8. ./build/posix/src/posix/ot-cli "spinel+hdlc+uart:///dev/ttyACM0?uart-baudrate=115200" -v
       disabled: true
 
     - label:
-          "Reads Basic Information Cluster NodeLabel attribute as
-          PreviousNodeLabel"
+          "Using TH_CR2, using ICMPv6 echo to ping with a payload >= 32 bytes to
+          the the DUT_CE that is already commissioned to the Matter network. IP
+          address is determined by operational discovery of the DNS-SD
+          operational service record (_matter._tcp service instance) of DUT_CE
+          done by TH_CR2."
       verification: |
-          ./chip-tool basic read node-label 77 0
+          In the RCP Shell , have the TH_CR2 discover the device IP address using
+          > dns service 177AC531F48BE736-0000000000000190 _matter._tcp.default.service.arpa.
+          DNS service resolution response for 177AC531F48BE736-0000000000000190 for service _matter._tcp.default.service.arpa.
+          Port:5540, Priority:0, Weight:0, TTL:6913
+          Host:72FF282E7739731F.default.service.arpa.
+          HostAddress:fd11:66:0:0:22ae:27fe:13ac:54df TTL:6915
+          TXT:[SII=35303030, SAI=333030, T=30] TTL:6913
+          Ping the IP address of the wifi device
 
-          Verify on the TH Log:
+          > ping fd11:66:0:0:22ae:27fe:13ac:54df
+          16 bytes from fd11:66:0:0:22ae:27fe:13ac:54df : icmp_seq=2 hlim=64 time=14ms
+          1 packets transmitted, 1 packets received. Packet loss = 0.0%. Round-trip min/avg/max = 14/14.0/14 ms.
+          Done
 
-          [1652420234.342201][2403:2408] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 2144347768
-          [1652420234.342277][2403:2408] CHIP:TOO:   NodeLabel:
-          [1652420234.342452][2403:2408] CHIP:EM: Sending Standalone Ack for MessageCounter:123718 on exchange 57159i
-      disabled: true
-
-    - label: 'Writes "TestRIO" to the NodeLabel attribute'
-      verification: |
-          ./chip-tool basic write node-label testrio 77 0
-
-          Verify on the TH Log:
-
-          StatusIB =
-          [1652421063.833937][2454:2459] CHIP:DMG:                         {
-          [1652421063.834016][2454:2459] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1652421063.834118][2454:2459] CHIP:DMG:                         },
-      disabled: true
-
-    - label: "Reads NodeLabel attribute"
-      verification: |
-          ./chip-tool basic read node-label 77 0
-
-          Verify on the TH Log:
-
-          [1652421068.143200][2460:2465] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 2144347769
-          [1652421068.143276][2460:2465] CHIP:TOO:   NodeLabel: testrio
-          [1652421068.143457][2460:2465] CHIP:EM: Sending Standalone Ack for MessageCounter:2274062 on exchange 46531i
-      disabled: true
-
-    - label: 'Writes "TestRIO2" to the NodeLabel attribute'
-      verification: |
-          ./chip-tool basic write node-label testrio2 77 0
-
-          Verify on the TH Log:
-
-          StatusIB =
-          [1652421082.185625][2467:2473] CHIP:DMG:                         {
-          [1652421082.185696][2467:2473] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1652421082.185766][2467:2473] CHIP:DMG:                         },
-      disabled: true
-
-    - label: "Reads NodeLabel attribute"
-      verification: |
-          ./chip-tool basic read node-label 77 0
-
-          Verify on the TH Log:
-
-          [1652421088.232903][2474:2479] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 2144347770
-          [1652421088.232983][2474:2479] CHIP:TOO:   NodeLabel: testrio2
-          [1652421088.233169][2474:2479] CHIP:EM: Sending Standalone Ack for MessageCounter:4743745 on exchange 61019i
+          The ping command should be successful.
       disabled: true

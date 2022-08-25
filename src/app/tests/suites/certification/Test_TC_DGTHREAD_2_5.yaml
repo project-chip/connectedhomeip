@@ -17,6 +17,9 @@ name:
     50.2.5. [TC-DGTHREAD-2.5] Thread Network Diagnostics Cluster
     Events[DUT-Server]
 
+PICS:
+    - DGTHREAD.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -26,60 +29,53 @@ tests:
     - label: "Induce a DUT by an Unspecified failure"
       PICS: DGTHREAD.S.E01
       verification: |
-          Not Implemented in CHIP Tool
+          There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
     - label: "Induce a DUT by LinkDown failure"
       PICS: DGTHREAD.S.E01
       verification: |
-          Not Implemented in CHIP Tool
+          There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
     - label: "Induce a DUT by HardwareFailure"
       PICS: DGTHREAD.S.E01
       verification: |
-          Not Implemented in CHIP Tool
+          There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
     - label: "Induce a DUT by NetworkJammed Failure"
       PICS: DGTHREAD.S.E01
       verification: |
-          Not Implemented in CHIP Tool
+          There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
     - label: "Induce a DUT by an Unspecified failure"
       PICS: DGTHREAD.S.E01
       verification: |
-          Not Implemented in CHIP Tool
+          There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
     - label: "Induce a DUT by LinkDown failure"
       PICS: DGTHREAD.S.E01
       verification: |
-          Not Implemented in CHIP Tool
+          There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
     - label: "Induce a DUT by HardwareFailure"
       PICS: DGTHREAD.S.E01
       verification: |
-          Not Implemented in CHIP Tool
+          There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
     - label: "Induce a DUT by NetworkJammed Failure"
       PICS: DGTHREAD.S.E01
       verification: |
-          Not Implemented in CHIP Tool
+          There is no implementation in TH (chip-tool) to read these optional events. Pls mark as Not Applicable
       disabled: true
 
     - label: "Disconnect and reconnect a node to a Thread network"
       PICS: DGTHREAD.S.E00
       verification: |
-          ./chip-tool  threadnetworkdiagnostics  read-event connection-status 137 0
-
-          [1651233430.972821][7560:7565] CHIP:DMG: ReportDataMessage =
-          [1651233430.972891][7560:7565] CHIP:DMG: {
-          [1651233430.972950][7560:7565] CHIP:DMG: 	SuppressResponse = true,
-          [1651233430.973013][7560:7565] CHIP:DMG: 	InteractionModelRevision = 1
-          [1651233430.973070][7560:7565] CHIP:DMG: }
-          [1651233430.973222][7560:7565] CHIP:EM: Sending Standalone Ack for MessageCounter:6424591 on exchange 2503i
+          Optional Event so it is not mandatory to verify in v1.0. Pls mark as Not Applicable.
       disabled: true

@@ -2,14 +2,19 @@
     "name": "Framework templates",
     "version": "chip-v1",
     "helpers": [
-        "../../../../../src/app/zap-templates/partials/helper.js",
-        "../../../../../src/app/zap-templates/common/ChipTypesHelper.js",
-        "../../../../../src/app/zap-templates/common/StringHelper.js",
-        "../../../../../src/app/zap-templates/templates/app/helper.js",
-        "../../../../../src/app/zap-templates/templates/chip/helper.js",
-        "../../../../../src/app/zap-templates/common/ClusterTestGeneration.js",
-        "helper.js"
+        "partials/helper.js",
+        "common/ChipTypesHelper.js",
+        "common/StringHelper.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "common/ClusterTestGeneration.js",
+        "darwin/Framework/CHIP/templates/helper.js"
     ],
+    "resources": {
+        "pics-metafile": "../../../../app/tests/suites/certification/PICS.yaml",
+        "certification-metadir": "../../../../app/tests/suites/certification",
+        "test-metadir": "../../../../app/tests/suites"
+    },
     "override": "../../../../../src/app/zap-templates/common/override.js",
     "partials": [
         {
@@ -54,18 +59,33 @@
         },
         {
             "path": "MTRBaseClusters_internal.zapt",
-            "name": "Objc ZCL API Internal Header",
+            "name": "Objc ZCL asynchronous API Internal Header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters_internal.h"
         },
         {
             "path": "MTRBaseClusters.zapt",
-            "name": "Objc ZCL API Header",
+            "name": "Objc ZCL asynchronous API Header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.h"
         },
         {
             "path": "MTRBaseClusters-src.zapt",
-            "name": "Objc ZCL API",
+            "name": "Objc ZCL asynchronous API",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.mm"
+        },
+        {
+            "path": "MTRClusters_internal.zapt",
+            "name": "Objc ZCL synchronous API Internal Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters_internal.h"
+        },
+        {
+            "path": "MTRClusters.zapt",
+            "name": "Objc ZCL synchronous API Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters.h"
+        },
+        {
+            "path": "MTRClusters-src.zapt",
+            "name": "Objc ZCL synchronous API",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters.mm"
         },
         {
             "path": "MTRStructsObjc.zapt",

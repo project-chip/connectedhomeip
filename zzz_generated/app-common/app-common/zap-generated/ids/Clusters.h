@@ -58,9 +58,9 @@ static constexpr ClusterId Id = 0x0000001E;
 namespace AccessControl {
 static constexpr ClusterId Id = 0x0000001F;
 } // namespace AccessControl
-namespace BridgedActions {
+namespace Actions {
 static constexpr ClusterId Id = 0x00000025;
-} // namespace BridgedActions
+} // namespace Actions
 namespace Basic {
 static constexpr ClusterId Id = 0x00000028;
 } // namespace Basic
@@ -235,6 +235,9 @@ static constexpr ClusterId Id = 0x00000B04;
 namespace TestCluster {
 static constexpr ClusterId Id = 0xFFF1FC05;
 } // namespace TestCluster
+namespace FaultInjection {
+static constexpr ClusterId Id = 0xFFF1FC06;
+} // namespace FaultInjection
 
 } // namespace Clusters
 } // namespace app

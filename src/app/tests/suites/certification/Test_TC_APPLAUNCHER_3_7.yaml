@@ -14,15 +14,18 @@
 
 name: 19.4.3. [TC-APPLAUNCHER-3.7] Launch Application Verification
 
+PICS:
+    - APPLAUNCHER.S
+
 config:
     nodeId: 0x12344321
     cluster: "Application Launcher"
     endpoint: 1
     catalogVendorId:
-        type: INT16U
+        type: int16u
         defaultValue: 123
     applicationId:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "exampleid"
 
 tests:
@@ -35,7 +38,7 @@ tests:
                 value: nodeId
 
     - label: "Launch an app with the provided a application ID"
-      PICS: APPLAUNCHER.S.C0000
+      PICS: APPLAUNCHER.S.C00.Rsp
       command: "LaunchApp"
       arguments:
           values:
@@ -55,7 +58,7 @@ tests:
     - label:
           "TH sends a LaunchApp command to DUT to launch an app which is not
           available"
-      PICS: APPLAUNCHER.S.C0000
+      PICS: APPLAUNCHER.S.C00.Rsp
       command: "LaunchApp"
       arguments:
           values:

@@ -15,18 +15,35 @@
 
 name: 111.3.2. [TC-DRLK-3.2] Commands [DUT - Client]
 
+PICS:
+    - DRLK.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Pre-Conditions"
+      verification: |
+          1. TH is commissioned with the DUT
+
+          2.Steps 4- 12 need a User added to the
+          lock
+      disabled: true
+
     - label: "DUT sends Lock Door command to TH."
       PICS: DRLK.C.C00.Tx
       verification: |
           ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " Lock Door command response" on TH(lock-app):
+
 
           [1654755271.172070][2969:2969] CHIP:DMG: InvokeRequestMessage =
           [1654755271.172131][2969:2969] CHIP:DMG: {
@@ -63,7 +80,9 @@ tests:
       PICS: DRLK.C.C01.Tx
       verification: |
           ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000
-          verify on Reference app receives the right response for the data sent in the above commands
+
+          Verify the " Unlock Door command response" on TH(lock-app):
+
 
           [1654755356.562412][2969:2969] CHIP:DMG: InvokeRequestMessage =
           [1654755356.562459][2969:2969] CHIP:DMG: {
@@ -100,7 +119,10 @@ tests:
       PICS: DRLK.C.C03.Tx
       verification: |
           ./chip-tool doorlock unlock-with-timeout 60 1 1 --timedInteractionTimeoutMs 1000
-          verify on Reference app receives the right response for the data sent in the above commands
+
+          Verify the " Unlock with Timeout command response" on TH(lock-app):
+
+
 
           [1654755446.175911][2969:2969] CHIP:DMG: InvokeRequestMessage =
           [1654755446.175940][2969:2969] CHIP:DMG: {
@@ -140,13 +162,54 @@ tests:
     - label: "DUT sends Set Week Day Schedule command to TH."
       PICS: DRLK.S.F04 && DRLK.C.C0b.Tx
       verification: |
+          ./chip-tool doorlock set-user 0 1 xxx 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
+
+          Verify the " Set user command response" on TH(lock-app):
+
+          [1658398796.181348][2474:2474] CHIP:DMG: InvokeRequestMessage =
+          [1658398796.181385][2474:2474] CHIP:DMG: {
+          [1658398796.181419][2474:2474] CHIP:DMG:        suppressResponse = false,
+          [1658398796.181457][2474:2474] CHIP:DMG:        timedRequest = true,
+          [1658398796.181493][2474:2474] CHIP:DMG:        InvokeRequests =
+          [1658398796.181542][2474:2474] CHIP:DMG:        [
+          [1658398796.181578][2474:2474] CHIP:DMG:                CommandDataIB =
+          [1658398796.181618][2474:2474] CHIP:DMG:                {
+          [1658398796.181656][2474:2474] CHIP:DMG:                        CommandPathIB =
+          [1658398796.181703][2474:2474] CHIP:DMG:                        {
+          [1658398796.181750][2474:2474] CHIP:DMG:                                EndpointId = 0x1,
+          [1658398796.181800][2474:2474] CHIP:DMG:                                ClusterId = 0x101,
+          [1658398796.181848][2474:2474] CHIP:DMG:                                CommandId = 0x1a,
+          [1658398796.181892][2474:2474] CHIP:DMG:                        },
+          [1658398796.181939][2474:2474] CHIP:DMG:
+          [1658398796.181981][2474:2474] CHIP:DMG:                        CommandFields =
+          [1658398796.182026][2474:2474] CHIP:DMG:                        {
+          [1658398796.182072][2474:2474] CHIP:DMG:                                0x0 = 0,
+          [1658398796.182120][2474:2474] CHIP:DMG:                                0x1 = 2,
+          [1658398796.182171][2474:2474] CHIP:DMG:                                0x2 = "xxx",
+          [1658398796.182220][2474:2474] CHIP:DMG:                                0x3 = 6452,
+          [1658398796.182269][2474:2474] CHIP:DMG:                                0x4 = 1,
+          [1658398796.182322][2474:2474] CHIP:DMG:                                0x5 = 0,
+          [1658398796.182371][2474:2474] CHIP:DMG:                                0x6 = 0,
+          [1658398796.182419][2474:2474] CHIP:DMG:                        },
+          [1658398796.182462][2474:2474] CHIP:DMG:                },
+          [1658398796.182512][2474:2474] CHIP:DMG:
+          [1658398796.182547][2474:2474] CHIP:DMG:        ],
+          [1658398796.182594][2474:2474] CHIP:DMG:
+          [1658398796.182629][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658398796.182664][2474:2474] CHIP:DMG: },
+          [1658398796.182758][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
+          [1658398796.182809][2474:2474] CHIP:DMG: AccessControl: allowed
+
           ./chip-tool doorlock set-week-day-schedule 1 1 2  15 45 16 55 1 1
-          verify on Reference app receives the right response for the data sent in the above commands
+
+          Verify the " Set Week Day Schedule command response" on TH(lock-app):
+
+
 
           [1657115333.959925][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115333.959993][8804:8804] CHIP:DMG: {
-          [1657115333.960051][8804:8804] CHIP:DMG:         suppressResponse = false, 
-          [1657115333.960172][8804:8804] CHIP:DMG:         timedRequest = false, 
+          [1657115333.960051][8804:8804] CHIP:DMG:         suppressResponse = false,
+          [1657115333.960172][8804:8804] CHIP:DMG:         timedRequest = false,
           [1657115333.960233][8804:8804] CHIP:DMG:         InvokeRequests =
           [1657115333.960314][8804:8804] CHIP:DMG:         [
           [1657115333.960373][8804:8804] CHIP:DMG:                 CommandDataIB =
@@ -157,21 +220,21 @@ tests:
           [1657115333.960812][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
           [1657115333.960954][8804:8804] CHIP:DMG:                                 CommandId = 0xb,
           [1657115333.961035][8804:8804] CHIP:DMG:                         },
-          [1657115333.961137][8804:8804] CHIP:DMG:                         
-          [1657115333.961225][8804:8804] CHIP:DMG:                         CommandFields = 
+          [1657115333.961137][8804:8804] CHIP:DMG:
+          [1657115333.961225][8804:8804] CHIP:DMG:                         CommandFields =
           [1657115333.961302][8804:8804] CHIP:DMG:                         {
-          [1657115333.961402][8804:8804] CHIP:DMG:                                 0x0 = 1, 
-          [1657115333.961486][8804:8804] CHIP:DMG:                                 0x1 = 1, 
-          [1657115333.961588][8804:8804] CHIP:DMG:                                 0x2 = 2, 
-          [1657115333.961689][8804:8804] CHIP:DMG:                                 0x3 = 15, 
-          [1657115333.961772][8804:8804] CHIP:DMG:                                 0x4 = 45, 
-          [1657115333.961884][8804:8804] CHIP:DMG:                                 0x5 = 16, 
-          [1657115333.961991][8804:8804] CHIP:DMG:                                 0x6 = 55, 
+          [1657115333.961402][8804:8804] CHIP:DMG:                                 0x0 = 1,
+          [1657115333.961486][8804:8804] CHIP:DMG:                                 0x1 = 1,
+          [1657115333.961588][8804:8804] CHIP:DMG:                                 0x2 = 2,
+          [1657115333.961689][8804:8804] CHIP:DMG:                                 0x3 = 15,
+          [1657115333.961772][8804:8804] CHIP:DMG:                                 0x4 = 45,
+          [1657115333.961884][8804:8804] CHIP:DMG:                                 0x5 = 16,
+          [1657115333.961991][8804:8804] CHIP:DMG:                                 0x6 = 55,
           [1657115333.962071][8804:8804] CHIP:DMG:                         },
           [1657115333.962165][8804:8804] CHIP:DMG:                 },
-          [1657115333.962247][8804:8804] CHIP:DMG:                 
+          [1657115333.962247][8804:8804] CHIP:DMG:
           [1657115333.962306][8804:8804] CHIP:DMG:         ],
-          [1657115333.962531][8804:8804] CHIP:DMG:         
+          [1657115333.962531][8804:8804] CHIP:DMG:
           [1657115333.962594][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
           [1657115333.962653][8804:8804] CHIP:DMG: },
           [1657115333.962812][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
@@ -184,12 +247,14 @@ tests:
       PICS: DRLK.S.F04 && DRLK.C.C0c.Tx
       verification: |
           ./chip-tool doorlock get-week-day-schedule 1 1 1 1
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " Get Week Day Schedule command response" on TH(lock-app):
+
+
 
           [1657115377.506828][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115377.506895][8804:8804] CHIP:DMG: {
-          [1657115377.506981][8804:8804] CHIP:DMG:         suppressResponse = false, 
-          [1657115377.507048][8804:8804] CHIP:DMG:         timedRequest = false, 
+          [1657115377.506981][8804:8804] CHIP:DMG:         suppressResponse = false,
+          [1657115377.507048][8804:8804] CHIP:DMG:         timedRequest = false,
           [1657115377.507109][8804:8804] CHIP:DMG:         InvokeRequests =
           [1657115377.507210][8804:8804] CHIP:DMG:         [
           [1657115377.507271][8804:8804] CHIP:DMG:                 CommandDataIB =
@@ -200,16 +265,16 @@ tests:
           [1657115377.507713][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
           [1657115377.507814][8804:8804] CHIP:DMG:                                 CommandId = 0xc,
           [1657115377.507911][8804:8804] CHIP:DMG:                         },
-          [1657115377.507991][8804:8804] CHIP:DMG:                         
-          [1657115377.508082][8804:8804] CHIP:DMG:                         CommandFields = 
+          [1657115377.507991][8804:8804] CHIP:DMG:
+          [1657115377.508082][8804:8804] CHIP:DMG:                         CommandFields =
           [1657115377.508161][8804:8804] CHIP:DMG:                         {
-          [1657115377.508261][8804:8804] CHIP:DMG:                                 0x0 = 1, 
-          [1657115377.508364][8804:8804] CHIP:DMG:                                 0x1 = 1, 
+          [1657115377.508261][8804:8804] CHIP:DMG:                                 0x0 = 1,
+          [1657115377.508364][8804:8804] CHIP:DMG:                                 0x1 = 1,
           [1657115377.508454][8804:8804] CHIP:DMG:                         },
           [1657115377.508553][8804:8804] CHIP:DMG:                 },
-          [1657115377.508634][8804:8804] CHIP:DMG:                 
+          [1657115377.508634][8804:8804] CHIP:DMG:
           [1657115377.508715][8804:8804] CHIP:DMG:         ],
-          [1657115377.508810][8804:8804] CHIP:DMG:         
+          [1657115377.508810][8804:8804] CHIP:DMG:
           [1657115377.508906][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
           [1657115377.508966][8804:8804] CHIP:DMG: },
           [1657115377.509153][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
@@ -225,12 +290,15 @@ tests:
       PICS: DRLK.S.F04 && DRLK.C.C0d.Tx
       verification: |
           ./chip-tool doorlock clear-week-day-schedule 1 1 1 1
-          verify on Reference app receives the right response for the data sent in the above commands
+
+          Verify the " Clear Week Day Schedule command response" on TH(lock-app):
+
+
 
           [1657115416.513747][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115416.513812][8804:8804] CHIP:DMG: {
-          [1657115416.513895][8804:8804] CHIP:DMG:         suppressResponse = false, 
-          [1657115416.513960][8804:8804] CHIP:DMG:         timedRequest = false, 
+          [1657115416.513895][8804:8804] CHIP:DMG:         suppressResponse = false,
+          [1657115416.513960][8804:8804] CHIP:DMG:         timedRequest = false,
           [1657115416.514021][8804:8804] CHIP:DMG:         InvokeRequests =
           [1657115416.514117][8804:8804] CHIP:DMG:         [
           [1657115416.514180][8804:8804] CHIP:DMG:                 CommandDataIB =
@@ -241,16 +309,16 @@ tests:
           [1657115416.514621][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
           [1657115416.514722][8804:8804] CHIP:DMG:                                 CommandId = 0xd,
           [1657115416.514800][8804:8804] CHIP:DMG:                         },
-          [1657115416.514903][8804:8804] CHIP:DMG:                         
-          [1657115416.514972][8804:8804] CHIP:DMG:                         CommandFields = 
+          [1657115416.514903][8804:8804] CHIP:DMG:
+          [1657115416.514972][8804:8804] CHIP:DMG:                         CommandFields =
           [1657115416.515069][8804:8804] CHIP:DMG:                         {
-          [1657115416.515171][8804:8804] CHIP:DMG:                                 0x0 = 1, 
-          [1657115416.515255][8804:8804] CHIP:DMG:                                 0x1 = 1, 
+          [1657115416.515171][8804:8804] CHIP:DMG:                                 0x0 = 1,
+          [1657115416.515255][8804:8804] CHIP:DMG:                                 0x1 = 1,
           [1657115416.515368][8804:8804] CHIP:DMG:                         },
           [1657115416.515441][8804:8804] CHIP:DMG:                 },
-          [1657115416.515516][8804:8804] CHIP:DMG:                 
+          [1657115416.515516][8804:8804] CHIP:DMG:
           [1657115416.515574][8804:8804] CHIP:DMG:         ],
-          [1657115416.515649][8804:8804] CHIP:DMG:         
+          [1657115416.515649][8804:8804] CHIP:DMG:
           [1657115416.515706][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
           [1657115416.515763][8804:8804] CHIP:DMG: },
           [1657115416.515907][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
@@ -266,12 +334,14 @@ tests:
       PICS: DRLK.S.F04 && DRLK.C.C0e.Tx
       verification: |
           ./chip-tool doorlock set-year-day-schedule 1 1 1080 2100 1 1
-          verify on Reference app receives the right response for the data sent in the above commands
+
+          Verify the " Set Year Day Schedule command response" on TH(lock-app):
+
 
           [1657115453.534892][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115453.534959][8804:8804] CHIP:DMG: {
-          [1657115453.535016][8804:8804] CHIP:DMG:         suppressResponse = false, 
-          [1657115453.535118][8804:8804] CHIP:DMG:         timedRequest = false, 
+          [1657115453.535016][8804:8804] CHIP:DMG:         suppressResponse = false,
+          [1657115453.535118][8804:8804] CHIP:DMG:         timedRequest = false,
           [1657115453.535180][8804:8804] CHIP:DMG:         InvokeRequests =
           [1657115453.535260][8804:8804] CHIP:DMG:         [
           [1657115453.535344][8804:8804] CHIP:DMG:                 CommandDataIB =
@@ -282,18 +352,18 @@ tests:
           [1657115453.535800][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
           [1657115453.535892][8804:8804] CHIP:DMG:                                 CommandId = 0xe,
           [1657115453.535999][8804:8804] CHIP:DMG:                         },
-          [1657115453.536100][8804:8804] CHIP:DMG:                         
-          [1657115453.536166][8804:8804] CHIP:DMG:                         CommandFields = 
+          [1657115453.536100][8804:8804] CHIP:DMG:
+          [1657115453.536166][8804:8804] CHIP:DMG:                         CommandFields =
           [1657115453.536262][8804:8804] CHIP:DMG:                         {
-          [1657115453.536441][8804:8804] CHIP:DMG:                                 0x0 = 1, 
-          [1657115453.536559][8804:8804] CHIP:DMG:                                 0x1 = 1, 
-          [1657115453.536675][8804:8804] CHIP:DMG:                                 0x2 = 1080, 
-          [1657115453.536764][8804:8804] CHIP:DMG:                                 0x3 = 2100, 
+          [1657115453.536441][8804:8804] CHIP:DMG:                                 0x0 = 1,
+          [1657115453.536559][8804:8804] CHIP:DMG:                                 0x1 = 1,
+          [1657115453.536675][8804:8804] CHIP:DMG:                                 0x2 = 1080,
+          [1657115453.536764][8804:8804] CHIP:DMG:                                 0x3 = 2100,
           [1657115453.536963][8804:8804] CHIP:DMG:                         },
           [1657115453.537066][8804:8804] CHIP:DMG:                 },
-          [1657115453.537153][8804:8804] CHIP:DMG:                 
+          [1657115453.537153][8804:8804] CHIP:DMG:
           [1657115453.537233][8804:8804] CHIP:DMG:         ],
-          [1657115453.537331][8804:8804] CHIP:DMG:         
+          [1657115453.537331][8804:8804] CHIP:DMG:
           [1657115453.537392][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
           [1657115453.537451][8804:8804] CHIP:DMG: },
           [1657115453.537622][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
@@ -309,12 +379,14 @@ tests:
       PICS: DRLK.S.F04 && DRLK.C.C0f.Tx
       verification: |
           ./chip-tool doorlock get-year-day-schedule 1 1 1 1
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " Get Year Day Schedule command response" on TH(lock-app):
+
+
 
           [1657115480.383098][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115480.383167][8804:8804] CHIP:DMG: {
-          [1657115480.383226][8804:8804] CHIP:DMG:         suppressResponse = false, 
-          [1657115480.383381][8804:8804] CHIP:DMG:         timedRequest = false, 
+          [1657115480.383226][8804:8804] CHIP:DMG:         suppressResponse = false,
+          [1657115480.383381][8804:8804] CHIP:DMG:         timedRequest = false,
           [1657115480.383452][8804:8804] CHIP:DMG:         InvokeRequests =
           [1657115480.383530][8804:8804] CHIP:DMG:         [
           [1657115480.383590][8804:8804] CHIP:DMG:                 CommandDataIB =
@@ -325,16 +397,16 @@ tests:
           [1657115480.384115][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
           [1657115480.384207][8804:8804] CHIP:DMG:                                 CommandId = 0xf,
           [1657115480.384314][8804:8804] CHIP:DMG:                         },
-          [1657115480.384416][8804:8804] CHIP:DMG:                         
-          [1657115480.384488][8804:8804] CHIP:DMG:                         CommandFields = 
+          [1657115480.384416][8804:8804] CHIP:DMG:
+          [1657115480.384488][8804:8804] CHIP:DMG:                         CommandFields =
           [1657115480.384594][8804:8804] CHIP:DMG:                         {
-          [1657115480.384710][8804:8804] CHIP:DMG:                                 0x0 = 1, 
-          [1657115480.384805][8804:8804] CHIP:DMG:                                 0x1 = 1, 
+          [1657115480.384710][8804:8804] CHIP:DMG:                                 0x0 = 1,
+          [1657115480.384805][8804:8804] CHIP:DMG:                                 0x1 = 1,
           [1657115480.384944][8804:8804] CHIP:DMG:                         },
           [1657115480.385030][8804:8804] CHIP:DMG:                 },
-          [1657115480.385108][8804:8804] CHIP:DMG:                 
+          [1657115480.385108][8804:8804] CHIP:DMG:
           [1657115480.385187][8804:8804] CHIP:DMG:         ],
-          [1657115480.385264][8804:8804] CHIP:DMG:         
+          [1657115480.385264][8804:8804] CHIP:DMG:
           [1657115480.385344][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
           [1657115480.385404][8804:8804] CHIP:DMG: },
           [1657115480.385578][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
@@ -350,12 +422,15 @@ tests:
       PICS: DRLK.S.F04 && DRLK.C.C10.Tx
       verification: |
           ./chip-tool doorlock clear-year-day-schedule 1 1 1 1
-          verify on Reference app receives the right response for the data sent in the above commands
+
+          Verify the " Clear Year Day Schedule command response" on TH(lock-app):
+
+
 
           [1657115522.132250][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115522.132318][8804:8804] CHIP:DMG: {
-          [1657115522.132375][8804:8804] CHIP:DMG:         suppressResponse = false, 
-          [1657115522.132442][8804:8804] CHIP:DMG:         timedRequest = false, 
+          [1657115522.132375][8804:8804] CHIP:DMG:         suppressResponse = false,
+          [1657115522.132442][8804:8804] CHIP:DMG:         timedRequest = false,
           [1657115522.132502][8804:8804] CHIP:DMG:         InvokeRequests =
           [1657115522.132578][8804:8804] CHIP:DMG:         [
           [1657115522.132639][8804:8804] CHIP:DMG:                 CommandDataIB =
@@ -366,16 +441,16 @@ tests:
           [1657115522.133086][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
           [1657115522.133178][8804:8804] CHIP:DMG:                                 CommandId = 0x10,
           [1657115522.133265][8804:8804] CHIP:DMG:                         },
-          [1657115522.133349][8804:8804] CHIP:DMG:                         
-          [1657115522.133414][8804:8804] CHIP:DMG:                         CommandFields = 
+          [1657115522.133349][8804:8804] CHIP:DMG:
+          [1657115522.133414][8804:8804] CHIP:DMG:                         CommandFields =
           [1657115522.133490][8804:8804] CHIP:DMG:                         {
-          [1657115522.133573][8804:8804] CHIP:DMG:                                 0x0 = 1, 
-          [1657115522.133664][8804:8804] CHIP:DMG:                                 0x1 = 1, 
+          [1657115522.133573][8804:8804] CHIP:DMG:                                 0x0 = 1,
+          [1657115522.133664][8804:8804] CHIP:DMG:                                 0x1 = 1,
           [1657115522.133755][8804:8804] CHIP:DMG:                         },
           [1657115522.133826][8804:8804] CHIP:DMG:                 },
-          [1657115522.133903][8804:8804] CHIP:DMG:                 
+          [1657115522.133903][8804:8804] CHIP:DMG:
           [1657115522.133962][8804:8804] CHIP:DMG:         ],
-          [1657115522.134036][8804:8804] CHIP:DMG:         
+          [1657115522.134036][8804:8804] CHIP:DMG:
           [1657115522.134095][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
           [1657115522.134152][8804:8804] CHIP:DMG: },
           [1657115522.134302][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
@@ -391,12 +466,14 @@ tests:
       PICS: DRLK.S.F04 && DRLK.C.C11.Tx
       verification: |
           ./chip-tool doorlock set-holiday-schedule 1 20 30 0 1 1
-          verify on Reference app receives the right response for the data sent in the above commands
+
+          Verify the " Set Holiday Day Schedule command response" on TH(lock-app):
+
 
           [1657115547.835987][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115547.836055][8804:8804] CHIP:DMG: {
-          [1657115547.836111][8804:8804] CHIP:DMG:         suppressResponse = false, 
-          [1657115547.836192][8804:8804] CHIP:DMG:         timedRequest = false, 
+          [1657115547.836111][8804:8804] CHIP:DMG:         suppressResponse = false,
+          [1657115547.836192][8804:8804] CHIP:DMG:         timedRequest = false,
           [1657115547.836254][8804:8804] CHIP:DMG:         InvokeRequests =
           [1657115547.836332][8804:8804] CHIP:DMG:         [
           [1657115547.836392][8804:8804] CHIP:DMG:                 CommandDataIB =
@@ -407,18 +484,18 @@ tests:
           [1657115547.836785][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
           [1657115547.836912][8804:8804] CHIP:DMG:                                 CommandId = 0x11,
           [1657115547.836989][8804:8804] CHIP:DMG:                         },
-          [1657115547.837069][8804:8804] CHIP:DMG:                         
-          [1657115547.837139][8804:8804] CHIP:DMG:                         CommandFields = 
+          [1657115547.837069][8804:8804] CHIP:DMG:
+          [1657115547.837139][8804:8804] CHIP:DMG:                         CommandFields =
           [1657115547.837214][8804:8804] CHIP:DMG:                         {
-          [1657115547.837294][8804:8804] CHIP:DMG:                                 0x0 = 1, 
-          [1657115547.837382][8804:8804] CHIP:DMG:                                 0x1 = 20, 
-          [1657115547.837464][8804:8804] CHIP:DMG:                                 0x2 = 30, 
-          [1657115547.837542][8804:8804] CHIP:DMG:                                 0x3 = 0, 
+          [1657115547.837294][8804:8804] CHIP:DMG:                                 0x0 = 1,
+          [1657115547.837382][8804:8804] CHIP:DMG:                                 0x1 = 20,
+          [1657115547.837464][8804:8804] CHIP:DMG:                                 0x2 = 30,
+          [1657115547.837542][8804:8804] CHIP:DMG:                                 0x3 = 0,
           [1657115547.837624][8804:8804] CHIP:DMG:                         },
           [1657115547.837693][8804:8804] CHIP:DMG:                 },
-          [1657115547.837768][8804:8804] CHIP:DMG:                 
+          [1657115547.837768][8804:8804] CHIP:DMG:
           [1657115547.837826][8804:8804] CHIP:DMG:         ],
-          [1657115547.837901][8804:8804] CHIP:DMG:         
+          [1657115547.837901][8804:8804] CHIP:DMG:
           [1657115547.837959][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
           [1657115547.838016][8804:8804] CHIP:DMG: },
           [1657115547.838163][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
@@ -432,7 +509,9 @@ tests:
       PICS: DRLK.S.F04 && DRLK.C.C12.Tx
       verification: |
           ./chip-tool doorlock get-holiday-schedule 1 1 1
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify the " Get Holiday Day Schedule command response" on TH(lock-app):
+
+
 
           [1655380520.601439][3411:3411] CHIP:DMG: {
           [1655380520.601461][3411:3411] CHIP:DMG:        suppressResponse = false,
@@ -467,12 +546,15 @@ tests:
       PICS: DRLK.S.F04 && DRLK.C.C13.Tx
       verification: |
           ./chip-tool doorlock clear-holiday-schedule 1 1 1
-          verify on Reference app receives the right response for the data sent in the above commands
+
+          Verify the " Clear Holiday Day Schedule command response" on TH(lock-app):
+
+
 
           [1657115633.501630][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115633.501697][8804:8804] CHIP:DMG: {
-          [1657115633.501754][8804:8804] CHIP:DMG:         suppressResponse = false, 
-          [1657115633.501831][8804:8804] CHIP:DMG:         timedRequest = false, 
+          [1657115633.501754][8804:8804] CHIP:DMG:         suppressResponse = false,
+          [1657115633.501831][8804:8804] CHIP:DMG:         timedRequest = false,
           [1657115633.501894][8804:8804] CHIP:DMG:         InvokeRequests =
           [1657115633.501971][8804:8804] CHIP:DMG:         [
           [1657115633.502031][8804:8804] CHIP:DMG:                 CommandDataIB =
@@ -483,15 +565,15 @@ tests:
           [1657115633.502445][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
           [1657115633.502536][8804:8804] CHIP:DMG:                                 CommandId = 0x13,
           [1657115633.502622][8804:8804] CHIP:DMG:                         },
-          [1657115633.502713][8804:8804] CHIP:DMG:                         
-          [1657115633.502786][8804:8804] CHIP:DMG:                         CommandFields = 
+          [1657115633.502713][8804:8804] CHIP:DMG:
+          [1657115633.502786][8804:8804] CHIP:DMG:                         CommandFields =
           [1657115633.502871][8804:8804] CHIP:DMG:                         {
-          [1657115633.502962][8804:8804] CHIP:DMG:                                 0x0 = 1, 
+          [1657115633.502962][8804:8804] CHIP:DMG:                                 0x0 = 1,
           [1657115633.503045][8804:8804] CHIP:DMG:                         },
           [1657115633.503129][8804:8804] CHIP:DMG:                 },
-          [1657115633.503210][8804:8804] CHIP:DMG:                 
+          [1657115633.503210][8804:8804] CHIP:DMG:
           [1657115633.503269][8804:8804] CHIP:DMG:         ],
-          [1657115633.503342][8804:8804] CHIP:DMG:         
+          [1657115633.503342][8804:8804] CHIP:DMG:
           [1657115633.503401][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
           [1657115633.503458][8804:8804] CHIP:DMG: },
           [1657115633.503600][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
@@ -504,278 +586,264 @@ tests:
     - label: "DUT sends Set USer command to TH."
       PICS: DRLK.S.F08 && DRLK.C.C1a.Tx
       verification: |
-          ./chip-tool doorlock set-user 0 1 xxx 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
-          verify on Reference app receives the right response for the data sent in the above commands
+          ./chip-tool doorlock set-user 0 2 xxx 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
-          [1657115673.129634][8804:8804] CHIP:DMG: InvokeRequestMessage =
-          [1657115673.129696][8804:8804] CHIP:DMG: {
-          [1657115673.129753][8804:8804] CHIP:DMG:         suppressResponse = false, 
-          [1657115673.129818][8804:8804] CHIP:DMG:         timedRequest = true, 
-          [1657115673.129877][8804:8804] CHIP:DMG:         InvokeRequests =
-          [1657115673.129959][8804:8804] CHIP:DMG:         [
-          [1657115673.130019][8804:8804] CHIP:DMG:                 CommandDataIB =
-          [1657115673.130094][8804:8804] CHIP:DMG:                 {
-          [1657115673.130156][8804:8804] CHIP:DMG:                         CommandPathIB =
-          [1657115673.130230][8804:8804] CHIP:DMG:                         {
-          [1657115673.130311][8804:8804] CHIP:DMG:                                 EndpointId = 0x1,
-          [1657115673.130392][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
-          [1657115673.130470][8804:8804] CHIP:DMG:                                 CommandId = 0x1a,
-          [1657115673.130545][8804:8804] CHIP:DMG:                         },
-          [1657115673.130622][8804:8804] CHIP:DMG:                         
-          [1657115673.130687][8804:8804] CHIP:DMG:                         CommandFields = 
-          [1657115673.130762][8804:8804] CHIP:DMG:                         {
-          [1657115673.130839][8804:8804] CHIP:DMG:                                 0x0 = 0, 
-          [1657115673.130928][8804:8804] CHIP:DMG:                                 0x1 = 1, 
-          [1657115673.131013][8804:8804] CHIP:DMG:                                 0x2 = "xxx", 
-          [1657115673.131094][8804:8804] CHIP:DMG:                                 0x3 = 6452, 
-          [1657115673.131183][8804:8804] CHIP:DMG:                                 0x4 = 1, 
-          [1657115673.131264][8804:8804] CHIP:DMG:                                 0x5 = 0, 
-          [1657115673.131345][8804:8804] CHIP:DMG:                                 0x6 = 0, 
-          [1657115673.131423][8804:8804] CHIP:DMG:                         },
-          [1657115673.131493][8804:8804] CHIP:DMG:                 },
-          [1657115673.131572][8804:8804] CHIP:DMG:                 
-          [1657115673.131632][8804:8804] CHIP:DMG:         ],
-          [1657115673.131708][8804:8804] CHIP:DMG:         
-          [1657115673.131766][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
-          [1657115673.131823][8804:8804] CHIP:DMG: },
-          [1657115673.131976][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
-          [1657115673.132056][8804:8804] CHIP:DMG: AccessControl: allowed
-          [1657115673.132122][8804:8804] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001A
-          [1657115673.132232][8804:8804] CHIP:ZCL: [SetUser] Incoming command [endpointId=1,userIndex=1]
-          [1657115673.132324][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetUser [endpoint=1,userIndex=1]
-          [1657115673.132380][8804:8804] CHIP:ZCL: Found unoccupied user [endpoint=1,adjustedIndex=0]
-          [1657115673.132436][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::SetUser [endpoint=1,userIndex=1,creator=1,modifier=1,userName="xxx",uniqueId=1934,userStatus=1,userType=0,credentialRule=0,credentials=(nil),totalCredentials=0]
-          [1657115673.132499][8804:8804] CHIP:ZCL: Successfully set the user [mEndpointId=1,index=1,adjustedIndex=0]
-          [1657115673.132551][8804:8804] CHIP:ZCL: [createUser] User created [endpointId=1,creatorFabricId=1,userIndex=1,userName="xxx",userUniqueId=0x1934,userStatus=1,userType=0,credentialRule=0,totalCredentials=0]
-          [1657115673.132702][8804:8804] CHIP:EVL: LogEvent event number: 0x0000000000000003 priority: 1, endpoint id:  0x1 cluster id: 0x0000_0101 event id: 0x4 Sys timestamp: 0x000000000221E52F
-          [1657115673.132770][8804:8804] CHIP:ZCL: [RemoteLockUserChange] Sent lock user change event [endpointId=1,eventNumber=3,dataType=2,operation=0,nodeId=112233,fabricIndex=1]
+          Verify the " Set User Day Schedule command response" on TH(lock-app):
+
+
+
+          [1658398796.181348][2474:2474] CHIP:DMG: InvokeRequestMessage =
+          [1658398796.181385][2474:2474] CHIP:DMG: {
+          [1658398796.181419][2474:2474] CHIP:DMG:        suppressResponse = false,
+          [1658398796.181457][2474:2474] CHIP:DMG:        timedRequest = true,
+          [1658398796.181493][2474:2474] CHIP:DMG:        InvokeRequests =
+          [1658398796.181542][2474:2474] CHIP:DMG:        [
+          [1658398796.181578][2474:2474] CHIP:DMG:                CommandDataIB =
+          [1658398796.181618][2474:2474] CHIP:DMG:                {
+          [1658398796.181656][2474:2474] CHIP:DMG:                        CommandPathIB =
+          [1658398796.181703][2474:2474] CHIP:DMG:                        {
+          [1658398796.181750][2474:2474] CHIP:DMG:                                EndpointId = 0x1,
+          [1658398796.181800][2474:2474] CHIP:DMG:                                ClusterId = 0x101,
+          [1658398796.181848][2474:2474] CHIP:DMG:                                CommandId = 0x1a,
+          [1658398796.181892][2474:2474] CHIP:DMG:                        },
+          [1658398796.181939][2474:2474] CHIP:DMG:
+          [1658398796.181981][2474:2474] CHIP:DMG:                        CommandFields =
+          [1658398796.182026][2474:2474] CHIP:DMG:                        {
+          [1658398796.182072][2474:2474] CHIP:DMG:                                0x0 = 0,
+          [1658398796.182120][2474:2474] CHIP:DMG:                                0x1 = 2,
+          [1658398796.182171][2474:2474] CHIP:DMG:                                0x2 = "xxx",
+          [1658398796.182220][2474:2474] CHIP:DMG:                                0x3 = 6452,
+          [1658398796.182269][2474:2474] CHIP:DMG:                                0x4 = 1,
+          [1658398796.182322][2474:2474] CHIP:DMG:                                0x5 = 0,
+          [1658398796.182371][2474:2474] CHIP:DMG:                                0x6 = 0,
+          [1658398796.182419][2474:2474] CHIP:DMG:                        },
+          [1658398796.182462][2474:2474] CHIP:DMG:                },
+          [1658398796.182512][2474:2474] CHIP:DMG:
+          [1658398796.182547][2474:2474] CHIP:DMG:        ],
+          [1658398796.182594][2474:2474] CHIP:DMG:
+          [1658398796.182629][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658398796.182664][2474:2474] CHIP:DMG: },
+          [1658398796.182758][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
+          [1658398796.182809][2474:2474] CHIP:DMG: AccessControl: allowed
+          [1658398796.182849][2474:2474] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001A
+          [1658398796.182918][2474:2474] CHIP:ZCL: [SetUser] Incoming command [endpointId=1,userIndex=2]
+          [1658398796.182977][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetUser [endpoint=1,userIndex=2]
+          [1658398796.183011][2474:2474] CHIP:ZCL: Found unoccupied user [endpoint=1,adjustedIndex=1]
+          [1658398796.183043][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::SetUser [endpoint=1,userIndex=2,creator=1,modifier=1,userName="xxx",uniqueId=1934,userStatus=1,userType=0,credentialRule=0,credentials=(nil),totalCredentials=0]
+          [1658398796.183081][2474:2474] CHIP:ZCL: Successfully set the user [mEndpointId=1,index=2,adjustedIndex=1]
       disabled: true
 
     - label: "DUT sends Get User to TH."
       PICS: DRLK.S.F08 && DRLK.C.C1b.Tx
       verification: |
-          ./chip-tool doorlock get-user 1 1 1 --timedInteractionTimeoutMs 1000
-          verify on Reference app receives the right response for the data sent in the above commands
+          ./chip-tool doorlock get-user 2 1 1 --timedInteractionTimeoutMs 1000
+          Verify the " Get User Day Schedule command response" on TH(lock-app):
 
-          [1657115701.117285][8804:8804] CHIP:DMG: InvokeRequestMessage =
-          [1657115701.117346][8804:8804] CHIP:DMG: {
-          [1657115701.117403][8804:8804] CHIP:DMG:         suppressResponse = false, 
-          [1657115701.117467][8804:8804] CHIP:DMG:         timedRequest = true, 
-          [1657115701.117527][8804:8804] CHIP:DMG:         InvokeRequests =
-          [1657115701.117601][8804:8804] CHIP:DMG:         [
-          [1657115701.117660][8804:8804] CHIP:DMG:                 CommandDataIB =
-          [1657115701.117779][8804:8804] CHIP:DMG:                 {
-          [1657115701.117851][8804:8804] CHIP:DMG:                         CommandPathIB =
-          [1657115701.117932][8804:8804] CHIP:DMG:                         {
-          [1657115701.118014][8804:8804] CHIP:DMG:                                 EndpointId = 0x1,
-          [1657115701.118099][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
-          [1657115701.118180][8804:8804] CHIP:DMG:                                 CommandId = 0x1b,
-          [1657115701.118256][8804:8804] CHIP:DMG:                         },
-          [1657115701.118336][8804:8804] CHIP:DMG:                         
-          [1657115701.118403][8804:8804] CHIP:DMG:                         CommandFields = 
-          [1657115701.118482][8804:8804] CHIP:DMG:                         {
-          [1657115701.118564][8804:8804] CHIP:DMG:                                 0x0 = 1, 
-          [1657115701.118645][8804:8804] CHIP:DMG:                         },
-          [1657115701.118716][8804:8804] CHIP:DMG:                 },
-          [1657115701.118789][8804:8804] CHIP:DMG:                 
-          [1657115701.118847][8804:8804] CHIP:DMG:         ],
-          [1657115701.118919][8804:8804] CHIP:DMG:         
-          [1657115701.118977][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
-          [1657115701.119035][8804:8804] CHIP:DMG: },
-          [1657115701.119186][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
-          [1657115701.119271][8804:8804] CHIP:DMG: AccessControl: allowed
-          [1657115701.119338][8804:8804] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001B
-          [1657115701.119416][8804:8804] CHIP:ZCL: [GetUser] Incoming command [endpointId=1,userIndex=1]
+
+
+          [1658398920.378963][2474:2474] CHIP:DMG:                        CommandPathIB =
+          [1658398920.378994][2474:2474] CHIP:DMG:                        {
+          [1658398920.379027][2474:2474] CHIP:DMG:                                EndpointId = 0x1,
+          [1658398920.379064][2474:2474] CHIP:DMG:                                ClusterId = 0x101,
+          [1658398920.379096][2474:2474] CHIP:DMG:                                CommandId = 0x1b,
+          [1658398920.379125][2474:2474] CHIP:DMG:                        },
+          [1658398920.379156][2474:2474] CHIP:DMG:
+          [1658398920.379185][2474:2474] CHIP:DMG:                        CommandFields =
+          [1658398920.379281][2474:2474] CHIP:DMG:                        {
+          [1658398920.379315][2474:2474] CHIP:DMG:                                0x0 = 2,
+          [1658398920.379348][2474:2474] CHIP:DMG:                        },
+          [1658398920.379377][2474:2474] CHIP:DMG:                },
+          [1658398920.379408][2474:2474] CHIP:DMG:
+          [1658398920.379433][2474:2474] CHIP:DMG:        ],
+          [1658398920.379463][2474:2474] CHIP:DMG:
+          [1658398920.379486][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658398920.379508][2474:2474] CHIP:DMG: },
+          [1658398920.379573][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
+          [1658398920.379611][2474:2474] CHIP:DMG: AccessControl: allowed
+          [1658398920.379637][2474:2474] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001B
+          [1658398920.379669][2474:2474] CHIP:ZCL: [GetUser] Incoming command [endpointId=1,userIndex=2]
+          [1658398920.379707][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetUser [endpoint=1,userIndex=2]
       disabled: true
 
     - label: "DUT sends Clear User command to TH.a"
       PICS: DRLK.S.F08 && DRLK.C.C1d.Tx
       verification: |
-          ./chip-tool doorlock clear-user 1 1 1 --timedInteractionTimeoutMs 1000
-          verify on Reference app receives the right response for the data sent in the above commands
+          ./chip-tool doorlock clear-user 2 1 1 --timedInteractionTimeoutMs 1000
+          Verify the " Clear User Day Schedule command response" on TH(lock-app):
 
 
-          [1657115759.636068][8804:8804] CHIP:DMG: InvokeRequestMessage =
-          [1657115759.636131][8804:8804] CHIP:DMG: {
-          [1657115759.636188][8804:8804] CHIP:DMG:         suppressResponse = false, 
-          [1657115759.636253][8804:8804] CHIP:DMG:         timedRequest = true, 
-          [1657115759.636314][8804:8804] CHIP:DMG:         InvokeRequests =
-          [1657115759.636390][8804:8804] CHIP:DMG:         [
-          [1657115759.636450][8804:8804] CHIP:DMG:                 CommandDataIB =
-          [1657115759.636534][8804:8804] CHIP:DMG:                 {
-          [1657115759.636597][8804:8804] CHIP:DMG:                         CommandPathIB =
-          [1657115759.636686][8804:8804] CHIP:DMG:                         {
-          [1657115759.636769][8804:8804] CHIP:DMG:                                 EndpointId = 0x1,
-          [1657115759.636902][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
-          [1657115759.636989][8804:8804] CHIP:DMG:                                 CommandId = 0x1d,
-          [1657115759.637074][8804:8804] CHIP:DMG:                         },
-          [1657115759.637155][8804:8804] CHIP:DMG:                         
-          [1657115759.637221][8804:8804] CHIP:DMG:                         CommandFields = 
-          [1657115759.637299][8804:8804] CHIP:DMG:                         {
-          [1657115759.637381][8804:8804] CHIP:DMG:                                 0x0 = 1, 
-          [1657115759.637462][8804:8804] CHIP:DMG:                         },
-          [1657115759.637534][8804:8804] CHIP:DMG:                 },
-          [1657115759.637609][8804:8804] CHIP:DMG:                 
-          [1657115759.637667][8804:8804] CHIP:DMG:         ],
-          [1657115759.637741][8804:8804] CHIP:DMG:         
-          [1657115759.637800][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
-          [1657115759.637859][8804:8804] CHIP:DMG: },
-          [1657115759.638009][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
-          [1657115759.638099][8804:8804] CHIP:DMG: AccessControl: allowed
-          [1657115759.638167][8804:8804] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001D
-          [1657115759.638242][8804:8804] CHIP:ZCL: [ClearUser] Incoming command [endpointId=1,userIndex=1]
+
+          [1658399465.849095][2474:2474] CHIP:DMG:                        CommandPathIB =
+          [1658399465.849133][2474:2474] CHIP:DMG:                        {
+          [1658399465.849169][2474:2474] CHIP:DMG:                                EndpointId = 0x1,
+          [1658399465.849208][2474:2474] CHIP:DMG:                                ClusterId = 0x101,
+          [1658399465.849245][2474:2474] CHIP:DMG:                                CommandId = 0x1d,
+          [1658399465.849279][2474:2474] CHIP:DMG:                        },
+          [1658399465.849316][2474:2474] CHIP:DMG:
+          [1658399465.849348][2474:2474] CHIP:DMG:                        CommandFields =
+          [1658399465.849386][2474:2474] CHIP:DMG:                        {
+          [1658399465.849422][2474:2474] CHIP:DMG:                                0x0 = 2,
+          [1658399465.849459][2474:2474] CHIP:DMG:                        },
+          [1658399465.849491][2474:2474] CHIP:DMG:                },
+          [1658399465.849528][2474:2474] CHIP:DMG:
+          [1658399465.849555][2474:2474] CHIP:DMG:        ],
+          [1658399465.849589][2474:2474] CHIP:DMG:
+          [1658399465.849616][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658399465.849643][2474:2474] CHIP:DMG: },
+          [1658399465.849717][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
+          [1658399465.849757][2474:2474] CHIP:DMG: AccessControl: allowed
+          [1658399465.849787][2474:2474] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001D
+          [1658399465.849824][2474:2474] CHIP:ZCL: [ClearUser] Incoming command [endpointId=1,userIndex=2]
+          [1658399465.849871][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetUser [endpoint=1,userIndex=2]
+          [1658399465.849898][2474:2474] CHIP:ZCL: Found occupied user [endpoint=1,adjustedIndex=1,name="xxx",credentialsCount=0,uniqueId=1934,type=0,credentialRule=0,createdBy=1,lastModifiedBy=1]
+          [1658399465.849942][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::SetUser [endpoint=1,userIndex=2,creator=0,modifier=0,userName="",uniqueId=0,userStatus=0,userType=0,credentialRule=0,credentials=(nil),totalCredentials=0]
+          [1658399465.849973][2474:2474] CHIP:ZCL: Successfully set the user [mEndpointId=1,index=2,adjustedIndex=1]
       disabled: true
 
     - label: "DUT sends Set Credential command to TH.a"
       PICS: DRLK.S.F08 && DRLK.C.C22.Tx
       verification: |
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
-          verify on Reference app receives the right response for the data sent in the above commands
+          ./chip-tool doorlock set-credential 0 "{ "credentialType" : 1 , "credentialIndex" : 1 }" 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
-          [1657115790.613466][8804:8804] CHIP:DMG: InvokeRequestMessage =
-          [1657115790.613528][8804:8804] CHIP:DMG: {
-          [1657115790.613584][8804:8804] CHIP:DMG:         suppressResponse = false, 
-          [1657115790.613649][8804:8804] CHIP:DMG:         timedRequest = true, 
-          [1657115790.613709][8804:8804] CHIP:DMG:         InvokeRequests =
-          [1657115790.613793][8804:8804] CHIP:DMG:         [
-          [1657115790.613855][8804:8804] CHIP:DMG:                 CommandDataIB =
-          [1657115790.613936][8804:8804] CHIP:DMG:                 {
-          [1657115790.614008][8804:8804] CHIP:DMG:                         CommandPathIB =
-          [1657115790.614098][8804:8804] CHIP:DMG:                         {
-          [1657115790.614187][8804:8804] CHIP:DMG:                                 EndpointId = 0x1,
-          [1657115790.614280][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
-          [1657115790.614370][8804:8804] CHIP:DMG:                                 CommandId = 0x22,
-          [1657115790.614455][8804:8804] CHIP:DMG:                         },
-          [1657115790.614550][8804:8804] CHIP:DMG:                         
-          [1657115790.614621][8804:8804] CHIP:DMG:                         CommandFields = 
-          [1657115790.614709][8804:8804] CHIP:DMG:                         {
-          [1657115790.614800][8804:8804] CHIP:DMG:                                 0x0 = 0, 
-          [1657115790.614887][8804:8804] CHIP:DMG:                                 0x1 = 
-          [1657115790.614976][8804:8804] CHIP:DMG:                                 {
-          [1657115790.615069][8804:8804] CHIP:DMG:                                         0x0 = 1, 
-          [1657115790.615164][8804:8804] CHIP:DMG:                                         0x1 = 1, 
-          [1657115790.615231][8804:8804] CHIP:DMG:                                 },
-          [1657115790.615325][8804:8804] CHIP:DMG:                                 0x2 = [
-          [1657115790.615417][8804:8804] CHIP:DMG:                                                 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 
-          [1657115790.615514][8804:8804] CHIP:DMG:                                 ]
-          [1657115790.615607][8804:8804] CHIP:DMG:                                 0x3 = 1, 
-          [1657115790.615699][8804:8804] CHIP:DMG:                                 0x4 = 0, 
-          [1657115790.615790][8804:8804] CHIP:DMG:                                 0x5 = 0, 
-          [1657115790.615879][8804:8804] CHIP:DMG:                         },
-          [1657115790.615959][8804:8804] CHIP:DMG:                 },
-          [1657115790.616046][8804:8804] CHIP:DMG:                 
-          [1657115790.616107][8804:8804] CHIP:DMG:         ],
-          [1657115790.616189][8804:8804] CHIP:DMG:         
-          [1657115790.616248][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
-          [1657115790.616305][8804:8804] CHIP:DMG: },
-          [1657115790.616471][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
-          [1657115790.616551][8804:8804] CHIP:DMG: AccessControl: allowed
-          [1657115790.616619][8804:8804] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0022
-          [1657115790.616725][8804:8804] CHIP:ZCL: [SetCredential] Incoming command [endpointId=1]
-          [1657115790.616810][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=2,credentialType=1]
-          [1657115790.616906][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=2]
-          [1657115790.616971][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=1,credentialType=1]
-          [1657115790.617026][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=1]
-          [1657115790.617078][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=2,credentialType=1]
-          [1657115790.617129][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=2]
-          [1657115790.617179][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=3,credentialType=1]
-          [1657115790.617229][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=3]
-          [1657115790.617278][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=4,credentialType=1]
-          [1657115790.617328][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=4]
-          [1657115790.617378][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=5,credentialType=1]
-          [1657115790.617428][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=5]
-          [1657115790.617478][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=6,credentialType=1]
-          [1657115790.617528][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=6]
-          [1657115790.617578][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=7,credentialType=1]
-          [1657115790.617629][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=7]
-          [1657115790.617679][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=8,credentialType=1]
-          [1657115790.617730][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=8]
-          [1657115790.617780][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=9,credentialType=1]
-          [1657115790.617831][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=9]
-          [1657115790.617881][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=10,credentialType=1]
-          [1657115790.617933][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=10]
-          [1657115790.617983][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=1,credentialType=1]
-          [1657115790.618034][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=1]
-          [1657115790.618095][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetUser [endpoint=1,userIndex=1]
-          [1657115790.618149][8804:8804] CHIP:ZCL: Found unoccupied user [endpoint=1,adjustedIndex=0]
-          [1657115790.618201][8804:8804] CHIP:ZCL: [SetCredential] Unable to add credential to user: user clot is empty [endpointId=1,credentialIndex=1,userIndex=1]
+          Verify the " Set Credential  command response" on TH(lock-app):
+
+
+
+          [1658399006.369032][2474:2474] CHIP:DMG:                        CommandPathIB =
+          [1658399006.369075][2474:2474] CHIP:DMG:                        {
+          [1658399006.369119][2474:2474] CHIP:DMG:                                EndpointId = 0x1,
+          [1658399006.369164][2474:2474] CHIP:DMG:                                ClusterId = 0x101,
+          [1658399006.369209][2474:2474] CHIP:DMG:                                CommandId = 0x22,
+          [1658399006.369251][2474:2474] CHIP:DMG:                        },
+          [1658399006.369299][2474:2474] CHIP:DMG:
+          [1658399006.369337][2474:2474] CHIP:DMG:                        CommandFields =
+          [1658399006.369379][2474:2474] CHIP:DMG:                        {
+          [1658399006.369421][2474:2474] CHIP:DMG:                                0x0 = 0,
+          [1658399006.369468][2474:2474] CHIP:DMG:                                0x1 =
+          [1658399006.369511][2474:2474] CHIP:DMG:                                {
+          [1658399006.369560][2474:2474] CHIP:DMG:                                        0x0 = 1,
+          [1658399006.369606][2474:2474] CHIP:DMG:                                        0x1 = 1,
+          [1658399006.369652][2474:2474] CHIP:DMG:                                },
+          [1658399006.369697][2474:2474] CHIP:DMG:                                0x2 = [
+          [1658399006.369745][2474:2474] CHIP:DMG:                                                0x31, 0x32, 0x33, 0x34, 0x35, 0x36,
+          [1658399006.369796][2474:2474] CHIP:DMG:                                ]
+          [1658399006.369841][2474:2474] CHIP:DMG:                                0x3 = 1,
+          [1658399006.369889][2474:2474] CHIP:DMG:                                0x4 = 0,
+          [1658399006.369937][2474:2474] CHIP:DMG:                                0x5 = 0,
+          [1658399006.369979][2474:2474] CHIP:DMG:                        },
+          [1658399006.370017][2474:2474] CHIP:DMG:                },
+          [1658399006.370063][2474:2474] CHIP:DMG:
+          [1658399006.370096][2474:2474] CHIP:DMG:        ],
+          [1658399006.370140][2474:2474] CHIP:DMG:
+          [1658399006.370172][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658399006.370204][2474:2474] CHIP:DMG: },
+          [1658399006.370297][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
+          [1658399006.370344][2474:2474] CHIP:DMG: AccessControl: allowed
+          [1658399006.370379][2474:2474] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0022
+          [1658399006.370446][2474:2474] CHIP:ZCL: [SetCredential] Incoming command [endpointId=1]
+          [1658399006.370498][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=2,credentialType=1]
+          [1658399006.370528][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=2]
+          [1658399006.370563][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=1,credentialType=1]
+          [1658399006.370592][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=1]
+          [1658399006.370619][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=2,credentialType=1]
+          [1658399006.370646][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=2]
+          [1658399006.370672][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=3,credentialType=1]
+          [1658399006.370700][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=3]
+          [1658399006.370726][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=4,credentialType=1]
+          [1658399006.370753][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=4]
+          [1658399006.370780][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=5,credentialType=1]
+          [1658399006.370807][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=5]
+          [1658399006.370834][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=6,credentialType=1]
+          [1658399006.370861][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=6]
+          [1658399006.370888][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=7,credentialType=1]
+          [1658399006.370915][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=7]
+          [1658399006.370941][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=8,credentialType=1]
+          [1658399006.370968][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=8]
+          [1658399006.370995][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=9,credentialType=1]
+          [1658399006.371022][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=9]
+          [1658399006.371048][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=10,credentialType=1]
+          [1658399006.371076][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=10]
+          [1658399006.371102][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=1,credentialType=1]
+          [1658399006.371130][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=1]
+          [1658399006.371164][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetUser [endpoint=1,userIndex=1]
+          [1658399006.371194][2474:2474] CHIP:ZCL: Found occupied user [endpoint=1,adjustedIndex=0,name="xxx",credentialsCount=0,uniqueId=1934,type=0,credentialRule=0,createdBy=1,lastModifiedBy=1]
+          [1658399006.371255][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetUser [endpoint=1,userIndex=1]
+          [1658399006.371284][2474:2474] CHIP:ZCL: Found occupied user [endpoint=1,adjustedIndex=0,name="xxx",credentialsCount=0,uniqueId=1934,type=0,credentialRule=0,createdBy=1,lastModifiedBy=1]
+          [1658399006.371321][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::SetUser [endpoint=1,userIndex=1,creator=1,modifier=1,userName="xxx",uniqueId=1934,userStatus=1,userType=0,credentialRule=0,credentials=0xaaaae780f570,totalCredentials=1]
+          [1658399006.371357][2474:2474] CHIP:ZCL: Successfully set the user [mEndpointId=1,index=1,adjustedIndex=0]
+          [1658399006.371385][2474:2474] CHIP:ZCL: [AddCredentialToUser] Credential added to user [endpointId=1,userIndex=1,credentialType=1,credentialIndex=1,userTotalCredentials=1]
+          [1658399006.371416][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::SetCredential [endpoint=1,credentialIndex=1,credentialStatus=1,credentialType=1,credentialDataSize=6,creator=1,modifier=1]
+          [1658399006.371447][2474:2474] CHIP:ZCL: Successfully set the credential [mEndpointId=1,index=1,credentialType=1,creator=1,modifier=1]
       disabled: true
 
     - label: "DUT sends Get Credential to TH."
       PICS: DRLK.S.F08 && DRLK.C.C24.Tx
       verification: |
-          ./chip-tool doorlock get-credential-status  '{ "credentialType" : 1 , "credentialIndex" : 1 }' 1 1 --timedInteractionTimeoutMs 1000
-          verify on Reference app receives the right response for the data sent in the above commands
+          ./chip-tool doorlock get-credential-status  "{ "credentialType" : 1 , "credentialIndex" : 1 }" 1 1 --timedInteractionTimeoutMs 1000
+          Verify the " Get Credential  command response" on TH(lock-app):
 
-          [1657115826.641760][8804:8804] CHIP:DMG: InvokeRequestMessage =
-          [1657115826.641847][8804:8804] CHIP:DMG: {
-          [1657115826.641907][8804:8804] CHIP:DMG:         suppressResponse = false, 
-          [1657115826.641973][8804:8804] CHIP:DMG:         timedRequest = true, 
-          [1657115826.642057][8804:8804] CHIP:DMG:         InvokeRequests =
-          [1657115826.642188][8804:8804] CHIP:DMG:         [
-          [1657115826.642251][8804:8804] CHIP:DMG:                 CommandDataIB =
-          [1657115826.642339][8804:8804] CHIP:DMG:                 {
-          [1657115826.642404][8804:8804] CHIP:DMG:                         CommandPathIB =
-          [1657115826.642502][8804:8804] CHIP:DMG:                         {
-          [1657115826.642586][8804:8804] CHIP:DMG:                                 EndpointId = 0x1,
-          [1657115826.642700][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
-          [1657115826.642805][8804:8804] CHIP:DMG:                                 CommandId = 0x24,
-          [1657115826.642891][8804:8804] CHIP:DMG:                         },
-          [1657115826.642996][8804:8804] CHIP:DMG:                         
-          [1657115826.643084][8804:8804] CHIP:DMG:                         CommandFields = 
-          [1657115826.643174][8804:8804] CHIP:DMG:                         {
-          [1657115826.643270][8804:8804] CHIP:DMG:                                 0x0 = 
-          [1657115826.643382][8804:8804] CHIP:DMG:                                 {
-          [1657115826.643480][8804:8804] CHIP:DMG:                                         0x0 = 1, 
-          [1657115826.643596][8804:8804] CHIP:DMG:                                         0x1 = 1, 
-          [1657115826.643704][8804:8804] CHIP:DMG:                                 },
-          [1657115826.643795][8804:8804] CHIP:DMG:                         },
-          [1657115826.643888][8804:8804] CHIP:DMG:                 },
-          [1657115826.643989][8804:8804] CHIP:DMG:                 
-          [1657115826.644053][8804:8804] CHIP:DMG:         ],
-          [1657115826.644148][8804:8804] CHIP:DMG:         
-          [1657115826.644210][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
-          [1657115826.644269][8804:8804] CHIP:DMG: },
-          [1657115826.644470][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
-          [1657115826.644577][8804:8804] CHIP:DMG: AccessControl: allowed
-          [1657115826.644648][8804:8804] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0024
-          [1657115826.644736][8804:8804] CHIP:ZCL: [GetCredentialStatus] Incoming command [endpointId=1]
-          [1657115826.644821][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=1,credentialType=1]
-          [1657115826.645076][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=1]
-          [1657115826.645160][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=2,credentialType=1]
-          [1657115826.645219][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=2]
-          [1657115826.645270][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=3,credentialType=1]
-          [1657115826.645320][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=3]
-          [1657115826.645370][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=4,credentialType=1]
-          [1657115826.645444][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=4]
-          [1657115826.645496][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=5,credentialType=1]
-          [1657115826.645547][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=5]
-          [1657115826.645596][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=6,credentialType=1]
-          [1657115826.645648][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=6]
-          [1657115826.645697][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=7,credentialType=1]
-          [1657115826.645748][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=7]
-          [1657115826.645797][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=8,credentialType=1]
-          [1657115826.645848][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=8]
-          [1657115826.645897][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=9,credentialType=1]
-          [1657115826.645948][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=9]
-          [1657115826.645997][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=10,credentialType=1]
-          [1657115826.646048][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=10]
-          [1657115826.646124][8804:8804] CHIP:DMG: ICR moving to [ Preparing]
-          [1657115826.646199][8804:8804] CHIP:DMG: ICR moving to [AddingComm]
-          [1657115826.646272][8804:8804] CHIP:DMG: ICR moving to [AddedComma]
-          [1657115826.646326][8804:8804] CHIP:ZCL: [GetCredentialStatus] Prepared credential status [endpointId=1,credentialType=1,credentialIndex=1,userIndex=0,nextCredentialIndex=0]
+
+
+          [1658399098.914006][2474:2474] CHIP:DMG:                        CommandPathIB =
+          [1658399098.914053][2474:2474] CHIP:DMG:                        {
+          [1658399098.914144][2474:2474] CHIP:DMG:                                EndpointId = 0x1,
+          [1658399098.914180][2474:2474] CHIP:DMG:                                ClusterId = 0x101,
+          [1658399098.914213][2474:2474] CHIP:DMG:                                CommandId = 0x24,
+          [1658399098.914243][2474:2474] CHIP:DMG:                        },
+          [1658399098.914277][2474:2474] CHIP:DMG:
+          [1658399098.914305][2474:2474] CHIP:DMG:                        CommandFields =
+          [1658399098.914335][2474:2474] CHIP:DMG:                        {
+          [1658399098.914364][2474:2474] CHIP:DMG:                                0x0 =
+          [1658399098.914395][2474:2474] CHIP:DMG:                                {
+          [1658399098.914428][2474:2474] CHIP:DMG:                                        0x0 = 1,
+          [1658399098.914462][2474:2474] CHIP:DMG:                                        0x1 = 1,
+          [1658399098.914496][2474:2474] CHIP:DMG:                                },
+          [1658399098.914528][2474:2474] CHIP:DMG:                        },
+          [1658399098.914556][2474:2474] CHIP:DMG:                },
+          [1658399098.914588][2474:2474] CHIP:DMG:
+          [1658399098.914612][2474:2474] CHIP:DMG:        ],
+          [1658399098.914642][2474:2474] CHIP:DMG:
+          [1658399098.914666][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658399098.914689][2474:2474] CHIP:DMG: },
+          [1658399098.914757][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
+          [1658399098.914793][2474:2474] CHIP:DMG: AccessControl: allowed
+          [1658399098.914821][2474:2474] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0024
+          [1658399098.914859][2474:2474] CHIP:ZCL: [GetCredentialStatus] Incoming command [endpointId=1]
+          [1658399098.914896][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=1,credentialType=1]
+          [1658399098.914919][2474:2474] CHIP:ZCL: Found occupied credential [endpoint=1,index=1,type=1,dataSize=6,createdBy=1,modifiedBy=1]
+          [1658399098.914943][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetUser [endpoint=1,userIndex=1]
+          [1658399098.914966][2474:2474] CHIP:ZCL: Found occupied user [endpoint=1,adjustedIndex=0,name="xxx",credentialsCount=1,uniqueId=1934,type=0,credentialRule=0,createdBy=1,lastModifiedBy=1]
+          [1658399098.914995][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=2,credentialType=1]
+          [1658399098.915016][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=2]
+          [1658399098.915036][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=3,credentialType=1]
+          [1658399098.915056][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=3]
+          [1658399098.915075][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=4,credentialType=1]
+          [1658399098.915095][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=4]
+          [1658399098.915115][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=5,credentialType=1]
+          [1658399098.915135][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=5]
+          [1658399098.915155][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=6,credentialType=1]
+          [1658399098.915174][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=6]
+          [1658399098.915194][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=7,credentialType=1]
+          [1658399098.915245][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=7]
+          [1658399098.915267][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=8,credentialType=1]
+          [1658399098.915287][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=8]
+          [1658399098.915307][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=9,credentialType=1]
+          [1658399098.915327][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=9]
+          [1658399098.915346][2474:2474] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=10,credentialType=1]
+          [1658399098.915366][2474:2474] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=10]
       disabled: true
 
     - label: "DUT sends Clear Credential command to TH."
       PICS: DRLK.S.F08 && DRLK.C.C26.Tx
       verification: |
-          ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }' 1 1 --timedInteractionTimeoutMs 1000
-          verify on Reference app receives the right response for the data sent in the above commands
+          ./chip-tool doorlock clear-credential  "{ "credentialType" : 1 , "credentialIndex" : 1 }" 1 1 --timedInteractionTimeoutMs 1000
+          Verify the " Clear Credential  command response" on TH(lock-app):
+
 
           [1657115878.582559][8804:8804] CHIP:DMG: InvokeRequestMessage =
           [1657115878.582642][8804:8804] CHIP:DMG: {
-          [1657115878.582698][8804:8804] CHIP:DMG:         suppressResponse = false, 
-          [1657115878.582787][8804:8804] CHIP:DMG:         timedRequest = true, 
+          [1657115878.582698][8804:8804] CHIP:DMG:         suppressResponse = false,
+          [1657115878.582787][8804:8804] CHIP:DMG:         timedRequest = true,
           [1657115878.582848][8804:8804] CHIP:DMG:         InvokeRequests =
           [1657115878.582948][8804:8804] CHIP:DMG:         [
           [1657115878.583009][8804:8804] CHIP:DMG:                 CommandDataIB =
@@ -786,19 +854,19 @@ tests:
           [1657115878.583607][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
           [1657115878.583724][8804:8804] CHIP:DMG:                                 CommandId = 0x26,
           [1657115878.583802][8804:8804] CHIP:DMG:                         },
-          [1657115878.583906][8804:8804] CHIP:DMG:                         
-          [1657115878.583972][8804:8804] CHIP:DMG:                         CommandFields = 
+          [1657115878.583906][8804:8804] CHIP:DMG:
+          [1657115878.583972][8804:8804] CHIP:DMG:                         CommandFields =
           [1657115878.584068][8804:8804] CHIP:DMG:                         {
-          [1657115878.584155][8804:8804] CHIP:DMG:                                 0x0 = 
+          [1657115878.584155][8804:8804] CHIP:DMG:                                 0x0 =
           [1657115878.584234][8804:8804] CHIP:DMG:                                 {
-          [1657115878.584335][8804:8804] CHIP:DMG:                                         0x0 = 1, 
-          [1657115878.584442][8804:8804] CHIP:DMG:                                         0x1 = 1, 
+          [1657115878.584335][8804:8804] CHIP:DMG:                                         0x0 = 1,
+          [1657115878.584442][8804:8804] CHIP:DMG:                                         0x1 = 1,
           [1657115878.584527][8804:8804] CHIP:DMG:                                 },
           [1657115878.584624][8804:8804] CHIP:DMG:                         },
           [1657115878.584695][8804:8804] CHIP:DMG:                 },
-          [1657115878.584795][8804:8804] CHIP:DMG:                 
+          [1657115878.584795][8804:8804] CHIP:DMG:
           [1657115878.584890][8804:8804] CHIP:DMG:         ],
-          [1657115878.584994][8804:8804] CHIP:DMG:         
+          [1657115878.584994][8804:8804] CHIP:DMG:
           [1657115878.585054][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
           [1657115878.585131][8804:8804] CHIP:DMG: },
           [1657115878.585305][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
@@ -808,4 +876,36 @@ tests:
           [1657115878.585693][8804:8804] CHIP:ZCL: Lock App: LockEndpoint::GetCredential [endpoint=1,credentialIndex=1,credentialType=1]
           [1657115878.585752][8804:8804] CHIP:ZCL: Found unoccupied credential [endpoint=1,index=1]
           [1657115878.585802][8804:8804] CHIP:ZCL: [clearCredential] Ignored attempt to clear unoccupied credential slot [endpointId=1,credentialType=1,credentialIndex=1,modifier=1]
+      disabled: true
+
+    - label: ""
+      verification: |
+          ./chip-tool doorlock clear-user 1 1 1 --timedInteractionTimeoutMs 1000
+
+          Verify the " clear-user  command response" on TH(lock-app):
+
+
+          [1658399779.246157][2474:2474] CHIP:DMG:                CommandDataIB =
+          [1658399779.246193][2474:2474] CHIP:DMG:                {
+          [1658399779.246219][2474:2474] CHIP:DMG:                        CommandPathIB =
+          [1658399779.246258][2474:2474] CHIP:DMG:                        {
+          [1658399779.246301][2474:2474] CHIP:DMG:                                EndpointId = 0x1,
+          [1658399779.246336][2474:2474] CHIP:DMG:                                ClusterId = 0x101,
+          [1658399779.246381][2474:2474] CHIP:DMG:                                CommandId = 0x1d,
+          [1658399779.246411][2474:2474] CHIP:DMG:                        },
+          [1658399779.246452][2474:2474] CHIP:DMG:
+          [1658399779.246480][2474:2474] CHIP:DMG:                        CommandFields =
+          [1658399779.246519][2474:2474] CHIP:DMG:                        {
+          [1658399779.246562][2474:2474] CHIP:DMG:                                0x0 = 1,
+          [1658399779.246595][2474:2474] CHIP:DMG:                        },
+          [1658399779.246631][2474:2474] CHIP:DMG:                },
+          [1658399779.246662][2474:2474] CHIP:DMG:
+          [1658399779.246694][2474:2474] CHIP:DMG:        ],
+          [1658399779.246732][2474:2474] CHIP:DMG:
+          [1658399779.246757][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658399779.246788][2474:2474] CHIP:DMG: },
+          [1658399779.246862][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
+          [1658399779.246899][2474:2474] CHIP:DMG: AccessControl: allowed
+          [1658399779.246926][2474:2474] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001D
+          [1658399779.246958][2474:2474] CHIP:ZCL: [ClearUser] Incoming command [endpointId=1,userIndex=1]
       disabled: true

@@ -12,16 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/examples/platform/efr32/args.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 
 # ARM architecture flags will be set based on efr32_family.
 arm_platform_config = "${efr32_sdk_build_root}/efr32_arm.gni"
 
 mbedtls_target = "${efr32_sdk_build_root}:efr32_sdk"
+
+# default to platform crypto implementation but allow commandline override
+if (chip_crypto == "") {
+  chip_crypto = "platform"
+}
 
 #lwip_platform = "external"
 lwip_platform = "efr32"

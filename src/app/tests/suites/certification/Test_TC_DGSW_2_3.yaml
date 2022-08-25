@@ -14,6 +14,10 @@
 
 name: 43.2.3. [TC-DGSW-2.3] Command received functionality with server as DUT
 
+PICS:
+    - DGSW.S.C
+    - DGSW.S
+
 config:
     nodeId: 0x12344321
     cluster: "Software Diagnostics"
@@ -47,7 +51,7 @@ tests:
       PICS: DGSW.S.A0002
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     #issue #830
     - label: "Reads CurrentHeapHighWaterMark attribute value from DUT"
@@ -56,4 +60,4 @@ tests:
       PICS: DGSW.S.A0003
       response:
           constraints:
-              type: uint64
+              type: int64u

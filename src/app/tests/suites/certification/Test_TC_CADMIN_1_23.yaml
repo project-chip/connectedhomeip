@@ -17,18 +17,25 @@ name:
     24.1.23. [TC-CADMIN-1.23] Open commissioning window - durations max and
     max+1 [BCM] [DUT - Commissionee]
 
+PICS:
+    - CADMIN.S
+    - CADMIN.S.F00
+
 config:
     nodeId: 0x12344321
-    timeout: 330
+    timeout: 200
     endpoint: 0
+    discriminator:
+        type: int16u
+        defaultValue: 3840
 
 tests:
-    - label: "Factory Reset the DUT_CE"
+    - label: "Precondition: Reset Devices to factory defaults"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "FactoryReset"
 
-    - label: "Factory Reset the DUT_CE"
+    - label: "Precondition: Reset Devices to factory defaults"
       verification: |
           Not implemented in YAML
       cluster: "LogCommands"
@@ -37,7 +44,7 @@ tests:
       arguments:
           values:
               - name: "message"
-                value: "Please reboot the DUT and enter 'y' after DUT starts"
+                value: "Factory Reset the DUT and enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
 
@@ -59,8 +66,10 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "discriminator"
+                value: discriminator
 
-    - label: "Wait for commissioning Window to 301 seconds"
+    - label: "Wait for commissioning Window to 181 seconds"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -86,6 +95,8 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 179
+              - name: "discriminator"
+                value: discriminator
       response:
           error: INVALID_COMMAND
 

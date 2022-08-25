@@ -268,7 +268,7 @@ enum class Privilege : uint8_t
 };
 } // namespace AccessControl
 
-namespace BridgedActions {
+namespace Actions {
 
 // Enum for ActionErrorEnum
 enum class ActionErrorEnum : uint8_t
@@ -326,7 +326,7 @@ enum class CommandBits : uint16_t
     kDisableAction               = 0x400,
     kDisableActionWithDuration   = 0x800,
 };
-} // namespace BridgedActions
+} // namespace Actions
 
 namespace Basic {
 } // namespace Basic
@@ -893,6 +893,40 @@ static PHYRateType __attribute__((unused)) kPHYRateTypekUnknownEnumValue        
 } // namespace EthernetNetworkDiagnostics
 
 namespace TimeSynchronization {
+
+// Enum for GranularityEnum
+enum class GranularityEnum : uint8_t
+{
+    kNoTimeGranularity       = 0x00,
+    kMinutesGranularity      = 0x01,
+    kSecondsGranularity      = 0x02,
+    kMillisecondsGranularity = 0x03,
+    kMicrosecondsGranularity = 0x04,
+    kUnknownEnumValue        = 5,
+};
+
+// Enum for TimeSourceEnum
+enum class TimeSourceEnum : uint8_t
+{
+    kNone             = 0x00,
+    kUnknown          = 0x01,
+    kAdmin            = 0x02,
+    kNodeTimeCluster  = 0x03,
+    kNonFabricSntp    = 0x04,
+    kNonFabricNtp     = 0x05,
+    kFabricSntp       = 0x06,
+    kFabricNtp        = 0x07,
+    kMixedNtp         = 0x08,
+    kNonFabricSntpNts = 0x09,
+    kNonFabricNtpNts  = 0x0A,
+    kFabricSntpNts    = 0x0B,
+    kFabricNtpNts     = 0x0C,
+    kMixedNtpNts      = 0x0D,
+    kCloudSource      = 0x0E,
+    kPtp              = 0x0F,
+    kGnss             = 0x10,
+    kUnknownEnumValue = 17,
+};
 } // namespace TimeSynchronization
 
 namespace BridgedDeviceBasic {
@@ -918,9 +952,9 @@ enum class CommissioningWindowStatus : uint8_t
 // Enum for StatusCode
 enum class StatusCode : uint8_t
 {
-    kBusy               = 0x01,
-    kPAKEParameterError = 0x02,
-    kWindowNotOpen      = 0x03,
+    kBusy               = 0x02,
+    kPAKEParameterError = 0x03,
+    kWindowNotOpen      = 0x04,
     kUnknownEnumValue   = 0,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -2271,6 +2305,20 @@ enum class SimpleBitmap : uint8_t
     kValueC = 0x4,
 };
 } // namespace TestCluster
+
+namespace FaultInjection {
+
+// Enum for FaultType
+enum class FaultType : uint8_t
+{
+    kUnspecified      = 0x00,
+    kSystemFault      = 0x01,
+    kInetFault        = 0x02,
+    kChipFault        = 0x03,
+    kCertFault        = 0x04,
+    kUnknownEnumValue = 5,
+};
+} // namespace FaultInjection
 
 } // namespace Clusters
 } // namespace app

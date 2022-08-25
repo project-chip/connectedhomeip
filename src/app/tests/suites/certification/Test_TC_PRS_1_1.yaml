@@ -14,6 +14,9 @@
 
 name: 36.1.1. [TC-PRS-1.1] Global attributes with server as DUT
 
+PICS:
+    - PRS.S
+
 config:
     nodeId: 0x12344321
     cluster: "Pressure Measurement"
@@ -34,7 +37,7 @@ tests:
       response:
           value: 3
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "Read the global attribute: FeatureMap"
       PICS: PRS.S.F00
@@ -43,7 +46,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "Read the global attribute: FeatureMap"
       PICS: " !PRS.S.F00 "
@@ -52,7 +55,7 @@ tests:
       response:
           value: 0
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "Read the global mandatory attribute: AttributeList"
       command: "readAttribute"
@@ -131,19 +134,18 @@ tests:
           value: []
           constraints:
               type: list
-
-    #issue #15011
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

@@ -60,6 +60,16 @@ static_assert(LWIP_VERSION_MAJOR > 1, "CHIP requires LwIP 2.0 or later");
 #endif
 
 namespace chip {
+namespace Platform {
+template <>
+struct Deleter<struct pbuf>
+{
+    void operator()(struct pbuf * p) { pbuf_free(p); }
+};
+} // namespace Platform
+} // namespace chip
+
+namespace chip {
 namespace Inet {
 
 CHIP_ERROR UDPEndPointImplLwIP::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port,
@@ -266,12 +276,10 @@ void UDPEndPointImplLwIP::Free()
     Release();
 }
 
-void UDPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && msg)
+void UDPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && msg, IPPacketInfo * pktInfo)
 {
     if ((mState == State::kListening) && (OnMessageReceived != nullptr))
     {
-        const IPPacketInfo * pktInfo = GetPacketInfo(msg);
-
         if (pktInfo != nullptr)
         {
             const IPPacketInfo pktInfoCopy = *pktInfo; // copy the address info so that the app can free the
@@ -286,6 +294,7 @@ void UDPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && msg)
             }
         }
     }
+    Platform::Delete(pktInfo);
 }
 
 CHIP_ERROR UDPEndPointImplLwIP::GetPCB(IPAddressType addrType)
@@ -352,50 +361,50 @@ CHIP_ERROR UDPEndPointImplLwIP::GetPCB(IPAddressType addrType)
 void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr,
                                                 u16_t port)
 {
-    UDPEndPointImplLwIP * ep       = static_cast<UDPEndPointImplLwIP *>(arg);
-    IPPacketInfo * pktInfo         = nullptr;
-    System::PacketBufferHandle buf = System::PacketBufferHandle::Adopt(p);
-
+    Platform::UniquePtr<struct pbuf> pbufFreeGuard(p);
+    UDPEndPointImplLwIP * ep = static_cast<UDPEndPointImplLwIP *>(arg);
     if (ep->mState == State::kClosed)
+    {
         return;
-
-    if (buf->HasChainedBuffer())
+    }
+    // Raw pointer is required for passing into lambda.
+    // The memory life cycle of `pktInfo` is manually managed.
+    IPPacketInfo * pktInfo = Platform::New<IPPacketInfo>();
+    if (pktInfo == nullptr)
     {
-        // Try the simple expedient of flattening in-place.
-        buf->CompactHead();
+        ChipLogError(Inet, "Cannot allocate packet info");
+        return;
     }
 
-    if (buf->HasChainedBuffer())
+    // TODO: Skip copying the buffer if the pbuf already meets the PacketBuffer memory model
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(p->tot_len, 0);
+    if (buf.IsNull() || pbuf_copy_partial(p, buf->Start(), p->tot_len, 0) != p->tot_len)
     {
-        // Have to allocate a new big-enough buffer and copy.
-        uint16_t messageSize            = buf->TotalLength();
-        System::PacketBufferHandle copy = System::PacketBufferHandle::New(messageSize, 0);
-        if (copy.IsNull() || buf->Read(copy->Start(), messageSize) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Inet, "No memory to flatten incoming packet buffer chain of size %u", buf->TotalLength());
-            return;
-        }
-        buf = std::move(copy);
+        ChipLogError(Inet, "Cannot copy received pbuf of size %u", p->tot_len);
+        return;
     }
+    buf->SetDataLength(p->tot_len);
 
-    pktInfo = GetPacketInfo(buf);
-    if (pktInfo != nullptr)
-    {
-        pktInfo->SrcAddress  = IPAddress(*addr);
-        pktInfo->DestAddress = IPAddress(*ip_current_dest_addr());
-        pktInfo->Interface   = InterfaceId(ip_current_netif());
-        pktInfo->SrcPort     = port;
-        pktInfo->DestPort    = pcb->local_port;
-    }
+    pktInfo->SrcAddress  = IPAddress(*addr);
+    pktInfo->DestAddress = IPAddress(*ip_current_dest_addr());
+    pktInfo->Interface   = InterfaceId(ip_current_netif());
+    pktInfo->SrcPort     = port;
+    pktInfo->DestPort    = pcb->local_port;
 
-    // TODO: add thread-safe reference counting for UDP endpoints
-    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf)] {
-        ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
+    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo] {
+        ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p), pktInfo);
     });
+
     if (err == CHIP_NO_ERROR)
     {
         // If ScheduleLambda() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
         static_cast<void>(std::move(buf).UnsafeRelease());
+    }
+    else
+    {
+        // If ScheduleLambda() succeeded, `pktInfo` will be deleted in `HandleDataReceived`.
+        // Otherwise we delete it here.
+        Platform::Delete(pktInfo);
     }
 }
 
@@ -498,20 +507,6 @@ struct netif * UDPEndPointImplLwIP::FindNetifFromInterfaceId(InterfaceId aInterf
 #endif // defined(NETIF_FOREACH)
 
     return (lRetval);
-}
-
-IPPacketInfo * UDPEndPointImplLwIP::GetPacketInfo(const System::PacketBufferHandle & aBuffer)
-{
-    if (!aBuffer->EnsureReservedSize(sizeof(IPPacketInfo) + 3))
-    {
-        return nullptr;
-    }
-
-    uintptr_t lStart           = (uintptr_t) aBuffer->Start();
-    uintptr_t lPacketInfoStart = lStart - sizeof(IPPacketInfo);
-
-    // Align to a 4-byte boundary
-    return reinterpret_cast<IPPacketInfo *>(lPacketInfoStart & ~(sizeof(uint32_t) - 1));
 }
 
 } // namespace Inet

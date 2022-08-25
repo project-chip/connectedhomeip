@@ -92,8 +92,7 @@ void initNetworkCommissioningThreadDriver(void)
 #endif
 }
 
-NetworkCommissioning::ThreadScanResponse * sScanResult;
-NetworkCommissioning::otScanResponseIterator<NetworkCommissioning::ThreadScanResponse> mScanResponseIter(sScanResult);
+NetworkCommissioning::otScanResponseIterator<NetworkCommissioning::ThreadScanResponse> mScanResponseIter;
 } // namespace
 
 /**
@@ -386,6 +385,9 @@ CHIP_ERROR
 GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    otLinkModeConfig linkMode;
+#endif
 
     // If there is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -399,6 +401,18 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCom
     {
         SuccessOrExit(error = MapOpenThreadError(otIp6SetEnabled(mOTInst, true)));
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    // Thread network discovery makes Sleepy End Devices detach from a network, so temporarily disable the SED mode.
+    linkMode = otThreadGetLinkMode(mOTInst);
+
+    if (!linkMode.mRxOnWhenIdle)
+    {
+        mTemporaryRxOnWhenIdle = true;
+        linkMode.mRxOnWhenIdle = true;
+        otThreadSetLinkMode(mOTInst, linkMode);
+    }
+#endif
 
     error = MapOpenThreadError(otThreadDiscover(mOTInst, 0,                       /* all channels */
                                                 OT_PANID_BROADCAST, false, false, /* disable PAN ID, EUI64 and Joiner filtering */
@@ -426,6 +440,16 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
 {
     if (aResult == nullptr) // scan completed
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+        if (mTemporaryRxOnWhenIdle)
+        {
+            otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
+            linkMode.mRxOnWhenIdle    = false;
+            mTemporaryRxOnWhenIdle    = false;
+            otThreadSetLinkMode(mOTInst, linkMode);
+        }
+#endif
+
         // If Thread scanning was done before commissioning, turn off the IPv6 interface.
         if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && !otDatasetIsCommissioned(mOTInst))
         {
@@ -1563,7 +1587,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::ChannelMask::Id: {
+    case ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::Id: {
         err = CHIP_ERROR_INCORRECT_STATE;
         if (otDatasetIsCommissioned(mOTInst))
         {

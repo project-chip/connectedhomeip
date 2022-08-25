@@ -387,6 +387,7 @@ menu "CHIP Device Layer"
     menu "WiFi AP Options"
 
         config ENABLE_WIFI_AP
+            depends on ESP_WIFI_SOFTAP_SUPPORT
             bool "Enable CHIP WIFI AP"
             default y
             help
@@ -501,14 +502,6 @@ menu "CHIP Device Layer"
                 Limit support for CHIP-over-BLE (WoBLE) to a single inbound connection.
 
                 When set, WoBLE advertisements will stop while a WoBLE connection is active.
-
-        config CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-            bool "Disable Advertising when Provisioned"
-            default n
-            depends on ENABLE_CHIPOBLE
-            help
-                Automatically disable CHIP-over-BLE (WoBLE) advertising when the device transitions
-                to a fully provisioned state.
 
         config DEINIT_BLE_ON_COMMISSIONING_COMPLETE
 	    bool "Disable and DeInit BLE on commissioning complete"
@@ -643,6 +636,15 @@ menu "CHIP Device Layer"
                 Use ESP32 Device Instance Info Provider to get device instance info from factory partition.
                 Details like Vendor Name, Vendor Id, Product Name, Product Id, Serial Number, Manufacturing Date,
                 Hardware Version, Hardware Version String, and Rotating Device Id UniqueId will be read from factory
+                partition.
+
+        config ENABLE_ESP32_DEVICE_INFO_PROVIDER
+            depends on ENABLE_ESP32_FACTORY_DATA_PROVIDER
+            bool "Use ESP32 Device Info Provider"
+            default n
+            help
+                Use ESP32 Device Info Provider to get device instance info from factory partition.
+                Details like Supported calendar types, supported locales, and fixed labels will be read from factory
                 partition.
 
     endmenu
@@ -834,6 +836,12 @@ menu "CHIP Device Layer"
             default "nvs"
             help
                 Label of the partition to store key-values in the "chip-counters" namespace.
+        
+        config CHIP_KVS_NAMESPACE_PARTITION_LABEL
+            string "chip-kvs namespace partition label"
+            default "nvs"
+            help
+                Label of the partition to store key-values in the "chip-kvs" namespace.
 
     endmenu
 

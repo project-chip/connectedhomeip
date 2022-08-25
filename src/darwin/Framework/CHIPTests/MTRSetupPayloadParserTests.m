@@ -52,7 +52,7 @@
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowCustom);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
-    XCTAssertEqual(payload.rendezvousInformation, MTRRendezvousInformationNone);
+    XCTAssertNil(payload.rendezvousInformation);
 }
 
 - (void)testOnboardingPayloadParser_Manual_WrongType
@@ -64,26 +64,6 @@
 
     XCTAssertNil(payload);
     XCTAssertEqual(error.code, MTRErrorCodeInvalidArgument);
-}
-
-- (void)testOnboardingPayloadParser_Admin_NoError
-{
-    NSError * error;
-    MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
-                                                                                      ofType:MTROnboardingPayloadTypeAdmin
-                                                                                       error:&error];
-
-    XCTAssertNotNil(payload);
-    XCTAssertNil(error);
-
-    XCTAssertTrue(payload.hasShortDiscriminator);
-    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 10);
-    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 123456780);
-    XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 1);
-    XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
-    XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowCustom);
-    XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
-    XCTAssertEqual(payload.rendezvousInformation, MTRRendezvousInformationNone);
 }
 
 - (void)testOnboardingPayloadParser_Admin_WrongType
@@ -114,18 +94,8 @@
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowStandard);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 5);
-    XCTAssertEqual(payload.rendezvousInformation, MTRRendezvousInformationSoftAP);
-}
-
-- (void)testOnboardingPayloadParser_QRCode_WrongType
-{
-    NSError * error;
-    MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"MT:R5L90MP500K64J00000"
-                                                                                      ofType:MTROnboardingPayloadTypeAdmin
-                                                                                       error:&error];
-
-    XCTAssertNil(payload);
-    XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+    XCTAssertNotNil(payload.rendezvousInformation);
+    XCTAssertEqual([payload.rendezvousInformation unsignedLongValue], MTRDiscoveryCapabilitiesSoftAP);
 }
 
 - (void)testOnboardingPayloadParser_NFC_NoError
@@ -146,7 +116,8 @@
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowStandard);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 5);
-    XCTAssertEqual(payload.rendezvousInformation, MTRRendezvousInformationSoftAP);
+    XCTAssertNotNil(payload.rendezvousInformation);
+    XCTAssertEqual([payload.rendezvousInformation unsignedLongValue], MTRDiscoveryCapabilitiesSoftAP);
 }
 
 - (void)testOnboardingPayloadParser_NFC_WrongType
@@ -178,7 +149,7 @@
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowCustom);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
-    XCTAssertEqual(payload.rendezvousInformation, MTRRendezvousInformationNone);
+    XCTAssertNil(payload.rendezvousInformation);
 }
 
 - (void)testManualParser_Error
@@ -219,7 +190,8 @@
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowStandard);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 5);
-    XCTAssertEqual(payload.rendezvousInformation, MTRRendezvousInformationSoftAP);
+    XCTAssertNotNil(payload.rendezvousInformation);
+    XCTAssertEqual([payload.rendezvousInformation unsignedLongValue], MTRDiscoveryCapabilitiesSoftAP);
 }
 
 - (void)testQRCodeParserWithOptionalData
@@ -239,7 +211,8 @@
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 12);
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowStandard);
-    XCTAssertEqual(payload.rendezvousInformation, MTRRendezvousInformationSoftAP);
+    XCTAssertNotNil(payload.rendezvousInformation);
+    XCTAssertEqual([payload.rendezvousInformation unsignedLongValue], MTRDiscoveryCapabilitiesSoftAP);
     XCTAssertTrue([payload.serialNumber isEqualToString:@"123456789"]);
 
     NSArray<MTROptionalQRCodeInfo *> * vendorOptionalInfo = [payload getAllOptionalVendorData:&error];

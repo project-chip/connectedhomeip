@@ -15,6 +15,9 @@
 
 name: 11.2.1. [TC-BINFO-2.1] Attributes [DUT-Server]
 
+PICS:
+    - BINFO.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -36,6 +39,7 @@ tests:
       verification: |
           While commissioning TH Saves the CountryCode Information from SetRegulatoryConfig command
 
+
           ./chip-tool pairing ble-wifi 1 GRLPrivate_EXT matter123 20202021 3840
 
           TH END:
@@ -45,6 +49,15 @@ tests:
 
           DUT END:
           [1641381202.306840][4431:4431] CHIP:DL: NVS set: chip-config/regulatory-location = 0 (0x0)
+
+          After pairing, Verify the countrycode Information by reading location atrribute from TH to DUT.
+          ./chip-tool basic read location 1 0
+
+          On TH,  Verify that TH reads Location from the DUT successfully,  the name should be string and length is less than or equal to 2 bytes.
+          [1656495999.760797][2249:2254] CHIP:DMG: }
+          [1656495999.761084][2249:2254] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 941124320
+          [1656495999.761187][2249:2254] CHIP:TOO:   Location: XX
+          [1656495999.761371][2249:2254] CHIP:EM: Sending Standalone Ack for MessageCounter:7663506 on exchange 28126i
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
@@ -62,7 +75,7 @@ tests:
       response:
           saveAs: DataModelRevisionValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65534
 
@@ -89,7 +102,7 @@ tests:
       response:
           saveAs: VendorNameValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes VendorName from the DUT."
@@ -115,9 +128,21 @@ tests:
       response:
           saveAs: VendorIDValue
           constraints:
-              type: uint16
+              type: vendor_id
               minValue: 1
               maxValue: 65521
+
+    - label:
+          "Verify that VendorID matches the value assigned to this manufacturer"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BINFO.S.A0002
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH writes VendorID from the DUT."
       PICS: BINFO.S.A0002
@@ -142,7 +167,7 @@ tests:
       response:
           saveAs: ProductNameValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes ProductName from the DUT."
@@ -168,7 +193,7 @@ tests:
       response:
           saveAs: ProductIDValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 1
               maxValue: 65534
 
@@ -195,7 +220,7 @@ tests:
       response:
           saveAs: NodeLabelValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes NodeLabel from the DUT."
@@ -218,7 +243,7 @@ tests:
       attribute: "Location"
       response:
           constraints:
-              type: string
+              type: char_string
               maxLength: 16
 
     - label:
@@ -263,7 +288,7 @@ tests:
       response:
           saveAs: HardwareVersionValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65534
 
@@ -290,7 +315,7 @@ tests:
       response:
           saveAs: HardwareVersionStringValue
           constraints:
-              type: string
+              type: char_string
               minLength: 1
               maxLength: 64
 
@@ -382,7 +407,7 @@ tests:
       response:
           saveAs: ManufacturingDateValue
           constraints:
-              type: string
+              type: char_string
               minLength: 8
               maxLength: 16
 
@@ -422,7 +447,7 @@ tests:
       response:
           saveAs: PartNumberValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes PartNumber from the DUT."
@@ -448,7 +473,7 @@ tests:
       response:
           saveAs: ProductURLValue
           constraints:
-              type: string
+              type: long_char_string
               maxLength: 256
 
     - label:
@@ -487,7 +512,7 @@ tests:
       response:
           saveAs: ProductLabelValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 64
 
     - label:
@@ -526,7 +551,7 @@ tests:
       response:
           saveAs: SerialNumberValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes SerialNumber from the DUT."
@@ -588,6 +613,15 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
+    - label: "TH reads Reachable from the DUT."
+      PICS: BINFO.S.A0011
+      command: "readAttribute"
+      attribute: "Reachable"
+      response:
+          value: true
+          constraints:
+              type: boolean
+
     - label: "TH reads UniqueID from the DUT."
       PICS: BINFO.S.A0012
       command: "readAttribute"
@@ -595,7 +629,7 @@ tests:
       response:
           saveAs: UniqueIDValue
           constraints:
-              type: string
+              type: char_string
               maxLength: 32
 
     - label: "TH writes UniqueID from the DUT."

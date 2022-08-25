@@ -50,22 +50,25 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 #if !CHIP_DISABLE_PLATFORM_KVS
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
-    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 #endif // CHIP_DISABLE_PLATFORM_KVS
 
     mRunLoopSem = dispatch_semaphore_create(0);
 
     // Ensure there is a dispatch queue available
-    GetWorkQueue();
+    static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
-    mStartTime = System::SystemClock().GetMonotonicTimestamp();
+#if !CHIP_DISABLE_PLATFORM_KVS
+    // Now set up our device instance info provider.  We couldn't do that
+    // earlier, because the generic implementation sets a generic one.
+    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
+#endif // CHIP_DISABLE_PLATFORM_KVS
 
-    static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
 exit:
     return err;

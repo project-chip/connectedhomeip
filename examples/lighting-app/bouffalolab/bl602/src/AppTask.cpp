@@ -145,6 +145,7 @@ CHIP_ERROR AppTask::Init()
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gRequestorUser.SetPeriodicQueryTimeout(OTA_PERIODIC_QUERY_TIMEOUT);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     ConfigurationMgr().LogDeviceConfig();
@@ -524,19 +525,6 @@ void AppTask::UpdateClusterState(void)
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         log_error("ERR: updating on/off %x\r\n", status);
-    }
-}
-
-void AppTask::OtaTask(void)
-{
-    int ret;
-    const char * const task_name = "ota task";
-
-    ret = xTaskCreate(ota_tcp_server, task_name, 512, NULL, 6, &OTA_TASK_HANDLE);
-    if (ret != pdPASS)
-    {
-        printf("unable to start task client task");
-        return;
     }
 }
 

@@ -14,12 +14,15 @@
 
 name: 19.8.3. [TC-MEDIAPLAYBACK-6.3] Advanced Seek Media Playback Verification
 
+PICS:
+    - MEDIAPLAYBACK.S
+
 config:
     nodeId: 0x12344321
     cluster: "Media Playback"
     endpoint: 1
     SeekPosition:
-        type: INT64U
+        type: int64u
         defaultValue: 100000000
 
 tests:

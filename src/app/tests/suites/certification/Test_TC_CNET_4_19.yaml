@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.17. [TC-CNET-4.19] [Ethernet] Verification for attributes check
+    12.4.17. [TC-CNET-4.19] [Ethernet] Verification for attributes check
     [DUT-Client]
+
+PICS:
+    - CNET.C.F02
 
 config:
     nodeId: 0x12344321
@@ -23,17 +26,44 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Commission TH and DUT on Ethernet setup"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
     - label: "DUT reads the MaxNetworks attribute from the TH"
       PICS: CNET.S.A0000
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read max-networks 1 0
+          ./chip-tool networkcommissioning read max-networks 1 0
 
-          [1646226441.815782][2475:2480] CHIP:DMG:        SuppressResponse = true,
-          [1646226441.815849][2475:2480] CHIP:DMG:        InteractionModelRevision = 1
-          [1646226441.815889][2475:2480] CHIP:DMG: }
-          [1646226441.816092][2475:2480] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0000DataVersion: 3622667250
-          [1646226441.816191][2475:2480] CHIP:TOO:   MaxNetworks: 1
-          [1646226441.816288][2475:2480] CHIP:EM: Sending Standalone Ack for MessageCounter:14864333 on exchange 39473i
+          Verify "MaxNetworks response" on the TH(All-cluster-app) Log:
+
+          [1659609763.322869][3355:3355] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:183685847 on exchange 32698r
+          [1659609763.322969][3355:3355] CHIP:EM: Handling via exchange: 32698r, Delegate: 0xaaaac00e4f08
+          [1659609763.323017][3355:3355] CHIP:IM: Received Read request
+          [1659609763.323116][3355:3355] CHIP:DMG: ReadRequestMessage =
+          [1659609763.323147][3355:3355] CHIP:DMG: {
+          [1659609763.323179][3355:3355] CHIP:DMG:         AttributePathIBs =
+          [1659609763.323206][3355:3355] CHIP:DMG:         [
+          [1659609763.323230][3355:3355] CHIP:DMG:                 AttributePathIB =
+          [1659609763.323267][3355:3355] CHIP:DMG:                 {
+          [1659609763.323296][3355:3355] CHIP:DMG:                         Endpoint = 0x0,
+          [1659609763.323355][3355:3355] CHIP:DMG:                         Cluster = 0x31,
+          [1659609763.323402][3355:3355] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659609763.323433][3355:3355] CHIP:DMG:                 }
+          [1659609763.323471][3355:3355] CHIP:DMG:
+          [1659609763.323497][3355:3355] CHIP:DMG:         ],
+          [1659609763.323536][3355:3355] CHIP:DMG:
+          [1659609763.323563][3355:3355] CHIP:DMG:         isFabricFiltered = true,
+          [1659609763.323597][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
+          [1659609763.323621][3355:3355] CHIP:DMG: },
+          [1659609763.323719][3355:3355] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659609763.323834][3355:3355] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
       disabled: true
 
     - label: "DUT reads the Networks attribute from the TH"
@@ -41,13 +71,29 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          [1653483289.382372][28210:28215] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3189790698
-          [1653483289.382458][28210:28215] CHIP:TOO:   Networks: 1 entries
-          [1653483289.382507][28210:28215] CHIP:TOO:     [1]: {
-          [1653483289.382537][28210:28215] CHIP:TOO:       NetworkID: 65746830
-          [1653483289.382561][28210:28215] CHIP:TOO:       Connected: TRUE
-          [1653483289.382584][28210:28215] CHIP:TOO:      }
-          [1653483289.382684][28210:28215] CHIP:EM: Sending Standalone Ack for MessageCounter:13711908 on exchange 32535i
+          Verify "Networks response" on the TH(All-cluster-app)Log:
+
+          [1659609799.625479][3355:3355] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:137580527 on exchange 7860r
+          [1659609799.625525][3355:3355] CHIP:EM: Handling via exchange: 7860r, Delegate: 0xaaaac00e4f08
+          [1659609799.625564][3355:3355] CHIP:IM: Received Read request
+          [1659609799.625641][3355:3355] CHIP:DMG: ReadRequestMessage =
+          [1659609799.625667][3355:3355] CHIP:DMG: {
+          [1659609799.625688][3355:3355] CHIP:DMG:         AttributePathIBs =
+          [1659609799.625714][3355:3355] CHIP:DMG:         [
+          [1659609799.625737][3355:3355] CHIP:DMG:                 AttributePathIB =
+          [1659609799.625765][3355:3355] CHIP:DMG:                 {
+          [1659609799.625797][3355:3355] CHIP:DMG:                         Endpoint = 0x0,
+          [1659609799.625828][3355:3355] CHIP:DMG:                         Cluster = 0x31,
+          [1659609799.625860][3355:3355] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1659609799.625888][3355:3355] CHIP:DMG:                 }
+          [1659609799.625916][3355:3355] CHIP:DMG:
+          [1659609799.625941][3355:3355] CHIP:DMG:         ],
+          [1659609799.625968][3355:3355] CHIP:DMG:
+          [1659609799.625994][3355:3355] CHIP:DMG:         isFabricFiltered = true,
+          [1659609799.626019][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
+          [1659609799.626042][3355:3355] CHIP:DMG: },
+          [1659609799.626114][3355:3355] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659609799.626196][3355:3355] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
       disabled: true
 
     - label: "DUT reads InterfaceEnabled attribute from the TH"
@@ -55,13 +101,29 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read interface-enabled 1 0
 
-          [1646226615.428003][2502:2507] CHIP:DMG:
-          [1646226615.428035][2502:2507] CHIP:DMG:        SuppressResponse = true,
-          [1646226615.428064][2502:2507] CHIP:DMG:        InteractionModelRevision = 1
-          [1646226615.428094][2502:2507] CHIP:DMG: }
-          [1646226615.428270][2502:2507] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0004DataVersion: 3622667250
-          [1646226615.428331][2502:2507] CHIP:TOO:   InterfaceEnabled: TRUE
-          [1646226615.428415][2502:2507] CHIP:EM: Sending Standalone Ack for MessageCounter:3894401 on exchange 55691i
+          Verify "InterfaceEnabled response" on the TH(All-cluster-app) Log:
+
+          [1659609853.345019][3355:3355] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:239370134 on exchange 36452r
+          [1659609853.345063][3355:3355] CHIP:EM: Handling via exchange: 36452r, Delegate: 0xaaaac00e4f08
+          [1659609853.345100][3355:3355] CHIP:IM: Received Read request
+          [1659609853.345179][3355:3355] CHIP:DMG: ReadRequestMessage =
+          [1659609853.345206][3355:3355] CHIP:DMG: {
+          [1659609853.345226][3355:3355] CHIP:DMG:         AttributePathIBs =
+          [1659609853.345252][3355:3355] CHIP:DMG:         [
+          [1659609853.345275][3355:3355] CHIP:DMG:                 AttributePathIB =
+          [1659609853.345303][3355:3355] CHIP:DMG:                 {
+          [1659609853.345332][3355:3355] CHIP:DMG:                         Endpoint = 0x0,
+          [1659609853.345372][3355:3355] CHIP:DMG:                         Cluster = 0x31,
+          [1659609853.345403][3355:3355] CHIP:DMG:                         Attribute = 0x0000_0004,
+          [1659609853.345433][3355:3355] CHIP:DMG:                 }
+          [1659609853.345461][3355:3355] CHIP:DMG:
+          [1659609853.345485][3355:3355] CHIP:DMG:         ],
+          [1659609853.345513][3355:3355] CHIP:DMG:
+          [1659609853.345539][3355:3355] CHIP:DMG:         isFabricFiltered = true,
+          [1659609853.345564][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
+          [1659609853.345588][3355:3355] CHIP:DMG: },
+          [1659609853.345662][3355:3355] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659609853.345744][3355:3355] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
       disabled: true
 
     - label: "DUT reads LastNetworkingStatus attribute from the TH"
@@ -69,12 +131,31 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read last-networking-status 1 0
 
-          [1646227167.614060][2533:2538] CHIP:DMG:        SuppressResponse = true,
-          [1646227167.614095][2533:2538] CHIP:DMG:        InteractionModelRevision = 1
-          [1646227167.614126][2533:2538] CHIP:DMG: }
-          [1646227167.614299][2533:2538] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005DataVersion: 3622667250
-          [1646227167.614385][2533:2538] CHIP:TOO:   LastNetworkingStatus: 0
-          [1646227167.614468][2533:2538] CHIP:EM: Sending Standalone Ack for MessageCounter:8947540 on exchange 12532i
+          Verify "LastNetworkingStatus response" on the TH(All-cluster-app) Log:
+
+          [1659609891.554817][3355:3355] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:196428434 on exchange 50438r
+          [1659609891.554892][3355:3355] CHIP:EM: Handling via exchange: 50438r, Delegate: 0xaaaac00e4f08
+          [1659609891.554942][3355:3355] CHIP:IM: Received Read request
+          [1659609891.555037][3355:3355] CHIP:DMG: ReadRequestMessage =
+          [1659609891.555064][3355:3355] CHIP:DMG: {
+          [1659609891.555089][3355:3355] CHIP:DMG:         AttributePathIBs =
+          [1659609891.555119][3355:3355] CHIP:DMG:         [
+          [1659609891.555147][3355:3355] CHIP:DMG:                 AttributePathIB =
+          [1659609891.555179][3355:3355] CHIP:DMG:                 {
+          [1659609891.555210][3355:3355] CHIP:DMG:                         Endpoint = 0x0,
+          [1659609891.555243][3355:3355] CHIP:DMG:                         Cluster = 0x31,
+          [1659609891.555286][3355:3355] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659609891.555325][3355:3355] CHIP:DMG:                 }
+          [1659609891.555357][3355:3355] CHIP:DMG:
+          [1659609891.555387][3355:3355] CHIP:DMG:         ],
+          [1659609891.555418][3355:3355] CHIP:DMG:
+          [1659609891.555449][3355:3355] CHIP:DMG:         isFabricFiltered = true,
+          [1659609891.555478][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
+          [1659609891.555505][3355:3355] CHIP:DMG: },
+          [1659609891.555595][3355:3355] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659609891.555710][3355:3355] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659609891.555746][3355:3355] CHIP:DMG: <RE:Run> Cluster 31, Attribute 5 is dirty
+          [1659609891.555770][3355:3355] CHIP:DMG: Reading attribute: Cluster=0x0000_0031 Endpoint=0 AttributeId=0x0000_0005 (expanded=0)
       disabled: true
 
     - label: "DUT reads LastNetworkID attribute from the TH"
@@ -82,13 +163,29 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read last-network-id 1 0
 
-          [1646227218.543427][2545:2550] CHIP:DMG:
-          [1646227218.543462][2545:2550] CHIP:DMG:        SuppressResponse = true,
-          [1646227218.543506][2545:2550] CHIP:DMG:        InteractionModelRevision = 1
-          [1646227218.543538][2545:2550] CHIP:DMG: }
-          [1646227218.543748][2545:2550] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006DataVersion: 3622667250
-          [1646227218.543836][2545:2550] CHIP:TOO:   LastNetworkID:
-          [1646227218.543924][2545:2550] CHIP:EM: Sending Standalone Ack for MessageCounter:9758721 on exchange 15256i
+          Verify "LastNetworkID response" on the TH(All-cluster-app) Log:
+
+          [1659610135.551323][3355:3355] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:254677399 on exchange 52969r
+          [1659610135.551381][3355:3355] CHIP:EM: Handling via exchange: 52969r, Delegate: 0xaaaac00e4f08
+          [1659610135.551423][3355:3355] CHIP:IM: Received Read request
+          [1659610135.551505][3355:3355] CHIP:DMG: ReadRequestMessage =
+          [1659610135.551531][3355:3355] CHIP:DMG: {
+          [1659610135.551553][3355:3355] CHIP:DMG:         AttributePathIBs =
+          [1659610135.551579][3355:3355] CHIP:DMG:         [
+          [1659610135.551603][3355:3355] CHIP:DMG:                 AttributePathIB =
+          [1659610135.551630][3355:3355] CHIP:DMG:                 {
+          [1659610135.551658][3355:3355] CHIP:DMG:                         Endpoint = 0x0,
+          [1659610135.551695][3355:3355] CHIP:DMG:                         Cluster = 0x31,
+          [1659610135.551727][3355:3355] CHIP:DMG:                         Attribute = 0x0000_0006,
+          [1659610135.551758][3355:3355] CHIP:DMG:                 }
+          [1659610135.551788][3355:3355] CHIP:DMG:
+          [1659610135.551812][3355:3355] CHIP:DMG:         ],
+          [1659610135.551840][3355:3355] CHIP:DMG:
+          [1659610135.551866][3355:3355] CHIP:DMG:         isFabricFiltered = true,
+          [1659610135.551891][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
+          [1659610135.551914][3355:3355] CHIP:DMG: },
+          [1659610135.551990][3355:3355] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659610135.552075][3355:3355] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
       disabled: true
 
     - label: "DUT reads LastConnectErrorValue attribute from the TH"
@@ -96,7 +193,29 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read last-connect-error-value 1 0
 
-          [1653483224.839873][28189:28194] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0007 DataVersion: 3189790698
-          [1653483224.839927][28189:28194] CHIP:TOO:   LastConnectErrorValue: null
-          [1653483224.840028][28189:28194] CHIP:EM: Sending Standalone Ack for MessageCounter:289132 on exchange 60682i
+          Verify "LastConnectErrorValue response" on the TH(All-cluster-app) Log:
+
+          [1659610208.727464][3355:3355] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:26873449 on exchange 27253r
+          [1659610208.727511][3355:3355] CHIP:EM: Handling via exchange: 27253r, Delegate: 0xaaaac00e4f08
+          [1659610208.727551][3355:3355] CHIP:IM: Received Read request
+          [1659610208.727629][3355:3355] CHIP:DMG: ReadRequestMessage =
+          [1659610208.727655][3355:3355] CHIP:DMG: {
+          [1659610208.727678][3355:3355] CHIP:DMG:         AttributePathIBs =
+          [1659610208.727704][3355:3355] CHIP:DMG:         [
+          [1659610208.727727][3355:3355] CHIP:DMG:                 AttributePathIB =
+          [1659610208.727763][3355:3355] CHIP:DMG:                 {
+          [1659610208.727791][3355:3355] CHIP:DMG:                         Endpoint = 0x0,
+          [1659610208.727822][3355:3355] CHIP:DMG:                         Cluster = 0x31,
+          [1659610208.727854][3355:3355] CHIP:DMG:                         Attribute = 0x0000_0007,
+          [1659610208.727882][3355:3355] CHIP:DMG:                 }
+          [1659610208.727909][3355:3355] CHIP:DMG:
+          [1659610208.727934][3355:3355] CHIP:DMG:         ],
+          [1659610208.727963][3355:3355] CHIP:DMG:
+          [1659610208.727988][3355:3355] CHIP:DMG:         isFabricFiltered = true,
+          [1659610208.728014][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
+          [1659610208.728036][3355:3355] CHIP:DMG: },
+          [1659610208.728112][3355:3355] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659610208.728196][3355:3355] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659610208.728226][3355:3355] CHIP:DMG: <RE:Run> Cluster 31, Attribute 7 is dirty
+          [1659610208.728247][3355:3355] CHIP:DMG: Reading attribute: Cluster=0x0000_0031 Endpoint=0 AttributeId=0x0000_0007 (expanded=0)
       disabled: true

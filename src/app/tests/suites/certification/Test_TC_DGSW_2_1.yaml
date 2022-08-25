@@ -14,6 +14,10 @@
 
 name: 43.2.1. [TC-DGSW-2.1] Attributes with server as DUT
 
+PICS:
+    - DGSW.S.A
+    - DGSW.S
+
 config:
     nodeId: 0x12344321
     cluster: "Software Diagnostics"
@@ -44,7 +48,7 @@ tests:
       PICS: DGSW.S.A0001
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label: "Reads CurrentHeapUsed non-global attribute value from DUT"
       command: "readAttribute"
@@ -52,7 +56,7 @@ tests:
       PICS: DGSW.S.A0002
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label:
           "Reads CurrentHeapHighWaterMark non-global attribute value from DUT"
@@ -61,4 +65,4 @@ tests:
       PICS: DGSW.S.A0003
       response:
           constraints:
-              type: uint64
+              type: int64u

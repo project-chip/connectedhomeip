@@ -15,6 +15,9 @@
 
 name: 3.6.1. [TC-SU-2.8] OTA functionality in Multi Fabric scenario
 
+PICS:
+    - MCORE.OTA.Requestor
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -23,11 +26,11 @@ config:
 tests:
     - label: "DUT sends a QueryImage command to the TH1/OTA-P"
       verification: |
-          ./chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]' 0x0000001234567890 0
+          ./chip-tool otasoftwareupdaterequestor write default-ota-providers "[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]" 0x0000001234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Provider logs:
+          Verify on the OTA Provider logs receives QueryImage:
 
           [1645743053317] [97806:20280749] CHIP: [ZCL] OTA Provider received QueryImage
           [1645743053317] [97806:20280749] CHIP: [ZCL]   VendorID: 0xfff1
@@ -45,9 +48,9 @@ tests:
           "DUT sends a QueryImage command to TH1/OTA-P. TH1/OTA-P does not
           respond with QueryImageResponse."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]' 0x0000001234567890 0
+          ./chip-tool otasoftwareupdaterequestor write default-ota-providers "[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]" 0x0000001234567890 0
 
-          ./chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 2, "providerNodeID": 1, "endpoint": 0}]' 0x858 0 --commissioner-name beta
+          ./chip-tool otasoftwareupdaterequestor write default-ota-providers "[{"fabricIndex": 2, "providerNodeID": 1, "endpoint": 0}]" 0x858 0 --commissioner-name beta
 
           Kill Default OTA Provider for fabric index 1 before DUT sends a query
 
@@ -58,7 +61,7 @@ tests:
           "DUT sends a QueryImage command to TH2/OTA-P. TH2/OTA-P sends a
           QueryImageResponse back to the DUT. Status is set to UpdateAvailable."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 2, "providerNodeID": 1, "endpoint": 0}]' 0x858 0 --commissioner-name beta
+          ./chip-tool otasoftwareupdaterequestor write default-ota-providers "[{"fabricIndex": 2, "providerNodeID": 1, "endpoint": 0}]" 0x858 0 --commissioner-name beta
 
           Verify there is a transfer of the software image from TH2/OTA-P to the DUT
       disabled: true

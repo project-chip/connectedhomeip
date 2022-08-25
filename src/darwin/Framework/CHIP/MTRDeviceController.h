@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Matter/MTRNOCChainIssuer.h>
 #import <Matter/MTROnboardingPayloadParser.h>
 
 @class MTRBaseDevice;
@@ -27,7 +28,6 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 
 @class MTRCommissioningParameters;
 @protocol MTRDevicePairingDelegate;
-@protocol MTROTAProviderDelegate;
 
 @interface MTRDeviceController : NSObject
 
@@ -121,13 +121,27 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 /**
- * Set the Delegate for the OTA Provider as well as the Queue on which the Delegate callbacks will be triggered
+ * Sets this MTRDeviceController to use the given issuer for issuing operational certs. By default, the MTRDeviceController uses an
+ * internal issuer.
  *
- * @param[in] delegate The delegate the OTA Provider should use
+ * When a nocChainIssuer is set, the device commissioner will delegate verification to the chip::Credentials::PartialDACVerifier so
+ * that DAC chain and CD validation can be performed by custom code triggered by MTRNOCChainIssuer.onNOCChainGenerationNeeded().
+ * Otherwise, the device commissioner uses the chip::Credentials::DefaultDACVerifier
+ *
+ * @param[in] nocChainIssuer the NOC Chain issuer to use for issuer operational certs
  *
  * @param[in] queue The queue on which the callbacks will be delivered
  */
-- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer queue:(dispatch_queue_t)queue;
+
+/**
+ * Compute a PASE verifier and passcode ID for the desired setup pincode.
+ *
+ * @param[in] setupPincode    The desired PIN code to use
+ * @param[in] iterations      The number of iterations to use when generating the verifier
+ * @param[in] salt            The 16-byte salt for verifier computation
+ */
+- (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt;
 
 /**
  * Shutdown the controller. Calls to shutdown after the first one are NO-OPs.

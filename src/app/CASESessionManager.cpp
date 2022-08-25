@@ -25,6 +25,7 @@ CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CAS
 {
     ReturnErrorOnFailure(params.sessionInitParams.Validate());
     mConfig = params;
+    params.sessionInitParams.exchangeMgr->GetReliableMessageMgr()->RegisterSessionUpdateDelegate(this);
     return AddressResolve::Resolver::Instance().Init(systemLayer);
 }
 
@@ -34,12 +35,13 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
                   ChipLogValueX64(peerId.GetNodeId()));
 
-    OperationalDeviceProxy * session = FindExistingSession(peerId);
+    bool forAddressUpdate             = false;
+    OperationalSessionSetup * session = FindExistingSessionSetup(peerId, forAddressUpdate);
     if (session == nullptr)
     {
-        ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing OperationalDeviceProxy instance found");
+        ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing OperationalSessionSetup instance found");
 
-        session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId);
+        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, peerId, this);
 
         if (session == nullptr)
         {
@@ -52,51 +54,62 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
     }
 
     session->Connect(onConnection, onFailure);
-    if (!session->IsConnected() && !session->IsConnecting() && !session->IsResolvingAddress())
-    {
-        // This session is not making progress toward anything.  It will have
-        // notified the consumer about the failure already via the provided
-        // callbacks, if any.
-        //
-        // Release the peer rather than the pointer in case the failure handler
-        // has already released the session.
-        ReleaseSession(peerId);
-    }
-}
-
-void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)
-{
-    ReleaseSession(FindExistingSession(peerId));
 }
 
 void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
 {
-    mConfig.devicePool->ReleaseDevicesForFabric(fabricIndex);
+    mConfig.sessionSetupPool->ReleaseAllSessionSetupsForFabric(fabricIndex);
 }
 
 void CASESessionManager::ReleaseAllSessions()
 {
-    mConfig.devicePool->ReleaseAllDevices();
+    mConfig.sessionSetupPool->ReleaseAllSessionSetup();
 }
 
 CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr)
 {
-    OperationalDeviceProxy * session = FindExistingSession(peerId);
-    VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);
-    addr = session->GetPeerAddress();
+    ReturnErrorOnFailure(mConfig.sessionInitParams.Validate());
+    auto optionalSessionHandle = FindExistingSession(peerId);
+    ReturnErrorCodeIf(!optionalSessionHandle.HasValue(), CHIP_ERROR_NOT_CONNECTED);
+    addr = optionalSessionHandle.Value()->AsSecureSession()->GetPeerAddress();
     return CHIP_NO_ERROR;
 }
 
-OperationalDeviceProxy * CASESessionManager::FindExistingSession(const ScopedNodeId & peerId) const
+void CASESessionManager::UpdatePeerAddress(ScopedNodeId peerId)
 {
-    return mConfig.devicePool->FindDevice(peerId);
+    bool forAddressUpdate             = true;
+    OperationalSessionSetup * session = FindExistingSessionSetup(peerId, forAddressUpdate);
+    if (session == nullptr)
+    {
+        ChipLogDetail(CASESessionManager, "UpdatePeerAddress: No existing OperationalSessionSetup instance found");
+
+        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, peerId, this);
+        if (session == nullptr)
+        {
+            ChipLogDetail(CASESessionManager, "UpdatePeerAddress: Failed to allocate OperationalSessionSetup instance");
+            return;
+        }
+    }
+
+    session->PerformAddressUpdate();
 }
 
-void CASESessionManager::ReleaseSession(OperationalDeviceProxy * session) const
+OperationalSessionSetup * CASESessionManager::FindExistingSessionSetup(const ScopedNodeId & peerId, bool forAddressUpdate) const
+{
+    return mConfig.sessionSetupPool->FindSessionSetup(peerId, forAddressUpdate);
+}
+
+Optional<SessionHandle> CASESessionManager::FindExistingSession(const ScopedNodeId & peerId) const
+{
+    return mConfig.sessionInitParams.sessionManager->FindSecureSessionForNode(peerId,
+                                                                              MakeOptional(Transport::SecureSession::Type::kCASE));
+}
+
+void CASESessionManager::ReleaseSession(OperationalSessionSetup * session)
 {
     if (session != nullptr)
     {
-        mConfig.devicePool->Release(session);
+        mConfig.sessionSetupPool->Release(session);
     }
 }
 

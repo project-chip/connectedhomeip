@@ -17,6 +17,9 @@ name:
     3.5.2. [TC-IDM-5.2] Status Response from DUT in response to a Timed Request
     Action from TH.
 
+PICS:
+    - MCORE.IDM.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -25,7 +28,7 @@ config:
 tests:
     - label:
           "TH sends a Timed Request Message with the timeout value set. (Example
-          - 200 milliseconds)."
+          - 200 milliseconds). +"
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
           ./chip-tool onoff on 1 1 --timedInteractionTimeoutMs 200

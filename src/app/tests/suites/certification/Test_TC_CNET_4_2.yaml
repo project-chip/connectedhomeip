@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.2. [TC-CNET-4.2] [Thread] Verification for attributes check
+    12.4.2. [TC-CNET-4.2] [Thread] Verification for attributes check
     [DUT-Server]
+
+PICS:
+    - CNET.S.F01
 
 config:
     nodeId: 0x12344321
@@ -25,21 +28,21 @@ config:
 tests:
     - label: "Factory reset the DUT"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "Commmission TH and DUT on Thread setup"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
           "TH reads Descriptor Cluster from the DUT with EP0 TH reads ServerList
           from the DUT"
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool descriptor read server-list 162 0
+          ./chip-tool descriptor read server-list 54 0
 
-          Verify on the TH Log:
+          Verify the "ServerList" in the TH(Chip-tool) Log:
 
           [1645772414.100694][3827:3832] CHIP:DMG:         SuppressResponse = true,
           [1645772414.100718][3827:3832] CHIP:DMG:         InteractionModelRevision = 1
@@ -72,10 +75,9 @@ tests:
 
     - label: "TH reads FeatureMap attribute from the DUT"
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read feature-map 162 0
+          ./chip-tool networkcommissioning read feature-map 54 0
 
-
-          Verify on the TH Log:
+          Verify the "FeatureMap: 2" in  the TH(Chip-tool) Log:
 
           [1645772204.502545][3809:3814] CHIP:DMG:         SuppressResponse = true,
           [1645772204.502608][3809:3814] CHIP:DMG:         InteractionModelRevision = 1
@@ -88,10 +90,9 @@ tests:
     - label: "TH reads the MaxNetworks attribute from the DUT"
       PICS: CNET.S.A0000
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read max-networks 162 0
+          ./chip-tool networkcommissioning read max-networks 54 0
 
-          Verify on the TH Log:
-
+          Verify "MaxNetworks" on the TH(Chip-tool) Log:
 
           [1645772548.257320][3837:3842] CHIP:DMG:         SuppressResponse = true,
           [1645772548.257381][3837:3842] CHIP:DMG:         InteractionModelRevision = 1
@@ -102,7 +103,7 @@ tests:
       disabled: true
 
     - label:
-          "TH saves the MaxNetworks attribute value as 'MaxNetworksValue' for
+          "TH saves the MaxNetworks attribute value as MaxNetworksValue for
           future use"
       verification: |
           TH1 saves the MaxNetworks attribute value
@@ -111,9 +112,9 @@ tests:
     - label: "TH reads the Networks attribute list from the DUT"
       PICS: CNET.S.A0001
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 162 0
+          ./chip-tool networkcommissioning read networks 54 0
 
-          Verify on the TH Log:
+          Verify "Networks entries and its status" on the TH(Chip-tool) Log:
 
           [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true,
           [1645772651.445149][3856:3861] CHIP:DMG:         InteractionModelRevision = 1
@@ -130,9 +131,9 @@ tests:
     - label: "TH reads ScanMaxTimeSeconds attribute from the DUT"
       PICS: CNET.S.A0002
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read scan-max-time-seconds 162 0
+          ./chip-tool networkcommissioning read scan-max-time-seconds 54 0
 
-          Verify on the TH Log:
+          Verify  "ScanMaxTimeSeconds" on the TH(Chip-tool) Log:
 
           [1645772820.740795][3867:3872] CHIP:DMG:         SuppressResponse = true,
           [1645772820.740855][3867:3872] CHIP:DMG:         InteractionModelRevision = 1
@@ -145,9 +146,9 @@ tests:
     - label: "TH reads ConnectMaxTimeSeconds Attribute from the DUT"
       PICS: CNET.S.A0003
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read connect-max-time-seconds 162 0
+          ./chip-tool networkcommissioning read connect-max-time-seconds 54 0
 
-          Verify on the TH Log:
+          Verify "ConnectMaxTimeSeconds" on the TH(Chip-tool) Log:
 
           [1645772901.118880][3879:3884] CHIP:DMG:         SuppressResponse = true,
           [1645772901.119008][3879:3884] CHIP:DMG:         InteractionModelRevision = 1
@@ -160,9 +161,9 @@ tests:
     - label: "TH reads InterfaceEnabled attribute from the DUT"
       PICS: CNET.S.A0004
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read interface-enabled 162 0
+          ./chip-tool networkcommissioning read interface-enabled 54 0
 
-          Verify on the TH Log:
+          Verify "InterfaceEnabled" on the TH(Chip-tool) Log:
 
           [1645772984.653996][3895:3900] CHIP:DMG:         SuppressResponse = true,
           [1645772984.654043][3895:3900] CHIP:DMG:         InteractionModelRevision = 1
@@ -175,10 +176,10 @@ tests:
     - label: "TH reads LastNetworkingStatus attribute from the DUT"
       PICS: CNET.S.A0005
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-networking-status 162 0
+          ./chip-tool networkcommissioning read last-networking-status 54 0
 
 
-          Verify on the TH Log:
+          Verify "LastNetworkingStatus" on the TH(Chip-tool) Log:
 
           [1645773078.930516][3905:3910] CHIP:DMG:         SuppressResponse = true,
           [1645773078.930579][3905:3910] CHIP:DMG:         InteractionModelRevision = 1
@@ -193,10 +194,10 @@ tests:
           Networks attribute from the DUT"
       PICS: CNET.S.A0006
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-network-id 162 0
+          ./chip-tool networkcommissioning read last-network-id 54 0
 
 
-          Verify on the TH Log:
+          Verify "LastNetworkID" on the TH(Chip-tool) Log:
 
           [1645773167.178501][3913:3918] CHIP:DMG:         SuppressResponse = true,
           [1645773167.178561][3913:3918] CHIP:DMG:         InteractionModelRevision = 1
@@ -209,10 +210,9 @@ tests:
     - label: "TH reads the LastConnectErrorValue attribute from the DUT"
       PICS: CNET.S.A0007
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-connect-error-value 162 0
+          ./chip-tool networkcommissioning read last-connect-error-value 54 0
 
-
-          Verify on the TH Log:
+          Verify "LastConnectErrorValue" on the TH(Chip-tool) Log:
 
           [1645773318.752774][3938:3943] CHIP:DMG:         SuppressResponse = true,
           [1645773318.752861][3938:3943] CHIP:DMG:         InteractionModelRevision = 1

@@ -23,7 +23,7 @@
 #pragma once
 
 #include <app-common/zap-generated/enums.h>
-#include <app/OperationalDeviceProxy.h>
+#include <app/OperationalSessionSetup.h>
 #include <app/app-platform/ContentApp.h>
 #include <app/util/attribute-storage.h>
 #include <controller/CHIPCluster.h>
@@ -57,6 +57,12 @@ public:
     // Converts application (any catalog) into the platform's catalog Vendor
     // and then writes it to destinationApp
     virtual CHIP_ERROR ConvertToPlatformCatalogVendorApp(const CatalogVendorApp & sourceApp, CatalogVendorApp * destinationApp) = 0;
+
+    // Get the privilege this vendorId should have on endpoints 1, 2, and content app endpoints
+    // In the case of casting video clients, this should usually be Access::Privilege::kOperate
+    // and for voice agents, this may be Access::Privilege::kAdminister
+    // When a vendor has admin privileges, it will get access to all clusters on ep1
+    virtual Access::Privilege GetVendorPrivilege(uint16_t vendorId) = 0;
 };
 
 class DLL_EXPORT ContentAppPlatform
@@ -124,16 +130,17 @@ public:
      *   Add ACLs on this device for the given client,
      *   and create bindings on the given client so that it knows what it has access to.
      *
-     * @param[in] targetDeviceProxy  OperationalDeviceProxy for the target device.
-     * @param[in] targetVendorId     Vendor ID for the target device.
-     * @param[in] localNodeId        The NodeId for the local device.
-     * @param[in] successCb          The function to be called on success of adding the binding.
-     * @param[in] failureCb          The function to be called on failure of adding the binding.
+     * @param[in] exchangeMgr     Exchange manager to be used to get an exchange context.
+     * @param[in] sessionHandle   Reference to an established session.
+     * @param[in] targetVendorId  Vendor ID for the target device.
+     * @param[in] localNodeId     The NodeId for the local device.
+     * @param[in] successCb       The function to be called on success of adding the binding.
+     * @param[in] failureCb       The function to be called on failure of adding the binding.
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR ManageClientAccess(OperationalDeviceProxy * targetDeviceProxy, uint16_t targetVendorId, NodeId localNodeId,
-                                  Controller::WriteResponseSuccessCallback successCb,
+    CHIP_ERROR ManageClientAccess(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle, uint16_t targetVendorId,
+                                  NodeId localNodeId, Controller::WriteResponseSuccessCallback successCb,
                                   Controller::WriteResponseFailureCallback failureCb);
 
 protected:

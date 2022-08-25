@@ -302,8 +302,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         }
         break;
     }
-    case Clusters::BridgedActions::Id: {
-        using namespace Clusters::BridgedActions;
+    case Clusters::Actions::Id: {
+        using namespace Clusters::Actions;
         switch (aPath.mEventId) {
 
         case Events::StateChanged::Id: {
@@ -313,7 +313,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            MTRBridgedActionsClusterStateChangedEvent * value = [MTRBridgedActionsClusterStateChangedEvent new];
+            MTRActionsClusterStateChangedEvent * value = [MTRActionsClusterStateChangedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -341,7 +341,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            MTRBridgedActionsClusterActionFailedEvent * value = [MTRBridgedActionsClusterActionFailedEvent new];
+            MTRActionsClusterActionFailedEvent * value = [MTRActionsClusterActionFailedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -415,6 +415,12 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
             }
 
             MTRBasicClusterLeaveEvent * value = [MTRBasicClusterLeaveEvent new];
+
+            do {
+                NSNumber * _Nonnull memberValue;
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+                value.fabricIndex = memberValue;
+            } while (0);
 
             return value;
         }
@@ -902,6 +908,60 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 NSNumber * _Nonnull memberValue;
                 memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.connectionStatus)];
                 value.connectionStatus = memberValue;
+            } while (0);
+
+            return value;
+        }
+
+        case Events::NetworkFaultChange::Id: {
+            Events::NetworkFaultChange::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+
+            MTRThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent * value =
+                [MTRThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent new];
+
+            do {
+                NSArray * _Nonnull memberValue;
+                { // Scope for our temporary variables
+                    auto * array_0 = [NSMutableArray new];
+                    auto iter_0 = cppValue.current.begin();
+                    while (iter_0.Next()) {
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
+                    }
+                    CHIP_ERROR err = iter_0.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue = array_0;
+                }
+                value.current = memberValue;
+            } while (0);
+            do {
+                NSArray * _Nonnull memberValue;
+                { // Scope for our temporary variables
+                    auto * array_0 = [NSMutableArray new];
+                    auto iter_0 = cppValue.previous.begin();
+                    while (iter_0.Next()) {
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
+                    }
+                    CHIP_ERROR err = iter_0.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue = array_0;
+                }
+                value.previous = memberValue;
             } while (0);
 
             return value;
@@ -2179,6 +2239,16 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
 
             return value;
         }
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::FaultInjection::Id: {
+        using namespace Clusters::FaultInjection;
+        switch (aPath.mEventId) {
 
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;

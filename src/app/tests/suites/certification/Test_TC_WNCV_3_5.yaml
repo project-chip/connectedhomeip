@@ -16,15 +16,18 @@ name:
     Window Covering [TC-WNCV-3.5] DownOrClose Long-Run Verification with server
     as DUT
 
+PICS:
+    - WNCV.S
+
 config:
     nodeId: 0x12344321
     cluster: "Window Covering"
     endpoint: 1
     fastMotionDuration:
-        type: INT16U
+        type: int16u
         defaultValue: 3000
     fullMotionDuration:
-        type: INT16U
+        type: int16u
         defaultValue: 6000
 
 tests:

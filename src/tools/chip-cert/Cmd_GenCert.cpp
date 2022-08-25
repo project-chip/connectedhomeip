@@ -243,19 +243,19 @@ OptionSet *gCmdOptionSets[] =
 // clang-format on
 
 ToolChipDN gSubjectDN;
-uint8_t gCertType                    = kCertType_NotSpecified;
-int gPathLengthConstraint            = kPathLength_NotSpecified;
-bool gSelfSign                       = false;
-const char * gCACertFileName         = nullptr;
-const char * gCAKeyFileName          = nullptr;
-const char * gInKeyFileName          = nullptr;
-const char * gOutCertFileName        = nullptr;
-const char * gOutKeyFileName         = nullptr;
-CertFormat gOutCertFormat            = kCertFormat_Default;
-KeyFormat gOutKeyFormat              = kKeyFormat_Default;
-uint32_t gValidDays                  = kCertValidDays_Undefined;
-FutureExtension gFutureExtensions[3] = { { 0, nullptr } };
-uint8_t gFutureExtensionsCount       = 0;
+uint8_t gCertType                           = kCertType_NotSpecified;
+int gPathLengthConstraint                   = kPathLength_NotSpecified;
+bool gSelfSign                              = false;
+const char * gCACertFileName                = nullptr;
+const char * gCAKeyFileName                 = nullptr;
+const char * gInKeyFileName                 = nullptr;
+const char * gOutCertFileName               = nullptr;
+const char * gOutKeyFileName                = nullptr;
+CertFormat gOutCertFormat                   = kCertFormat_Default;
+KeyFormat gOutKeyFormat                     = kKeyFormat_Default;
+uint32_t gValidDays                         = kCertValidDays_Undefined;
+FutureExtensionWithNID gFutureExtensions[3] = { { 0, nullptr } };
+uint8_t gFutureExtensionsCount              = 0;
 struct tm gValidFrom;
 CertStructConfig gCertConfig;
 
@@ -812,7 +812,7 @@ bool Cmd_GenCert(int argc, char * argv[])
 
     if (gInKeyFileName != nullptr)
     {
-        res = ReadKey(gInKeyFileName, newKey.get());
+        res = ReadKey(gInKeyFileName, newKey);
         VerifyTrueOrExit(res);
     }
     else
@@ -839,7 +839,7 @@ bool Cmd_GenCert(int argc, char * argv[])
         res = ReadCert(gCACertFileName, caCert.get());
         VerifyTrueOrExit(res);
 
-        res = ReadKey(gCAKeyFileName, caKey.get());
+        res = ReadKey(gCAKeyFileName, caKey);
         VerifyTrueOrExit(res);
 
         caCertPtr = caCert.get();

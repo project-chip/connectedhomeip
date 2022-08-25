@@ -18,10 +18,11 @@
 
 #pragma once
 
-#include "../common/CHIPCommand.h"
-#include "../common/Command.h"
-
 #include <lib/support/Span.h>
+
+#include "commands/common/CHIPCommand.h"
+#include "commands/common/Command.h"
+#include "commands/common/Commands.h"
 
 class ShowControllerGroups : public CHIPCommand
 {

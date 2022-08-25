@@ -248,9 +248,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::Privileg
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedActions::ActionErrorEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Actions::ActionErrorEnum val)
 {
-    using EnumType = BridgedActions::ActionErrorEnum;
+    using EnumType = Actions::ActionErrorEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -260,9 +260,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedActions::ActionE
         return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedActions::ActionStateEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Actions::ActionStateEnum val)
 {
-    using EnumType = BridgedActions::ActionStateEnum;
+    using EnumType = Actions::ActionStateEnum;
     switch (val)
     {
     case EnumType::kInactive:
@@ -274,9 +274,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedActions::ActionS
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedActions::ActionTypeEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Actions::ActionTypeEnum val)
 {
-    using EnumType = BridgedActions::ActionTypeEnum;
+    using EnumType = Actions::ActionTypeEnum;
     switch (val)
     {
     case EnumType::kOther:
@@ -291,9 +291,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedActions::ActionT
         return static_cast<EnumType>(7);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedActions::EndpointListTypeEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Actions::EndpointListTypeEnum val)
 {
-    using EnumType = BridgedActions::EndpointListTypeEnum;
+    using EnumType = Actions::EndpointListTypeEnum;
     switch (val)
     {
     case EnumType::kOther:
@@ -970,6 +970,49 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnost
         return val;
     default:
         return static_cast<EnumType>(10);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::GranularityEnum val)
+{
+    using EnumType = TimeSynchronization::GranularityEnum;
+    switch (val)
+    {
+    case EnumType::kNoTimeGranularity:
+    case EnumType::kMinutesGranularity:
+    case EnumType::kSecondsGranularity:
+    case EnumType::kMillisecondsGranularity:
+    case EnumType::kMicrosecondsGranularity:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::TimeSourceEnum val)
+{
+    using EnumType = TimeSynchronization::TimeSourceEnum;
+    switch (val)
+    {
+    case EnumType::kNone:
+    case EnumType::kUnknown:
+    case EnumType::kAdmin:
+    case EnumType::kNodeTimeCluster:
+    case EnumType::kNonFabricSntp:
+    case EnumType::kNonFabricNtp:
+    case EnumType::kFabricSntp:
+    case EnumType::kFabricNtp:
+    case EnumType::kMixedNtp:
+    case EnumType::kNonFabricSntpNts:
+    case EnumType::kNonFabricNtpNts:
+    case EnumType::kFabricSntpNts:
+    case EnumType::kFabricNtpNts:
+    case EnumType::kMixedNtpNts:
+    case EnumType::kCloudSource:
+    case EnumType::kPtp:
+    case EnumType::kGnss:
+        return val;
+    default:
+        return static_cast<EnumType>(17);
     }
 }
 
@@ -2050,6 +2093,22 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TestCluster::SimpleEnum
         return val;
     default:
         return static_cast<EnumType>(4);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(FaultInjection::FaultType val)
+{
+    using EnumType = FaultInjection::FaultType;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
+    case EnumType::kSystemFault:
+    case EnumType::kInetFault:
+    case EnumType::kChipFault:
+    case EnumType::kCertFault:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
     }
 }
 

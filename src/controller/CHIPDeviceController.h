@@ -31,8 +31,8 @@
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/ClusterStateCache.h>
-#include <app/OperationalDeviceProxy.h>
-#include <app/OperationalDeviceProxyPool.h>
+#include <app/OperationalSessionSetup.h>
+#include <app/OperationalSessionSetupPool.h>
 #include <controller/AbstractDnssdDiscoveryController.h>
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPCluster.h>
@@ -106,6 +106,18 @@ struct ControllerInitParams
     ByteSpan controllerNOC;
     ByteSpan controllerICAC;
     ByteSpan controllerRCAC;
+
+    /**
+     * Controls whether we permit multiple DeviceController instances to exist
+     * on the same logical fabric (identified by the tuple of the fabric's
+     * root public key + fabric id).
+     *
+     * Each controller instance will be associated with its own FabricIndex.
+     * This pivots the FabricTable to tracking identities instead of fabrics,
+     * represented by FabricInfo instances that can have colliding logical fabrics.
+     *
+     */
+    bool permitMultiControllerFabrics = false;
 
     //
     // Controls enabling server cluster interactions on a controller. This in turn
@@ -203,14 +215,6 @@ public:
     }
 
     /**
-     * DEPRECATED - to be removed
-     *
-     * Forces a DNSSD lookup for the specified device. It finds the corresponding session
-     * for the given peerNodeId and initiates a DNSSD lookup to find/update the node address
-     */
-    CHIP_ERROR UpdateDevice(NodeId peerNodeId);
-
-    /**
      * @brief
      *   Compute a PASE verifier and passcode ID for the desired setup pincode.
      *
@@ -289,28 +293,7 @@ public:
         return mSystemState->Fabrics();
     }
 
-    // TODO(#20452): This should be removed/renamed once #20452 is fixed
-    void ReleaseOperationalDevice(NodeId remoteNodeId);
-
     OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }
-
-    /**
-     * TODO(#20452): This needs to be refactored to reflect what it actually does (which is not disconnecting anything)
-     *
-     * TEMPORARY - DO NOT USE or if you use please request review on why/how to
-     * officially support such an API.
-     *
-     * This was added to support the 'reuse session' logic in cirque integration
-     * tests however since that is the only client, the correct update is to
-     * use 'ConnectDevice' and wait for connect success/failure inside the CI
-     * logic. The current code does not do that because python was not set up
-     * to wait for timeouts on success/fail, hence this temporary method.
-     *
-     * TODO(andy31415): update cirque test and remove this method.
-     *
-     * Returns success if a session with the given peer does not exist yet.
-     */
-    CHIP_ERROR DisconnectDevice(NodeId nodeId);
 
     /**
      * @brief
@@ -357,14 +340,7 @@ protected:
 
     chip::VendorId mVendorId;
 
-    /// Fetches the session to use for the current device. Allows overriding
-    /// in case subclasses want to create the session if it does not yet exist
-    virtual OperationalDeviceProxy * GetDeviceSession(const ScopedNodeId & peerId);
-
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
-
-private:
-    void ReleaseOperationalDevice(OperationalDeviceProxy * device);
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
@@ -571,6 +547,26 @@ public:
     CommissioningStageComplete(CHIP_ERROR err,
                                CommissioningDelegate::CommissioningReport report = CommissioningDelegate::CommissioningReport());
 
+    /**
+     * @brief
+     *   This function is called by the DevicePairingDelegate to indicate that network credentials have been set
+     * on the CommissioningParameters of the CommissioningDelegate using CommissioningDelegate.SetCommissioningParameters().
+     * As a result, commissioning can advance to the next stage.
+     *
+     * The DevicePairingDelegate may call this method from the OnScanNetworksSuccess and OnScanNetworksFailure callbacks,
+     * or it may call this method after obtaining network credentials using asyncronous methods (prompting user, cloud API call,
+     * etc).
+     *
+     * @return CHIP_ERROR   The return status. Returns CHIP_ERROR_INCORRECT_STATE if not in the correct state (kNeedsNetworkCreds).
+     */
+    CHIP_ERROR NetworkCredentialsReady();
+
+    /**
+     * @brief
+     *  This function returns the current CommissioningStage for this commissioner.
+     */
+    CommissioningStage GetCommissioningStage() { return mCommissioningStage; }
+
 #if CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     /**
@@ -648,15 +644,22 @@ public:
     // ClusterStateCache::Callback impl
     void OnDone(app::ReadClient *) override;
 
-    // Commissioner will establish new device connections after PASE.
-    OperationalDeviceProxy * GetDeviceSession(const ScopedNodeId & peerId) override;
-
     // Issue an NOC chain using the associated OperationalCredentialsDelegate. The NOC chain will
     // be provided in X509 DER format.
     // NOTE: This is only valid assuming that `mOperationalCredentialsDelegate` is what is desired
     // to issue the NOC chain.
     CHIP_ERROR IssueNOCChain(const ByteSpan & NOCSRElements, NodeId nodeId,
                              chip::Callback::Callback<OnNOCChainGeneration> * callback);
+
+    void SetDeviceAttestationVerifier(Credentials::DeviceAttestationVerifier * deviceAttestationVerifier)
+    {
+        mDeviceAttestationVerifier = deviceAttestationVerifier;
+    }
+
+    Optional<CommissioningParameters> GetCommissioningParameters()
+    {
+        return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
+    }
 
 private:
     DevicePairingDelegate * mPairingDelegate;
@@ -748,7 +751,7 @@ private:
     /* Callback called when adding root cert to device results in failure */
     static void OnRootCertFailureResponse(void * context, CHIP_ERROR error);
 
-    static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
+    static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     static void OnDeviceAttestationInformationVerification(void * context, Credentials::AttestationVerificationResult result);
@@ -761,8 +764,12 @@ private:
         void * context,
         const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
     static void
+    OnScanNetworksResponse(void * context,
+                           const app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data);
+    static void OnScanNetworksFailure(void * context, CHIP_ERROR err);
+    static void
     OnNetworkConfigResponse(void * context,
-                            const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
+                            const app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
     static void OnConnectNetworkResponse(
         void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
     static void OnCommissioningCompleteResponse(

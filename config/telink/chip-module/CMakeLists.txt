@@ -101,7 +101,7 @@ set(GN_ROOT_TARGET ${CHIP_ROOT}/config/telink/chip-gn)
 if (CONFIG_POSIX_API)
     list(APPEND CHIP_CFLAGS
         -D_SYS__PTHREADTYPES_H_
-        -isystem${ZEPHYR_BASE}/include/posix
+        -isystem${ZEPHYR_BASE}/include/zephyr/posix
     )
 endif()
 

@@ -13,7 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 121.3.2. [TC-G-3.2] Commands [DUT-Client]
+name: 125.3.2. [TC-G-3.2] Commands [DUT-Client]
+
+PICS:
+    - G.C
 
 config:
     nodeId: 0x12344321
@@ -21,142 +24,69 @@ config:
     endpoint: 0
 
 tests:
-    - label: "DUT sends AddGroup command to TH"
-      PICS: G.C.C00.Rsp
+    - label: "Note"
       verification: |
-          ./chip-tool groups add-group 0x0021 gp1 1 1
-
-
-          Verify on the TH Log:
-
-
-          [1657095032.527440][3394:3399] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
-          [1657095032.527552][3394:3399] CHIP:TOO:   AddGroupResponse: {
-          [1657095032.527616][3394:3399] CHIP:TOO:     status: 0
-          [1657095032.527685][3394:3399] CHIP:TOO:     groupId: 33
-          [1657095032.527733][3394:3399] CHIP:TOO:    }
-      disabled: true
-
-    - label: "DUT sends ViewGroup command to TH"
-      PICS: G.C.C01.Rsp
-      verification: |
-          ./chip-tool groups view-group 0x0021 1 1
-
-
-          Verify on the TH Log:
-
-          [1657095093.641399][3404:3409] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
-          [1657095093.641465][3404:3409] CHIP:TOO:   ViewGroupResponse: {
-          [1657095093.641509][3404:3409] CHIP:TOO:     status: 0
-          [1657095093.641541][3404:3409] CHIP:TOO:     groupId: 33
-          [1657095093.641571][3404:3409] CHIP:TOO:     groupName: gp1
-          [1657095093.641601][3404:3409] CHIP:TOO:    }
-          [1657095093.641650][3404:3409] CHIP:DMG: ICR moving to [AwaitingDe]
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
     - label: "DUT sends GetGroupMembership command to TH"
-      PICS: G.C.C02.Rsp
+      PICS: G.C.C02.Tx
       verification: |
-          ./chip-tool groups get-group-membership '[33]' 1 1
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          Verify on the TH Log:
+          ./chip-tool groups get-group-membership "[33]" 1 1
 
-          [1657095129.620336][3411:3416] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0002
-          [1657095129.620430][3411:3416] CHIP:TOO:   GetGroupMembershipResponse: {
-          [1657095129.620457][3411:3416] CHIP:TOO:     capacity: null
-          [1657095129.620506][3411:3416] CHIP:TOO:     groupList: 1 entries
-          [1657095129.620539][3411:3416] CHIP:TOO:       [1]: 33
-          [1657095129.620564][3411:3416] CHIP:TOO:    }
+          Verify the "GetGroupMembership command response" on the TH(Allcluster-app)  Log:
+
+
+          [1659609064.738513][3355:3355] CHIP:DMG: },
+          [1659609064.738580][3355:3355] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0004 e=1 p=o
+          [1659609064.738619][3355:3355] CHIP:DMG: AccessControl: allowed
+          [1659609064.738648][3355:3355] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0004 Command=0x0000_0002
+          [1659609064.738825][3355:3355] CHIP:DMG: ICR moving to [ Preparing]
       disabled: true
 
     - label: "DUT sends RemoveGroup command to TH"
-      PICS: G.C.C03.Rsp
+      PICS: G.C.C03.Tx
       verification: |
           ./chip-tool groups remove-group 0x0021 1 1
 
-          Verify on the TH Log:
-
-          [1657095157.846618][3417:3422] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0003
-          [1657095157.846703][3417:3422] CHIP:TOO:   RemoveGroupResponse: {
-          [1657095157.846761][3417:3422] CHIP:TOO:     status: 0
-          [1657095157.846804][3417:3422] CHIP:TOO:     groupId: 33
-          [1657095157.846845][3417:3422] CHIP:TOO:    }
+          Verify the "RemoveGroup command response" on the TH(Allcluster-app)  Log:
+          [1659609128.634829][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
+          [1659609128.634852][3355:3355] CHIP:DMG: },
+          [1659609128.634916][3355:3355] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0004 e=1 p=m
+          [1659609128.634952][3355:3355] CHIP:DMG: AccessControl: allowed
+          [1659609128.634981][3355:3355] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0004 Command=0x0000_0003
+          [1659609128.635123][3355:3355] CHIP:DMG: ICR moving to [ Preparing]
       disabled: true
 
-    - label: "DUT sends RemoveAllGroup command to TH"
-      PICS: G.C.C04.Rsp
+    - label: "DUT sends RemoveAllGroups command to TH"
+      PICS: G.C.C04.Tx
       verification: |
           ./chip-tool groups  remove-all-groups 1 1
 
-          Verify on the TH Log:
+          Verify the "RemoveAllGroups command response"  on the TH(Allcluster-app)  Log:
 
-          [1657706539.252762][5487:5492] CHIP:DMG: ICR moving to [ResponseRe]
-          [1657706539.252820][5487:5492] CHIP:DMG: InvokeResponseMessage =
-          [1657706539.252851][5487:5492] CHIP:DMG: {
-          [1657706539.252881][5487:5492] CHIP:DMG:        suppressResponse = false,
-          [1657706539.252912][5487:5492] CHIP:DMG:        InvokeResponseIBs =
-          [1657706539.252950][5487:5492] CHIP:DMG:        [
-          [1657706539.252979][5487:5492] CHIP:DMG:                InvokeResponseIB =
-          [1657706539.253020][5487:5492] CHIP:DMG:                {
-          [1657706539.253051][5487:5492] CHIP:DMG:                        CommandStatusIB =
-          [1657706539.253089][5487:5492] CHIP:DMG:                        {
-          [1657706539.253125][5487:5492] CHIP:DMG:                                CommandPathIB =
-          [1657706539.253167][5487:5492] CHIP:DMG:                                {
-          [1657706539.253213][5487:5492] CHIP:DMG:                                        EndpointId = 0x1,
-          [1657706539.253259][5487:5492] CHIP:DMG:                                        ClusterId = 0x4,
-          [1657706539.253298][5487:5492] CHIP:DMG:                                        CommandId = 0x4,
-          [1657706539.253338][5487:5492] CHIP:DMG:                                },
-          [1657706539.253379][5487:5492] CHIP:DMG:
-          [1657706539.253415][5487:5492] CHIP:DMG:                                StatusIB =
-          [1657706539.253457][5487:5492] CHIP:DMG:                                {
-          [1657706539.253503][5487:5492] CHIP:DMG:                                        status = 0x00 (SUCCESS),
-          [1657706539.253543][5487:5492] CHIP:DMG:                                },
-          [1657706539.253583][5487:5492] CHIP:DMG:
-          [1657706539.253619][5487:5492] CHIP:DMG:                        },
-          [1657706539.253659][5487:5492] CHIP:DMG:
-          [1657706539.253690][5487:5492] CHIP:DMG:                },
-          [1657706539.253727][5487:5492] CHIP:DMG:
-          [1657706539.253757][5487:5492] CHIP:DMG:        ],
-          [1657706539.253794][5487:5492] CHIP:DMG:
-          [1657706539.253824][5487:5492] CHIP:DMG:        InteractionModelRevision = 1
-          [1657706539.253852][5487:5492] CHIP:DMG: },
+          [1659609158.078774][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
+          [1659609158.078797][3355:3355] CHIP:DMG: },
+          [1659609158.078876][3355:3355] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0004 e=1 p=m
+          [1659609158.078911][3355:3355] CHIP:DMG: AccessControl: allowed
+          [1659609158.078949][3355:3355] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0004 Command=0x0000_0004
+          [1659609158.079188][3355:3355] CHIP:DMG: ICR moving to [ Preparing]
       disabled: true
 
     - label: "DUT sends AddGroupIfIdentifying command to TH"
-      PICS: G.C.C05.Rsp
+      PICS: G.C.C05.Tx
       verification: |
           ./chip-tool groups  add-group-if-identifying 0x0052 gp54 1 0
 
-          Verify on the TH Log:
+          Verify the "AddGroupIfIdentifying command response" on the TH(Allcluster-app)  Log:
 
-          [1657706689.647809][5502:5507] CHIP:DMG: ICR moving to [ResponseRe]
-          [1657706689.647906][5502:5507] CHIP:DMG: InvokeResponseMessage =
-          [1657706689.647954][5502:5507] CHIP:DMG: {
-          [1657706689.648014][5502:5507] CHIP:DMG:        suppressResponse = false,
-          [1657706689.648069][5502:5507] CHIP:DMG:        InvokeResponseIBs =
-          [1657706689.648143][5502:5507] CHIP:DMG:        [
-          [1657706689.648188][5502:5507] CHIP:DMG:                InvokeResponseIB =
-          [1657706689.648263][5502:5507] CHIP:DMG:                {
-          [1657706689.648311][5502:5507] CHIP:DMG:                        CommandStatusIB =
-          [1657706689.648384][5502:5507] CHIP:DMG:                        {
-          [1657706689.648460][5502:5507] CHIP:DMG:                                CommandPathIB =
-          [1657706689.648528][5502:5507] CHIP:DMG:                                {
-          [1657706689.648607][5502:5507] CHIP:DMG:                                        EndpointId = 0x0,
-          [1657706689.648689][5502:5507] CHIP:DMG:                                        ClusterId = 0x4,
-          [1657706689.648755][5502:5507] CHIP:DMG:                                        CommandId = 0x5,
-          [1657706689.648835][5502:5507] CHIP:DMG:                                },
-          [1657706689.648922][5502:5507] CHIP:DMG:
-          [1657706689.648979][5502:5507] CHIP:DMG:                                StatusIB =
-          [1657706689.649024][5502:5507] CHIP:DMG:                                {
-          [1657706689.649070][5502:5507] CHIP:DMG:                                        status = 0x00 (SUCCESS),
-          [1657706689.649167][5502:5507] CHIP:DMG:                                },
-          [1657706689.649213][5502:5507] CHIP:DMG:
-          [1657706689.649248][5502:5507] CHIP:DMG:                        },
-          [1657706689.649296][5502:5507] CHIP:DMG:
-          [1657706689.649323][5502:5507] CHIP:DMG:                },
-          [1657706689.649365][5502:5507] CHIP:DMG:
-          [1657706689.649390][5502:5507] CHIP:DMG:        ],
-          [1657706689.649431][5502:5507] CHIP:DMG:
-          [1657706689.649457][5502:5507] CHIP:DMG:        InteractionModelRevision = 1
-          [1657706689.649491][5502:5507] CHIP:DMG: },
+          [1659609228.441181][3355:3355] CHIP:DMG:
+          [1659609228.441208][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
+          [1659609228.441234][3355:3355] CHIP:DMG: },
+          [1659609228.441306][3355:3355] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0004 e=0 p=m
+          [1659609228.441346][3355:3355] CHIP:DMG: AccessControl: allowed
+          [1659609228.441378][3355:3355] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_0004 Command=0x0000_0005
+          [1659609228.441436][3355:3355] CHIP:DMG: ICR moving to [ Preparing]
       disabled: true

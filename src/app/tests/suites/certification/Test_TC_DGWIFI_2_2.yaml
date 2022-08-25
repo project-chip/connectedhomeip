@@ -15,6 +15,9 @@
 
 name: 3.2.2. [TC-DGWIFI-2.2] Event Functionality [DUT as Server]
 
+PICS:
+    - DGWIFI.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -26,10 +29,11 @@ tests:
           dis-association."
       PICS: DGWIFI.S.E00
       verification: |
-          This is an Optional event so its not compulsory to get the expected outcome
+          Disconnection is an optional event so its not compulsory to get the expected outcome
 
           ./chip-tool wifinetworkdiagnostics read-event disconnection 1 0
-          Verify on the TH Log:
+
+          Verify  Disconnection event on the TH Log:
 
           [1655734228.476828][18708:18713] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Event 0x0000_0000
           [1655734228.476890][18708:18713] CHIP:TOO:          Event number: 2
@@ -45,9 +49,11 @@ tests:
           dis-association. DUT exhausts all internal retries."
       PICS: DGWIFI.S.E01
       verification: |
-          This is an Optional event so its not compulsory to get the expected outcome
+          AssociationFailure is an Optional event so its not compulsory to get the expected outcome
 
           ./chip-tool wifinetworkdiagnostics read-event association-failure 1 0
+
+          VerifyAssociationFailure event on the TH Log:
 
            CHIP:DMG: ReportDataMessage =
           [1651574380.297222][8941:8946] CHIP:DMG: {
@@ -60,9 +66,11 @@ tests:
     - label: "Disconnect and reconnect node WiFi."
       PICS: DGWIFI.S.E02
       verification: |
-          This is an Optional event so its not compulsory to get the expected outcome
+          ConnectionStatus is an Optional event so its not compulsory to get the expected outcome
 
           ./chip-tool wifinetworkdiagnostics read-event connection-status 1 0
+
+          Verify ConnectionStatus event on the TH Log:
 
           [1655734276.513474][18731:18736] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Event 0x0000_0002
           [1655734276.513504][18731:18736] CHIP:TOO:          Event number: 3

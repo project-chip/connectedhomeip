@@ -81,7 +81,6 @@ list(
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -DCONFIG_ENABLE_PW_RPC=1
-    -DMATTER_PIGWEED_APP=1
 )
 
 if (matter_enable_persistentstorage_audit)

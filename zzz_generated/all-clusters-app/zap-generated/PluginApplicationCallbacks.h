@@ -32,7 +32,7 @@
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterBindingPluginServerInitCallback();                                                                                       \
     MatterAccessControlPluginServerInitCallback();                                                                                 \
-    MatterBridgedActionsPluginServerInitCallback();                                                                                \
+    MatterActionsPluginServerInitCallback();                                                                                       \
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \
@@ -84,4 +84,5 @@
     MatterApplicationBasicPluginServerInitCallback();                                                                              \
     MatterAccountLoginPluginServerInitCallback();                                                                                  \
     MatterElectricalMeasurementPluginServerInitCallback();                                                                         \
-    MatterTestClusterPluginServerInitCallback();
+    MatterTestClusterPluginServerInitCallback();                                                                                   \
+    MatterFaultInjectionPluginServerInitCallback();

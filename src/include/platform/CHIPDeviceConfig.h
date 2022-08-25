@@ -458,16 +458,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
- *
- * Automatically disable CHIPoBLE advertising when the device transitions to a fully
- * provisioned state.
- */
-#ifndef CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-#define CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED 0
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART
  *
  * Enable CHIPoBLE advertising start automatically after device power-up.

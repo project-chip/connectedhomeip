@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    121.2.2. [TC-G-2.2] Commands - AddGroup, ViewGroup, RemoveGroup,
+    125.2.2. [TC-G-2.2] Commands - AddGroup, ViewGroup, RemoveGroup,
     RemoveAllGroups [DUT-Server]
+
+PICS:
+    - G.S
 
 config:
     nodeId: 0x12344321
@@ -24,13 +27,13 @@ config:
 
 tests:
     - label:
-          "TH sends AddGroup command to DUT as unicast with the following fields
-          : GroupID as 0x0001 GroupName as Gp1"
+          "If maxgroups>0, TH sends AddGroup command to DUT as unicast with the
+          following fields : GroupID as 0x0001 GroupName as Gp1"
       PICS: G.S.C00.Rsp && G.S.C00.Tx
       verification: |
           ./chip-tool groups add-group 0x0001 grp1 1 1
 
-          Verify on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1651218084.427102][2526:2531] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
           [1651218084.427203][2526:2531] CHIP:TOO:   AddGroupResponse: {
@@ -40,13 +43,13 @@ tests:
       disabled: true
 
     - label:
-          "TH reads GroupTable attribute from the GroupKeyManagement cluster
-          from DUT"
+          "If maxgroups > 0, TH reads GroupTable attribute from the
+          GroupKeyManagement cluster from DUT on PIXIT.G.ENDPOINT"
       PICS: GRPKEY.S.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1651218198.062850][2538:2543] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 2261933069
           [1651218198.062980][2538:2543] CHIP:TOO:   GroupTable: 1 entries
@@ -60,13 +63,13 @@ tests:
       disabled: true
 
     - label:
-          "TH sends AddGroup command to DUT as unicast with the following fields
-          : GroupID as 0x0002 GroupName as Gp2"
+          "If maxgroups>1, TH sends AddGroup command to DUT as unicast with the
+          following fields : GroupID as 0x0002 GroupName as Gp2"
       PICS: G.S.C00.Rsp && G.S.C00.Tx
       verification: |
           ./chip-tool groups add-group 0x0002 grp2 1 1
 
-          Verify on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1653484028.897698][11275:11280] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
           [1653484028.897804][11275:11280] CHIP:TOO:   AddGroupResponse: {
@@ -76,13 +79,13 @@ tests:
       disabled: true
 
     - label:
-          "TH reads GroupTable attribute from the GroupKeyManagement cluster
-          from DUT"
+          "If maxgroups > 1 TH reads GroupTable attribute from the
+          GroupKeyManagement cluster from DUT on PIXIT.G.ENDPOINT"
       PICS: GRPKEY.S.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1653484065.934504][11281:11286] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1368205390
           [1653484065.934631][11281:11286] CHIP:TOO:   GroupTable: 2 entries
@@ -103,13 +106,13 @@ tests:
       disabled: true
 
     - label:
-          "TH sends AddGroup command to DUT as unicast with the following fields
-          : GroupID as 0x0003 GroupName as Gp3"
+          "If maxgroups>2, TH sends AddGroup command to DUT (n-2) more times,
+          starting with GroupID 0x0003 and incrementing by 1 each time."
       PICS: G.S.C00.Rsp && G.S.C00.Tx
       verification: |
           ./chip-tool groups add-group 0x0003 grp3 1 1
 
-          Verify on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1653484116.857523][11289:11294] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
           [1653484116.857675][11289:11294] CHIP:TOO:   AddGroupResponse: {
@@ -119,13 +122,13 @@ tests:
       disabled: true
 
     - label:
-          "TH reads GroupTable attribute from the GroupKeyManagement cluster
-          from DUT"
+          "If maxgroups>2, TH reads GroupTable attribute from the
+          GroupKeyManagement cluster from DUT on PIXIT.G.ENDPOINT"
       PICS: GRPKEY.S.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1653484156.968253][11299:11304] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1368205390
           [1653484156.968414][11299:11304] CHIP:TOO:   GroupTable: 3 entries
@@ -153,13 +156,13 @@ tests:
       disabled: true
 
     - label:
-          "TH sends AddGroup command to DUT (n+1) times as unicast with the
-          different GroupID each time"
-      PICS: G.S.C00.Rsp && G.S.C00.Tx
+          "TH sends AddGroup command to DUT as unicast with the GroupID set to
+          (maxgroups+1)"
+      PICS: G.S.C00.Rsp
       verification: |
           ./chip-tool groups add-group 0x0004 grp4 1 1
 
-          Verify on the TH Log:
+          Verify the "status is RESOURCE_EXHAUSTED" on the TH(Chip-tool)  Log:
 
           [1653484187.170553][11306:11311] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
           [1653484187.170637][11306:11311] CHIP:TOO:   AddGroupResponse: {
@@ -170,12 +173,12 @@ tests:
 
     - label:
           "TH reads GroupTable attribute from the GroupKeyManagement cluster
-          from DUT"
+          from DUT on PIXIT.G.ENDPOINT"
       PICS: GRPKEY.S.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1653484324.735216][11318:11323] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1368205390
           [1653484324.735368][11318:11323] CHIP:TOO:   GroupTable: 3 entries
@@ -209,7 +212,7 @@ tests:
       verification: |
           ./chip-tool groups add-group 0x0000 grp6 1 1
 
-          Verify on the TH Log:
+          Verify the "status is CONSTRAINT_ERROR" on the TH(Chip-tool)  Log:
 
           [1653484439.884144][11341:11346] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
           [1653484439.884258][11341:11346] CHIP:TOO:   AddGroupResponse: {
@@ -219,55 +222,36 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ViewGroup command to DUT as unicast with the following
-          fields: GroupID as 0x0001"
+          "TH sends AddGroup command to DUT as unicast with the following fields
+          : GroupID as 0x0005 GroupName as Gp5"
+      PICS: G.S.C00.Rsp && G.S.C00.Tx
+      verification: |
+          ./chip-tool groups add-group 0x0005 grp5 1 1
+
+          Verify the "status is UNSUPPORTED_ACCESS" on the TH(Chip-tool)  Log:
+
+          [1658302176.951047][2747:2752] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Command 0x0000_0000
+          [1658302176.951103][2747:2752] CHIP:TOO:   AddGroupResponse: {
+          [1658302176.951140][2747:2752] CHIP:TOO:     status: 126
+          [1658302176.951166][2747:2752] CHIP:TOO:     groupId: 5
+          [1658302176.951189][2747:2752] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "If maxgroups > 0, TH sends ViewGroup command to DUT as unicast with
+          the following fields: GroupID as 0x0001"
       PICS: G.S.C01.Rsp && G.S.C01.Tx
       verification: |
           ./chip-tool groups view-group 0x0001 1 1
 
-          Verify on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           1653484504.667714][11349:11354] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
-          [1653484504.667841][11349:11354] CHIP:TOO:   ViewGroupResponse: {
-          [1653484504.667927][11349:11354] CHIP:TOO:     status: 0
-          [1653484504.667974][11349:11354] CHIP:TOO:     groupId: 1
-          [1653484504.668018][11349:11354] CHIP:TOO:     groupName: grp1
-          [1653484504.668064][11349:11354] CHIP:TOO:    }
-      disabled: true
-
-    - label:
-          "TH reads GroupTable attribute from the GroupKeyManagement cluster
-          from DUT Iterate the GroupID in ViewGroup command the GroupId in
-          GroupTable"
-      PICS: GRPKEY.S.A0001
-      verification: |
-          ./chip-tool groupkeymanagement read group-table 1 0
-
-          Verify on the TH Log:
-
-          [1653484552.793059][11397:11402] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1368205390
-          [1653484552.793197][11397:11402] CHIP:TOO:   GroupTable: 3 entries
-          [1653484552.793327][11397:11402] CHIP:TOO:     [1]: {
-          [1653484552.793368][11397:11402] CHIP:TOO:       GroupId: 1
-          [1653484552.793407][11397:11402] CHIP:TOO:       Endpoints: 1 entries
-          [1653484552.793467][11397:11402] CHIP:TOO:         [1]: 0
-          [1653484552.793510][11397:11402] CHIP:TOO:       GroupName: grp1
-          [1653484552.793546][11397:11402] CHIP:TOO:       FabricIndex: 1
-          [1653484552.793583][11397:11402] CHIP:TOO:      }
-          [1653484552.793632][11397:11402] CHIP:TOO:     [2]: {
-          [1653484552.793669][11397:11402] CHIP:TOO:       GroupId: 2
-          [1653484552.793706][11397:11402] CHIP:TOO:       Endpoints: 1 entries
-          [1653484552.793747][11397:11402] CHIP:TOO:         [1]: 0
-          [1653484552.793786][11397:11402] CHIP:TOO:       GroupName: grp2
-          [1653484552.793822][11397:11402] CHIP:TOO:       FabricIndex: 1
-          [1653484552.793856][11397:11402] CHIP:TOO:      }
-          [1653484552.793905][11397:11402] CHIP:TOO:     [3]: {
-          [1653484552.793942][11397:11402] CHIP:TOO:       GroupId: 3
-          [1653484552.793979][11397:11402] CHIP:TOO:       Endpoints: 1 entries
-          [1653484552.794019][11397:11402] CHIP:TOO:         [1]: 0
-          [1653484552.794057][11397:11402] CHIP:TOO:       GroupName: grp3
-          [1653484552.794092][11397:11402] CHIP:TOO:       FabricIndex: 1
-          [1653484552.794126][11397:11402] CHIP:TOO:      }
+          [1653484504.667841][11349:11354] CHIP:TOO: ViewGroupResponse: {
+          [1653484504.667927][11349:11354] CHIP:TOO: status: 0
+          [1653484504.667974][11349:11354] CHIP:TOO: groupId: 1
+          [1653484504.668018][11349:11354] CHIP:TOO: groupName: grp1
+          [1653484504.668064][11349:11354] CHIP:TOO: }
       disabled: true
 
     - label:
@@ -277,7 +261,7 @@ tests:
       verification: |
           ./chip-tool groups view-group 0x0000 1 1
 
-          Verify on the TH Log:
+          Verify the "status is CONSTRAINT_ERROR" on the TH(Chip-tool)  Log:
 
           [1653484611.595344][11412:11417] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
           [1653484611.595454][11412:11417] CHIP:TOO:   ViewGroupResponse: {
@@ -288,100 +272,13 @@ tests:
       disabled: true
 
     - label:
-          "TH reads GroupTable attribute from the GroupKeyManagement cluster
-          from DUT Iterate the GroupID in ViewGroup command with the GroupId in
-          GroupTable"
-      PICS: GRPKEY.S.A0001
-      verification: |
-          ./chip-tool groupkeymanagement read group-table 1 0
-
-          Verify on the TH Log:
-
-          [1653484552.793059][11397:11402] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1368205390
-          [1653484552.793197][11397:11402] CHIP:TOO:   GroupTable: 3 entries
-          [1653484552.793327][11397:11402] CHIP:TOO:     [1]: {
-          [1653484552.793368][11397:11402] CHIP:TOO:       GroupId: 1
-          [1653484552.793407][11397:11402] CHIP:TOO:       Endpoints: 1 entries
-          [1653484552.793467][11397:11402] CHIP:TOO:         [1]: 0
-          [1653484552.793510][11397:11402] CHIP:TOO:       GroupName: grp1
-          [1653484552.793546][11397:11402] CHIP:TOO:       FabricIndex: 1
-          [1653484552.793583][11397:11402] CHIP:TOO:      }
-          [1653484552.793632][11397:11402] CHIP:TOO:     [2]: {
-          [1653484552.793669][11397:11402] CHIP:TOO:       GroupId: 2
-          [1653484552.793706][11397:11402] CHIP:TOO:       Endpoints: 1 entries
-          [1653484552.793747][11397:11402] CHIP:TOO:         [1]: 0
-          [1653484552.793786][11397:11402] CHIP:TOO:       GroupName: grp2
-          [1653484552.793822][11397:11402] CHIP:TOO:       FabricIndex: 1
-          [1653484552.793856][11397:11402] CHIP:TOO:      }
-          [1653484552.793905][11397:11402] CHIP:TOO:     [3]: {
-          [1653484552.793942][11397:11402] CHIP:TOO:       GroupId: 3
-          [1653484552.793979][11397:11402] CHIP:TOO:       Endpoints: 1 entries
-          [1653484552.794019][11397:11402] CHIP:TOO:         [1]: 0
-          [1653484552.794057][11397:11402] CHIP:TOO:       GroupName: grp3
-          [1653484552.794092][11397:11402] CHIP:TOO:       FabricIndex: 1
-          [1653484552.794126][11397:11402] CHIP:TOO:      }
-      disabled: true
-
-    - label:
-          "TH sends ViewGroup command to DUT as unicast with the following
-          fields: GroupID as 0x0021"
-      PICS: G.S.C01.Rsp && G.S.C01.Tx
-      verification: |
-          ./chip-tool groups view-group 0x0021 1 1
-
-          Verify on the TH Log:
-
-          [1653484707.569962][11436:11441] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
-          [1653484707.570073][11436:11441] CHIP:TOO:   ViewGroupResponse: {
-          [1653484707.570122][11436:11441] CHIP:TOO:     status: 139
-          [1653484707.570154][11436:11441] CHIP:TOO:     groupId: 33
-          [1653484707.570185][11436:11441] CHIP:TOO:     groupName:
-          [1653484707.570218][11436:11441] CHIP:TOO:    }
-      disabled: true
-
-    - label:
-          "TH reads GroupTable attribute from the GroupKeyManagement cluster
-          from DUT Iterate the GroupID in ViewGroup command with the GroupId in
-          GroupTable"
-      PICS: GRPKEY.S.A0001
-      verification: |
-          ./chip-tool groupkeymanagement read group-table 1 0
-
-          Verify on the TH Log:
-
-          [1653559604.877250][3163:3168] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 3214629634
-          [1653559604.877441][3163:3168] CHIP:TOO:   GroupTable: 3 entries
-          [1653559604.877556][3163:3168] CHIP:TOO:     [1]: {
-          [1653559604.877621][3163:3168] CHIP:TOO:       GroupId: 1
-          [1653559604.877671][3163:3168] CHIP:TOO:       Endpoints: 1 entries
-          [1653559604.877722][3163:3168] CHIP:TOO:         [1]: 0
-          [1653559604.877769][3163:3168] CHIP:TOO:       GroupName: grp1
-          [1653559604.877812][3163:3168] CHIP:TOO:       FabricIndex: 1
-          [1653559604.877853][3163:3168] CHIP:TOO:      }
-          [1653559604.877912][3163:3168] CHIP:TOO:     [2]: {
-          [1653559604.877955][3163:3168] CHIP:TOO:       GroupId: 2
-          [1653559604.877999][3163:3168] CHIP:TOO:       Endpoints: 1 entries
-          [1653559604.878045][3163:3168] CHIP:TOO:         [1]: 0
-          [1653559604.878090][3163:3168] CHIP:TOO:       GroupName: grp2
-          [1653559604.878132][3163:3168] CHIP:TOO:       FabricIndex: 1
-          [1653559604.878178][3163:3168] CHIP:TOO:      }
-          [1653559604.878234][3163:3168] CHIP:TOO:     [3]: {
-          [1653559604.878276][3163:3168] CHIP:TOO:       GroupId: 3
-          [1653559604.878319][3163:3168] CHIP:TOO:       Endpoints: 1 entries
-          [1653559604.878366][3163:3168] CHIP:TOO:         [1]: 0
-          [1653559604.878411][3163:3168] CHIP:TOO:       GroupName: grp3
-          [1653559604.878454][3163:3168] CHIP:TOO:       FabricIndex: 1
-          [1653559604.878494][3163:3168] CHIP:TOO:      }
-      disabled: true
-
-    - label:
-          "TH sends RemoveGroup command to DUT as unicast with the following
-          field : GroupID as 0x0001"
+          "If maxgroups > 0, TH sends RemoveGroup command to DUT as unicast with
+          the following field : GroupID as 0x0001"
       PICS: G.S.C03.Rsp && G.S.C03.Tx
       verification: |
           ./chip-tool groups remove-group 0x0001 1 1
 
-          Verify on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1653484876.432744][11451:11456] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0003
           [1653484876.432915][11451:11456] CHIP:TOO:   RemoveGroupResponse: {
@@ -391,13 +288,13 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ViewGroup command to DUT as unicast with the following field
-          : GroupID as 0x0001"
+          "If maxgroups > 0, TH sends ViewGroup command to DUT as unicast with
+          the following field : GroupID as 0x0001"
       PICS: G.S.C01.Rsp && G.S.C01.Tx
       verification: |
           ./chip-tool groups view-group 0x0001 1 1
 
-          Verify on the TH Log:
+          Verify the "status is NOT_FOUND" on the TH(Chip-tool)  Log:
 
           [1653484952.142387][11458:11463] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
           [1653484952.142476][11458:11463] CHIP:TOO:   ViewGroupResponse: {
@@ -407,15 +304,12 @@ tests:
           [1653484952.142592][11458:11463] CHIP:TOO:    }
       disabled: true
 
-    - label:
-          "TH reads GroupTable attribute from the GroupKeyManagement cluster
-          from DUT Iterate the GroupID in ViewGroup command with the GroupId in
-          GroupTable"
+    - label: "TH reads GroupTable attribute from the GroupKeyManagement cluster"
       PICS: GRPKEY.S.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1655125356.123370][27657:27662] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1860794324
           [1655125356.123494][27657:27662] CHIP:TOO:   GroupTable: 2 entries
@@ -442,7 +336,7 @@ tests:
       verification: |
           ./chip-tool groups remove-group 0x0000 1 1
 
-          Verify on the TH Log:
+          Verify the "status as CONSTRAINT_ERROR" on the TH(Chip-tool)  Log:
 
           [1653485045.328766][11473:11478] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0003
           [1653485045.328896][11473:11478] CHIP:TOO:   RemoveGroupResponse: {
@@ -453,12 +347,12 @@ tests:
 
     - label:
           "TH sends RemoveGroup command to DUT as unicast with the following
-          field : GroupID as 0x0034"
+          field : GroupID as 0x0001"
       PICS: G.S.C03.Rsp && G.S.C03.Tx
       verification: |
-          ./chip-tool groups remove-group 0x0034 1 1
+          ./chip-tool groups remove-group 0x0001 1 1
 
-          Verify on the TH Log:
+          Verify the "status is NOT_FOUND"  on the TH(Chip-tool)  Log:
 
           [1653485126.672869][11483:11488] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0003
           [1653485126.672969][11483:11488] CHIP:TOO:   RemoveGroupResponse: {
@@ -467,15 +361,12 @@ tests:
           [1653485126.673075][11483:11488] CHIP:TOO:    }
       disabled: true
 
-    - label:
-          "TH reads GroupTable attribute from the GroupKeyManagement cluster
-          from DUT Iterate the GroupID in ViewGroup command with the GroupId in
-          GroupTable"
+    - label: "TH reads GroupTable attribute from the GroupKeyManagement cluster"
       PICS: GRPKEY.S.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1655125356.123370][27657:27662] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1860794324
           [1655125356.123494][27657:27662] CHIP:TOO:   GroupTable: 2 entries
@@ -500,7 +391,7 @@ tests:
       verification: |
           ./chip-tool groups remove-all-groups 1 1
 
-          Verify on the TH Log:
+          Verify the "status is success" on the TH(Chip-tool)  Log:
 
           [1653485455.344097][11508:11513] CHIP:DMG:                              StatusIB =
           [1653485455.344141][11508:11513] CHIP:DMG:                              {
@@ -515,7 +406,7 @@ tests:
       verification: |
           ./chip-tool groups view-group 0x0001 1 1
 
-          Verify on the TH Log:
+          Verify the "status is NOT_FOUND" on the TH(Chip-tool)  Log:
 
           [1653559917.259920][3227:3232] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
           [1653559917.259993][3227:3232] CHIP:TOO:   ViewGroupResponse: {
@@ -525,15 +416,12 @@ tests:
           [1653559917.260138][3227:3232] CHIP:TOO:    }
       disabled: true
 
-    - label:
-          "TH reads GroupTable attribute from the GroupKeyManagement cluster
-          from DUT Iterate the GroupID in ViewGroup command with the GroupId in
-          GroupTable"
+    - label: "TH reads GroupTable attribute from the GroupKeyManagement cluster"
       PICS: GRPKEY.S.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify on the TH Log:
+          Verify the "grouptable entries" on the TH(Chip-tool)  Log:
 
           [1656332191.739327][27032:27037] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 3761602970
           [1656332191.739391][27032:27037] CHIP:TOO:   GroupTable: 0 entries

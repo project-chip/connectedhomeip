@@ -1,0 +1,50 @@
+{{> header}}
+
+#import <Foundation/Foundation.h>
+
+#import <Matter/MTRAttributeCacheContainer.h>
+
+#import <Matter/MTRBaseClusters.h>
+#import <Matter/MTRCluster.h>
+#import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRDevice.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+{{#chip_client_clusters includeAll=true}}
+
+
+/**
+ * Cluster {{name}}
+ *    {{description}}
+ */
+@interface MTRCluster{{asUpperCamelCase name}} : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+
+{{#chip_cluster_commands}}
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler;
+{{#unless (hasArguments)}}
+- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler;
+{{/unless}}
+{{/chip_cluster_commands}}
+
+{{#chip_server_cluster_attributes}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
+- (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params;
+{{#if isWritableAttribute}}
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params;
+{{/if}}
+{{/chip_server_cluster_attributes}}
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+{{/chip_client_clusters}}
+
+NS_ASSUME_NONNULL_END

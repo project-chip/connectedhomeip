@@ -17,6 +17,9 @@ name:
     31.5.1. [TC-SU-2.4] Tests ApplyUpdateRequest command sent by the DUT to the
     OTA-P
 
+PICS:
+    - MCORE.OTA.Requestor
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -25,8 +28,8 @@ config:
 tests:
     - label:
           "DUT sends a QueryImage command to the TH/OTA-P + TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to Available. Set
-          ImageURI to the location where the image is located.After the DUT
+          QueryImageResponse back to DUT. QueryStatus is set to UpdateAvailable.
+          Set ImageURI to the location where the image is located.After the DUT
           transfers the image, the DUT should send ApplyUpdateRequest to the
           OTA-P."
       verification: |

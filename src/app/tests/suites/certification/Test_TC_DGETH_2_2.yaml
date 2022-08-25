@@ -14,6 +14,10 @@
 
 name: 45.2.2. [TC-DGETH-2.2] Command received functionality with server as DUT
 
+PICS:
+    - DGETH.S
+    - DGETH.S.C
+
 config:
     nodeId: 0x12344321
     cluster: "Ethernet Network Diagnostics"
@@ -28,42 +32,182 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #issue #13648
-    - label: "Sends ResetCounts command"
-      PICS: PICS_SKIP_SAMPLE_APP && DGETH.S.C00.Rsp
-      command: "ResetCounts"
+    - label: "TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
 
-    - label: "Read the PacketRxCount attribute"
-      PICS: PICS_SKIP_SAMPLE_APP && DGETH.S.A0002
+    - label: "TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "TH reads PacketRxCount attribute value from DUT"
+      PICS: DGETH.S.A0002
       command: "readAttribute"
       attribute: "PacketRxCount"
       response:
-          value: 0
+          saveAs: PacketRxCount
 
-    - label: "Read the PacketTxCount attribute"
-      PICS: PICS_SKIP_SAMPLE_APP && DGETH.S.A0003
+    - label: "TH reads PacketTxCount attribute value from DUT"
+      PICS: DGETH.S.A0003
       command: "readAttribute"
       attribute: "PacketTxCount"
       response:
-          value: 0
+          saveAs: PacketTxCount
 
-    - label: "Read the TxErrCount attribute"
-      PICS: PICS_SKIP_SAMPLE_APP && DGETH.S.A0004
+    - label: "TH reads TxErrCount attribute value from DUT"
+      PICS: DGETH.S.A0004
       command: "readAttribute"
       attribute: "TxErrCount"
       response:
-          value: 0
+          saveAs: TxErrCount
 
-    - label: "Read the CollisionCount attribute"
-      PICS: PICS_SKIP_SAMPLE_APP && DGETH.S.A0005
+    - label: "TH reads CollisionCount attribute value from DUT"
+      PICS: DGETH.S.A0005
       command: "readAttribute"
       attribute: "CollisionCount"
       response:
-          value: 0
+          saveAs: CollisionCount
 
-    - label: "Read the OverrunCount attribute"
-      PICS: PICS_SKIP_SAMPLE_APP && DGETH.S.A0006
+    - label: "TH reads OverrunCount attribute value from DUT"
+      PICS: DGETH.S.A0006
       command: "readAttribute"
       attribute: "OverrunCount"
       response:
-          value: 0
+          saveAs: OverrunCount
+
+    #issue #13648
+    - label: "Sends ResetCounts command"
+      PICS: DGETH.S.C00.Rsp
+      command: "ResetCounts"
+
+    - label: "TH reads PacketRxCount attribute value from DUT"
+      PICS: DGETH.S.A0002
+      command: "readAttribute"
+      attribute: "PacketRxCount"
+      response:
+          constraints:
+              maxValue: PacketRxCount
+
+    - label: "TH reads PacketTxCount attribute value from DUT"
+      PICS: DGETH.S.A0003
+      command: "readAttribute"
+      attribute: "PacketTxCount"
+      response:
+          constraints:
+              maxValue: PacketTxCount
+
+    - label: "TH reads TxErrCount attribute value from DUT"
+      PICS: DGETH.S.A0004
+      command: "readAttribute"
+      attribute: "TxErrCount"
+      response:
+          constraints:
+              maxValue: TxErrCount
+
+    - label: "TH reads CollisionCount attribute value from DUT"
+      PICS: DGETH.S.A0005
+      command: "readAttribute"
+      attribute: "CollisionCount"
+      response:
+          constraints:
+              maxValue: CollisionCount
+
+    - label: "TH reads OverrunCount attribute value from DUT"
+      PICS: DGETH.S.A0006
+      command: "readAttribute"
+      attribute: "OverrunCount"
+      response:
+          constraints:
+              maxValue: OverrunCount

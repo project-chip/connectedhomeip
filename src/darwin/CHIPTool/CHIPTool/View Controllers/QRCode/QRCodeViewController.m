@@ -706,7 +706,11 @@
     } else {
         _manualCodeLabel.hidden = YES;
         _versionLabel.text = [NSString stringWithFormat:@"%@", payload.version];
-        _rendezVousInformation.text = [NSString stringWithFormat:@"%lu", payload.rendezvousInformation];
+        if (payload.rendezvousInformation == nil) {
+            _rendezVousInformation.text = NOT_APPLICABLE_STRING;
+        } else {
+            _rendezVousInformation.text = [NSString stringWithFormat:@"%lu", [payload.rendezvousInformation unsignedLongValue]];
+        }
         if ([payload.serialNumber length] > 0) {
             self->_serialNumber.text = payload.serialNumber;
         } else {
@@ -763,15 +767,22 @@
 
 - (void)handleRendezVous:(MTRSetupPayload *)payload rawPayload:(NSString *)rawPayload
 {
-    switch (payload.rendezvousInformation) {
-    case MTRRendezvousInformationNone:
-    case MTRRendezvousInformationOnNetwork:
-    case MTRRendezvousInformationBLE:
-    case MTRRendezvousInformationAllMask:
+    if (payload.rendezvousInformation == nil) {
+        NSLog(@"Rendezvous Default");
+        [self handleRendezVousDefault:rawPayload];
+        return;
+    }
+
+    // TODO: This is a pretty broken way to handle a bitmask.
+    switch ([payload.rendezvousInformation unsignedLongValue]) {
+    case MTRDiscoveryCapabilitiesNone:
+    case MTRDiscoveryCapabilitiesOnNetwork:
+    case MTRDiscoveryCapabilitiesBLE:
+    case MTRDiscoveryCapabilitiesAllMask:
         NSLog(@"Rendezvous Default");
         [self handleRendezVousDefault:rawPayload];
         break;
-    case MTRRendezvousInformationSoftAP:
+    case MTRDiscoveryCapabilitiesSoftAP:
         NSLog(@"Rendezvous Wi-Fi");
         [self handleRendezVousWiFi:[self getNetworkName:payload.discriminator]];
         break;

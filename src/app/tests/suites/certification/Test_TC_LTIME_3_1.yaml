@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    109.3.1. [TC-LTIME-3.1] Read and Write Time Format Localization Cluster
+    4.3.1. [TC-LTIME-3.1] Read and Write Time Format Localization Cluster
     Attributes [DUT as Server]
+
+PICS:
+    - LTIME.S
 
 config:
     nodeId: 0x12344321
@@ -27,14 +30,18 @@ tests:
       PICS: LTIME.S.A0000
       verification: |
           ./chip-tool timeformatlocalization read hour-format 1 0
+          On TH(chip-tool), verify that  HourFormat attribute value is of Enum8 datatype
+
           [1651191944157] [13649:182326] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530441
           [1651191944158] [13649:182326] CHIP: [TOO]   HourFormat: 0
       disabled: true
 
-    - label: "If (PICS_A_12HR) TH writes 0 to HourFormat attribute"
+    - label: "If (LTIME.S.A0000.12HR) TH writes 0 to HourFormat attribute"
       PICS: LTIME.S.A0000.12HR
       verification: |
           ./chip-tool timeformatlocalization write hour-format 0 1 0
+
+          On TH(chip-tool) verify that DUT sends a success response
           [1651192743588] [14026:192208] CHIP: [DMG] WriteResponseMessage =
           [1651192743588] [14026:192208] CHIP: [DMG] {
           [1651192743588] [14026:192208] CHIP: [DMG]         AttributeStatusIBs =
@@ -65,14 +72,17 @@ tests:
       PICS: LTIME.S.A0000
       verification: |
           ./chip-tool timeformatlocalization read hour-format 1 0
+          On TH(chip-tool) verify that  HourFormat attribute value changed as  0
           [1651193120969] [14169:196901] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530443
           [1651193120969] [14169:196901] CHIP: [TOO]   HourFormat: 0
       disabled: true
 
-    - label: "If (PICS_A_24HR) TH writes 1 to HourFormat attribute"
+    - label: "If (LTIME.S.A0000.24HR) TH writes 1 to HourFormat attribute"
       PICS: LTIME.S.A0000.24HR
       verification: |
           ./chip-tool timeformatlocalization write hour-format 1 1 0
+
+          On TH(chip-tool) verify that DUT sends a success response
           [1651193043035] [14140:195730] CHIP: [DMG] WriteResponseMessage =
           [1651193043035] [14140:195730] CHIP: [DMG] {
           [1651193043035] [14140:195730] CHIP: [DMG]         AttributeStatusIBs =
@@ -104,6 +114,7 @@ tests:
       PICS: LTIME.S.A0000
       verification: |
           ./chip-tool timeformatlocalization read hour-format 1 0
+          On TH(chip-tool) verify that  HourFormat attribute value changed as  1
           [1651193120969] [14169:196901] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530443
           [1651193120969] [14169:196901] CHIP: [TOO]   HourFormat: 1
       disabled: true
@@ -112,6 +123,7 @@ tests:
       PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          On TH(chip-tool), verify that  ActiveCalendarType attribute value is in between 0 to 11
           [1651193250602] [14215:198406] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3316530443
           [1651193250602] [14215:198406] CHIP: [TOO]   ActiveCalendarType: 0
       disabled: true
@@ -120,6 +132,7 @@ tests:
       PICS: LTIME.S.A0002
       verification: |
           ./chip-tool timeformatlocalization read supported-calendar-types 1 0
+          On TH(chip-tool), verify that  SupportedCalendarTypes attribute value is in between 0 to 11
           [1651194334793] [14653:210647] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0002 DataVersion: 3316530443
           [1651194334794] [14653:210647] CHIP: [TOO]   SupportedCalendarTypes: 12 entries
           [1651194334794] [14653:210647] CHIP: [TOO]     [1]: 0
@@ -137,11 +150,13 @@ tests:
       disabled: true
 
     - label:
-          "If (0 in LTIME.S.A0002.SCT) TH writes 0 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.S.A0002.SCT
+          "TH writes value in PIXIT.LTIME.SCT to ActiveCalendarType attribute,
+          followed by reading the ActiveCalendarType attribute value"
+      PICS: LTIME.S.A0001
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 0 1 0
+
+          On TH(chip-tool) verify that DUT sends a success response
           [1651194449245] [14699:212201] CHIP: [DMG] WriteResponseMessage =
           [1651194449245] [14699:212201] CHIP: [DMG] {
           [1651194449245] [14699:212201] CHIP: [DMG]         AttributeStatusIBs =
@@ -166,580 +181,42 @@ tests:
           [1651194449246] [14699:212201] CHIP: [DMG]
           [1651194449246] [14699:212201] CHIP: [DMG]         InteractionModelRevision = 1
           [1651194449246] [14699:212201] CHIP: [DMG] }
+
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          On TH verify that ActiveCalendarType attribute value changed as  0
+
+          [1658149303.936031][9227:9232] CHIP:DMG: }
+          [1658149303.936185][9227:9232] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2364893025
+          [1658149303.936302][9227:9232] CHIP:TOO:   ActiveCalendarType: 0
+          [1658149303.936385][9227:9232] CHIP:EM: Sending Standalone Ack for MessageCounter:70392442 on exchange 10288i
       disabled: true
 
-    - label: "TH reads ActiveCalendarType attribute"
+    - label: "Repeat step 8 for all the values in PIXIT.LTIME.SCT"
       PICS: LTIME.S.A0001
       verification: |
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          [1651194544627] [14736:213553] CHIP: [DMG] ReportDataMessage =
-          [1651194544627] [14736:213553] CHIP: [DMG] {
-          [1651194544627] [14736:213553] CHIP: [DMG]         AttributeReportIBs =
-          [1651194544627] [14736:213553] CHIP: [DMG]         [
-          [1651194544627] [14736:213553] CHIP: [DMG]                 AttributeReportIB =
-          [1651194544627] [14736:213553] CHIP: [DMG]                 {
-          [1651194544627] [14736:213553] CHIP: [DMG]                         AttributeDataIB =
-          [1651194544627] [14736:213553] CHIP: [DMG]                         {
-          [1651194544627] [14736:213553] CHIP: [DMG]                                 DataVersion = 0xc5ae3d0c,
-          [1651194544627] [14736:213553] CHIP: [DMG]                                 AttributePathIB =
-          [1651194544627] [14736:213553] CHIP: [DMG]                                 {
-          [1651194544627] [14736:213553] CHIP: [DMG]                                         Endpoint = 0x0,
-          [1651194544627] [14736:213553] CHIP: [DMG]                                         Cluster = 0x2c,
-          [1651194544627] [14736:213553] CHIP: [DMG]                                         Attribute = 0x0000_0001,
-          [1651194544627] [14736:213553] CHIP: [DMG]                                 }
-          [1651194544627] [14736:213553] CHIP: [DMG]
-          [1651194544627] [14736:213553] CHIP: [DMG]                                         Data = 0,
-          [1651194544627] [14736:213553] CHIP: [DMG]                         },
-          [1651194544627] [14736:213553] CHIP: [DMG]
-          [1651194544627] [14736:213553] CHIP: [DMG]                 },
-          [1651194544627] [14736:213553] CHIP: [DMG]
-          [1651194544627] [14736:213553] CHIP: [DMG]         ],
-          [1651194544627] [14736:213553] CHIP: [DMG]
-          [1651194544627] [14736:213553] CHIP: [DMG]         SuppressResponse = true,
-          [1651194544627] [14736:213553] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651194544627] [14736:213553] CHIP: [DMG] }
-      disabled: true
-
-    - label:
-          "If (1 in LTIME.S.A0002.SCT) TH writes 1 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.S.A0002.SCT
-      verification: |
-          ./chip-tool timeformatlocalization write active-calendar-type 1 1 0
-          [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
-          [1651194780019] [14823:216414] CHIP: [DMG] {
-          [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
-          [1651194780019] [14823:216414] CHIP: [DMG]         [
-          [1651194780019] [14823:216414] CHIP: [DMG]                 AttributeStatusIB =
-          [1651194780019] [14823:216414] CHIP: [DMG]                 {
-          [1651194780020] [14823:216414] CHIP: [DMG]                         AttributePathIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Endpoint = 0x0,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Cluster = 0x2c,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Attribute = 0x0000_0001,
-          [1651194780020] [14823:216414] CHIP: [DMG]                         }
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                         StatusIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
-          [1651194780020] [14823:216414] CHIP: [DMG]                         },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                 },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         ],
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651194780020] [14823:216414] CHIP: [DMG] }
-      disabled: true
-
-    - label: "TH reads ActiveCalendarType attribute"
-      PICS: LTIME.S.A0001
-      verification: |
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          [1651194544627] [14736:213553] CHIP: [DMG] ReportDataMessage =
-          [1651194544627] [14736:213553] CHIP: [DMG] {
-          [1651194544627] [14736:213553] CHIP: [DMG]         AttributeReportIBs =
-          [1651194544627] [14736:213553] CHIP: [DMG]         [
-          [1651194544627] [14736:213553] CHIP: [DMG]                 AttributeReportIB =
-          [1651194544627] [14736:213553] CHIP: [DMG]                 {
-          [1651194544627] [14736:213553] CHIP: [DMG]                         AttributeDataIB =
-          [1651194544627] [14736:213553] CHIP: [DMG]                         {
-          [1651194544627] [14736:213553] CHIP: [DMG]                                 DataVersion = 0xc5ae3d0c,
-          [1651194544627] [14736:213553] CHIP: [DMG]                                 AttributePathIB =
-          [1651194544627] [14736:213553] CHIP: [DMG]                                 {
-          [1651194544627] [14736:213553] CHIP: [DMG]                                         Endpoint = 0x0,
-          [1651194544627] [14736:213553] CHIP: [DMG]                                         Cluster = 0x2c,
-          [1651194544627] [14736:213553] CHIP: [DMG]                                         Attribute = 0x0000_0001,
-          [1651194544627] [14736:213553] CHIP: [DMG]                                 }
-          [1651194544627] [14736:213553] CHIP: [DMG]
-          [1651194544627] [14736:213553] CHIP: [DMG]                                         Data = 1,
-          [1651194544627] [14736:213553] CHIP: [DMG]                         },
-          [1651194544627] [14736:213553] CHIP: [DMG]
-          [1651194544627] [14736:213553] CHIP: [DMG]                 },
-          [1651194544627] [14736:213553] CHIP: [DMG]
-          [1651194544627] [14736:213553] CHIP: [DMG]         ],
-          [1651194544627] [14736:213553] CHIP: [DMG]
-          [1651194544627] [14736:213553] CHIP: [DMG]         SuppressResponse = true,
-          [1651194544627] [14736:213553] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651194544627] [14736:213553] CHIP: [DMG] }
-      disabled: true
-
-    - label:
-          "If (2 in LTIME.S.A0002.SCT) TH writes 2 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.S.A0002.SCT
-      verification: |
-          ./chip-tool timeformatlocalization write active-calendar-type 2 1 0
-          [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
-          [1651194780019] [14823:216414] CHIP: [DMG] {
-          [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
-          [1651194780019] [14823:216414] CHIP: [DMG]         [
-          [1651194780019] [14823:216414] CHIP: [DMG]                 AttributeStatusIB =
-          [1651194780019] [14823:216414] CHIP: [DMG]                 {
-          [1651194780020] [14823:216414] CHIP: [DMG]                         AttributePathIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Endpoint = 0x0,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Cluster = 0x2c,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Attribute = 0x0000_0001,
-          [1651194780020] [14823:216414] CHIP: [DMG]                         }
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                         StatusIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
-          [1651194780020] [14823:216414] CHIP: [DMG]                         },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                 },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         ],
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651194780020] [14823:216414] CHIP: [DMG] }
-      disabled: true
-
-    - label: "TH reads ActiveCalendarType attribute"
-      PICS: LTIME.S.A0001
-      verification: |
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          [1655184715.197446][2276:2281] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477121
-          [1655184715.197524][2276:2281] CHIP:TOO:   ActiveCalendarType: 2
-          [1655184715.197650][2276:2281] CHIP:EM: Sending Standalone Ack for MessageCounter:27645137 on exchange 37300i
-               InteractionModelRevision = 1
-          [1651194544627] [14736:213553] CHIP: [DMG] }
-      disabled: true
-
-    - label:
-          "If (3 in LTIME.S.A0002.SCT) TH writes 3 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.S.A0002.SCT
-      verification: |
-          ./chip-tool timeformatlocalization write active-calendar-type 3 1 0
-          [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
-          [1651194780019] [14823:216414] CHIP: [DMG] {
-          [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
-          [1651194780019] [14823:216414] CHIP: [DMG]         [
-          [1651194780019] [14823:216414] CHIP: [DMG]                 AttributeStatusIB =
-          [1651194780019] [14823:216414] CHIP: [DMG]                 {
-          [1651194780020] [14823:216414] CHIP: [DMG]                         AttributePathIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Endpoint = 0x0,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Cluster = 0x2c,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Attribute = 0x0000_0001,
-          [1651194780020] [14823:216414] CHIP: [DMG]                         }
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                         StatusIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
-          [1651194780020] [14823:216414] CHIP: [DMG]                         },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                 },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         ],
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651194780020] [14823:216414] CHIP: [DMG] }
-      disabled: true
-
-    - label: "TH reads ActiveCalendarType attribute"
-      PICS: LTIME.S.A0001
-      verification: |
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          [1655184753.237947][2289:2294] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477122
-          [1655184753.238025][2289:2294] CHIP:TOO:   ActiveCalendarType: 3
-          [1655184753.238126][2289:2294] CHIP:EM: Sending Standalone Ack for MessageCounter:167097094 on exchange 10188i
-      disabled: true
-
-    - label:
-          "If (4 in LTIME.S.A0002.SCT) TH writes 4 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.S.A0002.SCT
-      verification: |
-          ./chip-tool timeformatlocalization write active-calendar-type 4 1 0
-
-          [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
-          [1651194780019] [14823:216414] CHIP: [DMG] {
-          [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
-          [1651194780019] [14823:216414] CHIP: [DMG]         [
-          [1651194780019] [14823:216414] CHIP: [DMG]                 AttributeStatusIB =
-          [1651194780019] [14823:216414] CHIP: [DMG]                 {
-          [1651194780020] [14823:216414] CHIP: [DMG]                         AttributePathIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Endpoint = 0x0,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Cluster = 0x2c,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Attribute = 0x0000_0001,
-          [1651194780020] [14823:216414] CHIP: [DMG]                         }
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                         StatusIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
-          [1651194780020] [14823:216414] CHIP: [DMG]                         },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                 },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         ],
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651194780020] [14823:216414] CHIP: [DMG] }
-      disabled: true
-
-    - label: "TH reads ActiveCalendarType attribute"
-      PICS: LTIME.S.A0001
-      verification: |
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          [1655184774.541839][2301:2306] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477123
-          [1655184774.541949][2301:2306] CHIP:TOO:   ActiveCalendarType: 4
-          [1655184774.542080][2301:2306] CHIP:EM: Sending Standalone Ack for MessageCounter:20884820 on exchange 35148i
-      disabled: true
-
-    - label:
-          "If (5 in LTIME.S.A0002.SCT) TH writes 5 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.S.A0002.SCT
-      verification: |
-          ./chip-tool timeformatlocalization write active-calendar-type 5 1 0
-          [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
-          [1651194780019] [14823:216414] CHIP: [DMG] {
-          [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
-          [1651194780019] [14823:216414] CHIP: [DMG]         [
-          [1651194780019] [14823:216414] CHIP: [DMG]                 AttributeStatusIB =
-          [1651194780019] [14823:216414] CHIP: [DMG]                 {
-          [1651194780020] [14823:216414] CHIP: [DMG]                         AttributePathIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Endpoint = 0x0,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Cluster = 0x2c,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Attribute = 0x0000_0001,
-          [1651194780020] [14823:216414] CHIP: [DMG]                         }
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                         StatusIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
-          [1651194780020] [14823:216414] CHIP: [DMG]                         },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                 },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         ],
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651194780020] [14823:216414] CHIP: [DMG] }
-      disabled: true
-
-    - label: "TH reads ActiveCalendarType attribute"
-      PICS: LTIME.S.A0001
-      verification: |
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          [1655184794.906220][2314:2319] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477124
-          [1655184794.906340][2314:2319] CHIP:TOO:   ActiveCalendarType: 5
-          [1655184794.906501][2314:2319] CHIP:EM: Sending Standalone Ack for MessageCounter:238991245 on exchange 63616i
-      disabled: true
-
-    - label:
-          "If (6 in LTIME.S.A0002.SCT) TH writes 6 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.S.A0002.SCT
-      verification: |
-          ./chip-tool timeformatlocalization write active-calendar-type 6 1 0
-          [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
-          [1651194780019] [14823:216414] CHIP: [DMG] {
-          [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
-          [1651194780019] [14823:216414] CHIP: [DMG]         [
-          [1651194780019] [14823:216414] CHIP: [DMG]                 AttributeStatusIB =
-          [1651194780019] [14823:216414] CHIP: [DMG]                 {
-          [1651194780020] [14823:216414] CHIP: [DMG]                         AttributePathIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Endpoint = 0x0,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Cluster = 0x2c,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Attribute = 0x0000_0001,
-          [1651194780020] [14823:216414] CHIP: [DMG]                         }
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                         StatusIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
-          [1651194780020] [14823:216414] CHIP: [DMG]                         },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                 },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         ],
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651194780020] [14823:216414] CHIP: [DMG] }
-      disabled: true
-
-    - label: "TH reads ActiveCalendarType attribute"
-      PICS: LTIME.S.A0001
-      verification: |
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          [1655184813.727744][2327:2332] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477125
-          [1655184813.727848][2327:2332] CHIP:TOO:   ActiveCalendarType: 6
-          [1655184813.727986][2327:2332] CHIP:EM: Sending Standalone Ack for MessageCounter:89082324 on exchange 59020i
-      disabled: true
-
-    - label:
-          "If (7 in LTIME.S.A0002.SCT) TH writes 7 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.S.A0002.SCT
-      verification: |
-          ./chip-tool timeformatlocalization write active-calendar-type 7 1 0
-          [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
-          [1651194780019] [14823:216414] CHIP: [DMG] {
-          [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
-          [1651194780019] [14823:216414] CHIP: [DMG]         [
-          [1651194780019] [14823:216414] CHIP: [DMG]                 AttributeStatusIB =
-          [1651194780019] [14823:216414] CHIP: [DMG]                 {
-          [1651194780020] [14823:216414] CHIP: [DMG]                         AttributePathIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Endpoint = 0x0,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Cluster = 0x2c,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Attribute = 0x0000_0001,
-          [1651194780020] [14823:216414] CHIP: [DMG]                         }
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                         StatusIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
-          [1651194780020] [14823:216414] CHIP: [DMG]                         },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                 },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         ],
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651194780020] [14823:216414] CHIP: [DMG] }
-      disabled: true
-
-    - label: "TH reads ActiveCalendarType attribute"
-      PICS: LTIME.S.A0001
-      verification: |
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          [1655184842.351575][2339:2344] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477126
-          [1655184842.351697][2339:2344] CHIP:TOO:   ActiveCalendarType: 7
-          [1655184842.351855][2339:2344] CHIP:EM: Sending Standalone Ack for MessageCounter:117380134 on exchange 31303i
-      disabled: true
-
-    - label:
-          "If (8 in LTIME.S.A0002.SCT) TH writes 8 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.S.A0002.SCT
-      verification: |
-          ./chip-tool timeformatlocalization write active-calendar-type 8 1 0
-          [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
-          [1651194780019] [14823:216414] CHIP: [DMG] {
-          [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
-          [1651194780019] [14823:216414] CHIP: [DMG]         [
-          [1651194780019] [14823:216414] CHIP: [DMG]                 AttributeStatusIB =
-          [1651194780019] [14823:216414] CHIP: [DMG]                 {
-          [1651194780020] [14823:216414] CHIP: [DMG]                         AttributePathIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Endpoint = 0x0,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Cluster = 0x2c,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Attribute = 0x0000_0001,
-          [1651194780020] [14823:216414] CHIP: [DMG]                         }
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                         StatusIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
-          [1651194780020] [14823:216414] CHIP: [DMG]                         },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                 },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         ],
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651194780020] [14823:216414] CHIP: [DMG] }
-      disabled: true
-
-    - label: "TH reads ActiveCalendarType attribute"
-      PICS: LTIME.S.A0001
-      verification: |
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          [1655184868.057665][2351:2356] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477127
-          [1655184868.057774][2351:2356] CHIP:TOO:   ActiveCalendarType: 8
-          [1655184868.057907][2351:2356] CHIP:EM: Sending Standalone Ack for MessageCounter:183591506 on exchange 10843i
-      disabled: true
-
-    - label:
-          "If (9 in LTIME.S.A0002.SCT) TH writes 9 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.S.A0002.SCT
-      verification: |
-          ./chip-tool timeformatlocalization write active-calendar-type 9 1 0
-          [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
-          [1651194780019] [14823:216414] CHIP: [DMG] {
-          [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
-          [1651194780019] [14823:216414] CHIP: [DMG]         [
-          [1651194780019] [14823:216414] CHIP: [DMG]                 AttributeStatusIB =
-          [1651194780019] [14823:216414] CHIP: [DMG]                 {
-          [1651194780020] [14823:216414] CHIP: [DMG]                         AttributePathIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Endpoint = 0x0,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Cluster = 0x2c,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Attribute = 0x0000_0001,
-          [1651194780020] [14823:216414] CHIP: [DMG]                         }
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                         StatusIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
-          [1651194780020] [14823:216414] CHIP: [DMG]                         },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                 },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         ],
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651194780020] [14823:216414] CHIP: [DMG] }
-      disabled: true
-
-    - label: "TH reads ActiveCalendarType attribute"
-      PICS: LTIME.S.A0001
-      verification: |
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          [1655184888.113826][2364:2369] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477128
-          [1655184888.113934][2364:2369] CHIP:TOO:   ActiveCalendarType: 9
-          [1655184888.114068][2364:2369] CHIP:EM: Sending Standalone Ack for MessageCounter:236846127 on exchange 9207i
-      disabled: true
-
-    - label:
-          "If (10 in LTIME.S.A0002.SCT) TH writes 10 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.S.A0002.SCT
-      verification: |
-          ./chip-tool timeformatlocalization write active-calendar-type 10 1 0
-          [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
-          [1651194780019] [14823:216414] CHIP: [DMG] {
-          [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
-          [1651194780019] [14823:216414] CHIP: [DMG]         [
-          [1651194780019] [14823:216414] CHIP: [DMG]                 AttributeStatusIB =
-          [1651194780019] [14823:216414] CHIP: [DMG]                 {
-          [1651194780020] [14823:216414] CHIP: [DMG]                         AttributePathIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Endpoint = 0x0,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Cluster = 0x2c,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Attribute = 0x0000_0001,
-          [1651194780020] [14823:216414] CHIP: [DMG]                         }
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                         StatusIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
-          [1651194780020] [14823:216414] CHIP: [DMG]                         },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                 },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         ],
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651194780020] [14823:216414] CHIP: [DMG] }
-      disabled: true
-
-    - label: "TH reads ActiveCalendarType attribute"
-      PICS: LTIME.S.A0001
-      verification: |
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          [1655184911.317297][2377:2383] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3044477129
-          [1655184911.317407][2377:2383] CHIP:TOO:   ActiveCalendarType: 10
-          [1655184911.317542][2377:2383] CHIP:EM: Sending Standalone Ack for MessageCounter:69288389 on exchange 58126i
-      disabled: true
-
-    - label:
-          "If (11 in LTIME.S.A0002.SCT) TH writes 11 to ActiveCalendarType
-          attribute"
-      PICS: LTIME.S.A0002.SCT
-      verification: |
-          ./chip-tool timeformatlocalization write active-calendar-type 11 1 0
-          [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
-          [1651194780019] [14823:216414] CHIP: [DMG] {
-          [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
-          [1651194780019] [14823:216414] CHIP: [DMG]         [
-          [1651194780019] [14823:216414] CHIP: [DMG]                 AttributeStatusIB =
-          [1651194780019] [14823:216414] CHIP: [DMG]                 {
-          [1651194780020] [14823:216414] CHIP: [DMG]                         AttributePathIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Endpoint = 0x0,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Cluster = 0x2c,
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 Attribute = 0x0000_0001,
-          [1651194780020] [14823:216414] CHIP: [DMG]                         }
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                         StatusIB =
-          [1651194780020] [14823:216414] CHIP: [DMG]                         {
-          [1651194780020] [14823:216414] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
-          [1651194780020] [14823:216414] CHIP: [DMG]                         },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]                 },
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         ],
-          [1651194780020] [14823:216414] CHIP: [DMG]
-          [1651194780020] [14823:216414] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651194780020] [14823:216414] CHIP: [DMG] }
-      disabled: true
-
-    - label: "TH reads ActiveCalendarType attribute"
-      PICS: LTIME.S.A0001
-      verification: |
-          ./chip-tool timeformatlocalization read active-calendar-type 1 0
-          [1651194544627] [14736:213553] CHIP: [DMG] ReportDataMessage =
-          [1651194544627] [14736:213553] CHIP: [DMG] {
-          [1651194544627] [14736:213553] CHIP: [DMG]         AttributeReportIBs =
-          [1651194544627] [14736:213553] CHIP: [DMG]         [
-          [1651194544627] [14736:213553] CHIP: [DMG]                 AttributeReportIB =
-          [1651194544627] [14736:213553] CHIP: [DMG]                 {
-          [1651194544627] [14736:213553] CHIP: [DMG]                         AttributeDataIB =
-          [1651194544627] [14736:213553] CHIP: [DMG]                         {
-          [1651194544627] [14736:213553] CHIP: [DMG]                                 DataVersion = 0xc5ae3d0c,
-          [1651194544627] [14736:213553] CHIP: [DMG]                                 AttributePathIB =
-          [1651194544627] [14736:213553] CHIP: [DMG]                                 {
-          [1651194544627] [14736:213553] CHIP: [DMG]                                         Endpoint = 0x0,
-          [1651194544627] [14736:213553] CHIP: [DMG]                                         Cluster = 0x2c,
-          [1651194544627] [14736:213553] CHIP: [DMG]                                         Attribute = 0x0000_0001,
-          [1651194544627] [14736:213553] CHIP: [DMG]                                 }
-          [1651194544627] [14736:213553] CHIP: [DMG]
-          [1651194544627] [14736:213553] CHIP: [DMG]                                         Data = 11,
-          [1651194544627] [14736:213553] CHIP: [DMG]                         },
-          [1651194544627] [14736:213553] CHIP: [DMG]
-          [1651194544627] [14736:213553] CHIP: [DMG]                 },
-          [1651194544627] [14736:213553] CHIP: [DMG]
-          [1651194544627] [14736:213553] CHIP: [DMG]         ],
-          [1651194544627] [14736:213553] CHIP: [DMG]
-          [1651194544627] [14736:213553] CHIP: [DMG]         SuppressResponse = true,
-          [1651194544627] [14736:213553] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651194544627] [14736:213553] CHIP: [DMG] }
+          Repeat the test step 8 for below mentioned values 1, 2,3, 4, 5, 6,7, 8, 9,10 and 11 and verify that TH receives the write command and updates the respective value. Verify that TH reads ActiveCalendarType attribute value and it is the same as the value that was set before
       disabled: true
 
     - label: "TH writes 50 to ActiveCalendarType attribute"
       PICS: LTIME.S.A0001
       verification: |
-          Verify in TH log:
-
-          ./chip-tool timeformatlocalization write active-calendar-type 50  1 0
-
-          [1656934134.261135][6359:6364] CHIP:DMG: WriteResponseMessage =
-          [1656934134.261172][6359:6364] CHIP:DMG: {
-          [1656934134.261204][6359:6364] CHIP:DMG:         AttributeStatusIBs =
-          [1656934134.261248][6359:6364] CHIP:DMG:         [
-          [1656934134.261284][6359:6364] CHIP:DMG:                 AttributeStatusIB =
-          [1656934134.261334][6359:6364] CHIP:DMG:                 {
-          [1656934134.261375][6359:6364] CHIP:DMG:                         AttributePathIB =
-          [1656934134.261421][6359:6364] CHIP:DMG:                         {
-          [1656934134.261470][6359:6364] CHIP:DMG:                                 Endpoint = 0x0,
-          [1656934134.261517][6359:6364] CHIP:DMG:                                 Cluster = 0x2c,
-          [1656934134.261565][6359:6364] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1656934134.261609][6359:6364] CHIP:DMG:                         }
-          [1656934134.261660][6359:6364] CHIP:DMG:
-          [1656934134.261703][6359:6364] CHIP:DMG:                         StatusIB =
-          [1656934134.261749][6359:6364] CHIP:DMG:                         {
-          [1656934134.261795][6359:6364] CHIP:DMG:                                 status = 0x87 (CONSTRAINT_ERROR),
-          [1656934134.261840][6359:6364] CHIP:DMG:                         },
-          [1656934134.261884][6359:6364] CHIP:DMG:
-          [1656934134.261924][6359:6364] CHIP:DMG:                 },
-          [1656934134.261967][6359:6364] CHIP:DMG:
-          [1656934134.262001][6359:6364] CHIP:DMG:         ],
-          [1656934134.262043][6359:6364] CHIP:DMG:
-          [1656934134.262078][6359:6364] CHIP:DMG:         InteractionModelRevision = 1
-          [1656934134.262113][6359:6364] CHIP:DMG: }
-          [1656934134.262208][6359:6364] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          ./chip-tool timeformatlocalization write  active-calendar-type 50 1 0
+          On TH(chip-tool) verify that DUT sends a CONSTRAINT_ERROR response
+          [1658742658.653019][3572:3577] CHIP:DMG:         ],
+          [1658742658.653047][3572:3577] CHIP:DMG:
+          [1658742658.653071][3572:3577] CHIP:DMG:         InteractionModelRevision = 1
+          [1658742658.653098][3572:3577] CHIP:DMG: }
+          [1658742658.653166][3572:3577] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1658742658.653198][3572:3577] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1658742658.653254][3572:3577] CHIP:EM: Sending Standalone Ack for MessageCounter:51762667 on exchange 55831i
       disabled: true
 
     - label: "TH writes 5 to HourFormat attribute"
       PICS: LTIME.S.A0000
       verification: |
-          Verify in TH log:
-
-           ./chip-tool timeformatlocalization write   hour-format  5 1 0
+          ./chip-tool timeformatlocalization write   hour-format  5 1 0
+          On TH(chip-tool) verify that DUT sends a CONSTRAINT_ERROR response
 
           [1656934321.910991][6387:6392] CHIP:DMG: WriteResponseMessage =
           [1656934321.911025][6387:6392] CHIP:DMG: {

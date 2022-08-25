@@ -14,6 +14,9 @@
 
 name: 15.2.2. [TC-PCC-2.2] Primary functionality with server as DUT
 
+PICS:
+    - PCC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Pump Configuration and Control"
@@ -28,42 +31,58 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Write 1 to the OperationMode attribute to DUT: OperationMode"
+    - label: "TH write 0 (Normal) to the OperationMode attribute to DUT"
       command: "writeAttribute"
       attribute: "OperationMode"
       PICS: PCC.S.A0020
       arguments:
-          value: 1
+          value: 0
 
-    - label: "Reads the attribute: EffectiveOperationMode"
+    - label: "TH reads from the DUT the EffectiveOperationMode attribute"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
       PICS: PCC.S.A0011
       response:
-          value: 1
+          value: 0
 
-    - label: "Write 2 to the OperationMode attribute to DUT: OperationMode"
+    - label: "TH write 1 (Minimum) to the OperationMode attribute to DUT"
       command: "writeAttribute"
       attribute: "OperationMode"
-      PICS: PCC.S.A0020
+      PICS: PCC.S.A0020 && PCC.M.ControlModeConstSpeed
+      arguments:
+          value: 1
+
+    - label: "TH reads from the DUT the EffectiveOperationMode attribute"
+      command: "readAttribute"
+      attribute: "EffectiveOperationMode"
+      PICS: PCC.S.A0011 && PCC.M.ControlModeConstSpeed
+      response:
+          value: 1
+
+    - label:
+          "TH write 2 (Maximum) to the OperationMode attribute to DUT one at a
+          time."
+      command: "writeAttribute"
+      attribute: "OperationMode"
+      PICS: PCC.S.A0020 && PCC.M.ControlModeConstSpeed
       arguments:
           value: 2
 
-    - label: "Reads the attribute: EffectiveOperationMode"
+    - label: "TH reads from the DUT the EffectiveOperationMode attribute"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
-      PICS: PCC.S.A0011
+      PICS: PCC.S.A0011 && PCC.M.ControlModeConstSpeed
       response:
           value: 2
 
-    - label: "Write 3 to the OperationMode attribute to DUT: OperationMode"
+    - label: "TH write 3 (Local) to the OperationMode attribute to DUT"
       command: "writeAttribute"
       attribute: "OperationMode"
       PICS: PCC.S.A0020
       arguments:
           value: 3
 
-    - label: "Reads the attribute: EffectiveOperationMode"
+    - label: "TH reads from the DUT the EffectiveOperationMode attribute"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
       PICS: PCC.S.A0011

@@ -15,6 +15,9 @@
 
 name: 3.5.8. [TC-MEDIAINPUT-3.17] Rename Input Verification (DUT as Client)
 
+PICS:
+    - MEDIAINPUT.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -22,51 +25,40 @@ config:
 
 tests:
     - label: "DUT sends RenameInput command to TH"
-      PICS: MEDIAINPUT.C.C0003
+      PICS: MEDIAINPUT.C.C03.Tx
       verification: |
-          product maker needs to provide instructions for how to trigger the command:
-          Refer to device or application documentation for special argument values to each command, and/or additional steps required to put device into in correct state to exhibit test behavior.
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          If the DUT knows the Index value, then those can be sent as the argument.
-          Else User needs to execute the following command to know the index InputList
-
-           ./chip-tool mediainput read input-list 1 1
-
-          ./chip-tool mediainput rename-input 1 'DVD' 1 1
-          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
-
-          [1650267822.692603][8179:8184] CHIP:DMG: InvokeResponseMessage =
-          [1650267822.692667][8179:8184] CHIP:DMG: {
-          [1650267822.692704][8179:8184] CHIP:DMG:         suppressResponse = false,
-          [1650267822.692741][8179:8184] CHIP:DMG:         InvokeResponseIBs =
-          [1650267822.692787][8179:8184] CHIP:DMG:         [
-          [1650267822.692823][8179:8184] CHIP:DMG:                 InvokeResponseIB =
-          [1650267822.692875][8179:8184] CHIP:DMG:                 {
-          [1650267822.692913][8179:8184] CHIP:DMG:                         CommandStatusIB =
-          [1650267822.692960][8179:8184] CHIP:DMG:                         {
-          [1650267822.693008][8179:8184] CHIP:DMG:                                 CommandPathIB =
-          [1650267822.693058][8179:8184] CHIP:DMG:                                 {
-          [1650267822.693112][8179:8184] CHIP:DMG:                                         EndpointId = 0x1,
-          [1650267822.693168][8179:8184] CHIP:DMG:                                         ClusterId = 0x507,
-          [1650267822.693223][8179:8184] CHIP:DMG:                                         CommandId = 0x3,
-          [1650267822.693273][8179:8184] CHIP:DMG:                                 },
-          [1650267822.693330][8179:8184] CHIP:DMG:
-          [1650267822.693373][8179:8184] CHIP:DMG:                                 StatusIB =
-          [1650267822.693423][8179:8184] CHIP:DMG:                                 {
-          [1650267822.693468][8179:8184] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1650267822.693517][8179:8184] CHIP:DMG:                                 },
-          [1650267822.693562][8179:8184] CHIP:DMG:
-          [1650267822.693604][8179:8184] CHIP:DMG:                         },
-          [1650267822.693659][8179:8184] CHIP:DMG:
-          [1650267822.693708][8179:8184] CHIP:DMG:                 },
-          [1650267822.693768][8179:8184] CHIP:DMG:
-          [1650267822.693837][8179:8184] CHIP:DMG:         ],
-          [1650267822.693894][8179:8184] CHIP:DMG:
-          [1650267822.693939][8179:8184] CHIP:DMG:         InteractionModelRevision = 1
-          [1650267822.693983][8179:8184] CHIP:DMG: },
-          [1650267822.694088][8179:8184] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0507 Command=0x0000_0003 Status=0x0
+          ./chip-tool mediainput rename-input 1 "DVD" 1 1
+          ./chip-tv-casting-app mediainput rename-input 1 "DVD" 1 1
 
 
-          Enter the below command to read the current input.
-           ./chip-tool mediainput read input-list 1 1
+          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
+
+          [1658530748548] [21924:317544] CHIP: [DMG] InvokeRequestMessage =
+          [1658530748548] [21924:317544] CHIP: [DMG] {
+          [1658530748548] [21924:317544] CHIP: [DMG]         suppressResponse = false,
+          [1658530748548] [21924:317544] CHIP: [DMG]         timedRequest = false,
+          [1658530748548] [21924:317544] CHIP: [DMG]         InvokeRequests =
+          [1658530748548] [21924:317544] CHIP: [DMG]         [
+          [1658530748548] [21924:317544] CHIP: [DMG]                 CommandDataIB =
+          [1658530748548] [21924:317544] CHIP: [DMG]                 {
+          [1658530748548] [21924:317544] CHIP: [DMG]                         CommandPathIB =
+          [1658530748548] [21924:317544] CHIP: [DMG]                         {
+          [1658530748548] [21924:317544] CHIP: [DMG]                                 EndpointId = 0x1,
+          [1658530748548] [21924:317544] CHIP: [DMG]                                 ClusterId = 0x507,
+          [1658530748548] [21924:317544] CHIP: [DMG]                                 CommandId = 0x3,
+          [1658530748548] [21924:317544] CHIP: [DMG]                         },
+          [1658530748548] [21924:317544] CHIP: [DMG]
+          [1658530748548] [21924:317544] CHIP: [DMG]                         CommandFields =
+          [1658530748548] [21924:317544] CHIP: [DMG]                         {
+          [1658530748548] [21924:317544] CHIP: [DMG]                                 0x0 = 1,
+          [1658530748548] [21924:317544] CHIP: [DMG]                                 0x1 = "DVD",
+          [1658530748548] [21924:317544] CHIP: [DMG]                         },
+          [1658530748548] [21924:317544] CHIP: [DMG]                 },
+          [1658530748548] [21924:317544] CHIP: [DMG]
+          [1658530748548] [21924:317544] CHIP: [DMG]         ],
+          [1658530748548] [21924:317544] CHIP: [DMG]
+          [1658530748548] [21924:317544] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658530748548] [21924:317544] CHIP: [DMG] },
       disabled: true

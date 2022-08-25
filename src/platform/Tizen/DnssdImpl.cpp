@@ -41,6 +41,12 @@ namespace {
 
 constexpr uint8_t kDnssdKeyMaxSize = 32;
 
+// The number of miliseconds which must elapse without a new "found" event before
+// mDNS browsing is considered finished. We need this timeout because Tizen Native
+// API does not deliver all-for-now signal (such signal is delivered by e.g. Avahi)
+// and the browsing callback is called multiple times (once for each service found).
+constexpr unsigned int kDnssdBrowseTimeoutMs = 250;
+
 bool IsSupportedProtocol(DnssdServiceProtocol protocol)
 {
     return (protocol == DnssdServiceProtocol::kDnssdProtocolUdp) || (protocol == DnssdServiceProtocol::kDnssdProtocolTcp);
@@ -109,6 +115,22 @@ gboolean RegisterAsync(GMainLoop * mainLoop, gpointer userData)
     return true;
 }
 
+gboolean OnBrowseTimeout(void * userData)
+{
+    ChipLogDetail(DeviceLayer, "DNSsd %s: all for now", __func__);
+
+    auto * bCtx = reinterpret_cast<BrowseContext *>(userData);
+
+    bCtx->MainLoopQuit();
+    bCtx->mCallback(bCtx->mCbContext, bCtx->mServices.data(), bCtx->mServices.size(), CHIP_NO_ERROR);
+
+    // After this point the context might be no longer valid
+    bCtx->mInstance->RemoveContext(bCtx);
+
+    // This is a one-shot timer
+    return FALSE;
+}
+
 void OnBrowseAdd(BrowseContext * context, const char * type, const char * name, uint32_t interfaceId)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s: name: %s, type: %s, interfaceId: %u", __func__, name, type, interfaceId);
@@ -143,8 +165,20 @@ void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
     auto bCtx = reinterpret_cast<BrowseContext *>(data);
     int ret;
 
-    // Always stop browsing
-    bCtx->MainLoopQuit();
+    // If there is already a timeout source, so we need to cancel it.
+    if (bCtx->mTimeoutSource != nullptr)
+    {
+        g_source_destroy(bCtx->mTimeoutSource);
+        g_source_unref(bCtx->mTimeoutSource);
+    }
+
+    // Start a timer, so we could detect when there is no more on-browse events.
+    // The timeout callback function will be called in the same event loop as the
+    // browse callback (this one), so locking is not required.
+    auto * source = g_timeout_source_new(kDnssdBrowseTimeoutMs);
+    g_source_set_callback(source, OnBrowseTimeout, bCtx, nullptr);
+    g_source_attach(source, g_main_context_get_thread_default());
+    bCtx->mTimeoutSource = source;
 
     char * type          = nullptr;
     char * name          = nullptr;
@@ -173,22 +207,16 @@ void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
         OnBrowseRemove(bCtx, type, name, interfaceId);
     }
 
-    // For now, there is no way to wait for multiple services to be found.
-    // Darwin implementation just checks if kDNSServiceFlagsMoreComing is set or not,
-    // but it doesn't ensure that multiple services can be found.
-    bCtx->mCallback(bCtx->mCbContext, bCtx->mServices.data(), bCtx->mServices.size(), CHIP_NO_ERROR);
-
 exit:
+
+    dnssd_destroy_remote_service(service);
 
     if (ret != DNSSD_ERROR_NONE)
     {
         bCtx->mCallback(bCtx->mCbContext, nullptr, 0, GetChipError(ret));
+        // After this point the context might be no longer valid
+        bCtx->mInstance->RemoveContext(bCtx);
     }
-
-    // After this point, the context might be no longer valid
-    bCtx->mInstance->RemoveContext(bCtx);
-
-    dnssd_destroy_remote_service(service);
 
     g_free(type);
     g_free(name);
@@ -226,47 +254,37 @@ gboolean BrowseAsync(GMainLoop * mainLoop, gpointer userData)
     return true;
 }
 
-void ConvertTxtRecords(unsigned short txtLen, uint8_t * txtRecord, std::vector<TextEntry> & textEntries)
+void GetTextEntries(unsigned short txtLen, uint8_t * txtRecord, std::vector<TextEntry> & textEntries)
 {
-    if (txtLen <= 1)
+    VerifyOrReturn(txtLen > 1, ChipLogDetail(DeviceLayer, "DNSsd %s: No TXT records", __func__));
+    const uint8_t * txtRecordEnd = txtRecord + txtLen;
+
+    while (txtRecord < txtRecordEnd)
     {
-        ChipLogDetail(DeviceLayer, "DNSsd %s: No TXT records", __func__);
-        return;
-    }
+        uint8_t txtRecordSize = txtRecord[0];
+        txtRecord++;
 
-    const uint8_t * ptr = txtRecord;
-    const uint8_t * max = txtRecord + txtLen;
-    char key[kDnssdKeyMaxSize + 1];
-    char value[kDnssdTextMaxSize + 1];
+        VerifyOrReturn(txtRecord + txtRecordSize <= txtRecordEnd,
+                       ChipLogError(DeviceLayer, "DNSsd %s: Invalid TXT data", __func__));
 
-    while (ptr < max)
-    {
-        const uint8_t * const end = ptr + 1 + ptr[0];
-        if (end > max)
+        for (size_t i = 0; i < txtRecordSize; i++)
         {
-            ChipLogError(DeviceLayer, "DNSsd %s: Invalid TXT data", __func__);
-            return;
-        }
+            if (txtRecord[i] == '=')
+            {
+                // NULL-terminate the key string
+                txtRecord[i] = '\0';
 
-        char * buf = &key[0];
-        while (++ptr < end)
-        {
-            if (*ptr == '=')
-            {
-                *buf = 0;
-                buf  = &value[0];
-            }
-            else
-            {
-                *buf = *ptr;
-                ++buf;
+                char * key      = reinterpret_cast<char *>(txtRecord);
+                uint8_t * data  = txtRecord + i + 1;
+                size_t dataSize = txtRecordSize - i - 1;
+                textEntries.push_back({ key, data, dataSize });
+
+                break;
             }
         }
-        *buf = 0;
 
-        auto valueLen = strlen(value);
-        auto valuePtr = reinterpret_cast<const uint8_t *>(strdup(value));
-        textEntries.push_back(TextEntry{ strdup(key), valuePtr, valueLen });
+        // Move to the next text entry
+        txtRecord += txtRecordSize;
     }
 }
 
@@ -330,13 +348,12 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     ret = dnssd_service_get_port(service, &port);
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_port() failed. ret: %d", ret));
 
+    dnssdService.mPort = static_cast<uint16_t>(port);
+
     ret = dnssd_service_get_all_txt_record(service, &txtLen, reinterpret_cast<void **>(&txtRecord));
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_all_txt_record() failed. ret: %d", ret));
 
-    ConvertTxtRecords(txtLen, txtRecord, textEntries);
-    g_free(txtRecord);
-
-    dnssdService.mPort          = static_cast<uint16_t>(port);
+    GetTextEntries(txtLen, txtRecord, textEntries);
     dnssdService.mTextEntries   = textEntries.empty() ? nullptr : textEntries.data();
     dnssdService.mTextEntrySize = textEntries.size();
 
@@ -345,6 +362,8 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
         chip::DeviceLayer::StackLock lock;
         rCtx->mCallback(rCtx->mCbContext, &dnssdService, chip::Span<chip::Inet::IPAddress>(&ipAddr, 1), CHIP_NO_ERROR);
     }
+
+    g_free(txtRecord);
 
     rCtx->mInstance->RemoveContext(rCtx);
     return;
@@ -421,6 +440,11 @@ BrowseContext::BrowseContext(DnssdTizen * instance, const char * type, DnssdServ
 
 BrowseContext::~BrowseContext()
 {
+    if (mTimeoutSource != nullptr)
+    {
+        g_source_destroy(mTimeoutSource);
+        g_source_unref(mTimeoutSource);
+    }
     if (mIsBrowsing)
     {
         dnssd_cancel_browse_service(mBrowserHandle);
@@ -710,7 +734,6 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
         return chip::DeviceLayer::ThreadStackMgr().AddSrpService(service->mName, regtype.c_str(), service->mPort, subTypes,
                                                                  textEntries);
     }
-
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     return DnssdTizen::GetInstance().RegisterService(*service, callback, context);

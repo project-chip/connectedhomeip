@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.3. [TC-CNET-4.3] [Ethernet] Verification for attributes check
+    12.4.3. [TC-CNET-4.3] [Ethernet] Verification for attributes check
     [DUT-Server]
+
+PICS:
+    - CNET.S.F02
 
 config:
     nodeId: 0x12344321
@@ -25,23 +28,21 @@ config:
 tests:
     - label: "Factory reset the DUT"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label: "Commmission TH and DUT on Ethernet setup"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
           "TH reads Descriptor Cluster from the DUT with EP0 TH reads ServerList
           from the DUT"
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool descriptor read server-list 1 0
+          ./chip-tool descriptor read server-list 1 0
 
-
-          Verify on the TH Log:
-
+          Verify "server list" on the TH(Chip-tool) Log:
 
           [1646226258.250313][2446:2451] CHIP:DMG:        SuppressResponse = true,
           [1646226258.250337][2446:2451] CHIP:DMG:        InteractionModelRevision = 1
@@ -78,9 +79,9 @@ tests:
 
     - label: "TH reads FeatureMap attribute from the DUT"
       verification: |
-          ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read feature-map 1 0
+          ./chip-tool networkcommissioning read feature-map 1 0
 
-          Verify on the TH Log:
+          Verify "FeatureMap: 4 on the TH(Chip-tool) Log:
 
 
           [1649309323.273092][2611:2617] CHIP:DMG: }
@@ -92,9 +93,9 @@ tests:
     - label: "TH reads the MaxNetworks attribute from the DUT"
       PICS: CNET.S.A0000
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read max-networks 1 0
+          ./chip-tool networkcommissioning read max-networks 1 0
 
-          Verify on the TH Log:
+          Verify "MaxNetworks" on the TH(Chip-tool) Log:
 
           [1646226441.815782][2475:2480] CHIP:DMG:        SuppressResponse = true,
           [1646226441.815849][2475:2480] CHIP:DMG:        InteractionModelRevision = 1
@@ -105,7 +106,7 @@ tests:
       disabled: true
 
     - label:
-          "TH saves the MaxNetworks attribute value as 'MaxNetworksValue' for
+          "TH saves the MaxNetworks attribute value as MaxNetworksValue for
           future use"
       verification: |
           TH saves MaxNetworks attribute value
@@ -116,7 +117,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify on the TH Log:
+          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
 
           [1654076774.294361][33659:33664] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 609053543
           [1654076774.294505][33659:33664] CHIP:TOO:   Networks: 1 entries
@@ -129,32 +130,19 @@ tests:
     - label: "TH reads InterfaceEnabled attribute from the DUT"
       PICS: CNET.S.A0004
       verification: |
-          ./chip-tool networkcommissioning read interface-enabled 1 0
-
-          Verify on the TH Log:
-
-          [1646226615.428003][2502:2507] CHIP:DMG:
-          [1646226615.428035][2502:2507] CHIP:DMG:        SuppressResponse = true,
-          [1646226615.428064][2502:2507] CHIP:DMG:        InteractionModelRevision = 1
-          [1646226615.428094][2502:2507] CHIP:DMG: }
-          [1646226615.428270][2502:2507] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0004DataVersion: 3622667250
-          [1646226615.428331][2502:2507] CHIP:TOO:   InterfaceEnabled: TRUE
-          [1646226615.428415][2502:2507] CHIP:EM: Sending Standalone Ack for MessageCounter:3894401 on exchange 55691i
+          verification step to be updated.
       disabled: true
 
     - label: "TH reads LastNetworkingStatus attribute from the DUT"
       PICS: CNET.S.A0005
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-networking-status 1 0
+          ./chip-tool networkcommissioning read last-networking-status 1 0
 
-          Verify on the TH Log:
+          Verify "LastNetworkingStatus" on the TH(Chip-tool) Log:
 
-          [1646227167.614060][2533:2538] CHIP:DMG:        SuppressResponse = true,
-          [1646227167.614095][2533:2538] CHIP:DMG:        InteractionModelRevision = 1
-          [1646227167.614126][2533:2538] CHIP:DMG: }
-          [1646227167.614299][2533:2538] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005DataVersion: 3622667250
-          [1646227167.614385][2533:2538] CHIP:TOO:   LastNetworkingStatus: 0
-          [1646227167.614468][2533:2538] CHIP:EM: Sending Standalone Ack for MessageCounter:8947540 on exchange 12532i
+          [1659609891.611493][3877:3882] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005 DataVersion: 4108508964
+          [1659609891.611559][3877:3882] CHIP:TOO:   LastNetworkingStatus: null
+          [1659609891.611689][3877:3882] CHIP:EM: Sending Standalone Ack for MessageCounter:172102677 on exchange 50438i
       disabled: true
 
     - label:
@@ -162,20 +150,21 @@ tests:
           Networks attribute from the DUT"
       PICS: CNET.S.A0006
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-network-id 1
+          ./chip-tool networkcommissioning read last-network-id 1 0
 
-          Verify on the TH Log:
+          Verify "LastNetworkID" on the TH(Chip-tool) Log:
 
-          [1654076802.288579][33669:33674] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 609053543
-          [1654076802.288708][33669:33674] CHIP:TOO:   LastNetworkID: 6368697035
+          [1659610135.589352][3895:3900] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 4108508964
+          [1659610135.589410][3895:3900] CHIP:TOO:   LastNetworkID: null
+          [1659610135.589549][3895:3900] CHIP:EM: Sending Standalone Ack for MessageCounter:28696356 on exchange 52969i
       disabled: true
 
     - label: "TH reads the LastConnectErrorValue attribute from the DUT"
       PICS: CNET.S.A0007
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-connect-error-value 1 0
+          ./chip-tool networkcommissioning read last-connect-error-value 1 0
 
-          Verify on the TH Log:
+          Verify "LastConnectErrorValue" on the TH(Chip-tool) Log:
 
           [1653483224.839873][28189:28194] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0007 DataVersion: 3189790698
           [1653483224.839927][28189:28194] CHIP:TOO:   LastConnectErrorValue: null

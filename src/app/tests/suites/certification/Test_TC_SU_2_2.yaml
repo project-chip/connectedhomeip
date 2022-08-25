@@ -17,6 +17,9 @@ name:
     3.2.2. [TC-SU-2.2] Handling different QueryImageResponse scenarios on
     Requestor
 
+PICS:
+    - MCORE.OTA.Requestor
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -24,10 +27,9 @@ config:
 
 tests:
     - label:
-          'DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to
-          "UpdateAvailable". Set ImageURI to the location where the image is
-          located.'
+          "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
+          QueryImageResponse back to DUT. QueryStatus is set to UpdateAvailable.
+          Set ImageURI to the location where the image is located."
       verification: |
           Run the OTA Provider App using the command:
 
@@ -44,9 +46,9 @@ tests:
       disabled: true
 
     - label:
-          'DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to "Busy",
-          DelayedActionTime is set to 60 seconds.'
+          "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
+          QueryImageResponse back to DUT. QueryStatus is set to Busy,
+          DelayedActionTime is set to 60 seconds."
       verification: |
           Run the OTA Provider App using the command:
 
@@ -60,8 +62,8 @@ tests:
       disabled: true
 
     - label:
-          'DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to "NotAvailable".'
+          "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
+          QueryImageResponse back to DUT. QueryStatus is set to NotAvailable."
       verification: |
           Run the OTA Provider App using the command:
 
@@ -76,11 +78,11 @@ tests:
       disabled: true
 
     - label:
-          'DUT sends a QueryImage command to the TH/OTA-P.+ TH/OTA-P sends a
+          "DUT sends a QueryImage command to the TH/OTA-P.+ TH/OTA-P sends a
           QueryImageResponse back to DUT. QueryStatus is set to Busy, Set
           DelayedActionTime to 3 minutes. . On the subsequent QueryImage
           command, TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus
-          is set to "UpdateAvailable".'
+          is set to UpdateAvailable."
       verification: |
           Run the OTA Provider App using the command:
 
@@ -95,20 +97,20 @@ tests:
       disabled: true
 
     - label:
-          'DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to
-          "UpdateAvailable", ImageURI should have the https url from where the
-          image can be downloaded.'
+          "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
+          QueryImageResponse back to DUT. QueryStatus is set to UpdateAvailable,
+          ImageURI should have the https url from where the image can be
+          downloaded."
       PICS: MCORE.OTA.HTTPS
       verification: |
           Out of scope for V1.0
       disabled: true
 
     - label:
-          'DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to
-          "UpdateAvailable", Software Version should be set to the same or an
-          older (numerically lower) version.'
+          "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
+          QueryImageResponse back to DUT. QueryStatus is set to UpdateAvailable,
+          Software Version should be set to the same or an older (numerically
+          lower) version."
       verification: |
           Run the OTA Provider App using the command:
 
@@ -124,9 +126,9 @@ tests:
       disabled: true
 
     - label:
-          'DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to
-          "UpdateAvailable", ImageURI field contains an invalid BDX ImageURI.'
+          "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
+          QueryImageResponse back to DUT. QueryStatus is set to UpdateAvailable,
+          ImageURI field contains an invalid BDX ImageURI."
       verification: |
           Run the OTA Provider App using the command:
 

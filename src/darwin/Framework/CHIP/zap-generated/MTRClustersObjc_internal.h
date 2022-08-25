@@ -81,10 +81,10 @@
 - (chip::Controller::AccessControlCluster **)cppClusterSlot;
 @end
 
-@interface MTRBridgedActions ()
+@interface MTRActions ()
 // Must only touch cppCluster on the Matter queue.
-@property (readonly) chip::Controller::BridgedActionsCluster * cppCluster;
-- (chip::Controller::BridgedActionsCluster **)cppClusterSlot;
+@property (readonly) chip::Controller::ActionsCluster * cppCluster;
+- (chip::Controller::ActionsCluster **)cppClusterSlot;
 @end
 
 @interface MTRBasic ()

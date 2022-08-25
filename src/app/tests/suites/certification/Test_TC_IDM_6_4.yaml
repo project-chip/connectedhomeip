@@ -17,16 +17,30 @@ name:
     3.6.4. [TC-IDM-6.4] Events Subscribe Interaction from DUT to TH.
     [{DUT_Client}]
 
+PICS:
+    - MCORE.IDM.C.SubscribeRequest
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+      disabled: true
+
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT sends Subscribe Request Message to the TH for a supported event."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
@@ -61,7 +75,8 @@ tests:
           [1657455555.195766][11525:11525] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1657455555.195955][11525:11525] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
-          On DUT as a client side, verify that TH all-clusters-app sent  ReportDataMessage
+
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent  ReportDataMessage
 
           [1657886501.456822][3430:3435] CHIP:DMG: ReportDataMessage =
           [1657886501.456851][3430:3435] CHIP:DMG: {
@@ -109,7 +124,7 @@ tests:
           "DUT sends Subscribe Request Message to the TH. TH sends Report Data
           message to DUT."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
@@ -126,7 +141,8 @@ tests:
           [1657455691.695600][11525:11525] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
           [1657455691.695643][11525:11525] CHIP:DMG: Refresh Subscribe Sync Timer with max 400 seconds
 
-          On DUT as a client side, verify that TH all-clusters-app sent  ReportDataMessage
+
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent  ReportDataMessage
 
           [1657886532.588762][3430:3435] CHIP:DMG: }
           [1657886532.588882][3430:3435] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
@@ -157,8 +173,7 @@ tests:
           "DUT sends Subscribe Request Message to the TH and TH does not respond
           with Report Data message to DUT."
       verification: |
-          This is not testable in normal scenario, and needs to be tested as part of Unit test.
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1885
+          Mark this as not testable /NA. Out of Scope for V1.0
       disabled: true
 
     - label:
@@ -166,16 +181,14 @@ tests:
           message to DUT. DUT sends Status Response Message to the TH. TH does
           not respond with Subscribe Response message to DUT."
       verification: |
-          This is not testable in normal scenario, and needs to be tested as part of Unit test.
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1885
+          Mark this as not testable /NA. Out of Scope for V1.0
       disabled: true
 
     - label:
           "With an active Event subscription from DUT to TH, TH sends Report
           Data message to DUT with an inactive SubscriptionId."
       verification: |
-          This is not testable in normal scenario, and needs to be tested as part of Unit test.
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1885
+          Mark this as not testable /NA. Out of Scope for V1.0
       disabled: true
 
     - label:
@@ -183,6 +196,5 @@ tests:
           Data message to DUT after the maximum interval from the last Report
           Data."
       verification: |
-          This is not testable in normal scenario, and needs to be tested as part of Unit test.
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1885
+          Mark this as not testable /NA. Out of Scope for V1.0
       disabled: true

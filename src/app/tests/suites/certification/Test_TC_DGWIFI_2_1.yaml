@@ -14,6 +14,10 @@
 
 name: 51.2.1. [TC-DGWIFI-2.1] Attributes with server as DUT
 
+PICS:
+    - DGWIFI.S.A
+    - DGWIFI.S
+
 config:
     nodeId: 0x12344321
     cluster: "WiFi Network Diagnostics"
@@ -34,7 +38,7 @@ tests:
       attribute: "BSSID"
       response:
           constraints:
-              type: octstr
+              type: octet_string
 
     #issue #13645
     - label: "Reads SecurityType attribute constraints"
@@ -43,7 +47,7 @@ tests:
       attribute: "SecurityType"
       response:
           constraints:
-              type: enum
+              type: enum8
 
     - label: "Reads WiFiVersion attribute constraints"
       PICS: DGWIFI.S.A0002
@@ -51,7 +55,7 @@ tests:
       attribute: "WiFiVersion"
       response:
           constraints:
-              type: enum
+              type: enum8
               minValue: 0
               maxValue: 5
 
@@ -61,7 +65,7 @@ tests:
       attribute: "ChannelNumber"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -71,7 +75,7 @@ tests:
       attribute: "RSSI"
       response:
           constraints:
-              type: int8
+              type: int8s
               minValue: -120
               maxValue: 0
 
@@ -81,7 +85,7 @@ tests:
       attribute: "BeaconLostCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -91,7 +95,7 @@ tests:
       attribute: "BeaconRxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -101,7 +105,7 @@ tests:
       attribute: "PacketMulticastRxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -111,7 +115,7 @@ tests:
       attribute: "PacketMulticastTxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -121,7 +125,7 @@ tests:
       attribute: "PacketUnicastRxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -131,7 +135,7 @@ tests:
       attribute: "PacketUnicastTxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
@@ -141,7 +145,7 @@ tests:
       attribute: "CurrentMaxRate"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label: "Reads OverrunCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000c
@@ -149,4 +153,4 @@ tests:
       attribute: "OverrunCount"
       response:
           constraints:
-              type: uint64
+              type: int64u

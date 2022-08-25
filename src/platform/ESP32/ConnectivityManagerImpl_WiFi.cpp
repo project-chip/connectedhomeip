@@ -24,6 +24,7 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
@@ -109,10 +110,13 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
         esp_wifi_set_config(WIFI_IF_STA, &stationConfig);
 
         DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     }
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -166,6 +170,7 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
     mWiFiAPIdleTimeout = val;
     DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
 #define WIFI_BAND_2_4GHZ 2400
 #define WIFI_BAND_5_0GHZ 5000
@@ -381,13 +386,17 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWiFiStatsCounters(void)
 CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
 {
     mLastStationConnectFailTime   = System::Clock::kZero;
-    mLastAPDemandTime             = System::Clock::kZero;
     mWiFiStationMode              = kWiFiStationMode_Disabled;
     mWiFiStationState             = kWiFiStationState_NotConnected;
-    mWiFiAPMode                   = kWiFiAPMode_Disabled;
-    mWiFiAPState                  = kWiFiAPState_NotActive;
     mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
-    mWiFiAPIdleTimeout            = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+    mLastAPDemandTime  = System::Clock::kZero;
+    mWiFiAPMode        = kWiFiAPMode_Disabled;
+    mWiFiAPState       = kWiFiAPState_NotActive;
+    mWiFiAPIdleTimeout = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+
     mFlags.SetRaw(0);
 
     // TODO Initialize the Chip Addressing and Routing Module.
@@ -434,7 +443,10 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
 
     // Queue work items to bootstrap the AP and station state machines once the Chip event loop is running.
     ReturnErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     ReturnErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL));
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
     return CHIP_NO_ERROR;
 }
@@ -477,6 +489,7 @@ void ConnectivityManagerImpl::OnWiFiPlatformEvent(const ChipDeviceEvent * event)
                 ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_STOP");
                 DriveStationState();
                 break;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
             case WIFI_EVENT_AP_START:
                 ChipLogProgress(DeviceLayer, "WIFI_EVENT_AP_START");
                 ChangeWiFiAPState(kWiFiAPState_Active);
@@ -491,6 +504,7 @@ void ConnectivityManagerImpl::OnWiFiPlatformEvent(const ChipDeviceEvent * event)
                 ChipLogProgress(DeviceLayer, "WIFI_EVENT_AP_STACONNECTED");
                 MaintainOnDemandWiFiAP();
                 break;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
             default:
                 break;
             }
@@ -768,6 +782,7 @@ void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, 
     sInstance.DriveStationState();
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 void ConnectivityManagerImpl::DriveAPState()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -915,8 +930,14 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 
     uint16_t discriminator;
     ReturnErrorOnFailure(GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
+
+    uint16_t vendorId;
+    uint16_t productId;
+    ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetVendorId(vendorId));
+    ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetProductId(productId));
+
     snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%03X-%04X-%04X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
-             discriminator, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+             discriminator, vendorId, productId);
     wifiConfig.ap.channel         = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
     wifiConfig.ap.authmode        = WIFI_AUTH_OPEN;
     wifiConfig.ap.max_connection  = CHIP_DEVICE_CONFIG_WIFI_AP_MAX_STATIONS;
@@ -945,6 +966,7 @@ void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void 
 {
     sInstance.DriveAPState();
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
 void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
 {

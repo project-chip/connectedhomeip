@@ -15,32 +15,56 @@
 
 name: 3.2.3. [TC-DGGEN-2.3] Command received at server as DUT
 
+PICS:
+    - DGGEN.S
+    - DGGEN.S.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Commission DUT to TH"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label: "Commission DUT to TH"
+      verification: |
+          verification step to be updated.
+      disabled: true
+
+    - label: "TH reads TestEventTriggersEnabled attribute value"
+      verification: |
+          ./chip-tool generaldiagnostics read test-event-triggers-enabled 1 0
+          On TH(chip-tool) verify that the TestEventTriggersEnabled value is of bool type. If this value is set to True, then proceed with step 3, otherwise skip step 3.
+          [1659425031.608557][4213:4218] CHIP:DMG: }
+          [1659425031.608771][4213:4218] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0008 DataVersion: 1691505311
+          [1659425031.608815][4213:4218] CHIP:TOO:   TestEventTriggersEnabled: TRUE
+          [1659425031.608915][4213:4218] CHIP:EM: Sending Standalone Ack for MessageCounter:126478710 on exchange 37049i
+      disabled: true
+
     - label:
-          "Provision TH with EnableKey with 128 bit value provided and matched a
-          value chosen by the manufacturer and configured on the DUT using
-          manufacturer-specific means. EventTrigger value is configured and
-          SHALL indicate the test or test mode which TH wants to trigger the
-          testing use by manufacturers."
+          "Invoke the TestEventTrigger command with EnableKey field set to
+          PIXIT.DGGEN.ENABLEKEY and EventTrigger field set to 0."
       PICS: DGGEN.S.C00.Rsp
       verification: |
-          1. Read if TestEventTriggersEnabled attribute is set to true using ./chip-tool generaldiagnostics read test-event-triggers-enabled  1 0
+          Based on Spec, EnableKey value is to be provided by  manufacturer
+          below mentioned the example command to verify
+           ./chip-tool generaldiagnostics  <EnableKey> test-event-trigger   0 1 0
+      disabled: true
 
-
-           ./chip-tool generaldiagnostics read   test-event-triggers-enabled  1 0
-
-          Verify in TH log
-
-          [1655188892.957794][2868:2873] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0008 DataVersion: 3562689442
-          [1655188892.957869][2868:2873] CHIP:TOO:   TestEventTriggersEnabled: FALSE
-          [1655188892.957999][2868:2873] CHIP:EM: Sending Standalone Ack for MessageCounter:133140817 on exchange 23176i
-
-          2. when this attribute is false, do not need to verify rest of the below commands.
-          3. When this attribute is true, the Node has been configured with one or more test event triggers by virtue of the internally programmed EnableKey value by the product vendor
-          4. Use the manufacturer-provided EnableKey value and the EventTrigger value and send command using './chip-tool generaldiagnostics test-event-trigger <EnableKey> <EventTrigger destination-id> ' 1 0 and verify if the DUT generated the desired event.
+    - label:
+          "Invoke the TestEventTrigger command with EnableKey field set to 16
+          bytes of all zeroes and EventTrigger field set to 0."
+      PICS: DGGEN.S.C00.Rsp
+      verification: |
+          ./chip-tool generaldiagnostics  test-event-trigger hex:0000000000000000  0 1 0
+          On TH(chip-tool) Verify that DUT responds with CONSTRAINT_ERROR.
+          [1659426470.994413][4451:4456] CHIP:DMG:         InteractionModelRevision = 1
+          [1659426470.994442][4451:4456] CHIP:DMG: },
+          [1659426470.994513][4451:4456] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0033 Command=0x0000_0000 Status=0x87
+          [1659426470.994553][4451:4456] CHIP:TOO: Error: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1659426470.994618][4451:4456] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true

@@ -17,6 +17,9 @@ name:
     50.3.5. [TC-DGTHREAD-3.5] Thread Network Diagnostics Cluster Events [DUT as
     Client]
 
+PICS:
+    - DGTHREAD.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -26,62 +29,53 @@ tests:
     - label: "Simulate an Unspecified failure on TH"
       PICS: DGTHREAD.C.E01
       verification: |
-          Not Implemented in CHIP Tool
+          Optional Event so it is not mandatory to verify in v1.0. Pls mark as Not Applicable.
       disabled: true
 
     - label: "Simulate a LinkDown failure on TH"
       PICS: DGTHREAD.C.E01
       verification: |
-          Not Implemented in CHIP Tool
+          Optional Event so it is not mandatory to verify in v1.0. Pls mark as Not Applicable.
       disabled: true
 
     - label: "Simulate a HardwareFailure on TH"
       PICS: DGTHREAD.C.E01
       verification: |
-          Not Implemented in CHIP Tool
+          Optional Event so it is not mandatory to verify in v1.0. Pls mark as Not Applicable.
       disabled: true
 
     - label: "Simulate a NetworkJammed Failure on TH"
       PICS: DGTHREAD.C.E01
       verification: |
-          Not Implemented in CHIP Tool
+          Optional Event so it is not mandatory to verify in v1.0. Pls mark as Not Applicable.
       disabled: true
 
     - label: "Simulate an Unspecified failure on TH"
       PICS: DGTHREAD.C.E01
       verification: |
-          Not Implemented in CHIP Tool
+          Optional Event so it is not mandatory to verify in v1.0. Pls mark as Not Applicable.
       disabled: true
 
     - label: "Simulate a LinkDown failure on TH"
       PICS: DGTHREAD.C.E01
       verification: |
-          Not Implemented in CHIP Tool
+          Optional Event so it is not mandatory to verify in v1.0. Pls mark as Not Applicable.
       disabled: true
 
     - label: "Simulate a HardwareFailure on TH"
       PICS: DGTHREAD.C.E01
       verification: |
-          Not Implemented in CHIP Tool
+          Optional Event so it is not mandatory to verify in v1.0. Pls mark as Not Applicable.
       disabled: true
 
     - label: "Simulate a NetworkJammed Failure on TH"
       PICS: DGTHREAD.C.E01
       verification: |
-          Not Implemented in CHIP Tool
+          Optional Event so it is not mandatory to verify in v1.0. Pls mark as Not Applicable.
       disabled: true
 
     - label: "Simulate disconnecting and reconnecting to a Thread network on TH"
       PICS: DGTHREAD.C.E00
       verification: |
-          ./chip-tool  threadnetworkdiagnostics  read-event connection-status 137 0
-
-          Verify on the TH Log:
-
-          [1651233430.972821][7560:7565] CHIP:DMG: ReportDataMessage =
-          [1651233430.972891][7560:7565] CHIP:DMG: {
-          [1651233430.972950][7560:7565] CHIP:DMG:         SuppressResponse = true,
-          [1651233430.973013][7560:7565] CHIP:DMG:         InteractionModelRevision = 1
-          [1651233430.973070][7560:7565] CHIP:DMG: }
-          [1651233430.973222][7560:7565] CHIP:EM: Sending Standalone Ack for MessageCounter:6424591 on exchange 2503i
+          Optional Event so it is not mandatory to verify in v1.0. Pls mark as Not Applicable.
       disabled: true

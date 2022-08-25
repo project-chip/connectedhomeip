@@ -1395,13 +1395,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_LISTENER_ALREADY_STOPPED                    CHIP_CORE_ERROR(0x6a)
 
 /**
- *  @def CHIP_ERROR_UNKNOWN_TOPIC
+ *  @def CHIP_ERROR_INVALID_SUBSCRIPTION
  *
  *  @brief
- *    A topic ID was unknown to the recipient.
+ *    A message was received as part of a subscription exchange that has a mis-matching subscription id.
  *
  */
-#define CHIP_ERROR_UNKNOWN_TOPIC                               CHIP_CORE_ERROR(0x6b)
+#define CHIP_ERROR_INVALID_SUBSCRIPTION                               CHIP_CORE_ERROR(0x6b)
 
 /**
  *  @def CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
@@ -1879,13 +1879,12 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND           CHIP_CORE_ERROR(0xa0)
 
 /**
- *  @def CHIP_ERROR_PROFILE_STRING_CONTEXT_ALREADY_REGISTERED
+ * @def CHIP_ERROR_IM_FABRIC_DELETED
  *
- *  @brief
- *    The specified profile string support context is already registered.
- *
+ * @brief
+ *   The fabric is deleted, and the corresponding IM resources are released
  */
-#define CHIP_ERROR_PROFILE_STRING_CONTEXT_ALREADY_REGISTERED   CHIP_CORE_ERROR(0xa1)
+#define CHIP_ERROR_IM_FABRIC_DELETED                            CHIP_CORE_ERROR(0xa1)
 
 /**
  *  @def CHIP_ERROR_PROFILE_STRING_CONTEXT_NOT_REGISTERED

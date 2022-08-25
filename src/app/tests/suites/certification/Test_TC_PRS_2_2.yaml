@@ -13,41 +13,57 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.2. [TC-PRS-2.2] Primary functionality with server as DUT
+name: 34.2.2. [TC-PRS-2.2] Primary Functionality with Server as DUT
+
+PICS:
+    - PRS.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Pressure Measurement"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
-
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "TH reads from the DUT the MeasuredValue attribute"
       PICS: PRS.S.A0000
-      verification: |
-          Verify on the TH Log:
-
-          ./chip-tool pressuremeasurement read measured-value 1 1
-
-          CHIP:TOO:   MeasuredValue: 0
-      disabled: true
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          saveAs: ValueBeforeChange
 
     - label: "Operate on device to change the pressure significantly"
-      PICS: PRS.M.PressureChange
-      verification: |
-          Operate at device
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && PRS.M.PressureChange
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait 2s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
 
     - label:
           "After a few seconds, TH reads from the DUT the MeasuredValue
           attribute"
-      PICS: PRS.S.A0000
-      verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
-
-          DUT action missing [cant verify using Raspi]
-      disabled: true
+      PICS: PRS.S.A0000 && PRS.M.PressureChange
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              notValue: ValueBeforeChange

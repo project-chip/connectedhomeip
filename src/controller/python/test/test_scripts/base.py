@@ -34,9 +34,13 @@ import chip.clusters as Clusters
 import chip.clusters.Attribute as Attribute
 from chip.utils import CommissioningBuildingBlocks
 from chip.ChipStack import *
+import chip.native
 import chip.FabricAdmin
+import chip.CertificateAuthority
 import copy
 import secrets
+import faulthandler
+import ipdb
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -49,9 +53,27 @@ sh.setStream(sys.stdout)
 logger.addHandler(sh)
 
 
-def TestFail(message):
+def TestFail(message, doCrash=False):
     logger.fatal("Testfail: {}".format(message))
-    os._exit(1)
+
+    if (doCrash):
+        logger.fatal("--------------------------------")
+        logger.fatal("Backtrace of all Python threads:")
+        logger.fatal("--------------------------------")
+
+        #
+        # Let's dump the Python backtrace for all threads, since the backtrace we'll
+        # get from gdb (if one is attached) won't give us good Python symbol information.
+        #
+        faulthandler.dump_traceback()
+
+        #
+        # Cause a crash to happen so that we can actually get a meaningful
+        # backtrace when run through GDB.
+        #
+        chip.native.GetLibraryHandle().pychip_CauseCrash()
+    else:
+        os._exit(1)
 
 
 def FailIfNot(cond, message):
@@ -142,7 +164,7 @@ class TestTimeout(threading.Thread):
                 self._cv.wait(wait_time)
                 wait_time = stop_time - time.time()
         if time.time() > stop_time:
-            TestFail("Timeout")
+            TestFail("Timeout", doCrash=True)
 
 
 class TestResult:
@@ -170,9 +192,12 @@ class TestResult:
 
 class BaseTestHelper:
     def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False):
+        chip.native.Init()
+
         self.chipStack = ChipStack('/tmp/repl_storage.json')
-        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(vendorId=0XFFF1,
-                                                        fabricId=1, fabricIndex=1)
+        self.certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self.chipStack)
+        self.certificateAuthority = self.certificateAuthorityManager.NewCertificateAuthority()
+        self.fabricAdmin = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
         self.devCtrl = self.fabricAdmin.NewController(
             nodeid, paaTrustStorePath, testCommissioner)
         self.controllerNodeId = nodeid
@@ -362,13 +387,115 @@ class BaseTestHelper:
             return True
         return False
 
+    async def TestControllerCATValues(self, nodeid: int):
+        ''' This tests controllers using CAT Values
+        '''
+        # Allocate a new controller instance with a CAT tag.
+        newControllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=self.fabricAdmin, adminDevCtrl=self.devCtrl, controllerNodeIds=[300], targetNodeId=nodeid, privilege=None, catTags=[0x0001_0001])
+
+        # Read out an attribute using the new controller. It has no privileges, so this should fail with an UnsupportedAccess error.
+        res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+            self.logger.error(f"1: Received data instead of an error:{res}")
+            return False
+
+        # Grant the new controller privilege by adding the CAT tag to the subject.
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=nodeid, targetCatTags=[0x0001_0001])
+
+        # Read out the attribute again - this time, it should succeed.
+        res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+            self.logger.error(f"2: Received something other than data:{res}")
+            return False
+
+        # Reset the privilege back to pre-test.
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=None, targetNodeId=nodeid)
+
+        newControllers[0].Shutdown()
+
+        return True
+
+    async def TestMultiControllerFabric(self, nodeid: int):
+        ''' This tests having multiple controller instances on the same fabric.
+        '''
+
+        # Create two new controllers on the same fabric with no privilege on the target node.
+        newControllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=self.fabricAdmin, adminDevCtrl=self.devCtrl, controllerNodeIds=[100, 200], targetNodeId=nodeid, privilege=None)
+
+        #
+        # Read out the ACL list from one of the newly minted controllers which has no access. This should return an IM error.
+        #
+        res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+            self.logger.error(f"1: Received data instead of an error:{res}")
+            return False
+
+        #
+        # Read out the ACL list from an existing controller with admin privileges. This should return back valid data.
+        # Doing this ensures that we're not somehow aliasing the CASE sessions.
+        #
+        res = await self.devCtrl.ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+            self.logger.error(f"2: Received something other than data:{res}")
+            return False
+
+        #
+        # Re-do the previous read from the unprivileged controller just to do an ABA test to prove we haven't switched the CASE sessions
+        # under-neath.
+        #
+        res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+            self.logger.error(f"3: Received data instead of an error:{res}")
+            return False
+
+        #
+        # Grant the new controller admin privileges. Reading out the ACL cluster should now yield data.
+        #
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=nodeid)
+        res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+            self.logger.error(f"4: Received something other than data:{res}")
+            return False
+
+        #
+        # Grant the second new controller admin privileges as well. Reading out the ACL cluster should now yield data.
+        #
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[1], privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=nodeid)
+        res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+            self.logger.error(f"5: Received something other than data:{res}")
+            return False
+
+        #
+        # Grant the second new controller just view privilege. Reading out the ACL cluster should return no data.
+        #
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[1], privilege=Clusters.AccessControl.Enums.Privilege.kView, targetNodeId=nodeid)
+        res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
+        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+            self.logger.error(f"6: Received data5 instead of an error:{res}")
+            return False
+
+        #
+        # Read the Basic cluster from the 2nd controller. This is possible with just view privileges.
+        #
+        res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.Basic.Attributes.ClusterRevision)])
+        if (type(res[0][Clusters.Basic][Clusters.Basic.Attributes.ClusterRevision]) != Clusters.Basic.Attributes.ClusterRevision.attribute_type.Type):
+            self.logger.error(f"7: Received something other than data:{res}")
+            return False
+
+        newControllers[0].Shutdown()
+        newControllers[1].Shutdown()
+
+        return True
+
     async def TestAddUpdateRemoveFabric(self, nodeid: int):
         logger.info("Testing AddNOC, UpdateNOC and RemoveFabric")
 
         self.logger.info("Waiting for attribute read for CommissionedFabrics")
         startOfTestFabricCount = await self._GetCommissonedFabricCount(nodeid)
 
-        tempFabric = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1)
+        tempCertificateAuthority = self.certificateAuthorityManager.NewCertificateAuthority()
+        tempFabric = tempCertificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
         tempDevCtrl = tempFabric.NewController(self.controllerNodeId, self.paaTrustStorePath)
 
         self.logger.info("Starting AddNOC using same node ID")
@@ -533,8 +660,7 @@ class BaseTestHelper:
         await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000)
 
         self.logger.info("Creating 2nd Fabric Admin")
-        self.fabricAdmin2 = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1,
-                                                         fabricId=2, fabricIndex=2)
+        self.fabricAdmin2 = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
 
         self.logger.info("Creating Device Controller on 2nd Fabric")
         self.devCtrl2 = self.fabricAdmin2.NewController(
@@ -551,15 +677,15 @@ class BaseTestHelper:
         self.logger.info(
             "Shutting down controllers & fabrics and re-initing stack...")
 
-        ChipDeviceCtrl.ChipDeviceController.ShutdownAll()
-        chip.FabricAdmin.FabricAdmin.ShutdownAll()
+        self.certificateAuthorityManager.Shutdown()
 
         self.logger.info("Shutdown completed, starting new controllers...")
 
-        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(vendorId=0XFFF1,
-                                                        fabricId=1, fabricIndex=1)
-        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1,
-                                                    fabricId=2, fabricIndex=2)
+        self.certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self.chipStack)
+        self.certificateAuthority = self.certificateAuthorityManager.NewCertificateAuthority()
+        self.fabricAdmin = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+
+        fabricAdmin2 = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
 
         self.devCtrl = self.fabricAdmin.NewController(
             self.controllerNodeId, self.paaTrustStorePath)
@@ -756,6 +882,52 @@ class BaseTestHelper:
         if (expectedDataFabric1 != readListDataFabric1):
             raise AssertionError("Got back mismatched data")
 
+    async def TestResubscription(self, nodeid: int):
+        ''' This validates the re-subscription logic by triggering a liveness failure caused by the expiration
+            of the underlying CASE session and the resultant failure to receive reports from the server. This should
+            trigger CASE session establishment and subscription restablishment. Both the attempt and successful
+            restablishment of the subscription are validated.
+        '''
+        cv = asyncio.Condition()
+        resubAttempted = False
+        resubSucceeded = True
+
+        async def OnResubscriptionAttempted(transaction, errorEncountered: int, nextResubscribeIntervalMsec: int):
+            self.logger.info("Re-subscription Attempted")
+            nonlocal resubAttempted
+            resubAttempted = True
+
+        async def OnResubscriptionSucceeded(transaction):
+            self.logger.info("Re-subscription Succeeded")
+            nonlocal cv
+            async with cv:
+                cv.notify()
+
+        subscription = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)], reportInterval=(0, 5))
+
+        #
+        # Register async callbacks that will fire when a re-sub is attempted or succeeds.
+        #
+        subscription.SetResubscriptionAttemptedCallback(OnResubscriptionAttempted, True)
+        subscription.SetResubscriptionSucceededCallback(OnResubscriptionSucceeded, True)
+
+        #
+        # Over-ride the default liveness timeout (which is set quite high to accomodate for
+        # transport delays) to something very small. This ensures that our liveness timer will
+        # fire quickly and cause a re-subscription to occur naturally.
+        #
+        subscription.OverrideLivenessTimeoutMs(100)
+
+        async with cv:
+            if (not(resubAttempted) or not(resubSucceeded)):
+                res = await asyncio.wait_for(cv.wait(), 3)
+                if not res:
+                    self.logger.error("Timed out waiting for resubscription to succeed")
+                    return False
+
+        subscription.Shutdown()
+        return True
+
     def TestCloseSession(self, nodeid: int):
         self.logger.info(f"Closing sessions with device {nodeid}")
         try:
@@ -796,7 +968,7 @@ class BaseTestHelper:
         self.logger.info(
             f"Sending MoveToLevel command to device {nodeid} endpoint {endpoint}")
         try:
-            commonArgs = dict(transitionTime=0, optionMask=1, optionOverride=1)
+            commonArgs = dict(transitionTime=0, optionsMask=1, optionsOverride=1)
 
             # Move to 1
             self.devCtrl.ZCLSend("LevelControl", "MoveToLevel", nodeid,

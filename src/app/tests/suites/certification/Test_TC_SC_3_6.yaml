@@ -1,0 +1,313 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.3.6. [TC-SC-3.6] CASE Resource validation
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "RD1X, RD2X, RD3X, RD4X, RD5X each send 1 Subscribe Request Messages
+          to DUT.(Total - 15 active subscriptions) They can subscribe to any
+          attribute. Once all subscriptions are active, change the value of the
+          attribute that has been subscribed to"
+      verification: |
+          Send 1 Subscriptionrequest message from each Reference Device(Eg. RD1...) to DUT and verify all the subscription requests are succes, and change the value of all the attributes by sending write command, after sending write commanfd verify on each of these Reference Devices that the appropriate attribute value has been received. Example commands given below are using 4 reference device (User can use 15 reference device and send the below command in from each reference device)
+
+
+          on the first reference device enter:
+
+           onoff  subscribe on-time  10 100  1 1
+          [1657715218.149357][5956:5961] CHIP:DMG: ReportDataMessage =
+          [1657715218.149399][5956:5961] CHIP:DMG: {
+          [1657715218.149432][5956:5961] CHIP:DMG:         SubscriptionId = 0xea8e5b3b,
+          [1657715218.149465][5956:5961] CHIP:DMG:         AttributeReportIBs =
+          [1657715218.149504][5956:5961] CHIP:DMG:         [
+          [1657715218.149535][5956:5961] CHIP:DMG:                 AttributeReportIB =
+          [1657715218.149581][5956:5961] CHIP:DMG:                 {
+          [1657715218.149619][5956:5961] CHIP:DMG:                         AttributeDataIB =
+          [1657715218.149663][5956:5961] CHIP:DMG:                         {
+          [1657715218.149711][5956:5961] CHIP:DMG:                                 DataVersion = 0x734a2d83,
+          [1657715218.149755][5956:5961] CHIP:DMG:                                 AttributePathIB =
+          [1657715218.149802][5956:5961] CHIP:DMG:                                 {
+          [1657715218.149849][5956:5961] CHIP:DMG:                                         Endpoint = 0x1,
+          [1657715218.149895][5956:5961] CHIP:DMG:                                         Cluster = 0x6,
+          [1657715218.149942][5956:5961] CHIP:DMG:                                         Attribute = 0x0000_4001,
+          [1657715218.149983][5956:5961] CHIP:DMG:                                 }
+          [1657715218.150027][5956:5961] CHIP:DMG:
+          [1657715218.150075][5956:5961] CHIP:DMG:                                 Data = 0,
+          [1657715218.150118][5956:5961] CHIP:DMG:                         },
+          [1657715218.150165][5956:5961] CHIP:DMG:
+          [1657715218.150201][5956:5961] CHIP:DMG:                 },
+          [1657715218.150245][5956:5961] CHIP:DMG:
+          [1657715218.150275][5956:5961] CHIP:DMG:         ],
+          [1657715218.150313][5956:5961] CHIP:DMG:
+          [1657715218.150343][5956:5961] CHIP:DMG:         InteractionModelRevision = 1
+          [1657715218.150372][5956:5961] CHIP:DMG: }
+          [1657715218.150529][5956:5961] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_4001 DataVersion: 1934241155
+          [1657715218.150599][5956:5961] CHIP:TOO:   OnTime: 0
+          [1657715218.150646][5956:5961] CHIP:DMG: MoveToState ReadClient[0xffff94008e40]: Moving to
+
+
+          On the 2nd reference device
+
+           levelcontrol  subscribe  on-level 100 1000  1 1
+          [1657715273.668717][5956:5961] CHIP:DMG: ReportDataMessage =
+          [1657715273.668784][5956:5961] CHIP:DMG: {
+          [1657715273.668846][5956:5961] CHIP:DMG:         SubscriptionId = 0xb6497be6,
+          [1657715273.668908][5956:5961] CHIP:DMG:         AttributeReportIBs =
+          [1657715273.668984][5956:5961] CHIP:DMG:         [
+          [1657715273.669046][5956:5961] CHIP:DMG:                 AttributeReportIB =
+          [1657715273.669126][5956:5961] CHIP:DMG:                 {
+          [1657715273.669190][5956:5961] CHIP:DMG:                         AttributeDataIB =
+          [1657715273.669261][5956:5961] CHIP:DMG:                         {
+          [1657715273.669378][5956:5961] CHIP:DMG:                                 DataVersion = 0x319eeda7,
+          [1657715273.669460][5956:5961] CHIP:DMG:                                 AttributePathIB =
+          [1657715273.669540][5956:5961] CHIP:DMG:                                 {
+          [1657715273.669620][5956:5961] CHIP:DMG:                                         Endpoint = 0x1,
+          [1657715273.669706][5956:5961] CHIP:DMG:                                         Cluster = 0x8,
+          [1657715273.669792][5956:5961] CHIP:DMG:                                         Attribute = 0x0000_0011,
+          [1657715273.669875][5956:5961] CHIP:DMG:                                 }
+          [1657715273.669961][5956:5961] CHIP:DMG:
+          [1657715273.670043][5956:5961] CHIP:DMG:                                 Data = NULL
+          [1657715273.670119][5956:5961] CHIP:DMG:                         },
+          [1657715273.670199][5956:5961] CHIP:DMG:
+          [1657715273.670267][5956:5961] CHIP:DMG:                 },
+          [1657715273.670341][5956:5961] CHIP:DMG:
+          [1657715273.670400][5956:5961] CHIP:DMG:         ],
+          [1657715273.670474][5956:5961] CHIP:DMG:
+          [1657715273.670533][5956:5961] CHIP:DMG:         InteractionModelRevision = 1
+          [1657715273.670591][5956:5961] CHIP:DMG: }
+          [1657715273.670803][5956:5961] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 832499111
+          [1657715273.670879][5956:5961] CHIP:TOO:   on level: null
+          [1657715273.670967][5956:5961] CHIP:DMG: MoveToState ReadClient[0xffff94008f30]: Moving to [AwaitingSu]
+
+          on 3rd reference device
+
+          onoff subscribe start-up-on-off   100 1000 1 1
+          [1657715343.924200][5956:5961] CHIP:DMG: ReportDataMessage =
+          [1657715343.924269][5956:5961] CHIP:DMG: {
+          [1657715343.924330][5956:5961] CHIP:DMG:         SubscriptionId = 0x9fce63ae,
+          [1657715343.924392][5956:5961] CHIP:DMG:         AttributeReportIBs =
+          [1657715343.924470][5956:5961] CHIP:DMG:         [
+          [1657715343.924532][5956:5961] CHIP:DMG:                 AttributeReportIB =
+          [1657715343.924612][5956:5961] CHIP:DMG:                 {
+          [1657715343.924678][5956:5961] CHIP:DMG:                         AttributeDataIB =
+          [1657715343.924750][5956:5961] CHIP:DMG:                         {
+          [1657715343.924833][5956:5961] CHIP:DMG:                                 DataVersion = 0x734a2d84,
+          [1657715343.924909][5956:5961] CHIP:DMG:                                 AttributePathIB =
+          [1657715343.924992][5956:5961] CHIP:DMG:                                 {
+          [1657715343.925074][5956:5961] CHIP:DMG:                                         Endpoint = 0x1,
+          [1657715343.925159][5956:5961] CHIP:DMG:                                         Cluster = 0x6,
+          [1657715343.925245][5956:5961] CHIP:DMG:                                         Attribute = 0x0000_4003,
+          [1657715343.925382][5956:5961] CHIP:DMG:                                 }
+          [1657715343.925470][5956:5961] CHIP:DMG:
+          [1657715343.925561][5956:5961] CHIP:DMG:                                 Data = NULL
+          [1657715343.925631][5956:5961] CHIP:DMG:                         },
+          [1657715343.925713][5956:5961] CHIP:DMG:
+          [1657715343.925776][5956:5961] CHIP:DMG:                 },
+          [1657715343.925851][5956:5961] CHIP:DMG:
+          [1657715343.925910][5956:5961] CHIP:DMG:         ],
+          [1657715343.925985][5956:5961] CHIP:DMG:
+          [1657715343.926046][5956:5961] CHIP:DMG:         InteractionModelRevision = 1
+          [1657715343.926104][5956:5961] CHIP:DMG: }
+          [1657715343.926315][5956:5961] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_4003 DataVersion: 1934241156
+          [1657715343.926395][5956:5961] CHIP:TOO:   StartUpOnOff: null
+          [1657715343.926485][5956:5961] CHIP:DMG: MoveToState ReadClient[0xffff94008c80]: Moving to [AwaitingSu]
+
+          on the 4th reference device
+
+          basic subscribe node-label 10 100  1 0
+          [1657715505.138806][5956:5961] CHIP:DMG: ReportDataMessage =
+          [1657715505.138881][5956:5961] CHIP:DMG: {
+          [1657715505.138943][5956:5961] CHIP:DMG:         SubscriptionId = 0xd002abb6,
+          [1657715505.139045][5956:5961] CHIP:DMG:         AttributeReportIBs =
+          [1657715505.139128][5956:5961] CHIP:DMG:         [
+          [1657715505.139190][5956:5961] CHIP:DMG:                 AttributeReportIB =
+          [1657715505.139498][5956:5961] CHIP:DMG:                 {
+          [1657715505.139600][5956:5961] CHIP:DMG:                         AttributeDataIB =
+          [1657715505.139713][5956:5961] CHIP:DMG:                         {
+          [1657715505.139824][5956:5961] CHIP:DMG:                                 DataVersion = 0x1b93dc30,
+          [1657715505.139932][5956:5961] CHIP:DMG:                                 AttributePathIB =
+          [1657715505.140020][5956:5961] CHIP:DMG:                                 {
+          [1657715505.140112][5956:5961] CHIP:DMG:                                         Endpoint = 0x0,
+          [1657715505.140202][5956:5961] CHIP:DMG:                                         Cluster = 0x28,
+          [1657715505.140289][5956:5961] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1657715505.140370][5956:5961] CHIP:DMG:                                 }
+          [1657715505.140560][5956:5961] CHIP:DMG:
+          [1657715505.140657][5956:5961] CHIP:DMG:                                 Data = "",
+          [1657715505.140741][5956:5961] CHIP:DMG:                         },
+          [1657715505.140825][5956:5961] CHIP:DMG:
+          [1657715505.140893][5956:5961] CHIP:DMG:                 },
+          [1657715505.140972][5956:5961] CHIP:DMG:
+          [1657715505.141031][5956:5961] CHIP:DMG:         ],
+          [1657715505.141105][5956:5961] CHIP:DMG:
+          [1657715505.141165][5956:5961] CHIP:DMG:         InteractionModelRevision = 1
+          [1657715505.141223][5956:5961] CHIP:DMG: }
+          [1657715505.141471][5956:5961] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 462674992
+          [1657715505.141554][5956:5961] CHIP:TOO:   NodeLabel:
+          [1657715505.141643][5956:5961] CHIP:DMG: MoveToState ReadClient[0xffff94008c80]: Moving to [AwaitingSu]
+
+
+
+          on the first reference device enter below mentioned commands to change the attribute values
+
+          onoff  write on-time 1 1 1
+          [1657715232.758666][5956:5961] CHIP:DMG: ReportDataMessage =
+          [1657715232.758698][5956:5961] CHIP:DMG: {
+          [1657715232.758724][5956:5961] CHIP:DMG:         SubscriptionId = 0xea8e5b3b,
+          [1657715232.758753][5956:5961] CHIP:DMG:         AttributeReportIBs =
+          [1657715232.758782][5956:5961] CHIP:DMG:         [
+          [1657715232.758803][5956:5961] CHIP:DMG:                 AttributeReportIB =
+          [1657715232.758832][5956:5961] CHIP:DMG:                 {
+          [1657715232.758854][5956:5961] CHIP:DMG:                         AttributeDataIB =
+          [1657715232.758880][5956:5961] CHIP:DMG:                         {
+          [1657715232.758911][5956:5961] CHIP:DMG:                                 DataVersion = 0x734a2d84,
+          [1657715232.758936][5956:5961] CHIP:DMG:                                 AttributePathIB =
+          [1657715232.758962][5956:5961] CHIP:DMG:                                 {
+          [1657715232.758989][5956:5961] CHIP:DMG:                                         Endpoint = 0x1,
+          [1657715232.759030][5956:5961] CHIP:DMG:                                         Cluster = 0x6,
+          [1657715232.759071][5956:5961] CHIP:DMG:                                         Attribute = 0x0000_4001,
+          [1657715232.759104][5956:5961] CHIP:DMG:                                 }
+          [1657715232.759140][5956:5961] CHIP:DMG:
+          [1657715232.759174][5956:5961] CHIP:DMG:                                 Data = 1,
+          [1657715232.759203][5956:5961] CHIP:DMG:                         },
+          [1657715232.759235][5956:5961] CHIP:DMG:
+          [1657715232.759261][5956:5961] CHIP:DMG:                 },
+          [1657715232.759292][5956:5961] CHIP:DMG:
+          [1657715232.759317][5956:5961] CHIP:DMG:         ],
+          [1657715232.759348][5956:5961] CHIP:DMG:
+          [1657715232.759373][5956:5961] CHIP:DMG:         InteractionModelRevision = 1
+          [1657715232.759398][5956:5961] CHIP:DMG: }
+          [1657715232.759493][5956:5961] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_4001 DataVersion: 1934241156
+          [1657715232.759530][5956:5961] CHIP:TOO:   OnTime: 1
+          [1657715232.759576][5956:5961] CHIP:DMG: Refresh LivenessCheckTime for 125000 milliseconds with SubscriptionId = 0xea8e5b3b
+
+
+
+          on the 2nd reference device enter below mentioned commands to change the attribute values
+
+           levelcontrol  write  on-level  1  1 1
+          [1657715287.200431][5956:5961] CHIP:DMG: ReportDataMessage =
+          [1657715287.200491][5956:5961] CHIP:DMG: {
+          [1657715287.200557][5956:5961] CHIP:DMG:         SubscriptionId = 0xb6497be6,
+          [1657715287.200622][5956:5961] CHIP:DMG:         AttributeReportIBs =
+          [1657715287.200701][5956:5961] CHIP:DMG:         [
+          [1657715287.200765][5956:5961] CHIP:DMG:                 AttributeReportIB =
+          [1657715287.200848][5956:5961] CHIP:DMG:                 {
+          [1657715287.200921][5956:5961] CHIP:DMG:                         AttributeDataIB =
+          [1657715287.201012][5956:5961] CHIP:DMG:                         {
+          [1657715287.201094][5956:5961] CHIP:DMG:                                 DataVersion = 0x319eeda8,
+          [1657715287.201180][5956:5961] CHIP:DMG:                                 AttributePathIB =
+          [1657715287.201263][5956:5961] CHIP:DMG:                                 {
+          [1657715287.201403][5956:5961] CHIP:DMG:                                         Endpoint = 0x1,
+          [1657715287.201501][5956:5961] CHIP:DMG:                                         Cluster = 0x8,
+          [1657715287.201596][5956:5961] CHIP:DMG:                                         Attribute = 0x0000_0011,
+          [1657715287.201686][5956:5961] CHIP:DMG:                                 }
+          [1657715287.201889][5956:5961] CHIP:DMG:
+          [1657715287.201987][5956:5961] CHIP:DMG:                                 Data = 1,
+          [1657715287.202074][5956:5961] CHIP:DMG:                         },
+          [1657715287.202157][5956:5961] CHIP:DMG:
+          [1657715287.202221][5956:5961] CHIP:DMG:                 },
+          [1657715287.202296][5956:5961] CHIP:DMG:
+          [1657715287.202354][5956:5961] CHIP:DMG:         ],
+          [1657715287.202429][5956:5961] CHIP:DMG:
+          [1657715287.202488][5956:5961] CHIP:DMG:         InteractionModelRevision = 1
+          [1657715287.202546][5956:5961] CHIP:DMG: }
+          [1657715287.202754][5956:5961] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 832499112
+          [1657715287.202838][5956:5961] CHIP:TOO:   on level: 1
+          [1657715287.202937][5956:5961] CHIP:DMG: Refresh LivenessCheckTime for 125000 milliseconds with SubscriptionId = 0xb6497be6 Peer = 01:0000000000000001
+
+
+
+
+          on the 3rd reference device enter below mentioned commands to change the attribute values
+
+          onoff write start-up-on-off  1 1 1
+          [1657715357.628508][5956:5961] CHIP:DMG: ReportDataMessage =
+          [1657715357.628536][5956:5961] CHIP:DMG: {
+          [1657715357.628561][5956:5961] CHIP:DMG:         SubscriptionId = 0x9fce63ae,
+          [1657715357.628586][5956:5961] CHIP:DMG:         AttributeReportIBs =
+          [1657715357.628618][5956:5961] CHIP:DMG:         [
+          [1657715357.628643][5956:5961] CHIP:DMG:                 AttributeReportIB =
+          [1657715357.628676][5956:5961] CHIP:DMG:                 {
+          [1657715357.628702][5956:5961] CHIP:DMG:                         AttributeDataIB =
+          [1657715357.628735][5956:5961] CHIP:DMG:                         {
+          [1657715357.628763][5956:5961] CHIP:DMG:                                 DataVersion = 0x734a2d85,
+          [1657715357.628791][5956:5961] CHIP:DMG:                                 AttributePathIB =
+          [1657715357.628822][5956:5961] CHIP:DMG:                                 {
+          [1657715357.628853][5956:5961] CHIP:DMG:                                         Endpoint = 0x1,
+          [1657715357.628882][5956:5961] CHIP:DMG:                                         Cluster = 0x6,
+          [1657715357.628914][5956:5961] CHIP:DMG:                                         Attribute = 0x0000_4003,
+          [1657715357.628944][5956:5961] CHIP:DMG:                                 }
+          [1657715357.628977][5956:5961] CHIP:DMG:
+          [1657715357.629009][5956:5961] CHIP:DMG:                                 Data = 1,
+          [1657715357.629037][5956:5961] CHIP:DMG:                         },
+          [1657715357.629068][5956:5961] CHIP:DMG:
+          [1657715357.629093][5956:5961] CHIP:DMG:                 },
+          [1657715357.629123][5956:5961] CHIP:DMG:
+          [1657715357.629147][5956:5961] CHIP:DMG:         ],
+          [1657715357.629177][5956:5961] CHIP:DMG:
+          [1657715357.629201][5956:5961] CHIP:DMG:         InteractionModelRevision = 1
+          [1657715357.629225][5956:5961] CHIP:DMG: }
+          [1657715357.629340][5956:5961] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_4003 DataVersion: 1934241157
+          [1657715357.629432][5956:5961] CHIP:TOO:   StartUpOnOff: 1
+          [1657715357.629480][5956:5961] CHIP:DMG: Refresh LivenessCheckTime for 125000 milliseconds with SubscriptionId = 0x9fce63ae Peer = 01:0000000000000001
+
+
+
+
+
+
+          on the 4th reference device enter below mentioned commands to change the attribute values
+
+
+           basic write node-label  1  1 0
+          [1657715530.832949][5956:5961] CHIP:DMG: ReportDataMessage =
+          [1657715530.832977][5956:5961] CHIP:DMG: {
+          [1657715530.833000][5956:5961] CHIP:DMG:         SubscriptionId = 0xfd355fe5,
+          [1657715530.833024][5956:5961] CHIP:DMG:         AttributeReportIBs =
+          [1657715530.833063][5956:5961] CHIP:DMG:         [
+          [1657715530.833091][5956:5961] CHIP:DMG:                 AttributeReportIB =
+          [1657715530.833133][5956:5961] CHIP:DMG:                 {
+          [1657715530.833165][5956:5961] CHIP:DMG:                         AttributeDataIB =
+          [1657715530.833205][5956:5961] CHIP:DMG:                         {
+          [1657715530.833243][5956:5961] CHIP:DMG:                                 DataVersion = 0x1b93dc31,
+          [1657715530.833279][5956:5961] CHIP:DMG:                                 AttributePathIB =
+          [1657715530.833342][5956:5961] CHIP:DMG:                                 {
+          [1657715530.833382][5956:5961] CHIP:DMG:                                         Endpoint = 0x0,
+          [1657715530.833422][5956:5961] CHIP:DMG:                                         Cluster = 0x28,
+          [1657715530.833466][5956:5961] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1657715530.833505][5956:5961] CHIP:DMG:                                 }
+          [1657715530.833546][5956:5961] CHIP:DMG:
+          [1657715530.833587][5956:5961] CHIP:DMG:                                 Data = "1",
+          [1657715530.833623][5956:5961] CHIP:DMG:                         },
+          [1657715530.833662][5956:5961] CHIP:DMG:
+          [1657715530.833693][5956:5961] CHIP:DMG:                 },
+          [1657715530.833730][5956:5961] CHIP:DMG:
+          [1657715530.833760][5956:5961] CHIP:DMG:         ],
+          [1657715530.833794][5956:5961] CHIP:DMG:
+          [1657715530.833822][5956:5961] CHIP:DMG:         InteractionModelRevision = 1
+          [1657715530.833851][5956:5961] CHIP:DMG: }
+          [1657715530.833959][5956:5961] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 462674993
+          [1657715530.833999][5956:5961] CHIP:TOO:   NodeLabel: 1
+          [1657715530.834171][5956:5961] CHIP:DMG: Refresh LivenessCheckTime for 125000 milliseconds with SubscriptionId = 0xfd355fe5 Peer = 01:0000000000000001
+      disabled: true

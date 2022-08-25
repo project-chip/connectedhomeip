@@ -6,6 +6,7 @@
     VerifyOrReturn(CheckValueNull("{{label}}", {{actual}}));
   {{else}}
     {{#if (chip_tests_variables_has expected)}}
+      {{#if (chip_tests_variables_is_nullable expected)}}
       {{! Expected value is also a nullable. }}
       if ({{expected}}.IsNull()) {
         VerifyOrReturn(CheckValueNull("{{label}}", {{actual}}));
@@ -15,6 +16,10 @@
         VerifyOrReturn(CheckValueNonNull("{{label}}", {{actual}}));
         {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=(concat expected ".Value()") isNullable=false keepAsExpected=true depth=(incrementDepth depth)}}
       }
+      {{else}}
+        VerifyOrReturn(CheckValueNonNull("{{label}}", {{actual}}));
+        {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=expected isNullable=false keepAsExpected=true depth=(incrementDepth depth)}}
+      {{/if}}
     {{else}}
       VerifyOrReturn(CheckValueNonNull("{{label}}", {{actual}}));
       {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=expected isNullable=false depth=(incrementDepth depth)}}
@@ -53,11 +58,7 @@
       {{~#if (chip_tests_variables_has expected)}}{{expected}}
       {{else if keepAsExpected}}{{expected}}
       {{else if (isOctetString type)}}
-        {{~#if (isHexString expected)}}
-          chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringFromHexString expected}}"), {{octetStringLengthFromHexString expected}})
-        {{else}}
-          chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringEscapedForCLiteral expected}}"), {{expected.length}})
-        {{/if}}
+        {{> octetStringValue value=expected}}
       {{else if (isCharString type)}}chip::CharSpan("{{expected}}", {{utf8StringLength expected}})
       {{else if (chip_tests_config_has expected)}}m{{asUpperCamelCase expected}}.HasValue() ? m{{asUpperCamelCase expected}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value expected) (chip_tests_config_get_type expected)}}
       {{else}}{{asTypedExpression expected type}}

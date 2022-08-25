@@ -17,23 +17,30 @@ name:
     3.4.8. [TC-SC-4.8] Compressed Fabric ID remains the same for Nodes
     commissioned to the same fabric [DUT - Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label: "Commission TH1 to DUTs Fabric"
       verification: |
-          1. Provision the device using 1st controller chip-tool (as example commissioner) on the raspi (use above instructions)
-
+          1. Provision the device using 1st controller chip-tool (as example commissioner) on the raspi (use the instructions)
 
           ./chip-tool pairing onnetwork 2 20202021
 
 
           avahi-browse _matter._tcp -rt
 
-          Verify on the TH Log:
+          Verify Compressed Fabric ID on the TH Log:
 
           eth0 IPv6 8840D142C33AB653-0000000000000001             _matter._tcp         local
       disabled: true
@@ -48,13 +55,10 @@ tests:
 
 
 
-          Verify you got below message
-          Device commissioning completed with success
-
 
           avahi-browse _matter._tcp -rt
 
-          Verify on the TH Log:
+          Verify Compressed Fabric ID on the TH Log:
 
           +   eth0 IPv6 8840D142C33AB653-0000000000000001             _matter._tcp         local
       disabled: true
@@ -64,7 +68,6 @@ tests:
           ./chip-tool operationalcredentials remove-fabric 1 1 0
 
           Verify in TH all-clusters-app log
-
 
 
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
@@ -79,7 +82,7 @@ tests:
 
           avahi-browse _matter._tcp -rt
 
-          Verify on the TH Log:
+          Verify Compressed Fabric ID on the TH Log:
 
           +   eth0 IPv6 8840D142C33AB653-0000000000000001             _matter._tcp         local
       disabled: true
@@ -98,13 +101,13 @@ tests:
           [1657628679275] [78509:912135] CHIP: [TOO]    }
           [1657628679275] [78509:912135] CHIP: [DMG] ICR mov
 
-          ./chip-tool pairing ble-wifi 1 chipsetup4 matter123 20202021 3841
+
 
           ./chip-tool pairing onnetwork 2 20202021
 
           avahi-browse _matter._tcp -rt
 
-          Verify on the TH Log:
+          VerifyCompressed Fabric ID on the TH Log:
 
           +   eth0 IPv6 8840D142C33AB653-0000000000000002
       disabled: true

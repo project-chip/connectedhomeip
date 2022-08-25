@@ -152,34 +152,41 @@ protected:
     public:
         GroupKeyContext(GroupDataProviderImpl & provider) : mProvider(provider) {}
 
-        GroupKeyContext(GroupDataProviderImpl & provider, const ByteSpan & key, uint16_t hash) : mProvider(provider)
+        GroupKeyContext(GroupDataProviderImpl & provider, const ByteSpan & encryptionKey, uint16_t hash,
+                        const ByteSpan & privacyKey) :
+            mProvider(provider)
         {
-            SetKey(key, hash);
+            SetKey(encryptionKey, hash);
+            SetPrivacyKey(privacyKey);
         }
 
-        void SetKey(const ByteSpan & key, uint16_t hash)
+        void SetKey(const ByteSpan & encryptionKey, uint16_t hash)
         {
             mKeyHash = hash;
-            memcpy(mKeyValue, key.data(), std::min(key.size(), sizeof(mKeyValue)));
+            memcpy(mEncryptionKey, encryptionKey.data(), std::min(encryptionKey.size(), sizeof(mEncryptionKey)));
+        }
+
+        void SetPrivacyKey(const ByteSpan & privacyKey)
+        {
+            memcpy(mPrivacyKey, privacyKey.data(), std::min(privacyKey.size(), sizeof(mPrivacyKey)));
         }
 
         uint16_t GetKeyHash() override { return mKeyHash; }
 
-        CHIP_ERROR EncryptMessage(const ByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce, MutableByteSpan & mic,
+        CHIP_ERROR MessageEncrypt(const ByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce, MutableByteSpan & mic,
                                   MutableByteSpan & ciphertext) const override;
-        CHIP_ERROR DecryptMessage(const ByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce, const ByteSpan & mic,
+        CHIP_ERROR MessageDecrypt(const ByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce, const ByteSpan & mic,
                                   MutableByteSpan & plaintext) const override;
-        CHIP_ERROR EncryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
-                                  const ByteSpan & mic) const override;
-        CHIP_ERROR DecryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
-                                  const ByteSpan & mic) const override;
+        CHIP_ERROR PrivacyEncrypt(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const override;
+        CHIP_ERROR PrivacyDecrypt(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const override;
 
         void Release() override;
 
     protected:
         GroupDataProviderImpl & mProvider;
-        uint16_t mKeyHash                                                 = 0;
-        uint8_t mKeyValue[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
+        uint16_t mKeyHash                                                      = 0;
+        uint8_t mEncryptionKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
+        uint8_t mPrivacyKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES]    = { 0 };
     };
 
     class KeySetIteratorImpl : public KeySetIterator
@@ -218,7 +225,7 @@ protected:
         uint16_t mKeyIndex       = 0;
         uint16_t mKeyCount       = 0;
         bool mFirstMap           = true;
-        GroupKeyContext mKeyContext;
+        GroupKeyContext mGroupKeyContext;
     };
     bool IsInitialized() { return (mStorage != nullptr); }
     CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id);
@@ -229,7 +236,7 @@ protected:
     ObjectPool<EndpointIteratorImpl, kIteratorsMax> mEndpointIterators;
     ObjectPool<KeySetIteratorImpl, kIteratorsMax> mKeySetIterators;
     ObjectPool<GroupSessionIteratorImpl, kIteratorsMax> mGroupSessionsIterator;
-    ObjectPool<GroupKeyContext, kIteratorsMax> mKeyContexPool;
+    ObjectPool<GroupKeyContext, kIteratorsMax> mGroupKeyContexPool;
 };
 
 } // namespace Credentials

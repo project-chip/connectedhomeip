@@ -38,14 +38,40 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
-static_assert(std::is_same<uint32_t, chip::ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
+using namespace chip;
+
+static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
 
 extern "C" {
 
-chip::ChipError::StorageType pychip_CommonStackInit()
+struct __attribute__((packed)) PyCommonStackInitParams
 {
-    ReturnErrorOnFailure(chip::Platform::MemoryInit().AsInteger());
-    ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().InitChipStack().AsInteger());
+    uint32_t mBluetoothAdapterId;
+};
+
+/**
+ * Function to artifically cause a crash to happen
+ * that can be used in place of os.exit() in Python so that
+ * when run through GDB, you'll get a backtrace of what happened.
+ */
+void pychip_CauseCrash()
+{
+    uint8_t * ptr = nullptr;
+    *ptr          = 0;
+}
+
+ChipError::StorageType pychip_CommonStackInit(const PyCommonStackInitParams * aParams)
+{
+    ReturnErrorOnFailure(Platform::MemoryInit().AsInteger());
+
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
+    ReturnErrorOnFailure(
+        DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(aParams->mBluetoothAdapterId, /* BLE central */ true).AsInteger());
+#endif
+
+    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack().AsInteger());
+
     return CHIP_NO_ERROR.AsInteger();
 }
 
@@ -55,7 +81,7 @@ void pychip_CommonStackShutdown()
       // We cannot actually call this because the destructor for the MdnsContexts singleton on Darwin only gets called
       // on termination of the program, and that unfortunately makes a bunch of Platform::MemoryFree calls.
       //
-    chip::Platform::MemoryShutdown();
+    Platform::MemoryShutdown();
 #endif
 }
 };

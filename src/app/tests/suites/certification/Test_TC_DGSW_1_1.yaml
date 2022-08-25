@@ -13,69 +13,125 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.1.1. [TC-DGSW-1.1] Global attributes with server as DUT
+name: 44.1.1. [TC-DGSW-1.1] Global Attributes [DUT_Sever]
+
+PICS:
+    - DGSW.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Software Diagnostics"
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
-          ./chip-tool pairing ble-wifi NODEID SSID PASSWD 20202021 3840 (commissioner side)
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "TH reads the ClusterRevision from DUT"
-      verification: |
-          ./chip-tool softwarediagnostics read cluster-revision 1 0
-
-          [1651787699.397201][241075:241080] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFFD DataVersion: 1343666373
-          [1651787699.397254][241075:241080] CHIP:TOO:   ClusterRevision: 1
-      disabled: true
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
     - label: "TH reads the FeatureMap from DUT"
-      verification: |
-          ./chip-tool softwarediagnostics read feature-map 1  0
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              minValue: 0
+              maxValue: 1
 
-          [1651787772.992060][241090:241095] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFFC DataVersion: 1343666373
-          [1651787772.992110][241090:241095] CHIP:TOO:   FeatureMap: 1
-      disabled: true
+    - label: "TH reads AttributeList from DUT"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
 
-    - label: "TH reads AttribubteList from DUT"
-      verification: |
-          ./chip-tool softwarediagnostics read attribute-list 1 0
-          [1651787823.737029][241102:241107] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFFB DataVersion: 1343666373
-          [1651787823.737115][241102:241107] CHIP:TOO:   AttributeList: 9 entries
-          [1651787823.737139][241102:241107] CHIP:TOO:     [1]: 0
-          [1651787823.737157][241102:241107] CHIP:TOO:     [2]: 1
-          [1651787823.737174][241102:241107] CHIP:TOO:     [3]: 2
-          [1651787823.737190][241102:241107] CHIP:TOO:     [4]: 3
-          [1651787823.737212][241102:241107] CHIP:TOO:     [5]: 65528
-          [1651787823.737229][241102:241107] CHIP:TOO:     [6]: 65529
-          [1651787823.737245][241102:241107] CHIP:TOO:     [7]: 65531
-          [1651787823.737261][241102:241107] CHIP:TOO:     [8]: 65532
-          [1651787823.737277][241102:241107] CHIP:TOO:     [9]: 65533
-      disabled: true
+    - label: "TH reads optional attribute(ThreadMetrics) in AttributeList"
+      PICS: DGSW.S.A0000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "TH reads optional attribute(CurrentHeapFree) in AttributeList"
+      PICS: DGSW.S.A0001
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label: "TH reads optional attribute(CurrentHeapUsed) in AttributeList"
+      PICS: DGSW.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label:
+          "TH reads Feature dependent attribute(CurrentHeapHighWatermark) in
+          AttributeList"
+      PICS: DGSW.S.F00 || DGSW.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
 
     - label: "TH reads AcceptedCommandList from DUT"
-      verification: |
-          ./chip-tool softwarediagnostics read accepted-command-list 1 0
+      PICS: DGSW.S.F00
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
 
-          [1651787861.534707][241117:241122] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFF9 DataVersion: 1343666373
-          [1651787861.534769][241117:241122] CHIP:TOO:   AcceptedCommandList: 1 entries
-          [1651787861.534793][241117:241122] CHIP:TOO:     [1]: 0
-      disabled: true
+    - label: "TH reads AcceptedCommandList from DUT"
+      PICS: " !DGSW.S.F00 "
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
     - label: "TH reads GeneratedCommandList from DUT"
-      verification: |
-          ./chip-tool softwarediagnostics read generated-command-list 1 0
-
-          [1651787918.020673][241128:241133] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFF8 DataVersion: 1343666373
-          [1651787918.020734][241128:241133] CHIP:TOO:   GeneratedCommandList: 0 entries
-      disabled: true
-
-    - label: "TH reads EventList from DUT"
-      verification: |
-          Out of scope v1.0
-      disabled: true
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.8. [TC-CNET-4.10] [Thread] Verification for RemoveNetwork Command
+    12.4.8. [TC-CNET-4.10] [Thread] Verification for RemoveNetwork Command
     [DUT-Server]
+
+PICS:
+    - CNET.S.F01
 
 config:
     nodeId: 0x12344321
@@ -29,7 +32,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 1 62 0
 
-          Verify on the TH Log:
+          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
 
           [1650391404.723087][10042:10047] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1650391404.723164][10042:10047] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -42,12 +45,12 @@ tests:
 
     - label:
           "TH1 reads Networks attribute from the DUT and save the number of
-          entries as 'NumNetworks'"
+          entries as NumNetworks"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify on the TH Log:
+          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
 
           [1657790578.359665][5247:5252] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 2276799582
           [1657790578.359820][5247:5252] CHIP:TOO:   Networks: 1 entries
@@ -61,9 +64,9 @@ tests:
     - label:
           "TH finds the index of the Networks list entry with NetworkID field
           value PIXIT.CNET.THRE AD_1ST_OPERATI ONALDATASET and saves it as
-          'Userth_netidx'"
+          Userth_netidx"
       verification: |
-
+          verification step to be updated.
       disabled: true
 
     - label:
@@ -72,9 +75,13 @@ tests:
           1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
-          ./chip-tool networkcommissioning  remove-network hex:1850171990782922 62 0
+          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
 
-          Verify on the TH Log:
+          Below is an example:
+
+           ./chip-tool networkcommissioning  remove-network hex:1850171990782922 62 0
+
+          Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
 
           [1657790635.532308][5254:5259] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1657790635.532395][5254:5259] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
@@ -91,7 +98,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify on the TH Log:
+          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
 
           [1657625584.426746][2703:2708] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1201757611
           [1657625584.427014][2703:2708] CHIP:TOO:   Networks: 0 entries
@@ -103,7 +110,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read last-networking-status 1 0
 
-          Verify on the TH Log:
+          Verify "LastNetworkingStatus" on the TH(Chip-tool) Log:
 
           [1657625631.550171][2710:2715] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005 DataVersion: 1201757611
           [1657625631.550337][2710:2715] CHIP:TOO:   LastNetworkingStatus: 0
@@ -115,7 +122,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read last-network-id 1 0
 
-          Verify on the TH Log:
+          Verify "LastNetworkID" on the TH(Chip-tool) Log:
 
           [1657625691.050998][2718:2724] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 1201757611
           [1657625691.051142][2718:2724] CHIP:TOO:   LastNetworkID: 1850171990782922
@@ -129,7 +136,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-          Verify on the TH Log:
+          Verify "Breadcrumb: 1" on the TH(Chip-tool) Log:
 
           [1657625860.742472][2739:2744] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2669958173
           [1657625860.742607][2739:2744] CHIP:TOO:   Breadcrumb: 1
@@ -142,9 +149,13 @@ tests:
           and Breadcrumb field set to 2"
       PICS: CNET.S.C04.Rsp
       verification: |
+          ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
+
+          Below is an example:
+
           ./chip-tool networkcommissioning connect-network hex:1850171990782922 1 0 --Breadcrumb 2
 
-          Verify on the TH Log:
+          Verify "ConnectNetworkResponse and its arguments" on the TH(Chip-tool) Log:
 
 
           [1657625912.836563][2747:2752] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
@@ -164,7 +175,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
 
-          Verify on the TH Log:
+          Verify "Breadcrumb: 1" on the TH(Chip-tool) Log:
 
           [1657781070.617341][4823:4828] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2383846386
           [1657781070.617458][4823:4828] CHIP:TOO:   Breadcrumb: 1
@@ -177,7 +188,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
 
-          Verify on the TH Log:
+          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
 
           [1657626058.290176][2767:2772] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657626058.290276][2767:2772] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -193,7 +204,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify on the TH Log:
+          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
 
           [1657790810.454838][5308:5313] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 2276799582
           [1657790810.454996][5308:5313] CHIP:TOO:   Networks: 1 entries
@@ -210,7 +221,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 90 0 1 0
 
-          Verify on the TH Log:
+          Verify "ArmFailSafeResponse" on the TH (chip-tool)Log:
 
           [1657626161.611078][2780:2785] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657626161.611183][2780:2785] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -228,9 +239,13 @@ tests:
           Breadcrumb field set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
+          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
+
+          Below is an example:
+
           ./chip-tool networkcommissioning  remove-network hex:1850171990782922 32 0 --Breadcrumb 1
 
-          Verify on the TH Log:
+          Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
 
           [1657791030.761976][5336:5341] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1657791030.762070][5336:5341] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
@@ -247,7 +262,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning commissioning-complete 1 0
 
-          Verify on the TH Log:
+          Verify "CommissioningCompleteResponse and its arguments" on the TH(Chip-tool) Log:
 
           [1657626243.485752][2795:2801] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           [1657626243.485947][2795:2801] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0005
@@ -267,7 +282,7 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 62 0
 
-          Verify on the TH Log:
+          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
 
 
           [1657626274.218994][2802:2807] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
@@ -285,7 +300,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          Verify on the TH Log:
+          Verify "Networks entiries and its status on the TH Log:
 
           [1657626300.861344][2808:2813] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1201757611
           [1657626300.861492][2808:2813] CHIP:TOO:   Networks: 0 entries

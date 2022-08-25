@@ -54,33 +54,32 @@ class GnBuilder(Builder):
         pass
 
     def generate(self):
-        if not os.path.exists(self.output_dir):
+        cmd = [
+            'gn', 'gen', '--check', '--fail-on-unused-args',
+            '--export-compile-commands',
+            '--root=%s' % self.root
+        ]
+
+        extra_args = self.GnBuildArgs()
+        if extra_args:
+            cmd += ['--args=%s' % ' '.join(extra_args)]
+
+        cmd += [self.output_dir]
+
+        title = 'Generating ' + self.identifier
+        extra_env = self.GnBuildEnv()
+
+        if extra_env:
+            # convert the command into a bash command that includes
+            # setting environment variables
             cmd = [
-                'gn', 'gen', '--check', '--fail-on-unused-args',
-                '--export-compile-commands',
-                '--root=%s' % self.root
+                'bash', '-c', '\n' + ' '.join(
+                    ['%s="%s" \\\n' % (key, value) for key, value in extra_env.items()] +
+                    [shlex.join(cmd)]
+                )
             ]
 
-            extra_args = self.GnBuildArgs()
-            if extra_args:
-                cmd += ['--args=%s' % ' '.join(extra_args)]
-
-            cmd += [self.output_dir]
-
-            title = 'Generating ' + self.identifier
-            extra_env = self.GnBuildEnv()
-
-            if extra_env:
-                # convert the command into a bash command that includes
-                # setting environment variables
-                cmd = [
-                    'bash', '-c', '\n' + ' '.join(
-                        ['%s="%s" \\\n' % (key, value) for key, value in extra_env.items()] +
-                        [shlex.join(cmd)]
-                    )
-                ]
-
-            self._Execute(cmd, title=title)
+        self._Execute(cmd, title=title)
 
     def _build(self):
         self.PreBuildCommand()

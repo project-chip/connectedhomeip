@@ -15,48 +15,54 @@
 
 name: 19.9.3. [TC-AUDIOOUTPUT-7.3] Select Output Verification (DUT as Client)
 
+PICS:
+    - AUDIOOUTPUT.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
-    - label: "DUT sends SelectOutput command to TH"
-      PICS: AUDIOOUTPUT.S.C0000
+    - label: "Preconditions:"
       verification: |
-          If the DUT knows the Index value, then those can be sent as the argument.
-          Else User needs to execute the following command to know the index InputList
+          Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
+      disabled: true
 
-          ./chip-tool audiooutput read output-list 1 1
+    - label: "DUT sends SelectOutput command to TH"
+      PICS: AUDIOOUTPUT.C.C00.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
           ./chip-tool audiooutput select-output 1 1 1
-          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
-          [1653156016245] [89108:1733165] CHIP: [DMG] InvokeRequestMessage =
-          [1653156016245] [89108:1733165] CHIP: [DMG] {
-          [1653156016245] [89108:1733165] CHIP: [DMG]         suppressResponse = false,
-          [1653156016245] [89108:1733165] CHIP: [DMG]         timedRequest = false,
-          [1653156016245] [89108:1733165] CHIP: [DMG]         InvokeRequests =
-          [1653156016245] [89108:1733165] CHIP: [DMG]         [
-          [1653156016245] [89108:1733165] CHIP: [DMG]                 CommandDataIB =
-          [1653156016245] [89108:1733165] CHIP: [DMG]                 {
-          [1653156016245] [89108:1733165] CHIP: [DMG]                         CommandPathIB =
-          [1653156016245] [89108:1733165] CHIP: [DMG]                         {
-          [1653156016245] [89108:1733165] CHIP: [DMG]                                 EndpointId = 0x1,
-          [1653156016245] [89108:1733165] CHIP: [DMG]                                 ClusterId = 0x50b,
-          [1653156016245] [89108:1733165] CHIP: [DMG]                                 CommandId = 0x0,
-          [1653156016245] [89108:1733165] CHIP: [DMG]                         },
-          [1653156016245] [89108:1733165] CHIP: [DMG]
-          [1653156016245] [89108:1733165] CHIP: [DMG]                         CommandData =
-          [1653156016245] [89108:1733165] CHIP: [DMG]                         {
-          [1653156016245] [89108:1733165] CHIP: [DMG]                                 0x0 = 1,
-          [1653156016245] [89108:1733165] CHIP: [DMG]                         },
-          [1653156016245] [89108:1733165] CHIP: [DMG]                 },
-          [1653156016245] [89108:1733165] CHIP: [DMG]
-          [1653156016245] [89108:1733165] CHIP: [DMG]         ],
-          [1653156016245] [89108:1733165] CHIP: [DMG]
-          [1653156016245] [89108:1733165] CHIP: [DMG]         InteractionModelRevision = 1
-          [1653156016245] [89108:1733165] CHIP: [DMG] },
+          ./chip-tv-casting-app audiooutput select-output 1 1 1
 
-          Enter the below command to read the current input.
-           ./chip-tool audiooutput read current-output 1 1
+
+          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
+
+          [1658531323969] [21924:323905] CHIP: [DMG] InvokeRequestMessage =
+          [1658531323969] [21924:323905] CHIP: [DMG] {
+          [1658531323969] [21924:323905] CHIP: [DMG]         suppressResponse = false,
+          [1658531323969] [21924:323905] CHIP: [DMG]         timedRequest = false,
+          [1658531323969] [21924:323905] CHIP: [DMG]         InvokeRequests =
+          [1658531323969] [21924:323905] CHIP: [DMG]         [
+          [1658531323969] [21924:323905] CHIP: [DMG]                 CommandDataIB =
+          [1658531323969] [21924:323905] CHIP: [DMG]                 {
+          [1658531323969] [21924:323905] CHIP: [DMG]                         CommandPathIB =
+          [1658531323969] [21924:323905] CHIP: [DMG]                         {
+          [1658531323969] [21924:323905] CHIP: [DMG]                                 EndpointId = 0x1,
+          [1658531323969] [21924:323905] CHIP: [DMG]                                 ClusterId = 0x50b,
+          [1658531323969] [21924:323905] CHIP: [DMG]                                 CommandId = 0x0,
+          [1658531323969] [21924:323905] CHIP: [DMG]                         },
+          [1658531323969] [21924:323905] CHIP: [DMG]
+          [1658531323969] [21924:323905] CHIP: [DMG]                         CommandFields =
+          [1658531323969] [21924:323905] CHIP: [DMG]                         {
+          [1658531323969] [21924:323905] CHIP: [DMG]                                 0x0 = 1,
+          [1658531323969] [21924:323905] CHIP: [DMG]                         },
+          [1658531323969] [21924:323905] CHIP: [DMG]                 },
+          [1658531323969] [21924:323905] CHIP: [DMG]
+          [1658531323969] [21924:323905] CHIP: [DMG]         ],
+          [1658531323969] [21924:323905] CHIP: [DMG]
+          [1658531323969] [21924:323905] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658531323969] [21924:323905] CHIP: [DMG] },
       disabled: true

@@ -15,6 +15,13 @@
 
 name: 65.3.1. [TC-PSCFG-3.1] Attributes with client as DUT
 
+PICS:
+    - PSCFG.C
+    - PSCFG.C.AM-READ
+    - PSCFG.C.AO-READ
+    - PSCFG.C.AM-WRITE
+    - PSCFG.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -25,11 +32,9 @@ tests:
           "DUT reads all supported mandatory attributes from TH once at a time
           in a manufacturer specific order"
       verification: |
-          On TestHarnes (all-cluster-app) a received read of the Sources attribute (id 0) looks like this:
-
           ./chip-tool powersourceconfiguration read sources 1 0
 
-          Verify in TH all-clusters-app log
+          verify the " sources response" on the TH (all-cluster-app) log:
 
           [1650881032.387446][2715:2715] CHIP:IM: Received Read request
           [1650881032.387500][2715:2715] CHIP:DMG: ReadRequestMessage =
@@ -58,35 +63,21 @@ tests:
           "DUT reads all supported optional attributes from TH once at a time in
           a manufacturer specific order"
       verification: |
-          This cluster doesn't have any  optional attribute
+          This cluster doesn"t have any  optional attribute
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH once at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH once at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
-      disabled: true
-
-    - label:
-          "DUT writes a suitable value to all supported mandatory attributes on
-          the TH once at a time in a manufacturer specific order"
-      verification: |
-          This cluster doesn't have any writable attributes
-      disabled: true
-
-    - label:
-          "DUT writes a suitable value to all supported optional attributes on
-          the TH once at a time in a manufacturer specific order"
-      verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
@@ -95,11 +86,9 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH aga"
       verification: |
-          On TestHarnes (all-cluster-app) a received read of the Sources attribute (id 0) looks like this:
-
           ./chip-tool powersourceconfiguration read sources 1 0
 
-          Verify in TH all-clusters-app log
+          verify the " sources response" on the TH (all-cluster-minimal-app) log:
 
           [1650881032.387446][2715:2715] CHIP:IM: Received Read request
           [1650881032.387500][2715:2715] CHIP:DMG: ReadRequestMessage =
@@ -128,12 +117,12 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific orde"
       verification: |
-          This cluster doesn't have any  optional attribute
+          This cluster doesn"t have any  optional attribute
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific orde"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true

@@ -92,6 +92,10 @@ public:
 
     void GetProviderLocation(Optional<ProviderLocationType> & providerLocation) override { providerLocation = mProviderLocation; }
 
+    // Set the metadata value for the provider to be used in the next query and OTA update process
+    // NOTE: Does not persist across reboot.
+    void SetMetadataForProvider(ByteSpan metadataForProvider) override { mMetadataForProvider.SetValue(metadataForProvider); }
+
     // Add a default OTA provider to the cached list
     CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation) override;
 
@@ -207,7 +211,6 @@ private:
 
     ScopedNodeId GetProviderScopedId() const
     {
-        VerifyOrDie(mProviderLocation.HasValue());
         return ScopedNodeId(mProviderLocation.Value().providerNodeID, mProviderLocation.Value().fabricIndex);
     }
 
@@ -229,7 +232,7 @@ private:
     /**
      * Send QueryImage request using values matching Basic cluster
      */
-    CHIP_ERROR SendQueryImageRequest(OperationalDeviceProxy & deviceProxy);
+    CHIP_ERROR SendQueryImageRequest(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
 
     /**
      * Validate and extract mandatory information from QueryImageResponse
@@ -260,17 +263,17 @@ private:
     /**
      * Start download of the software image returned in QueryImageResponse
      */
-    CHIP_ERROR StartDownload(OperationalDeviceProxy & deviceProxy);
+    CHIP_ERROR StartDownload(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
 
     /**
      * Send ApplyUpdate request using values obtained from QueryImageResponse
      */
-    CHIP_ERROR SendApplyUpdateRequest(OperationalDeviceProxy & deviceProxy);
+    CHIP_ERROR SendApplyUpdateRequest(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
 
     /**
      * Send NotifyUpdateApplied request
      */
-    CHIP_ERROR SendNotifyUpdateAppliedRequest(OperationalDeviceProxy & deviceProxy);
+    CHIP_ERROR SendNotifyUpdateAppliedRequest(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
 
     /**
      * Store current update information to KVS
@@ -285,7 +288,7 @@ private:
     /**
      * Session connection callbacks
      */
-    static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
+    static void OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
     static void OnConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
@@ -320,6 +323,7 @@ private:
     BDXDownloader * mBdxDownloader           = nullptr; // TODO: this should be OTADownloader
     BDXMessenger mBdxMessenger;                         // TODO: ideally this is held by the application
     uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
+    Optional<ByteSpan> mMetadataForProvider;
     ByteSpan mUpdateToken;
     uint32_t mCurrentVersion = 0;
     uint32_t mTargetVersion  = 0;
@@ -332,6 +336,7 @@ private:
     // persistent storage (if available), used for sending the NotifyApplied message, and then cleared. This will ensure determinism
     // in the OTARequestorDriver on reboot.
     Optional<ProviderLocationType> mProviderLocation;
+    SessionHolder mSessionHolder;
 };
 
 } // namespace chip

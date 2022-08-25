@@ -60,11 +60,12 @@ MyPincodeService gMyPincodeService;
 
 class MyPostCommissioningListener : public PostCommissioningListener
 {
-    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, OperationalDeviceProxy * device) override
+    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
+                                SessionHandle & sessionHandle) override
     {
 
-        ContentAppPlatform::GetInstance().ManageClientAccess(device, vendorId, GetDeviceCommissioner()->GetNodeId(),
-                                                             OnSuccessResponse, OnFailureResponse);
+        ContentAppPlatform::GetInstance().ManageClientAccess(
+            exchangeMgr, sessionHandle, vendorId, GetDeviceCommissioner()->GetNodeId(), OnSuccessResponse, OnFailureResponse);
     }
 
     /* Callback when command results in success */
@@ -92,6 +93,11 @@ class MyPostCommissioningListener : public PostCommissioningListener
 
 MyPostCommissioningListener gMyPostCommissioningListener;
 ContentAppFactoryImpl gFactory;
+
+ContentAppFactoryImpl * GetContentAppFactoryImpl()
+{
+    return &gFactory;
+}
 
 namespace chip {
 namespace AppPlatform {
@@ -412,6 +418,24 @@ void ContentAppFactoryImpl::SendTestMessage(EndpointId epId, const char * messag
     }
 }
 
+void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
+{
+    mAdminVendorIds.push_back(vendorId);
+}
+
+Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)
+{
+    for (size_t i = 0; i < mAdminVendorIds.size(); ++i)
+    {
+        auto & vendor = mAdminVendorIds.at(i);
+        if (vendorId == vendor)
+        {
+            return Access::Privilege::kAdminister;
+        }
+    }
+    return Access::Privilege::kOperate;
+}
+
 } // namespace AppPlatform
 } // namespace chip
 
@@ -448,6 +472,11 @@ CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter, jobject con
     ChipLogProgress(AppServer, "Started commissioner");
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    // Disable last fixed endpoint, which is used as a placeholder for all of the
+    // supported clusters so that ZAP will generated the requisite code.
+    ChipLogDetail(DeviceLayer, "TV App: Disabling Fixed Content App Endpoints");
+    emberAfEndpointEnableDisable(3, false);
     return CHIP_NO_ERROR;
 }
 

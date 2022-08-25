@@ -16,80 +16,95 @@
  */
 
 #import "MTROTAProviderDelegateBridge.h"
+#import "MTRControllerFactory_Internal.h"
 #import "NSDataSpanConversion.h"
+#import "NSStringSpanConversion.h"
 
 #include <app/clusters/ota-provider/ota-provider.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/PlatformManager.h>
 #include <protocols/interaction_model/Constants.h>
 
-// BDX
 #include <MTRError_Internal.h>
+#include <messaging/ExchangeMgr.h>
+#include <protocols/bdx/BdxUri.h>
 #include <protocols/bdx/TransferFacilitator.h>
-
-#include <app/InteractionModelEngine.h> // For InteractionModelEngine::GetInstance()->GetExchangeManager();
-#include <platform/CHIPDeviceLayer.h> // For &DeviceLayer::SystemLayer()
-// BDX
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
+using namespace chip::bdx;
+using Protocols::InteractionModel::Status;
 
 // TODO Expose a method onto the delegate to make that configurable.
 constexpr uint32_t kMaxBdxBlockSize = 1024;
+constexpr uint32_t kMaxBDXURILen = 256;
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
 constexpr System::Clock::Timeout kBdxPollIntervalMs = System::Clock::Milliseconds32(50);
 constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 
 class BdxOTASender : public bdx::Responder {
 public:
-    BdxOTASender() {}
+    BdxOTASender() {};
 
-    CHIP_ERROR Start(FabricIndex fabricIndex, NodeId nodeId)
+    CHIP_ERROR PrepareForTransfer(FabricIndex fabricIndex, NodeId nodeId)
     {
-        if (mInitialized) {
-            VerifyOrReturnError(mFabricIndex.HasValue() && mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mDelegate != nil, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-            // Prevent a new node connection since another is active
-            VerifyOrReturnError(mFabricIndex.Value() == fabricIndex && mNodeId.Value() == nodeId, CHIP_ERROR_BUSY);
-
-            // Reset stale connection from the Same Node if exists
-            Reset();
-        }
-        mInitialized = true;
-
-        mFabricIndex.SetValue(fabricIndex);
-        mNodeId.SetValue(nodeId);
+        ReturnErrorOnFailure(ConfigureState(fabricIndex, nodeId));
 
         BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
-        // TODO Have a better mechanism to remove the need from getting an instance of the system layer here.
-        return PrepareForTransfer(&DeviceLayer::SystemLayer(), kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollIntervalMs);
+        return Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollIntervalMs);
     }
 
-    void SetDelegate(id<MTROTAProviderDelegate> delegate, dispatch_queue_t queue)
+    CHIP_ERROR Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeMgr)
     {
-        // TODO Have a better mechanism to retrieve the exchange manager instance
-        // In order to register ourself as a protocol handler for BDX, it needs to be a reference
-        // to the exchange manager instance. That's not ideal but the reference is retrieved
-        // from the interaction model engine instance.
-        auto exchangeMgr = InteractionModelEngine::GetInstance()->GetExchangeManager();
-        if (delegate && queue) {
+        VerifyOrReturnError(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mExchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(systemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
+
+        mSystemLayer = systemLayer;
+        mExchangeMgr = exchangeMgr;
+        mWorkQueue = DeviceLayer::PlatformMgrImpl().GetWorkQueue();
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Shutdown()
+    {
+        VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
+
+        mExchangeMgr = nullptr;
+        mSystemLayer = nullptr;
+        mWorkQueue = nil;
+
+        ResetState();
+
+        return CHIP_NO_ERROR;
+    }
+
+    void SetDelegate(id<MTROTAProviderDelegate> delegate)
+    {
+        if (delegate) {
             mDelegate = delegate;
-            mDelegateQueue = queue;
-            mWorkQueue = DeviceLayer::PlatformMgrImpl().GetWorkQueue();
-            exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
         } else {
-            Reset();
-            exchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
+            ResetState();
         }
     }
 
 private:
-    CHIP_ERROR OnMessageToSend(bdx::TransferSession::OutputEvent & event)
+    CHIP_ERROR OnMessageToSend(TransferSession::OutputEvent & event)
     {
         VerifyOrReturnError(mExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mDelegate != nil, CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(mDelegateQueue != nil, CHIP_ERROR_INCORRECT_STATE);
 
         Messaging::SendFlags sendFlags;
 
@@ -103,8 +118,10 @@ private:
         return mExchangeCtx->SendMessage(msgTypeData.ProtocolId, msgTypeData.MessageType, std::move(event.MsgData), sendFlags);
     }
 
-    CHIP_ERROR OnTransferSessionBegin(bdx::TransferSession::OutputEvent & event)
+    CHIP_ERROR OnTransferSessionBegin(TransferSession::OutputEvent & event)
     {
+        VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
         uint16_t fdl = 0;
         auto fd = mTransfer.GetFileDesignator(fdl);
         VerifyOrReturnError(fdl <= bdx::kMaxFileDesignatorLen, CHIP_ERROR_INVALID_ARGUMENT);
@@ -122,7 +139,7 @@ private:
                 // bdx::TransferSession will automatically reject a transfer if there are no
                 // common supported control modes. It will also default to the smaller
                 // block size.
-                bdx::TransferSession::TransferAcceptData acceptData;
+                TransferSession::TransferAcceptData acceptData;
                 acceptData.ControlMode = bdx::TransferControlFlags::kReceiverDrive;
                 acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
                 acceptData.StartOffset = mTransfer.GetStartOffset();
@@ -132,38 +149,59 @@ private:
             });
         };
 
-        dispatch_async(mDelegateQueue, ^{
-            [mDelegate handleBDXTransferSessionBegin:fileDesignator offset:offset completionHandler:completionHandler];
+        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+        auto nodeId = @(mNodeId.Value());
+
+        auto strongDelegate = mDelegate;
+        dispatch_async(mWorkQueue, ^{
+            [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
+                                                        controller:controller
+                                                    fileDesignator:fileDesignator
+                                                            offset:offset
+                                                 completionHandler:completionHandler];
         });
 
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR OnTransferSessionEnd(bdx::TransferSession::OutputEvent & event)
+    CHIP_ERROR OnTransferSessionEnd(TransferSession::OutputEvent & event)
     {
-        CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-        if (event.EventType == bdx::TransferSession::OutputEventType::kAckEOFReceived) {
-            error = CHIP_NO_ERROR;
-        } else if (event.EventType == bdx::TransferSession::OutputEventType::kTransferTimeout) {
+        VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
+        CHIP_ERROR error = CHIP_NO_ERROR;
+        if (event.EventType == TransferSession::OutputEventType::kTransferTimeout) {
             error = CHIP_ERROR_TIMEOUT;
+        } else if (event.EventType != TransferSession::OutputEventType::kAckEOFReceived) {
+            error = CHIP_ERROR_INTERNAL;
         }
 
-        auto delegate = mDelegate; // mDelegate will be set to nil by Reset, so get a strong ref to it.
-        dispatch_async(mDelegateQueue, ^{
-            [delegate handleBDXTransferSessionEnd:[MTRError errorForCHIPErrorCode:error]];
+        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+        auto nodeId = @(mNodeId.Value());
+
+        auto strongDelegate = mDelegate;
+        dispatch_async(mWorkQueue, ^{
+            [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId
+                                                      controller:controller
+                                                           error:[MTRError errorForCHIPErrorCode:error]];
         });
 
-        Reset();
+        ResetState();
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR OnBlockQuery(bdx::TransferSession::OutputEvent & event)
+    CHIP_ERROR OnBlockQuery(TransferSession::OutputEvent & event)
     {
+        VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
         auto blockSize = @(mTransfer.GetTransferBlockSize());
         auto blockIndex = @(mTransfer.GetNextBlockNum());
 
         auto bytesToSkip = @(0);
-        if (event.EventType == bdx::TransferSession::OutputEventType::kQueryWithSkipReceived) {
+        if (event.EventType == TransferSession::OutputEventType::kQueryWithSkipReceived) {
             bytesToSkip = @(event.bytesToSkip.BytesToSkip);
         }
 
@@ -174,7 +212,7 @@ private:
                     return;
                 }
 
-                bdx::TransferSession::BlockData blockData;
+                TransferSession::BlockData blockData;
                 blockData.Data = static_cast<const uint8_t *>([data bytes]);
                 blockData.Length = static_cast<size_t>([data length]);
                 blockData.IsEof = isEOF;
@@ -189,44 +227,53 @@ private:
 
         // TODO Handle MaxLength
 
-        dispatch_async(mDelegateQueue, ^{
-            [mDelegate handleBDXQuery:blockSize blockIndex:blockIndex bytesToSkip:bytesToSkip completionHandler:completionHandler];
+        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+        auto nodeId = @(mNodeId.Value());
+
+        auto strongDelegate = mDelegate;
+        dispatch_async(mWorkQueue, ^{
+            [strongDelegate handleBDXQueryForNodeID:nodeId
+                                         controller:controller
+                                          blockSize:blockSize
+                                         blockIndex:blockIndex
+                                        bytesToSkip:bytesToSkip
+                                  completionHandler:completionHandler];
         });
 
         return CHIP_NO_ERROR;
     }
 
-    void HandleTransferSessionOutput(bdx::TransferSession::OutputEvent & event) override
+    void HandleTransferSessionOutput(TransferSession::OutputEvent & event) override
     {
         VerifyOrReturn(mDelegate != nil);
-        VerifyOrReturn(mDelegateQueue != nil);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
         switch (event.EventType) {
-        case bdx::TransferSession::OutputEventType::kInitReceived:
+        case TransferSession::OutputEventType::kInitReceived:
             err = OnTransferSessionBegin(event);
             break;
-        case bdx::TransferSession::OutputEventType::kStatusReceived:
+        case TransferSession::OutputEventType::kStatusReceived:
             ChipLogError(BDX, "Got StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
             [[fallthrough]];
-        case bdx::TransferSession::OutputEventType::kAckEOFReceived:
-        case bdx::TransferSession::OutputEventType::kInternalError:
-        case bdx::TransferSession::OutputEventType::kTransferTimeout:
+        case TransferSession::OutputEventType::kAckEOFReceived:
+        case TransferSession::OutputEventType::kInternalError:
+        case TransferSession::OutputEventType::kTransferTimeout:
             err = OnTransferSessionEnd(event);
             break;
-        case bdx::TransferSession::OutputEventType::kQueryWithSkipReceived:
-        case bdx::TransferSession::OutputEventType::kQueryReceived:
+        case TransferSession::OutputEventType::kQueryWithSkipReceived:
+        case TransferSession::OutputEventType::kQueryReceived:
             err = OnBlockQuery(event);
             break;
-        case bdx::TransferSession::OutputEventType::kMsgToSend:
+        case TransferSession::OutputEventType::kMsgToSend:
             err = OnMessageToSend(event);
             break;
-        case bdx::TransferSession::OutputEventType::kNone:
-        case bdx::TransferSession::OutputEventType::kAckReceived:
+        case TransferSession::OutputEventType::kNone:
+        case TransferSession::OutputEventType::kAckReceived:
             // Nothing to do.
             break;
-        case bdx::TransferSession::OutputEventType::kAcceptReceived:
-        case bdx::TransferSession::OutputEventType::kBlockReceived:
+        case TransferSession::OutputEventType::kAcceptReceived:
+        case TransferSession::OutputEventType::kBlockReceived:
         default:
             // Should never happens.
             chipDie();
@@ -235,19 +282,38 @@ private:
         LogErrorOnFailure(err);
     }
 
-    void Reset()
+    CHIP_ERROR ConfigureState(chip::FabricIndex fabricIndex, chip::NodeId nodeId)
     {
+        if (mInitialized) {
+            // Prevent a new node connection since another is active.
+            VerifyOrReturnError(mFabricIndex.Value() == fabricIndex && mNodeId.Value() == nodeId, CHIP_ERROR_BUSY);
+
+            // Reset stale connection from the same Node if exists.
+            ResetState();
+        }
+
+        mFabricIndex.SetValue(fabricIndex);
+        mNodeId.SetValue(nodeId);
+
+        mInitialized = true;
+
+        return CHIP_NO_ERROR;
+    }
+
+    void ResetState()
+    {
+        if (!mInitialized) {
+            return;
+        }
+
+        Responder::ResetTransfer();
         mFabricIndex.ClearValue();
         mNodeId.ClearValue();
-        mTransfer.Reset();
+
         if (mExchangeCtx != nullptr) {
             mExchangeCtx->Close();
             mExchangeCtx = nullptr;
         }
-
-        mDelegate = nil;
-        mDelegateQueue = nil;
-        mWorkQueue = nil;
 
         mInitialized = false;
     }
@@ -256,139 +322,211 @@ private:
     Optional<FabricIndex> mFabricIndex;
     Optional<NodeId> mNodeId;
     id<MTROTAProviderDelegate> mDelegate = nil;
-    dispatch_queue_t mDelegateQueue = nil;
     dispatch_queue_t mWorkQueue = nil;
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
 };
 
 BdxOTASender gOtaSender;
 
 static NSInteger const kOtaProviderEndpoint = 0;
 
-MTROTAProviderDelegateBridge::MTROTAProviderDelegateBridge(void)
-    : mDelegate(nil)
+MTROTAProviderDelegateBridge::MTROTAProviderDelegateBridge(id<MTROTAProviderDelegate> delegate)
+    : mDelegate(delegate)
+    , mWorkQueue(DeviceLayer::PlatformMgrImpl().GetWorkQueue())
 {
-}
-
-MTROTAProviderDelegateBridge::~MTROTAProviderDelegateBridge(void) {}
-
-void MTROTAProviderDelegateBridge::setDelegate(id<MTROTAProviderDelegate> delegate, dispatch_queue_t queue)
-{
-    mDelegate = delegate ?: nil;
-    mQueue = queue ?: nil;
-
-    gOtaSender.SetDelegate(delegate, queue);
+    gOtaSender.SetDelegate(delegate);
     Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, this);
 }
+
+MTROTAProviderDelegateBridge::~MTROTAProviderDelegateBridge()
+{
+    gOtaSender.SetDelegate(nil);
+    Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, nullptr);
+}
+
+CHIP_ERROR MTROTAProviderDelegateBridge::Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeManager)
+{
+    return gOtaSender.Init(systemLayer, exchangeManager);
+}
+
+void MTROTAProviderDelegateBridge::Shutdown() { gOtaSender.Shutdown(); }
+
+namespace {
+// Return false if we could not get peer node info (a running controller for
+// the fabric and a node id).  In that case we will have already added an
+// error status to the CommandHandler.
+//
+// Otherwise set outNodeId and outController to values that identify the source
+// node for the command.
+bool GetPeerNodeInfo(CommandHandler * commandHandler, const ConcreteCommandPath & commandPath, NodeId * outNodeId,
+    MTRDeviceController * __autoreleasing _Nonnull * _Nonnull outController)
+{
+    auto desc = commandHandler->GetSubjectDescriptor();
+    if (desc.authMode != Access::AuthMode::kCase) {
+        commandHandler->AddStatus(commandPath, Status::Failure);
+        return false;
+    }
+
+    auto * controller =
+        [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:commandHandler->GetAccessingFabricIndex()];
+    if (controller == nil) {
+        commandHandler->AddStatus(commandPath, Status::Failure);
+        return false;
+    }
+
+    *outController = controller;
+    *outNodeId = desc.subject;
+    return true;
+}
+} // anonymous namespace
 
 void MTROTAProviderDelegateBridge::HandleQueryImage(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const Commands::QueryImage::DecodableType & commandData)
 {
-    id<MTROTAProviderDelegate> strongDelegate = mDelegate;
-    if (strongDelegate && mQueue) {
-        auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterQueryImageParams alloc] init];
-        CHIP_ERROR err = ConvertToQueryImageParams(commandData, commandParams);
-        if (err != CHIP_NO_ERROR) {
-            commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
-            return;
-        }
-
-        // Make sure to hold on to the command handler and command path to be used in the completion block
-        __block CommandHandler::Handle handle(commandObj);
-        __block ConcreteCommandPath cachedCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
-
-        dispatch_async(mQueue, ^{
-            [strongDelegate handleQueryImage:commandParams
-                           completionHandler:^(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                               NSError * _Nullable error) {
-                               dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-                                   Commands::QueryImageResponse::Type response;
-                                   ConvertFromQueryImageResponseParms(data, response);
-
-                                   CommandHandler * handler = handle.Get();
-                                   if (handler) {
-                                       auto hasUpdate =
-                                           [data.status isEqual:@(MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable)];
-                                       auto isBDXProtocolSupported = [commandParams.protocolsSupported
-                                           containsObject:@(MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
-
-                                       if (hasUpdate && isBDXProtocolSupported) {
-                                           auto fabricIndex = handler->GetSubjectDescriptor().fabricIndex;
-                                           auto nodeId = handler->GetSubjectDescriptor().subject;
-                                           CHIP_ERROR err = gOtaSender.Start(fabricIndex, nodeId);
-                                           if (CHIP_NO_ERROR != err) {
-                                               LogErrorOnFailure(err);
-                                               handler->AddStatus(cachedCommandPath, Protocols::InteractionModel::Status::Failure);
-                                               handle.Release();
-                                               return;
-                                           }
-                                       }
-
-                                       handler->AddResponse(cachedCommandPath, response);
-                                       handle.Release();
-                                   }
-                               });
-                           }];
-        });
+    NodeId nodeId;
+    MTRDeviceController * controller;
+    if (!GetPeerNodeInfo(commandObj, commandPath, &nodeId, &controller)) {
+        return;
     }
+
+    auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterQueryImageParams alloc] init];
+    CHIP_ERROR err = ConvertToQueryImageParams(commandData, commandParams);
+    if (err != CHIP_NO_ERROR) {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        return;
+    }
+
+    // Make sure to hold on to the command handler and command path to be used in the completion block
+    __block CommandHandler::Handle handle(commandObj);
+    __block ConcreteCommandPath cachedCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
+
+    auto completionHandler = ^(
+        MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error) {
+        dispatch_async(mWorkQueue, ^{
+            CommandHandler * handler = handle.Get();
+            VerifyOrReturn(handler != nullptr);
+
+            Commands::QueryImageResponse::Type response;
+            ConvertFromQueryImageResponseParms(data, response);
+
+            auto hasUpdate = [data.status isEqual:@(MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable)];
+            auto isBDXProtocolSupported =
+                [commandParams.protocolsSupported containsObject:@(MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
+
+            if (hasUpdate && isBDXProtocolSupported) {
+                auto fabricIndex = handler->GetSubjectDescriptor().fabricIndex;
+                auto nodeId = handler->GetSubjectDescriptor().subject;
+                CHIP_ERROR err = gOtaSender.PrepareForTransfer(fabricIndex, nodeId);
+                if (CHIP_NO_ERROR != err) {
+                    LogErrorOnFailure(err);
+                    handler->AddStatus(cachedCommandPath, Protocols::InteractionModel::Status::Failure);
+                    handle.Release();
+                    return;
+                }
+
+                auto targetNodeId = handler->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetLocalScopedNodeId();
+
+                char uriBuffer[kMaxBDXURILen];
+                MutableCharSpan uri(uriBuffer);
+                err = bdx::MakeURI(targetNodeId.GetNodeId(), AsCharSpan(data.imageURI), uri);
+                if (CHIP_NO_ERROR != err) {
+                    LogErrorOnFailure(err);
+                    handler->AddStatus(cachedCommandPath, Protocols::InteractionModel::Status::Failure);
+                    handle.Release();
+                    return;
+                }
+
+                response.imageURI.SetValue(uri);
+                handler->AddResponse(cachedCommandPath, response);
+                handle.Release();
+                return;
+            }
+
+            handler->AddResponse(cachedCommandPath, response);
+            handle.Release();
+        });
+    };
+
+    auto strongDelegate = mDelegate;
+    dispatch_async(mWorkQueue, ^{
+        [strongDelegate handleQueryImageForNodeID:@(nodeId)
+                                       controller:controller
+                                           params:commandParams
+                                completionHandler:completionHandler];
+    });
 }
 
 void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::ApplyUpdateRequest::DecodableType & commandData)
 {
+    NodeId nodeId;
+    MTRDeviceController * controller;
+    if (!GetPeerNodeInfo(commandObj, commandPath, &nodeId, &controller)) {
+        return;
+    }
+
     // Make sure to hold on to the command handler and command path to be used in the completion block
     __block CommandHandler::Handle handle(commandObj);
     __block ConcreteCommandPath cachedCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
 
-    id<MTROTAProviderDelegate> strongDelegate = mDelegate;
-    if (strongDelegate && mQueue) {
-        auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
-        ConvertToApplyUpdateRequestParams(commandData, commandParams);
+    auto completionHandler
+        = ^(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error) {
+              dispatch_async(mWorkQueue, ^{
+                  CommandHandler * handler = handle.Get();
+                  VerifyOrReturn(handler != nullptr);
 
-        dispatch_async(mQueue, ^{
-            [strongDelegate
-                handleApplyUpdateRequest:commandParams
-                       completionHandler:^(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                           NSError * _Nullable error) {
-                           dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-                               Commands::ApplyUpdateResponse::Type response;
-                               ConvertFromApplyUpdateRequestResponseParms(data, response);
+                  Commands::ApplyUpdateResponse::Type response;
+                  ConvertFromApplyUpdateRequestResponseParms(data, response);
+                  handler->AddResponse(cachedCommandPath, response);
+                  handle.Release();
+              });
+          };
 
-                               CommandHandler * handler = handle.Get();
-                               if (handler) {
-                                   handler->AddResponse(cachedCommandPath, response);
-                                   handle.Release();
-                               }
-                           });
-                       }];
-        });
-    }
+    auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
+    ConvertToApplyUpdateRequestParams(commandData, commandParams);
+
+    auto strongDelegate = mDelegate;
+    dispatch_async(mWorkQueue, ^{
+        [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
+                                               controller:controller
+                                                   params:commandParams
+                                        completionHandler:completionHandler];
+    });
 }
 
 void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::NotifyUpdateApplied::DecodableType & commandData)
 {
+    NodeId nodeId;
+    MTRDeviceController * controller;
+    if (!GetPeerNodeInfo(commandObj, commandPath, &nodeId, &controller)) {
+        return;
+    }
+
     // Make sure to hold on to the command handler and command path to be used in the completion block
     __block CommandHandler::Handle handle(commandObj);
     __block ConcreteCommandPath cachedCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
 
-    id<MTROTAProviderDelegate> strongDelegate = mDelegate;
-    if (strongDelegate && mQueue) {
-        auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
-        ConvertToNotifyUpdateAppliedParams(commandData, commandParams);
+    auto completionHandler = ^(NSError * _Nullable error) {
+        dispatch_async(mWorkQueue, ^{
+            CommandHandler * handler = handle.Get();
+            VerifyOrReturn(handler != nullptr);
 
-        dispatch_async(mQueue, ^{
-            [strongDelegate handleNotifyUpdateApplied:commandParams
-                                    completionHandler:^(NSError * _Nullable error) {
-                                        dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-                                            CommandHandler * handler = handle.Get();
-                                            if (handler) {
-                                                handler->AddStatus(cachedCommandPath, Protocols::InteractionModel::Status::Success);
-                                                handle.Release();
-                                            }
-                                        });
-                                    }];
+            handler->AddStatus(cachedCommandPath, Protocols::InteractionModel::Status::Success);
+            handle.Release();
         });
-    }
+    };
+
+    auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
+    ConvertToNotifyUpdateAppliedParams(commandData, commandParams);
+
+    auto strongDelegate = mDelegate;
+    dispatch_async(mWorkQueue, ^{
+        [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
+                                                controller:controller
+                                                    params:commandParams
+                                         completionHandler:completionHandler];
+    });
 }
 
 CHIP_ERROR MTROTAProviderDelegateBridge::ConvertToQueryImageParams(
@@ -411,9 +549,7 @@ CHIP_ERROR MTROTAProviderDelegateBridge::ConvertToQueryImageParams(
     }
 
     if (commandData.location.HasValue()) {
-        commandParams.location = [[NSString alloc] initWithBytes:commandData.location.Value().data()
-                                                          length:commandData.location.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
+        commandParams.location = AsString(commandData.location.Value());
     }
 
     if (commandData.requestorCanConsent.HasValue()) {
@@ -437,7 +573,7 @@ void MTROTAProviderDelegateBridge::ConvertFromQueryImageResponseParms(
     }
 
     if (responseParams.imageURI) {
-        response.imageURI.SetValue(CharSpan([responseParams.imageURI UTF8String], responseParams.imageURI.length));
+        response.imageURI.SetValue(AsCharSpan(responseParams.imageURI));
     }
 
     if (responseParams.softwareVersion) {
@@ -445,8 +581,7 @@ void MTROTAProviderDelegateBridge::ConvertFromQueryImageResponseParms(
     }
 
     if (responseParams.softwareVersionString) {
-        response.softwareVersionString.SetValue(
-            CharSpan([responseParams.softwareVersionString UTF8String], responseParams.softwareVersionString.length));
+        response.softwareVersionString.SetValue(AsCharSpan(responseParams.softwareVersionString));
     }
 
     if (responseParams.updateToken) {

@@ -17,6 +17,9 @@ name:
     LocationCapability and SupportsConcurrentConnection attributes [DUT -
     Server]
 
+PICS:
+    - CGEN.S
+
 config:
     nodeId: 0x12344321
     cluster: "General Commissioning"
@@ -37,7 +40,7 @@ tests:
       attribute: "Breadcrumb"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label: "TH1 writes the BreadCrumb attribute as 1 to the DUT"
       PICS: CGEN.S.A0000
@@ -88,4 +91,4 @@ tests:
       attribute: "SupportsConcurrentConnection"
       response:
           constraints:
-              type: bool
+              type: boolean

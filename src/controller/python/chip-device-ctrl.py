@@ -25,11 +25,14 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
+from sqlite3 import adapt
 from chip import ChipDeviceCtrl
+from chip import clusters as Clusters
 from chip import FabricAdmin
 from chip import ChipStack
 from chip import ChipCommissionableNodeCtrl
 from chip import exceptions
+from chip import native
 import argparse
 import ctypes
 import sys
@@ -156,6 +159,7 @@ def ShowColoredWarnings(message, category, filename, lineno, file=None, line=Non
 class DeviceMgrCmd(Cmd):
     def __init__(self, rendezvousAddr=None, controllerNodeId=1, bluetoothAdapter=None):
         self.lastNetworkId = None
+        self.replHint = None
 
         pretty.install(indent_guides=True, expand_all=True)
 
@@ -181,7 +185,7 @@ class DeviceMgrCmd(Cmd):
 
         self.chipStack = ChipStack.ChipStack(
             bluetoothAdapter=bluetoothAdapter, persistentStoragePath='/tmp/chip-device-ctrl-storage.json')
-        self.fabricAdmin = FabricAdmin.FabricAdmin()
+        self.fabricAdmin = FabricAdmin.FabricAdmin(0xFFF1)
         self.devCtrl = self.fabricAdmin.NewController(
             nodeId=controllerNodeId, useTestCommissioner=True)
 
@@ -267,6 +271,11 @@ class DeviceMgrCmd(Cmd):
         return line
 
     def postcmd(self, stop, line):
+        if self.replHint is not None:
+            print("Try the following command in repl: ")
+            print(self.replHint)
+            print("")
+        self.replHint = None
         if not stop and self.use_rawinput:
             self.prompt = "chip-device-ctrl > "
         return stop
@@ -367,7 +376,7 @@ class DeviceMgrCmd(Cmd):
         setup-payload generate [options]
 
         Options:
-          -vr  Version        
+          -vr  Version
           -vi  Vendor ID
           -pi  Product ID
           -cf  Custom Flow [Standard = 0, UserActionRequired = 1, Custom = 2]
@@ -545,12 +554,11 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("paseonly")
                 return
-
             nodeid = random.randint(1, 1000000)  # Just a random number
             if len(args) == 4:
                 nodeid = int(args[3])
             print("Device is assigned with nodeid = {}".format(nodeid))
-
+            self.replHint = f"devCtrl.EstablishPASESessionIP({repr(args[1])}, {int(args[2])}, {nodeid})"
             if args[0] == "-ip" and len(args) >= 3:
                 self.devCtrl.EstablishPASESessionIP(args[1], int(args[2]), nodeid)
             else:
@@ -575,8 +583,8 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("commission")
                 return
-
             nodeid = int(args[0])
+            self.replHint = f"devCtrl.Commission({nodeid})"
             self.devCtrl.Commission(nodeid)
         except Exception as ex:
             print(str(ex))
@@ -613,8 +621,10 @@ class DeviceMgrCmd(Cmd):
             print("Device is assigned with nodeid = {}".format(nodeid))
 
             if args[0] == "-ip" and len(args) >= 3:
+                self.replHint = f"devCtrl.CommissionIP({repr(args[1])}, {int(args[2])}, {nodeid})"
                 self.devCtrl.CommissionIP(args[1], int(args[2]), nodeid)
             elif args[0] == "-ble" and len(args) >= 3:
+                self.replHint = f"devCtrl.ConnectBLE({int(args[1])}, {int(args[2])}, {nodeid})"
                 self.devCtrl.ConnectBLE(int(args[1]), int(args[2]), nodeid)
             elif args[0] in ['-qr', '-code'] and len(args) >= 2:
                 if len(args) == 3:
@@ -632,6 +642,7 @@ class DeviceMgrCmd(Cmd):
                     print("No rendezvous information provided, default to all.")
                     setupPayload.attributes["RendezvousInformation"] = 0b111
                 setupPayload.Print()
+                self.replHint = f"devCtrl.CommissionWithCode(setupPayload={repr(setupPayload)}, nodeid={nodeid})"
                 self.ConnectFromSetupPayload(setupPayload, nodeid)
             else:
                 print("Usage:")
@@ -653,7 +664,7 @@ class DeviceMgrCmd(Cmd):
             parser = argparse.ArgumentParser()
             parser.add_argument('nodeid', type=int, help='Peer node ID')
             args = parser.parse_args(shlex.split(line))
-
+            self.replHint = f"devCtrl.CloseSession({args.nodeid})"
             self.devCtrl.CloseSession(args.nodeid)
         except exceptions.ChipStackException as ex:
             print(str(ex))
@@ -671,6 +682,7 @@ class DeviceMgrCmd(Cmd):
             args = shlex.split(line)
             if len(args) == 1:
                 try:
+                    self.replHint = f"devCtrl.ResolveNode({int(args[0])});devCtrl.GetAddressAndPort({int(args[0])})"
                     self.devCtrl.ResolveNode(int(args[0]))
                     address = self.devCtrl.GetAddressAndPort(int(args[0]))
                     address = "{}:{}".format(
@@ -815,6 +827,8 @@ class DeviceMgrCmd(Cmd):
                 # When command takes no arguments, (not command) is True
                 if command is None:
                     raise exceptions.UnknownCommand(args[0], args[1])
+                req = eval(f"Clusters.{args[0]}.Commands.{args[1]}")(**FormatZCLArguments(args[5:], command))
+                self.replHint = f"await devCtrl.SendCommand({int(args[2])}, {int(args[3])}, Clusters.{repr(req)})"
                 err, res = self.devCtrl.ZCLSend(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command), blocking=True)
                 if err != 0:
@@ -851,6 +865,7 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 5:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
+                self.replHint = f"await devCtrl.ReadAttribute({int(args[2])}, [({int(args[3])}, Clusters.{args[0]}.Attributes.{args[1]})])"
                 res = self.devCtrl.ZCLReadAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]))
                 if res != None:
@@ -885,6 +900,7 @@ class DeviceMgrCmd(Cmd):
                     raise exceptions.UnknownCluster(args[0])
                 attribute_type = all_attrs.get(args[0], {}).get(
                     args[1], {}).get("type", None)
+                self.replHint = f"await devCtrl.WriteAttribute({int(args[2])}, [({int(args[3])}, Clusters.{args[0]}.Attributes.{args[1]}(value={repr(ParseValueWithType(args[5], attribute_type))}))])"
                 res = self.devCtrl.ZCLWriteAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), ParseValueWithType(args[5], attribute_type))
                 print(repr(res))
@@ -921,10 +937,12 @@ class DeviceMgrCmd(Cmd):
                     raise exceptions.UnknownCluster(args[0])
                 res = self.devCtrl.ZCLSubscribeAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), int(args[5]))
+                self.replHint = f"sub = await devCtrl.ReadAttribute({int(args[2])}, [({int(args[3])}, Clusters.{args[0]}.Attributes.{args[1]})], reportInterval=({int(args[4])}, {int(args[5])}))"
                 print(res.GetAllValues())
                 print(f"Subscription Established: {res}")
             elif len(args) == 2 and args[0] == '-shutdown':
                 subscriptionId = int(args[1], base=0)
+                self.replHint = "You can call sub.Shutdown() (sub is the return value of ReadAttribute() called before)"
                 self.devCtrl.ZCLShutdownSubscription(subscriptionId)
             else:
                 self.do_help("zclsubscribe")
@@ -947,6 +965,7 @@ class DeviceMgrCmd(Cmd):
                 return
             self.devCtrl.SetWiFiCredentials(
                 args[0], args[1])
+            self.replHint = f"devCtrl.SetWiFiCredentials({repr(args[0])}, {repr(args[1])})"
         except Exception as ex:
             print(str(ex))
             return
@@ -961,6 +980,7 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("set-pairing-thread-credential")
                 return
+            self.replHint = f"devCtrl.SetThreadOperationalDataset(bytes.fromhex({repr(args[0])}))"
             self.devCtrl.SetThreadOperationalDataset(bytes.fromhex(args[0]))
         except Exception as ex:
             print(str(ex))
@@ -971,7 +991,7 @@ class DeviceMgrCmd(Cmd):
         open-commissioning-window <nodeid> [options]
 
         Options:
-          -t  Timeout (in seconds)     
+          -t  Timeout (in seconds)
           -o  Option  [TokenWithRandomPIN = 1, TokenWithProvidedPIN = 2]
           -d  Discriminator Value
           -i  Iteration
@@ -1000,6 +1020,8 @@ class DeviceMgrCmd(Cmd):
                 print("Invalid option specified!")
                 raise ValueError("Invalid option specified")
 
+            self.replHint = f"devCtrl.OpenCommissioningWindow(nodeid={int(arglist[0])}, timeout={args.timeout}, iteration={args.iteration}, discriminator={args.discriminator}, option={args.option})"
+
             self.devCtrl.OpenCommissioningWindow(
                 int(arglist[0]), args.timeout, args.iteration, args.discriminator, args.option)
 
@@ -1024,7 +1046,9 @@ class DeviceMgrCmd(Cmd):
                 return
 
             compressed_fabricid = self.devCtrl.GetCompressedFabricId()
-            raw_fabricid = self.devCtrl.GetFabricId()
+            raw_fabricid = self.devCtrl.fabricId
+
+            self.replHint = f"devCtrl.GetCompressedFabricId(), devCtrl.fabricId"
         except exceptions.ChipStackException as ex:
             print("An exception occurred during reading FabricID:")
             print(str(ex))
@@ -1133,7 +1157,7 @@ def main():
                 print(
                     "Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
                 sys.exit(-1)
-
+    native.Init(bluetoothAdapter=adapterId)
     try:
         devMgrCmd = DeviceMgrCmd(rendezvousAddr=options.rendezvousAddr,
                                  controllerNodeId=options.controllerNodeId, bluetoothAdapter=adapterId)
@@ -1160,4 +1184,17 @@ def main():
 
 
 if __name__ == "__main__":
+    print("""
+    chip-device-ctrl will be deprecated and will be removed in the future. Please try chip-repl, which provides a lot of features.
+
+    - Multi-fabric support,
+    - Better complex type support for sending commands,
+    - Native command highlight,
+    - Parallel commands with asyncio,
+    - Writing complex logic inline.
+
+    You can still use chip-device-ctrl as usual for now, and you will learn how to do the same thing in chip-repl.
+
+    Feel free to file an issue if some features are not supported by chip-repl yet.
+    """)
     main()

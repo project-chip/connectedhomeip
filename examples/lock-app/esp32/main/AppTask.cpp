@@ -21,7 +21,6 @@
 #include "Button.h"
 #include "LEDWidget.h"
 #include "esp_log.h"
-#include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -57,8 +56,6 @@ QueueHandle_t sAppEventQueue;
 bool sHaveBLEConnections = false;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
-
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 } // namespace
 
 using namespace ::chip::DeviceLayer;
@@ -105,8 +102,6 @@ CHIP_ERROR AppTask::Init()
     lockButton.Init(APP_LOCK_BUTTON, APP_BUTTON_DEBOUNCE_PERIOD_MS);
 
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
-
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     chip::DeviceLayer::SystemLayer().ScheduleWork(UpdateClusterState, nullptr);
 

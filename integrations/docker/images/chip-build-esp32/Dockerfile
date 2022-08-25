@@ -10,7 +10,7 @@ RUN set -x \
     && : # last line
 
 RUN set -x \
-    && git clone --recursive -b v4.4.1 https://github.com/espressif/esp-idf.git /tmp/esp-idf \
+    && git clone --recursive -b v4.4.2 --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git /tmp/esp-idf \
     && : # last line
 
 FROM connectedhomeip/chip-build:${VERSION}

@@ -93,9 +93,10 @@ done
 
 declare -a args=(
     'default_configs_cosmetic=[]' # suppress colorization
-    'chip_crypto="mbedtls"'
+    'chip_crypto="boringssl"'
     'chip_build_tools=false'
     'chip_build_tests=false'
+    'chip_log_message_max_size=4096' # might as well allow nice long log messages
     'chip_disable_platform_kvs=true'
     'target_cpu="'"$target_cpu"'"'
     'target_defines='"$target_defines"

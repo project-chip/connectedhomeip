@@ -271,9 +271,12 @@ def HostTargets():
         app_targets.append(target.Extend('tv-casting-app', app=HostApp.TV_CASTING))
         app_targets.append(target.Extend('bridge', app=HostApp.BRIDGE))
 
-        nodeps_args = dict(enable_ble=False, enable_wifi=False, enable_thread=False, use_clang=True)
+        nodeps_args = dict(enable_ble=False, enable_wifi=False, enable_thread=False,
+                           crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True)
         app_targets.append(target.Extend('chip-tool-nodeps', app=HostApp.CHIP_TOOL, **nodeps_args))
         app_targets.append(target.Extend('all-clusters-app-nodeps', app=HostApp.ALL_CLUSTERS, **nodeps_args))
+        app_targets.append(target.Extend('ota-provider-nodeps', app=HostApp.OTA_PROVIDER, **nodeps_args))
+        app_targets.append(target.Extend('ota-requestor-nodeps', app=HostApp.OTA_REQUESTOR, **nodeps_args))
 
     builder = VariantBuilder()
 
@@ -513,12 +516,19 @@ def MbedTargets():
 
 
 def InfineonTargets():
-    target = Target('infineon', InfineonBuilder)
+    builder = VariantBuilder()
+    builder.AppendVariant(name="ota", enable_ota_requestor=True)
+    builder.AppendVariant(name="updateimage", update_image=True)
 
-    yield target.Extend('p6-lock', board=InfineonBoard.P6BOARD, app=InfineonApp.LOCK)
-    yield target.Extend('p6-all-clusters', board=InfineonBoard.P6BOARD, app=InfineonApp.ALL_CLUSTERS)
-    yield target.Extend('p6-all-clusters-minimal', board=InfineonBoard.P6BOARD, app=InfineonApp.ALL_CLUSTERS_MINIMAL)
-    yield target.Extend('p6-light', board=InfineonBoard.P6BOARD, app=InfineonApp.LIGHT)
+    target = Target('infineon-psoc6', InfineonBuilder, board=InfineonBoard.PSOC6BOARD)
+
+    builder.targets.append(target.Extend('lock', app=InfineonApp.LOCK))
+    builder.targets.append(target.Extend('light', app=InfineonApp.LIGHT))
+    builder.targets.append(target.Extend('all-clusters', app=InfineonApp.ALL_CLUSTERS))
+    builder.targets.append(target.Extend('all-clusters-minimal', app=InfineonApp.ALL_CLUSTERS_MINIMAL))
+
+    for target in builder.AllVariants():
+        yield target
 
 
 def AmebaTargets():

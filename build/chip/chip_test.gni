@@ -44,7 +44,11 @@ if (chip_link_tests) {
     pw_python_action(_test_name + "_run") {
       deps = [ ":${_test_name}" ]
       inputs = [ pw_unit_test_AUTOMATIC_RUNNER ]
-      script = "$dir_pw_unit_test/py/pw_unit_test/test_runner.py"
+      module = "pw_unit_test.test_runner"
+      python_deps = [
+        "$dir_pw_cli/py",
+        "$dir_pw_unit_test/py",
+      ]
       args = [
         "--runner",
         rebase_path(pw_unit_test_AUTOMATIC_RUNNER, root_build_dir),

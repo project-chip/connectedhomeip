@@ -148,7 +148,7 @@ chef_$PLATFORM:
         - name: Checkout submodules
           run: scripts/checkout_submodules.py --shallow --platform $PLATFORM
         - name: Bootstrap
-          timeout-minutes: 10
+          timeout-minutes: 25
           run: scripts/build/gn_bootstrap.sh
         - name: CI Examples $PLATFORM
           shell: bash

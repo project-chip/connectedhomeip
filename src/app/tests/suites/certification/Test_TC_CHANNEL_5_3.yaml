@@ -14,15 +14,18 @@
 
 name: 19.7.3. [TC-CHANNEL-5.3] Skip Channel Verification
 
+PICS:
+    - CHANNEL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Channel"
     endpoint: 1
     majornumber:
-        type: INT16U
+        type: int16u
         defaultValue: 9
     minornumber:
-        type: INT16U
+        type: int16u
         defaultValue: 1
 
 tests:
@@ -78,10 +81,10 @@ tests:
                 value: "y"
 
     - label: "Reads the CurrentChannel attribute from the DUT"
-      PICS: CHANNEL.S.A0002
+      PICS: CHANNEL.S.A0002 && CHANNEL.S.C03.Rsp
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
           value: [majorNumber: majornumber, minorNumber: minornumber + 1]
           constraints:
-              type: list
+              type: ChannelInfo

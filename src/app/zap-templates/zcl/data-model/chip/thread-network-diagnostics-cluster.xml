@@ -152,9 +152,9 @@ limitations under the License.
     <attribute side="server" code="0x37" define="RX_ERR_OTHER_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrOtherCount</attribute>
     <attribute side="server" code="0x38" define="ACTIVE_TIMESTAMP" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" isNullable="true" optional="true">ActiveTimestamp</attribute>
     <attribute side="server" code="0x39" define="PENDING_TIMESTAMP" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" isNullable="true" optional="true">PendingTimestamp</attribute>
-    <attribute side="server" code="0x3A" define="DELAY" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" isNullable="true" optional="true">delay</attribute>
+    <attribute side="server" code="0x3A" define="DELAY" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" isNullable="true" optional="true">Delay</attribute>
     <attribute side="server" code="0x3B" define="SECURITY_POLICY" type="SecurityPolicy" writable="false" isNullable="true" optional="false">SecurityPolicy</attribute>
-    <attribute side="server" code="0x3C" define="DIAG_CHANNEL_MASK" type="OCTET_STRING" length="4" writable="false" isNullable="true" optional="false">ChannelMask</attribute>
+    <attribute side="server" code="0x3C" define="DIAG_CHANNEL_MASK" type="OCTET_STRING" length="4" writable="false" isNullable="true" optional="false">ChannelPage0Mask</attribute>
     <attribute side="server" code="0x3D" define="OPERATIONAL_DATASET_COMPONENTS" type="OperationalDatasetComponents" writable="false" isNullable="true" optional="false">OperationalDatasetComponents</attribute>
     <attribute side="server" code="0x3E" define="ACTIVE_THREAD_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFault" length="4" writable="false" optional="false">ActiveNetworkFaultsList</attribute>
     <command source="client" code="0x00" name="ResetCounts" optional="true" cli="chip thread_network_diagnostics resetcounts">
@@ -164,6 +164,11 @@ limitations under the License.
       <description>Indicate that a Node’s connection status to a Thread network has changed</description>
       <field id="0" name="ConnectionStatus" type="ThreadConnectionStatus"/>
     </event>
+    <event side="server" code="0x01" name="NetworkFaultChange" priority="info" optional="true">
+      <description>Indicate a change in the set of network faults currently detected by the Node</description>
+      <field id="0" name="Current" type="NetworkFault" array="true"/>
+      <field id="1" name="Previous" type="NetworkFault" array="true"/>
+    </event>    
   </cluster>
   <bitmap name="ThreadNetworkDiagnosticsFeature" type="BITMAP32">
     <cluster code="0x0035"/>

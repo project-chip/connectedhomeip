@@ -13,7 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.4.4. [TC-SC-4.4] Operational Discovery - Controller [DUT - Controller]
+name: 15.4.4. [TC-SC-4.4] Discovery [DUT as Controller]
+
+PICS:
+    - PICS_MCORE_ROLE_CONTROLLER
 
 config:
     nodeId: 0x12344321
@@ -21,72 +24,89 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH is instructed to start advertising a service using DNS-SD"
+    - label: "Note"
       verification: |
-
+          Chip-tool command used below are an example to verify the  DUT as controller test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
-    - label: "Scan for DNS-SD advertising"
+    - label: "TH starts commissioning process with DUT"
       verification: |
-          ubuntu@ubuntu:~$ avahi-browse _matter._tcp -r
-
-          + veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
-          +   eth0 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
-          = veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::28e0:95ff:fed9:3085]
-             port = [5540]
-             txt = ["T=1" "SAI=300" "SII=5000"]
-          =   eth0 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::e65f:1ff:fe49:ae29]
-             port = [5540]
-             txt = ["T=1" "SAI=300" "SII=5000"]
+          1. Provision the DUT by TH (Chip-tool)
       disabled: true
 
-    - label: "DUT is instructed to advertise its service"
+    - label: "DUT reads Vendor Id attribute from TH"
+      PICS: BINFO.C.A0002
       verification: |
+          On TH,  Verify that TH read and shows Vendor Id value
+          ./chip-tool basic read vendor-id  1 0
 
+          [1660776352.802689][3357:3357] CHIP:DMG:
+          [1660776352.802776][3357:3357] CHIP:DMG: ReportDataMessage =
+          [1660776352.802807][3357:3357] CHIP:DMG: {
+          [1660776352.802832][3357:3357] CHIP:DMG:         AttributeReportIBs =
+          [1660776352.802868][3357:3357] CHIP:DMG:         [
+          [1660776352.802896][3357:3357] CHIP:DMG:                 AttributeReportIB =
+          [1660776352.802933][3357:3357] CHIP:DMG:                 {
+          [1660776352.802963][3357:3357] CHIP:DMG:                         AttributeDataIB =
+          [1660776352.802999][3357:3357] CHIP:DMG:                         {
+          [1660776352.803040][3357:3357] CHIP:DMG:                                 DataVersion = 0x5c6f4557,
+          [1660776352.803080][3357:3357] CHIP:DMG:                                 AttributePathIB =
+          [1660776352.803118][3357:3357] CHIP:DMG:                                 {
+          [1660776352.803157][3357:3357] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660776352.803198][3357:3357] CHIP:DMG:                                         Cluster = 0x28,
+          [1660776352.803241][3357:3357] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1660776352.803279][3357:3357] CHIP:DMG:                                 }
+          [1660776352.803319][3357:3357] CHIP:DMG:
+          [1660776352.803360][3357:3357] CHIP:DMG:                                 Data = 65521,
+          [1660776352.803396][3357:3357] CHIP:DMG:                         },
+          [1660776352.803434][3357:3357] CHIP:DMG:
+          [1660776352.803468][3357:3357] CHIP:DMG:                 },
+          [1660776352.803503][3357:3357] CHIP:DMG:
+          [1660776352.803530][3357:3357] CHIP:DMG:         ],
+          [1660776352.803571][3357:3357] CHIP:DMG:
+          [1660776352.803600][3357:3357] CHIP:DMG:         SuppressResponse = true,
+          [1660776352.803628][3357:3357] CHIP:DMG:         InteractionModelRevision = 1
+          [1660776352.803655][3357:3357] CHIP:DMG: }
+          [1660776352.803699][3357:3357] CHIP:DMG:
       disabled: true
 
-    - label: "Scan for DNS-SD advertising"
+    - label: "Change the IP address of TH by any means within the same network"
       verification: |
-          avahi-browse _matter._tcp -r
-          + veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
-          +   eth0 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
-          = veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::28e0:95ff:fed9:3085]
-             port = [5540]
-             txt = ["T=1" "SAI=300" "SII=5000"]
-          =   eth0 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::e65f:1ff:fe49:ae29]
-             port = [5540]
-             txt = ["T=1" "SAI=300" "SII=5000"]
+          Connect the raspi running the TH to another router which is on the same network. Make sure that the DUT and TH are on the same network and can ping to each other. Observe that the TH gets a new IP address. Perform Step 4
       disabled: true
 
-    - label: "DUT is instructed to query the TH for its services"
+    - label: "DUT reads Vendor Id attribute from TH"
+      PICS: BINFO.C.A0002
       verification: |
+          On TH,  Verify that TH read and shows Vendor Id value
+          ./chip-tool basic read vendor-id  1 0
 
-      disabled: true
-
-    - label: "Change its IP address by any means"
-      verification: |
-          change the IP address
-          1.we have to take two routers
-          2.execute the above steps using the 1st router
-          3.switch the connection to 2nd router and execute the below steps and check the ipaddress of the routers.
-      disabled: true
-
-    - label: "DUT is instructed to query the TH for its services"
-      verification: |
-          ubuntu@ubuntu:~$ avahi-browse _matter._tcp -r
-
-          + veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
-          = veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
-             hostname = [E45F0149AE290000.local]
-             address = [fe80::28e0:95ff:fed9:3085]
-             port = [5540]
-             txt = ["T=1" "SAI=300" "SII=5000"]
+          [1660776352.802689][3357:3357] CHIP:DMG:
+          [1660776352.802776][3357:3357] CHIP:DMG: ReportDataMessage =
+          [1660776352.802807][3357:3357] CHIP:DMG: {
+          [1660776352.802832][3357:3357] CHIP:DMG:         AttributeReportIBs =
+          [1660776352.802868][3357:3357] CHIP:DMG:         [
+          [1660776352.802896][3357:3357] CHIP:DMG:                 AttributeReportIB =
+          [1660776352.802933][3357:3357] CHIP:DMG:                 {
+          [1660776352.802963][3357:3357] CHIP:DMG:                         AttributeDataIB =
+          [1660776352.802999][3357:3357] CHIP:DMG:                         {
+          [1660776352.803040][3357:3357] CHIP:DMG:                                 DataVersion = 0x5c6f4557,
+          [1660776352.803080][3357:3357] CHIP:DMG:                                 AttributePathIB =
+          [1660776352.803118][3357:3357] CHIP:DMG:                                 {
+          [1660776352.803157][3357:3357] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660776352.803198][3357:3357] CHIP:DMG:                                         Cluster = 0x28,
+          [1660776352.803241][3357:3357] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1660776352.803279][3357:3357] CHIP:DMG:                                 }
+          [1660776352.803319][3357:3357] CHIP:DMG:
+          [1660776352.803360][3357:3357] CHIP:DMG:                                 Data = 65521,
+          [1660776352.803396][3357:3357] CHIP:DMG:                         },
+          [1660776352.803434][3357:3357] CHIP:DMG:
+          [1660776352.803468][3357:3357] CHIP:DMG:                 },
+          [1660776352.803503][3357:3357] CHIP:DMG:
+          [1660776352.803530][3357:3357] CHIP:DMG:         ],
+          [1660776352.803571][3357:3357] CHIP:DMG:
+          [1660776352.803600][3357:3357] CHIP:DMG:         SuppressResponse = true,
+          [1660776352.803628][3357:3357] CHIP:DMG:         InteractionModelRevision = 1
+          [1660776352.803655][3357:3357] CHIP:DMG: }
+          [1660776352.803699][3357:3357] CHIP:DMG:
       disabled: true

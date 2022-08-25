@@ -144,7 +144,7 @@
 #define ZCL_TARGETS_PER_ACCESS_CONTROL_ENTRY_ATTRIBUTE_ID (0x0003)
 #define ZCL_ACCESS_CONTROL_ENTRIES_PER_FABRIC_ATTRIBUTE_ID (0x0004)
 
-// Attribute ids for cluster: Bridged Actions
+// Attribute ids for cluster: Actions
 
 // Client attributes
 
@@ -427,6 +427,16 @@
 // Client attributes
 
 // Server attributes
+#define ZCL_UTC_TIME_ATTRIBUTE_ID (0x0000)
+#define ZCL_GRANULARITY_ATTRIBUTE_ID (0x0001)
+#define ZCL_TIME_SOURCE_ATTRIBUTE_ID (0x0002)
+#define ZCL_TRUSTED_TIME_NODE_ID_ATTRIBUTE_ID (0x0003)
+#define ZCL_DEFAULT_NTP_ATTRIBUTE_ID (0x0004)
+#define ZCL_TIME_ZONE_ATTRIBUTE_ID (0x0005)
+#define ZCL_DST_OFFSET_ATTRIBUTE_ID (0x0006)
+#define ZCL_LOCAL_TIME_ATTRIBUTE_ID (0x0007)
+#define ZCL_TIME_ZONE_DATABASE_ATTRIBUTE_ID (0x0008)
+#define ZCL_NTP_SERVER_PORT_ATTRIBUTE_ID (0x0009)
 
 // Attribute ids for cluster: Bridged Device Basic
 
@@ -1209,3 +1219,9 @@
 #define ZCL_NULLABLE_RANGE_RESTRICTED_INT8S_ATTRIBUTE_ID (0x4027)
 #define ZCL_NULLABLE_RANGE_RESTRICTED_INT16_U_ATTRIBUTE_ID (0x4028)
 #define ZCL_NULLABLE_RANGE_RESTRICTED_INT16_S_ATTRIBUTE_ID (0x4029)
+
+// Attribute ids for cluster: Fault Injection
+
+// Client attributes
+
+// Server attributes

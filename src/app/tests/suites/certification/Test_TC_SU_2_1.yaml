@@ -15,6 +15,9 @@
 
 name: 3.2.1. [TC-SU-2.1] QueryImage Command from DUT to OTA-P
 
+PICS:
+    - MCORE.OTA.Requestor
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -27,7 +30,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Provider logs:
+          Verify on the OTA Provider logs received QueryImage:
 
           [1645743053317] [97806:20280749] CHIP: [ZCL] OTA Provider received QueryImage
           [1645743053317] [97806:20280749] CHIP: [ZCL]   VendorID: 0xfff1
@@ -62,7 +65,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Provider logs:
+          Verify on the OTA Provider logs received QueryImage:
 
           [1645743053317] [97806:20280749] CHIP: [ZCL] OTA Provider received QueryImage
           [1645743053317] [97806:20280749] CHIP: [ZCL]   VendorID: 0xfff1

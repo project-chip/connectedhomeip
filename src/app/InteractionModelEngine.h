@@ -59,6 +59,8 @@
 #include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
 
+#include <app/CASESessionManager.h>
+
 namespace chip {
 namespace app {
 
@@ -72,7 +74,8 @@ namespace app {
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
                                public CommandHandler::Callback,
-                               public ReadHandler::ManagementCallback
+                               public ReadHandler::ManagementCallback,
+                               public FabricTable::Delegate
 {
 public:
     /**
@@ -102,17 +105,26 @@ public:
      *  Initialize the InteractionModel Engine.
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
+     *  @param[in]    apFabricTable    A pointer to the FabricTable object.
+     *  @param[in]    apCASESessionMgr An optional pointer to a CASESessionManager (used for re-subscriptions).
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
+                    CASESessionManager * apCASESessionMgr = nullptr);
 
     void Shutdown();
 
-    Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
+    Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; }
+
+    /**
+     * Returns a pointer to the CASESessionManager. This can return nullptr if one wasn't
+     * provided in the call to Init().
+     */
+    CASESessionManager * GetCASESessionManager() const { return mpCASESessionMgr; }
 
     /**
      * Tears down an active subscription.
@@ -120,7 +132,7 @@ public:
      * @retval #CHIP_ERROR_KEY_NOT_FOUND If the subscription is not found.
      * @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR ShutdownSubscription(SubscriptionId aSubscriptionId);
+    CHIP_ERROR ShutdownSubscription(const ScopedNodeId & aPeerNodeId, SubscriptionId aSubscriptionId);
 
     /**
      * Tears down active subscriptions for a given peer node ID.
@@ -128,10 +140,9 @@ public:
     void ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
 
     /**
-     * Expire active transactions and release related objects for the given fabric index.
-     * This is used for releasing transactions that won't be closed when a fabric is removed.
+     * Tears down all active subscriptions.
      */
-    void CloseTransactionsFromFabricIndex(FabricIndex aFabricIndex);
+    void ShutdownAllSubscriptions();
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
@@ -147,6 +158,11 @@ public:
      * Returns the handler at a particular index within the active handler list.
      */
     ReadHandler * ActiveHandlerAt(unsigned int aIndex);
+
+    /**
+     * Returns the write handler at a particular index within the active handler list.
+     */
+    WriteHandler * ActiveWriteHandlerAt(unsigned int aIndex);
 
     /**
      * The Magic number of this InteractionModelEngine, the magic number is set during Init()
@@ -268,6 +284,9 @@ public:
      */
     uint16_t GetMinGuaranteedSubscriptionsPerFabric() const;
 
+    // virtual method from FabricTable::Delegate
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool
@@ -346,13 +365,10 @@ private:
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
     /**
-     * Called when Interaction Model receives a Command Request message.  Errors processing
-     * the Command Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
-     * expected to set it to success if it does not want an automatic status response message to be sent.
+     * Called when Interaction Model receives a Command Request message.
      */
-    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                      System::PacketBufferHandle && aPayload, bool aIsTimedInvoke,
-                                      Protocols::InteractionModel::Status & aStatus);
+    Status OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                  System::PacketBufferHandle && aPayload, bool aIsTimedInvoke);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
@@ -386,8 +402,8 @@ private:
     /**This function handles processing of un-solicited ReportData messages on the client, which can
      * only occur post subscription establishment
      */
-    CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                       System::PacketBufferHandle && aPayload);
+    Status OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                   System::PacketBufferHandle && aPayload);
 
     void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
@@ -550,6 +566,8 @@ private:
 #endif
 
     FabricTable * mpFabricTable;
+
+    CASESessionManager * mpCASESessionMgr = nullptr;
 
     // A magic number for tracking values between stack Shutdown()-s and Init()-s.
     // An ObjectHandle is valid iff. its magic equals to this one.

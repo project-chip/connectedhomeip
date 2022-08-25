@@ -17,6 +17,9 @@ name:
     3.7.2. [TC-SU-3.2] Handling different QueryImageResponse scenarios on
     Provider
 
+PICS:
+    - MCORE.OTA.Provider
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -32,7 +35,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Requestor logs
+          Verify on the OTA Requestor logs receives QueryImageResponse
 
           [1651265462659] [21768:35233106] CHIP: [SWU] QueryImageResponse:
           [1651265462659] [21768:35233106] CHIP: [SWU]   status: 0
@@ -57,7 +60,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Requestor logs
+          Verify on the OTA Requestor logs receives QueryImageResponse
 
           [1645819644181] [21592:21187907] CHIP: [SWU] QueryImageResponse:
           [1645819644181] [21592:21187907] CHIP: [SWU]   status: 2
@@ -75,7 +78,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Requestor logs
+          Verify on the OTA Requestor logs receives QueryImageResponse
 
           [1651265462659] [21768:35233106] CHIP: [SWU] QueryImageResponse:
           [1651265462659] [21768:35233106] CHIP: [SWU]   status: 0
@@ -92,20 +95,20 @@ tests:
       disabled: true
 
     - label:
-          'OTA-R/TH sends a QueryImage Command to the DUT. ProtocolSupported
-          field should list "https". DUT responds with a QueryImageResponse to
-          the OTA-R/TH.'
+          "OTA-R/TH sends a QueryImage Command to the DUT. ProtocolSupported
+          field should list https. DUT responds with a QueryImageResponse to the
+          OTA-R/TH."
       verification: |
           Out of scope for V1.0
       disabled: true
 
     - label:
-          'OTA-R/TH sends a QueryImage Command to the DUT. DUT responds with the
-          QueryImageResponse with QueryStatus set to "Busy", DelayedActionTime
-          set to 3 minutes. On the subsequent QueryImage command, DUT sends a
+          "OTA-R/TH sends a QueryImage Command to the DUT. DUT responds with the
+          QueryImageResponse with QueryStatus set to Busy, DelayedActionTime set
+          to 3 minutes. On the subsequent QueryImage command, DUT sends a
           QueryImageResponse back to OTA-R/TH. QueryStatus is set to
-          "UpdateAvailable".'
-      PICS: OTAS.S.M.DelayedActionTime
+          UpdateAvailable."
+      PICS: OTAP.S.M.DelayedActionTime
       verification: |
           ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -q busy -t 180
 
@@ -113,7 +116,8 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Requestor logs
+          Verify on the OTA Requestor logs receives QueryImageResponse
+
           [1651265271074] [21764:35230537] CHIP: [SWU] QueryImageResponse:
           [1651265271074] [21764:35230537] CHIP: [SWU]   status: 1
           [1651265271074] [21764:35230537] CHIP: [SWU]   delayedActionTime: 180 seconds
@@ -121,6 +125,7 @@ tests:
           [1651265271074] [21764:35230537] CHIP: [SWU]   metadataForRequestor: 0
 
           Verify that the OTA-R/TH starts the download from the DUT after the second QueryImageResponse with UpdateAvailable status.
+
           [1651265462659] [21768:35233106] CHIP: [SWU] QueryImageResponse:
           [1651265462659] [21768:35233106] CHIP: [SWU]   status: 0
           [1651265462659] [21768:35233106] CHIP: [SWU]   delayedActionTime: 0 seconds

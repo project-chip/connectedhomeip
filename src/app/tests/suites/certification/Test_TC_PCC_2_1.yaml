@@ -14,6 +14,9 @@
 
 name: 15.2.1. [TC-PCC-2.1] Attributes with server as DUT
 
+PICS:
+    - PCC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Pump Configuration and Control"
@@ -34,7 +37,7 @@ tests:
       attribute: "MaxPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -44,7 +47,7 @@ tests:
       attribute: "MaxSpeed"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -54,7 +57,7 @@ tests:
       attribute: "MaxFlow"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -64,7 +67,7 @@ tests:
       attribute: "MinConstPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -74,7 +77,7 @@ tests:
       attribute: "MaxConstPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -84,7 +87,7 @@ tests:
       attribute: "MinCompPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -94,7 +97,7 @@ tests:
       attribute: "MaxCompPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -104,7 +107,7 @@ tests:
       attribute: "MinConstSpeed"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -114,7 +117,7 @@ tests:
       attribute: "MaxConstSpeed"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -124,7 +127,7 @@ tests:
       attribute: "MinConstFlow"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -134,7 +137,7 @@ tests:
       attribute: "MaxConstFlow"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -144,7 +147,7 @@ tests:
       attribute: "MinConstTemp"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -154,7 +157,7 @@ tests:
       attribute: "MaxConstTemp"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -164,7 +167,7 @@ tests:
       attribute: "PumpStatus"
       response:
           constraints:
-              type: map16
+              type: bitmap16
               minValue: 0
               maxValue: 8
 
@@ -194,7 +197,7 @@ tests:
       attribute: "Capacity"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -204,7 +207,7 @@ tests:
       attribute: "Speed"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -214,7 +217,7 @@ tests:
       attribute: "LifetimeRunningHours"
       response:
           constraints:
-              type: uint24
+              type: int24u
               minValue: 0
               maxValue: 16777215
 
@@ -224,7 +227,7 @@ tests:
       attribute: "Power"
       response:
           constraints:
-              type: uint24
+              type: int24u
               minValue: 0
               maxValue: 16777215
 
@@ -234,7 +237,7 @@ tests:
       attribute: "LifetimeEnergyConsumed"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0
               maxValue: 4294967295
 

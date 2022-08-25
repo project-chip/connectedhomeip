@@ -74,6 +74,14 @@ tests:
               - name: "nextCredentialIndex"
                 value: 2
 
+    - label:
+          "Set the WrongCodeEntryLimit to big value so that we can test
+          incorrect PIN entry"
+      command: "writeAttribute"
+      attribute: "WrongCodeEntryLimit"
+      arguments:
+          value: 20
+
     - label: "Try to unlock the door with invalid PIN"
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 10000
@@ -141,22 +149,195 @@ tests:
           value: 3
 
     - label: "Try to unlock the door when OperatingMode is NoRemoteLockUnlock"
-      command: "LockDoor"
+      command: "UnlockDoor"
       timedInteractionTimeoutMs: 10000
       response:
           error: FAILURE
 
-    # Clean-up
     - label: "Set OperatingMode to Normal"
       command: "writeAttribute"
       attribute: "OperatingMode"
       arguments:
           value: 0
 
-    - label: "Clean the created credential"
-      command: "ClearCredential"
+    - label: "Read the lockout timeout"
+      command: "readAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      response:
+          value: 10
+
+    - label: "Set the WrongCodeEntryLimit to small value so we can test lockout"
+      command: "writeAttribute"
+      attribute: "WrongCodeEntryLimit"
+      arguments:
+          value: 3
+
+    - label: "Try to unlock the door with invalid PIN for the first time"
+      command: "UnlockDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
+              - name: "pinCode"
+                value: "000000"
+      response:
+          error: FAILURE
+
+    - label: "Try to unlock the door with invalid PIN for the second time"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "000000"
+      response:
+          error: FAILURE
+
+    - label: "Try to unlock the door with invalid PIN for the third time"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "000000"
+      response:
+          error: FAILURE
+
+    - label:
+          "Try to unlock the door with valid PIN and make sure it fails due to
+          lockout"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "123456"
+      response:
+          error: FAILURE
+
+    - label: "Wait for the lockout to end"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      # We know the lockout value, but it's in seconds. Previous read from UserCodeTemporaryDisableTime verified that
+      # the lockout time is 10 seconds, so we can just put 10000ms here.
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Try to unlock the door with valid PIN and make sure it succeeds"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "123456"
+
+    - label: "Verify that lock state attribute value is set to Unlocked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 2
+
+    - label: "Lock the door back prior to next tests"
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "123456"
+
+    - label: "Create a disabled user and credential"
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
               - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
+                value: { CredentialType: 1, CredentialIndex: 2 }
+              - name: "credentialData"
+                value: "654321"
+              - name: "userIndex"
+                value: null
+              - name: "userStatus"
+                value: 3
+              - name: "userType"
+                value: null
+      response:
+          values:
+              - name: "status"
+                value: 0x00
+              - name: "userIndex"
+                value: 2
+              - name: "nextCredentialIndex"
+                value: 3
+
+    - label: "Try to unlock the door with disabled user PIN"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "654321"
+      response:
+          error: FAILURE
+
+    - label: "Verify that lock state attribute value is set to Locked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
+
+    - label: "Unlock the door with enabled user PIN"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "123456"
+
+    - label: "Verify that lock state attribute value is set to Unlocked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 2
+
+    - label: "Try to lock the door with disabled user PIN"
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "654321"
+      response:
+          error: FAILURE
+
+    - label: "Verify that lock state attribute value stays Unlocked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 2
+
+    - label: "Lock the door with enabled user PIN"
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "123456"
+
+    - label: "Verify that lock state attribute value is set to Locked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
+
+    # Clean-up
+
+    - label: "Clean all the users and credentials"
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 0xFFFE

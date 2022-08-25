@@ -14,6 +14,9 @@
 
 name: 18.1.1. [TC-LVL-1.1] Global attributes with server as DUT
 
+PICS:
+    - LVL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Level Control"
@@ -34,7 +37,7 @@ tests:
       response:
           value: 5
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "Read the global attribute: FeatureMap"
       PICS: LVL.S.F00 || LVL.S.F01 || LVL.S.F02
@@ -42,9 +45,18 @@ tests:
       attribute: "FeatureMap"
       response:
           constraints:
-              type: map32
-              minValue: 0
+              type: bitmap32
+              minValue: 1
               maxValue: 7
+
+    - label: "Read the global attribute: FeatureMap"
+      PICS: " !LVL.S.F00 && !LVL.S.F01 && !LVL.S.F02 "
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
@@ -52,10 +64,10 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 15, 17]
+              contains: [0, 15, 17, 65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Read the optonal attribute(StartUpCurrentLevel and RemainingTime) in
+          "Read the optional attribute(StartUpCurrentLevel and RemainingTime) in
           AttributeList"
       PICS: LVL.S.F01
       command: "readAttribute"
@@ -66,7 +78,7 @@ tests:
               contains: [1, 16384]
 
     - label:
-          "Read the optonal attribute(CurrentFrequency, MinFrequency and
+          "Read the optional attribute(CurrentFrequency, MinFrequency and
           MinFrequency) in AttributeList"
       PICS: LVL.S.F02
       command: "readAttribute"
@@ -76,7 +88,7 @@ tests:
               type: list
               contains: [4, 5, 6]
 
-    - label: "Read the optonal attribute(MinLevel) in AttributeList"
+    - label: "Read the optional attribute(MinLevel) in AttributeList"
       PICS: LVL.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
@@ -85,7 +97,7 @@ tests:
               type: list
               contains: [2]
 
-    - label: "Read the optonal attribute(MaxLevel) in AttributeList"
+    - label: "Read the optional attribute(MaxLevel) in AttributeList"
       PICS: LVL.S.A0003
       command: "readAttribute"
       attribute: "AttributeList"
@@ -94,7 +106,7 @@ tests:
               type: list
               contains: [3]
 
-    - label: "Read the optonal attribute(OnOffTransitionTime) in AttributeList"
+    - label: "Read the optional attribute(OnOffTransitionTime) in AttributeList"
       PICS: LVL.S.A0010
       command: "readAttribute"
       attribute: "AttributeList"
@@ -103,7 +115,7 @@ tests:
               type: list
               contains: [16]
 
-    - label: "Read the optonal attribute(OnTransitionTime) in AttributeList"
+    - label: "Read the optional attribute(OnTransitionTime) in AttributeList"
       PICS: LVL.S.A0012
       command: "readAttribute"
       attribute: "AttributeList"
@@ -112,7 +124,7 @@ tests:
               type: list
               contains: [18]
 
-    - label: "Read the optonal attribute(OffTransitionTime) in AttributeList"
+    - label: "Read the optional attribute(OffTransitionTime) in AttributeList"
       PICS: LVL.S.A0013
       command: "readAttribute"
       attribute: "AttributeList"
@@ -121,7 +133,7 @@ tests:
               type: list
               contains: [19]
 
-    - label: "Read the optonal attribute(DefaultMoveRate) in AttributeList"
+    - label: "Read the optional attribute(DefaultMoveRate) in AttributeList"
       PICS: LVL.S.A0014
       command: "readAttribute"
       attribute: "AttributeList"
@@ -156,19 +168,18 @@ tests:
           value: []
           constraints:
               type: list
-
-    #issue #15011
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    #Commenting out the step EventList attribute  which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

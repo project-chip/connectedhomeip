@@ -15,6 +15,13 @@
 
 name: 62.3.1. [TC-PS-3.1] Attributes with client as DUT
 
+PICS:
+    - PS.C
+    - PS.C.AM-READ
+    - PS.C.AO-READ
+    - PS.C.AM-WRITE
+    - PS.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -25,11 +32,9 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          On TestHarnes (all-cluster-app) a received read of Staus attribute (id 0) looks like this:
-
           ./chip-tool powersource read status 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " status response" on the TH (all-cluster-app) log:
 
 
           [1646155382.977445][33190:33190] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:685127 on exchange 16568r
@@ -59,7 +64,7 @@ tests:
 
           ./chip-tool powersource read order 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " order response" on the TH (all-cluster-app) log:
 
           [1653395573.862606][19412:19412] CHIP:IM: Received Read request
           [1653395573.862690][19412:19412] CHIP:DMG: ReadRequestMessage =
@@ -83,7 +88,7 @@ tests:
 
           ./chip-tool powersource read description 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " description response" on the TH (all-cluster-app) log:
 
           CHIP:IM: Received Read request
           [1653395620.020314][19412:19412] CHIP:DMG: ReadRequestMessage =
@@ -109,21 +114,21 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          This cluster doesn't have any  optional attribute
+          This cluster doesn"t have any  optional attribute
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true
 
     - label:
@@ -132,12 +137,34 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          "On TestHarnes (all-cluster-app) a received read of Staus attribute (id 0) looks like this:
+          ./chip-tool powersource read attribute-list 1 0
+
+          verify the " attribute-list response" on the TH (all-cluster-minimal-app) log:
+
+          [1659596771.124636][2409:2409] CHIP:IM: Received Read request
+          [1659596771.124765][2409:2409] CHIP:DMG: ReadRequestMessage =
+          [1659596771.124795][2409:2409] CHIP:DMG: {
+          [1659596771.124814][2409:2409] CHIP:DMG:         AttributePathIBs =
+          [1659596771.124838][2409:2409] CHIP:DMG:         [
+          [1659596771.124859][2409:2409] CHIP:DMG:                 AttributePathIB =
+          [1659596771.124901][2409:2409] CHIP:DMG:                 {
+          [1659596771.124928][2409:2409] CHIP:DMG:                         Endpoint = 0x0,
+          [1659596771.124963][2409:2409] CHIP:DMG:                         Cluster = 0x2f,
+          [1659596771.124989][2409:2409] CHIP:DMG:                         Attribute = 0x0000_FFFB,
+          [1659596771.125020][2409:2409] CHIP:DMG:                 }
+          [1659596771.125045][2409:2409] CHIP:DMG:
+          [1659596771.125077][2409:2409] CHIP:DMG:         ],
+          [1659596771.125102][2409:2409] CHIP:DMG:
+          [1659596771.125134][2409:2409] CHIP:DMG:         isFabricFiltered = true,
+          [1659596771.125156][2409:2409] CHIP:DMG:         InteractionModelRevision = 1
+          [1659596771.125177][2409:2409] CHIP:DMG: },
+
+
+
           ./chip-tool powersource read status 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " status response" on the TH (all-cluster-minimal-app) log:
 
-          [1646155382.977445][33190:33190] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:685127 on exchange 16568r
           [1646155382.977534][33190:33190] CHIP:EM: Handling via exchange: 16568r, Delegate: 0xaaaace1730c8
           [1646155382.978021][33190:33190] CHIP:IM: Received Read request
           [1646155382.978109][33190:33190] CHIP:DMG: ReadRequestMessage =
@@ -164,7 +191,7 @@ tests:
 
           ./chip-tool powersource read order 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " order response" on the TH (all-cluster-minimal-app) log:
 
           [1653395573.862606][19412:19412] CHIP:IM: Received Read request
           [1653395573.862690][19412:19412] CHIP:DMG: ReadRequestMessage =
@@ -188,7 +215,7 @@ tests:
 
           ./chip-tool powersource read description 1 1
 
-          Verify in TH all-clusters-app log
+          verify the " description response" on the TH (all-cluster-minimal-app) log:
 
           CHIP:IM: Received Read request
           [1653395620.020314][19412:19412] CHIP:DMG: ReadRequestMessage =
@@ -207,19 +234,19 @@ tests:
           [1653395620.021052][19412:19412] CHIP:DMG:         isFabricFiltered = true,
           [1653395620.021104][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
           [1653395620.021153][19412:19412] CHIP:DMG: },
-          [1653395620.021252][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]"
+          [1653395620.021252][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          This cluster doesn't have any  optional attribute
+          This cluster doesn"t have any  optional attribute
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          This cluster doesn't have any writable attributes
+          This cluster doesn"t have any writable attributes
       disabled: true

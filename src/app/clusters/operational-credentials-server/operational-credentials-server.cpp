@@ -30,6 +30,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
+#include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -176,7 +177,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
 
             fabricDescriptor.fabricIndex = fabricIndex;
             fabricDescriptor.nodeId      = fabricInfo.GetPeerId().GetNodeId();
-            fabricDescriptor.vendorId    = static_cast<chip::VendorId>(fabricInfo.GetVendorId());
+            fabricDescriptor.vendorId    = fabricInfo.GetVendorId();
             fabricDescriptor.fabricId    = fabricInfo.GetFabricId();
 
             fabricDescriptor.label = fabricInfo.GetFabricLabel();
@@ -281,7 +282,6 @@ CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
 
 void CleanupSessionsForFabric(SessionManager & sessionMgr, FabricIndex fabricIndex)
 {
-    InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(fabricIndex);
     sessionMgr.ExpireAllSessionsForFabric(fabricIndex);
 }
 
@@ -296,18 +296,6 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     // Session Context at the Server.
     if (event->FailSafeTimerExpired.addNocCommandHasBeenInvoked || event->FailSafeTimerExpired.updateNocCommandHasBeenInvoked)
     {
-        // TODO(#19259): The following scope will no longer need to exist after #19259 is fixed
-        {
-            CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
-            if (caseSessionManager)
-            {
-                const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-                VerifyOrReturn(fabricInfo != nullptr);
-
-                caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetFabricIndex());
-            }
-        }
-
         SessionManager & sessionMgr = Server::GetInstance().GetSecureSessionManager();
         CleanupSessionsForFabric(sessionMgr, fabricIndex);
     }
@@ -354,6 +342,7 @@ public:
         {
             // If Basic cluster is implemented on this endpoint
             Basic::Events::Leave::Type event;
+            event.fabricIndex = fabricIndex;
             EventNumber eventNumber;
 
             if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
@@ -362,13 +351,13 @@ public:
             }
         }
 
-        // Try to send the queued events as soon as possible. If the just emitted leave event won't
+        // Try to send the queued events as soon as possible for this fabric. If the just emitted leave event won't
         // be sent this time, it will likely not be delivered at all for the following reasons:
         // - removing the fabric expires all associated ReadHandlers, so all subscriptions to
         //   the leave event will be cancelled.
         // - removing the fabric removes all associated access control entries, so generating
         //   subsequent reports containing the leave event will fail the access control check.
-        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync();
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync(MakeOptional(fabricIndex));
     }
 
     // Gets called when a fabric is deleted
@@ -377,6 +366,7 @@ public:
         ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
 
         EventManagement::GetInstance().FabricRemoved(fabricIndex);
+
         NotifyFabricTableChanged();
     }
 
@@ -736,8 +726,6 @@ exit:
         {
             (void) groupDataProvider->RemoveFabric(newFabricIndex);
         }
-
-        // TODO(#19898): All ACL work done within AddNOC does not trigger ACL cluster updates
 
         (void) Access::GetAccessControl().DeleteAllEntriesForFabric(newFabricIndex);
 

@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 27.2.1. [TC-CC-2.1] Attributes with server as DUT
+name: 25.2.1. [TC-CC-2.1] Attributes with server as DUT
+
+PICS:
+    - CC.S
 
 config:
     nodeId: 0x12344321
@@ -34,9 +37,9 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.A0001
@@ -44,9 +47,9 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "TH reads RemainingTime attribute from DUT"
       PICS: CC.S.A0002
@@ -54,9 +57,9 @@ tests:
       attribute: "RemainingTime"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
-              maxValue: 65535
+              maxValue: 65534
 
     - label: "TH reads CurrentX attribute from DUT"
       PICS: CC.S.A0003
@@ -64,7 +67,7 @@ tests:
       attribute: "CurrentX"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -74,7 +77,7 @@ tests:
       attribute: "CurrentY"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -94,7 +97,7 @@ tests:
       attribute: "CompensationText"
       response:
           constraints:
-              type: string
+              type: char_string
               maxLength: 254
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT"
@@ -103,7 +106,7 @@ tests:
       attribute: "ColorTemperature"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -133,7 +136,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -153,9 +156,9 @@ tests:
       attribute: "ColorLoopActive"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "TH reads ColorLoopDirection attribute from DUT"
       PICS: CC.S.A4003
@@ -163,9 +166,9 @@ tests:
       attribute: "ColorLoopDirection"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
     - label: "TH reads ColorLoopTime attribute from DUT"
       PICS: CC.S.A4004
@@ -173,9 +176,9 @@ tests:
       attribute: "ColorLoopTime"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
-              maxValue: 65535
+              maxValue: 65534
 
     - label: "TH reads ColorLoopStartEnhancedHue attribute from DUT"
       PICS: CC.S.A4005
@@ -183,7 +186,7 @@ tests:
       attribute: "ColorLoopStartEnhancedHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -193,7 +196,7 @@ tests:
       attribute: "ColorLoopStoredEnhancedHue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
@@ -210,7 +213,7 @@ tests:
       response:
           value: FeatureMapValue
           constraints:
-              type: map16
+              type: bitmap16
               minValue: 0
               maxValue: 31
 
@@ -220,7 +223,7 @@ tests:
       attribute: "ColorTempPhysicalMinMireds"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -230,7 +233,7 @@ tests:
       attribute: "ColorTempPhysicalMaxMireds"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -240,7 +243,7 @@ tests:
       attribute: "CoupleColorTempToLevelMinMireds"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -250,7 +253,7 @@ tests:
       attribute: "StartUpColorTemperatureMireds"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -261,7 +264,7 @@ tests:
       attribute: "NumberOfPrimaries"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 6
 
@@ -645,7 +648,7 @@ tests:
       attribute: "WhitePointX"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -655,7 +658,7 @@ tests:
       attribute: "WhitePointY"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -665,7 +668,7 @@ tests:
       attribute: "ColorPointRX"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -675,7 +678,7 @@ tests:
       attribute: "ColorPointRY"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -685,7 +688,7 @@ tests:
       attribute: "ColorPointRIntensity"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -695,7 +698,7 @@ tests:
       attribute: "ColorPointGX"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -705,7 +708,7 @@ tests:
       attribute: "ColorPointGY"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -715,7 +718,7 @@ tests:
       attribute: "ColorPointGIntensity"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
@@ -725,7 +728,7 @@ tests:
       attribute: "ColorPointBX"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -735,7 +738,7 @@ tests:
       attribute: "ColorPointBY"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
@@ -745,6 +748,6 @@ tests:
       attribute: "ColorPointBIntensity"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255

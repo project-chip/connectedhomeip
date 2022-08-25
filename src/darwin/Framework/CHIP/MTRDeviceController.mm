@@ -14,6 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#import <os/lock.h>
+
 #import "MTRDeviceController.h"
 
 #import "MTRBaseDevice_Internal.h"
@@ -22,10 +24,10 @@
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDevicePairingDelegateBridge.h"
+#import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
 #import "MTRLogging.h"
-#import "MTROTAProviderDelegateBridge.h"
 #import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
@@ -45,6 +47,7 @@
 #include <controller/CommissioningWindowOpener.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
+#include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/PlatformManager.h>
@@ -57,7 +60,6 @@ static NSString * const kErrorSigningKeypairInit = @"Init failure while creating
 static NSString * const kErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
 static NSString * const kErrorOperationalKeypairInit = @"Init failure while creating operational keypair bridge";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
-static NSString * const kErrorOtaProviderInit = @"Init failure while creating an OTA provider delegate";
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
@@ -76,13 +78,15 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
+@property (readonly) chip::Credentials::PartialDACVerifier * partialDACVerifier;
 @property (readonly) MTRDevicePairingDelegateBridge * pairingDelegateBridge;
-@property (readonly) MTROTAProviderDelegateBridge * otaProviderDelegateBridge;
 @property (readonly) MTROperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) MTRP256KeypairBridge signingKeypairBridge;
 @property (readonly) MTRP256KeypairBridge operationalKeypairBridge;
 @property (readonly) MTRDeviceAttestationDelegateBridge * deviceAttestationDelegateBridge;
 @property (readonly) MTRControllerFactory * factory;
+@property (readonly) NSMutableDictionary * nodeIDToDeviceMap;
+@property (readonly) os_unfair_lock deviceMapLock; // protects nodeIDToDeviceMap
 @end
 
 @implementation MTRDeviceController
@@ -92,14 +96,11 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     if (self = [super init]) {
         _chipWorkQueue = queue;
         _factory = factory;
+        _deviceMapLock = OS_UNFAIR_LOCK_INIT;
+        _nodeIDToDeviceMap = [NSMutableDictionary dictionary];
 
         _pairingDelegateBridge = new MTRDevicePairingDelegateBridge();
         if ([self checkForInitError:(_pairingDelegateBridge != nullptr) logMsg:kErrorPairingInit]) {
-            return nil;
-        }
-
-        _otaProviderDelegateBridge = new MTROTAProviderDelegateBridge();
-        if ([self checkForInitError:(_otaProviderDelegateBridge != nullptr) logMsg:kErrorOtaProviderInit]) {
             return nil;
         }
 
@@ -107,6 +108,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kErrorOperationalCredentialsInit]) {
             return nil;
         }
+        _operationalCredentialsDelegate->setChipWorkQueue(_chipWorkQueue);
     }
     return self;
 }
@@ -154,11 +156,6 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     if (_operationalCredentialsDelegate) {
         delete _operationalCredentialsDelegate;
         _operationalCredentialsDelegate = nullptr;
-    }
-
-    if (_otaProviderDelegateBridge) {
-        delete _otaProviderDelegateBridge;
-        _otaProviderDelegateBridge = nullptr;
     }
 
     if (_pairingDelegateBridge) {
@@ -209,19 +206,20 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         chip::Crypto::P256Keypair * signingKeypair = nullptr;
         if (startupParams.nocSigner) {
             errorCode = _signingKeypairBridge.Init(startupParams.nocSigner);
-            if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorSigningKeypairInit]) {
+            if ([self checkForStartError:errorCode logMsg:kErrorSigningKeypairInit]) {
                 return;
             }
             signingKeypair = &_signingKeypairBridge;
         }
         errorCode = _operationalCredentialsDelegate->Init(_factory.storageDelegateBridge, signingKeypair, startupParams.ipk,
             startupParams.rootCertificate, startupParams.intermediateCertificate);
-        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
+        if ([self checkForStartError:errorCode logMsg:kErrorOperationalCredentialsInit]) {
             return;
         }
 
         _cppCommissioner = new chip::Controller::DeviceCommissioner();
-        if ([self checkForStartError:(_cppCommissioner != nullptr) logMsg:kErrorCommissionerInit]) {
+        if (_cppCommissioner == nullptr) {
+            [self checkForStartError:CHIP_ERROR_NO_MEMORY logMsg:kErrorCommissionerInit];
             return;
         }
 
@@ -234,6 +232,8 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
         commissionerParams.pairingDelegate = _pairingDelegateBridge;
 
+        _operationalCredentialsDelegate->SetDeviceCommissioner(_cppCommissioner);
+
         commissionerParams.operationalCredentialsDelegate = _operationalCredentialsDelegate;
 
         commissionerParams.controllerRCAC = _operationalCredentialsDelegate->RootCertSpan();
@@ -241,7 +241,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
         if (startupParams.operationalKeypair != nil) {
             errorCode = _operationalKeypairBridge.Init(startupParams.operationalKeypair);
-            if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalKeypairInit]) {
+            if ([self checkForStartError:errorCode logMsg:kErrorOperationalKeypairInit]) {
                 return;
             }
             commissionerParams.operationalKeypair = &_operationalKeypairBridge;
@@ -257,7 +257,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
                 errorCode = _operationalCredentialsDelegate->GenerateNOC([startupParams.nodeId unsignedLongLongValue],
                     startupParams.fabricId, chip::kUndefinedCATs, commissionerParams.operationalKeypair->Pubkey(), noc);
 
-                if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorGenerateNOC]) {
+                if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
                     return;
                 }
             } else {
@@ -265,20 +265,20 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
                 uint8_t csrBuffer[chip::Crypto::kMAX_CSR_Length];
                 chip::MutableByteSpan csr(csrBuffer);
                 errorCode = startupParams.fabricTable->AllocatePendingOperationalKey(startupParams.fabricIndex, csr);
-                if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorKeyAllocation]) {
+                if ([self checkForStartError:errorCode logMsg:kErrorKeyAllocation]) {
                     return;
                 }
 
                 chip::Crypto::P256PublicKey pubKey;
                 errorCode = VerifyCertificateSigningRequest(csr.data(), csr.size(), pubKey);
-                if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCSRValidation]) {
+                if ([self checkForStartError:errorCode logMsg:kErrorCSRValidation]) {
                     return;
                 }
 
                 errorCode = _operationalCredentialsDelegate->GenerateNOC(
                     [startupParams.nodeId unsignedLongLongValue], startupParams.fabricId, chip::kUndefinedCATs, pubKey, noc);
 
-                if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorGenerateNOC]) {
+                if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
                     return;
                 }
             }
@@ -290,7 +290,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
 
         errorCode = factory.SetupCommissioner(commissionerParams, *_cppCommissioner);
-        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+        if ([self checkForStartError:errorCode logMsg:kErrorCommissionerInit]) {
             return;
         }
 
@@ -299,13 +299,13 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         uint8_t compressedIdBuffer[sizeof(uint64_t)];
         chip::MutableByteSpan compressedId(compressedIdBuffer);
         errorCode = _cppCommissioner->GetCompressedFabricIdBytes(compressedId);
-        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
+        if ([self checkForStartError:errorCode logMsg:kErrorIPKInit]) {
             return;
         }
 
         errorCode = chip::Credentials::SetSingleIpkEpochKey(
             _factory.groupData, fabricIdx, _operationalCredentialsDelegate->GetIPK(), compressedId);
-        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
+        if ([self checkForStartError:errorCode logMsg:kErrorIPKInit]) {
             return;
         }
 
@@ -418,20 +418,20 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
         chip::Controller::CommissioningParameters params;
         if (commissioningParams.CSRNonce) {
-            params.SetCSRNonce(chip::ByteSpan((uint8_t *) commissioningParams.CSRNonce.bytes, commissioningParams.CSRNonce.length));
+            params.SetCSRNonce(AsByteSpan(commissioningParams.CSRNonce));
         }
         if (commissioningParams.attestationNonce) {
-            params.SetAttestationNonce(chip::ByteSpan(
-                (uint8_t *) commissioningParams.attestationNonce.bytes, commissioningParams.attestationNonce.length));
+            params.SetAttestationNonce(AsByteSpan(commissioningParams.attestationNonce));
         }
         if (commissioningParams.threadOperationalDataset) {
-            params.SetThreadOperationalDataset(chip::ByteSpan((uint8_t *) commissioningParams.threadOperationalDataset.bytes,
-                commissioningParams.threadOperationalDataset.length));
+            params.SetThreadOperationalDataset(AsByteSpan(commissioningParams.threadOperationalDataset));
         }
-        if (commissioningParams.wifiSSID && commissioningParams.wifiCredentials) {
-            chip::ByteSpan ssid((uint8_t *) commissioningParams.wifiSSID.bytes, commissioningParams.wifiSSID.length);
-            chip::ByteSpan credentials(
-                (uint8_t *) commissioningParams.wifiCredentials.bytes, commissioningParams.wifiCredentials.length);
+        if (commissioningParams.wifiSSID) {
+            chip::ByteSpan ssid = AsByteSpan(commissioningParams.wifiSSID);
+            chip::ByteSpan credentials;
+            if (commissioningParams.wifiCredentials != nil) {
+                credentials = AsByteSpan(commissioningParams.wifiCredentials);
+            }
             chip::Controller::WiFiCredentials wifiCreds(ssid, credentials);
             params.SetWiFiCredentials(wifiCreds);
         }
@@ -508,7 +508,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     });
     VerifyOrReturnValue(success, nil);
 
-    return [[MTRBaseDevice alloc] initWithDevice:deviceProxy];
+    return [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
 }
 
 - (BOOL)getBaseDevice:(uint64_t)deviceID
@@ -523,19 +523,49 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         return NO;
     }
 
-    dispatch_async(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning]);
+    // We know getSessionForNode will return YES here, since we already checked
+    // that we are running.
+    return [self getSessionForNode:deviceID
+                 completionHandler:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+                     const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
+                     // Create an MTRBaseDevice for the node id involved, now that our
+                     // CASE session is primed.  We don't actually care about the session
+                     // information here.
+                     dispatch_async(queue, ^{
+                         MTRBaseDevice * device;
+                         if (error == nil) {
+                             device = [[MTRBaseDevice alloc] initWithNodeID:deviceID controller:self];
+                         } else {
+                             device = nil;
+                         }
+                         completionHandler(device, error);
+                     });
+                 }];
+}
 
-        auto connectionBridge = new MTRDeviceConnectionBridge(completionHandler, queue);
-        auto errorCode = connectionBridge->connect(self->_cppCommissioner, deviceID);
-        if ([self checkForError:errorCode logMsg:kErrorGetPairedDevice error:nil]) {
-            // Errors are propagated to the caller through completionHandler.
-            // No extra error handling is needed here.
-            return;
-        }
-    });
+- (MTRDevice *)deviceForNodeID:(uint64_t)nodeID
+{
+    os_unfair_lock_lock(&_deviceMapLock);
+    MTRDevice * deviceToReturn = self.nodeIDToDeviceMap[@(nodeID)];
+    if (!deviceToReturn) {
+        deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID deviceController:self];
+        self.nodeIDToDeviceMap[@(nodeID)] = deviceToReturn;
+    }
+    os_unfair_lock_unlock(&_deviceMapLock);
 
-    return YES;
+    return deviceToReturn;
+}
+
+- (void)removeDevice:(MTRDevice *)device
+{
+    os_unfair_lock_lock(&_deviceMapLock);
+    MTRDevice * deviceToRemove = self.nodeIDToDeviceMap[@(device.nodeID)];
+    if (deviceToRemove == device) {
+        self.nodeIDToDeviceMap[@(device.nodeID)] = nil;
+    } else {
+        MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, device.nodeID);
+    }
+    os_unfair_lock_unlock(&_deviceMapLock);
 }
 
 - (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
@@ -589,7 +619,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     }
 
     if (!chip::CanCastTo<uint32_t>(setupPIN) || !chip::SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(setupPIN))) {
-        MTR_LOG_ERROR("Error: Setup pin %lu is not valid", setupPIN);
+        MTR_LOG_ERROR("Error: Setup pin %lu is not valid", static_cast<unsigned long>(setupPIN));
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -629,11 +659,48 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     });
 }
 
-- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer queue:(dispatch_queue_t)queue
 {
-    dispatch_async(_chipWorkQueue, ^{
-        self->_otaProviderDelegateBridge->setDelegate(delegate, queue);
+    VerifyOrReturn([self checkIsRunning]);
+
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning]);
+
+        if (nocChainIssuer != nil) {
+            self->_operationalCredentialsDelegate->SetNocChainIssuer(nocChainIssuer, queue);
+            self->_cppCommissioner->SetDeviceAttestationVerifier(_partialDACVerifier);
+        } else {
+            self->_cppCommissioner->SetDeviceAttestationVerifier(chip::Credentials::GetDeviceAttestationVerifier());
+        }
     });
+}
+
+- (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt
+{
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    if (![self isRunning]) {
+        [self checkForError:errorCode logMsg:kErrorNotRunning error:nil];
+        return nil;
+    }
+
+    __block NSData * result;
+    __block chip::Spake2pVerifier paseVerifier;
+    __block chip::ByteSpan saltByteSpan = chip::ByteSpan(static_cast<const uint8_t *>(salt.bytes), salt.length);
+
+    dispatch_sync(_chipWorkQueue, ^{
+        if ([self isRunning]) {
+            errorCode = self.cppCommissioner->ComputePASEVerifier(iterations, setupPincode, saltByteSpan, paseVerifier);
+            MTR_LOG_ERROR("ComputePaseVerifier: %s", chip::ErrorStr(errorCode));
+
+            uint8_t serializedVerifier[sizeof(paseVerifier.mW0) + sizeof(paseVerifier.mL)];
+            memcpy(serializedVerifier, paseVerifier.mW0, chip::kSpake2p_WS_Length);
+            memcpy(&serializedVerifier[sizeof(paseVerifier.mW0)], paseVerifier.mL, sizeof(paseVerifier.mL));
+
+            result = [NSData dataWithBytes:serializedVerifier length:sizeof(serializedVerifier)];
+        }
+    });
+
+    return result;
 }
 
 - (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg
@@ -657,13 +724,13 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     }
 }
 
-- (BOOL)checkForStartError:(BOOL)condition logMsg:(NSString *)logMsg
+- (BOOL)checkForStartError:(CHIP_ERROR)errorCode logMsg:(NSString *)logMsg
 {
-    if (condition) {
+    if (CHIP_NO_ERROR == errorCode) {
         return NO;
     }
 
-    MTR_LOG_ERROR("Error: %@", logMsg);
+    MTR_LOG_ERROR("Error(%" CHIP_ERROR_FORMAT "): %@", errorCode.Format(), logMsg);
 
     return YES;
 }
@@ -674,7 +741,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         return NO;
     }
 
-    MTR_LOG_ERROR("Error(%s): %s", chip::ErrorStr(errorCode), [logMsg UTF8String]);
+    MTR_LOG_ERROR("Error(%" CHIP_ERROR_FORMAT "): %s", errorCode.Format(), [logMsg UTF8String]);
     if (error) {
         *error = [MTRError errorForCHIPErrorCode:errorCode];
     }
@@ -710,6 +777,29 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     VerifyOrReturnValue(errorCode == CHIP_NO_ERROR, NO);
 
     return deviceProxy->GetDeviceTransportType() == chip::Transport::Type::kBle;
+}
+
+- (BOOL)getSessionForNode:(chip::NodeId)nodeID completionHandler:(MTRInternalDeviceConnectionCallback)completionHandler
+{
+    if (![self checkIsRunning]) {
+        return NO;
+    }
+
+    dispatch_async(_chipWorkQueue, ^{
+        NSError * error;
+        if (![self checkIsRunning:&error]) {
+            completionHandler(nullptr, chip::NullOptional, error);
+            return;
+        }
+
+        auto connectionBridge = new MTRDeviceConnectionBridge(completionHandler);
+
+        // MTRDeviceConnectionBridge always delivers errors async via
+        // completionHandler.
+        connectionBridge->connect(self->_cppCommissioner, nodeID);
+    });
+
+    return YES;
 }
 
 @end
@@ -753,4 +843,22 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     return CHIP_NO_ERROR;
 }
 
+- (void)invalidateCASESessionForNode:(chip::NodeId)nodeID;
+{
+    if (![self checkIsRunning]) {
+        return;
+    }
+
+    dispatch_sync(_chipWorkQueue, ^{
+        if (![self checkIsRunning]) {
+            return;
+        }
+
+        auto sessionMgr = self->_cppCommissioner->SessionMgr();
+        VerifyOrDie(sessionMgr != nullptr);
+
+        sessionMgr->MarkSessionsAsDefunct(
+            self->_cppCommissioner->GetPeerScopedId(nodeID), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
+    });
+}
 @end

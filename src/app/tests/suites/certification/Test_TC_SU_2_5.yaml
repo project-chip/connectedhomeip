@@ -17,6 +17,9 @@ name:
     3.4.2. [TC-SU-2.5] Handling different ApplyUpdateResponse scenarios on
     Requestor
 
+PICS:
+    - MCORE.OTA.Requestor
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -24,8 +27,8 @@ config:
 
 tests:
     - label:
-          'OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to "Proceed" DelayedActionTime is set to 0.'
+          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
+          field is set to Proceed DelayedActionTime is set to 0."
       verification: |
           Verify that the DUT starts updating its software.
           Once the update is finished verify the software version on the DUT to match the version downloaded for the software update.
@@ -43,8 +46,8 @@ tests:
       disabled: true
 
     - label:
-          'OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to "Proceed" DelayedActionTime is set to 3 minutes'
+          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
+          field is set to Proceed DelayedActionTime is set to 3 minutes"
       verification: |
           Run the OTA Provider App using the command:
 
@@ -63,9 +66,8 @@ tests:
       disabled: true
 
     - label:
-          'OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to "AwaitNextAction", DelayedActionTime is set to 1
-          minute.'
+          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
+          field is set to AwaitNextAction, DelayedActionTime is set to 1 minute."
       verification: |
           Run the OTA Provider App using the command:
 
@@ -81,10 +83,10 @@ tests:
       disabled: true
 
     - label:
-          'OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to "AwaitNextAction", DelayedActionTime is set to 3
+          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
+          field is set to AwaitNextAction, DelayedActionTime is set to 3
           minutes. On the subsequent ApplyUpdateRequest command, TH/OTA-P sends
-          the ApplyUpdateResponse back to DUT. Action field is set to "Proceed".'
+          the ApplyUpdateResponse back to DUT. Action field is set to Proceed."
       verification: |
           Run the OTA Provider App using the command:
 
@@ -102,8 +104,8 @@ tests:
       disabled: true
 
     - label:
-          'OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to "Discontinue".'
+          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
+          field is set to Discontinue."
       verification: |
           Run the OTA Provider App using the command:
           ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -a  discontinue

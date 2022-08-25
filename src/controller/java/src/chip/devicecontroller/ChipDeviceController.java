@@ -23,7 +23,9 @@ import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -31,6 +33,8 @@ public class ChipDeviceController {
   private long deviceControllerPtr;
   private int connectionId;
   private CompletionListener completionListener;
+  private ScanNetworksListener scanNetworksListener;
+  private NOCChainIssuer nocChainIssuer;
 
   /**
    * To load class and jni, we need to new AndroidChipPlatform after jni load but before new
@@ -40,18 +44,41 @@ public class ChipDeviceController {
     return;
   }
 
-  /** Returns a new {@link ChipDeviceController} with default parameters. */
-  public ChipDeviceController() {
-    this(ControllerParams.newBuilder().build());
-  }
-
-  /** Returns a new {@link ChipDeviceController} with the specified parameters. */
+  /**
+   * Returns a new {@link ChipDeviceController} with the specified parameters. you must set a vendor
+   * ID, ControllerParams.newBuilder().setControllerVendorId(0xFFF4).build() 0xFFF4 is a test vendor
+   * ID
+   */
   public ChipDeviceController(ControllerParams params) {
     deviceControllerPtr = newDeviceController(params);
   }
 
   public void setCompletionListener(CompletionListener listener) {
     completionListener = listener;
+  }
+
+  public void setScanNetworksListener(ScanNetworksListener listener) {
+    scanNetworksListener = listener;
+  }
+
+  /**
+   * Sets this DeviceController to use the given issuer for issuing operational certs and verifying
+   * the DAC. By default, the DeviceController uses an internal, OperationalCredentialsDelegate (see
+   * AndroidOperationalCredentialsIssuer).
+   *
+   * <p>When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
+   * called when the NOC CSR needs to be signed and DAC verified. This allows for custom credentials
+   * issuer and DAC verifier implementations, for example, when a proprietary cloud API will perform
+   * DAC verification and the CSR signing.
+   *
+   * <p>When a NOCChainIssuer is set for this controller, the PartialDACVerifier will be used rather
+   * than the DefaultDACVerifier.
+   *
+   * @param issuer
+   */
+  public void setNOCChainIssuer(NOCChainIssuer issuer) {
+    setUseJavaCallbackForNOCRequest(deviceControllerPtr, issuer != null);
+    nocChainIssuer = issuer;
   }
 
   public void pairDevice(
@@ -168,6 +195,42 @@ public class ChipDeviceController {
     commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials);
   }
 
+  /**
+   * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
+   * called when the NOC CSR needs to be signed. This allows for custom credentials issuer
+   * implementations, for example, when a proprietary cloud API will perform the CSR signing.
+   *
+   * <p>The commissioning workflow will stop upon the onNOCChainGenerationNeeded callback and resume
+   * once onNOCChainGeneration is called.
+   *
+   * <p>The following fields on the ControllerParams object MUST be populated: rootCertificate,
+   * intermediateCertificate, operationalCertificate
+   *
+   * <p>If ipk and adminSubject are set on the ControllerParams object, then they will be used in
+   * the AddNOC command set to the commissionee. If they are not populated, then the values provided
+   * in the ChipDeviceController initialization will be used.
+   *
+   * @param params
+   * @return CHIP_ERROR error code (0 is no error)
+   */
+  public int onNOCChainGeneration(ControllerParams params) {
+    return onNOCChainGeneration(deviceControllerPtr, params);
+  }
+
+  /**
+   * Update the network credentials held by the commissioner for the current commissioning session.
+   * The updated values will be used by the commissioner if the network credentials haven't already
+   * been sent to the device.
+   *
+   * <p>Its expected that this method will be called in response to the NetworkScan or the
+   * ReadCommissioningInfo callbacks.
+   *
+   * @param networkCredentials the credentials (Wi-Fi or Thread) to use in commissioning
+   */
+  public void updateCommissioningNetworkCredentials(NetworkCredentials networkCredentials) {
+    updateCommissioningNetworkCredentials(deviceControllerPtr, networkCredentials);
+  }
+
   public void unpairDevice(long deviceId) {
     unpairDevice(deviceControllerPtr, deviceId);
   }
@@ -194,8 +257,8 @@ public class ChipDeviceController {
     getConnectedDevicePointer(deviceControllerPtr, nodeId, jniCallback.getCallbackHandle());
   }
 
-  public boolean disconnectDevice(long deviceId) {
-    return disconnectDevice(deviceControllerPtr, deviceId);
+  public void releaseConnectedDevicePointer(long devicePtr) {
+    releaseOperationalDevicePointer(devicePtr);
   }
 
   public void onConnectDeviceComplete() {
@@ -217,6 +280,39 @@ public class ChipDeviceController {
   public void onCommissioningComplete(long nodeId, int errorCode) {
     if (completionListener != null) {
       completionListener.onCommissioningComplete(nodeId, errorCode);
+    }
+  }
+
+  public void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode) {
+    if (completionListener != null) {
+      completionListener.onCommissioningStatusUpdate(nodeId, stage, errorCode);
+    }
+  }
+
+  public void onReadCommissioningInfo(
+      int vendorId, int productId, int wifiEndpointId, int threadEndpointId) {
+    if (completionListener != null) {
+      completionListener.onReadCommissioningInfo(
+          vendorId, productId, wifiEndpointId, threadEndpointId);
+    }
+  }
+
+  public void onScanNetworksFailure(int errorCode) {
+    if (scanNetworksListener != null) {
+      scanNetworksListener.onScanNetworksFailure(errorCode);
+    }
+  }
+
+  public void onScanNetworksSuccess(
+      Integer networkingStatus,
+      Optional<String> debugText,
+      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
+          wiFiScanResults,
+      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
+          threadScanResults) {
+    if (scanNetworksListener != null) {
+      scanNetworksListener.onScanNetworksSuccess(
+          networkingStatus, debugText, wiFiScanResults, threadScanResults);
     }
   }
 
@@ -250,6 +346,12 @@ public class ChipDeviceController {
 
   public void onError(Throwable error) {
     completionListener.onError(error);
+  }
+
+  public void onNOCChainGenerationNeeded(CSRInfo csrInfo, AttestationInfo attestationInfo) {
+    if (nocChainIssuer != null) {
+      nocChainIssuer.onNOCChainGenerationNeeded(csrInfo, attestationInfo);
+    }
   }
 
   public void close() {
@@ -294,10 +396,6 @@ public class ChipDeviceController {
    * @see #convertX509CertToMatterCert(byte[])
    */
   public native long generateCompressedFabricId(byte[] rcac, byte[] noc);
-
-  public void updateDevice(long fabricId, long deviceId) {
-    updateDevice(deviceControllerPtr, fabricId, deviceId);
-  }
 
   /**
    * Get commmissionible Node. Commmissionible Node results are able to get using {@link
@@ -527,7 +625,7 @@ public class ChipDeviceController {
   private native void getConnectedDevicePointer(
       long deviceControllerPtr, long deviceId, long callbackHandle);
 
-  private native boolean disconnectDevice(long deviceControllerPtr, long deviceId);
+  private native void releaseOperationalDevicePointer(long devicePtr);
 
   private native void deleteDeviceController(long deviceControllerPtr);
 
@@ -536,8 +634,6 @@ public class ChipDeviceController {
   private native NetworkLocation getNetworkLocation(long deviceControllerPtr, long deviceId);
 
   private native long getCompressedFabricId(long deviceControllerPtr);
-
-  private native void updateDevice(long deviceControllerPtr, long fabricId, long deviceId);
 
   private native void discoverCommissionableNodes(long deviceControllerPtr);
 
@@ -567,6 +663,14 @@ public class ChipDeviceController {
 
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
 
+  private native void setUseJavaCallbackForNOCRequest(
+      long deviceControllerPtr, boolean useCallback);
+
+  private native void updateCommissioningNetworkCredentials(
+      long deviceControllerPtr, NetworkCredentials networkCredentials);
+
+  private native int onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
+
   private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
 
   private native void shutdownCommissioning(long deviceControllerPtr);
@@ -583,6 +687,57 @@ public class ChipDeviceController {
       deleteDeviceController(deviceControllerPtr);
       deviceControllerPtr = 0;
     }
+  }
+
+  /** Interface to implement custom operational credentials issuer (NOC chain generation). */
+  public interface NOCChainIssuer {
+    /**
+     * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
+     * called when the DAC chain must be verified and NOC chain needs to be issued from a CSR. This
+     * allows for custom credentials issuer and DAC verifier implementations, for example, when a
+     * proprietary cloud API will perform DAC verification and the NOC chain issuance from CSR.
+     *
+     * <p>When a NOCChainIssuer is set for this controller, the PartialDACVerifier will be used
+     * rather than the DefaultDACVerifier.
+     *
+     * <p>The commissioning workflow will stop upon the onNOCChainGenerationNeeded callback and
+     * resume once onNOCChainGeneration is called.
+     *
+     * <p>The following fields on the ControllerParams object passed to onNOCChainGeneration MUST be
+     * populated: rootCertificate, intermediateCertificate, operationalCertificate
+     *
+     * <p>If ipk and adminSubject are set on the ControllerParams object, then they will be used in
+     * the AddNOC command set to the commissionee. If they are not populated, then the values
+     * provided in the ChipDeviceController initialization will be used.
+     *
+     * <p>All csr and attestation fields are provided to allow for custom attestestation checks.
+     */
+    void onNOCChainGenerationNeeded(CSRInfo csrInfo, AttestationInfo attestationInfo);
+  }
+
+  /**
+   * Interface to listen for scan networks callbacks from CHIPDeviceController.
+   *
+   * <p>Set the AttemptNetworkScanWiFi or AttemptNetworkScanThread to configure the enable/disable
+   * WiFi or Thread network scan during commissioning in the the default CommissioningDelegate used
+   * by the ChipDeviceCommissioner.
+   *
+   * <p>When the callbacks onScanNetworksFailure or onScanNetworksSuccess are invoked, the
+   * commissioning flow has reached the kNeedsNetworkCreds and will wait to advance until this
+   * device controller's updateCommissioningNetworkCredentials method is called with the desired
+   * network credentials set.
+   */
+  public interface ScanNetworksListener {
+    /** Notifies when scan networks call fails. */
+    void onScanNetworksFailure(int errorCode);
+
+    void onScanNetworksSuccess(
+        Integer networkingStatus,
+        Optional<String> debugText,
+        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
+            wiFiScanResults,
+        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
+            threadScanResults);
   }
 
   /** Interface to listen for callbacks from CHIPDeviceController. */
@@ -602,6 +757,13 @@ public class ChipDeviceController {
 
     /** Notifies the completion of commissioning. */
     void onCommissioningComplete(long nodeId, int errorCode);
+
+    /** Notifies the completion of each stage of commissioning. */
+    void onReadCommissioningInfo(
+        int vendorId, int productId, int wifiEndpointId, int threadEndpointId);
+
+    /** Notifies the completion of each stage of commissioning. */
+    void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode);
 
     /** Notifies that the Chip connection has been closed. */
     void onNotifyChipConnectionClosed();

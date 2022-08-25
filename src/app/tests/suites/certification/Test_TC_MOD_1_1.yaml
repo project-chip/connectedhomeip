@@ -14,6 +14,9 @@
 
 name: 78.1.1. [TC-MOD-1.1] Global attributes with server as DUT
 
+PICS:
+    - MOD.S
+
 config:
     nodeId: 0x12344321
     cluster: "Mode Select"
@@ -34,7 +37,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "TH reads the FeatureMap attribute from the DUT"
       PICS: MOD.S.F00
@@ -43,7 +46,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "TH reads the FeatureMap attribute from the DUT"
       PICS: " !MOD.S.F00 "
@@ -52,7 +55,7 @@ tests:
       response:
           value: 0
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "TH reads the AttributeList attribute from the DUT"
       command: "readAttribute"
@@ -98,19 +101,18 @@ tests:
           value: []
           constraints:
               type: list
-
-    #issue #15011 disabled steps below Global attributes missing from YAML framework
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"
