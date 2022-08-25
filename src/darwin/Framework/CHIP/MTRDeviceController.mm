@@ -675,6 +675,34 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     });
 }
 
+- (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt
+{
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    if (![self isRunning]) {
+        [self checkForError:errorCode logMsg:kErrorNotRunning error:nil];
+        return nil;
+    }
+
+    __block NSData * result;
+    __block chip::Spake2pVerifier paseVerifier;
+    __block chip::ByteSpan saltByteSpan = chip::ByteSpan(static_cast<const uint8_t *>(salt.bytes), salt.length);
+
+    dispatch_sync(_chipWorkQueue, ^{
+        if ([self isRunning]) {
+            errorCode = self.cppCommissioner->ComputePASEVerifier(iterations, setupPincode, saltByteSpan, paseVerifier);
+            MTR_LOG_ERROR("ComputePaseVerifier: %s", chip::ErrorStr(errorCode));
+
+            uint8_t serializedVerifier[sizeof(paseVerifier.mW0) + sizeof(paseVerifier.mL)];
+            memcpy(serializedVerifier, paseVerifier.mW0, chip::kSpake2p_WS_Length);
+            memcpy(&serializedVerifier[sizeof(paseVerifier.mW0)], paseVerifier.mL, sizeof(paseVerifier.mL));
+
+            result = [NSData dataWithBytes:serializedVerifier length:sizeof(serializedVerifier)];
+        }
+    });
+
+    return result;
+}
+
 - (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg
 {
     if (condition) {
