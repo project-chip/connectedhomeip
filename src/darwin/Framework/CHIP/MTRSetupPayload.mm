@@ -197,7 +197,7 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     return payload;
 }
 
-- (nullable NSString *)getManualEntryCode
+- (nullable NSString *)manualEntryCode
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     std::string outDecimalString;
