@@ -695,35 +695,20 @@ To perform the unicast binding process, complete the following steps:
 1.  Build the CHIP Tool according to the steps from the
     [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md#building).
 2.  Go to the CHIP Tool build directory.
-3.  Add an ACL to the [lighting endpoint](../../lighting-app/nrfconnect/)
-    permissions by running the following command:
 
-         chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}]' 1 0
-
-    In this command:
-
-    -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`
-        is an ACL for the communication with the CHIP Tool.
-    -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
-        is an ACL for binding (cluster `no. 6` is the On/Off cluster and the
-        cluster `no. 8` is the Level Control cluster).
-
-    This allows the lighting application device to receive commands from the
-    light switch device.
-
-4.  Add the light switch device to the multicast group by running the following
+3.  Add the light switch device to the multicast group by running the following
     command:
 
         chip-tool tests TestGroupDemoConfig --nodeId 1
 
-5.  Add all light bulbs to the same multicast group by applying command below
+4.  Add all light bulbs to the same multicast group by applying command below
     for each of the light bulbs, using the appropriate `<node_id>` (the
     user-defined ID of the node being commissioned except `2` due to use this
     `<node_id>` for light-switch) for each of them:
 
         chip-tool tests TestGroupDemoConfig --nodeId <node_id>
 
-6.  Add Binding commands for group multicast:
+5.  Add Binding commands for group multicast:
 
         chip-tool binding write binding '[{"fabricIndex": 1, "group": 257}]' 2 1
 
