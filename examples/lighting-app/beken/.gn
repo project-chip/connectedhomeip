@@ -12,20 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Options from standalone-chip.mk that differ from configure defaults. These
-# options are used from examples/.
-
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-#import("${chip_root}/build/chip/tests.gni")
+# The location of the build configuration file.
+buildconfig = "${build_root}/config/BUILDCONFIG.gn"
 
-group("beken") {
-  deps = [
-    "${chip_root}/examples/lighting-app/beken:MatterApp",
-    "${chip_root}/src/lib",
-  ]
-}
-group("default") {
-  deps = [ ":beken" ]
+# CHIP uses angle bracket includes.
+check_system_includes = true
+
+default_args = {
+  target_cpu = "risc-v"
+  target_os = "freertos"
+
+  import("//args.gni")
 }
