@@ -20,7 +20,9 @@
 #if CONFIG_BT_ENABLED
 #include "esp_bt.h"
 #if CONFIG_BT_NIMBLE_ENABLED
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "esp_nimble_hci.h"
+#endif // ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "nimble/nimble_port.h"
 #endif // CONFIG_BT_NIMBLE_ENABLED
 #endif // CONFIG_BT_ENABLED
@@ -45,6 +47,9 @@ using namespace chip::DeviceLayer;
 using namespace chip::System;
 
 DeviceCallbacksDelegate * appDelegate = nullptr;
+#if CONFIG_ENABLE_OTA_REQUESTOR
+static bool isOTAInitialized = false;
+#endif
 
 void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -62,17 +67,30 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
         ESP_LOGI(TAG, "CHIPoBLE disconnected");
         break;
 
+    case DeviceEventType::kThreadConnectivityChange:
+#if CONFIG_ENABLE_OTA_REQUESTOR
+        if (event->ThreadConnectivityChange.Result == kConnectivity_Established && !isOTAInitialized)
+        {
+            OTAHelpers::Instance().InitOTARequestor();
+            isOTAInitialized = true;
+        }
+#endif
+        break;
+
     case DeviceEventType::kCommissioningComplete: {
         ESP_LOGI(TAG, "Commissioning complete");
 #if CONFIG_BT_NIMBLE_ENABLED && CONFIG_DEINIT_BLE_ON_COMMISSIONING_COMPLETE
 
         if (ble_hs_is_enabled())
         {
-            int ret = nimble_port_stop();
+            int ret       = nimble_port_stop();
+            esp_err_t err = ESP_OK;
             if (ret == 0)
             {
                 nimble_port_deinit();
-                esp_err_t err = esp_nimble_hci_and_controller_deinit();
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+                err = esp_nimble_hci_and_controller_deinit();
+#endif // ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
                 err += esp_bt_mem_release(ESP_BT_MODE_BLE);
                 if (err == ESP_OK)
                 {
@@ -114,9 +132,6 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
 
 void CommonDeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
 {
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    static bool isOTAInitialized = false;
-#endif
     appDelegate = DeviceCallbacksDelegate::Instance().GetAppDelegate();
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {

@@ -40,7 +40,6 @@ tests:
               type: int16u
 
     - label: "Read the global attribute: FeatureMap"
-      PICS: PS.S.F00 || PS.S.F01 || PS.S.F02 || PS.S.F03
       command: "readAttribute"
       attribute: "FeatureMap"
       response:

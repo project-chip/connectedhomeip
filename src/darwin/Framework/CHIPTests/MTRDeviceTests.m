@@ -347,6 +347,51 @@ static MTRBaseDevice * GetConnectedDevice(void)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)test004_InvokeTimedCommand
+{
+#if MANUAL_INDIVIDUAL_TEST
+    [self initStack];
+    [self waitForCommissionee];
+#endif
+    XCTestExpectation * expectation = [self expectationWithDescription:@"invoke Off command"];
+
+    MTRBaseDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    NSDictionary * fields = @{
+        @"type" : @"Structure",
+        @"value" : @[],
+    };
+    [device invokeCommandWithEndpointId:@1
+                              clusterId:@6
+                              commandId:@0
+                          commandFields:fields
+                     timedInvokeTimeout:@10000
+                            clientQueue:queue
+                             completion:^(id _Nullable values, NSError * _Nullable error) {
+                                 NSLog(@"invoke command: Off values: %@, error: %@", values, error);
+
+                                 XCTAssertNil(error);
+
+                                 {
+                                     XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+                                     NSArray * resultArray = values;
+                                     for (NSDictionary * result in resultArray) {
+                                         MTRCommandPath * path = result[@"commandPath"];
+                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+                                         XCTAssertEqual([path.command unsignedIntegerValue], 0);
+                                         XCTAssertNil(result[@"error"]);
+                                     }
+                                     XCTAssertEqual([resultArray count], 1);
+                                 }
+
+                                 [expectation fulfill];
+                             }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
 
 - (void)test005_Subscribe
@@ -551,7 +596,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:kTimeoutInSeconds];
 }
 
-#if 0 // Re-enable test if the crash bug in CHIP stack is fixed to handle bad command Id
 - (void)test008_InvokeCommandFailure
 {
 #if MANUAL_INDIVIDUAL_TEST
@@ -563,34 +607,31 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    NSDictionary * fields = @ {
-@"type" :
-        @"Structure",
-@"value" :
-        @[
-@{ @"contextTag" : @0, @"data" : @ { @"type" : @"UnsignedInteger", @"value" : @0 } },
-@{ @"contextTag" : @1, @"data" : @ { @"type" : @"UnsignedInteger", @"value" : @10 } }
+    NSDictionary * fields = @{
+        @"type" : @"Structure",
+        @"value" : @[
+            @{ @"contextTag" : @0, @"data" : @ { @"type" : @"UnsignedInteger", @"value" : @0 } },
+            @{ @"contextTag" : @1, @"data" : @ { @"type" : @"UnsignedInteger", @"value" : @10 } }
         ]
     };
     [device
-     invokeCommandWithEndpointId:@1
-     clusterId:@8
-     commandId:@40000
-     commandFields:fields
-     timedInvokeTimeout:nil
-     clientQueue:queue
-    completion:^(id _Nullable values, NSError * _Nullable error) {
-        NSLog(@"invoke command: MoveToLevelWithOnOff values: %@, error: %@", values, error);
+        invokeCommandWithEndpointId:@1
+                          clusterId:@8
+                          commandId:@40000
+                      commandFields:fields
+                 timedInvokeTimeout:nil
+                        clientQueue:queue
+                         completion:^(id _Nullable values, NSError * _Nullable error) {
+                             NSLog(@"invoke command: MoveToLevelWithOnOff values: %@, error: %@", values, error);
 
-        XCTAssertNil(values);
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+                             XCTAssertNil(values);
+                             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
 
-        [expectation fulfill];
-    }];
+                             [expectation fulfill];
+                         }];
 
     [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:kTimeoutInSeconds];
 }
-#endif
 
 - (void)test009_SubscribeFailure
 {
@@ -1047,6 +1088,118 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ deregisterExpectation ] timeout:kTimeoutInSeconds];
 }
 #endif
+
+- (void)test013_ReuseChipClusterObject
+{
+#if MANUAL_INDIVIDUAL_TEST
+    [self initStack];
+    [self waitForCommissionee];
+#endif
+
+    MTRDeviceController * controller = sController;
+    XCTAssertNotNil(controller);
+
+    __block MTRBaseDevice * device;
+    __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
+    [controller getBaseDevice:kDeviceId
+                        queue:dispatch_get_main_queue()
+            completionHandler:^(MTRBaseDevice * _Nullable retrievedDevice, NSError * _Nullable error) {
+                XCTAssertEqual(error.code, 0);
+                [connectionExpectation fulfill];
+                connectionExpectation = nil;
+                device = retrievedDevice;
+            }];
+    [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"ReuseMTRClusterObjectFirstCall"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    MTRBaseClusterTestCluster * cluster = [[MTRBaseClusterTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster testWithCompletionHandler:^(NSError * err) {
+        NSLog(@"ReuseMTRClusterObject test Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    expectation = [self expectationWithDescription:@"ReuseMTRClusterObjectSecondCall"];
+
+    // Reuse the MTRCluster Object for multiple times.
+
+    [cluster testWithCompletionHandler:^(NSError * err) {
+        NSLog(@"ReuseMTRClusterObject test Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)test014_InvokeCommandWithDifferentIdResponse
+{
+#if MANUAL_INDIVIDUAL_TEST
+    [self initStack];
+    [self waitForCommissionee];
+#endif
+    XCTestExpectation * expectation = [self expectationWithDescription:@"invoke Off command"];
+
+    MTRBaseDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    NSDictionary * fields = @{
+        @"type" : @"Structure",
+        @"value" : @[],
+    };
+    // KeySetReadAllIndices in the Group Key Management has id 4 and a data response with id 5
+    [device
+        invokeCommandWithEndpointId:@0
+                          clusterId:@(0x003F)
+                          commandId:@4
+                      commandFields:fields
+                 timedInvokeTimeout:nil
+                        clientQueue:queue
+                         completion:^(id _Nullable values, NSError * _Nullable error) {
+                             NSLog(@"invoke command: KeySetReadAllIndices values: %@, error: %@", values, error);
+
+                             XCTAssertNil(error);
+
+                             {
+                                 XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+                                 NSArray * resultArray = values;
+                                 for (NSDictionary * result in resultArray) {
+                                     MTRCommandPath * path = result[MTRCommandPathKey];
+                                     XCTAssertEqual([path.endpoint unsignedIntegerValue], 0);
+                                     XCTAssertEqual([path.cluster unsignedIntegerValue], 0x003F);
+                                     XCTAssertEqual([path.command unsignedIntegerValue], 5);
+                                     // We expect a KeySetReadAllIndicesResponse struct,
+                                     // which has context tag 0 pointing to a list with one
+                                     // item: 0 (the IPK's keyset id).
+                                     NSDictionary * expectedResult = @{
+                                         MTRTypeKey : MTRStructureValueType,
+                                         MTRValueKey : @[ @{
+                                             MTRContextTagKey : @0,
+                                             MTRDataKey : @ {
+                                                 MTRTypeKey : MTRArrayValueType,
+                                                 MTRValueKey : @[ @{
+                                                     MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @0 }
+                                                 } ]
+                                             }
+                                         } ],
+                                     };
+                                     XCTAssertEqualObjects(result[MTRDataKey], expectedResult);
+                                     XCTAssertNil(result[MTRErrorKey]);
+                                 }
+                                 XCTAssertEqual([resultArray count], 1);
+                             }
+
+                             [expectation fulfill];
+                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)test900_SubscribeAllAttributes
 {

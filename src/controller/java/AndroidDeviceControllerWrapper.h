@@ -26,6 +26,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
+#include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/android/CHIPP256KeypairBridge.h>
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -93,6 +94,8 @@ public:
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
     chip::Controller::AutoCommissioner * GetAutoCommissioner() { return &mAutoCommissioner; }
+
+    chip::Credentials::PartialDACVerifier * GetPartialDACVerifier() { return &mPartialDACVerifier; }
 
     const chip::Controller::CommissioningParameters & GetCommissioningParameters() const
     {
@@ -174,6 +177,8 @@ private:
     jbyte * operationalDataset         = nullptr;
 
     chip::Controller::AutoCommissioner mAutoCommissioner;
+
+    chip::Credentials::PartialDACVerifier mPartialDACVerifier;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidOperationalCredentialsIssuerPtr opCredsIssuer) :
         mController(std::move(controller)), mOpCredsIssuer(std::move(opCredsIssuer))

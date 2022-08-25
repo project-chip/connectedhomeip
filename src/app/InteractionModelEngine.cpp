@@ -56,6 +56,7 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     mpFabricTable    = apFabricTable;
     mpCASESessionMgr = apCASESessionMgr;
 
+    ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
     mReportingEngine.Init();
@@ -76,9 +77,9 @@ void InteractionModelEngine::Shutdown()
     //
     while (handlerIter)
     {
-        CommandHandlerInterface * next = handlerIter->GetNext();
+        CommandHandlerInterface * nextHandler = handlerIter->GetNext();
         handlerIter->SetNext(nullptr);
-        handlerIter = next;
+        handlerIter = nextHandler;
     }
 
     mCommandHandlerList = nullptr;
@@ -235,29 +236,12 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
     return numActive;
 }
 
-void InteractionModelEngine::CloseTransactionsFromFabricIndex(FabricIndex aFabricIndex)
-{
-    //
-    // Walk through all existing subscriptions and shut down those whose subscriber matches
-    // that which just came in.
-    //
-    mReadHandlers.ForEachActiveObject([this, aFabricIndex](ReadHandler * handler) {
-        if (handler->GetAccessingFabricIndex() == aFabricIndex)
-        {
-            ChipLogProgress(InteractionModel, "Deleting expired ReadHandler for NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
-                            ChipLogValueX64(handler->GetInitiatorNodeId()), aFabricIndex);
-            mReadHandlers.ReleaseObject(handler);
-        }
-
-        return Loop::Continue;
-    });
-}
-
-CHIP_ERROR InteractionModelEngine::ShutdownSubscription(SubscriptionId aSubscriptionId)
+CHIP_ERROR InteractionModelEngine::ShutdownSubscription(const ScopedNodeId & aPeerNodeId, SubscriptionId aSubscriptionId)
 {
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
-        if (readClient->IsSubscriptionType() && readClient->IsMatchingSubscriptionId(aSubscriptionId))
+        if (readClient->IsSubscriptionType() && readClient->IsMatchingSubscriptionId(aSubscriptionId) &&
+            readClient->GetFabricIndex() == aPeerNodeId.GetFabricIndex() && readClient->GetPeerNodeId() == aPeerNodeId.GetNodeId())
         {
             readClient->Close(CHIP_NO_ERROR);
             return CHIP_NO_ERROR;
@@ -307,22 +291,18 @@ void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
     mReadHandlers.ReleaseObject(&apReadObj);
 }
 
-CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
-                                                          const PayloadHeader & aPayloadHeader,
-                                                          System::PacketBufferHandle && aPayload, bool aIsTimedInvoke,
-                                                          Protocols::InteractionModel::Status & aStatus)
+Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
+                                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
+                                                      bool aIsTimedInvoke)
 {
     CommandHandler * commandHandler = mCommandHandlerObjs.CreateObject(this);
     if (commandHandler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for Invoke interaction");
-        aStatus = Status::Busy;
-        return CHIP_ERROR_NO_MEMORY;
+        return Status::Busy;
     }
-    ReturnErrorOnFailure(
-        commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), aIsTimedInvoke));
-    aStatus = Status::Success;
-    return CHIP_NO_ERROR;
+    commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), aIsTimedInvoke);
+    return Status::Success;
 }
 
 Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,
@@ -589,7 +569,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest))
     {
-        OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ false, status);
+        status = OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ false);
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequest))
     {
@@ -1217,9 +1197,9 @@ void InteractionModelEngine::ReleasePool(ObjectList<T> *& aObjectList, ObjectPoo
     ObjectList<T> * current = aObjectList;
     while (current != nullptr)
     {
-        ObjectList<T> * next = current->mpNext;
+        ObjectList<T> * nextObject = current->mpNext;
         aObjectPool.ReleaseObject(current);
-        current = next;
+        current = nextObject;
     }
 
     aObjectList = nullptr;
@@ -1371,8 +1351,7 @@ void InteractionModelEngine::OnTimedInvoke(TimedHandler * apTimedHandler, Messag
     VerifyOrDie(aPayloadHeader.HasMessageType(MsgType::InvokeCommandRequest));
     VerifyOrDie(!apExchangeContext->IsGroupExchangeContext());
 
-    Status status = Status::Failure;
-    OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ true, status);
+    Status status = OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ true);
     if (status != Status::Success)
     {
         StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
@@ -1434,5 +1413,41 @@ size_t InteractionModelEngine::GetNumDirtySubscriptions() const
     return numDirtySubscriptions;
 }
 
+void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    mReadHandlers.ForEachActiveObject([fabricIndex](ReadHandler * handler) {
+        if (handler->GetAccessingFabricIndex() == fabricIndex)
+        {
+            ChipLogProgress(InteractionModel, "Deleting expired ReadHandler for NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
+                            ChipLogValueX64(handler->GetInitiatorNodeId()), fabricIndex);
+            handler->Close();
+        }
+
+        return Loop::Continue;
+    });
+
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    {
+        if (readClient->GetFabricIndex() == fabricIndex)
+        {
+            ChipLogProgress(InteractionModel, "Fabric removed, deleting obsolete read client with FabricIndex: %u", fabricIndex);
+            readClient->Close(CHIP_ERROR_IM_FABRIC_DELETED, false);
+        }
+    }
+
+    for (auto & handler : mWriteHandlers)
+    {
+        if (!(handler.IsFree()) && handler.GetAccessingFabricIndex() == fabricIndex)
+        {
+            ChipLogProgress(InteractionModel, "Fabric removed, deleting obsolete write handler with FabricIndex: %u", fabricIndex);
+            handler.Close();
+        }
+    }
+
+    // Applications may hold references to CommandHandler instances for async command processing.
+    // Therefore we can't forcible destroy CommandHandlers here.  Their exchanges will get closed by
+    // the fabric removal, though, so they will fail when they try to actually send their command response
+    // and will close at that point.
+}
 } // namespace app
 } // namespace chip

@@ -27,11 +27,39 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Preconditions"
+      verification: |
+          1 - DUT is on an operational network and has accurate date, time, timezone, regulatory, and fabric information available.
+
+          2 - 5.1.4.2 - 11-digit Manual Pairing Code is printed on the Commissionee device or in additional provided materials (ex: manual).
+
+          An example onboarding payload could be "34970112332" (following 5.1.4. Table 37. "Manual Pairing Code Elements") which each include:
+
+          - 1-bit VID_PID_PRESENT = 0 (11-digit only)
+
+          - 1-bit VERSION=0
+
+          - 4-bit SHORT DISCRIMINATOR=0xF00 (4 Most-significant bits of the 12-bits Discriminator value)
+
+          - 27-bit PASSCODE=20202021 (see section 5.1.6. Generation of the Passcode)
+
+          - 16-bit VENDOR_ID=0xFFF1 (as defined in section 2.5.2. "Vendor Identifier", for 21-digit Manual Pairing Code only)
+
+          - 16-bit PRODUCT_ID=0x8001 (as defined in section 2.5.3. "Product Identifier", present if and only if VID is present)
+
+          - A generated CHECK_DIGIT (see section 5.1.4. Manual Pairing Code, subsection "Check Digit")
+      disabled: true
+
     - label:
           "Provide the 11-digit Manual Pairing Code from the Commissionee to the
           DUT in any format supported by DUT"
       verification: |
-          Verify in TH as server side
+          Verify on the TH Commissionee side:
           $ ./out/all-clusters-app/chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 0 --capabilities 4 --discriminator 3840 --passcode 20202021
 
           [1651180718.960383][13218:13218] CHIP:DL: Device Configuration:
@@ -56,10 +84,10 @@ tests:
           2"
       verification: |
           1. Use chip-tool"s "payload verhoeff-generate" command to help generate the new, invalid Manual code
+          No applicable DUT or TH logs
 
           $ ./chip-tool payload verhoeff-generate 8497011233
 
-          Verify in DUT as client side
           [1651186243492] [13415:349553] CHIP: [SPL] Generating Character for: 84970112331
           [1651186243492] [13415:349553] CHIP: [SPL] Generated Char: 1
           Manual Code: 84970112331
@@ -71,7 +99,7 @@ tests:
       verification: |
           $  ./chip-tool pairing code 1 84970112331
 
-          Verify in DUT as client side
+          Verify in DUT Commissioner side
 
           Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
       disabled: true
@@ -81,9 +109,11 @@ tests:
           manual code but substituting out the current VID_PID_PRESENT with an
           invalid VID_PID_PRESENT set to 1"
       verification: |
+          1. Use chip-tool"s "payload generate-manualcode" command to help generate the new, invalid Manual code
+          No applicable DUT or TH logs
+
           $ ./chip-tool payload generate-manualcode --discriminator 0xF00 --setup-pin-code 20202021 --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 2 --force-short-code 1
 
-          Verify in DUT as client side
           [1651181048462] [11611:269469] CHIP: [TOO] Manual Code: 74970112334
       disabled: true
 
@@ -93,7 +123,7 @@ tests:
       verification: |
           $  ./chip-tool pairing code 1 74970112334
 
-          Verify in DUT as client side
+          Verify on the DUT Commissioner side:
           [1651184274318] [12512:321250] CHIP: [SPL] Failed decoding base10. Input length 10 was not expected length 20
           ...
           [1651184274321] [12512:321244] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:63: CHIP Error 0x0000001E: Invalid string length
@@ -109,11 +139,11 @@ tests:
           Discriminator value)"
       verification: |
           1. Use chip-tool"s "payload generate-manualcode" command to help generate the new, invalid Manual code
+          No applicable DUT or TH logs
 
           $ ./chip-tool payload generate-manualcode --existing-payload 34970112332 --discriminator 0xE00
           [1657236763262] [31784:16850989] CHIP: [TOO] Manual Code: 33331712336
 
-          Verify in DUT as client side
           Manual Code: 33331712336
       disabled: true
 
@@ -121,7 +151,7 @@ tests:
           "Provide the Manual Pairing Code, generated in the previous step, to
           the DUT in any format supported by the DUT"
       verification: |
-          On DUT=chip-tool:
+          Verify on the DUT Commissioner side:
           $  ./chip-tool pairing code 1 33331712336
 
           [1654001605.517505][3200:3205] CHIP:-: ../../third_party/connectedhomeip/src/platform/Linux/BLEManagerImpl.cpp:748: CHIP Error 0x0000002D: Not Implemented at ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:450
@@ -139,8 +169,7 @@ tests:
           55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321"
       verification: |
           1. Use these as examples of how to generate manual codes with invalid passcodes
-
-          Verify in DUT as client side
+          No applicable DUT or TH logs
 
           "34915200008" (00000000),
           $ ./chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0 --allow-invalid-payload 1 --setup-pin-code 00000000
@@ -195,7 +224,8 @@ tests:
           "Provide each of the Manual Pairing Codes, generated in the previous
           step, to the DUT in any format supported by the DUT"
       verification: |
-          Verify in DUT as client side
+          Verify on the DUT Commissioner side:
+          No applicable TH logs
 
           (00000000)
           $  ./chip-tool pairing code 1 34915200008
@@ -253,7 +283,8 @@ tests:
           CHECK_DIGIT while following Table 38. Encoding Method without Vendor
           and Product IDs (VID_PID_Present == 0))"
       verification: |
-          1. Change the last digit of the manual pairing code to a different digit
+          1. Manually change the last digit of the manual pairing code to a different digit
+          No applicable DUT or TH logs
 
           Manual Code: 34970112331
       disabled: true
@@ -262,7 +293,7 @@ tests:
           "Provide the Manual Pairing Code, generated in the previous step, to
           the DUT in any format supported by the DUT"
       verification: |
-          On DUT=chip-tool:
+          Verify on the DUT Commissioner side:
           $ ./chip-tool pairing code 1 34970112331
           [1657586218401] [10710:465838] CHIP: [TOO] Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:50: CHIP Error 0x00000013: Integrity check failed
       disabled: true

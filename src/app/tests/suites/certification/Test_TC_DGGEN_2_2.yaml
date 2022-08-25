@@ -25,9 +25,23 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          "NOTE: https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#readme
+           Events to be executed as following
+           1. Compile app using below command in connectedhomeip folder
+           a. ./scripts/run_in_build_env.sh ""./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build""
+           b. ./scripts/run_in_build_env.sh ""./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang build""
+           2. Build respective app (all-clusters-app)
+           3. Commission DUT to TH
+           4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT
+           ps  -aef|grep all-clusters-app
+           5. Follow the Verification step below to generate the event in 2nd terminal of DUT "
+      disabled: true
+
     - label: "Commission DUT to TH"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -132,53 +146,4 @@ tests:
           [1659530352.583750][4993:4998] CHIP:TOO:   BootReason: {
           [1659530352.583789][4993:4998] CHIP:TOO:     BootReason: 0
           [1659530352.583813][4993:4998] CHIP:TOO:    }
-      disabled: true
-
-    - label: "TH initiates the subscription of NetworkFault event from DUT."
-      PICS: DGGEN.S.E02
-      verification: |
-          On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
-
-           "echo "{"Name":"NetworkFaultChange"}" > /tmp/chip_all_clusters_fifo-<PID>   (PID of all-clusters-app)"
-
-
-          sudo ./chip-tool generaldiagnostics subscribe-event network-fault-change 100 1000 1 0
-          On TH(chip-tool) verify that subscription response  of NetworkFault event  shows subscrition ID
-
-          [1653659901.757441][242605:242610] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:11933575 on exchange 20223i
-          [1653659901.757513][242605:242610] CHIP:EM: Found matching exchange: 20223i, Delegate: 0x7fd058003950
-          [1653659901.757544][242605:242610] CHIP:EM: Rxd Ack; Removing MessageCounter:3369789 from Retrans Table on exchange 20223i
-          [1653659901.757564][242605:242610] CHIP:EM: Removed CHIP MessageCounter:3369789 from RetransTable on exchange 20223i
-          [1653659901.757618][242605:242610] CHIP:DMG: SubscribeResponseMessage =
-          [1653659901.757638][242605:242610] CHIP:DMG: {
-          [1653659901.757658][242605:242610] CHIP:DMG:         SubscriptionId = 0x17dc072d1130a3bd,
-          [1653659901.757676][242605:242610] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
-          [1653659901.757690][242605:242610] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
-          [1653659901.757708][242605:242610] CHIP:DMG:         InteractionModelRevision = 1
-          [1653659901.757721][242605:242610] CHIP:DMG: }
-          [1653659901.757746][242605:242610] CHIP:DMG: Subscription established with SubscriptionID = 0x17DC072D1130A3BD MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000002
-      disabled: true
-
-    - label:
-          "Reboot DUT with a normal reboot process. Rejoin DUT back to previous
-          TH fabric."
-      PICS: DGGEN.S.E03
-      verification: |
-          On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
-
-           "echo "{"Name":"<BootReason>"}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of all-clusters-app)"
-
-
-          1. Reboot DUT with a normal reboot process
-          2. ./chip-tool generaldiagnostics read-event boot-reason 1 0
-          On TH(chip-tool) verify that the event data of BootReason specified by Table 103 BootReason ENUM table.
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0003
-          [1651562139.644134][7873:7878] CHIP:TOO:          Event number: 1
-          [1651562139.644157][7873:7878] CHIP:TOO:          Priority: Critical
-          [1651562139.644179][7873:7878] CHIP:TOO:          Timestamp: 8347991
-          [1651562139.644273][7873:7878] CHIP:TOO:   BootReason: {
-          [1651562139.644317][7873:7878] CHIP:TOO:     BootReason: 0
-          [1651562139.644343][7873:7878] CHIP:TOO:    }
-          [1651562139.644431][7873:7878] CHIP:EM: Sending Standalone Ack for MessageCounter:9685408 on exchange 6383i
       disabled: true

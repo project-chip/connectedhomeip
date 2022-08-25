@@ -26,12 +26,12 @@ config:
 tests:
     - label: "Note"
       verification: |
-          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
     - label: "Commission TH to DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT reads a list of ThreadMetrics struct attribute from TH."
@@ -107,19 +107,19 @@ tests:
           [1659972063.411625][3458:3458] CHIP:IM: Received Read request
           [1659972063.411702][3458:3458] CHIP:DMG: ReadRequestMessage =
           [1659972063.411740][3458:3458] CHIP:DMG: {
-          [1659972063.411763][3458:3458] CHIP:DMG: 	AttributePathIBs =
-          [1659972063.411789][3458:3458] CHIP:DMG: 	[
-          [1659972063.411822][3458:3458] CHIP:DMG: 		AttributePathIB =
-          [1659972063.411852][3458:3458] CHIP:DMG: 		{
-          [1659972063.411892][3458:3458] CHIP:DMG: 			Endpoint = 0x0,
-          [1659972063.411932][3458:3458] CHIP:DMG: 			Cluster = 0x34,
-          [1659972063.411964][3458:3458] CHIP:DMG: 			Attribute = 0x0000_0002,
-          [1659972063.412003][3458:3458] CHIP:DMG: 		}
+          [1659972063.411763][3458:3458] CHIP:DMG:         AttributePathIBs =
+          [1659972063.411789][3458:3458] CHIP:DMG:         [
+          [1659972063.411822][3458:3458] CHIP:DMG:                 AttributePathIB =
+          [1659972063.411852][3458:3458] CHIP:DMG:                 {
+          [1659972063.411892][3458:3458] CHIP:DMG:                         Endpoint = 0x0,
+          [1659972063.411932][3458:3458] CHIP:DMG:                         Cluster = 0x34,
+          [1659972063.411964][3458:3458] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1659972063.412003][3458:3458] CHIP:DMG:                 }
           [1659972063.412032][3458:3458] CHIP:DMG:
-          [1659972063.412069][3458:3458] CHIP:DMG: 	],
+          [1659972063.412069][3458:3458] CHIP:DMG:         ],
           [1659972063.412106][3458:3458] CHIP:DMG:
-          [1659972063.412133][3458:3458] CHIP:DMG: 	isFabricFiltered = true,
-          [1659972063.412165][3458:3458] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659972063.412133][3458:3458] CHIP:DMG:         isFabricFiltered = true,
+          [1659972063.412165][3458:3458] CHIP:DMG:         InteractionModelRevision = 1
           [1659972063.412191][3458:3458] CHIP:DMG: },
           [1659972063.412273][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1659972063.412375][3458:3458] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
@@ -139,19 +139,19 @@ tests:
           [1659972088.497642][3458:3458] CHIP:IM: Received Read request
           [1659972088.497747][3458:3458] CHIP:DMG: ReadRequestMessage =
           [1659972088.497787][3458:3458] CHIP:DMG: {
-          [1659972088.497816][3458:3458] CHIP:DMG: 	AttributePathIBs =
-          [1659972088.497854][3458:3458] CHIP:DMG: 	[
-          [1659972088.497889][3458:3458] CHIP:DMG: 		AttributePathIB =
-          [1659972088.497928][3458:3458] CHIP:DMG: 		{
-          [1659972088.497970][3458:3458] CHIP:DMG: 			Endpoint = 0x0,
-          [1659972088.498016][3458:3458] CHIP:DMG: 			Cluster = 0x34,
-          [1659972088.498061][3458:3458] CHIP:DMG: 			Attribute = 0x0000_0003,
-          [1659972088.498103][3458:3458] CHIP:DMG: 		}
+          [1659972088.497816][3458:3458] CHIP:DMG:         AttributePathIBs =
+          [1659972088.497854][3458:3458] CHIP:DMG:         [
+          [1659972088.497889][3458:3458] CHIP:DMG:                 AttributePathIB =
+          [1659972088.497928][3458:3458] CHIP:DMG:                 {
+          [1659972088.497970][3458:3458] CHIP:DMG:                         Endpoint = 0x0,
+          [1659972088.498016][3458:3458] CHIP:DMG:                         Cluster = 0x34,
+          [1659972088.498061][3458:3458] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972088.498103][3458:3458] CHIP:DMG:                 }
           [1659972088.498144][3458:3458] CHIP:DMG:
-          [1659972088.498180][3458:3458] CHIP:DMG: 	],
+          [1659972088.498180][3458:3458] CHIP:DMG:         ],
           [1659972088.498219][3458:3458] CHIP:DMG:
-          [1659972088.498257][3458:3458] CHIP:DMG: 	isFabricFiltered = true,
-          [1659972088.498294][3458:3458] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659972088.498257][3458:3458] CHIP:DMG:         isFabricFiltered = true,
+          [1659972088.498294][3458:3458] CHIP:DMG:         InteractionModelRevision = 1
           [1659972088.498328][3458:3458] CHIP:DMG: },
           [1659972088.498431][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1659972088.498545][3458:3458] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0

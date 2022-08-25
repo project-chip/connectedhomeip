@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 121.1.1. [TC-G-1.1] Global Attributes [DUT-Server]
 
@@ -20,80 +19,79 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Groups"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
-          verification step to be updated.
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "TH reads the ClusterRevision from DUT"
-      verification: |
-          ./chip-tool groups read cluster-revision 1 1
-
-          Verify the "clusterrevision value" on the TH(Chip-tool)  Log:
-
-          [1651216621.203474][2391:2396] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFD DataVersion: 745654550
-          [1651216621.204919][2391:2396] CHIP:TOO:   ClusterRevision: 4
-      disabled: true
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 4
+          constraints:
+              type: int16u
 
     - label: "TH reads the FeatureMap from DUT"
-      verification: |
-          ./chip-tool groups read feature-map 1 1
+      PICS: " !G.S.F00 "
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
 
-          Verify the "featuremap value" on the TH(Chip-tool)  Log:
-
-          [1653556224.547920][18764:18769] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFC DataVersion: 3409054639
-          [1653556224.548038][18764:18769] CHIP:TOO:   FeatureMap: 1
-      disabled: true
+    - label: "TH reads the FeatureMap from DUT"
+      PICS: G.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: bitmap32
 
     - label: "TH reads AttributeList from DUT"
-      verification: |
-          ./chip-tool groups read attribute-list 1 1
-
-          Verify the "attibute list contains the mandatory attributes and global attributes" on the TH(Chip-tool)  Log:
-
-          [1653556295.417734][18773:18779] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFB DataVersion: 3409054639
-          [1653556295.417900][18773:18779] CHIP:TOO:   AttributeList: 6 entries
-          [1653556295.417971][18773:18779] CHIP:TOO:     [1]: 0
-          [1653556295.418015][18773:18779] CHIP:TOO:     [2]: 65528
-          [1653556295.418057][18773:18779] CHIP:TOO:     [3]: 65529
-          [1653556295.418098][18773:18779] CHIP:TOO:     [4]: 65531
-          [1653556295.418138][18773:18779] CHIP:TOO:     [5]: 65532
-          [1653556295.418179][18773:18779] CHIP:TOO:     [6]: 65533
-      disabled: true
-
-    - label: "TH reads EventList from DUT"
-      verification: |
-          Out of scope for V1.0
-      disabled: true
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 65528, 65529, 65531, 65532, 65533]
 
     - label: "TH reads AcceptedCommandList from DUT"
-      verification: |
-          ./chip-tool groups read accepted-command-list 1 1
-
-          Verify the "AcceptedCommands" on the TH(Chip-tool)  Log:
-
-          [1651217107.034926][2435:2440] CHIP:TOO:   AcceptedCommandList: 6 entries
-          [1651217107.034984][2435:2440] CHIP:TOO:     [1]: 0
-          [1651217107.035028][2435:2440] CHIP:TOO:     [2]: 1
-          [1651217107.035070][2435:2440] CHIP:TOO:     [3]: 2
-          [1651217107.035112][2435:2440] CHIP:TOO:     [4]: 3
-          [1651217107.035153][2435:2440] CHIP:TOO:     [5]: 4
-          [1651217107.035194][2435:2440] CHIP:TOO:     [6]: 5
-      disabled: true
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3, 4, 5]
 
     - label: "TH reads GeneratedCommandList from DUT"
-      verification: |
-          ./chip-tool groups read generated-command-list 1 1
-
-          Verify the "GeneratedCommands" on the TH(Chip-tool)  Log:
-
-          [1651217152.020233][2444:2449] CHIP:TOO:   GeneratedCommandList: 4 entries
-          [1651217152.020276][2444:2449] CHIP:TOO:     [1]: 0
-          [1651217152.020312][2444:2449] CHIP:TOO:     [2]: 1
-          [1651217152.020346][2444:2449] CHIP:TOO:     [3]: 2
-          [1651217152.020380][2444:2449] CHIP:TOO:     [4]: 3
-      disabled: true
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3]
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

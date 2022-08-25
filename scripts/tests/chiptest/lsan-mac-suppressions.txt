@@ -1,0 +1,35 @@
+# Looks like some Objective C class bits are leaked, which is probably OK since
+# those are singletons.
+leak:realizeClassWithoutSwift
+leak:objc_initializeClassPair_internal
+
+# TODO: Under [NSManagedObjectContext executeFetchRequest] there are managed object bits that seem to be leaky.
+leak:class_addMethod
+leak:class_addIvar
+
+# TODO: Leaks of blocks from dispatch source handlers that need to be investigated.
+leak:_Block_copy
+
+# TODO: OpenSSL random byte generation creates some sort of pools that we seem to never clean up.  This seems to be happening a _lot_.
+leak:drbg_ctr_init
+leak:rand_pool_new
+leak:RAND_priv_bytes
+leak:drbg_bytes
+
+# TODO: OpenSSL ERR_get_state seems to leak.
+leak:ERR_get_state
+
+# TODO: BLE initialization allocates some UUIDs and strings that seem to leak.
+leak:[BleConnection initWithDiscriminator:]
+leak:[CBXpcConnection initWithDelegate:queue:options:sessionType:]
+
+# TODO: ClusterBase::SubscribeAttribute creates a subscription that cannot
+# actually be shut down in any way.
+leak:ClusterBase::SubscribeAttribute
+
+# TODO: Figure out how we are managing to leak NSData while using ARC!
+leak:[CHIPToolKeypair signMessageECDSA_RAW:]
+
+# TODO: Figure out how we are managing to leak NSData while using ARC, though
+# this may just be a leak deep inside the CFPreferences stuff somewhere.
+leak:[CHIPToolPersistentStorageDelegate storageDataForKey:]

@@ -31,18 +31,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Precondition Send On Command"
-      cluster: "On/Off"
-      PICS: OO.S.C01.Rsp
-      command: "On"
-
-    - label: "Check on/off attribute value is true after on command"
-      cluster: "On/Off"
-      PICS: OO.S.A0000
-      command: "readAttribute"
-      attribute: "OnOff"
-      response:
-          value: 1
+    #Adding below step resolve the issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/499
+    - label:
+          "Precondition: write default value of OnOffTransitionTime attribute"
+      PICS: LVL.S.A0010
+      command: "writeAttribute"
+      attribute: "OnOffTransitionTime"
+      arguments:
+          value: 0
 
     - label: "TH writes 0 to the Options attribute"
       PICS: LVL.S.A000f
@@ -103,6 +99,16 @@ tests:
               - name: "ms"
                 value: 5000
 
+    - label: "Sends stop command to DUT"
+      PICS: LVL.S.C03.Rsp
+      command: "Stop"
+      arguments:
+          values:
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
     - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
       command: "UserPrompt"
@@ -113,16 +119,6 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
-    - label: "Sends stop command to DUT"
-      PICS: LVL.S.C03.Rsp
-      command: "Stop"
-      arguments:
-          values:
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
 
     - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.C03.Rsp && LVL.S.A0000

@@ -76,6 +76,15 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
 
     mExchangeCtx->SetResponseTimeout(timeout.ValueOr(session->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
 
+    if (mTimedRequest != mTimedInvokeTimeoutMs.HasValue())
+    {
+        ChipLogError(
+            DataManagement,
+            "Inconsistent timed request state in CommandSender: mTimedRequest (%d) != mTimedInvokeTimeoutMs.HasValue() (%d)",
+            mTimedRequest, mTimedInvokeTimeoutMs.HasValue());
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     if (mTimedInvokeTimeoutMs.HasValue())
     {
         ReturnErrorOnFailure(TimedRequest::Send(mExchangeCtx.Get(), mTimedInvokeTimeoutMs.Value()));
@@ -127,16 +136,25 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
         MoveToState(State::ResponseReceived);
     }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    bool sendStatusResponse = false;
     VerifyOrExit(apExchangeContext == mExchangeCtx.Get(), err = CHIP_ERROR_INCORRECT_STATE);
+    sendStatusResponse = true;
 
     if (mState == State::AwaitingTimedStatus)
     {
-        VerifyOrExit(aPayloadHeader.HasMessageType(MsgType::StatusResponse), err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
-        CHIP_ERROR statusError = CHIP_NO_ERROR;
-        SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
-        SuccessOrExit(err = statusError);
-        err = SendInvokeRequest();
+        if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+        {
+            CHIP_ERROR statusError = CHIP_NO_ERROR;
+            SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
+            sendStatusResponse = false;
+            SuccessOrExit(err = statusError);
+            err = SendInvokeRequest();
+        }
+        else
+        {
+            err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
+        }
         // Skip all other processing here (which is for the response to the
         // invoke request), no matter whether err is success or not.
         goto exit;
@@ -146,6 +164,7 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     {
         err = ProcessInvokeResponse(std::move(aPayload));
         SuccessOrExit(err);
+        sendStatusResponse = false;
     }
     else if (aPayloadHeader.HasMessageType(MsgType::StatusResponse))
     {
@@ -166,6 +185,11 @@ exit:
         {
             mpCallback->OnError(this, err);
         }
+    }
+
+    if (sendStatusResponse)
+    {
+        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     }
 
     if (mState != State::CommandSent)

@@ -347,6 +347,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     if (tlvReader.Next() != CHIP_END_OF_TLV)
     {
         SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
+        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(mRemoteMRPConfig);
     }
 
     err = SendPBKDFParamResponse(ByteSpan(initiatorRandom), hasPBKDFParameters);
@@ -470,6 +471,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
         if (tlvReader.Next() != CHIP_END_OF_TLV)
         {
             SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
+            mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(mRemoteMRPConfig);
         }
 
         // TODO - Add a unit test that exercises mHavePBKDFParameters path
@@ -494,6 +496,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
         if (tlvReader.Next() != CHIP_END_OF_TLV)
         {
             SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
+            mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(mRemoteMRPConfig);
         }
     }
 

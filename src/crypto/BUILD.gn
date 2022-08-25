@@ -167,6 +167,8 @@ static_library("crypto") {
       "hsm/nxp/CHIPCryptoPALHsm_SE05X_PBKDF.cpp",
       "hsm/nxp/CHIPCryptoPALHsm_SE05X_Spake2p.cpp",
       "hsm/nxp/CHIPCryptoPALHsm_SE05X_utils.cpp",
+      "hsm/nxp/PersistentStorageOperationalKeystoreHSM.cpp",
+      "hsm/nxp/PersistentStorageOperationalKeystoreHSM.h",
     ]
     public_deps += [ "${chip_root}/third_party/simw-top-mini:se05x" ]
     public_configs += [ "${chip_root}/third_party/simw-top-mini:se05x_config" ]

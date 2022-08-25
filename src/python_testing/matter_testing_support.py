@@ -25,9 +25,10 @@ from chip.storage import PersistentStorage
 import chip.logging
 import chip.native
 import chip.FabricAdmin
+import chip.CertificateAuthority
 from chip.utils import CommissioningBuildingBlocks
 import builtins
-from typing import Optional
+from typing import Optional, List, Tuple
 from dataclasses import dataclass, field
 from dataclasses import asdict as dataclass_asdict
 import re
@@ -44,7 +45,6 @@ from mobly import logger
 from mobly import signals
 from mobly import utils
 from mobly.test_runner import TestRunner
-
 
 # TODO: Add utility to commission a device if needed
 # TODO: Add utilities to keep track of controllers/fabrics
@@ -124,14 +124,16 @@ class MatterTestConfig:
     ble_interface_id: int = None
 
     admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
+    case_admin_subject: int = None
     global_test_params: dict = field(default_factory=dict)
     # List of explicit tests to run by name. If empty, all tests will run
-    tests: list[str] = field(default_factory=list)
+    tests: List[str] = field(default_factory=list)
 
     commissioning_method: str = None
     discriminator: int = None
     setup_passcode: int = None
     commissionee_ip_address_just_for_testing: str = None
+    maximize_cert_chains: bool = False
 
     qr_code_content: str = None
     manual_code: str = None
@@ -144,6 +146,9 @@ class MatterTestConfig:
     dut_node_id: int = _DEFAULT_DUT_NODE_ID
     # Node ID to use for controller/commissioner
     controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
+    # CAT Tags for default controller/commissioner
+    controller_cat_tags: List[int] = None
+
     # Fabric ID which to use
     fabric_id: int = None
     # "Alpha" by default
@@ -157,7 +162,6 @@ class MatterStackState:
     def __init__(self, config: MatterTestConfig):
         self._logger = logger
         self._config = config
-        self._fabric_admins = []
 
         if not hasattr(builtins, "chipStack"):
             chip.native.Init(bluetoothAdapter=config.ble_interface_id)
@@ -180,22 +184,18 @@ class MatterStackState:
             builtins.chipStack = self._chip_stack
 
         self._storage = self._chip_stack.GetStorageManager()
+        self._certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self._chip_stack)
+        self._certificate_authority_manager.LoadAuthoritiesFromStorage()
 
-        try:
-            admin_list = self._storage.GetReplKey('fabricAdmins')
-            found_admin_list = True
-        except KeyError:
-            found_admin_list = False
-
-        if not found_admin_list:
-            self._logger.warn("No previous fabric administrative data found in persistent data: initializing a new one")
-            self._fabric_admins.append(chip.FabricAdmin.FabricAdmin(self._config.admin_vendor_id))
-        else:
-            for admin_idx in admin_list:
-                self._logger.info(
-                    f"Restoring FabricAdmin from storage to manage FabricId {admin_list[admin_idx]['fabricId']}, AdminIndex {admin_idx}")
-                self._fabric_admins.append(chip.FabricAdmin.FabricAdmin(vendorId=int(admin_list[admin_idx]['vendorId']),
-                                           fabricId=admin_list[admin_idx]['fabricId'], adminIndex=int(admin_idx)))
+        if (len(self._certificate_authority_manager.activeCaList) == 0):
+            self._logger.warn(
+                "Didn't find any CertificateAuthorities in storage -- creating a new CertificateAuthority + FabricAdmin...")
+            ca = self._certificate_authority_manager.NewCertificateAuthority(caIndex=self._config.root_of_trust_index)
+            ca.maximizeCertChains = self._config.maximize_cert_chains
+            ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
+        elif (len(self._certificate_authority_manager.activeCaList[0].adminList) == 0):
+            self._logger.warn("Didn't find any FabricAdmins in storage -- creating a new one...")
+            self._certificate_authority_manager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
 
     # TODO: support getting access to chip-tool credentials issuer's data
 
@@ -204,14 +204,17 @@ class MatterStackState:
             # Unfortunately, all the below are singleton and possibly
             # managed elsewhere so we have to be careful not to touch unless
             # we initialized ourselves.
-            ChipDeviceCtrl.ChipDeviceController.ShutdownAll()
-            chip.FabricAdmin.FabricAdmin.ShutdownAll()
+            self._certificate_authority_manager.Shutdown()
             global_chip_stack = builtins.chipStack
             global_chip_stack.Shutdown()
 
     @property
-    def fabric_admins(self):
-        return self._fabric_admins
+    def certificate_authorities(self):
+        return self._certificate_authority_manager.activeCaList
+
+    @property
+    def certificate_authority_manager(self):
+        return self._certificate_authority_manager
 
     @property
     def storage(self) -> PersistentStorage:
@@ -250,6 +253,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     @property
     def matter_stack(self) -> MatterStackState:
         return unstash_globally(self.user_params.get("matter_stack"))
+
+    @property
+    def certificate_authority_manager(self) -> chip.CertificateAuthority.CertificateAuthorityManager:
+        return unstash_globally(self.user_params.get("certificate_authority_manager"))
 
     @property
     def dut_node_id(self) -> int:
@@ -321,7 +328,7 @@ def int_from_manual_code(s: str) -> int:
     return int(s, 10)
 
 
-def int_named_arg(s: str) -> tuple[str, int]:
+def int_named_arg(s: str) -> Tuple[str, int]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
     match = re.match(regex, s)
     if not match:
@@ -335,7 +342,7 @@ def int_named_arg(s: str) -> tuple[str, int]:
     return (name, value)
 
 
-def str_named_arg(s: str) -> tuple[str, str]:
+def str_named_arg(s: str) -> Tuple[str, str]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
@@ -344,7 +351,7 @@ def str_named_arg(s: str) -> tuple[str, str]:
     return (match.group("name"), match.group("value"))
 
 
-def float_named_arg(s: str) -> tuple[str, float]:
+def float_named_arg(s: str) -> Tuple[str, float]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
@@ -356,7 +363,7 @@ def float_named_arg(s: str) -> tuple[str, float]:
     return (name, value)
 
 
-def json_named_arg(s: str) -> tuple[str, object]:
+def json_named_arg(s: str) -> Tuple[str, object]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
@@ -368,7 +375,7 @@ def json_named_arg(s: str) -> tuple[str, object]:
     return (name, value)
 
 
-def bool_named_arg(s: str) -> tuple[str, bool]:
+def bool_named_arg(s: str) -> Tuple[str, bool]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
     match = re.match(regex, s.lower())
     if not match:
@@ -383,7 +390,7 @@ def bool_named_arg(s: str) -> tuple[str, bool]:
     return (name, value)
 
 
-def bytes_as_hex_named_arg(s: str) -> tuple[str, bytes]:
+def bytes_as_hex_named_arg(s: str) -> Tuple[str, bytes]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
     match = re.match(regex, s)
     if not match:
@@ -476,6 +483,13 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
             return False
         config.commissionee_ip_address_just_for_testing = args.ip_addr
 
+    if args.case_admin_subject is None:
+        # Use controller node ID as CASE admin subject during commissioning if nothing provided
+        config.case_admin_subject = config.controller_node_id
+    else:
+        # If a CASE admin subject is provided, then use that
+        config.case_admin_subject = args.case_admin_subject
+
     return True
 
 
@@ -510,7 +524,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     return config
 
 
-def parse_matter_test_args(argv: list[str]) -> MatterTestConfig:
+def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
@@ -568,6 +582,8 @@ def parse_matter_test_args(argv: list[str]) -> MatterTestConfig:
 
     commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=_DEFAULT_ADMIN_VENDOR_ID,
                                   metavar="VENDOR_ID", help="VendorID to use during commissioning (default 0x%04X)" % _DEFAULT_ADMIN_VENDOR_ID)
+    commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
+                                  metavar="CASE_ADMIN_SUBJECT", help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
 
     code_group = parser.add_mutually_exclusive_group(required=False)
 
@@ -654,7 +670,7 @@ class CommissionDeviceTest(MatterBaseTest):
             raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)
 
 
-def default_matter_test_main(argv=None):
+def default_matter_test_main(argv=None, **kwargs):
     """Execute the test class in a test module.
     This is the default entry point for running a test script file directly.
     In this case, only one test class in a test script is allowed.
@@ -669,6 +685,10 @@ def default_matter_test_main(argv=None):
     """
     matter_test_config = parse_matter_test_args(argv)
 
+    # Allow override of command line from optional arguments
+    if matter_test_config.controller_cat_tags is None and "controller_cat_tags" in kwargs:
+        matter_test_config.controller_cat_tags = kwargs["controller_cat_tags"]
+
     # Find the test class in the test script.
     test_class = _find_test_class()
 
@@ -680,15 +700,26 @@ def default_matter_test_main(argv=None):
     if len(matter_test_config.tests) > 0:
         tests = matter_test_config.tests
 
+    # This is required in case we need any testing with maximized certificate chains.
+    # We need *all* issuers from the start, even for default controller, to use
+    # maximized chains, before MatterStackState init, others some stale certs
+    # may not chain properly.
+    if "maximize_cert_chains" in kwargs:
+        matter_test_config.maximize_cert_chains = kwargs["maximize_cert_chains"]
+
     stack = MatterStackState(matter_test_config)
     test_config.user_params["matter_stack"] = stash_globally(stack)
 
     # TODO: Steer to right FabricAdmin!
-    default_controller = stack.fabric_admins[0].NewController(nodeId=matter_test_config.controller_node_id,
-                                                              paaTrustStorePath=str(matter_test_config.paa_trust_store_path))
+    # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
+
+    default_controller = stack.certificate_authorities[0].adminList[0].NewController(nodeId=matter_test_config.controller_node_id,
+                                                                                     paaTrustStorePath=str(matter_test_config.paa_trust_store_path), catTags=matter_test_config.controller_cat_tags)
     test_config.user_params["default_controller"] = stash_globally(default_controller)
 
     test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
+
+    test_config.user_params["certificate_authority_manager"] = stash_globally(stack.certificate_authority_manager)
 
     # Execute the test class with the config
     ok = True

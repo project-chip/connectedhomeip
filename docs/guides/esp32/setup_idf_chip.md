@@ -13,39 +13,39 @@ step.
 
 ### Install Prerequisites
 
--   [Linux](https://docs.espressif.com/projects/esp-idf/en/v4.4.1/esp32/get-started/linux-setup.html)
--   [macOS](https://docs.espressif.com/projects/esp-idf/en/v4.4.1/esp32/get-started/macos-setup.html)
+-   [Linux](https://docs.espressif.com/projects/esp-idf/en/v4.4.2/esp32/get-started/linux-setup.html)
+-   [macOS](https://docs.espressif.com/projects/esp-idf/en/v4.4.2/esp32/get-started/macos-setup.html)
 
-### Get IDF v4.4.1
+### Get IDF v4.4.2
 
 -   Clone ESP-IDF
-    [v4.4.1 release](https://github.com/espressif/esp-idf/releases/tag/v4.4.1)
+    [v4.4.2 release](https://github.com/espressif/esp-idf/releases/tag/v4.4.2)
 
     ```
-    $ git clone -b v4.4.1 --recursive https://github.com/espressif/esp-idf.git
+    $ git clone -b v4.4.2 --recursive https://github.com/espressif/esp-idf.git
     $ cd esp-idf
     $ ./install.sh
     ```
 
--   To update an existing esp-idf toolchain to v4.4.1:
+-   To update an existing esp-idf toolchain to v4.4.2:
 
     ```
     $ cd path/to/esp-idf
     $ git fetch origin
-    $ git checkout v4.4.1
-    $ git reset --hard origin/v4.4.1
+    $ git checkout v4.4.2
+    $ git reset --hard origin/v4.4.2
     $ git submodule update --recursive --init
     $ git clean -fdx
     $ ./install.sh
     ```
 
--   For ESP32H2, please checkout commit id
-    [10f3aba770](https://github.com/espressif/esp-idf/tree/10f3aba770),
+-   For ESP32H2, please checkout tag
+    [v5.0-beta1](https://github.com/espressif/esp-idf/tree/v5.0-beta1),
     currently only lighting-app is supported on H2
 
     ```
     $ cd esp-idf
-    $ git checkout 10f3aba770
+    $ git checkout v5.0-beta1
     $ git submodule update --init
     $ ./install.sh
     ```

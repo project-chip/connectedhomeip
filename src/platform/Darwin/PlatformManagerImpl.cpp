@@ -55,7 +55,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     mRunLoopSem = dispatch_semaphore_create(0);
 
     // Ensure there is a dispatch queue available
-    GetWorkQueue();
+    static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
@@ -69,8 +69,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 #endif // CHIP_DISABLE_PLATFORM_KVS
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
-
-    static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
 
 exit:
     return err;

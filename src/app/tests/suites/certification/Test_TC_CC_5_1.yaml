@@ -189,6 +189,11 @@ tests:
       response:
           value: 0
 
+    - label: "TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      cluster: "On/Off"
+      command: "On"
+
     - label:
           "TH sends a MoveToColor command to the DUT with ColorX = 32768/0x8000
           (x=0.5) (purple) ColorY = 19660/0x4CCC (y=0.3) TransitionTime = 0

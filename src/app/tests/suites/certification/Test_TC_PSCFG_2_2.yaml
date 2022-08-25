@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions:"
+      verification: |
+          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
+      disabled: true
+
     - label: "Commission DUT to TH"
       verification: |
           verification step to be updated.
@@ -48,6 +53,14 @@ tests:
           "TH reads the Order attribute from Power Source Cluster at
           Enpoint[eNr] of the DUT"
       verification: |
+          ./chip-tool powersource read order 1 2
+
+          verify on TH(chip-tool) that order attribute succeeds with no error.The order value is the same or greater than the order value of the previous iteration
+
+          [1659879820.566144][2615:2620] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_002F Attribute 0x0000_0001 DataVersion: 1842182672
+          [1659879820.569572][2615:2620] CHIP:TOO:   Order: 1
+
+
           ./chip-tool powersource read order 1 1
 
           verify on TH(chip-tool) that order attribute succeeds with no error.The order value is the same or greater than the order value of the previous iteration
@@ -56,18 +69,10 @@ tests:
           [1653564242.694964][36231:36236] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_002F Attribute 0x0000_0001 DataVersion: 4212858705
           [1653564242.695038][36231:36236] CHIP:TOO:   Order: 2
 
-          ./chip-tool powersource read order 1 2
-
-          verify on TH(chip-tool) that order attribute succeeds with no error.The order value is the same or greater than the order value of the previous iteration
-
-          [1659879820.566144][2615:2620] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_002F Attribute 0x0000_0001 DataVersion: 1842182672
-          [1659879820.569572][2615:2620] CHIP:TOO:   Order: 1
-
-           ./chip-tool powersource read order 1 0
+          ./chip-tool powersource read order 1 0
 
           verify on TH(chip-tool) that order attribute succeeds with no error.The order value is the same or greater than the order value of the previous iteration
 
           [1659879944.863570][2633:2638] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002F Attribute 0x0000_0001 DataVersion: 1479870496
           [1659879944.863664][2633:2638] CHIP:TOO:   Order: 3
-          [1659879944.863854][2633:2638] CHIP:EM: Sending Standalone Ack for MessageCounter:4546692 on exchange 20518i
       disabled: true

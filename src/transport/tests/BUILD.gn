@@ -33,6 +33,7 @@ chip_test_suite("tests") {
   output_name = "libTransportLayerTests"
 
   test_sources = [
+    "TestCryptoContext.cpp",
     "TestGroupMessageCounter.cpp",
     "TestPeerConnections.cpp",
     "TestPeerMessageCounter.cpp",

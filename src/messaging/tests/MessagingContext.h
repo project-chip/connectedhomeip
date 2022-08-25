@@ -148,6 +148,9 @@ public:
     SessionHandle GetSessionDavidToCharlie();
     SessionHandle GetSessionBobToFriends();
 
+    CHIP_ERROR CreateAliceFabric();
+    CHIP_ERROR CreateBobFabric();
+
     const Transport::PeerAddress & GetAliceAddress() { return mAliceAddress; }
     const Transport::PeerAddress & GetBobAddress() { return mBobAddress; }
 

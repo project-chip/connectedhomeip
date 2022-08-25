@@ -68,20 +68,29 @@ void ReadClient::ClearActiveSubscriptionState()
 
 void ReadClient::StopResubscription()
 {
-
     CancelLivenessCheckTimer();
     CancelResubscribeTimer();
-    mpCallback.OnDeallocatePaths(std::move(mReadPrepareParams));
+
+    // Only deallocate the paths if they are not already deallocated.
+    if (mReadPrepareParams.mpAttributePathParamsList != nullptr || mReadPrepareParams.mpEventPathParamsList != nullptr ||
+        mReadPrepareParams.mpDataVersionFilterList != nullptr)
+    {
+        mpCallback.OnDeallocatePaths(std::move(mReadPrepareParams));
+        // Make sure we will never try to free those pointers again.
+        mReadPrepareParams.mpAttributePathParamsList    = nullptr;
+        mReadPrepareParams.mAttributePathParamsListSize = 0;
+        mReadPrepareParams.mpEventPathParamsList        = nullptr;
+        mReadPrepareParams.mEventPathParamsListSize     = 0;
+        mReadPrepareParams.mpDataVersionFilterList      = nullptr;
+        mReadPrepareParams.mDataVersionFilterListSize   = 0;
+    }
 }
 
 ReadClient::~ReadClient()
 {
+    Close(CHIP_NO_ERROR, /* allowResubscription = */ false, /* allowOnDone = */ false);
     if (IsSubscriptionType())
     {
-        CancelLivenessCheckTimer();
-        CancelResubscribeTimer();
-
-        //
         // Only remove ourselves from the engine's tracker list if we still continue to have a valid pointer to it.
         // This won't be the case if the engine shut down before this destructor was called (in which case, mpImEngine
         // will point to null)
@@ -141,7 +150,7 @@ CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscripti
     return CHIP_NO_ERROR;
 }
 
-void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
+void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription, bool allowOnDone)
 {
     if (IsReadType())
     {
@@ -152,10 +161,9 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
     }
     else
     {
+        ClearActiveSubscriptionState();
         if (aError != CHIP_NO_ERROR)
         {
-            ClearActiveSubscriptionState();
-
             //
             // We infer that re-subscription was requested by virtue of having a non-zero list of event OR attribute paths present
             // in mReadPrepareParams. This would only be the case if an application called SendAutoResubscribeRequest which
@@ -182,7 +190,10 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
         StopResubscription();
     }
 
-    mpCallback.OnDone(this);
+    if (allowOnDone)
+    {
+        mpCallback.OnDone(this);
+    }
 }
 
 const char * ReadClient::GetStateStr() const
@@ -827,6 +838,29 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
     ChipLogError(DataManagement,
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
+
+    // We didn't get a message from the server on time; it's possible that it no
+    // longer has a useful CASE session to us.  Mark defunct all sessions that
+    // have not seen peer activity in at least as long as our session.
+    const auto & holder = _this->mReadPrepareParams.mSessionHolder;
+    if (holder)
+    {
+        System::Clock::Timestamp lastPeerActivity = holder->AsSecureSession()->GetLastPeerActivityTime();
+        _this->mpImEngine->GetExchangeManager()->GetSessionManager()->ForEachMatchingSession(
+            _this->mPeer, [&lastPeerActivity](auto * session) {
+                if (!session->IsCASESession())
+                {
+                    return;
+                }
+
+                if (session->GetLastPeerActivityTime() > lastPeerActivity)
+                {
+                    return;
+                }
+
+                session->MarkAsDefunct();
+            });
+    }
 
     // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
     // response timeouts).

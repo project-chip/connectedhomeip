@@ -72,9 +72,11 @@ const ESP32Config::Key ESP32Config::kConfigKey_VendorId              = { kConfig
 const ESP32Config::Key ESP32Config::kConfigKey_VendorName            = { kConfigNamespace_ChipFactory, "vendor-name" };
 const ESP32Config::Key ESP32Config::kConfigKey_ProductId             = { kConfigNamespace_ChipFactory, "product-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_ProductName           = { kConfigNamespace_ChipFactory, "product-name" };
-const ESP32Config::Key ESP32Config::kConfigKey_UniqueId              = { kConfigNamespace_ChipFactory, "unique-id" };
+const ESP32Config::Key ESP32Config::kConfigKey_ProductLabel          = { kConfigNamespace_ChipFactory, "product-label" };
+const ESP32Config::Key ESP32Config::kConfigKey_ProductURL            = { kConfigNamespace_ChipFactory, "product-url" };
 const ESP32Config::Key ESP32Config::kConfigKey_SupportedCalTypes     = { kConfigNamespace_ChipFactory, "cal-types" };
 const ESP32Config::Key ESP32Config::kConfigKey_SupportedLocaleSize   = { kConfigNamespace_ChipFactory, "locale-sz" };
+const ESP32Config::Key ESP32Config::kConfigKey_RotatingDevIdUniqueId = { kConfigNamespace_ChipFactory, "rd-id-uid" };
 
 // Keys stored in the chip-config namespace
 const ESP32Config::Key ESP32Config::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
@@ -85,6 +87,7 @@ const ESP32Config::Key ESP32Config::kConfigKey_FailSafeArmed      = { kConfigNam
 const ESP32Config::Key ESP32Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "reg-location" };
 const ESP32Config::Key ESP32Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
+const ESP32Config::Key ESP32Config::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
 
 // Keys stored in the Chip-counters namespace
 const ESP32Config::Key ESP32Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
@@ -352,8 +355,14 @@ CHIP_ERROR ESP32Config::ClearConfigValue(Key key)
 
 bool ESP32Config::ConfigValueExists(Key key)
 {
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+    nvs_iterator_t iterator = NULL;
+    esp_err_t err           = nvs_entry_find(NVS_DEFAULT_PART_NAME, key.Namespace, NVS_TYPE_ANY, &iterator);
+    for (; iterator && err == ESP_OK; err = nvs_entry_next(&iterator))
+#else
     nvs_iterator_t iterator = nvs_entry_find(NVS_DEFAULT_PART_NAME, key.Namespace, NVS_TYPE_ANY);
     for (; iterator; iterator = nvs_entry_next(iterator))
+#endif
     {
         nvs_entry_info_t info;
         nvs_entry_info(iterator, &info);

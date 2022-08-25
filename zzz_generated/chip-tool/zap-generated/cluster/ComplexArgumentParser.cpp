@@ -567,6 +567,37 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::
     ComplexArgumentParser::Finalize(request.a);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DstOffsetType.offset", "offset", value.isMember("offset")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("DstOffsetType.validStarting", "validStarting", value.isMember("validStarting")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("DstOffsetType.validUntil", "validUntil", value.isMember("validUntil")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "offset");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.offset, value["offset"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "validStarting");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.validStarting, value["validStarting"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "validUntil");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.validUntil, value["validUntil"]));
+
+    return CHIP_NO_ERROR;
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.offset);
+    ComplexArgumentParser::Finalize(request.validStarting);
+    ComplexArgumentParser::Finalize(request.validUntil);
+}
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Actions::Structs::EndpointListStruct::Type & request,
                                         Json::Value & value)
 {
@@ -2108,6 +2139,37 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::SoftwareDiagnostics::S
     ComplexArgumentParser::Finalize(request.stackFreeCurrent);
     ComplexArgumentParser::Finalize(request.stackFreeMinimum);
     ComplexArgumentParser::Finalize(request.stackSize);
+}
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TimeZoneType.offset", "offset", value.isMember("offset")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TimeZoneType.validAt", "validAt", value.isMember("validAt")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "offset");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.offset, value["offset"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "validAt");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.validAt, value["validAt"]));
+
+    if (value.isMember("name"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.offset);
+    ComplexArgumentParser::Finalize(request.validAt);
+    ComplexArgumentParser::Finalize(request.name);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type & request,

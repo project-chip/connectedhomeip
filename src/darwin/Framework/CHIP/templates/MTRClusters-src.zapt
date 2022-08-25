@@ -52,55 +52,54 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    [self.device connectAndPerformAsync:^(MTRBaseDevice * baseDevice) {
-        new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
-          baseDevice,
-          {{#if hasSpecificResponse}}
-            {{! This treats completionHandler as taking an id for the data.  This is
-                not great from a type-safety perspective, of course. }}
-            completionHandler,
-          {{else}}
-            {{! For now, don't change the bridge API; instead just use an adapter
-                to invoke our completion handler. This is not great from a
-                type-safety perspective, of course. }}
-            ^(id _Nullable value, NSError * _Nullable error) {
-              completionHandler(error);
-            },
-          {{/if}}
-          ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
+    MTRBaseDevice *baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
+    new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
+      baseDevice,
+      {{#if hasSpecificResponse}}
+        {{! This treats completionHandler as taking an id for the data.  This is
+            not great from a type-safety perspective, of course. }}
+        completionHandler,
+      {{else}}
+        {{! For now, don't change the bridge API; instead just use an adapter
+            to invoke our completion handler. This is not great from a
+            type-safety perspective, of course. }}
+        ^(id _Nullable value, NSError * _Nullable error) {
+          completionHandler(error);
+        },
+      {{/if}}
+      ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        chip::Optional<uint16_t> timedInvokeTimeoutMs;
+        ListFreer listFreer;
+        {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
+        if (params != nil) {
+          if (params.timedInvokeTimeoutMs != nil) {
+            timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+          }
+        }
+        {{#if mustUseTimedInvoke}}
+        if (!timedInvokeTimeoutMs.HasValue()) {
+          timedInvokeTimeoutMs.SetValue(10000);
+        }
+        {{/if}}
+        {{#chip_cluster_command_arguments}}
+          {{#first}}
+            {{#unless (commandHasRequiredField parent)}}
             if (params != nil) {
-              if (params.timedInvokeTimeoutMs != nil) {
-                timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-              }
+            {{/unless}}
+          {{/first}}
+          {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "params." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
+          {{#last}}
+            {{#unless (commandHasRequiredField parent)}}
             }
-            {{#if mustUseTimedInvoke}}
-            if (!timedInvokeTimeoutMs.HasValue()) {
-              timedInvokeTimeoutMs.SetValue(10000);
-            }
-            {{/if}}
-            {{#chip_cluster_command_arguments}}
-              {{#first}}
-                {{#unless (commandHasRequiredField parent)}}
-                if (params != nil) {
-                {{/unless}}
-              {{/first}}
-              {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "params." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
-              {{#last}}
-                {{#unless (commandHasRequiredField parent)}}
-                }
-               {{/unless}}
-              {{/last}}
-            {{/chip_cluster_command_arguments}}
+           {{/unless}}
+          {{/last}}
+        {{/chip_cluster_command_arguments}}
 
-            auto successFn = Callback<{{>callbackName}}CallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
-    }];
+        auto successFn = Callback<{{>callbackName}}CallbackType>::FromCancelable(success);
+        auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+        chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
+        return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+    });
 
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
@@ -109,7 +108,7 @@ using chip::SessionHandle;
 {{#chip_server_cluster_attributes}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 - (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
-    return [self.device readAttributeWithEndpointId:@(_endpoint) clusterId:@(MTRCluster{{asUpperCamelCase parent.name}}ID) attributeId:@(MTRCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) params:params];
+    return [self.device readAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRCluster{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) params:params];
 }
 
 {{#if isWritableAttribute}}
@@ -120,14 +119,14 @@ using chip::SessionHandle;
 }
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
 {
-    NSNumber *waitTimeInMs = params.timedWriteTimeout;
+    NSNumber *timedWriteTimeout = params.timedWriteTimeout;
     {{#if mustUseTimedInvoke}}
-    if (!waitTimeInMs) {
-        waitTimeInMs = @(10000);
+    if (!timedWriteTimeout) {
+        timedWriteTimeout = @(10000);
     }
     {{/if}}
 
-    [self.device writeAttributeWithEndpointId:@(_endpoint) clusterId:@(MTRCluster{{asUpperCamelCase parent.name}}ID) attributeId:@(MTRCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:waitTimeInMs];
+    [self.device writeAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRCluster{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 {{/if}}

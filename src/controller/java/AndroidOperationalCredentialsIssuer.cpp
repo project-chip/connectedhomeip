@@ -151,7 +151,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
 }
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
-                                                                         const ByteSpan & csrSignature,
+                                                                         const ByteSpan & csrElementsSignature,
                                                                          const ByteSpan & attestationChallenge,
                                                                          const ByteSpan & DAC, const ByteSpan & PAI,
                                                                          Callback::Callback<OnNOCChainGeneration> * onCompletion)
@@ -177,8 +177,9 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     jbyteArray javaCsrNonce;
     JniReferences::GetInstance().N2J_ByteArray(env, csrNonce.data(), csrNonce.size(), javaCsrNonce);
 
-    jbyteArray javaCsrSignature;
-    JniReferences::GetInstance().N2J_ByteArray(env, csrSignature.data(), csrSignature.size(), javaCsrSignature);
+    jbyteArray javaCsrElementsSignature;
+    JniReferences::GetInstance().N2J_ByteArray(env, csrElementsSignature.data(), csrElementsSignature.size(),
+                                               javaCsrElementsSignature);
 
     ChipLogProgress(Controller, "Parsing Certificate Signing Request");
     TLVReader reader;
@@ -202,8 +203,12 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     jbyteArray javaCsr;
     JniReferences::GetInstance().N2J_ByteArray(env, csr.data(), csr.size(), javaCsr);
 
+    P256PublicKey pubkey;
+    ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
+    ChipLogProgress(chipTool, "VerifyCertificateSigningRequest");
+
     jobject csrInfo;
-    err = N2J_CSRInfo(env, javaCsrNonce, javaCsrElements, javaCsrSignature, javaCsr, csrInfo);
+    err = N2J_CSRInfo(env, javaCsrNonce, javaCsrElements, javaCsrElementsSignature, javaCsr, csrInfo);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to create CSRInfo");
@@ -373,7 +378,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const Byte
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR N2J_CSRInfo(JNIEnv * env, jbyteArray nonce, jbyteArray elements, jbyteArray elementsSignature, jbyteArray csr,
+CHIP_ERROR N2J_CSRInfo(JNIEnv * env, jbyteArray nonce, jbyteArray elements, jbyteArray csrElementsSignature, jbyteArray csr,
                        jobject & outCSRInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -388,7 +393,7 @@ CHIP_ERROR N2J_CSRInfo(JNIEnv * env, jbyteArray nonce, jbyteArray elements, jbyt
     constructor = env->GetMethodID(infoClass, "<init>", "([B[B[B[B)V");
     VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outCSRInfo = (jobject) env->NewObject(infoClass, constructor, nonce, elements, elementsSignature, csr);
+    outCSRInfo = (jobject) env->NewObject(infoClass, constructor, nonce, elements, csrElementsSignature, csr);
 
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 exit:

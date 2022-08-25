@@ -14,6 +14,9 @@
 
 name: 25.1.1. [TC-CC-1.1] Global attributes with server as DUT
 
+PICS:
+    - CC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Color Control"
@@ -37,13 +40,22 @@ tests:
               type: int16u
 
     - label: "Read the global attribute: FeatureMap"
-      PICS: (CC.S.F00 || CC.S.F01 || CC.S.F02 || CC.S.F03)
+      PICS: ( !CC.S.F00 && !CC.S.F01 && !CC.S.F02 && !CC.S.F03 )
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label: "Read the global attribute: FeatureMap"
+      PICS: ( CC.S.F00 || CC.S.F01 || CC.S.F02 || CC.S.F03 )
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              minValue: 0
+              minValue: 1
               maxValue: 31
 
     - label: "Read the global attribute: AttributeList"

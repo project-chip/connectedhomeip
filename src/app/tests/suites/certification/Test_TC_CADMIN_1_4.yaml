@@ -16,6 +16,7 @@ name: 24.1.4. [TC-CADMIN-1.4] Node Behavior using BCM [DUT - Commissionee]
 
 PICS:
     - CADMIN.S
+    - CADMIN.S.F00
 
 config:
     nodeId: 0x12344321
@@ -160,7 +161,7 @@ tests:
               maxLength: 32
 
     - label:
-          "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
+          "TH_CR2 writes the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       identity: "beta"
       command: "writeAttribute"
@@ -171,7 +172,7 @@ tests:
           value: "chiptest"
 
     - label:
-          "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
+          "TH_CR2 reads the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       identity: "beta"
       command: "readAttribute"

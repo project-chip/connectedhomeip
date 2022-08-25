@@ -142,6 +142,10 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#ifdef DISPLAY_ENABLED
+    GetLCD().Init((uint8_t *) "Lock-App", true);
+#endif
+
     err = BaseApplication::Init(&gIdentify);
     if (err != CHIP_NO_ERROR)
     {
@@ -354,16 +358,14 @@ void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAc
 
 void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
 {
-    // Action initiated, update the light led
-    if (aAction == LockManager::LOCK_ACTION)
+    if (aAction == LockManager::UNLOCK_ACTION || aAction == LockManager::LOCK_ACTION)
     {
-        EFR32_LOG("Lock Action has been initiated")
-        sLockLED.Set(false);
-    }
-    else if (aAction == LockManager::UNLOCK_ACTION)
-    {
-        EFR32_LOG("Unlock Action has been initiated")
-        sLockLED.Set(true);
+        bool locked = (aAction == LockManager::LOCK_ACTION);
+        EFR32_LOG("%s Action has been initiated", (locked) ? "Lock" : "Unlock");
+        sLockLED.Set(!locked);
+#ifdef DISPLAY_ENABLED
+        sAppTask.GetLCD().WriteDemoUI(locked);
+#endif
     }
 
     if (aActor == AppEvent::kEventType_Button)

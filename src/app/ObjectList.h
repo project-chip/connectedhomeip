@@ -18,6 +18,9 @@
 
 #pragma once
 
+#include <inttypes.h>
+#include <stddef.h>
+
 namespace chip {
 namespace app {
 

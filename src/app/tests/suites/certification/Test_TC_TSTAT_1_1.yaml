@@ -41,6 +41,17 @@ tests:
 
     - label: "Read the global attribute: FeatureMap"
       PICS:
+          "!TSTAT.S.F00 && !TSTAT.S.F01 && !TSTAT.S.F02 && !TSTAT.S.F03 &&
+          !TSTAT.S.F04 && !TSTAT.S.F05"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label: "Read the global attribute: FeatureMap"
+      PICS:
           TSTAT.S.F00 || TSTAT.S.F01 || TSTAT.S.F02 || TSTAT.S.F03 ||
           TSTAT.S.F04 || TSTAT.S.F05
       command: "readAttribute"

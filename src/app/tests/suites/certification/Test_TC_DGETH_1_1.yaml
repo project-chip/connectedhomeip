@@ -13,89 +13,87 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.1.1. [TC-DGETH-1.1] Global Attributes [{DUT_Server}]
+name: 47.1.1. [TC-DGETH-1.1] Global Attributes [DUT as Server]
 
 PICS:
     - DGETH.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Ethernet Network Diagnostics"
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
-          ./chip-tool pairing ble-wifi NODEID SSID PASSWD 20202021 3840 (commissioner side)
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    - label: "TH reads the ClusterRevision from DUT."
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read cluster-revision 1 0
+    - label: "TH reads the ClusterRevision from DUT"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
-          Verify cluster revision value is 1 in TH(chip-tool) log:
+    - label: "TH reads the FeatureMap from DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              minValue: 0
+              maxValue: 3
 
-          [1653911336.371533][3567:3572] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFFD DataVersion: 2944003194
-          [1653911336.371751][3567:3572] CHIP:TOO:   ClusterRevision: 1
-          [1653911336.371940][3567:3572] CHIP:EM: Sending Standalone Ack for MessageCounter:13743333 on exchange 10337i
-      disabled: true
+    - label: "TH reads AttributeList from DUT"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
 
-    - label: "TH reads the FeatureMap from DUT."
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read feature-map 1 0
+    - label: "TH reads AcceptedCommandList from DUT"
+      PICS: DGETH.S.F00 || DGETH.S.F01
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
 
-          Verify featuremap value is 3 in TH(chip-tool) log:
+    - label: "TH reads AcceptedCommandList from DUT"
+      PICS: " !DGETH.S.F00 && !DGETH.S.F01 "
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-          [1651786827.582555][240914:240920] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFFC DataVersion: 2811403040
-          [1651786827.582608][240914:240920] CHIP:TOO:   FeatureMap: 3
-      disabled: true
-
-    - label: "TH reads AttribubteList from DUT."
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read attribute-list 1 0
-
-          Verify  list of supported attributes in TH(chip-tool) log:
-
-          [1651786900.043572][240929:240934] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFFB DataVersion: 2811403040
-          [1651786900.043655][240929:240934] CHIP:TOO:   AttributeList: 14 entries
-          [1651786900.043689][240929:240934] CHIP:TOO:     [1]: 0
-          [1651786900.043710][240929:240934] CHIP:TOO:     [2]: 1
-          [1651786900.043730][240929:240934] CHIP:TOO:     [3]: 2
-          [1651786900.043744][240929:240934] CHIP:TOO:     [4]: 3
-          [1651786900.043757][240929:240934] CHIP:TOO:     [5]: 4
-          [1651786900.043775][240929:240934] CHIP:TOO:     [6]: 5
-          [1651786900.043796][240929:240934] CHIP:TOO:     [7]: 6
-          [1651786900.043817][240929:240934] CHIP:TOO:     [8]: 7
-          [1651786900.043838][240929:240934] CHIP:TOO:     [9]: 8
-          [1651786900.043862][240929:240934] CHIP:TOO:     [10]: 65528
-          [1651786900.043884][240929:240934] CHIP:TOO:     [11]: 65529
-          [1651786900.043907][240929:240934] CHIP:TOO:     [12]: 65531
-          [1651786900.043930][240929:240934] CHIP:TOO:     [13]: 65532
-          [1651786900.043952][240929:240934] CHIP:TOO:     [14]: 65533
-      disabled: true
-
-    - label: "TH reads AcceptedCommandList from DUT."
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read accepted-command-list 1 0
-
-          Verify list of Acccepted Command in TH(chip-tool) log:
-
-          [1651786971.201258][240944:240949] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFF9 DataVersion: 2811403040
-          [1651786971.201322][240944:240949] CHIP:TOO:   AcceptedCommandList: 1 entries
-          [1651786971.201347][240944:240949] CHIP:TOO:     [1]: 0
-      disabled: true
-
-    - label: "TH reads GeneratedCommandList from DUT."
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read generated-command-list 1 0
-
-          Verify list of Generated Command, this list SHALL have zero entry in TH(chip-tool) log:
-
-          [1651787190.403639][240971:240976] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFF8 DataVersion: 2811403040
-          [1651787190.403729][240971:240976] CHIP:TOO:   GeneratedCommandList: 0 entries
-      disabled: true
-
-    - label: "TH reads EventList from DUT."
-      verification: |
-          Out of scope v1.0
-      disabled: true
+    - label: "TH reads GeneratedCommandList from DUT"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

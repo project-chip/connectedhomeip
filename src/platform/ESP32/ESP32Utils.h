@@ -29,7 +29,9 @@ namespace Internal {
 class ESP32Utils
 {
 public:
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     static CHIP_ERROR IsAPEnabled(bool & apEnabled);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     static CHIP_ERROR IsStationEnabled(bool & staEnabled);
     static bool IsStationProvisioned(void);
     static CHIP_ERROR IsStationConnected(bool & connected);
