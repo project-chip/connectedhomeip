@@ -254,10 +254,10 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('chip_config_memory_debug_dmalloc=true')
 
             # this is from `dmalloc -b -l DMALLOC_LOG -i 1 high`
-            self.build_env['DMALLOC_OPTIONS']='debug=0x4f4ed03,inter=1,log=DMALLOC_LOG'
+            self.build_env['DMALLOC_OPTIONS'] = 'debug=0x4f4ed03,inter=1,log=DMALLOC_LOG'
 
             # glib interop with dmalloc
-            self.build_env['G_SLICE']='always-malloc'
+            self.build_env['G_SLICE'] = 'always-malloc'
 
         if not separate_event_loop:
             self.extra_gn_options.append('config_use_separate_eventloop=false')
