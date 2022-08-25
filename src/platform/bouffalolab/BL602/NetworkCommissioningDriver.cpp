@@ -231,12 +231,12 @@ CHIP_ERROR BLWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     {
         memset(WiFiSSIDStr, 0, sizeof(WiFiSSIDStr));
         memcpy(WiFiSSIDStr, ssid.data(), ssid.size());
-        err = (CHIP_ERROR) wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, WiFiSSIDStr);
+        err       = (CHIP_ERROR) wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, WiFiSSIDStr);
         scan_type = 1;
     }
     else
     {
-        err = (CHIP_ERROR) wifi_mgmr_scan(NULL, NULL);
+        err       = (CHIP_ERROR) wifi_mgmr_scan(NULL, NULL);
         scan_type = 0;
     }
     if (err != CHIP_NO_ERROR)
