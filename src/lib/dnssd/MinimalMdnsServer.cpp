@@ -15,10 +15,14 @@
  *    limitations under the License.
  */
 #include "MinimalMdnsServer.h"
-#include "AllInterfacesListenIterator.h"
+
+#include <lib/dnssd/minimal_mdns/AddressPolicy.h>
 
 namespace chip {
 namespace Dnssd {
+
+using namespace mdns::Minimal;
+using chip::Platform::UniquePtr;
 
 GlobalMinimalMdnsServer & GlobalMinimalMdnsServer::Instance()
 {
@@ -30,8 +34,10 @@ CHIP_ERROR GlobalMinimalMdnsServer::StartServer(chip::Inet::EndPointManager<chip
                                                 uint16_t port)
 {
     GlobalMinimalMdnsServer::Server().Shutdown();
-    AllInterfaces allInterfaces;
-    return GlobalMinimalMdnsServer::Server().Listen(udpEndPointManager, &allInterfaces, port);
+
+    UniquePtr<ListenIterator> endpoints = Policies::GetListenEndpoints();
+
+    return GlobalMinimalMdnsServer::Server().Listen(udpEndPointManager, endpoints.get(), port);
 }
 
 void GlobalMinimalMdnsServer::ShutdownServer()
