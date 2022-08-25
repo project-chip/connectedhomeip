@@ -239,14 +239,19 @@ jobs:
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
-            - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v2
-              if: ${{ failure() && !env.ACT }}
-              with:
-                  name: crash-objdir-linux
-                  path: out/
-                  # objdirs are big; don't hold on to them too long.
-                  retention-days: 5
+            # OBJDIR on linux is > 10K files and takes more than 50 minutes to upload, usually
+            # having the job timeout. 
+            #
+            # If re-enabling, some subset of this should be picked
+            #
+            # - name: Uploading objdir for debugging
+            #   uses: actions/upload-artifact@v2
+            #   if: ${{ failure() && !env.ACT }}
+            #   with:
+            #       name: crash-objdir-linux
+            #       path: out/
+            #       # objdirs are big; don't hold on to them too long.
+            #       retention-days: 5
 
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
