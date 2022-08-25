@@ -258,6 +258,10 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     ChipLogProgress(Controller, "newDeviceController() called");
 
     // Retrieve initialization params.
+    jmethodID getFabricId;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getFabricId", "()J", &getFabricId);
+    SuccessOrExit(err);
+
     jmethodID getUdpListenPort;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getUdpListenPort", "()I", &getUdpListenPort);
     SuccessOrExit(err);
@@ -309,6 +313,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     SuccessOrExit(err);
 
     {
+        uint64_t fabricId                  = env->CallLongMethod(controllerParams, getFabricId);
         uint16_t listenPort                = env->CallIntMethod(controllerParams, getUdpListenPort);
         uint16_t controllerVendorId        = env->CallIntMethod(controllerParams, getControllerVendorId);
         jobject keypairDelegate            = env->CallObjectMethod(controllerParams, getKeypairDelegate);
@@ -324,10 +329,10 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
             new chip::Controller::AndroidOperationalCredentialsIssuer());
         wrapper = AndroidDeviceControllerWrapper::AllocateNew(
-            sJVM, self, kLocalDeviceId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(), DeviceLayer::TCPEndPointManager(),
-            DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate, rootCertificate, intermediateCertificate,
-            operationalCertificate, ipk, listenPort, controllerVendorId, failsafeTimerSeconds, attemptNetworkScanWiFi,
-            attemptNetworkScanThread, &err);
+            sJVM, self, kLocalDeviceId, fabricId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(),
+            DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate,
+            rootCertificate, intermediateCertificate, operationalCertificate, ipk, listenPort, controllerVendorId,
+            failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, &err);
         SuccessOrExit(err);
 
         if (adminSubject != kUndefinedNodeId)

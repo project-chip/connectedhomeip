@@ -339,7 +339,7 @@ tests:
           [1657884902.176007][2938:2943] CHIP:DMG:                                         Attribute = 0x0000_0005,
           [1657884902.176067][2938:2943] CHIP:DMG:                                 }
           [1657884902.176147][2938:2943] CHIP:DMG:
-          [1657884902.176215][2938:2943] CHIP:DMG:                                 Data = "label",
+          [1657884902.176215][2938:2943] CHIP:DMG:                                 Data = label,
           [1657884902.176265][2938:2943] CHIP:DMG:                         },
           [1657884902.176322][2938:2943] CHIP:DMG:
           [1657884902.176369][2938:2943] CHIP:DMG:                 },
@@ -512,7 +512,7 @@ tests:
           activation."
       PICS: MCORE.IDM.C.SubscribeRequest
       verification: |
-          This is not testable in normal scenario, and needs to be tested as part of Unit test.
+          Out of scope for V1.0
       disabled: true
 
     - label:

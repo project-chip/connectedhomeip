@@ -191,6 +191,7 @@ bool Cmd_ValidateCert(int argc, char * argv[])
     uint32_t currentTime;
     res = chip::UnixEpochToChipEpochTime(static_cast<uint32_t>(time(nullptr)), currentTime);
     context.mEffectiveTime.Set<CurrentChipEpochTime>(currentTime);
+    context.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     VerifyTrueOrExit(res);
 
     err = certSet.FindValidCert(certToBeValidated->mSubjectDN, certToBeValidated->mSubjectKeyId, context, &validatedCert);

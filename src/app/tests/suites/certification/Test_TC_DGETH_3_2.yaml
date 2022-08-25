@@ -31,7 +31,7 @@ tests:
 
     - label: "Commission TH to DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT sends ResetCounts to TH."
@@ -39,7 +39,7 @@ tests:
       verification: |
           Verify Command data recieved from running the below command is a success
 
-          ./chip-tool ethernetnetworkdiagnostics reset-counts 1 1
+          ./chip-tool ethernetnetworkdiagnostics reset-counts 1 0
 
           Verify Command data recieved from running the below command is a success on TH(all-clusters-app) Log
 

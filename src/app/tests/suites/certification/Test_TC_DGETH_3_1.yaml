@@ -31,7 +31,7 @@ tests:
 
     - label: "Commission TH to DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT reads PHYRate attribute from TH."
@@ -166,7 +166,7 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0004
       verification: |
-          ./chip-tool ethernetnetworkdiagnostics read tx-err-count 1 1
+          ./chip-tool ethernetnetworkdiagnostics read tx-err-count 1 0
 
           Verify the value of TxErrCount is in range uint64 on TH(all-clusters-app) Log
 
@@ -198,7 +198,7 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0005
       verification: |
-          ./chip-tool ethernetnetworkdiagnostics read collision-count 1 1
+          ./chip-tool ethernetnetworkdiagnostics read collision-count 1 0
 
           Verify the value of  CollisionCount is in range uint64 on TH(all-clusters-app) Log
 
@@ -230,7 +230,7 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0006
       verification: |
-          ./chip-tool ethernetnetworkdiagnostics read overrun-count 1 1
+          ./chip-tool ethernetnetworkdiagnostics read overrun-count 1 0
 
           Verify on TH(all-clusters-app) Log
 
@@ -262,7 +262,7 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0007
       verification: |
-          ./chip-tool ethernetnetworkdiagnostics read carrier-detect 1 1
+          ./chip-tool ethernetnetworkdiagnostics read carrier-detect 1 0
 
           Verify the value of CarrierDetect is either bool or null on TH(all-clusters-app) Log
 
@@ -294,7 +294,7 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0008
       verification: |
-          ./chip-tool ethernetnetworkdiagnostics read  time-since-reset 1 1
+          ./chip-tool ethernetnetworkdiagnostics read  time-since-reset 1 0
 
           Verify the value of TimeSinceReset is in range uint64 on TH(all-clusters-app) Log
 
