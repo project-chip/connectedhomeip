@@ -45,6 +45,7 @@ constexpr char blWiFiSSIDKeyName[]        = "bl-wifi-ssid";
 constexpr char blWiFiCredentialsKeyName[] = "bl-wifi-pass";
 
 static uint8_t WiFiSSIDStr[DeviceLayer::Internal::kMaxWiFiSSIDLength];
+static uint8_t scan_type = 0;
 } // namespace
 
 CHIP_ERROR BLWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
@@ -162,7 +163,6 @@ CHIP_ERROR BLWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     wifi_interface = wifi_mgmr_sta_enable();
     wifi_mgmr_sta_connect(wifi_interface, ssid, passwd, NULL, NULL, 0, 0);
 
-    // Configure the WiFi interface.
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
 
     return ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
@@ -200,8 +200,8 @@ void BLWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
     Status networkingStatus = Status::kSuccess;
     static int save         = 0;
 
-    // VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
-    // VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
+    VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
+    VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
     ChipLogProgress(NetworkProvisioning, "BL NetworkCommissioningDelegate: SSID: %.*s", static_cast<int>(networkId.size()),
                     networkId.data());
 
@@ -230,11 +230,13 @@ CHIP_ERROR BLWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     {
         memset(WiFiSSIDStr, 0, sizeof(WiFiSSIDStr));
         memcpy(WiFiSSIDStr, ssid.data(), ssid.size());
-        err = (CHIP_ERROR) wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, WiFiSSIDStr);
+        err       = (CHIP_ERROR) wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, WiFiSSIDStr);
+        scan_type = 1;
     }
     else
     {
-        err = (CHIP_ERROR) wifi_mgmr_scan(NULL, NULL);
+        err       = (CHIP_ERROR) wifi_mgmr_scan(NULL, NULL);
+        scan_type = 0;
     }
     if (err != CHIP_NO_ERROR)
     {
@@ -260,7 +262,7 @@ void BLWiFiDriver::OnScanWiFiNetworkDone()
     }
 
     wifi_mgmr_ap_item_t * ScanResult = (wifi_mgmr_ap_item_t *) pvPortMalloc(ap_num * sizeof(wifi_mgmr_ap_item_t));
-    wifi_mgmr_get_scan_result(ScanResult, ap_num);
+    wifi_mgmr_get_scan_result(ScanResult, &ap_num, scan_type, WiFiSSIDStr);
 
     if (ScanResult)
     {
