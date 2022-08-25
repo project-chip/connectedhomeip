@@ -214,7 +214,8 @@ class HostBuilder(GnBuilder):
                  separate_event_loop=True, use_libfuzzer=False, use_clang=False,
                  interactive_mode=True, extra_tests=False,
                  use_platform_mdns=False, enable_rpcs=False,
-                 use_coverage=False, crypto_library: HostCryptoLibrary = None):
+                 use_coverage=False, use_dmalloc=False,
+                 crypto_library: HostCryptoLibrary = None):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -243,6 +244,11 @@ class HostBuilder(GnBuilder):
 
         if use_asan:
             self.extra_gn_options.append('is_asan=true')
+
+        self.use_dmalloc = use_dmalloc
+        if use_dmalloc:
+            self.extra_gn_options.append('chip_config_memory_debug_checks=true')
+            self.extra_gn_options.append('chip_config_memory_debug_dmalloc=true')
 
         if not separate_event_loop:
             self.extra_gn_options.append('config_use_separate_eventloop=false')
@@ -327,18 +333,30 @@ class HostBuilder(GnBuilder):
             raise Exception('Unknown host board type: %r' % self)
 
     def GnBuildEnv(self):
+        env = {}
+
+        if self.use_dmalloc:
+            # this is from `dmalloc -b -l DMALLOC_LOG -i 1 high`
+            env['DMALLOC_OPTIONS']='debug=0x4f4ed03,inter=1,log=DMALLOC_LOG'
+
+            # glib interop with dmalloc
+            env['G_SLICE']='always-malloc'
+
         if self.board == HostBoard.NATIVE:
-            return None
+            pass
         elif self.board == HostBoard.FAKE:
-            return None
+            pass
         elif self.board == HostBoard.ARM64:
-            return {
-                'PKG_CONFIG_PATH': os.path.join(
+            env['PKG_CONFIG_PATH'] = os.path.join(
                     self.SysRootPath('SYSROOT_AARCH64'),
-                    'lib/aarch64-linux-gnu/pkgconfig'),
-            }
+                    'lib/aarch64-linux-gnu/pkgconfig')
         else:
             raise Exception('Unknown host board type: %r' % self)
+
+        if not env:
+            return None
+
+        return env
 
     def SysRootPath(self, name):
         if name not in os.environ:
