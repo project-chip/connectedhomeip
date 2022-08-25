@@ -20,7 +20,6 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#include <app/server/Server.h>
 
 #include "FreeRTOS.h"
 
@@ -41,7 +40,17 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+
+#include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
@@ -56,6 +65,7 @@
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::app::Clusters::DoorLock;
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
@@ -166,14 +176,14 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
-    static chip::CommonCaseDeviceServerInitParams initParams;
+    static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
     // Initialize info provider
     sExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
 
-    chip::Server::GetInstance().Init(initParams);
+    Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -206,11 +216,64 @@ int AppTask::Init()
     sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
     Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
 
-    // Initialize BoltLock module
-    PLAT_LOG("Initialize BoltLock");
-    BoltLockMgr().Init();
+    // Initial lock state
+    chip::app::DataModel::Nullable<DlLockState> state;
+    EndpointId endpointId{ 1 };
+    PlatformMgr().LockChipStack();
+    Attributes::LockState::Get(endpointId, state);
 
-    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    {
+        uint8_t  numberOfCredentialsPerUser      = 0;
+        uint16_t numberOfUsers                   = 0;
+        uint8_t  numberOfWeekdaySchedulesPerUser = 0;
+        uint8_t  numberOfYeardaySchedulesPerUser = 0;
+        uint8_t  numberOfHolidaySchedules        = 0;
+
+        if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, numberOfCredentialsPerUser))
+        {
+            numberOfCredentialsPerUser = 5;
+        }
+
+        if (!DoorLockServer::Instance().GetNumberOfUserSupported(endpointId, numberOfUsers))
+        {
+            numberOfUsers = 10;
+        }
+
+        if (!DoorLockServer::Instance().GetNumberOfWeekDaySchedulesPerUserSupported(endpointId, numberOfWeekdaySchedulesPerUser))
+        {
+            numberOfWeekdaySchedulesPerUser = 10;
+        }
+
+        if (!DoorLockServer::Instance().GetNumberOfYearDaySchedulesPerUserSupported(endpointId, numberOfYeardaySchedulesPerUser))
+        {
+            numberOfYeardaySchedulesPerUser = 10;
+        }
+
+        if (!DoorLockServer::Instance().GetNumberOfHolidaySchedulesSupported(endpointId, numberOfHolidaySchedules))
+        {
+            numberOfHolidaySchedules = 10;
+        }
+
+        PlatformMgr().UnlockChipStack();
+
+        ret = LockMgr().Init(state,
+                             CC13X2_26X2DoorLock::LockInitParams::ParamBuilder()
+                                 .SetNumberOfUsers(numberOfUsers)
+                                 .SetNumberOfCredentialsPerUser(numberOfCredentialsPerUser)
+                                 .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
+                                 .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
+                                 .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
+                                 .GetLockParam());
+    }
+
+    if (ret != CHIP_NO_ERROR)
+    {
+        PLAT_LOG("LockMgr().Init() failed");
+        while (1)
+            ;
+    }
+
+    LockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -229,6 +292,8 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     sAppTask.Init();
 
+    LockMgr().ReadConfigValues();
+
     while (1)
     {
         /* Task pend until we have stuff to do */
@@ -236,14 +301,6 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             sAppTask.DispatchEvent(&event);
         }
-    }
-}
-
-void AppTask::PostEvent(const AppEvent * aEvent)
-{
-    if (xQueueSend(sAppEventQueue, aEvent, 0) != pdPASS)
-    {
-        /* Failed to post the message */
     }
 }
 
@@ -287,16 +344,16 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
     }
 }
 
-void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
 {
     // If the action has been initiated by the lock, update the bolt lock trait
     // and start flashing the LEDs rapidly to indicate action initiation.
-    if (aAction == BoltLockManager::LOCK_ACTION)
+    if (aAction == LockManager::LOCK_ACTION)
     {
         PLAT_LOG("Lock initiated");
         ; // TODO
     }
-    else if (aAction == BoltLockManager::UNLOCK_ACTION)
+    else if (aAction == LockManager::UNLOCK_ACTION)
     {
         PLAT_LOG("Unlock initiated");
         ; // TODO
@@ -308,12 +365,12 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
     LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
 }
 
-void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
+void AppTask::ActionCompleted(LockManager::Action_t aAction)
 {
     // if the action has been completed by the lock, update the bolt lock trait.
     // Turn on the lock LED if in a LOCKED state OR
     // Turn off the lock LED if in an UNLOCKED state.
-    if (aAction == BoltLockManager::LOCK_ACTION)
+    if (aAction == LockManager::LOCK_ACTION)
     {
         PLAT_LOG("Lock completed");
         LED_stopBlinking(sAppGreenHandle);
@@ -321,13 +378,47 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
         LED_stopBlinking(sAppRedHandle);
         LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
     }
-    else if (aAction == BoltLockManager::UNLOCK_ACTION)
+    else if (aAction == LockManager::UNLOCK_ACTION)
     {
         PLAT_LOG("Unlock completed");
         LED_stopBlinking(sAppGreenHandle);
         LED_setOff(sAppGreenHandle);
         LED_stopBlinking(sAppRedHandle);
         LED_setOff(sAppRedHandle);
+    }
+}
+
+void AppTask::PostEvent(const AppEvent * aEvent)
+{
+    if (sAppEventQueue != NULL)
+    {
+        BaseType_t status;
+        if (xPortIsInsideInterrupt())
+        {
+            BaseType_t higherPrioTaskWoken = pdFALSE;
+            status                         = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
+
+#ifdef portYIELD_FROM_ISR
+            portYIELD_FROM_ISR(higherPrioTaskWoken);
+#elif portEND_SWITCHING_ISR // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+            portEND_SWITCHING_ISR(higherPrioTaskWoken);
+#else                       // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+#error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
+#endif // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+        }
+        else
+        {
+            status = xQueueSend(sAppEventQueue, aEvent, 1);
+        }
+
+        if (status != pdTRUE)
+        {
+            PLAT_LOG("Failed to post event to app task event queue");
+        }
+    }
+    else
+    {
+        PLAT_LOG("Event Queue is NULL should never happen");
     }
 }
 
@@ -338,10 +429,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-            if (!BoltLockMgr().IsUnlocked())
-            {
-                BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
-            }
+            LockMgr().InitiateAction(0, LockManager::UNLOCK_ACTION);
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
@@ -352,10 +440,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonRight:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-            if (BoltLockMgr().IsUnlocked())
-            {
-                BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
-            }
+            LockMgr().InitiateAction(0, LockManager::LOCK_ACTION);
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
@@ -390,5 +475,22 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_None:
     default:
         break;
+    }
+}
+
+void AppTask::UpdateClusterState(intptr_t context)
+{
+    bool unlocked        = LockMgr().NextState();
+    DlLockState newState = unlocked ? DlLockState::kUnlocked : DlLockState::kLocked;
+
+    DlOperationSource source = DlOperationSource::kUnspecified;
+
+    // write the new lock value
+    EmberAfStatus status =
+        DoorLockServer::Instance().SetLockState(1, newState, source) ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        PLAT_LOG("ERR: updating lock state %x", status);
     }
 }

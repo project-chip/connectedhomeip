@@ -76,7 +76,7 @@ ti_simplelink_executable("lock_app") {
   sources = [
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
     "${project_dir}/main/AppTask.cpp",
-    "${project_dir}/main/BoltLockManager.cpp",
+    "${project_dir}/main/LockManager.cpp",
     "${project_dir}/main/ZclCallbacks.cpp",
     "${project_dir}/main/main.cpp",
   ]
