@@ -24,13 +24,6 @@ struct DemoClusterCluster : public CommonCluster
     }
   }
 
-  template<typename T>
-  void AddAllAttributes(T *list)
-  {
-    list->Add(mSingleLabel);
-    list->Add(mSomeLabels);
-  }
-
   chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
   {
     static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
@@ -41,8 +34,8 @@ struct DemoClusterCluster : public CommonCluster
   }
 
 
-  Attribute<32, ATTRIBUTE_MASK_WRITABLE, StructType<LabelStruct>> mSingleLabel;
-  Attribute<33, ATTRIBUTE_MASK_WRITABLE, ArrayType<1, StructType<LabelStruct>>> mSomeLabels;
+  Attribute<32, ATTRIBUTE_MASK_WRITABLE, ZCL_STRUCT_ATTRIBUTE_TYPE, sizeof(LabelStruct), LabelStruct, false> mSingleLabel;
+  ArrayAttribute<1, false, 33, ATTRIBUTE_MASK_WRITABLE, ZCL_ARRAY_ATTRIBUTE_TYPE, sizeof(LabelStruct) * 1 + 2, LabelStruct, false> mSomeLabels;
 };
 
 struct DemoClusterAccess : public CommonAttributeAccessInterface

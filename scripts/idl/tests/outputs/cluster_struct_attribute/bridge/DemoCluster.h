@@ -24,13 +24,6 @@ struct DemoClusterCluster : public CommonCluster
     }
   }
 
-  template<typename T>
-  void AddAllAttributes(T *list)
-  {
-    list->Add(mSingleFailSafe);
-    list->Add(mArmFailsafes);
-  }
-
   chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
   {
     static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
@@ -41,8 +34,8 @@ struct DemoClusterCluster : public CommonCluster
   }
 
 
-  Attribute<5, ATTRIBUTE_MASK_WRITABLE, StructType<ArmFailSafeRequest>> mSingleFailSafe;
-  Attribute<100, ATTRIBUTE_MASK_WRITABLE, ArrayType<1, StructType<ArmFailSafeRequest>>> mArmFailsafes;
+  Attribute<5, ATTRIBUTE_MASK_WRITABLE, ZCL_STRUCT_ATTRIBUTE_TYPE, sizeof(ArmFailSafeRequest), ArmFailSafeRequest, false> mSingleFailSafe;
+  ArrayAttribute<1, false, 100, ATTRIBUTE_MASK_WRITABLE, ZCL_ARRAY_ATTRIBUTE_TYPE, sizeof(ArmFailSafeRequest) * 1 + 2, ArmFailSafeRequest, false> mArmFailsafes;
 };
 
 struct DemoClusterAccess : public CommonAttributeAccessInterface

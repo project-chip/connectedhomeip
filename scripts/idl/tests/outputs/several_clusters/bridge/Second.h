@@ -22,12 +22,6 @@ struct SecondCluster : public CommonCluster
     }
   }
 
-  template<typename T>
-  void AddAllAttributes(T *list)
-  {
-    list->Add(mSomeBytes);
-  }
-
   chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
   {
     static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
@@ -37,7 +31,7 @@ struct SecondCluster : public CommonCluster
   }
 
 
-  Attribute<123, 0, OctetString<32, ZCL_OCTET_STRING_ATTRIBUTE_TYPE>> mSomeBytes;
+  Attribute<123, 0, ZCL_OCTET_STRING_ATTRIBUTE_TYPE, 32, FixedOctetString<32, ZCL_OCTET_STRING_ATTRIBUTE_TYPE>, false> mSomeBytes;
 };
 
 struct SecondAccess : public CommonAttributeAccessInterface

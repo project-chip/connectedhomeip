@@ -46,7 +46,8 @@ struct DynamicCluster : public T
     DynamicCluster(const chip::CommandId * incomingCommands = nullptr, const chip::CommandId * outgoingCommands = nullptr) :
         mIncomingCommands(incomingCommands), mOutgoingCommands(outgoingCommands)
     {
-        this->AddAllAttributes(&mAttributes);
+        for(auto& attr : this->GetAllAttributes())
+            mAttributes.Add(attr);
     }
 
     DynamicAttributeList mAttributes;

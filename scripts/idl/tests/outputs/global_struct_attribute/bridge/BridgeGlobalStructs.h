@@ -2,6 +2,7 @@
 
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/attribute-id.h>
+#include <app/data-model/Nullable.h>
 
 namespace clusters {
 
@@ -26,8 +27,8 @@ struct LabelStruct
     t.value = value;
     return t.Encode(writer, tag);
   }
-  OctetString<16, ZCL_CHAR_STRING_ATTRIBUTE_TYPE> label;
-  OctetString<16, ZCL_CHAR_STRING_ATTRIBUTE_TYPE> value;
+  FixedOctetString<16, ZCL_CHAR_STRING_ATTRIBUTE_TYPE> label;
+  FixedOctetString<16, ZCL_CHAR_STRING_ATTRIBUTE_TYPE> value;
 };
 
 }

@@ -30,6 +30,8 @@ struct {{cluster.name}}Cluster : public CommonCluster
       return t.Encode(writer, tag);
     }
 
+    static constexpr bool kIsFabricScoped = false;
+
     {%-      for field in struct.fields %}
     {{field | getField(cluster, idl)}} {{field.name}};
     {%-      endfor  %}
@@ -55,14 +57,6 @@ struct {{cluster.name}}Cluster : public CommonCluster
     }
   }
 
-  template<typename T>
-  void AddAllAttributes(T *list)
-  {
-  {%-  for attr in cluster.attributes %}
-    list->Add(m{{attr.definition.name | capitalcase}});
-  {%-  endfor  %}
-  }
-
   chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
   {
     static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
@@ -74,7 +68,7 @@ struct {{cluster.name}}Cluster : public CommonCluster
   }
 
 {%  for attr in cluster.attributes %}
-  Attribute<{{attr.definition.code}}, {{attr | getMask(cluster, idl)}}, {{attr | getType(cluster, idl)}}> m{{attr.definition.name | capitalcase}}{{attr | getInit(cluster, idl)}};
+  {{attr | getType(cluster, idl)}}{{attr.definition.code}}, {{attr | getMask(cluster, idl)}}, {{attr | getRawSizeAndType(cluster, idl)}}, {{attr.definition | getField(cluster, idl)}}, false> m{{attr.definition.name | capitalcase}}{{attr | getInit(cluster, idl)}};
 {%-  endfor  %}
 };
 
@@ -99,6 +93,7 @@ struct {{cluster.name}}Access : public CommonAttributeAccessInterface
   {%-    if attr.is_readable %}
     case {{attr.definition.code}}:
       return c->m{{attr.definition.name | capitalcase}}.Read(aPath, aEncoder);
+
   {%-    endif %}
   {%-  endfor  %}
     default:

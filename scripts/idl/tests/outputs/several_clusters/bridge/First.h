@@ -22,12 +22,6 @@ struct FirstCluster : public CommonCluster
     }
   }
 
-  template<typename T>
-  void AddAllAttributes(T *list)
-  {
-    list->Add(mSomeInteger);
-  }
-
   chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
   {
     static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
@@ -37,7 +31,7 @@ struct FirstCluster : public CommonCluster
   }
 
 
-  Attribute<1, ATTRIBUTE_MASK_WRITABLE, PrimitiveType<uint16_t, 2, ZCL_INT16U_ATTRIBUTE_TYPE>> mSomeInteger;
+  Attribute<1, ATTRIBUTE_MASK_WRITABLE, ZCL_INT16U_ATTRIBUTE_TYPE, 2, uint16_t, false> mSomeInteger;
 };
 
 struct FirstAccess : public CommonAttributeAccessInterface

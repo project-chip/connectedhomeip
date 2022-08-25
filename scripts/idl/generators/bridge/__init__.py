@@ -64,18 +64,18 @@ def get_field_info(definition: Field, cluster: Cluster, idl: Idl):
         ty = "int%d_t" % actual.power_of_two_bits
         if not actual.is_signed:
             ty = "u" + ty
-        return "PrimitiveType", ty, actual.byte_count, "ZCL_%s_ATTRIBUTE_TYPE" % name
+        return "", ty, actual.byte_count, "ZCL_%s_ATTRIBUTE_TYPE" % name
     if type(actual) == FundamentalType:
         if actual == FundamentalType.BOOL:
-            return "PrimitiveType", "bool", 1, "ZCL_BOOLEAN_ATTRIBUTE_TYPE"
+            return "", "bool", 1, "ZCL_BOOLEAN_ATTRIBUTE_TYPE"
         if actual == FundamentalType.FLOAT:
-            return "PrimitiveType", "float", 4, "ZCL_SINGLE_ATTRIBUTE_TYPE"
+            return "", "float", 4, "ZCL_SINGLE_ATTRIBUTE_TYPE"
         if actual == FundamentalType.DOUBLE:
-            return "PrimitiveType", "double", 8, "ZCL_DOUBLE_ATTRIBUTE_TYPE"
+            return "", "double", 8, "ZCL_DOUBLE_ATTRIBUTE_TYPE"
         logging.warn('Unknown fundamental type: %r' % actual)
         return None
     if type(actual) == IdlType:
-        return 'StructType', actual.idl_name, 'sizeof(%s)' % actual.idl_name, \
+        return '', actual.idl_name, 'sizeof(%s)' % actual.idl_name, \
             'ZCL_STRUCT_ATTRIBUTE_TYPE'
     logging.warn('Unknown type: %r' % actual)
     return None
@@ -95,19 +95,21 @@ def get_raw_size_and_type(attr: Attribute, cluster: Cluster, idl: Idl):
 
 def get_field_type(definition: Field, cluster: Cluster, idl: Idl):
     container, cType, size, matterType = get_field_info(definition, cluster, idl)
-    if container == 'StructType':
-        return 'StructType<{}>'.format(cType)
     if container == 'OctetString':
-        return 'OctetString<{}, {}>'.format(size, matterType)
-    return '{}<{}, {}, {}>'.format(container, cType, size, matterType)
+        return 'FixedOctetString<{}, {}>'.format(size, matterType)
+    if definition.is_nullable:
+        cType = '::chip::app::DataModel::Nullable<{}>'.format(cType)
+    return cType
 
 
 def get_attr_type(attr: Attribute, cluster: Cluster, idl: Idl):
-    decl = get_field_type(attr.definition, cluster, idl)
     if attr.definition.is_list:
         count = get_array_count(attr)
-        return 'ArrayType<{}, {}>'.format(count, decl)
-    return decl
+        nullable = 'false'
+        if attr.definition.is_nullable:
+            nullable = 'true'
+        return 'ArrayAttribute<{}, {}, '.format(count, nullable)
+    return 'Attribute<'
 
 
 def get_attr_init(attr: Attribute, cluster: Cluster, idl: Idl):
