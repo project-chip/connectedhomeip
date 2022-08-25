@@ -5157,12 +5157,6 @@ PICS:
     - label: "Does the Controller DUT support Service Advertising?"
       id: MCORE.SC.ADV
 
-    - label: "Does the DUT(Client) implement sending Keysetwrite Command?"
-      id: GRPKEY.C.C00.Tx
-
-    - label: "Does the DUT(Client) support the GroupKeyMap attribute?"
-      id: GRPKEY.C.A0000
-
     #133.1. Bridged Device Basic Information Cluster
     - label: "Does the DUT(server) support the DataModelRevision attribute?"
       id: BRBINFO.S.A0000
@@ -5564,3 +5558,6 @@ PICS:
           "Is the device a Client and supports subscribing for multiple
           attribute"
       id: MCORE.IDM.C.SubscribeRequest.MultipleAttributes
+
+    - label: "Does the device support the Factory Reset Method?"
+      id: MCORE.UI.FACTORYRESET

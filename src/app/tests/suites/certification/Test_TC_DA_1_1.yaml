@@ -78,6 +78,7 @@ tests:
     - label:
           "Factory reset DUT Perform the device discovery flow checks as covered
           in TC-DD-2.2"
+      PICS: MCORE.UI.FACTORYRESET
       verification: |
           1. TH starts matter announcement procedure using BLE transport : verify this by sending
           "./chip-tool discover commissionables" after launching all-clusters-app on DUT
@@ -90,31 +91,20 @@ tests:
 
     - label: "Commission DUT to TH2s Fabric"
       verification: |
-          To commission DUT to TH2 follow below procedure
-          1../chip-tool  pairing open-commissioning-window 1 1 400 2000 3840  on TH
+          sudo ./chip-all-clusters-app --wifi
 
-          Verify manual parin code on TH1 (chip-tool) Log:
-          CHIP:IN: Sending encrypted msg 0xaaaad3464d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 5805157 msec
-          [1635691999.946536][3822:3827] CHIP:DMG: ICR moving to [CommandSen]
-          [1635691999.946586][3822:3827] CHIP:CTL: Manual pairing code: [35407541839]
-          [1635691999.946650][3822:3827] CHIP:CTL: SetupQRCode: [MT:00000CQM00G6V851H10]
-          [1635691999.946802][3822:3827] CHIP:EM: Sending Standalone Ack for MessageCounter:3234931243 on exchange 35324i
-          [1635691999.946850][3822:3827] CHIP:IN: Prepared plaintext message 0xffffaa58a960 to 0x0000000000000000 of type 0x10 and protocolId (0, 0) on exchange 35324i with MessageCounter:1726016118.
-          [1635691999.946895][3822:3827] CHIP:IN: Sending plaintext msg 0xffffaa58a960 with MessageCounter:1726016118 to 0x0000000000000000 at monotonic time: 5805158 msec
-          [1635691999.946983][3822:3827] CHIP:EM: Flushed pending ack for MessageCounter:3234931243 on exchange 35324i
+          ./chip-tool pairing ble-wifi 2 zigbeehome matter123 20202021 3841 --trace_decode 1
 
+          Verify in TH2 log:
 
-          2. Verify TH2 is commissioned  by using "./chip-tool pairing code 2 36199720672" considering 36199720672 as manualcode generated in TH1
-
-          Verify whether you got below message on TH2 (chip-tool) log
-          Device commissioning completed with success
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
 
     - label:
           "TH2 does a non-fabric-filtered read of Fabrics attribute list from
           DUT"
       verification: |
-          ./chip-tool operationalcredentials read fabrics 2 0
+          ./chip-tool operationalcredentials read fabrics 2 0  --commissioner-name beta
 
           Verify there is single entry and FabricID matches the FabricID of TH2 on TH2 (chip-tool) log
 
@@ -133,7 +123,7 @@ tests:
     - label:
           "TH2 does a non-fabric-filtered read of NOCs attribute list from DUT"
       verification: |
-          ./chip-tool operationalcredentials read nocs 2 0
+          ./chip-tool operationalcredentials read nocs 2 0   --commissioner-name beta
 
           Verify there is single entry on TH2 (chip-tool) log
 
