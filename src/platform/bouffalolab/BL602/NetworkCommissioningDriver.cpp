@@ -45,6 +45,7 @@ constexpr char blWiFiSSIDKeyName[]        = "bl-wifi-ssid";
 constexpr char blWiFiCredentialsKeyName[] = "bl-wifi-pass";
 
 static uint8_t WiFiSSIDStr[DeviceLayer::Internal::kMaxWiFiSSIDLength];
+static uint8_t scan_type = 0;
 } // namespace
 
 CHIP_ERROR BLWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
@@ -231,10 +232,12 @@ CHIP_ERROR BLWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
         memset(WiFiSSIDStr, 0, sizeof(WiFiSSIDStr));
         memcpy(WiFiSSIDStr, ssid.data(), ssid.size());
         err = (CHIP_ERROR) wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, WiFiSSIDStr);
+        scan_type = 1;
     }
     else
     {
         err = (CHIP_ERROR) wifi_mgmr_scan(NULL, NULL);
+        scan_type = 0;
     }
     if (err != CHIP_NO_ERROR)
     {
@@ -260,7 +263,7 @@ void BLWiFiDriver::OnScanWiFiNetworkDone()
     }
 
     wifi_mgmr_ap_item_t * ScanResult = (wifi_mgmr_ap_item_t *) pvPortMalloc(ap_num * sizeof(wifi_mgmr_ap_item_t));
-    wifi_mgmr_get_scan_result(ScanResult, ap_num);
+    wifi_mgmr_get_scan_result(ScanResult, &ap_num, scan_type, WiFiSSIDStr);
 
     if (ScanResult)
     {
