@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -108,6 +109,18 @@ void TestIPv6(nlTestSuite * inSuite, void * inContext)
     responder.AddAllResponses(&packetInfo, &acc, ResponseConfiguration());
 }
 
+int Setup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    return (error == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
+}
+
+int Teardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 const nlTest sTests[] = {
 #if INET_CONFIG_ENABLE_IPV4
     NL_TEST_DEF("TestIPv4", TestIPv4), //
@@ -120,7 +133,7 @@ const nlTest sTests[] = {
 
 int TestIP(void)
 {
-    nlTestSuite theSuite = { "IP", sTests, nullptr, nullptr };
+    nlTestSuite theSuite = { "IP", sTests, &Setup, &Teardown };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
