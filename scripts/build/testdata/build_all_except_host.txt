@@ -612,6 +612,17 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light/sdkconfig.defaults
 idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light reconfigure'
 
+# Generating esp32-devkitc-light-rpc
+mkdir -p {out}/esp32-devkitc-light-rpc
+
+cp examples/lighting-app/esp32/sdkconfig_rpc.defaults {out}/esp32-devkitc-light-rpc/sdkconfig.defaults
+
+rm -f examples/lighting-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light-rpc/sdkconfig.defaults
+idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light-rpc reconfigure'
+
 # Generating esp32-devkitc-lock
 mkdir -p {out}/esp32-devkitc-lock
 
@@ -1947,6 +1958,13 @@ rm -f examples/lighting-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light/sdkconfig.defaults
 idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light build'
+
+rm -f examples/lighting-app/esp32/sdkconfig
+
+# Building esp32-devkitc-light-rpc
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light-rpc/sdkconfig.defaults
+idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light-rpc build'
 
 rm -f examples/lock-app/esp32/sdkconfig
 
