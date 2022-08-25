@@ -212,6 +212,7 @@ jobs:
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --no-log-timestamps \
                        --compile-database out/sanitizers/compile_commands.json \
+                       --file-exclude-regex "/(repo|zzz_generated|lwip/standalone)/",
                        check \
                     "
             - name: Build using build_examples.py
