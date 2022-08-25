@@ -143,8 +143,11 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     mSystemState = params.systemState->Retain();
     mState       = State::Initialized;
 
-    ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64, GetFabricIndex(),
-                    ChipLogValueX64(GetCompressedFabricId()));
+    if (GetFabricIndex() != kUndefinedFabricIndex)
+    {
+        ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64, GetFabricIndex(),
+                        ChipLogValueX64(GetCompressedFabricId()));
+    }
 
     return CHIP_NO_ERROR;
 }
