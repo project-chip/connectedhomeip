@@ -237,7 +237,7 @@ static void TestAES_CTR_128_Decrypt(nlTestSuite * inSuite, const AesCtrTestEntry
     NL_TEST_ASSERT(inSuite, outputMatches);
     if (!outputMatches)
     {
-        printf("\n Test failed due to mismatching ciphertext\n");
+        printf("\n Test failed due to mismatching plaintext\n");
     }
 }
 
