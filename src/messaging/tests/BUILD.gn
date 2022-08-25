@@ -58,6 +58,10 @@ chip_test_suite("tests") {
         chip_device_platform != "nrfconnect") {
       test_sources += [ "TestExchangeHolder.cpp" ]
     }
+
+    if (chip_device_platform == "linux") {
+      test_sources += [ "TestMessagingLayer.cpp" ]
+    }
   }
 
   cflags = [ "-Wconversion" ]
