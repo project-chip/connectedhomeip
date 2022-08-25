@@ -51,7 +51,7 @@ tests:
       verification: |
           On DUT_CR1 (chip tool), open commissioning window using BCM
 
-            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
@@ -95,10 +95,11 @@ tests:
       verification: |
           On TH_CR2 using chip tool connect to the accessory
 
-            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
 
           ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
+
 
           Verify you got below message on TH_CE (all-clusters-app) log
           Device commissioning completed with success
@@ -114,7 +115,7 @@ tests:
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
           Verify success response On TH_CE (all-clusters-app) Log
 
@@ -172,7 +173,7 @@ tests:
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool operationalcredentials read fabrics 1234 0 --fabric-filtered 0
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
 
           Verify TH_CE receives and processes the command successfully on TH_CE (all-clusters-app) log
 
@@ -215,7 +216,7 @@ tests:
 
           Verify TH_CE responses with NOCResponse with a StatusCode OK on TH_CE (all-clusters-app) log
 
-          ./chip-tool operationalcredentials remove-fabric 2 1 0 --commissioner-name beta
+          ./chip-tool operationalcredentials remove-fabric 2 1 0
 
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
@@ -259,7 +260,7 @@ tests:
 
           Verify TH_CE receives and processes the command successfully on TH_CE (all-clusters-app)
 
-          ./chip-tool operationalcredentials read fabrics 1234 0 --fabric-filtered 0
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2455995219
           [1647863260.286772][9294:9299] CHIP:TOO:   Fabrics: 2 entries
@@ -282,7 +283,9 @@ tests:
           [1647863260.287515][9294:9299] CHIP:EM: Sending Standalone Ack for MessageCounter:11301761 on exchange 13180i
       disabled: true
 
-    - label: ""
+    - label:
+          "Verify TH_CE is now discoverable over DNS-SD with 2 Operational
+          service records (_matter._tcp SRV records)."
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
@@ -314,7 +317,7 @@ tests:
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
           For BCM,
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
           Verify success response On TH_CE (all-clusters-app) Log
 
@@ -372,7 +375,7 @@ tests:
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool operationalcredentials read fabrics 1234 0 --fabric-filtered 0 --commissioner-name beta
+          ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0 --commissioner-name beta
 
           Verify TH_CE receives and processes the command successfully on TH_CE (all-clusters-app) log
 

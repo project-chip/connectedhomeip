@@ -82,7 +82,7 @@ tests:
 
     - label:
           "MaxNetworks attribute value is at least 4 which is saved as
-          MaxNetworksValue for future use"
+          'MaxNetworksValue' for future use"
       verification: |
           The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
 

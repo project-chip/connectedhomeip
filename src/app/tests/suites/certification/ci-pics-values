@@ -813,6 +813,7 @@ GRPKEY.C.A0000=1
 OO.C.C00.Tx=1
 OO.C.C01.Tx=1
 GRPKEY.C.C00.Tx=1
+GRPKEY.C.C01.Tx=1
 G.C.C00.Tx=1
 
 #Device Discovery
