@@ -343,7 +343,7 @@ class TC_RR_1_1(MatterBaseTest):
                     num_failed_clients = num_failed_clients + 1
 
             if (num_failed_clients > 0):
-                asserts.fail("Failed Step 8b: ({num_failed_clients} / {len(client_list)} failed)")
+                asserts.fail(f"Failed Step 8b: ({num_failed_clients} / {len(client_list)} failed)")
 
         # Step 9: Fill user label list
         if has_user_labels and not skip_user_label_cluster_steps:
