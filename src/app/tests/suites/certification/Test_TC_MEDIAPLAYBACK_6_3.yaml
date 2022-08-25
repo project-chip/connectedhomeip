@@ -81,7 +81,7 @@ tests:
     - label: "TH reads the StartTime attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0001 && PICS_USER_PROMPT
       verification: |
-          "The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):  
+          "The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback read start-time 1 1
           ./chip-tv-casting-app mediaplayback read start-time 1 1
 
@@ -100,7 +100,7 @@ tests:
     #Issue 10988
     - label: "TH reads the SeekRangeEnd attribute from the DUT"
       verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):  
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback read seek-range-end 1 1
           ./chip-tv-casting-app mediaplayback read seek-range-end 1 1
 
@@ -120,12 +120,12 @@ tests:
     #Issue 10988
     - label: "TH reads the SeekRangeStart attribute from the DUT"
       verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):  
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback read seek-range-start 1 1
           ./chip-tv-casting-app mediaplayback read seek-range-start 1 1
 
           On TH Verify that the response is a valid position or Nas.
-          [1661240180.806771][2930:2935] CHIP:DMG:         SuppressResponse = true, 
+          [1661240180.806771][2930:2935] CHIP:DMG:         SuppressResponse = true,
           [1661240180.806809][2930:2935] CHIP:DMG:         InteractionModelRevision = 1
           [1661240180.806844][2930:2935] CHIP:DMG: }
           [1661240180.807024][2930:2935] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0006 DataVersion: 1520269522
@@ -145,7 +145,7 @@ tests:
     #Issue 10988
     - label: "TH reads the Duration attribute from the DUT"
       verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):  
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback read duration 1 1
           ./chip-tv-casting-app mediaplayback read duration 1 1
 
