@@ -62,7 +62,11 @@ int streamer_esp32_init(streamer_t * streamer)
         .stop_bits           = UART_STOP_BITS_1,
         .flow_ctrl           = UART_HW_FLOWCTRL_DISABLE,
         .rx_flow_ctrl_thresh = 0,
-        .source_clk          = UART_SCLK_APB,
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+        .source_clk = UART_SCLK_DEFAULT,
+#else
+        .source_clk = UART_SCLK_APB,
+#endif
     };
     ESP_ERROR_CHECK(uart_param_config(CONFIG_ESP_CONSOLE_UART_NUM, &uart_config));
     esp_vfs_dev_uart_use_driver(0);

@@ -31,13 +31,13 @@ tests:
 
     - label: "Commission TH to DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT sends ResetWatermarks to TH."
       PICS: DGSW.C.C00.Tx
       verification: |
-          ./chip-tool softwarediagnostics read reset-watermarks 1 0
+          ./chip-tool softwarediagnostics reset-watermarks 1 0
 
           Verify the success response on TH(all-clusters-app) Log:
 

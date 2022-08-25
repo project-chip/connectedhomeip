@@ -49,7 +49,20 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         return (err = CHIP_ERROR_NOT_IMPLEMENTED);
     }
 
-    ret = getPref_bin_new(key, key, (uint8_t *) value, value_size, read_bytes_size);
+    if (read_bytes_size)
+    {
+        ret = getPref_bin_new(key, key, (uint8_t *) value, value_size, read_bytes_size);
+    }
+    else
+    {
+        size_t * dummy_read_bytes_size = (size_t *) pvPortMalloc(sizeof(size_t));
+        if (!dummy_read_bytes_size)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+        ret = getPref_bin_new(key, key, (uint8_t *) value, value_size, dummy_read_bytes_size);
+        vPortFree(dummy_read_bytes_size);
+    }
     switch (ret)
     {
     case 0:

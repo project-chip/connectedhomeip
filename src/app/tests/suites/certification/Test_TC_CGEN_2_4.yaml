@@ -28,7 +28,7 @@ config:
 tests:
     - label: "Start the commissioning process of TH1 on DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -36,12 +36,12 @@ tests:
           DUT"
       PICS: CGEN.S.C04.Rsp && CGEN.S.C05.Tx
       verification: |
-          Not testable as the execution is in PASE session
+          Out of scope for V1.0
       disabled: true
 
     - label: "Complete the Commission for TH1 and DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:

@@ -124,6 +124,10 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * Sets this MTRDeviceController to use the given issuer for issuing operational certs. By default, the MTRDeviceController uses an
  * internal issuer.
  *
+ * When a nocChainIssuer is set, the device commissioner will delegate verification to the chip::Credentials::PartialDACVerifier so
+ * that DAC chain and CD validation can be performed by custom code triggered by MTRNOCChainIssuer.onNOCChainGenerationNeeded().
+ * Otherwise, the device commissioner uses the chip::Credentials::DefaultDACVerifier
+ *
  * @param[in] nocChainIssuer the NOC Chain issuer to use for issuer operational certs
  *
  * @param[in] queue The queue on which the callbacks will be delivered
