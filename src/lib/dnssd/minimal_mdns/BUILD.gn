@@ -54,7 +54,10 @@ config("config") {
 }
 
 source_set("policy_header") {
-  sources = [ "AddressPolicy.h" ]
+  sources = [
+    "AddressPolicy.h",
+    "ServerIPAddresses.h",
+  ]
 }
 
 static_library("default_policy") {
