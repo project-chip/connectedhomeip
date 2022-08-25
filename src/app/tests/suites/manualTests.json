@@ -224,6 +224,7 @@
         "Test_TC_SC_3_4",
         "Test_TC_SC_3_6",
         "Test_TC_SC_4_1",
+        "Test_TC_SC_4_2",
         "Test_TC_SC_4_3",
         "Test_TC_SC_4_4",
         "Test_TC_SC_4_5",
@@ -231,7 +232,11 @@
         "Test_TC_SC_4_7",
         "Test_TC_SC_4_8",
         "Test_TC_SC_4_9",
-        "Test_TC_SC_4_10"
+        "Test_TC_SC_4_10",
+        "Test_TC_SC_5_1",
+        "Test_TC_SC_5_2",
+        "Test_TC_SC_5_3",
+        "Test_TC_SC_6_1"
     ],
     "SoftwareDiagnostics": ["Test_TC_DGSW_3_1", "Test_TC_DGSW_3_2"],
     "WiFiNetworkDiagnostics": [
@@ -332,6 +337,7 @@
         "Test_TC_BRBINFO_2_2",
         "Test_TC_BRBINFO_2_3"
     ],
+    "AccessControlEnforcement": ["Test_TC_ACE_1_1", "Test_TC_ACE_1_2"],
     "collection": [
         "DeviceDiscovery",
         "Groups",
@@ -381,6 +387,7 @@
         "PumpConfigurationControl",
         "AccessControl",
         "UserLabel",
-        "BridgedDeviceBasicInformation"
+        "BridgedDeviceBasicInformation",
+        "AccessControlEnforcement"
     ]
 }
