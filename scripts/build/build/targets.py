@@ -338,7 +338,6 @@ def HostTargets():
     yield target_native.Extend('tests-clang', app=HostApp.TESTS, use_clang=True).GlobBlacklist("Non-default test")
     yield target_native.Extend('tests-clang-asan', app=HostApp.TESTS, use_clang=True, use_asan=True).GlobBlacklist("Non-default test")
     yield target_native.Extend('tests-dmalloc', app=HostApp.TESTS, use_dmalloc=True).GlobBlacklist("Non-default test")
-    yield target_native.Extend('tests-clang-dmalloc-asan', app=HostApp.TESTS, use_clang=True, use_asan=True, use_dmalloc=True).GlobBlacklist("Non-default test")
 
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
     yield test_target.Extend(HostBoard.FAKE.BoardName() + '-tests', board=HostBoard.FAKE, app=HostApp.TESTS)
