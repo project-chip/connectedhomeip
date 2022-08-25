@@ -101,7 +101,7 @@ CHIP_ERROR BindingManager::EstablishConnection(const ScopedNodeId & nodeId)
     VerifyOrReturnError(mInitParams.mCASESessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mLastSessionEstablishmentError = CHIP_NO_ERROR;
-    auto * connectionCallback      = Platform::New<ConnectionCallback>(this);
+    auto * connectionCallback      = Platform::New<ConnectionCallback>(*this);
     mInitParams.mCASESessionManager->FindOrEstablishSession(nodeId, connectionCallback->GetOnDeviceConnected(),
                                                             connectionCallback->GetOnDeviceConnectionFailure());
     if (mLastSessionEstablishmentError == CHIP_ERROR_NO_MEMORY)
@@ -115,7 +115,7 @@ CHIP_ERROR BindingManager::EstablishConnection(const ScopedNodeId & nodeId)
             // Now retry
             mLastSessionEstablishmentError = CHIP_NO_ERROR;
             // At this point connectionCallback is null since it deletes itself when the callback is called.
-            connectionCallback = Platform::New<ConnectionCallback>(this);
+            connectionCallback = Platform::New<ConnectionCallback>(*this);
             mInitParams.mCASESessionManager->FindOrEstablishSession(nodeId, connectionCallback->GetOnDeviceConnected(),
                                                                     connectionCallback->GetOnDeviceConnectionFailure());
         }
@@ -152,10 +152,9 @@ void BindingManager::HandleDeviceConnectionFailure(const ScopedNodeId & peerId, 
     ChipLogError(AppServer, "Failed to establish connection to node 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
     mLastSessionEstablishmentError = error;
     // We don't release the entry when connection fails, because inside
-    // BindingManager::EstablishConnection we may try again the connection. The logic in there
-    // doesn't actually make any sense with how mPendingNotificationMap and
-    // CASESessionManager are implemented today, but the risk of making changes close to 1.0 release
-    // prevents us from cleaning this up at the moment.
+    // BindingManager::EstablishConnection we may try again the connection.
+    // TODO(#22173): The logic in there doesn't actually make any sense with how
+    // mPendingNotificationMap and CASESessionManager are implemented today.
 }
 
 void BindingManager::FabricRemoved(FabricIndex fabricIndex)

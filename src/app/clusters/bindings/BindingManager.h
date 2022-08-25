@@ -121,10 +121,20 @@ public:
     static BindingManager & GetInstance() { return sBindingManager; }
 
 private:
+    /*
+     * Used when providing OnConnection/Failure callbacks to CASESessionManager when establishing session.
+     *
+     * Since the BindingManager calls EstablishConnection inside of a loop, and it is possible that the
+     * callback is called some time after the loop is completed, we need a separate callbacks for each
+     * connection we are trying to establish. Failure to provide different instances of the callback
+     * to CASESessionManager may result in the callback only be called for that last EstablishConnection
+     * that was called when it establishes the connections asynchronously.
+     *
+     */
     class ConnectionCallback
     {
     public:
-        ConnectionCallback(BindingManager * bindingManager) :
+        ConnectionCallback(BindingManager & bindingManager) :
             mBindingManager(bindingManager), mOnConnectedCallback(HandleDeviceConnected, this),
             mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
         {}
@@ -135,18 +145,18 @@ private:
     private:
         static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
         {
-            ConnectionCallback * connectionCallback = static_cast<ConnectionCallback *>(context);
-            connectionCallback->mBindingManager->HandleDeviceConnected(exchangeMgr, sessionHandle);
-            Platform::Delete(connectionCallback);
+            ConnectionCallback * _this = static_cast<ConnectionCallback *>(context);
+            _this->mBindingManager.HandleDeviceConnected(exchangeMgr, sessionHandle);
+            Platform::Delete(_this);
         }
         static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
         {
-            ConnectionCallback * connectionCallback = static_cast<ConnectionCallback *>(context);
-            connectionCallback->mBindingManager->HandleDeviceConnectionFailure(peerId, error);
-            Platform::Delete(connectionCallback);
+            ConnectionCallback * _this = static_cast<ConnectionCallback *>(context);
+            _this->mBindingManager.HandleDeviceConnectionFailure(peerId, error);
+            Platform::Delete(_this);
         }
 
-        BindingManager * mBindingManager;
+        BindingManager & mBindingManager;
         Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
         Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
     };
