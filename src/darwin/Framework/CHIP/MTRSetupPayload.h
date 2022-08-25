@@ -75,7 +75,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 + (NSUInteger)generateRandomPIN;
 
 /** Get 11 digit manual entry code from the setup payload. */
-- (nullable NSString *)getManualEntryCode;
+- (nullable NSString *)manualEntryCode;
 
 @end
 
