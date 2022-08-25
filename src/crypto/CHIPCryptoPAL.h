@@ -621,7 +621,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
                            size_t nonce_length, uint8_t * plaintext);
 
 /**
- * @brief A function that implements AES-CCM decryption
+ * @brief A function that implements AES-CTR encryption/decryption
  *
  * This implements the AES-CTR-Encrypt/Decrypt() cryptographic primitives per sections
  * 3.7.1 and 3.7.2 of the specification. For an empty input, the user of the API
