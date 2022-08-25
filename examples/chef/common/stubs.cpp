@@ -13,13 +13,15 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const c
                                             chip::app::Clusters::DoorLock::DlOperationError & err)
 {
     err = DlOperationError::kUnspecified;
-    return true;
+    // TBD: LockManager, check pinCode, ...
+    return DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked);
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode,
                                               chip::app::Clusters::DoorLock::DlOperationError & err)
 {
     err = DlOperationError::kUnspecified;
-    return true;
+    // TBD: LockManager, check pinCode, ...
+    return DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kUnlocked);
 }
 #endif /* EMBER_AF_PLUGIN_DOOR_LOCK_SERVER */

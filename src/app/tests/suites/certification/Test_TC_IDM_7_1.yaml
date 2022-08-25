@@ -30,6 +30,46 @@ tests:
           Here the command to enter interactive mode:--   ./chip-tool interactive start
       disabled: true
 
+    - label: "Precondition"
+      verification: |
+          Use the below commands to provision the DUT with 5 reference devices (Reference device is unique instance of a Chip-tool)
+          RD1, RD2, RD3, RD4, RD5 should be on separate, distinct fabrics. in RPI platform
+
+          * For ethernet provisioning in DUT
+          ./chip-all-clusters-app
+
+          *Provision the device using chip tool on first controller(RD1)
+          *./chip-tool pairing ethernet node-id  setup-pin-code  discriminator  device-remote-ip  device-remote-port(5540)
+          on first controller open a commissioning window using below command (In RD1)
+          ./chip-tool pairing open-commissioning-window 1 1 400 2000 3840 (Save the manualcode for 2nd  Provision)
+
+          *Provision the device using chip tool on 2nd  controller(RD2)
+          * ./chip-tool pairing code 2 mannualcode –commissioner name beta
+          on 2nd controller open a commissioning window using below command (In RD2)
+          ./chip-tool pairing open-commissioning-window 2 1 400 2000 3840 ( Save the manualcode for 3rd Provision)
+
+
+          *Provision the device using chip tool on 3rd  controller(RD3)
+          * ./chip-tool pairing code 3 mannualcode –commissioner name gamma
+          on 3rd controller open a commissioning window using below command (In RD3)
+          ./chip-tool pairing open-commissioning-window 2 1 400 2000 3840 ( Save the manualcode for 4th Provision)
+
+          *Provision the device using chip tool on 4th  controller(RD4)
+          * ./chip-tool pairing code 4 mannualcode –commissioner name 234
+          on 3rd controller open a commissioning window using below command (In RD4)
+          ./chip-tool pairing open-commissioning-window 2 1 400 2000 3840 ( Save the manualcode for 5th Provision)
+
+          *Provision the device using chip tool on 5th  controller(RD5)
+          * ./chip-tool pairing code 5 mannualcode –commissioner name 2345
+          on 3rd controller open a commissioning window using below command (In RD5)
+          ./chip-tool pairing open-commissioning-window 2 1 400 2000 3840
+
+
+          Please open 5 terminal windows  to observe the subscription report messages coming from different subscriptions(to different fabrics)
+
+          Please use Interactive mode to Verify subscription test cases. Here the command to enter interactive mode:-- ./chip-tool interactive start
+      disabled: true
+
     - label:
           "RD1, RD2, RD3, RD4, RD5 send 3 Subscribe Request Messages to
           DUT.(Total - 15 active subscriptions) Each subscribe request should
@@ -1346,6 +1386,5 @@ tests:
           Subscription Requests are activated, send a Subscribe request messages
           having 3 different paths from RD1A to the DUT."
       verification: |
-          Verification step identification is in progress
-          https://github.com/project-chip/connectedhomeip/issues/21009
+          Mark this as not testable /NA. Out of Scope for V1.0
       disabled: true

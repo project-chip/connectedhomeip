@@ -44,6 +44,9 @@ if (efr32_board == "BRD4304A") {
 } else if (efr32_board == "BRD4161A") {
   efr32_family = "efr32mg12"
   efr32_mcu = "EFR32MG12P432F1024GL125"
+} else if (efr32_board == "BRD4162A") {
+  efr32_family = "efr32mg12"
+  efr32_mcu = "EFR32MG12P332F1024GL125"
 } else if (efr32_board == "BRD4163A") {
   efr32_family = "efr32mg12"
   efr32_mcu = "EFR32MG12P433F1024GL125"
@@ -75,8 +78,11 @@ if (efr32_board == "BRD4304A") {
 } else if (efr32_board == "BRD2601B") {
   efr32_family = "efr32mg24"
   efr32_mcu = "EFR32MG24B310F1536IM48"
+} else if (efr32_board == "BRD2703A") {
+  efr32_family = "efr32mg24"
+  efr32_mcu = "EFR32MG24B020F1536IM48"
 } else {
   print(
-      "Please provide a valid value for EFR32_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186C, BRD4187C, BRD2601B)")
+      "Please provide a valid value for EFR32_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186C, BRD4187C, BRD2601B, BRD2703A)")
   assert(false, "The board ${efr32_board} is unsupported")
 }

@@ -77,14 +77,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
-    currentHeapUsed = _heap_size - xPortGetFreeHeapSize();
+    currentHeapUsed = (uint32_t) &_heap_size - xPortGetFreeHeapSize();
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-    currentHeapHighWatermark = _heap_size - xPortGetMinimumEverFreeHeapSize();
+    currentHeapHighWatermark = (uint32_t) &_heap_size - xPortGetMinimumEverFreeHeapSize();
 
     return CHIP_NO_ERROR;
 }

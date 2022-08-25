@@ -24,9 +24,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Pre-Conditions TH only has official PAAs from DCL"
+    - label: "Pre-Conditions"
       verification: |
-          verification step to be updated.
+          TH only has official PAAs from DCL
       disabled: true
 
     - label: "Commission DUT1 to TH fabric"

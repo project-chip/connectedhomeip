@@ -3046,6 +3046,9 @@ PICS:
     - label: "Does the DUT(Client) implement sending Keysetwrite command?"
       id: GRPKEY.C.C00.Tx
 
+    - label: "Does the DUT(Client) implement sending Keysetread Command?"
+      id: GRPKEY.C.C01.Tx
+
     - label: "Does the DUT(Client) implement sending AddGroup command?"
       id: G.C.C00.Tx
 
@@ -5153,6 +5156,12 @@ PICS:
 
     - label: "Does the Controller DUT support Service Advertising?"
       id: MCORE.SC.ADV
+
+    - label: "Does the DUT(Client) implement sending Keysetwrite Command?"
+      id: GRPKEY.C.C00.Tx
+
+    - label: "Does the DUT(Client) support the GroupKeyMap attribute?"
+      id: GRPKEY.C.A0000
 
     #133.1. Bridged Device Basic Information Cluster
     - label: "Does the DUT(server) support the DataModelRevision attribute?"
