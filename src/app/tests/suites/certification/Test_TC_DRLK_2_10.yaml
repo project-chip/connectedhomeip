@@ -37,6 +37,22 @@ tests:
           4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT
           ps  -aef|grep lock-app
           5. Follow the Verification step below to generate the event in 2nd terminal of DUT
+
+
+          Pre-Conditions
+          "1 TH is commissioned with the DUT
+
+          2 Lock device is the DUT
+
+          Before sending the Events proceed following steps:
+
+          1. Send Set User Command and Get User for setting User.
+
+          2. Send Set Credential Command and Get Credential Status for setting PIN code.
+
+          After sending Events with all condition proceed following step
+
+          1. Send Clear Credential and Clear User Command."
       disabled: true
 
     - label:
