@@ -72,9 +72,7 @@ struct BindingManagerInitParams
 class BindingManager
 {
 public:
-    BindingManager() :
-        mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
-    {}
+    BindingManager() {}
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
@@ -123,13 +121,37 @@ public:
     static BindingManager & GetInstance() { return sBindingManager; }
 
 private:
+    class ConnectionCallback
+    {
+    public:
+        ConnectionCallback(BindingManager * bindingManager) :
+            mBindingManager(bindingManager), mOnConnectedCallback(HandleDeviceConnected, this),
+            mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
+        {}
+
+        Callback::Callback<OnDeviceConnected> * GetOnDeviceConnected() { return &mOnConnectedCallback; }
+        Callback::Callback<OnDeviceConnectionFailure> * GetOnDeviceConnectionFailure() { return &mOnConnectionFailureCallback; }
+
+    private:
+        static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+        {
+            ConnectionCallback * connectionCallback = static_cast<ConnectionCallback *>(context);
+            connectionCallback->mBindingManager->HandleDeviceConnected(exchangeMgr, sessionHandle);
+            Platform::Delete(connectionCallback);
+        }
+        static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
+        {
+            ConnectionCallback * connectionCallback = static_cast<ConnectionCallback *>(context);
+            connectionCallback->mBindingManager->HandleDeviceConnectionFailure(peerId, error);
+            Platform::Delete(connectionCallback);
+        }
+
+        BindingManager * mBindingManager;
+        Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
+        Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+    };
+
     static BindingManager sBindingManager;
-
-    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
-    void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
-
-    static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
-    void HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error);
 
     CHIP_ERROR EstablishConnection(const ScopedNodeId & nodeId);
 
@@ -137,8 +159,8 @@ private:
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
     BindingManagerInitParams mInitParams;
 
-    Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
-    Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+    void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    void HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error);
 
     // Used to keep track of synchronous failures from FindOrEstablishSession.
     CHIP_ERROR mLastSessionEstablishmentError;

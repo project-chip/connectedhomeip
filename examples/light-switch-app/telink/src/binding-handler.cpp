@@ -135,7 +135,7 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
 
 void LightSwitchContextReleaseHandler(void * context)
 {
-    VerifyOrReturn(context != nullptr, LOG_ERR("Invalid context for Light switch context release handler"););
+    VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "Invalid context for Light switch context release handler"));
 
     Platform::Delete(static_cast<BindingCommandData *>(context));
 }
