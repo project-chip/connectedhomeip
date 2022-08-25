@@ -414,7 +414,7 @@ void ChipLinuxAppMainLoop()
 
     // Initialize device attestation config
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProviderv2());
 #else
     SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
 #endif
