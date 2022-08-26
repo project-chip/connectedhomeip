@@ -230,7 +230,31 @@ exit:
     return err;
 }
 
-CHIP_ERROR EncodeExtensions(bool isCA, const Crypto::P256PublicKey & SKI, const Crypto::P256PublicKey & AKI, ASN1Writer & writer)
+CHIP_ERROR EncodeFutureExtension(const Optional<FutureExtension> & futureExt, ASN1Writer & writer)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(futureExt.HasValue(), CHIP_NO_ERROR);
+
+    ASN1_START_SEQUENCE
+    {
+        ReturnErrorOnFailure(writer.PutObjectId(futureExt.Value().OID.data(), static_cast<uint16_t>(futureExt.Value().OID.size())));
+
+        ASN1_START_OCTET_STRING_ENCAPSULATED
+        {
+            ReturnErrorOnFailure(writer.PutOctetString(futureExt.Value().Extension.data(),
+                                                       static_cast<uint16_t>(futureExt.Value().Extension.size())));
+        }
+        ASN1_END_ENCAPSULATED;
+    }
+    ASN1_END_SEQUENCE;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR EncodeExtensions(bool isCA, const Crypto::P256PublicKey & SKI, const Crypto::P256PublicKey & AKI,
+                            const Optional<FutureExtension> & futureExt, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -250,6 +274,8 @@ CHIP_ERROR EncodeExtensions(bool isCA, const Crypto::P256PublicKey & SKI, const 
             ReturnErrorOnFailure(EncodeSubjectKeyIdentifierExtension(SKI, writer));
 
             ReturnErrorOnFailure(EncodeAuthorityKeyIdentifierExtension(AKI, writer));
+
+            ReturnErrorOnFailure(EncodeFutureExtension(futureExt, writer));
         }
         ASN1_END_SEQUENCE;
     }
@@ -336,7 +362,7 @@ CHIP_ERROR EncodeTBSCert(const X509CertRequestParams & requestParams, const Cryp
         ReturnErrorOnFailure(EncodeSubjectPublicKeyInfo(subjectPubkey, writer));
 
         // certificate extensions
-        ReturnErrorOnFailure(EncodeExtensions(isCA, subjectPubkey, issuerPubkey, writer));
+        ReturnErrorOnFailure(EncodeExtensions(isCA, subjectPubkey, issuerPubkey, requestParams.FutureExt, writer));
     }
     ASN1_END_SEQUENCE;
 

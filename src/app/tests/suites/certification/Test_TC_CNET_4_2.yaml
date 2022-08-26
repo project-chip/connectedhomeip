@@ -14,7 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    12.4.1. [TC-CNET-4.1] [Wi-Fi] Verification for attributes check [DUT-Server]
+    12.4.2. [TC-CNET-4.2] [Thread] Verification for attributes check
+    [DUT-Server]
 
 PICS:
     - CNET.S.F01

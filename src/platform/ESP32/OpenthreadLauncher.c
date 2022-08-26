@@ -53,7 +53,7 @@ static void ot_task_worker(void * context)
     // Initialize the OpenThread stack
     ESP_ERROR_CHECK(esp_openthread_init(&config));
     // The OpenThread log level directly matches ESP log level
-    (void) otLoggingSetLevel(OT_LOG_LEVEL_INFO);
+    (void) otLoggingSetLevel(CONFIG_LOG_DEFAULT_LEVEL);
     // Initialize the esp_netif bindings
     openthread_netif = init_openthread_netif(&config);
 

@@ -26,6 +26,9 @@
 #include <string>
 #include <task.h>
 #include <timers.h>
+#ifdef DISPLAY_ENABLED
+#include <LcdPainter.h>
+#endif
 
 class WindowAppImpl : public WindowApp
 {
@@ -81,6 +84,8 @@ private:
 
     // Get QR Code and emulate its content using NFC tag
     char mQRCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+#ifdef DISPLAY_ENABLED
     Timer mIconTimer;
     LcdIcon mIcon = LcdIcon::None;
+#endif
 };

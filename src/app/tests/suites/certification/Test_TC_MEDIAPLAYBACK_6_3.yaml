@@ -81,9 +81,13 @@ tests:
     - label: "TH reads the StartTime attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0001 && PICS_USER_PROMPT
       verification: |
+          "The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback read start-time 1 1
+          ./chip-tv-casting-app mediaplayback read start-time 1 1
+
+          On TH Verify that the response is a valid start time or null.
           [1654001778189] [97015:7707437] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0001 DataVersion: 775839144
-          [1654001778190] [97015:7707437] CHIP: [TOO]   StartTime: 0
+          [1654001778190] [97015:7707437] CHIP: [TOO]   StartTime: 0"
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -96,7 +100,11 @@ tests:
     #Issue 10988
     - label: "TH reads the SeekRangeEnd attribute from the DUT"
       verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback read seek-range-end 1 1
+          ./chip-tv-casting-app mediaplayback read seek-range-end 1 1
+
+          On TH Verify that the response is a valid position or Nas.
           [1654002119527] [97409:7712444] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0005 DataVersion: 775839144
           [1654002119527] [97409:7712444] CHIP: [TOO]   SeekRangeEnd: 80000
       cluster: "LogCommands"
@@ -112,10 +120,18 @@ tests:
     #Issue 10988
     - label: "TH reads the SeekRangeStart attribute from the DUT"
       verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback read seek-range-start 1 1
-          [1654751320.161753][2491:2496] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0006 DataVersion: 1615951406
-          [1654751320.161846][2491:2496] CHIP:TOO:   SeekRangeStart: 10000
-          [1654751320.161941][2491:2496] CHIP:EM: Sending Standalone Ack for MessageCounter:120565821 on exchange 1929
+          ./chip-tv-casting-app mediaplayback read seek-range-start 1 1
+
+          On TH Verify that the response is a valid position or Nas.
+          [1661240180.806771][2930:2935] CHIP:DMG:         SuppressResponse = true,
+          [1661240180.806809][2930:2935] CHIP:DMG:         InteractionModelRevision = 1
+          [1661240180.806844][2930:2935] CHIP:DMG: }
+          [1661240180.807024][2930:2935] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0006 DataVersion: 1520269522
+          [1661240180.807103][2930:2935] CHIP:TOO:   SeekRangeStart: 0
+          [1661240180.807211][2930:2935] CHIP:EM: Sending Standalone Ack for MessageCounter:164562596 on exchange 31684i
+          [1661240180.807299][2930:2935] CHIP:IN: Prepared secure message 0xffff95f5d978 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 31684i with MessageCounter:104721987.s
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0006
@@ -129,7 +145,11 @@ tests:
     #Issue 10988
     - label: "TH reads the Duration attribute from the DUT"
       verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool mediaplayback read duration 1 1
+          ./chip-tv-casting-app mediaplayback read duration 1 1
+
+          On TH Verify that the response is null or not 0.
           [1654001869267] [97168:7708957] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0002 DataVersion: 775839144
           [1654001869267] [97168:7708957] CHIP: [TOO]   Duration: 80000
       cluster: "LogCommands"

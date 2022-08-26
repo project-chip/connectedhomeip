@@ -862,8 +862,7 @@ tests:
           message to DUT + TH sends Status Response Message with an error
           Status."
       verification: |
-          This is not testable in normal scenario, and needs to be tested as part of Unit test.
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1885
+          Mark this as not testable /NA. Out of Scope for V1.0
       disabled: true
 
     - label:

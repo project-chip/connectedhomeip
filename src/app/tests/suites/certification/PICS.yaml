@@ -3046,6 +3046,9 @@ PICS:
     - label: "Does the DUT(Client) implement sending Keysetwrite command?"
       id: GRPKEY.C.C00.Tx
 
+    - label: "Does the DUT(Client) implement sending Keysetread Command?"
+      id: GRPKEY.C.C01.Tx
+
     - label: "Does the DUT(Client) implement sending AddGroup command?"
       id: G.C.C00.Tx
 
@@ -5555,3 +5558,6 @@ PICS:
           "Is the device a Client and supports subscribing for multiple
           attribute"
       id: MCORE.IDM.C.SubscribeRequest.MultipleAttributes
+
+    - label: "Does the device support the Factory Reset Method?"
+      id: MCORE.UI.FACTORYRESET

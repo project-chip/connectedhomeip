@@ -180,7 +180,7 @@ tests:
       response:
           error: FAILURE
 
-    - label: "Commission from beta"
+    - label: "TH_CR2 starts a commissioning process on DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -191,7 +191,7 @@ tests:
               - name: "payload"
                 value: payload
 
-    - label: "TH_CR2 starts a commissioning process on DUT_CE"
+    - label: "DUT_CE is commissioned by TH_CR2"
       identity: "beta"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"

@@ -217,6 +217,5 @@ tests:
           the received timed request."
       PICS: MCORE.IDM.C.WriteRequest || MCORE.IDM.C.InvokeRequest
       verification: |
-          This is not testable in normal scenario, and needs to be tested as part of Unit test.
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1885
+          Mark this as not testable /NA. Out of Scope for V1.0
       disabled: true

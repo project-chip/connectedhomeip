@@ -18,6 +18,7 @@
 #import "MTRError.h"
 #import "MTRError_Internal.h"
 #import "MTRSetupPayload_Internal.h"
+#import "setup_payload/ManualSetupPayloadGenerator.h"
 #import <setup_payload/SetupPayload.h>
 
 @implementation MTROptionalQRCodeInfo
@@ -194,6 +195,31 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     payload.serialNumber = serialNumber;
 
     return payload;
+}
+
+- (nullable NSString *)manualEntryCode
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    std::string outDecimalString;
+    chip::SetupPayload payload;
+
+    /// The 11 digit manual pairing code only requires the version, VID_PID present flag,
+    /// discriminator, and the setup pincode.
+    payload.version = [self.version unsignedCharValue];
+    if (self.hasShortDiscriminator) {
+        payload.discriminator.SetShortValue([self.discriminator unsignedCharValue]);
+    } else {
+        payload.discriminator.SetLongValue([self.discriminator unsignedShortValue]);
+    }
+    payload.setUpPINCode = [self.setUpPINCode unsignedIntValue];
+
+    err = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(outDecimalString);
+
+    if (err != CHIP_NO_ERROR) {
+        return nil;
+    }
+
+    return [NSString stringWithUTF8String:outDecimalString.c_str()];
 }
 
 @end
