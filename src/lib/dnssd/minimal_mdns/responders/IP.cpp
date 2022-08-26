@@ -28,7 +28,7 @@ void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, Res
                                     const ResponseConfiguration & configuration)
 {
     chip::Inet::IPAddress addr;
-    UniquePtr<IpAddressIterator> ips = Policies::GetIpAddressesForEndpoint(source->Interface);
+    UniquePtr<IpAddressIterator> ips = GetAddressPolicy()->GetIpAddressesForEndpoint(source->Interface);
     VerifyOrDie(ips);
 
     while (ips->Next(addr))
@@ -46,7 +46,7 @@ void IPv6Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, Res
                                     const ResponseConfiguration & configuration)
 {
     chip::Inet::IPAddress addr;
-    UniquePtr<IpAddressIterator> ips = Policies::GetIpAddressesForEndpoint(source->Interface);
+    UniquePtr<IpAddressIterator> ips = GetAddressPolicy()->GetIpAddressesForEndpoint(source->Interface);
 
     VerifyOrDie(ips);
 

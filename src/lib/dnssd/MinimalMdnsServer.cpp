@@ -18,11 +18,28 @@
 
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
 
+#ifndef CHIP_MINMDNS_DEFAULT_POLICY
+#define CHIP_MINMDNS_DEFAULT_POLICY 0
+#endif
+
+#if CHIP_MINMDNS_DEFAULT_POLICY
+#include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
+#endif
+
 namespace chip {
 namespace Dnssd {
 
 using namespace mdns::Minimal;
 using chip::Platform::UniquePtr;
+
+GlobalMinimalMdnsServer::GlobalMinimalMdnsServer()
+{
+    mServer.SetDelegate(this);
+
+#if CHIP_MINMDNS_DEFAULT_POLICY
+    mdns::Minimal::SetDefaultAddressPolicy();
+#endif
+}
 
 GlobalMinimalMdnsServer & GlobalMinimalMdnsServer::Instance()
 {
@@ -35,7 +52,7 @@ CHIP_ERROR GlobalMinimalMdnsServer::StartServer(chip::Inet::EndPointManager<chip
 {
     GlobalMinimalMdnsServer::Server().Shutdown();
 
-    UniquePtr<ListenIterator> endpoints = Policies::GetListenEndpoints();
+    UniquePtr<ListenIterator> endpoints = GetAddressPolicy()->GetListenEndpoints();
 
     return GlobalMinimalMdnsServer::Server().Listen(udpEndPointManager, endpoints.get(), port);
 }

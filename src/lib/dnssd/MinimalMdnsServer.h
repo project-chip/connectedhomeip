@@ -40,7 +40,7 @@ public:
 
     using ServerType = mdns::Minimal::Server<kMaxEndPoints>;
 
-    GlobalMinimalMdnsServer() { mServer.SetDelegate(this); }
+    GlobalMinimalMdnsServer();
 
     static GlobalMinimalMdnsServer & Instance();
     static mdns::Minimal::ServerBase & Server()

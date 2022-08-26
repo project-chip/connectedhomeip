@@ -22,6 +22,8 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
+#include <lib/dnssd/minimal_mdns/AddressPolicy.h>
+#include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
 #include <lib/dnssd/minimal_mdns/core/QName.h>
@@ -30,7 +32,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
 
-#include "AllInterfaceListener.h"
 #include "PacketReporter.h"
 
 using namespace chip;
@@ -324,13 +325,14 @@ int main(int argc, char ** args)
     ReportDelegate reporter;
     CHIP_ERROR err;
 
+    mdns::Minimal::SetDefaultAddressPolicy();
     gMdnsServer.SetDelegate(&reporter);
 
     {
+        // FIXME: use gOptions.enableIpV4
+        auto endpoints = mdns::Minimal::GetAddressPolicy()->GetListenEndpoints();
 
-        MdnsExample::AllInterfaces allInterfaces(gOptions.enableIpV4);
-
-        err = gMdnsServer.Listen(chip::DeviceLayer::UDPEndPointManager(), &allInterfaces, gOptions.listenPort);
+        err = gMdnsServer.Listen(chip::DeviceLayer::UDPEndPointManager(), endpoints.get(), gOptions.listenPort);
         if (err != CHIP_NO_ERROR)
         {
             printf("Server failed to listen on all interfaces: %s\n", chip::ErrorStr(err));

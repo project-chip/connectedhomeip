@@ -16,9 +16,10 @@
  */
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
 
+#include <lib/support/logging/CHIPLogging.h>
+
 namespace mdns {
 namespace Minimal {
-namespace Policies {
 namespace {
 
 /// Checks if the current interface is powered on
@@ -157,23 +158,28 @@ private:
     chip::Inet::InterfaceAddressIterator mIterator;
 };
 
+class DefaultAddressPolicy : public AddressPolicy
+{
+public:
+    chip::Platform::UniquePtr<ListenIterator> GetListenEndpoints() override
+    {
+        return chip::Platform::UniquePtr<ListenIterator>(chip::Platform::New<AllInterfaces>());
+    }
+
+    chip::Platform::UniquePtr<IpAddressIterator> GetIpAddressesForEndpoint(chip::Inet::InterfaceId interfaceId) override
+    {
+        return chip::Platform::UniquePtr<IpAddressIterator>(chip::Platform::New<AllAddressesIterator>(interfaceId));
+    }
+};
+
+DefaultAddressPolicy gDefaultAddressPolicy;
+
 } // namespace
 
-chip::Platform::UniquePtr<mdns::Minimal::ListenIterator> GetListenEndpoints()
+void SetDefaultAddressPolicy()
 {
-    return chip::Platform::UniquePtr<mdns::Minimal::ListenIterator>(chip::Platform::New<AllInterfaces>());
+    SetAddressPolicy(&gDefaultAddressPolicy);
 }
 
-/// Fetch all the IP addresses for the given interface which are valid
-/// for DNSSD server advertisement.
-///
-/// Generally this should skip invalid addresses even if reported by the
-/// underlying operating system (e.g. linux could skip deprecated/temporary/dad-failed ones).
-chip::Platform::UniquePtr<mdns::Minimal::IpAddressIterator> GetIpAddressesForEndpoint(chip::Inet::InterfaceId interfaceId)
-{
-    return chip::Platform::UniquePtr<mdns::Minimal::IpAddressIterator>(chip::Platform::New<AllAddressesIterator>(interfaceId));
-}
-
-} // namespace Policies
 } // namespace Minimal
 } // namespace mdns

@@ -870,14 +870,14 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
         responseConfiguration.SetTtlSecondsOverride(0);
     }
 
-    UniquePtr<ListenIterator> allInterfaces = Policies::GetListenEndpoints();
+    UniquePtr<ListenIterator> allInterfaces = GetAddressPolicy()->GetListenEndpoints();
 
     chip::Inet::InterfaceId interfaceId;
     chip::Inet::IPAddressType addressType;
 
     while (allInterfaces->Next(&interfaceId, &addressType))
     {
-        UniquePtr<IpAddressIterator> allIps = Policies::GetIpAddressesForEndpoint(interfaceId);
+        UniquePtr<IpAddressIterator> allIps = GetAddressPolicy()->GetIpAddressesForEndpoint(interfaceId);
 
         Inet::IPAddress ipAddress;
         while (allIps->Next(ipAddress))
