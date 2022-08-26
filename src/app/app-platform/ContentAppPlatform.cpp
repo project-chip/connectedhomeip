@@ -101,7 +101,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
         if (mContentApps[index] == app)
         {
             ChipLogProgress(DeviceLayer, "Already added");
-            // already added, return endpointId of already added endpoint. 
+            // already added, return endpointId of already added endpoint.
             // desired endpointId does not have any impact
             return app->GetEndpointId();
         }
