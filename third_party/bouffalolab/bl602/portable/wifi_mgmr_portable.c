@@ -110,8 +110,8 @@ int wifi_mgmr_profile_ssid_get(uint8_t *ssid)
 
     wifi_mgmr_profile_get_by_idx(&wifiMgmr, &profile_msg, wifiMgmr.profile_active_index);
 
-    
-   memcpy(ssid, profile_msg.ssid, profile_msg.ssid_len); 
+
+   memcpy(ssid, profile_msg.ssid, profile_msg.ssid_len);
 
    return profile_msg.ssid_len;
 }
