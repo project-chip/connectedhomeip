@@ -55,13 +55,8 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
 
     if (mInitializeNodes)
     {
-        ReturnErrorOnFailure(mFabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
-                                                                                GetNodeA1CertAsset().mCert,
-                                                                                GetNodeA1CertAsset().mKey, &mAliceFabricIndex));
-
-        ReturnErrorOnFailure(mFabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
-                                                                                GetNodeA2CertAsset().mCert,
-                                                                                GetNodeA2CertAsset().mKey, &mBobFabricIndex));
+        ReturnErrorOnFailure(CreateAliceFabric());
+        ReturnErrorOnFailure(CreateBobFabric());
 
         ReturnErrorOnFailure(CreateSessionBobToAlice());
         ReturnErrorOnFailure(CreateSessionAliceToBob());
@@ -120,6 +115,20 @@ void MessagingContext::SetMRPMode(MRPMode mode)
         mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(
             ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
     }
+}
+
+CHIP_ERROR MessagingContext::CreateAliceFabric()
+{
+    return mFabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                              GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey,
+                                                              &mAliceFabricIndex);
+}
+
+CHIP_ERROR MessagingContext::CreateBobFabric()
+{
+    return mFabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                              GetNodeA2CertAsset().mCert, GetNodeA2CertAsset().mKey,
+                                                              &mBobFabricIndex);
 }
 
 CHIP_ERROR MessagingContext::CreateSessionBobToAlice()

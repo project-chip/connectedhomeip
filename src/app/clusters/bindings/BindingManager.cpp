@@ -111,7 +111,6 @@ CHIP_ERROR BindingManager::EstablishConnection(const ScopedNodeId & nodeId)
         if (mPendingNotificationMap.FindLRUConnectPeer(peerToRemove) == CHIP_NO_ERROR)
         {
             mPendingNotificationMap.RemoveAllEntriesForNode(peerToRemove);
-            mInitParams.mCASESessionManager->ReleaseSession(peerToRemove);
 
             // Now retry
             mLastSessionEstablishmentError = CHIP_NO_ERROR;
@@ -160,7 +159,6 @@ void BindingManager::HandleDeviceConnectionFailure(const ScopedNodeId & peerId, 
 {
     // Simply release the entry, the connection will be re-established as needed.
     ChipLogError(AppServer, "Failed to establish connection to node 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
-    mInitParams.mCASESessionManager->ReleaseSession(peerId);
     mLastSessionEstablishmentError = error;
 }
 

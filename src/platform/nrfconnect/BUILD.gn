@@ -46,6 +46,8 @@ static_library("nrfconnect") {
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
     "PlatformManagerImpl.h",
+    "Reboot.cpp",
+    "Reboot.h",
     "SystemPlatformConfig.h",
   ]
 

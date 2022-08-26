@@ -43,6 +43,7 @@ esp32-devkitc-all-clusters-minimal
 esp32-devkitc-all-clusters-minimal-ipv6only
 esp32-devkitc-bridge
 esp32-devkitc-light
+esp32-devkitc-light-rpc
 esp32-devkitc-lock
 esp32-devkitc-ota-requestor
 esp32-devkitc-ota-requestor-rpc
@@ -72,10 +73,10 @@ imx-ota-provider-app
 imx-ota-provider-app-release
 imx-thermostat
 imx-thermostat-release
-infineon-p6-all-clusters
-infineon-p6-all-clusters-minimal
-infineon-p6-light
-infineon-p6-lock
+infineon-psoc6-all-clusters
+infineon-psoc6-all-clusters-minimal
+infineon-psoc6-light
+infineon-psoc6-lock
 k32w-light-release-no-ota
 k32w-lock-release
 k32w-shell-release

@@ -97,7 +97,7 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
     return EFR32Config::WriteConfigValue(EFR32Config::kConfigKey_BootCount, bootCount + 1);
 }
 
-uint32_t ConfigurationManagerImpl::GetBootReason(void)
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
     // rebootCause is obtained at bootup.
     BootReasonType matterBootCause;
@@ -150,7 +150,8 @@ uint32_t ConfigurationManagerImpl::GetBootReason(void)
     matterBootCause = BootReasonType::kUnspecified;
 #endif
 
-    return to_underlying(matterBootCause);
+    bootReason = to_underlying(matterBootCause);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)

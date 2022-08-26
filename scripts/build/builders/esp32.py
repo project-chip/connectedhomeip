@@ -105,6 +105,7 @@ class Esp32App(Enum):
 def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
     rpc_enabled_apps = [Esp32App.ALL_CLUSTERS,
                         Esp32App.ALL_CLUSTERS_MINIMAL,
+                        Esp32App.LIGHT,
                         Esp32App.OTA_REQUESTOR,
                         Esp32App.TEMPERATURE_MEASUREMENT]
     if app == Esp32App.TESTS:

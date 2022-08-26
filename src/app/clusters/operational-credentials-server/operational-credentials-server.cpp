@@ -282,7 +282,6 @@ CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
 
 void CleanupSessionsForFabric(SessionManager & sessionMgr, FabricIndex fabricIndex)
 {
-    InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(fabricIndex);
     sessionMgr.ExpireAllSessionsForFabric(fabricIndex);
 }
 
@@ -297,18 +296,6 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     // Session Context at the Server.
     if (event->FailSafeTimerExpired.addNocCommandHasBeenInvoked || event->FailSafeTimerExpired.updateNocCommandHasBeenInvoked)
     {
-        // TODO(#19259): The following scope will no longer need to exist after #19259 is fixed
-        {
-            CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
-            if (caseSessionManager)
-            {
-                const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-                VerifyOrReturn(fabricInfo != nullptr);
-
-                caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetFabricIndex());
-            }
-        }
-
         SessionManager & sessionMgr = Server::GetInstance().GetSecureSessionManager();
         CleanupSessionsForFabric(sessionMgr, fabricIndex);
     }
@@ -379,6 +366,7 @@ public:
         ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
 
         EventManagement::GetInstance().FabricRemoved(fabricIndex);
+
         NotifyFabricTableChanged();
     }
 

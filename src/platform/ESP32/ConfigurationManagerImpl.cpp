@@ -119,6 +119,8 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     SuccessOrExit(MapConfigError(esp_err));
     esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_COUNTERS_NAMESPACE_PARTITION);
     SuccessOrExit(MapConfigError(esp_err));
+    esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_KVS_NAMESPACE_PARTITION);
+    SuccessOrExit(MapConfigError(esp_err));
 #endif
 
     // Force initialization of NVS namespaces if they doesn't already exist.
@@ -180,6 +182,26 @@ CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOp
 CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
 {
     return WriteConfigValue(ESP32Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetProductURL(char * buf, size_t bufSize)
+{
+    CHIP_ERROR err = ReadConfigValueStr(ESP32Config::kConfigKey_ProductURL, buf, bufSize, bufSize);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetProductLabel(char * buf, size_t bufSize)
+{
+    CHIP_ERROR err = ReadConfigValueStr(ESP32Config::kConfigKey_ProductLabel, buf, bufSize, bufSize);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)

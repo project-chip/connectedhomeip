@@ -628,7 +628,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     size_t output_length                      = 0;
     const psa_plaintext_ecp_keypair * keypair = to_const_keypair(&mKeypair);
 
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
     VerifyOrExit((msg != nullptr) && (msg_length > 0), error = CHIP_ERROR_INVALID_ARGUMENT);
 
     psa_crypto_init();
@@ -674,7 +674,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
     status = psa_driver_wrapper_verify_message(&attr, Uint8::to_const_uchar(*this), Length(), PSA_ALG_ECDSA(PSA_ALG_SHA_256), msg,
                                                msg_length, signature.ConstBytes(), signature.Length());
 
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INVALID_SIGNATURE);
 exit:
     _log_PSA_error(status);
     psa_reset_key_attributes(&attr);
@@ -722,7 +722,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     size_t output_length                      = 0;
     const psa_plaintext_ecp_keypair * keypair = to_const_keypair(&mKeypair);
 
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
 
     // Step 1: import plaintext key as volatile for ECDH
     psa_crypto_init();
@@ -839,7 +839,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     size_t len                                = output.Length() == 0 ? output.Capacity() : output.Length();
     Encoding::BufferWriter bbuf(output, len);
 
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
 
     bbuf.Put(mPublicKey, mPublicKey.Length());
 
@@ -894,12 +894,16 @@ P256Keypair::~P256Keypair()
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
     MutableByteSpan csr(out_csr, csr_length);
-    return GenerateCertificateSigningRequest(this, csr);
+    CHIP_ERROR err = GenerateCertificateSigningRequest(this, csr);
+    csr_length     = (CHIP_NO_ERROR == err) ? csr.size() : 0;
+    return err;
 }
 
 CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_length, P256PublicKey & pubkey)
 {
 #if defined(MBEDTLS_X509_CSR_PARSE_C)
+    ReturnErrorOnFailure(VerifyCertificateSigningRequestFormat(csr_buf, csr_length));
+
     // TODO: For some embedded targets, mbedTLS library doesn't have mbedtls_x509_csr_parse_der, and mbedtls_x509_csr_parse_free.
     //       Taking a step back, embedded targets likely will not process CSR requests. Adding this action item to reevaluate
     //       this if there's a need for this processing for embedded targets.

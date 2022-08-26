@@ -266,7 +266,7 @@ class ChipStack(object):
         self._persistentStorage = PersistentStorage(persistentStoragePath)
 
         # Initialize the chip stack.
-        res = self._ChipStackLib.pychip_DeviceController_StackInit()
+        res = self._ChipStackLib.pychip_DeviceController_StackInit(self._persistentStorage.GetSdkStorageObject())
         if res != 0:
             raise self.ErrorToException(res)
 
@@ -440,7 +440,7 @@ class ChipStack(object):
             self._ChipStackLib = chip.native.GetLibraryHandle()
             self._chipDLLPath = chip.native.FindNativeLibraryPath()
 
-            self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = []
+            self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = [c_void_p]
             self._ChipStackLib.pychip_DeviceController_StackInit.restype = c_uint32
             self._ChipStackLib.pychip_DeviceController_StackShutdown.argtypes = []
             self._ChipStackLib.pychip_DeviceController_StackShutdown.restype = c_uint32

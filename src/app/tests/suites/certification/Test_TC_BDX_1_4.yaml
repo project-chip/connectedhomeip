@@ -25,6 +25,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          This test can be verified using TC-SU-3.3 from the OTA Software Update section. Pls refer to OTA section for steps.
+      disabled: true
+
     - label:
           "TH sends a ReceiveInit message to DUT + DUT sends a ReceiveAccept
           message back to TH"

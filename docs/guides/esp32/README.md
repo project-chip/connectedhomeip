@@ -1,6 +1,9 @@
-## ESP32 Guides
+## Espressif (ESP32) Getting Started Guide
 
 ---
+
+Please follow the steps below to create and test a fully functional Matter
+example on ESP32 series of SoCs
 
 -   [Setup ESP-IDF and CHIP Environment](setup_idf_chip.md)
 -   [Using factory data from NVS](factory_data.md)

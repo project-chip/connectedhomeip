@@ -88,7 +88,6 @@ static_library("inet") {
     "InetArgParser.h",
     "InetError.cpp",
     "InetError.h",
-    "InetFaultInjection.h",
     "InetInterface.cpp",
     "InetInterface.h",
     "InetLayer.h",
@@ -108,13 +107,7 @@ static_library("inet") {
   }
 
   if (chip_system_config_use_open_thread_inet_endpoints) {
-    if (chip_openthread_ftd) {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
-    } else {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
-    }
+    public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
   }
 
   if (chip_inet_config_enable_tcp_endpoint) {
@@ -138,17 +131,12 @@ static_library("inet") {
   }
 
   if (chip_with_nlfaultinjection) {
-    sources += [ "InetFaultInjection.cpp" ]
+    sources += [
+      "InetFaultInjection.cpp",
+      "InetFaultInjection.h",
+    ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
 
   cflags = [ "-Wconversion" ]
-
-  include_dirs = []
-  if (current_os == "android") {
-    include_dirs += [
-      "${chip_root}/third_party/android/platform-libcore/android-platform-libcore/luni/src/main/native",
-      "${chip_root}/third_party/android/platform-libcore/android-platform-libcore/include",
-    ]
-  }
 }

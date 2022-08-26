@@ -61,7 +61,7 @@ RUN set -x \
     && (apt-get remove -fy python3-yaml && apt-get autoremove || exit 0) \
     && python3 -m pip install -U --no-cache-dir cmake==3.22.5 \
     && python3 -m pip install --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/zephyr/scripts/requirements.txt \
-    && python3 -m pip install --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/nrf/scripts/requirements.txt \
+    && python3 -m pip install --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/nrf/scripts/requirements-build.txt \
     && python3 -m pip install --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/bootloader/mcuboot/scripts/requirements.txt \
     && : # last line
 

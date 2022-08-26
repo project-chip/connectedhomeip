@@ -70,6 +70,8 @@ namespace {
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
+bool mCurrentButtonState = false;
+
 /**********************************************************
  * Identify Callbacks
  *********************************************************/
@@ -146,6 +148,9 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+#ifdef DISPLAY_ENABLED
+    GetLCD().Init((uint8_t *) "Light Switch");
+#endif
 
     err = BaseApplication::Init(&gIdentify);
     if (err != CHIP_NO_ERROR)
@@ -221,8 +226,22 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
         BindingCommandData * data = Platform::New<BindingCommandData>();
-        data->commandId           = chip::app::Clusters::OnOff::Commands::Toggle::Id;
         data->clusterId           = chip::app::Clusters::OnOff::Id;
+
+        if (mCurrentButtonState)
+        {
+            mCurrentButtonState = false;
+            data->commandId     = chip::app::Clusters::OnOff::Commands::Off::Id;
+        }
+        else
+        {
+            data->commandId     = chip::app::Clusters::OnOff::Commands::On::Id;
+            mCurrentButtonState = true;
+        }
+
+#ifdef DISPLAY_ENABLED
+        sAppTask.GetLCD().WriteDemoUI(mCurrentButtonState);
+#endif
 
         DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     }

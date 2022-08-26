@@ -35,14 +35,19 @@ static_library("helpers") {
     "TestInetCommonOptions.h",
     "TestInetCommonPosix.cpp",
     "TestInetLayerCommon.cpp",
-    "TestSetupFaultInjection.h",
-    "TestSetupFaultInjectionPosix.cpp",
     "TestSetupSignalling.h",
     "TestSetupSignallingPosix.cpp",
   ]
 
   if (current_os != "mbed") {
     sources += [ "TestInetLayer.cpp" ]
+  }
+
+  if (chip_with_nlfaultinjection) {
+    sources += [
+      "TestSetupFaultInjection.h",
+      "TestSetupFaultInjectionPosix.cpp",
+    ]
   }
 
   cflags = [ "-Wconversion" ]

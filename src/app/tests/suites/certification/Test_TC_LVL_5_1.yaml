@@ -44,6 +44,15 @@ tests:
       response:
           value: 1
 
+    #Adding below step resolve the issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/499
+    - label:
+          "Precondition: write default value of OnOffTransitionTime attribute"
+      PICS: LVL.S.A0010
+      command: "writeAttribute"
+      attribute: "OnOffTransitionTime"
+      arguments:
+          value: 0
+
     - label: "TH writes 0 to the Options attribute"
       PICS: LVL.S.A000f
       command: "writeAttribute"
@@ -113,7 +122,7 @@ tests:
     - label:
           "TH sends a Step command to the DUT with StepMode =0x00 (up), StepSize
           =150 and TransitionTime =300"
-      PICS: LVL.S.C02.Rsp && LVL.S.M.VarRate
+      PICS: LVL.S.C02.Rsp
       command: "Step"
       arguments:
           values:

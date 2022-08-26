@@ -497,7 +497,13 @@ DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     VerifyOrReturnValue(IsValidWeekdayScheduleIndex(weekdayIndex), DlStatus::kFailure);
     VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
 
-    schedule = mWeekdaySchedule[userIndex][weekdayIndex];
+    const auto & scheduleInStorage = mWeekdaySchedule[userIndex][weekdayIndex];
+    if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
+    {
+        return DlStatus::kNotFound;
+    }
+
+    schedule = scheduleInStorage.schedule;
 
     return DlStatus::kSuccess;
 }
@@ -518,11 +524,12 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
 
     auto & scheduleInStorage = mWeekdaySchedule[userIndex][weekdayIndex];
 
-    scheduleInStorage.daysMask    = daysMask;
-    scheduleInStorage.startHour   = startHour;
-    scheduleInStorage.startMinute = startMinute;
-    scheduleInStorage.endHour     = endHour;
-    scheduleInStorage.endMinute   = endMinute;
+    scheduleInStorage.schedule.daysMask    = daysMask;
+    scheduleInStorage.schedule.startHour   = startHour;
+    scheduleInStorage.schedule.startMinute = startMinute;
+    scheduleInStorage.schedule.endHour     = endHour;
+    scheduleInStorage.schedule.endMinute   = endMinute;
+    scheduleInStorage.status               = status;
 
     // Save schedule information in NVM flash
     EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
@@ -544,9 +551,13 @@ DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     VerifyOrReturnValue(IsValidYeardayScheduleIndex(yearDayIndex), DlStatus::kFailure);
     VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
 
-    auto & scheduleInStorage = mYeardaySchedule[userIndex][yearDayIndex];
+    const auto & scheduleInStorage = mYeardaySchedule[userIndex][yearDayIndex];
+    if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
+    {
+        return DlStatus::kNotFound;
+    }
 
-    schedule = scheduleInStorage;
+    schedule = scheduleInStorage.schedule;
 
     return DlStatus::kSuccess;
 }
@@ -565,8 +576,9 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 
     auto & scheduleInStorage = mYeardaySchedule[userIndex][yearDayIndex];
 
-    scheduleInStorage.localStartTime = localStartTime;
-    scheduleInStorage.localEndTime   = localEndTime;
+    scheduleInStorage.schedule.localStartTime = localStartTime;
+    scheduleInStorage.schedule.localEndTime   = localEndTime;
+    scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
     EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
@@ -585,9 +597,13 @@ DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
 
     VerifyOrReturnValue(IsValidHolidayScheduleIndex(holidayIndex), DlStatus::kFailure);
 
-    auto & scheduleInStorage = mHolidaySchedule[holidayIndex];
+    const auto & scheduleInStorage = mHolidaySchedule[holidayIndex];
+    if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
+    {
+        return DlStatus::kNotFound;
+    }
 
-    schedule = scheduleInStorage;
+    schedule = scheduleInStorage.schedule;
 
     return DlStatus::kSuccess;
 }
@@ -603,9 +619,10 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
 
     auto & scheduleInStorage = mHolidaySchedule[holidayIndex];
 
-    scheduleInStorage.localStartTime = localStartTime;
-    scheduleInStorage.localEndTime   = localEndTime;
-    scheduleInStorage.operatingMode  = operatingMode;
+    scheduleInStorage.schedule.localStartTime = localStartTime;
+    scheduleInStorage.schedule.localEndTime   = localEndTime;
+    scheduleInStorage.schedule.operatingMode  = operatingMode;
+    scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
     EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_HolidaySchedules,

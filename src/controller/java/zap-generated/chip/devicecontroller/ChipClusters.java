@@ -16188,6 +16188,14 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
+    public interface StartUpColorTemperatureMiredsAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -16784,7 +16792,8 @@ public class ChipClusters {
           chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readStartUpColorTemperatureMiredsAttribute(IntegerAttributeCallback callback) {
+    public void readStartUpColorTemperatureMiredsAttribute(
+        StartUpColorTemperatureMiredsAttributeCallback callback) {
       readStartUpColorTemperatureMiredsAttribute(chipClusterPtr, callback);
     }
 
@@ -16800,7 +16809,7 @@ public class ChipClusters {
     }
 
     public void subscribeStartUpColorTemperatureMiredsAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        StartUpColorTemperatureMiredsAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeStartUpColorTemperatureMiredsAttribute(
           chipClusterPtr, callback, minInterval, maxInterval);
     }
@@ -17262,7 +17271,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readStartUpColorTemperatureMiredsAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, StartUpColorTemperatureMiredsAttributeCallback callback);
 
     private native void writeStartUpColorTemperatureMiredsAttribute(
         long chipClusterPtr,
@@ -17271,7 +17280,10 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeStartUpColorTemperatureMiredsAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        StartUpColorTemperatureMiredsAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
@@ -25128,6 +25140,165 @@ public class ChipClusters {
         NullableRangeRestrictedInt16sAttributeCallback callback,
         int minInterval,
         int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class FaultInjectionCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 4294048774L;
+
+    public FaultInjectionCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void failAtFault(
+        DefaultClusterCallback callback,
+        Integer type,
+        Long id,
+        Long numCallsToSkip,
+        Long numCallsToFail,
+        Boolean takeMutex) {
+      failAtFault(
+          chipClusterPtr, callback, type, id, numCallsToSkip, numCallsToFail, takeMutex, null);
+    }
+
+    public void failAtFault(
+        DefaultClusterCallback callback,
+        Integer type,
+        Long id,
+        Long numCallsToSkip,
+        Long numCallsToFail,
+        Boolean takeMutex,
+        int timedInvokeTimeoutMs) {
+      failAtFault(
+          chipClusterPtr,
+          callback,
+          type,
+          id,
+          numCallsToSkip,
+          numCallsToFail,
+          takeMutex,
+          timedInvokeTimeoutMs);
+    }
+
+    private native void failAtFault(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Integer type,
+        Long id,
+        Long numCallsToSkip,
+        Long numCallsToFail,
+        Boolean takeMutex,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);

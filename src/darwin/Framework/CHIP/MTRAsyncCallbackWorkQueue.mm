@@ -18,12 +18,17 @@
 #import <dispatch/dispatch.h>
 #import <os/lock.h>
 
-#import "MTRAsyncCallbackWorkQueue_Internal.h"
+#import "MTRAsyncCallbackWorkQueue.h"
 #import "MTRLogging.h"
 
 #pragma mark - Class extensions
 
 @interface MTRAsyncCallbackWorkQueue ()
+// The lock protects the internal state of the work queue so that these may be called from any queue or thread:
+//   -enqueueWorkItem:
+//   -invalidate
+//   -endWork:
+//   -retryWork:
 @property (nonatomic, readonly) os_unfair_lock lock;
 @property (nonatomic, strong, readonly) id context;
 @property (nonatomic, strong, readonly) dispatch_queue_t queue;
@@ -81,7 +86,8 @@
     [invalidateItems removeAllObjects];
 }
 
-- (void)endWork:(MTRAsyncCallbackQueueWorkItem *)workItem
+// called after executing a work item
+- (void)_postProcessWorkItem:(MTRAsyncCallbackQueueWorkItem *)workItem retry:(BOOL)retry
 {
     os_unfair_lock_lock(&_lock);
     // sanity check if running
@@ -102,8 +108,10 @@
         return;
     }
 
-    // since work is done, remove from queue and call ready on the next item
-    [self.items removeObjectAtIndex:0];
+    // if work item is done (no need to retry), remove from queue and call ready on the next item
+    if (!retry) {
+        [self.items removeObjectAtIndex:0];
+    }
 
     // when "concurrency width" is implemented this will be decremented instead
     self.runningWorkItemCount = 0;
@@ -111,32 +119,14 @@
     os_unfair_lock_unlock(&_lock);
 }
 
+- (void)endWork:(MTRAsyncCallbackQueueWorkItem *)workItem
+{
+    [self _postProcessWorkItem:workItem retry:NO];
+}
+
 - (void)retryWork:(MTRAsyncCallbackQueueWorkItem *)workItem
 {
-    // reset BOOL and call again
-    os_unfair_lock_lock(&_lock);
-    // sanity check if running
-    if (!self.runningWorkItemCount) {
-        // something is wrong with state - nothing is currently running
-        os_unfair_lock_unlock(&_lock);
-        MTR_LOG_ERROR("retryWork: no work is running on work queue");
-        return;
-    }
-
-    // sanity check the same work item is running
-    // when "concurrency width" is implemented need to check first N items
-    MTRAsyncCallbackQueueWorkItem * firstWorkItem = self.items.firstObject;
-    if (firstWorkItem != workItem) {
-        // something is wrong with this work item - should not be currently running
-        os_unfair_lock_unlock(&_lock);
-        MTR_LOG_ERROR("retryWork: work item is not first on work queue");
-        return;
-    }
-
-    // when "concurrency width" is implemented this will be decremented instead
-    self.runningWorkItemCount = 0;
-    [self _callNextReadyWorkItem];
-    os_unfair_lock_unlock(&_lock);
+    [self _postProcessWorkItem:workItem retry:YES];
 }
 
 // assume lock is held while calling this
@@ -166,13 +156,11 @@
     return self;
 }
 
-// Called by Cluster object's after async work is done
 - (void)endWork
 {
     [self.workQueue endWork:self];
 }
 
-// Called by Cluster object's after async work is done
 - (void)retryWork
 {
     [self.workQueue retryWork:self];

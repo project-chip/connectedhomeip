@@ -327,6 +327,14 @@ typedef void (*EthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallback)(
     void *, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType);
 typedef void (*NullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> &);
+typedef void (*TimeSynchronizationClusterGranularityEnumAttributeCallback)(
+    void *, chip::app::Clusters::TimeSynchronization::GranularityEnum);
+typedef void (*NullableTimeSynchronizationClusterGranularityEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::GranularityEnum> &);
+typedef void (*TimeSynchronizationClusterTimeSourceEnumAttributeCallback)(void *,
+                                                                          chip::app::Clusters::TimeSynchronization::TimeSourceEnum);
+typedef void (*NullableTimeSynchronizationClusterTimeSourceEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::TimeSourceEnum> &);
 typedef void (*AdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback)(
     void *, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus);
 typedef void (*NullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback)(
@@ -524,6 +532,9 @@ typedef void (*NullableApplicationBasicClusterApplicationStatusEnumAttributeCall
 typedef void (*TestClusterClusterSimpleEnumAttributeCallback)(void *, chip::app::Clusters::TestCluster::SimpleEnum);
 typedef void (*NullableTestClusterClusterSimpleEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> &);
+typedef void (*FaultInjectionClusterFaultTypeAttributeCallback)(void *, chip::app::Clusters::FaultInjection::FaultType);
+typedef void (*NullableFaultInjectionClusterFaultTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FaultInjection::FaultType> &);
 
 typedef void (*IdentifyGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
@@ -1101,6 +1112,12 @@ typedef void (*TestClusterAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TestClusterAttributeListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*FaultInjectionGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*FaultInjectionAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*FaultInjectionAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 
 class MTRDefaultSuccessCallbackBridge : public MTRCallbackBridge<DefaultSuccessCallback>
 {
@@ -15134,6 +15151,150 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class MTRFaultInjectionGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FaultInjectionGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRFaultInjectionGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<FaultInjectionGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    MTRFaultInjectionGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                     MTRDeviceController * controller, ResponseHandler handler,
+                                                                     MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<FaultInjectionGeneratedCommandListListAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                                   OnSuccessFn, keepAlive){};
+
+    MTRFaultInjectionGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                     ResponseHandler handler, MTRActionBlock action,
+                                                                     bool keepAlive = false) :
+        MTRCallbackBridge<FaultInjectionGeneratedCommandListListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRFaultInjectionGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRFaultInjectionGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRFaultInjectionGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRFaultInjectionGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRFaultInjectionGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        MTRFaultInjectionGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFaultInjectionAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FaultInjectionAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRFaultInjectionAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<FaultInjectionAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRFaultInjectionAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                    MTRDeviceController * controller, ResponseHandler handler,
+                                                                    MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<FaultInjectionAcceptedCommandListListAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                                  OnSuccessFn, keepAlive){};
+
+    MTRFaultInjectionAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                    ResponseHandler handler, MTRActionBlock action,
+                                                                    bool keepAlive = false) :
+        MTRCallbackBridge<FaultInjectionAcceptedCommandListListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                                  keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRFaultInjectionAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRFaultInjectionAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRFaultInjectionAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                                MTRDeviceController * controller,
+                                                                                ResponseHandler handler, MTRActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        MTRFaultInjectionAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRFaultInjectionAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                                ResponseHandler handler, MTRActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        MTRFaultInjectionAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFaultInjectionAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FaultInjectionAttributeListListAttributeCallback>
+{
+public:
+    MTRFaultInjectionAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<FaultInjectionAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRFaultInjectionAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                              MTRDeviceController * controller, ResponseHandler handler,
+                                                              MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<FaultInjectionAttributeListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                            keepAlive){};
+
+    MTRFaultInjectionAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                              ResponseHandler handler, MTRActionBlock action,
+                                                              bool keepAlive = false) :
+        MTRCallbackBridge<FaultInjectionAttributeListListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                            keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRFaultInjectionAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRFaultInjectionAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRFaultInjectionAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                          MTRDeviceController * controller, ResponseHandler handler,
+                                                                          MTRActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        MTRFaultInjectionAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRFaultInjectionAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                          ResponseHandler handler, MTRActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        MTRFaultInjectionAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class MTRGroupsClusterAddGroupResponseCallbackBridge : public MTRCallbackBridge<GroupsClusterAddGroupResponseCallbackType>
 {
 public:
@@ -21653,6 +21814,206 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<TimeSynchronizationClusterGranularityEnumAttributeCallback>
+{
+public:
+    MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<TimeSynchronizationClusterGranularityEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                        MTRDeviceController * controller, ResponseHandler handler,
+                                                                        MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<TimeSynchronizationClusterGranularityEnumAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                                      OnSuccessFn, keepAlive){};
+
+    MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                        ResponseHandler handler, MTRActionBlock action,
+                                                                        bool keepAlive = false) :
+        MTRCallbackBridge<TimeSynchronizationClusterGranularityEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::TimeSynchronization::GranularityEnum value);
+};
+
+class MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge
+    : public MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge
+{
+public:
+    MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTimeSynchronizationClusterGranularityEnumAttributeCallback>
+{
+public:
+    MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRLocalActionBlock action,
+                                                                                bool keepAlive = false) :
+        MTRCallbackBridge<NullableTimeSynchronizationClusterGranularityEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
+
+    MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                                MTRDeviceController * controller,
+                                                                                ResponseHandler handler, MTRActionBlock action,
+                                                                                bool keepAlive = false) :
+        MTRCallbackBridge<NullableTimeSynchronizationClusterGranularityEnumAttributeCallback>(queue, nodeID, controller, handler,
+                                                                                              action, OnSuccessFn, keepAlive){};
+
+    MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                                ResponseHandler handler, MTRActionBlock action,
+                                                                                bool keepAlive = false) :
+        MTRCallbackBridge<NullableTimeSynchronizationClusterGranularityEnumAttributeCallback>(queue, device, handler, action,
+                                                                                              OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::GranularityEnum> & value);
+};
+
+class MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action,
+                                                                                    true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<TimeSynchronizationClusterTimeSourceEnumAttributeCallback>
+{
+public:
+    MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<TimeSynchronizationClusterTimeSourceEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                       MTRDeviceController * controller, ResponseHandler handler,
+                                                                       MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<TimeSynchronizationClusterTimeSourceEnumAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                                     OnSuccessFn, keepAlive){};
+
+    MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                       ResponseHandler handler, MTRActionBlock action,
+                                                                       bool keepAlive = false) :
+        MTRCallbackBridge<TimeSynchronizationClusterTimeSourceEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::TimeSynchronization::TimeSourceEnum value);
+};
+
+class MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge
+    : public MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge
+{
+public:
+    MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTimeSynchronizationClusterTimeSourceEnumAttributeCallback>
+{
+public:
+    MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableTimeSynchronizationClusterTimeSourceEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
+
+    MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                               MTRDeviceController * controller,
+                                                                               ResponseHandler handler, MTRActionBlock action,
+                                                                               bool keepAlive = false) :
+        MTRCallbackBridge<NullableTimeSynchronizationClusterTimeSourceEnumAttributeCallback>(queue, nodeID, controller, handler,
+                                                                                             action, OnSuccessFn, keepAlive){};
+
+    MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                               ResponseHandler handler, MTRActionBlock action,
+                                                                               bool keepAlive = false) :
+        MTRCallbackBridge<NullableTimeSynchronizationClusterTimeSourceEnumAttributeCallback>(queue, device, handler, action,
+                                                                                             OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::TimeSourceEnum> & value);
+};
+
+class MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action,
+                                                                                   true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge
     : public MTRCallbackBridge<AdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback>
 {
@@ -27318,6 +27679,103 @@ public:
                                                                                ResponseHandler handler, MTRActionBlock action,
                                                                                SubscriptionEstablishedHandler establishedHandler) :
         MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<FaultInjectionClusterFaultTypeAttributeCallback>
+{
+public:
+    MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<FaultInjectionClusterFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                             MTRDeviceController * controller, ResponseHandler handler,
+                                                             MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<FaultInjectionClusterFaultTypeAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                           keepAlive){};
+
+    MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                             ResponseHandler handler, MTRActionBlock action,
+                                                             bool keepAlive = false) :
+        MTRCallbackBridge<FaultInjectionClusterFaultTypeAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                           keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::FaultInjection::FaultType value);
+};
+
+class MTRFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge
+    : public MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge
+{
+public:
+    MTRFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                         MTRDeviceController * controller, ResponseHandler handler,
+                                                                         MTRActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
+        MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                         ResponseHandler handler, MTRActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
+        MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableFaultInjectionClusterFaultTypeAttributeCallback>
+{
+public:
+    MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableFaultInjectionClusterFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                     MTRDeviceController * controller, ResponseHandler handler,
+                                                                     MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableFaultInjectionClusterFaultTypeAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                                   OnSuccessFn, keepAlive){};
+
+    MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                     ResponseHandler handler, MTRActionBlock action,
+                                                                     bool keepAlive = false) :
+        MTRCallbackBridge<NullableFaultInjectionClusterFaultTypeAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::FaultInjection::FaultType> & value);
+};
+
+class MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
