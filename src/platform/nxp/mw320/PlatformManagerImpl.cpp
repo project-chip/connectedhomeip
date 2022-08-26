@@ -30,7 +30,7 @@
 #include <lwip/tcpip.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
-//#include <platform/nxp/mw320/DeviceInfoProviderImpl.h>
+#include <platform/nxp/mw320/DeviceInfoProviderImpl.h>
 #include <platform/nxp/mw320/DiagnosticDataProviderImpl.h>
 #if defined(MBEDTLS_USE_TINYCRYPT)
 #include "ecc.h"
@@ -83,7 +83,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     SuccessOrExit(err);
 
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-    //SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
+    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
 
     // Initialize LwIP.
     // tcpip_init(NULL, NULL);
