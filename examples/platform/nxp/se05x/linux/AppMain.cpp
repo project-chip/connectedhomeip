@@ -77,11 +77,10 @@
 #include "CommissionableInit.h"
 
 #if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
 #include "DeviceAttestationSe05xCredsExample.h"
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
 #include <crypto/hsm/nxp/PersistentStorageOperationalKeystoreHSM.h>
 #endif
-
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -414,7 +413,7 @@ void ChipLinuxAppMainLoop()
 
     // Initialize device attestation config
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProviderv2());
 #else
     SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
 #endif

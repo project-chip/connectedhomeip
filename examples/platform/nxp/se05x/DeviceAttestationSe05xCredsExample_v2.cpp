@@ -20,10 +20,10 @@
 #include <credentials/examples/ExamplePAI.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/Span.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVTags.h>
 #include <lib/core/CHIPTLVTypes.h>
+#include <lib/support/Span.h>
 
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
@@ -34,30 +34,29 @@
 #include <crypto/hsm/nxp/CHIPCryptoPALHsm_SE05X_utils.h>
 
 /* Device attestation key ids */
-#define DEV_ATTESTATION_KEY_SE05X_ID         0x7D300000
-#define DEV_ATTESTATION_CERT_SE05X_ID        0x7D300001
+#define DEV_ATTESTATION_KEY_SE05X_ID 0x7D300000
+#define DEV_ATTESTATION_CERT_SE05X_ID 0x7D300001
 
 /* Device attestation key ids (Used with internal sign) */
-#define CD_DEV_ATTESTATION_KEY_SE05X_ID      0x7D300002
-#define NOCSR_DEV_ATTESTATION_KEY_SE05X_ID   0x7D300004
+#define CD_DEV_ATTESTATION_KEY_SE05X_ID 0x7D300002
+#define NOCSR_DEV_ATTESTATION_KEY_SE05X_ID 0x7D300004
 
 /* Device attestation data ids (for Cert decl) */
-#define CD_CERT_DECLARATION_DATA_SE05X_ID    0x7D300009
-#define CD_ATTEST_NONCE_DATA_SE05X_ID        0x7D30000C
-#define CD_TIME_STAMP_LEN_SE05X_ID           0x7D30000E
-#define CD_TIME_STAMP_DATA_SE05X_ID          0x7D30000F
-#define CD_ATTEST_CHALLENGE_SE05X_ID         0x7D300011
+#define CD_CERT_DECLARATION_DATA_SE05X_ID 0x7D300009
+#define CD_ATTEST_NONCE_DATA_SE05X_ID 0x7D30000C
+#define CD_TIME_STAMP_LEN_SE05X_ID 0x7D30000E
+#define CD_TIME_STAMP_DATA_SE05X_ID 0x7D30000F
+#define CD_ATTEST_CHALLENGE_SE05X_ID 0x7D300011
 
 /* Device attestation data ids (for CSR) */
-#define NOCSR_CSR_LEN_SE05X_ID               0x7D300014
-#define NOCSR_CSR_DATA_SE05X_ID              0x7D300015
-#define NOCSR_CSR_NONCE_DATA_SE05X_ID        0x7D300018
-#define NOCSR_ATTEST_CHALLENGE_SE05X_ID      0x7D30001A
-
+#define NOCSR_CSR_LEN_SE05X_ID 0x7D300014
+#define NOCSR_CSR_DATA_SE05X_ID 0x7D300015
+#define NOCSR_CSR_NONCE_DATA_SE05X_ID 0x7D300018
+#define NOCSR_ATTEST_CHALLENGE_SE05X_ID 0x7D30001A
 
 extern CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t * buf, size_t * buflen);
 extern CHIP_ERROR se05xSetCertificate(uint32_t keyId, const uint8_t * buf, size_t buflen);
-extern CHIP_ERROR se05xPerformInternalSign(uint32_t keyId, uint8_t* sigBuf, size_t* sigBufLen);
+extern CHIP_ERROR se05xPerformInternalSign(uint32_t keyId, uint8_t * sigBuf, size_t * sigBufLen);
 extern void se05x_delete_key(uint32_t keyid);
 
 namespace chip {
@@ -165,14 +164,14 @@ CHIP_ERROR ExampleSe05xDACProviderv2::GetFirmwareInformation(MutableByteSpan & o
 }
 
 CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
-                                                                 MutableByteSpan & out_signature_buffer)
+                                                                   MutableByteSpan & out_signature_buffer)
 {
     VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogDetail(Crypto, "Sign using DA key from se05x (Using internal sign)");
 
-    MutableByteSpan tlv_buffer = ((MutableByteSpan &)message_to_sign).SubSpan(1); // Exclude the Start container
+    MutableByteSpan tlv_buffer = ((MutableByteSpan &) message_to_sign).SubSpan(1); // Exclude the Start container
 
     TLV::TLVReader msg_reader;
     TLV::Tag tagValue;
@@ -183,17 +182,20 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
     /* To be removed. Use common key id to sign message */
     static bool sign_cert_decl_attest = 1;
 
-    if (sign_cert_decl_attest) {
+    if (sign_cert_decl_attest)
+    {
         /* Skip certificate declaration tag */
         msg_reader.Next();
 
         tagValue = msg_reader.GetTag();
-        VerifyOrReturnError(TLV::ContextTag(2) == tagValue, CHIP_ERROR_INVALID_TLV_TAG);    
+        VerifyOrReturnError(TLV::ContextTag(2) == tagValue, CHIP_ERROR_INVALID_TLV_TAG);
         /* Get attestation nonce */
         ByteSpan attest_nonce;
         msg_reader.Get(attest_nonce);
         /* Set attestation nonce */
-        VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(CD_ATTEST_NONCE_DATA_SE05X_ID, attest_nonce.data(), attest_nonce.size()), CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(CHIP_NO_ERROR ==
+                                se05xSetCertificate(CD_ATTEST_NONCE_DATA_SE05X_ID, attest_nonce.data(), attest_nonce.size()),
+                            CHIP_ERROR_INTERNAL);
 
         msg_reader.Next();
         tagValue = msg_reader.GetTag();
@@ -203,19 +205,26 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
         uint8_t tmp = time_stamp.size();
         /* Set time stamp length */
         VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(CD_TIME_STAMP_LEN_SE05X_ID, &tmp, 1), CHIP_ERROR_INTERNAL);
-        if (time_stamp.size() > 0){
+        if (time_stamp.size() > 0)
+        {
             /* Set time stamp data */
-            VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(CD_TIME_STAMP_DATA_SE05X_ID, time_stamp.data(), time_stamp.size()), CHIP_ERROR_INTERNAL);
+            VerifyOrReturnError(CHIP_NO_ERROR ==
+                                    se05xSetCertificate(CD_TIME_STAMP_DATA_SE05X_ID, time_stamp.data(), time_stamp.size()),
+                                CHIP_ERROR_INTERNAL);
         }
 
-        if (message_to_sign.size() >= 16){
+        if (message_to_sign.size() >= 16)
+        {
             /* Set attestation challenge */
-            VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(CD_ATTEST_CHALLENGE_SE05X_ID, (message_to_sign.end() - 16), 16), CHIP_ERROR_INTERNAL);
+            VerifyOrReturnError(CHIP_NO_ERROR ==
+                                    se05xSetCertificate(CD_ATTEST_CHALLENGE_SE05X_ID, (message_to_sign.end() - 16), 16),
+                                CHIP_ERROR_INTERNAL);
         }
     }
-    else {
+    else
+    {
         tagValue = msg_reader.GetTag();
-        VerifyOrReturnError(TLV::ContextTag(1) == tagValue, CHIP_ERROR_INVALID_TLV_TAG);    
+        VerifyOrReturnError(TLV::ContextTag(1) == tagValue, CHIP_ERROR_INVALID_TLV_TAG);
         /* Get nocsr */
         ByteSpan csr_data;
         msg_reader.Get(csr_data);
@@ -224,37 +233,44 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
         VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(NOCSR_CSR_LEN_SE05X_ID, &tmp, 1), CHIP_ERROR_INTERNAL);
         /* Set nocsr data */
         se05x_delete_key(NOCSR_CSR_DATA_SE05X_ID);
-        VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(NOCSR_CSR_DATA_SE05X_ID, csr_data.data(), csr_data.size()), CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(NOCSR_CSR_DATA_SE05X_ID, csr_data.data(), csr_data.size()),
+                            CHIP_ERROR_INTERNAL);
 
         msg_reader.Next();
         tagValue = msg_reader.GetTag();
-        VerifyOrReturnError(TLV::ContextTag(2) == tagValue, CHIP_ERROR_INVALID_TLV_TAG);    
+        VerifyOrReturnError(TLV::ContextTag(2) == tagValue, CHIP_ERROR_INVALID_TLV_TAG);
         /* Get nocsr nonce */
         ByteSpan nocsr_nonce;
         msg_reader.Get(nocsr_nonce);
         /* Set nocsr nonce data */
-        VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(NOCSR_CSR_NONCE_DATA_SE05X_ID, nocsr_nonce.data(), nocsr_nonce.size()), CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(CHIP_NO_ERROR ==
+                                se05xSetCertificate(NOCSR_CSR_NONCE_DATA_SE05X_ID, nocsr_nonce.data(), nocsr_nonce.size()),
+                            CHIP_ERROR_INTERNAL);
 
-
-        if (message_to_sign.size() >= 16){
+        if (message_to_sign.size() >= 16)
+        {
             /* Set attestation challenge */
-            VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(NOCSR_ATTEST_CHALLENGE_SE05X_ID, (message_to_sign.end() - 16), 16), CHIP_ERROR_INTERNAL);
-        }   
+            VerifyOrReturnError(CHIP_NO_ERROR ==
+                                    se05xSetCertificate(NOCSR_ATTEST_CHALLENGE_SE05X_ID, (message_to_sign.end() - 16), 16),
+                                CHIP_ERROR_INTERNAL);
+        }
     }
 
     uint8_t signature_se05x[Crypto::kMax_ECDSA_Signature_Length_Der] = { 0 };
-    size_t signature_se05x_len = sizeof(signature_se05x);
+    size_t signature_se05x_len                                       = sizeof(signature_se05x);
 
-    if (sign_cert_decl_attest) {
+    if (sign_cert_decl_attest)
+    {
         ReturnErrorOnFailure(se05xPerformInternalSign(CD_DEV_ATTESTATION_KEY_SE05X_ID, signature_se05x, &signature_se05x_len));
         sign_cert_decl_attest = 0;
     }
     else
-    {   
+    {
         ReturnErrorOnFailure(se05xPerformInternalSign(NOCSR_DEV_ATTESTATION_KEY_SE05X_ID, signature_se05x, &signature_se05x_len));
     }
 
-    return chip::Crypto::EcdsaAsn1SignatureToRaw(chip::Crypto::kP256_FE_Length, ByteSpan{ signature_se05x, signature_se05x_len }, out_signature_buffer);
+    return chip::Crypto::EcdsaAsn1SignatureToRaw(chip::Crypto::kP256_FE_Length, ByteSpan{ signature_se05x, signature_se05x_len },
+                                                 out_signature_buffer);
 }
 
 } // namespace

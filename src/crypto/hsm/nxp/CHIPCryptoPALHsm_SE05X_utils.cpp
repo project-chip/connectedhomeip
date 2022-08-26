@@ -244,42 +244,33 @@ CHIP_ERROR se05xSetCertificate(uint32_t keyId, const uint8_t * buf, size_t bufle
     status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    status = sss_key_object_allocate_handle(&keyObject,
-        keyId,
-        kSSS_KeyPart_Default,
-        kSSS_CipherType_Certificate,
-        buflen,
-        kKeyObject_Mode_Persistent);
+    status = sss_key_object_allocate_handle(&keyObject, keyId, kSSS_KeyPart_Default, kSSS_CipherType_Certificate, buflen,
+                                            kKeyObject_Mode_Persistent);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, buf, buflen, buflen*8, NULL, 0);
+    status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, buf, buflen, buflen * 8, NULL, 0);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }
 
-#if SSS_HAVE_APPLET_SE051_H
-
-CHIP_ERROR se05xPerformInternalSign(uint32_t keyId, uint8_t* sigBuf, size_t* sigBufLen)
+CHIP_ERROR se05xPerformInternalSign(uint32_t keyId, uint8_t * sigBuf, size_t * sigBufLen)
 {
-    smStatus_t status = SM_NOT_OK;
-    sss_se05x_session_t *pSe05xCtx = (sss_se05x_session_t *)&gex_sss_chip_ctx.session;
-    uint8_t hashData[chip::Crypto::kSHA256_Hash_Length] = {0};
-    size_t hashDataLen = sizeof(hashData);
+#if SSS_HAVE_APPLET_SE051_H
+    smStatus_t status                                   = SM_NOT_OK;
+    sss_se05x_session_t * pSe05xCtx                     = (sss_se05x_session_t *) &gex_sss_chip_ctx.session;
+    uint8_t hashData[chip::Crypto::kSHA256_Hash_Length] = { 0 };
+    size_t hashDataLen                                  = sizeof(hashData);
 
-    status = Se05x_API_ECDSA_Internal_Sign(&(pSe05xCtx->s_ctx),
-        keyId,
-        kSE05x_ECSignatureAlgo_SHA_256,
-        sigBuf,
-        sigBufLen,
-        hashData,
-        &hashDataLen);
+    status = Se05x_API_ECDSA_Internal_Sign(&(pSe05xCtx->s_ctx), keyId, kSE05x_ECSignatureAlgo_SHA_256, sigBuf, sigBufLen, hashData,
+                                           &hashDataLen);
     VerifyOrReturnError(status == SM_OK, CHIP_ERROR_INTERNAL);
-
     return CHIP_NO_ERROR;
-}
-
+#else
+    /* Enable Se051H to use internal sign */
+    return CHIP_ERROR_INTERNAL;
 #endif
+}
 
 #if ENABLE_REENTRANCY
 

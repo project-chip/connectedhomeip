@@ -14,5 +14,5 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/config/standalone/args.gni")
-chip_with_se05x=1 
-host="host_linux"
+chip_with_se05x = 1
+host = "host_linux"

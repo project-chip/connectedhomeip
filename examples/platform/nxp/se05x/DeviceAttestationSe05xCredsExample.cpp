@@ -31,8 +31,8 @@
 #include <crypto/hsm/nxp/CHIPCryptoPALHsm_SE05X_utils.h>
 
 /* Device attestation key ids */
-#define DEV_ATTESTATION_KEY_SE05X_ID         0x7D300000
-#define DEV_ATTESTATION_CERT_SE05X_ID        0x7D300001
+#define DEV_ATTESTATION_KEY_SE05X_ID 0x7D300000
+#define DEV_ATTESTATION_CERT_SE05X_ID 0x7D300001
 
 extern CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t * buf, size_t * buflen);
 
