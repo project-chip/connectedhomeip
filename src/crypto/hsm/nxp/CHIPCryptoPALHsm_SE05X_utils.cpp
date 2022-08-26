@@ -264,7 +264,7 @@ CHIP_ERROR se05xPerformInternalSign(uint32_t keyId, uint8_t* sigBuf, size_t* sig
 {
     smStatus_t status = SM_NOT_OK;
     sss_se05x_session_t *pSe05xCtx = (sss_se05x_session_t *)&gex_sss_chip_ctx.session;
-    uint8_t hashData[32] = {0};
+    uint8_t hashData[chip::Crypto::kSHA256_Hash_Length] = {0};
     size_t hashDataLen = sizeof(hashData);
 
     status = Se05x_API_ECDSA_Internal_Sign(&(pSe05xCtx->s_ctx),
@@ -274,24 +274,6 @@ CHIP_ERROR se05xPerformInternalSign(uint32_t keyId, uint8_t* sigBuf, size_t* sig
         sigBufLen,
         hashData,
         &hashDataLen);
-    VerifyOrReturnError(status == SM_OK, CHIP_ERROR_INTERNAL);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR se05xCreateEmptyFile(uint32_t keyId)
-{
-    smStatus_t status = SM_NOT_OK;
-    sss_se05x_session_t *pSe05xCtx = (sss_se05x_session_t *)&gex_sss_chip_ctx.session;
-
-    status = Se05x_API_WriteBinary_Ver(&(pSe05xCtx->s_ctx),
-        nullptr,
-        keyId,
-        0,
-        0,
-        nullptr,
-        0,
-        0);
     VerifyOrReturnError(status == SM_OK, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;

@@ -41,7 +41,6 @@
 #define CD_DEV_ATTESTATION_KEY_SE05X_ID      0x7D300002
 #define NOCSR_DEV_ATTESTATION_KEY_SE05X_ID   0x7D300004
 
-
 /* Device attestation data ids (for Cert decl) */
 #define CD_CERT_DECLARATION_DATA_SE05X_ID    0x7D300009
 #define CD_ATTEST_NONCE_DATA_SE05X_ID        0x7D30000C
@@ -59,7 +58,6 @@
 extern CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t * buf, size_t * buflen);
 extern CHIP_ERROR se05xSetCertificate(uint32_t keyId, const uint8_t * buf, size_t buflen);
 extern CHIP_ERROR se05xPerformInternalSign(uint32_t keyId, uint8_t* sigBuf, size_t* sigBufLen);
-extern CHIP_ERROR se05xCreateEmptyFile(uint32_t keyId);
 extern void se05x_delete_key(uint32_t keyid);
 
 namespace chip {
@@ -84,7 +82,7 @@ CHIP_ERROR ExampleSe05xDACProviderv2::GetDeviceAttestationCert(MutableByteSpan &
     return CopySpanToMutableSpan(DevelopmentCerts::kDacCert, out_dac_buffer);
 #else
     size_t buflen = out_dac_buffer.size();
-    ChipLogDetail(Crypto, "Get certificate from se05x");
+    ChipLogDetail(Crypto, "Get DA certificate from se05x");
     ReturnErrorOnFailure(se05xGetCertificate(DEV_ATTESTATION_CERT_SE05X_ID, out_dac_buffer.data(), &buflen));
     out_dac_buffer.reduce_size(buflen);
     return CHIP_NO_ERROR;
@@ -166,17 +164,13 @@ CHIP_ERROR ExampleSe05xDACProviderv2::GetFirmwareInformation(MutableByteSpan & o
     return CHIP_NO_ERROR;
 }
 
-static bool dasigntrack = false;
 CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
                                                                  MutableByteSpan & out_signature_buffer)
 {
-    Crypto::P256ECDSASignature signature;
-
     VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(out_signature_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ChipLogDetail(Crypto, "Sign using DA key from se05x");
+    ChipLogDetail(Crypto, "Sign using DA key from se05x (Using internal sign)");
 
     MutableByteSpan tlv_buffer = ((MutableByteSpan &)message_to_sign).SubSpan(1); // Exclude the Start container
 
@@ -186,7 +180,10 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
     msg_reader.Init(tlv_buffer);
     msg_reader.Next();
 
-    if (!dasigntrack) {
+    /* To be removed. Use common key id to sign message */
+    static bool sign_cert_decl_attest = 1;
+
+    if (sign_cert_decl_attest) {
         /* Skip certificate declaration tag */
         msg_reader.Next();
 
@@ -245,12 +242,12 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
         }   
     }
 
-    uint8_t signature_se05x[chip::Crypto::kMax_ECDSA_Signature_Length_Der] = { 0 };
+    uint8_t signature_se05x[Crypto::kMax_ECDSA_Signature_Length_Der] = { 0 };
     size_t signature_se05x_len = sizeof(signature_se05x);
 
-    if (!dasigntrack) {
+    if (sign_cert_decl_attest) {
         ReturnErrorOnFailure(se05xPerformInternalSign(CD_DEV_ATTESTATION_KEY_SE05X_ID, signature_se05x, &signature_se05x_len));
-        dasigntrack = true;
+        sign_cert_decl_attest = 0;
     }
     else
     {   
