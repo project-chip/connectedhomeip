@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
 
@@ -111,7 +112,10 @@ void TestIPv6(nlTestSuite * inSuite, void * inContext)
 
 int Setup(void * inContext)
 {
+    mdns::Minimal::SetDefaultAddressPolicy();
+
     CHIP_ERROR error = chip::Platform::MemoryInit();
+
     return (error == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 
