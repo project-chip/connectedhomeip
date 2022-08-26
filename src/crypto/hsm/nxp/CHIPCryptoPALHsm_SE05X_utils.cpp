@@ -146,7 +146,7 @@ void se05x_delete_key(uint32_t keyid)
 }
 
 /* Set key in se05x */
-CHIP_ERROR se05x_set_key(uint32_t keyid, const uint8_t * key, size_t keylen, sss_key_part_t keyPart, sss_cipher_type_t cipherType)
+CHIP_ERROR se05x_set_key_for_spake(uint32_t keyid, const uint8_t * key, size_t keylen, sss_key_part_t keyPart, sss_cipher_type_t cipherType)
 {
     sss_status_t status       = kStatus_SSS_Success;
     sss_object_t keyObject    = { 0 };
@@ -167,10 +167,10 @@ CHIP_ERROR se05x_set_key(uint32_t keyid, const uint8_t * key, size_t keylen, sss
     commonPol.policy.common.can_Write  = 1;
 
     static sss_policy_u hmac_withPol;
-    hmac_withPol.type                      = KPolicy_Asym_Key;
+    hmac_withPol.type                      = KPolicy_Sym_Key;
     hmac_withPol.auth_obj_id               = 0;
-    hmac_withPol.policy.asymmkey.can_Write = 1;
-    hmac_withPol.policy.asymmkey.can_KA    = 1;
+    hmac_withPol.policy.symmkey.can_Write = 1;
+    hmac_withPol.policy.symmkey.can_KA    = 1;
 
     sss_policy_t policy_for_hmac_key;
     policy_for_hmac_key.nPolicies   = 2;
