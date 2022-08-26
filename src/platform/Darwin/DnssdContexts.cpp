@@ -251,26 +251,27 @@ CHIP_ERROR MdnsContexts::GetRegisterContextOfType(const char * type, RegisterCon
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-RegisterContext::RegisterContext(const char * sType, DnssdPublishCallback cb, void * cbContext)
+RegisterContext::RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext)
 {
     type     = ContextType::Register;
     context  = cbContext;
     callback = cb;
 
-    mType = sType;
+    mType         = sType;
+    mInstanceName = instanceName;
 }
 
 void RegisterContext::DispatchFailure(DNSServiceErrorType err)
 {
     ChipLogError(Discovery, "Mdns: Register failure (%s)", Error::ToString(err));
-    callback(context, nullptr, CHIP_ERROR_INTERNAL);
+    callback(context, nullptr, nullptr, CHIP_ERROR_INTERNAL);
     MdnsContexts::GetInstance().Remove(this);
 }
 
 void RegisterContext::DispatchSuccess()
 {
     std::string typeWithoutSubTypes = GetFullTypeWithoutSubTypes(mType);
-    callback(context, typeWithoutSubTypes.c_str(), CHIP_NO_ERROR);
+    callback(context, typeWithoutSubTypes.c_str(), mInstanceName.c_str(), CHIP_NO_ERROR);
 }
 
 BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol)
