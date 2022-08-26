@@ -88,7 +88,8 @@ namespace AppPlatform {
 
 EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,
                                              const Span<DataVersion> & dataVersionStorage,
-                                             const Span<const EmberAfDeviceType> & deviceTypeList)
+                                             const Span<const EmberAfDeviceType> & deviceTypeList,
+                                             EndpointId desiredEndpointId)
 {
     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
 
@@ -100,9 +101,18 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
         if (mContentApps[index] == app)
         {
             ChipLogProgress(DeviceLayer, "Already added");
+            // already added, return endpointId of already added endpoint. 
+            // desired endpointId does not have any impact
             return app->GetEndpointId();
         }
         index++;
+    }
+
+
+    if (desiredEndpointId >= emberAfFixedEndpointCount() && emberAfGetDynamicIndexFromEndpoint(desiredEndpointId) != kEmberInvalidEndpointIndex) {
+        // an endpoint already exists with the desiredEndpointId. return error.
+        ChipLogError(DeviceLayer, "Failed to add dynamic endpoint: desired endpointID already in use!");
+        return kNoCurrentEndpointId;
     }
 
     index = 0;
@@ -112,25 +122,44 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
         {
             mContentApps[index] = app;
             EmberAfStatus ret;
-            while (1)
+
+            if (desiredEndpointId >= emberAfFixedEndpointCount()) {
+                    ret = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
+                    if (ret == EMBER_ZCL_STATUS_SUCCESS)
+                    {
+                        ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
+                                        desiredEndpointId, index);
+                        app->SetEndpointId(desiredEndpointId);
+                        return app->GetEndpointId();
+                    }
+                    else
+                    {
+                        ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
+                        return kNoCurrentEndpointId;
+                    }
+            }
+            else
             {
-                ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
-                if (ret == EMBER_ZCL_STATUS_SUCCESS)
+                while (1)
                 {
-                    ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
-                                    mCurrentEndpointId, index);
-                    app->SetEndpointId(mCurrentEndpointId);
-                    return app->GetEndpointId();
-                }
-                else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
-                {
-                    ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
-                    return kNoCurrentEndpointId;
-                }
-                // Handle wrap condition
-                if (++mCurrentEndpointId < mFirstDynamicEndpointId)
-                {
-                    mCurrentEndpointId = mFirstDynamicEndpointId;
+                    ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
+                    if (ret == EMBER_ZCL_STATUS_SUCCESS)
+                    {
+                        ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
+                                        mCurrentEndpointId, index);
+                        app->SetEndpointId(mCurrentEndpointId);
+                        return app->GetEndpointId();
+                    }
+                    else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
+                    {
+                        ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
+                        return kNoCurrentEndpointId;
+                    }
+                    // Handle wrap condition
+                    if (++mCurrentEndpointId < mFirstDynamicEndpointId)
+                    {
+                        mCurrentEndpointId = mFirstDynamicEndpointId;
+                    }
                 }
             }
         }
