@@ -40,7 +40,6 @@ namespace {
 
 struct Options
 {
-    bool enableIpV4           = false;
     bool unicastAnswers       = true;
     uint32_t runtimeMs        = 500;
     uint16_t querySendPort    = 5353;
@@ -54,9 +53,8 @@ constexpr size_t kMdnsMaxPacketSize = 1'024;
 
 using namespace chip::ArgParser;
 
-constexpr uint16_t kOptionEnableIpV4 = '4';
-constexpr uint16_t kOptionQuery      = 'q';
-constexpr uint16_t kOptionType       = 't';
+constexpr uint16_t kOptionQuery = 'q';
+constexpr uint16_t kOptionType  = 't';
 
 // non-ascii options have no short option version
 constexpr uint16_t kOptionListenPort       = 0x100;
@@ -68,10 +66,6 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 {
     switch (aIdentifier)
     {
-    case kOptionEnableIpV4:
-        gOptions.enableIpV4 = true;
-        return true;
-
     case kOptionListenPort:
         if (!ParseInt(aValue, gOptions.listenPort))
         {
@@ -146,7 +140,6 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
 OptionDef cmdLineOptionsDef[] = {
     { "listen-port", kArgumentRequired, kOptionListenPort },
-    { "enable-ip-v4", kNoArgument, kOptionEnableIpV4 },
     { "query", kArgumentRequired, kOptionQuery },
     { "type", kArgumentRequired, kOptionType },
     { "query-port", kArgumentRequired, kOptionQueryPort },
@@ -158,9 +151,6 @@ OptionDef cmdLineOptionsDef[] = {
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
                              "  --listen-port <number>\n"
                              "        The port number to listen on\n"
-                             "  -4\n"
-                             "  --enable-ip-v4\n"
-                             "        enable listening on IPv4\n"
                              "  -q\n"
                              "  --query\n"
                              "        The query to send\n"
