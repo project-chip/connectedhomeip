@@ -46,7 +46,7 @@ namespace Messaging {
  *      nullptr.
  *
  *   3. If you send a message successfully that does require a response, invoking Get() on the holder will return a valid
- *      pointer until the response is received.
+ *      pointer until the response is received or times out.
  *
  *   4. On reception of a message on an exchange, if you return from OnMessageReceived() and no messages were sent on that exchange,
  *      invoking Get() on the holder will return a nullptr.

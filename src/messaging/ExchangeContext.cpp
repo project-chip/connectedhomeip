@@ -142,16 +142,6 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     bool isStandaloneAck =
         (protocolId == Protocols::SecureChannel::Id) && msgType == to_underlying(Protocols::SecureChannel::MsgType::StandaloneAck);
 
-    //
-    // The caller clearly intends to send a message. Let's set the WillSendMessage flag so that if we fail at any
-    // point below, the exchange is still in a mode of being ready to send a message again, as well as being setup
-    // correctly for delegates to know that they still need to release the ref on this exchange.
-    //
-    if (!isStandaloneAck)
-    {
-        mFlags.Set(Flags::kFlagWillSendMessage);
-    }
-
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(mSession, CHIP_ERROR_CONNECTION_ABORTED);
 
@@ -216,7 +206,6 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         CHIP_ERROR err;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        // Create a new scope for `err`, to avoid shadowing warning previous `err`.
         if (mInjectedFailures.Has(InjectedFailureType::kFailOnSend))
         {
             err = CHIP_ERROR_SENDING_BLOCKED;
@@ -364,6 +353,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
 ExchangeContext::~ExchangeContext()
 {
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
+    // VerifyOrDie(!IsAckPending());
 
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
     // Make sure that the exchange withdraws the request for Sleepy End Device active mode.

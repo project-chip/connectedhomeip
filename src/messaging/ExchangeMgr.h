@@ -92,7 +92,8 @@ public:
      *                              for which the ExchangeContext is being set up.
      *
      *  @param[in]    delegate      A pointer to ExchangeDelegate.
-     *  @param[in]    isInitiator   Set to true if the exchange is created on the initiator.
+     *  @param[in]    isInitiator   Set to true if the exchange is created on the initiator. This is generally true
+     *                              except in unit tests.
      *
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.

@@ -204,8 +204,10 @@ CHIP_ERROR MockProtocolResponder::OnMessageReceived(ExchangeContext * ec, const 
 
             if (mExchangeCtx)
             {
-                ReturnErrorOnFailure(mExchangeCtx->SendMessage(chip::Protocols::MockProtocol::MessageType::kMsg2,
-                                                               std::move(respBuffer), SendMessageFlags::kExpectResponse));
+                err = mExchangeCtx->SendMessage(chip::Protocols::MockProtocol::MessageType::kMsg2, std::move(respBuffer),
+                                                SendMessageFlags::kExpectResponse);
+                mExchangeCtx->ClearInjectedFailures();
+                ReturnErrorOnFailure(err);
             }
 
             if (mBehaviorModifier.Has(BehaviorModifier::kExpireSessionAfterMsg2Send))
@@ -263,8 +265,10 @@ CHIP_ERROR MockProtocolInitiator::StartInteraction(SessionHandle & sessionHandle
 
     if (!mBehaviorModifier.Has(BehaviorModifier::kDontSendMsg1))
     {
-        ReturnErrorOnFailure(mExchangeCtx->SendMessage(chip::Protocols::MockProtocol::MessageType::kMsg1, std::move(buffer),
-                                                       SendMessageFlags::kExpectResponse));
+        auto err = mExchangeCtx->SendMessage(chip::Protocols::MockProtocol::MessageType::kMsg1, std::move(buffer),
+                                             SendMessageFlags::kExpectResponse);
+        mExchangeCtx->ClearInjectedFailures();
+        ReturnErrorOnFailure(err);
     }
 
     if (mBehaviorModifier.Has(BehaviorModifier::kExpireSessionAfterMsg1Send))
@@ -301,8 +305,10 @@ CHIP_ERROR MockProtocolInitiator::OnMessageReceived(ExchangeContext * ec, const 
 
             if (mExchangeCtx)
             {
-                ReturnErrorOnFailure(mExchangeCtx->SendMessage(chip::Protocols::MockProtocol::MessageType::kMsg3,
-                                                               std::move(respBuffer), SendMessageFlags::kNone));
+                err = mExchangeCtx->SendMessage(chip::Protocols::MockProtocol::MessageType::kMsg3, std::move(respBuffer),
+                                                SendMessageFlags::kNone);
+                mExchangeCtx->ClearInjectedFailures();
+                ReturnErrorOnFailure(err);
             }
 
             if (mBehaviorModifier.Has(BehaviorModifier::kExpireSessionAfterMsg3Send))

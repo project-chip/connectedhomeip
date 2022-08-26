@@ -62,11 +62,11 @@ class ExchangeContext;
  *        or Close/Abort if you no longer wish to have the exchange around.
  *
  *     6. If you get a call to OnExchangeClosing, you should null out your reference to the exchange UNLESS you still
- *        ownership of the exchange (i.e due to a prior call to WillSendMessage). In that case, you should call Abort/Close
+ *        hold ownership of the exchange (i.e due to a prior call to WillSendMessage). In that case, you should call Abort/Close
  *        whenever you're done with using the exchange. Those calls can be made synchronously within the OnExchangeClosing
  *        callback.
  *
- *     6. If you get a call to OnResponseTimeout, you should null out your reference to the exchange since the exchange layer
+ *     7. If you get a call to OnResponseTimeout, you should null out your reference to the exchange since the exchange layer
  *        owns the exchange and will handle releasing the ref later. A call to OnExchangeClosing will follow after.
  *
  */

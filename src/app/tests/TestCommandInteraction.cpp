@@ -504,6 +504,11 @@ void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSu
 
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
+    //
+    // Ordinarily, the ExchangeContext will close itself upon sending the final message / error'ing out on a responder exchange
+    // when unwinding back from an OnMessageReceived callback. Since that isn't the case in this artificial setup here, we need
+    // to explicitly close it out. This is not expected in normal application logic.
+    //
     exchange->Close();
 }
 
@@ -589,6 +594,11 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
 
+    //
+    // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
+    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here,
+    // we need to explicitly close it out. This is not expected in normal application logic.
+    //
     exchange->Close();
 }
 
@@ -654,6 +664,11 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
 
+    //
+    // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
+    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here,
+    // we need to explicitly close it out. This is not expected in normal application logic.
+    //
     exchange->Close();
 }
 
@@ -684,6 +699,11 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
 
+    //
+    // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
+    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here,
+    // we need to explicitly close it out. This is not expected in normal application logic.
+    //
     exchange->Close();
 }
 
@@ -1040,6 +1060,11 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
 
+    //
+    // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
+    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here,
+    // we need to explicitly close it out. This is not expected in normal application logic.
+    //
     exchange->Close();
 }
 
@@ -1088,6 +1113,12 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
 
             NL_TEST_ASSERT(apSuite, chip::isCommandDispatched == (messageIsTimed == transactionIsTimed));
 
+            //
+            // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
+            // OnMessageReceived callback and not having sent a subsequent message (as is the case when calling ProcessInvokeRequest
+            // above, which doesn't actually send back a response in these cases). Since that isn't the case in this artificial
+            // setup here, we need to explicitly close it out. This is not expected in normal application logic.
+            //
             exchange->Close();
         }
     }
@@ -1317,7 +1348,11 @@ void TestCommandInteraction::TestCommandHandlerReleaseWithExchangeClosed(nlTestS
     // Verify that async command handle has been allocated
     NL_TEST_ASSERT(apSuite, asyncCommandHandle.Get() != nullptr);
 
-    // Close the handle and ensure it's handled correctly.
+    // Mimick closure of the exchange that would happen on a session release and verify that releasing the handle there-after
+    // is handled gracefully.
+    asyncCommandHandle.Get()->mExchangeCtx->GetSessionHolder().Release();
+    asyncCommandHandle.Get()->mExchangeCtx->OnSessionReleased();
+
     asyncCommandHandle = nullptr;
 }
 

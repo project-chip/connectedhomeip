@@ -53,7 +53,6 @@ logger.addHandler(sh)
 
 def TestFail(message, doCrash=False):
     logger.fatal("Testfail: {}".format(message))
-    doCrash = False
 
     if (doCrash):
         logger.fatal("--------------------------------")
