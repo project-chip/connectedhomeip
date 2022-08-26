@@ -16,6 +16,8 @@
  */
 #include "IP.h"
 
+#include <assert.h>
+
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
 #include <lib/dnssd/minimal_mdns/records/IP.h>
 
@@ -27,37 +29,38 @@ using chip::Platform::UniquePtr;
 void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                                     const ResponseConfiguration & configuration)
 {
+#if INET_CONFIG_ENABLE_IPV4
     chip::Inet::IPAddress addr;
-    UniquePtr<IpAddressIterator> ips = GetAddressPolicy()->GetIpAddressesForEndpoint(source->Interface);
+    UniquePtr<IpAddressIterator> ips =
+        GetAddressPolicy()->GetIpAddressesForEndpoint(source->Interface, chip::Inet::IPAddressType::kIPv4);
     VerifyOrDie(ips);
 
     while (ips->Next(addr))
     {
-        if (addr.IsIPv4())
-        {
-            IPResourceRecord record(GetQName(), addr);
-            configuration.Adjust(record);
-            delegate->AddResponse(record);
-        }
+        assert(addr.IsIPv4());
+
+        IPResourceRecord record(GetQName(), addr);
+        configuration.Adjust(record);
+        delegate->AddResponse(record);
     }
+#endif
 }
 
 void IPv6Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                                     const ResponseConfiguration & configuration)
 {
     chip::Inet::IPAddress addr;
-    UniquePtr<IpAddressIterator> ips = GetAddressPolicy()->GetIpAddressesForEndpoint(source->Interface);
-
+    UniquePtr<IpAddressIterator> ips =
+        GetAddressPolicy()->GetIpAddressesForEndpoint(source->Interface, chip::Inet::IPAddressType::kIPv6);
     VerifyOrDie(ips);
 
     while (ips->Next(addr))
     {
-        if (addr.IsIPv6())
-        {
-            IPResourceRecord record(GetQName(), addr);
-            configuration.Adjust(record);
-            delegate->AddResponse(record);
-        }
+        assert(addr.IsIPv6());
+
+        IPResourceRecord record(GetQName(), addr);
+        configuration.Adjust(record);
+        delegate->AddResponse(record);
     }
 }
 

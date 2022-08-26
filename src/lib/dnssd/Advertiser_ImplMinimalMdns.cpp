@@ -877,17 +877,11 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
 
     while (allInterfaces->Next(&interfaceId, &addressType))
     {
-        UniquePtr<IpAddressIterator> allIps = GetAddressPolicy()->GetIpAddressesForEndpoint(interfaceId);
+        UniquePtr<IpAddressIterator> allIps = GetAddressPolicy()->GetIpAddressesForEndpoint(interfaceId, addressType);
 
         Inet::IPAddress ipAddress;
         while (allIps->Next(ipAddress))
         {
-
-            if (ipAddress.Type() != addressType)
-            {
-                continue;
-            }
-
             if (!ShouldAdvertiseOn(interfaceId, ipAddress))
             {
                 continue;

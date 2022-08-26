@@ -38,7 +38,8 @@ public:
     ///
     /// Generally this should skip invalid addresses even if reported by the
     /// underlying operating system (e.g. linux could skip deprecated/temporary/dad-failed ones).
-    virtual chip::Platform::UniquePtr<IpAddressIterator> GetIpAddressesForEndpoint(chip::Inet::InterfaceId interfaceId) = 0;
+    virtual chip::Platform::UniquePtr<IpAddressIterator> GetIpAddressesForEndpoint(chip::Inet::InterfaceId interfaceId,
+                                                                                   chip::Inet::IPAddressType type) = 0;
 };
 
 /// Fetch the globally used MinMDNS address policy

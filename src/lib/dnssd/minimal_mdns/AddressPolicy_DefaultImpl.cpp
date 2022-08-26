@@ -124,7 +124,9 @@ private:
 class AllAddressesIterator : public mdns::Minimal::IpAddressIterator
 {
 public:
-    AllAddressesIterator(chip::Inet::InterfaceId interfaceId) : mInterfaceIdFilter(interfaceId) {}
+    AllAddressesIterator(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addrType) :
+        mInterfaceIdFilter(interfaceId), mAddrType(addrType)
+    {}
 
     bool Next(chip::Inet::IPAddress & dest)
     {
@@ -140,8 +142,17 @@ public:
                 mIterator.Next();
                 continue;
             }
+
             CHIP_ERROR err = mIterator.GetAddress(dest);
             mIterator.Next();
+
+            if (mAddrType != chip::Inet::IPAddressType::kAny)
+            {
+                if (dest.Type() != mAddrType)
+                {
+                    continue;
+                }
+            }
 
             if (err != CHIP_NO_ERROR)
             {
@@ -154,7 +165,8 @@ public:
     }
 
 private:
-    chip::Inet::InterfaceId mInterfaceIdFilter;
+    const chip::Inet::InterfaceId mInterfaceIdFilter;
+    const chip::Inet::IPAddressType mAddrType;
     chip::Inet::InterfaceAddressIterator mIterator;
 };
 
@@ -166,9 +178,10 @@ public:
         return chip::Platform::UniquePtr<ListenIterator>(chip::Platform::New<AllInterfaces>());
     }
 
-    chip::Platform::UniquePtr<IpAddressIterator> GetIpAddressesForEndpoint(chip::Inet::InterfaceId interfaceId) override
+    chip::Platform::UniquePtr<IpAddressIterator> GetIpAddressesForEndpoint(chip::Inet::InterfaceId interfaceId,
+                                                                           chip::Inet::IPAddressType type) override
     {
-        return chip::Platform::UniquePtr<IpAddressIterator>(chip::Platform::New<AllAddressesIterator>(interfaceId));
+        return chip::Platform::UniquePtr<IpAddressIterator>(chip::Platform::New<AllAddressesIterator>(interfaceId, type));
     }
 };
 
