@@ -571,6 +571,7 @@ template("bl602_sdk") {
       "${chip_root}/third_party/bouffalolab/bl602/portable/async_log.c",
       "${chip_root}/third_party/bouffalolab/bl602/portable/bfl_main.c",
       "${chip_root}/third_party/bouffalolab/bl602/portable/debug.c",
+      "${chip_root}/third_party/bouffalolab/bl602/portable/wifi_mgmr_portable.c",
 
       #wap_supplicant
       "${bl602_sdk_root}/components/security/wpa_supplicant/port/os_bl.c",

@@ -47,6 +47,7 @@
 #include <controller/CommissioningWindowOpener.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
+#include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/PlatformManager.h>
@@ -77,6 +78,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
+@property (readonly) chip::Credentials::PartialDACVerifier * partialDACVerifier;
 @property (readonly) MTRDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) MTROperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) MTRP256KeypairBridge signingKeypairBridge;
@@ -664,8 +666,41 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     dispatch_sync(_chipWorkQueue, ^{
         VerifyOrReturn([self checkIsRunning]);
 
-        self->_operationalCredentialsDelegate->SetNocChainIssuer(nocChainIssuer, queue);
+        if (nocChainIssuer != nil) {
+            self->_operationalCredentialsDelegate->SetNocChainIssuer(nocChainIssuer, queue);
+            self->_cppCommissioner->SetDeviceAttestationVerifier(_partialDACVerifier);
+        } else {
+            self->_cppCommissioner->SetDeviceAttestationVerifier(chip::Credentials::GetDeviceAttestationVerifier());
+        }
     });
+}
+
+- (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt
+{
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    if (![self isRunning]) {
+        [self checkForError:errorCode logMsg:kErrorNotRunning error:nil];
+        return nil;
+    }
+
+    __block NSData * result;
+    __block chip::Spake2pVerifier paseVerifier;
+    __block chip::ByteSpan saltByteSpan = chip::ByteSpan(static_cast<const uint8_t *>(salt.bytes), salt.length);
+
+    dispatch_sync(_chipWorkQueue, ^{
+        if ([self isRunning]) {
+            errorCode = self.cppCommissioner->ComputePASEVerifier(iterations, setupPincode, saltByteSpan, paseVerifier);
+            MTR_LOG_ERROR("ComputePaseVerifier: %s", chip::ErrorStr(errorCode));
+
+            uint8_t serializedVerifier[sizeof(paseVerifier.mW0) + sizeof(paseVerifier.mL)];
+            memcpy(serializedVerifier, paseVerifier.mW0, chip::kSpake2p_WS_Length);
+            memcpy(&serializedVerifier[sizeof(paseVerifier.mW0)], paseVerifier.mL, sizeof(paseVerifier.mL));
+
+            result = [NSData dataWithBytes:serializedVerifier length:sizeof(serializedVerifier)];
+        }
+    });
+
+    return result;
 }
 
 - (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg

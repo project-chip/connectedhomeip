@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          To execute this test case set onmode to any integer value because as default it value has null.
+      disabled: true
+
     - label: "TH reads the OnMode attribute from the DUT"
       PICS: MOD.S.A0005 && MOD.S.F00
       verification: |

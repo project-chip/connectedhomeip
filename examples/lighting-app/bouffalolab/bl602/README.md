@@ -1,10 +1,10 @@
 # BL602
 
 This example functions as a wifi light bulb device type, with on/off
-capabilities. The steps were verified on BL602 development board.
+capabilities. The steps were verified on BL602-IoT-Matter-V1 board.
 
-BL602 development board:
-<img src="../../../platform/bouffalolab/bl602/doc/images/bl602_iot_3S_v2.jpg" style="zoom:25%;" />
+BL602-IoT-Matter-V1 board:
+<img src="../../../platform/bouffalolab/bl602/doc/images/BL602-IoT-Matter_V1.png" style="zoom:25%;" />
 
 ## Initial setup
 
@@ -84,6 +84,54 @@ picocom -b 115200 /dev/ttyACM0
 
 2.To reset the board, press the RESET button, and you will see the log in the
 `picocom terminal`.
+
+```
+Starting bl602 now....
+Booting BL602 Chip...
+```
+
+3.To control the development board after successfully debugging the development
+board, press the BOOT button and you should see the following output in the
+terminal:
+
+```
+[    404197][:588238200] Short press
+[    404198][:588238200] receiving event type: 0
+[    404203][:588238200] sending event type: 0
+[    404207][:588238200] receiving event type: 0
+[    404211][:588238200] Turning light ON
+[    406211][:588238200] sending event type: 1
+[    406212][:588238200] receiving event type: 1
+[    406217][:588238200] Light ON
+[    406220][:588238200] updating on/off = 1
+```
+
+4.To restore the board to factory Settings, press and hold the BOOT button for 5
+seconds, and you should see the following output in the terminal:
+
+```
+[     37268][:588238200] LongLong press
+[     37269][:588238200] receiving event type: 0
+[     37274][:588238200] FactoryReset! please release button!!!
+[     37279][:588238200] Toggling state to 1
+[     37283][:588238200] brightness: 255, mHue: 0, mSaturation: 0, red: 255, green: 255, blue: 255
+[     37292][:588238200] red level: 10000
+[     38296][:588238200] Toggling state to 0
+[     38297][:588238200] brightness: 0, mHue: 0, mSaturation: 0, red: 0, green: 0, blue: 0
+[     38305][:588238200] red level: 0
+[     39308][:588238200] Toggling state to 1
+[     39309][:588238200] brightness: 255, mHue: 0, mSaturation: 0, red: 255, green: 255, blue: 255
+[     39318][:588238200] red level: 10000
+[     42323][:588238200] [DL] Easyflash erase: f/1/n
+[     42327][:588238200] [DL] Easyflash erase: f/1/i
+[     42332][:588238200] [DL] Easyflash erase: f/1/r
+[     42335][:588238200] [DL] Easyflash erase: f/1/m
+[     42340][:588238200] [DL] Easyflash erase: f/1/o
+[     42349][:588238200] [DIS] Fabric (0x1) deleted. Calling OnFabricDeletedFromStorage
+[     42403][:588238200] [DL] Easyflash erase: f/1/k/0
+[     42462][:588238200] [DL] Easyflash erase: f/1/g
+[     42465][:588238200] [DMG] AccessControl: removing fabric 1
+```
 
 ## Commission a device using chip-tool
 
