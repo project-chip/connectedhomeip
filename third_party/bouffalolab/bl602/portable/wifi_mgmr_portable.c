@@ -1,6 +1,5 @@
 #include "bl_main.h"
 #include "hal_sys.h"
-#include "hosal_adc.h"
 #include "include/wifi_mgmr_ext.h"
 #include "os_hal.h"
 #include "wifi_mgmr.h"
@@ -10,7 +9,6 @@
 #include "wifi_netif.h"
 #include <aos/yloop.h>
 #include <bl60x_fw_api.h>
-#include <bl_adc.h>
 #include <blog.h>
 #include <dns_server.h>
 #include <lwip/dhcp6.h>
