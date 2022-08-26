@@ -206,7 +206,11 @@ CHIP_ERROR MockProtocolResponder::OnMessageReceived(ExchangeContext * ec, const 
             {
                 err = mExchangeCtx->SendMessage(chip::Protocols::MockProtocol::MessageType::kMsg2, std::move(respBuffer),
                                                 SendMessageFlags::kExpectResponse);
-                mExchangeCtx->ClearInjectedFailures();
+                if (mExchangeCtx)
+                {
+                    mExchangeCtx->ClearInjectedFailures();
+                }
+
                 ReturnErrorOnFailure(err);
             }
 
@@ -267,7 +271,11 @@ CHIP_ERROR MockProtocolInitiator::StartInteraction(SessionHandle & sessionHandle
     {
         auto err = mExchangeCtx->SendMessage(chip::Protocols::MockProtocol::MessageType::kMsg1, std::move(buffer),
                                              SendMessageFlags::kExpectResponse);
-        mExchangeCtx->ClearInjectedFailures();
+        if (mExchangeCtx)
+        {
+            mExchangeCtx->ClearInjectedFailures();
+        }
+
         ReturnErrorOnFailure(err);
     }
 
@@ -307,7 +315,11 @@ CHIP_ERROR MockProtocolInitiator::OnMessageReceived(ExchangeContext * ec, const 
             {
                 err = mExchangeCtx->SendMessage(chip::Protocols::MockProtocol::MessageType::kMsg3, std::move(respBuffer),
                                                 SendMessageFlags::kNone);
-                mExchangeCtx->ClearInjectedFailures();
+                if (mExchangeCtx)
+                {
+                    mExchangeCtx->ClearInjectedFailures();
+                }
+
                 ReturnErrorOnFailure(err);
             }
 
