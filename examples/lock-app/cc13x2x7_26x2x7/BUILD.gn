@@ -78,6 +78,7 @@ ti_simplelink_executable("lock_app") {
     "${project_dir}/main/BoltLockManager.cpp",
     "${project_dir}/main/ZclCallbacks.cpp",
     "${project_dir}/main/main.cpp",
+    "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
   ]
 
   deps = [
@@ -96,6 +97,7 @@ ti_simplelink_executable("lock_app") {
   include_dirs = [
     "${project_dir}",
     "${project_dir}/main",
+    "${chip_root}/examples/providers/",
   ]
 
   cflags = [
