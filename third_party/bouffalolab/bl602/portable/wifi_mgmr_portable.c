@@ -15,7 +15,6 @@
 #include <lwip/dns.h>
 #include <lwip/netifapi.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <string.h>
 BLOG_DECLARE(tcal_power)
 BLOG_DECLARE(scan)
