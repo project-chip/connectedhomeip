@@ -102,7 +102,7 @@ public:
 
     CHIP_ERROR FindLRUConnectPeer(ScopedNodeId & nodeId);
 
-    void AddPendingNotification(uint8_t bindingEntryId, PendingNotificationContext * context);
+    CHIP_ERROR AddPendingNotification(uint8_t bindingEntryId, PendingNotificationContext * context);
 
     void RemoveEntry(uint8_t bindingEntryId);
 

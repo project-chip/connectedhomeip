@@ -78,9 +78,14 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
     return CHIP_ERROR_NOT_FOUND;
 }
 
-void PendingNotificationMap::AddPendingNotification(uint8_t bindingEntryId, PendingNotificationContext * context)
+CHIP_ERROR PendingNotificationMap::AddPendingNotification(uint8_t bindingEntryId, PendingNotificationContext * context)
 {
     RemoveEntry(bindingEntryId);
+    if (mNumEntries == EMBER_BINDING_TABLE_SIZE)
+    {
+        // We know that the RemoveEntry above did not do anything so we don't need to try restoring it.
+        return CHIP_ERROR_NO_MEMORY;
+    }
     mPendingBindingEntries[mNumEntries] = bindingEntryId;
     mPendingContexts[mNumEntries]       = context;
     if (context)
@@ -88,6 +93,7 @@ void PendingNotificationMap::AddPendingNotification(uint8_t bindingEntryId, Pend
         context->IncrementConsumersNumber();
     }
     mNumEntries++;
+    return CHIP_NO_ERROR;
 }
 
 void PendingNotificationMap::RemoveEntry(uint8_t bindingEntryId)
