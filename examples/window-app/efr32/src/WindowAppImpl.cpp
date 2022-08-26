@@ -31,16 +31,13 @@
 #include <sl_simple_led_instances.h>
 #include <sl_system_kernel.h>
 
-#ifdef SL_WIFI
-#include "wfx_host_events.h"
-#endif
-
 #ifdef DISPLAY_ENABLED
 #include <LcdPainter.h>
 SilabsLCD slLCD;
 #endif
 
 #define APP_TASK_STACK_SIZE (4096)
+#define APP_MAIN_TASK_SIZE (APP_TASK_STACK_SIZE + 2048)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define EXAMPLE_VENDOR_ID 0xcafe
@@ -54,7 +51,6 @@ using namespace chip::app::Clusters::WindowCovering;
 //------------------------------------------------------------------------------
 // Timers
 //------------------------------------------------------------------------------
-
 WindowAppImpl::Timer::Timer(const char * name, uint32_t timeoutInMs, Callback callback, void * context) :
     WindowApp::Timer(name, timeoutInMs, callback, context)
 {
@@ -125,7 +121,9 @@ void WindowAppImpl::Timer::TimerCallback(TimerHandle_t xTimer)
 //------------------------------------------------------------------------------
 
 StackType_t sAppStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
+StackType_t sAppMainStack[APP_MAIN_TASK_SIZE / sizeof(StackType_t)];
 StaticTask_t sAppTaskStruct;
+StaticTask_t sAppMainTaskStruct;
 
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(WindowApp::Event)];
 StaticQueue_t sAppEventQueueStruct;
@@ -156,38 +154,30 @@ void WindowAppImpl::OnIconTimeout(WindowApp::Timer & timer)
 #endif
 }
 
+CHIP_ERROR WindowAppImpl::StartAppTask()
+{
+    // Start App task.
+    TaskHandle_t a = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(sAppMainStack), NULL, 1, sAppMainStack, &sAppMainTaskStruct);
+    return (a == nullptr) ? CHIP_ERROR_NO_MEMORY : CHIP_NO_ERROR;
+}
+
+void WindowAppImpl::AppTaskMain(void * pvParameter){
+    CHIP_ERROR err = sInstance.Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("AppTask.Init() failed");
+        appError(err);
+    }
+    vTaskSuspend(NULL);
+}
+
 CHIP_ERROR WindowAppImpl::Init()
 {
-#ifdef SL_WIFI
-    /*
-     * Wait for the WiFi to be initialized
-     */
-    EFR32_LOG("APP: Wait WiFi Init");
-    while (!wfx_hw_ready())
-    {
-        vTaskDelay(10);
-    }
-    EFR32_LOG("APP: Done WiFi Init");
-    /* We will init server when we get IP */
-#endif
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     WindowApp::Init();
-
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     // Initialize App Task
-    mHandle = xTaskCreateStatic(OnTaskCallback, APP_TASK_NAME, ArraySize(sAppStack), NULL, 1, sAppStack, &sAppTaskStruct);
-    if (NULL == mHandle)
-    {
-        EFR32_LOG("Failed to allocate app task");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    // Initialize App Queue
-    mQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(WindowApp::Event), sAppEventQueueBuffer, &sAppEventQueueStruct);
-    if (NULL == mQueue)
-    {
-        EFR32_LOG("Failed to allocate app event queue");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
+    
     // Initialize LEDs
     LEDWidget::InitGpio();
     mStatusLED.Init(APP_STATE_LED);
@@ -197,7 +187,21 @@ CHIP_ERROR WindowAppImpl::Init()
     slLCD.Init();
 #endif
 
-    return CHIP_NO_ERROR;
+mHandle = xTaskCreateStatic(OnTaskCallback, APP_TASK_NAME, ArraySize(sAppStack), NULL, 1, sAppStack, &sAppTaskStruct);
+if (NULL == mHandle)
+{
+    EFR32_LOG("Failed to allocate app task");
+    return CHIP_ERROR_NO_MEMORY;
+}
+
+// Initialize App Queue
+mQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(WindowApp::Event), sAppEventQueueBuffer, &sAppEventQueueStruct);
+if (NULL == mQueue)
+{
+    EFR32_LOG("Failed to allocate app event queue");
+    return CHIP_ERROR_NO_MEMORY;
+}
+return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WindowAppImpl::Start()

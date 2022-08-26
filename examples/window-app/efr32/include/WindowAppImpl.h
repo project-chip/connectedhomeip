@@ -36,6 +36,8 @@ public:
     static WindowAppImpl sInstance;
 
     WindowAppImpl();
+    CHIP_ERROR StartAppTask(void);
+    static void AppTaskMain(void * pvParameter);
     CHIP_ERROR Init() override;
     CHIP_ERROR Start() override;
     void Finish() override;

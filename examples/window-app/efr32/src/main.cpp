@@ -57,10 +57,9 @@ int main(void)
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     WindowApp & app = WindowApp::Instance();
-
-    EFR32_LOG("Starting App");
+    
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    err = app.Init();
+ //   err = app.Init();
     // Initialize device attestation config
 #ifdef EFR32_ATTESTATION_CREDENTIALS
     SetDeviceAttestationCredentialsProvider(EFR32::GetEFR32DacProvider());
@@ -69,6 +68,8 @@ int main(void)
 #endif
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
+    EFR32_LOG("Starting App Task");
+    err = app.StartAppTask();
     if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("App Init failed");

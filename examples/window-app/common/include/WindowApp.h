@@ -157,6 +157,7 @@ public:
 
     virtual ~WindowApp() = default;
     virtual CHIP_ERROR Init();
+    virtual CHIP_ERROR StartAppTask();
     virtual CHIP_ERROR Start() = 0;
     virtual CHIP_ERROR Run();
     virtual void Finish();
