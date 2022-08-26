@@ -20,8 +20,6 @@
 #include <lib/support/IntrusiveList.h>
 #include <messaging/ExchangeContext.h>
 
-#define CHIP_EXCHANGE_HOLDER_DETAIL_LOGGING 1
-
 namespace chip {
 namespace Messaging {
 

@@ -54,8 +54,6 @@ using namespace chip::Encoding;
 using namespace chip::Inet;
 using namespace chip::System;
 
-#define CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING 1
-
 namespace chip {
 namespace Messaging {
 
