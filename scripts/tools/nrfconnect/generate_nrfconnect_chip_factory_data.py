@@ -70,6 +70,7 @@ def gen_test_certs(chip_cert_exe: str,
                    product_id: int,
                    device_name: str,
                    generate_cd: bool = False,
+                   cd_type: int = 1,
                    paa_cert_path: str = None,
                    paa_key_path: str = None):
     """
@@ -109,15 +110,15 @@ def gen_test_certs(chip_cert_exe: str,
                "--key", CD_KEY_PATH,
                "--cert", CD_PATH,
                "--out", output + "/CD.der",
-               "--format-version",  str(1),
+               "--format-version",  "1",
                "--vendor-id",  hex(vendor_id),
                "--product-id",  hex(product_id),
-               "--device-type-id", "0xA",
-               "--certificate-id", "ZIG20142ZB330003-24",
-               "--security-level",  str(0),
-               "--security-info",  str(0),
-               "--certification-type",  str(0),
-               "--version-number", "0x2694",
+               "--device-type-id", "0",
+               "--certificate-id", "FFFFFFFFFFFFFFFFFFF",
+               "--security-level",  "0",
+               "--security-info",  "0",
+               "--certification-type",  str(cd_type),
+               "--version-number", "0xFFFF",
                ]
         subprocess.run(cmd)
 
@@ -270,6 +271,7 @@ class FactoryDataGenerator:
                                    self._args.product_id,
                                    self._args.vendor_name + "_" + self._args.product_name,
                                    self._args.gen_cd,
+                                   self._args.cd_type,
                                    self._args.paa_cert,
                                    self._args.paa_key)
             dac_cert = certs.dac_cert
@@ -464,6 +466,8 @@ def main():
                                     help="[string] Provide additional user-specific keys in JSON format: {'name_1': 'value_1', 'name_2': 'value_2', ... 'name_n', 'value_n'}.")
     optional_arguments.add_argument("--gen_cd", action="store_true", default=False,
                                     help="Generate a new Certificate Declaration in .der format according to used Vendor ID and Product ID. This certificate will not be included to the factory data.")
+    optional_arguments.add_argument("--cd_type", type=int, default=1,
+                                    help="[int] Type of generated Certification Declaration: 0 - development, 1 - provisional, 2 - official")
     optional_arguments.add_argument("--paa_cert", type=str,
                                     help="Provide a path to the Product Attestation Authority (PAA) certificate to generate the PAI certificate. Without providing it, a testing PAA stored in the Matter repository will be used.")
     optional_arguments.add_argument("--paa_key", type=str,
