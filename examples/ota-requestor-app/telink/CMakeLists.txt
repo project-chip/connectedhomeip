@@ -28,7 +28,7 @@ set(CONF_FILE ${CHIP_ROOT}/config/telink/app/zephyr.conf prj.conf)
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
-project(chip-telink-light-switch-example)
+project(chip-telink-ota-requestor-example)
 
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
 
@@ -37,7 +37,7 @@ target_compile_options(app PRIVATE -fpermissive)
 target_include_directories(app PRIVATE
                            include
                            ${GEN_DIR}/app-common
-                           ${GEN_DIR}/light-switch-app
+                           ${GEN_DIR}/ota-requestor-app
                            ${NLIO_ROOT}
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include)
@@ -51,9 +51,8 @@ target_sources(app PRIVATE
                src/AppTask.cpp
                src/main.cpp
                src/ZclCallbacks.cpp
-               src/binding-handler.cpp
-               ${GEN_DIR}/light-switch-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/light-switch-app/zap-generated/IMClusterCommandHandler.cpp
+               ${GEN_DIR}/ota-requestor-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
@@ -89,14 +88,15 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/localization-configuration-server/localization-configuration-server.cpp
                ${CHIP_ROOT}/src/app/clusters/time-format-localization-server/time-format-localization-server.cpp
                ${CHIP_ROOT}/src/app/clusters/fixed-label-server/fixed-label-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/user-label-server/user-label-server.cpp               
+               ${CHIP_ROOT}/src/app/clusters/user-label-server/user-label-server.cpp
                ${CHIP_ROOT}/src/app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/software-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/switch-server/switch-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/general-diagnostics-server/general-diagnostics-server.cpp               	       
+               ${CHIP_ROOT}/src/app/clusters/general-diagnostics-server/general-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/group-key-mgmt-server/group-key-mgmt-server.cpp
                ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
                ${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/occupancy-sensor-server.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp

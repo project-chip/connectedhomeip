@@ -54,7 +54,7 @@ The following buttons are available on **tlsr9518adk80d** board:
 | Name     | Function               | Description                                                                                            |
 | :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
 | Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | Lighting control       | Manually triggers the lighting state                                                                   |
+| Button 2 | NA                     | NA                                                                                                     |
 | Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device                             |
 | Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
 
@@ -69,12 +69,11 @@ following states:
 | Blinls with frequent pulses | Device is commissioned, Thread enabled. Device trying to JOIN thread network |
 | Blinks with whde pulses     | Device commissioned and joined to thread network as CHILD                    |
 
-**Blue** LED shows current state of lightbulb
-
 ### CHIP tool commands
 
 1. Build
    [chip-tool cli](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
+
 2. Pair with device
 
     ```
@@ -83,70 +82,7 @@ following states:
 
     here:
 
-    - \${NODE_ID_TO_ASSIGN} is the node id to assign to the lightbulb
-
-3. Switch on the light:
-
-    ```
-    ${CHIP_TOOL_DIR}/chip-tool onoff on 1
-    ```
-
-    here:
-
-    - **onoff** is name of cluster
-    - **on** command to the cluster
-    - **1** ID of endpoint
-
-4. Switch off the light:
-
-    ```
-    ${CHIP_TOOL_DIR}/chip-tool onoff off 1
-    ```
-
-    here:
-
-    - **onoff** is name of cluster
-    - **off** command to the cluster
-    - **1** ID of endpoint
-
-5. Read the light state:
-
-    ```
-    ${CHIP_TOOL_DIR}/chip-tool onoff read on-off 1
-    ```
-
-    here:
-
-    - **onoff** is name of cluster
-    - **read** command to the cluster
-    - **on-off** attribute to read
-    - **1** ID of endpoint
-
-6. Change brightness of light:
-
-    ```
-    ${CHIP_TOOL_DIR}/chip-tool levelcontrol move-to-level 32 0 0 0 1
-    ```
-
-    here:
-
-    - **levelcontrol** is name of cluster
-    - **move-to-level** command to the cluster
-    - **32** brightness value
-    - **0** transition time
-    - **0** option mask
-    - **0** option override
-    - **1** ID of endpoint
-
-7. Read brightness level:
-    ```
-    ./chip-tool levelcontrol read current-level 1
-    ```
-    here:
-    - **levelcontrol** is name of cluster
-    - **read** command to the cluster
-    - **current-level** attribute to read
-    - **1** ID of endpoint
+    - \${NODE_ID_TO_ASSIGN} is the node id to assign to the ota requestor
 
 ### OTA with Linux OTA Provider
 

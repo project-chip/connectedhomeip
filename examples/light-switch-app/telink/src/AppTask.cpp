@@ -43,6 +43,10 @@
 #include <setup_payload/SetupPayload.h>
 #include <system/SystemClock.h>
 
+#if CONFIG_CHIP_OTA_REQUESTOR
+#include "OTAUtil.h"
+#endif
+
 #include <logging/log.h>
 #include <zephyr.h>
 
@@ -82,6 +86,9 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR ret;
 
+    LOG_INF("Current Software Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION,
+            CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+
     // Initialize status LED
     LEDWidget::InitGpio(SYSTEM_STATE_LED_PORT);
     sStatusLED.Init(SYSTEM_STATE_LED_PIN);
@@ -97,6 +104,10 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+#if CONFIG_CHIP_OTA_REQUESTOR
+    InitBasicOTARequestor();
+#endif
 
     ConfigurationMgr().LogDeviceConfig();
 
