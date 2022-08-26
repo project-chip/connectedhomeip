@@ -1565,7 +1565,7 @@ client cluster ColorControl = 768 {
   readonly attribute int16u colorTempPhysicalMinMireds = 16395;
   readonly attribute int16u colorTempPhysicalMaxMireds = 16396;
   readonly attribute int16u coupleColorTempToLevelMinMireds = 16397;
-  attribute access(write: manage) int16u startUpColorTemperatureMireds = 16400;
+  attribute access(write: manage) nullable int16u startUpColorTemperatureMireds = 16400;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct MoveToHueRequest {

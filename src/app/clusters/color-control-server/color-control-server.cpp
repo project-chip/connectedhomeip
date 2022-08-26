@@ -2071,13 +2071,13 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
     // the StartUpColorTemperatureMireds attribute are listed in the table below.
     // Value                Action on power up
     // 0x0000-0xffef        Set the ColorTemperatureMireds attribute to this value.
-    // 0xffff               Set the ColorTemperatureMireds attribute to its previous value.
+    // null                 Set the ColorTemperatureMireds attribute to its previous value.
 
-    // Initialize startUpColorTempMireds to "maintain previous value" value 0xFFFF
-    uint16_t startUpColorTemp = 0xFFFF;
-    EmberAfStatus status      = Attributes::StartUpColorTemperatureMireds::Get(endpoint, &startUpColorTemp);
+    // Initialize startUpColorTempMireds to "maintain previous value" value null
+    app::DataModel::Nullable<uint16_t> startUpColorTemp;
+    EmberAfStatus status = Attributes::StartUpColorTemperatureMireds::Get(endpoint, startUpColorTemp);
 
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    if (status == EMBER_ZCL_STATUS_SUCCESS && !startUpColorTemp.IsNull())
     {
         uint16_t updatedColorTemp = MAX_TEMPERATURE_VALUE;
         status                    = Attributes::ColorTemperature::Get(endpoint, &updatedColorTemp);
@@ -2090,13 +2090,13 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
             uint16_t tempPhysicalMax = MAX_TEMPERATURE_VALUE;
             Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
 
-            if (tempPhysicalMin <= startUpColorTemp && startUpColorTemp <= tempPhysicalMax)
+            if (tempPhysicalMin <= startUpColorTemp.Value() && startUpColorTemp.Value() <= tempPhysicalMax)
             {
                 // Apply valid startup color temp value that is within physical limits of device.
                 // Otherwise, the startup value is outside the device's supported range, and the
                 // existing setting of ColorTemp attribute will be left unchanged (i.e., treated as
-                // if startup color temp was set to 0xFFFF).
-                updatedColorTemp = startUpColorTemp;
+                // if startup color temp was set to null).
+                updatedColorTemp = startUpColorTemp.Value();
                 status           = Attributes::ColorTemperature::Set(endpoint, updatedColorTemp);
 
                 if (status == EMBER_ZCL_STATUS_SUCCESS)

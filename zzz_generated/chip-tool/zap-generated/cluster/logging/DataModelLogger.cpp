@@ -7866,7 +7866,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("CoupleColorTempToLevelMinMireds", 1, value);
         }
         case ColorControl::Attributes::StartUpColorTemperatureMireds::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUpColorTemperatureMireds", 1, value);
         }
