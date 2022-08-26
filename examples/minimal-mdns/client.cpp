@@ -319,7 +319,6 @@ int main(int argc, char ** args)
     gMdnsServer.SetDelegate(&reporter);
 
     {
-        // FIXME: use gOptions.enableIpV4
         auto endpoints = mdns::Minimal::GetAddressPolicy()->GetListenEndpoints();
 
         err = gMdnsServer.Listen(chip::DeviceLayer::UDPEndPointManager(), endpoints.get(), gOptions.listenPort);
