@@ -162,6 +162,11 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         delete _pairingDelegateBridge;
         _pairingDelegateBridge = nullptr;
     }
+
+    if (_partialDACVerifier) {
+        delete _partialDACVerifier;
+        _partialDACVerifier = nullptr;
+    }
 }
 
 - (BOOL)startup:(MTRDeviceControllerStartupParamsInternal *)startupParams
@@ -233,6 +238,8 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         commissionerParams.pairingDelegate = _pairingDelegateBridge;
 
         _operationalCredentialsDelegate->SetDeviceCommissioner(_cppCommissioner);
+
+        _partialDACVerifier = new chip::Credentials::PartialDACVerifier();
 
         commissionerParams.operationalCredentialsDelegate = _operationalCredentialsDelegate;
 
