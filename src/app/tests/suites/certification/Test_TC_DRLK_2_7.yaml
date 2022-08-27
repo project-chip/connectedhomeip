@@ -84,7 +84,7 @@ tests:
                 value: null
 
     - label: "TH reads NumberOfYearDay SchedulesSupportedPerUser attribute"
-      PICS: DRLK.S.F04 && DRLK.S.A0015
+      PICS: DRLK.S.F10 && DRLK.S.A0015
       command: "readAttribute"
       attribute: "NumberOfYearDaySchedulesSupportedPerUser"
       response:
@@ -94,7 +94,7 @@ tests:
               maxValue: 255
 
     - label: "TH reads NumberOfTotalUsers Supported attribute"
-      PICS: DRLK.C.F08 && DRLK.S.A0011
+      PICS: DRLK.S.F08 && DRLK.S.A0011
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
       response:
@@ -104,7 +104,7 @@ tests:
               maxValue: 65534
 
     - label: "TH sends Set Year Day Schedule Command to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C0e.Rsp
+      PICS: DRLK.S.F10 && DRLK.S.C0e.Rsp
       command: "SetYearDaySchedule"
       arguments:
           values:
@@ -119,7 +119,7 @@ tests:
 
     #issue #18591
     - label: "TH sends Get Year Day Schedule Command to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
+      PICS: DRLK.S.F10 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
@@ -159,7 +159,7 @@ tests:
           error: INVALID_COMMAND
 
     - label: "TH sends Get Year Day Schedule Command to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
+      PICS: DRLK.S.F10 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
@@ -203,18 +203,18 @@ tests:
                 value: 0
 
     - label: "TH sends Get Year Day Schedule Command to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
+      PICS: DRLK.S.F10 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
               - name: "YearDayIndex"
-                value: 10
+                value: NumberOfYearDaySchedulesSupportedPerUser
               - name: "userIndex"
                 value: 5
       response:
           values:
               - name: "YearDayIndex"
-                value: 10
+                value: NumberOfYearDaySchedulesSupportedPerUser
               - name: "userIndex"
                 value: 5
               - name: "status"
@@ -237,7 +237,7 @@ tests:
                 value: 1
 
     - label: "TH sends Get Year Day Schedule Command to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx && DRLK.S.C10.Rsp
+      PICS: DRLK.S.F10 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx && DRLK.S.C10.Rsp
       command: "GetYearDaySchedule"
       arguments:
           values:
@@ -275,7 +275,7 @@ tests:
                 value: 2100
 
     - label: "TH sends Get Year Day Schedule Command to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
+      PICS: DRLK.S.F10 && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
@@ -299,7 +299,7 @@ tests:
                     minValue: 1081
 
     - label: "TH sends Clear Year Day Schedule to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C10.Rsp
+      PICS: DRLK.S.F10 && DRLK.S.C10.Rsp
       command: "ClearYearDaySchedule"
       arguments:
           values:
@@ -311,7 +311,7 @@ tests:
           error: INVALID_COMMAND
 
     - label: "Clear a year day schedule for the first user"
-      PICS: DRLK.S.F04 && DRLK.S.C10.Rsp
+      PICS: DRLK.S.F10 && DRLK.S.C10.Rsp
       command: "ClearYearDaySchedule"
       arguments:
           values:

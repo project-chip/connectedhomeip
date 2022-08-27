@@ -40,7 +40,7 @@ tests:
               type: int16u
 
     - label: "Read the global attribute: FeatureMap"
-      PICS: ( !CC.S.F00 && !CC.S.F01 && !CC.S.F02 && !CC.S.F03 )
+      PICS: ( !CC.S.F00 && !CC.S.F01 && !CC.S.F02 && !CC.S.F03 && !CC.S.F04 )
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -49,7 +49,7 @@ tests:
               type: bitmap32
 
     - label: "Read the global attribute: FeatureMap"
-      PICS: ( CC.S.F00 || CC.S.F01 || CC.S.F02 || CC.S.F03 )
+      PICS: ( CC.S.F00 || CC.S.F01 || CC.S.F02 || CC.S.F03 || CC.S.F04)
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
