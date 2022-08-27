@@ -509,7 +509,8 @@ void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSu
 
     //
     // Ordinarily, the ExchangeContext will close itself upon sending the final message / error'ing out on a responder exchange
-    // when unwinding back from an OnMessageReceived callback. Since that isn't the case in this artificial setup here, we need
+    // when unwinding back from an OnMessageReceived callback. Since that isn't the case in this artificial setup here
+    // (where we created a responder exchange that's not responding to anything), we need
     // to explicitly close it out. This is not expected in normal application logic.
     //
     exchange->Close();
@@ -599,8 +600,9 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
 
     //
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
-    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here,
-    // we need to explicitly close it out. This is not expected in normal application logic.
+    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here
+    // (where we created a responder exchange that's not responding to anything), we need to explicitly close it out. This is not
+    // expected in normal application logic.
     //
     exchange->Close();
 }
@@ -669,8 +671,9 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
 
     //
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
-    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here,
-    // we need to explicitly close it out. This is not expected in normal application logic.
+    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here
+    //  (where we created a responder exchange that's not responding to anything), we need to explicitly close it out. This is not
+    //  expected in normal application logic.
     //
     exchange->Close();
 }
@@ -704,8 +707,9 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
 
     //
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
-    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here,
-    // we need to explicitly close it out. This is not expected in normal application logic.
+    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here
+    // (where we created a responder exchange that's not responding to anything), we need to explicitly close it out. This is not
+    // expected in normal application logic.
     //
     exchange->Close();
 }
@@ -1065,8 +1069,9 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
 
     //
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
-    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here,
-    // we need to explicitly close it out. This is not expected in normal application logic.
+    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here
+    // (where we created a responder exchange that's not responding to anything), we need to explicitly close it out. This is not
+    // expected in normal application logic.
     //
     exchange->Close();
 }
@@ -1128,7 +1133,8 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
             // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
             // OnMessageReceived callback and not having sent a subsequent message (as is the case when calling ProcessInvokeRequest
             // above, which doesn't actually send back a response in these cases). Since that isn't the case in this artificial
-            // setup here, we need to explicitly close it out. This is not expected in normal application logic.
+            // setup here (where we created a responder exchange that's not responding to anything), we need to explicitly close it
+            // out. This is not expected in normal application logic.
             //
             exchange->Close();
         }

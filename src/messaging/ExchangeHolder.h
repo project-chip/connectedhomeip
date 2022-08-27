@@ -50,8 +50,8 @@ namespace Messaging {
  *      invoking Get() on the holder will return a nullptr.
  *
  *   5. If you invoke WillSendMessage() on the exchange in your implementation of OnMessageReceived indicating a desire to send a
- * message later on the exchange, invoking Get() on the holder will return a valid exchange until SendMessage() on the exchange is
- * called, at which point, rules 2 and 3 apply.
+ *      message later on the exchange, invoking Get() on the holder will return a valid exchange until SendMessage() on the exchange
+ *      is called, at which point, rules 2 and 3 apply.
  *
  *   6. This is a delegate forwarder -  consumers can still register to be an ExchangeDelegate
  *      and get notified of all relevant happenings on that delegate interface.

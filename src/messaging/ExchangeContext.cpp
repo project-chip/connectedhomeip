@@ -351,7 +351,11 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
 ExchangeContext::~ExchangeContext()
 {
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
-    // VerifyOrDie(!IsAckPending());
+
+    //
+    // Ensure that DoClose has been called by the time we get here. If not, we have a leak somewhere.
+    //
+    VerifyOrDie(mFlags.Has(Flags::kFlagClosed));
 
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
     // Make sure that the exchange withdraws the request for Sleepy End Device active mode.
