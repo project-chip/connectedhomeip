@@ -109,7 +109,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 235
+              minValue: 215
               maxValue: 254
 
     - label: "Wait 2s"
@@ -126,7 +126,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 240
+              minValue: 215
               maxValue: 254
 
     - label:
@@ -398,8 +398,8 @@ tests:
       response:
           saveAs: EnhancedCurrentHueValue
           constraints:
-              minValue: 23500
-              maxValue: 26500
+              minValue: 21250
+              maxValue: 28750
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -416,7 +416,7 @@ tests:
       response:
           constraints:
               minValue: EnhancedCurrentHueValue
-              maxValue: 26500
+              maxValue: 28750
 
     - label: "Turn Off light that we turned on"
       PICS: OO.S.C00.Rsp
