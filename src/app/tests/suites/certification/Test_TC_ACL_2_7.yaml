@@ -42,7 +42,7 @@ tests:
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
           DUT
-          sudo ./chip-all-clusters-app
+          sudo ./chip-all-clusters-app --wifi
 
           TH1
           ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
@@ -75,7 +75,7 @@ tests:
 
           Commission TH2(Chiptool) to DUT using manualcode generated in TH1 using open commission window
 
-          ./chip-tool pairing code 2 36253605617
+          ./chip-tool pairing code 2 36253605617 --commissioner-name beta
           [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step "Cleanup"
           [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
       disabled: true
@@ -84,7 +84,7 @@ tests:
           "TH2 reads DUT Endpoint 0 OperationalCredentials cluster
           CurrentFabricIndex attribute"
       verification: |
-          ./chip-tool operationalcredentials read current-fabric-index 2 0
+          ./chip-tool operationalcredentials read current-fabric-index 2 0 --commissioner-name-beta
 
           On TH2(Chiptool), verify  CurrentFabricIndex attribute of operationalCredential cluster  as 2
           [1657186956.724761][3910:3915] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 3161849734
@@ -146,7 +146,7 @@ tests:
           17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
       PICS: ACL.S.A0001
       verification: |
-          ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 2 0
+          ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 2 0 --commissioner-name beta
 
           On TH2(Chiptool),Verify Successfully to extension attribute list containg one element .
           1657894672.479983][2433:2438] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -212,7 +212,7 @@ tests:
           "TH2 reads DUT Endpoint 0 AccessControl cluster Extension attribute"
       PICS: ACL.S.A0001
       verification: |
-          ./chip-tool accesscontrol read extension 2 0
+          ./chip-tool accesscontrol read extension 2 0 --commissioner-name beta
 
           On TH2(Chiptool), Verify AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
           [1658327214.683199][2749:2754] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 2953114587
@@ -252,7 +252,7 @@ tests:
           AccessControlExtensionChanged event"
       PICS: ACL.S.E01
       verification: |
-          ./chip-tool accesscontrol read-event access-control-extension-changed  2
+          ./chip-tool accesscontrol read-event access-control-extension-changed  2 --commissioner-name beta
           On TH2(Chiptool) , Verify AccessControlExtensionChanged containing 1 element, and MUST NOT contain an element with FabricIndex F1
           [1658327551.622018][4295:4300] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
           [1658327551.622043][4295:4300] CHIP:TOO:          Event number: 6
