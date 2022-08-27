@@ -203,9 +203,9 @@ CHIP_ERROR MTROperationalCredentialsDelegate::CallbackGenerateNOCChain(const chi
     dispatch_sync(mNocChainIssuerQueue, ^{
         [mNocChainIssuer onNOCChainGenerationNeeded:csrInfo
                                     attestationInfo:attestationInfo
-                       onNOCChainGenerationComplete:^BOOL(NSData * operationalCertificate, NSData * intermediateCertificate,
+                       onNOCChainGenerationComplete:^void(NSData * operationalCertificate, NSData * intermediateCertificate,
                            NSData * rootCertificate, NSData * ipk, NSNumber * adminSubject, NSError * __autoreleasing * error) {
-                           return onNOCChainGenerationComplete(
+                           onNOCChainGenerationComplete(
                                operationalCertificate, intermediateCertificate, rootCertificate, ipk, adminSubject, error);
                        }];
     });
@@ -220,13 +220,12 @@ void MTROperationalCredentialsDelegate::setNSError(CHIP_ERROR err, NSError * __a
     }
 }
 
-BOOL MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(NSData * operationalCertificate,
+void MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(NSData * operationalCertificate,
     NSData * intermediateCertificate, NSData * rootCertificate, NSData * _Nullable ipk, NSNumber * _Nullable adminSubject,
     NSError * __autoreleasing * error)
 {
     if (operationalCertificate == nil || intermediateCertificate == nil || rootCertificate == nil) {
         setNSError(CHIP_ERROR_INVALID_ARGUMENT, error);
-        return NO;
     }
 
     // use ipk and adminSubject from CommissioningParameters if not passed in.
@@ -236,7 +235,6 @@ BOOL MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(NSData * op
         = mCppCommissioner->GetCommissioningParameters();
     if (!commissioningParameters.HasValue()) {
         setNSError(CHIP_ERROR_INCORRECT_STATE, error);
-        return NO;
     }
 
     chip::Optional<chip::Crypto::AesCcm128KeySpan> ipkOptional;
@@ -245,7 +243,6 @@ BOOL MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(NSData * op
     if (ipk != nil) {
         if ([ipk length] != sizeof(ipkValue)) {
             setNSError(CHIP_ERROR_INCORRECT_STATE, error);
-            return NO;
         }
         memcpy(&ipkValue[0], [ipk bytes], [ipk length]);
         ipkOptional.SetValue(ipkTempSpan);
@@ -269,9 +266,7 @@ BOOL MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(NSData * op
     if (err != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Failed to SetNocChain for the device: %" CHIP_ERROR_FORMAT, err.Format());
         setNSError(CHIP_ERROR_INCORRECT_STATE, error);
-        return NO;
     }
-    return YES;
 }
 
 CHIP_ERROR MTROperationalCredentialsDelegate::LocalGenerateNOCChain(const chip::ByteSpan & csrElements,

@@ -22,7 +22,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef BOOL (^MTRNOCChainGenerationCompleteHandler)(NSData * operationalCertificate, NSData * intermediateCertificate,
+typedef void (^MTRNOCChainGenerationCompleteHandler)(NSData * operationalCertificate, NSData * intermediateCertificate,
     NSData * rootCertificate, NSData * _Nullable ipk, NSNumber * _Nullable adminSubject, NSError * __autoreleasing * error);
 
 @protocol MTRNOCChainIssuer <NSObject>

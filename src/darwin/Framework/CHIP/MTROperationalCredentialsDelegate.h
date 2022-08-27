@@ -127,7 +127,7 @@ private:
      * If ipk and adminSubject are non nil, then they will be used in the AddNOC command sent to the commissionee. If they are not
      * populated, then the values provided in the MTRDeviceController initialization will be used.
      */
-    BOOL onNOCChainGenerationComplete(NSData * operationalCertificate, NSData * intermediateCertificate, NSData * rootCertificate,
+    void onNOCChainGenerationComplete(NSData * operationalCertificate, NSData * intermediateCertificate, NSData * rootCertificate,
         NSData * _Nullable ipk, NSNumber * _Nullable adminSubject, NSError * __autoreleasing * error);
 
     void setNSError(CHIP_ERROR err, NSError * __autoreleasing * outError);
