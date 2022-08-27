@@ -374,8 +374,40 @@ bool ResolveContext::HasAddress()
 void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostnameWithDomain, uint16_t port,
                                     uint16_t txtLen, const unsigned char * txtRecord)
 {
-    ChipLogDetail(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%.*s\"", __func__,
-                  hostnameWithDomain, fullname, interfaceId, port, static_cast<int>(txtLen), txtRecord);
+#if CHIP_DETAIL_LOGGING
+    std::string txtString;
+    auto txtRecordIter  = txtRecord;
+    size_t remainingLen = txtLen;
+    while (remainingLen > 0)
+    {
+        size_t len = *txtRecordIter;
+        ++txtRecordIter;
+        --remainingLen;
+        len = min(len, remainingLen);
+        chip::Span<const unsigned char> bytes(txtRecordIter, len);
+        if (txtString.size() > 0)
+        {
+            txtString.push_back(',');
+        }
+        for (auto & byte : bytes)
+        {
+            if ((std::isalnum(byte) || std::ispunct(byte)) && byte != '\\' && byte != ',')
+            {
+                txtString.push_back(static_cast<char>(byte));
+            }
+            else
+            {
+                char hex[5];
+                snprintf(hex, sizeof(hex), "\\x%02x", byte);
+                txtString.append(hex);
+            }
+        }
+        txtRecordIter += len;
+        remainingLen -= len;
+    }
+#endif // CHIP_DETAIL_LOGGING
+    ChipLogDetail(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%s\"", __func__,
+                  hostnameWithDomain, fullname, interfaceId, port, txtString.c_str());
 
     InterfaceInfo interface;
     interface.service.mPort = ntohs(port);

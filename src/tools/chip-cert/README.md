@@ -84,6 +84,18 @@ Note that in the last example the generated Node certificate and private key are
 stored in base-64 encoded CHIP native format and not in PEM format as in the
 previous examples.
 
+The following example generates Node certificate, where the CA cert/key and the
+Node key are provided as a command line arguments:
+
+```
+./chip-cert gen-cert --type n --subject-chip-id DEDEDEDE0000001E --subject-fab-id FAB000000000001D --valid-from "2020-10-15 14:23:43" --lifetime 7305 --ca-key 30770201010420C31A9FD24F91B28F3553C6DD0BC05DFB264FB19DE4A293457FF61CF08656F795A00A06082A8648CE3D030107A144034200046909160652E60035DEAFF5EE4DCED6E451BB171D39972874193CBDEA79E2C81198A8CA5151F0FC086556B8D63610E9DDB237DA1AFAC7378838897FA46A776BE5 --ca-cert FTABCEV4XDq64xZcJAIBNwMnFAEAAADKysrKGCYE7xcbJyYFbrW5TDcGJxMEAAAAysrKyicVHQAAAAAAsPoYJAcBJAgBMAlBBGkJFgZS5gA13q/17k3O1uRRuxcdOZcodBk8vep54sgRmKjKUVHw/AhlVrjWNhDp3bI32hr6xzeIOIl/pGp3a+U3CjUBKQEkAgAYJAJgMAQUTMntCbE2MN9jRhRZ0bmiX4LtcIYwBRTwPNuYHS2KwOmYp5Apx6b9P/ztyBgwC0D8Ieqk5XNVp4h3De3CAlndmNqPzT/yGQFkgjozuBz41efPVctoPODsGq6zKv/0RIO45obJNN8X1pGQrtv/9JVSGA== --key 04F1C53AFB1761A75FF07437018E5B76BC75F852904DC7C4607839A5D953140FFE253626FB737647F1043F61D91B5EC0D3B42A7A25FA209CAB7ACD1A76CA46ECD2 --out Chip-Node02-Cert.chip-b64 --out-format chip-b64
+```
+
+Note that in the last example, to illustrate the fact that multiple key/cert
+formats are supported, the CA private key is in the X509 Hex format, the CA
+certificate is in the CHIP TLV base64 format and the Node public key is in the
+CHIP TLV Hex format.
+
 Now the 'chip-cert' tool can be used to validate generated Node certificate:
 
 ```
@@ -228,27 +240,29 @@ COMMAND OPTIONS
 
        NID_info_access extension to be added to the list of certificate extensions.
 
-   -C, --ca-cert <file>
+   -C, --ca-cert <file/str>
 
-       File containing CA certificate to be used to sign the new certificate.
+       File or string containing CA certificate to be used to sign the new certificate.
 
-   -K, --ca-key <file>
+   -K, --ca-key <file/str>
 
-       File containing CA private key to be used to sign the new certificate.
+       File or string containing CA private key to be used to sign the new certificate.
 
-   -k, --key <file>
+   -k, --key <file/str>
 
-       File containing the public and private keys for the new certificate.
+       File or string containing the public and private keys for the new certificate.
        If not specified, a new key pair will be generated.
 
-   -o, --out <file>
+   -o, --out <file/stdout>
 
        File to contain the new certificate.
+       If specified '-' then output is written to stdout.
 
-   -O, --out-key <file>
+   -O, --out-key <file/stdout>
 
        File to contain the public/private key for the new certificate.
        This option must be specified if the --key option is not.
+       If specified '-' then output is written to stdout.
 
   -F, --out-format <format>
 
@@ -256,10 +270,11 @@ COMMAND OPTIONS
        If not specified, the default base-64 encoded CHIP format is used.
        Supported format parametes are:
            x509-pem  - X.509 PEM format
-           x509-der  - X.509 DER format
+           x509-der  - X.509 DER raw format
+           x509-hex  - X.509 DER hex encoded format
            chip      - raw CHIP TLV format
-           chip-hex  - hex encoded CHIP TLV format
            chip-b64  - base-64 encoded CHIP TLV format (default)
+           chip-hex  - hex encoded CHIP TLV format
 
    -V, --valid-from <YYYY>-<MM>-<DD> [ <HH>:<MM>:<SS> ]
 
@@ -287,19 +302,19 @@ HELP OPTIONS
 $ ./out/debug/standalone/chip-cert convert-cert -h
 Usage: chip-cert convert-cert [ <options...> ] <in-file> <out-file>
 
-Convert a certificate between CHIP and X509 forms.
+Convert operational certificate between CHIP and X.509 formats.
 
 ARGUMENTS
 
-  <in-file>
+  <in-file/str>
 
-       The input certificate file name, or - to read from stdin. The
-       format of the input certificate is auto-detected and can be any
-       of: X.509 PEM, X.509 DER, CHIP base-64 or CHIP raw TLV.
+       File or string containing certificate to be converted.
+       The format of the input certificate is auto-detected and can be any of:
+       X.509 PEM, X.509 DER, X.509 HEX, CHIP base-64, CHIP raw TLV or CHIP HEX.
 
-  <out-file>
+  <out-file/stdout>
 
-       The output certificate file name, or - to write to stdout.
+       The output certificate file name, or '-' to write to stdout.
 
 COMMAND OPTIONS
 
@@ -310,6 +325,10 @@ COMMAND OPTIONS
   -d, --x509-der
 
        Output certificate in X.509 DER format.
+
+  -X, --x509-hex
+
+       Output certificate in X.509 DER hex encoded format.
 
   -c, --chip
 
@@ -339,18 +358,24 @@ HELP OPTIONS
 $ ./out/debug/standalone/chip-cert convert-key -h
 Usage: chip-cert convert-key [ <options...> ] <in-file> <out-file>
 
-Convert a private key between CHIP and PEM/DER forms.
+Convert private/public key between CHIP and X.509 formats.
+
 ARGUMENTS
 
-   <in-file>
+   <in-file/str>
 
-       The input private key file name, or - to read from stdin. The
-       format of the input key is auto-detected and can be any
-       of: PEM, DER, CHIP base-64 or CHIP raw.
+       File or string containing private/public key to be converted.
+       The format of the input key is auto-detected and can be any of:
+       X.509 PEM, X.509 DER, X.509 HEX, CHIP base-64, CHIP raw TLV or CHIP HEX.
 
-   <out-file>
+       Note: the private key formats include both private and public keys, while
+       the public key formats include only public keys. Therefore, conversion from any
+       private key format to public key is supported but conversion from public key
+       to private CANNOT be done.
 
-       The output private key file name, or - to write to stdout.
+   <out-file/stdout>
+
+       The output private key file name, or '-' to write to stdout.
 
 COMMAND OPTIONS
 
@@ -361,6 +386,14 @@ COMMAND OPTIONS
    -d, --x509-der
 
        Output the private key in SEC1/RFC-5915 DER format.
+
+   -x, --x509-hex
+
+       Output the private key in SEC1/RFC-5915 DER hex encoded format.
+
+   -P, --x509-pubkey-pem
+
+       Output the public key in SEC1/RFC-5915 PEM format.
 
    -c, --chip
 
@@ -373,6 +406,22 @@ COMMAND OPTIONS
 
        Output the private key in base-64 encoded CHIP serialized format.
        This is the default.
+
+   -e, --chip-hex
+
+       Output the private key in hex encoded CHIP serialized format.
+
+   -C, --chip-pubkey
+
+       Output the raw public key.
+
+   -B, --chip-pubkey-b64
+
+       Output the public key in base-64 encoded format.
+
+   -E, --chip-pubkey-hex
+
+       Output the public key in hex encoded format.
 
 HELP OPTIONS
 
@@ -393,21 +442,22 @@ Resign a CHIP certificate using a new CA certificate/key.
 
 COMMAND OPTIONS
 
-  -c, --cert <file>
+  -c, --cert <file/str>
 
-       File containing the certificate to be re-signed.
+       File or string containing the certificate to be re-signed.
 
-  -o, --out <file>
+  -o, --out <file/stdout>
 
        File to contain the re-signed certificate.
+       If specified '-' then output is written to stdout.
 
-  -C, --ca-cert <file>
+  -C, --ca-cert <file/str>
 
-       File containing CA certificate to be used to re-sign the certificate.
+       File or string containing CA certificate to be used to re-sign the certificate.
 
-  -K, --ca-key <file>
+  -K, --ca-key <file/str>
 
-       File containing CA private key to be used to re-sign the certificate.
+       File or string containing CA private key to be used to re-sign the certificate.
 
   -s, --self
 
@@ -432,21 +482,23 @@ Validate a chain of CHIP certificates.
 
 ARGUMENTS
 
-  <target-cert-file>
+  <file/str>
 
-      A file containing the certificate to be validated.
+      File or string containing the certificate to be validated.
+      The formats of all input certificates are auto-detected and can be any of:
+      X.509 PEM, X.509 DER, X.509 HEX, CHIP base-64, CHIP raw TLV or CHIP HEX.
 
 COMMAND OPTIONS
 
-  -c, --cert <cert-file>
+  -c, --cert <file/str>
 
-       A file containing an untrusted CHIP certificate to be used during
-       validation. Usually, it is Intermediate CA certificate.
+       File or string containing an untrusted CHIP certificate to be used during
+       validation. Usually, it is Intermediate CA certificate (ICAC).
 
-  -t, --trusted-cert <cert-file>
+  -t, --trusted-cert <file/str>
 
-       A file containing a trusted CHIP certificate to be used during
-       validation. Usually, it is trust anchor root certificate.
+       File or string containing a trusted CHIP certificate to be used during
+       validation. Usually, it is trust anchor root certificate (RCAC).
 
 HELP OPTIONS
 
@@ -463,20 +515,20 @@ HELP OPTIONS
 $ ./out/debug/standalone/chip-cert print-cert -h
 Usage: chip-cert print-cert [<options...>] <cert-file>
 
-Print a CHIP certificate.
+Print a CHIP operational certificate.
 
 ARGUMENTS
 
-  <cert-file>
+  <file/str>
 
-       A file containing a CHIP certificate.
+       File or string containing a CHIP certificate.
 
 COMMAND OPTIONS
 
-   -o, --out
+   -o, --out <file/stdout>
 
        The output printed certificate file name. If not specified
-       or if specified - then output is written to stdout.
+       or if specified '-' then output is written to stdout.
 
 HELP OPTIONS
 
@@ -493,7 +545,7 @@ HELP OPTIONS
 $ ./out/debug/standalone/chip-cert gen-att-cert -h
 Usage: chip-cert gen-att-cert [ <options...> ]
 
-Generate a CHIP certificate
+Generate a CHIP Attestation certificate
 
 COMMAND OPTIONS
 
@@ -522,27 +574,29 @@ COMMAND OPTIONS
        If not specified then by default the VID and PID fields are encoded using
        Matter specific OIDs.
 
-   -C, --ca-cert <file>
+   -C, --ca-cert <file/str>
 
-       File containing CA certificate to be used to sign the new certificate.
+       File or string containing CA certificate to be used to sign the new certificate.
 
-   -K, --ca-key <file>
+   -K, --ca-key <file/str>
 
-       File containing CA private key to be used to sign the new certificate.
+       File or string containing CA private key to be used to sign the new certificate.
 
-   -k, --key <file>
+   -k, --key <file/str>
 
-       File containing the public and private keys for the new certificate (in an X.509 PEM format).
+       File or string containing the public and private keys for the new certificate (in an X.509 PEM format).
        If not specified, a new key pair will be generated.
 
-   -o, --out <file>
+   -o, --out <file/stdout>
 
        File to contain the new certificate (in an X.509 PEM format).
+       If specified '-' then output is written to stdout.
 
-   -O, --out-key <file>
+   -O, --out-key <file/stdout>
 
        File to contain the public/private key for the new certificate (in an X.509 PEM format).
        This option must be specified if the --key option is not.
+       If specified '-' then output is written to stdout.
 
    -f, --valid-from <YYYY>-<MM>-<DD> [ <HH>:<MM>:<SS> ]
 
@@ -574,20 +628,20 @@ Validate a chain of CHIP attestation certificates
 
 COMMAND OPTIONS
 
-  -d, --dac <cert-file>
+  -d, --dac <file/str>
 
-       A file containing Device Attestation Certificate (DAC) to be
-       validated. The DAC is provided in the DER encoded format.
+       File or string containing Device Attestation Certificate (DAC) to be validated.
+       The DAC format is auto-detected and can be any of: X.509 PEM, DER or HEX formats.
 
-  -i, --pai <cert-file>
+  -i, --pai <file/str>
 
-       A file containing Product Attestation Intermediate (PAI) Certificate.
-       The PAI is provided in the DER encoded format.
+       File or string containing Product Attestation Intermediate (PAI) Certificate.
+       The PAI format is auto-detected and can be any of: X.509 PEM, DER or HEX formats.
 
-  -a, --paa <cert-file>
+  -a, --paa <file/str>
 
-       A file containing trusted Product Attestation Authority (PAA) Certificate.
-       The PAA is provided in the DER encoded format.
+       File or string containing trusted Product Attestation Authority (PAA) Certificate.
+       The PAA format is auto-detected and can be any of: X.509 PEM, DER or HEX formats.
 
 HELP OPTIONS
 
@@ -608,19 +662,20 @@ Generate CD CMS Signed Message
 
 COMMAND OPTIONS
 
-   -K, --key <file>
+   -K, --key <file/str>
 
-       File containing private key to be used to sign the Certification Declaration.
+       File or string containing private key to be used to sign the Certification Declaration.
 
-   -C, --cert <file>
+   -C, --cert <file/str>
 
-       File containing certificate associated with the private key that is used
+       File or string containing certificate associated with the private key that is used
        to sign the Certification Declaration. The Subject Key Identifier in the
        certificate will be included in the signed Certification Declaration message.
 
-   -O, --out <file>
+   -O, --out <file/stdout>
 
        File to contain the signed Certification Declaration message.
+       If specified '-' then output is written to stdout.
 
    -f, --format-version <int>
 
