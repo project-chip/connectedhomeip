@@ -60,6 +60,7 @@ static NSString * const kErrorSigningKeypairInit = @"Init failure while creating
 static NSString * const kErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
 static NSString * const kErrorOperationalKeypairInit = @"Init failure while creating operational keypair bridge";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
+static NSString * const kErrorPartialDacVerifierInit = @"Init failure while creating a partial DAC verifier";
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
@@ -101,6 +102,11 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
         _pairingDelegateBridge = new MTRDevicePairingDelegateBridge();
         if ([self checkForInitError:(_pairingDelegateBridge != nullptr) logMsg:kErrorPairingInit]) {
+            return nil;
+        }
+
+        _partialDACVerifier = new chip::Credentials::PartialDACVerifier();
+        if ([self checkForInitError:(_partialDACVerifier != nullptr) logMsg:kErrorPartialDacVerifierInit]) {
             return nil;
         }
 
@@ -238,8 +244,6 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         commissionerParams.pairingDelegate = _pairingDelegateBridge;
 
         _operationalCredentialsDelegate->SetDeviceCommissioner(_cppCommissioner);
-
-        _partialDACVerifier = new chip::Credentials::PartialDACVerifier();
 
         commissionerParams.operationalCredentialsDelegate = _operationalCredentialsDelegate;
 
