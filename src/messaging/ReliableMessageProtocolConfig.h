@@ -57,7 +57,7 @@ namespace chip {
  * needs (e.g. sleeping period) using Service Discovery TXT record CRI key.
  */
 #ifndef CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-#define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (5000_ms32)
+#define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (300_ms32)
 #endif // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
 
 /**
