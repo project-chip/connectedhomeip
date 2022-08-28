@@ -70,8 +70,8 @@ tests:
                 value: 100
 
     - label:
-          "TH sends StepColor command to DUT, with StepX = -2000, StepY = -6000,
-          TransitionTime = 200 (20s)"
+          "TH sends StepColor command to DUT, with StepX = -20000, StepY =
+          -6000, TransitionTime = 200 (20s)"
       command: "StepColor"
       PICS: CC.S.F03 && CC.S.C09.Rsp
       arguments:
@@ -101,8 +101,8 @@ tests:
       attribute: "CurrentX"
       response:
           constraints:
-              minValue: 13000
-              maxValue: 33000
+              minValue: 19500
+              maxValue: 26500
 
     - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
@@ -110,8 +110,8 @@ tests:
       attribute: "CurrentY"
       response:
           constraints:
-              minValue: 14000
-              maxValue: 20000
+              minValue: 14500
+              maxValue: 19500
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -128,7 +128,7 @@ tests:
       response:
           constraints:
               minValue: 13000
-              maxValue: 14000
+              maxValue: 15000
 
     - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
@@ -137,7 +137,7 @@ tests:
       response:
           constraints:
               minValue: 14000
-              maxValue: 15000
+              maxValue: 16000
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
