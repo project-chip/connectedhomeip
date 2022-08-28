@@ -193,6 +193,8 @@ void pychip_Stack_SetLogFunct(LogMessageFunct logFunct);
 ChipError::StorageType pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                                          DeviceAvailableFunc callback);
 ChipError::StorageType pychip_FreeOperationalDeviceProxy(chip::OperationalDeviceProxy * deviceProxy);
+ChipError::StorageType pychip_GetLocalSessionId(chip::OperationalDeviceProxy * deviceProxy, uint16_t * localSessionId);
+ChipError::StorageType pychip_GetNumSessionsToPeer(chip::OperationalDeviceProxy * deviceProxy, uint32_t * numSessions);
 ChipError::StorageType pychip_GetDeviceBeingCommissioned(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                                          CommissioneeDeviceProxy ** proxy);
 ChipError::StorageType pychip_ExpireSessions(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId);
@@ -696,6 +698,27 @@ ChipError::StorageType pychip_FreeOperationalDeviceProxy(chip::OperationalDevice
     {
         delete deviceProxy;
     }
+    return CHIP_NO_ERROR.AsInteger();
+}
+
+ChipError::StorageType pychip_GetLocalSessionId(chip::OperationalDeviceProxy * deviceProxy, uint16_t * localSessionId)
+{
+    VerifyOrReturnError(deviceProxy->GetSecureSession().HasValue(), CHIP_ERROR_MISSING_SECURE_SESSION.AsInteger());
+    VerifyOrReturnError(localSessionId != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+
+    *localSessionId = deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetLocalSessionId();
+    return CHIP_NO_ERROR.AsInteger();
+}
+
+ChipError::StorageType pychip_GetNumSessionsToPeer(chip::OperationalDeviceProxy * deviceProxy, uint32_t * numSessions)
+{
+    VerifyOrReturnError(deviceProxy->GetSecureSession().HasValue(), CHIP_ERROR_MISSING_SECURE_SESSION.AsInteger());
+    VerifyOrReturnError(numSessions != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+
+    *numSessions = 0;
+    deviceProxy->GetExchangeManager()->GetSessionManager()->ForEachMatchingSession(
+        deviceProxy->GetPeerScopedNodeId(), [numSessions](auto * session) { (*numSessions)++; });
+
     return CHIP_NO_ERROR.AsInteger();
 }
 
