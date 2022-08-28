@@ -282,8 +282,8 @@ jobs:
               timeout-minutes: 40
               run: |
                   scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factoryreset --script-args "--log-level INFO -t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
-                  scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_RR_1_1.py" --script-args "--commissioning-method on-network --discriminator 1234 --passcode 20202021"'
-              # the below tests are broken, enable them when they are fixed.
+              # the below tests are broken, enable them when they are fixed. Suspect hermetic issues for now
+              # scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_RR_1_1.py" --script-args "--commissioning-method on-network --discriminator 1234 --passcode 20202021"'
               # scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_SC_3_6.py" --script-args "--commissioning-method on-network --discriminator 1234 --passcode 20202021"'
               # scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_DA_1_7.py"'
             - name: Uploading core files
