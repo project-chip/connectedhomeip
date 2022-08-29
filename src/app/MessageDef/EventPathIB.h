@@ -127,6 +127,8 @@ public:
      *          #CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB if the path from the reader is not a valid concrere event path.
      */
     CHIP_ERROR GetEventPath(ConcreteEventPath * const apPath) const;
+
+    CHIP_ERROR ParsePath(EventPathParams & aEvent) const;
 };
 
 class Builder : public ListBuilder

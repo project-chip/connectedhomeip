@@ -26,6 +26,8 @@
 
 #include <app/AppConfig.h>
 
+#include <protocols/interaction_model/Constants.h>
+
 namespace chip {
 namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -169,6 +171,49 @@ CHIP_ERROR EventPathIB::Parser::GetEventPath(ConcreteEventPath * const apPath) c
 CHIP_ERROR EventPathIB::Parser::GetIsUrgent(bool * const apIsUrgent) const
 {
     return GetSimpleValue(to_underlying(Tag::kIsUrgent), TLV::kTLVType_Boolean, apIsUrgent);
+}
+
+CHIP_ERROR EventPathIB::Parser::ParsePath(EventPathParams & aEvent) const
+{
+    CHIP_ERROR err = GetEndpoint(&(aEvent.mEndpointId));
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(!aEvent.HasWildcardEndpointId(), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    else if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    err = GetCluster(&(aEvent.mClusterId));
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(!aEvent.HasWildcardClusterId(), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    else if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    err = GetEvent(&(aEvent.mEventId));
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    else if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(!aEvent.HasWildcardEventId(), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    ReturnErrorOnFailure(err);
+
+    err = GetIsUrgent(&(aEvent.mIsUrgentEvent));
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    return err;
 }
 
 EventPathIB::Builder & EventPathIB::Builder::Node(const NodeId aNode)

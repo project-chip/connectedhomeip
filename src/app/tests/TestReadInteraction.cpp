@@ -295,6 +295,8 @@ public:
     static void TestReadClientGenerateTwoEventPaths(nlTestSuite * apSuite, void * apContext);
     static void TestReadClientInvalidReport(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandlerEmptyReadRequest(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandlerEmptySubscribeRequest(nlTestSuite * apSuite, void * apContext);
     static void TestProcessSubscribeRequest(nlTestSuite * apSuite, void * apContext);
     static void TestReadRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestPostSubscribeRoundtripChunkReport(nlTestSuite * apSuite, void * apContext);
@@ -670,6 +672,114 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
         NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE);
 #else
         NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_END_OF_TLV);
+#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+
+        //
+        // In the call above to ProcessReadRequest, the handler will not actually close out the EC since
+        // it expects the ExchangeManager to do so automatically given it's not calling WillSend() on the EC,
+        // and is not sending a response back.
+        //
+        // Consequently, we have to manually close out the EC here in this test since we're not actually calling
+        // methods on these objects in a manner similar to how it would happen in normal use.
+        //
+        exchangeCtx->Close();
+    }
+
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadHandlerEmptyReadRequest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    System::PacketBufferTLVWriter writer;
+    System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    ReadRequestMessage::Builder readRequestBuilder;
+    MockInteractionModelApp delegate;
+    NullReadHandlerCallback nullCallback;
+
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    {
+        Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr, false);
+        ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
+
+        GenerateReportData(apSuite, apContext, reportDatabuf, false /*aNeedInvalidReport*/, false /* aSuppressResponse*/);
+        err = readHandler.SendReportData(std::move(reportDatabuf), false);
+        NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+
+        writer.Init(std::move(readRequestbuf));
+        err = readRequestBuilder.Init(&writer);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        readRequestBuilder.EndOfReadRequestMessage();
+        NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
+        err = writer.Finalize(&readRequestbuf);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = readHandler.ProcessReadRequest(std::move(readRequestbuf));
+        ChipLogError(DataManagement, "The error is %s", ErrorStr(err));
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+        NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE);
+#else
+        NL_TEST_ASSERT(apSuite, err == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+
+        //
+        // In the call above to ProcessReadRequest, the handler will not actually close out the EC since
+        // it expects the ExchangeManager to do so automatically given it's not calling WillSend() on the EC,
+        // and is not sending a response back.
+        //
+        // Consequently, we have to manually close out the EC here in this test since we're not actually calling
+        // methods on these objects in a manner similar to how it would happen in normal use.
+        //
+        exchangeCtx->Close();
+    }
+
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadHandlerEmptySubscribeRequest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    System::PacketBufferTLVWriter writer;
+    System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    ReadRequestMessage::Builder readRequestBuilder;
+    MockInteractionModelApp delegate;
+    NullReadHandlerCallback nullCallback;
+
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    {
+        Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr, false);
+        ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Subscribe);
+
+        GenerateReportData(apSuite, apContext, reportDatabuf, false /*aNeedInvalidReport*/, false /* aSuppressResponse*/);
+        err = readHandler.SendReportData(std::move(reportDatabuf), false);
+        NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+
+        writer.Init(std::move(readRequestbuf));
+        err = readRequestBuilder.Init(&writer);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        readRequestBuilder.EndOfReadRequestMessage();
+        NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
+        err = writer.Finalize(&readRequestbuf);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = readHandler.ProcessReadRequest(std::move(readRequestbuf));
+        ChipLogError(DataManagement, "The error is %s", ErrorStr(err));
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+        NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE);
+#else
+        NL_TEST_ASSERT(apSuite, err == CHIP_IM_GLOBAL_STATUS(InvalidAction));
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
         //
@@ -3940,6 +4050,8 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadClientGenerateTwoEventPaths", chip::app::TestReadInteraction::TestReadClientGenerateTwoEventPaths),
     NL_TEST_DEF("TestReadClientInvalidReport", chip::app::TestReadInteraction::TestReadClientInvalidReport),
     NL_TEST_DEF("TestReadHandlerInvalidAttributePath", chip::app::TestReadInteraction::TestReadHandlerInvalidAttributePath),
+    NL_TEST_DEF("TestReadHandlerEmptyReadRequest", chip::app::TestReadInteraction::TestReadHandlerEmptyReadRequest),
+    NL_TEST_DEF("TestReadHandlerEmptySubscribeRequest", chip::app::TestReadInteraction::TestReadHandlerEmptySubscribeRequest),
     NL_TEST_DEF("TestProcessSubscribeRequest", chip::app::TestReadInteraction::TestProcessSubscribeRequest),
     NL_TEST_DEF("TestSubscribeRoundtrip", chip::app::TestReadInteraction::TestSubscribeRoundtrip),
     NL_TEST_DEF("TestPostSubscribeRoundtripChunkReport", chip::app::TestReadInteraction::TestPostSubscribeRoundtripChunkReport),
