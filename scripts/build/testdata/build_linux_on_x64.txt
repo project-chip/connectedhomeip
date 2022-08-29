@@ -322,115 +322,189 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-casting-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-tv-casting-app-ipv6only
 
 # Building linux-arm64-clang-all-clusters
-ninja -C {out}/linux-arm64-clang-all-clusters
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-all-clusters'
 
 # Building linux-arm64-clang-all-clusters-app-nodeps
-ninja -C {out}/linux-arm64-clang-all-clusters-app-nodeps
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-all-clusters-app-nodeps'
 
 # Building linux-arm64-clang-all-clusters-app-nodeps-ipv6only
-ninja -C {out}/linux-arm64-clang-all-clusters-app-nodeps-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-all-clusters-app-nodeps-ipv6only'
 
 # Building linux-arm64-clang-all-clusters-ipv6only
-ninja -C {out}/linux-arm64-clang-all-clusters-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-all-clusters-ipv6only'
 
 # Building linux-arm64-clang-all-clusters-minimal
-ninja -C {out}/linux-arm64-clang-all-clusters-minimal
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-all-clusters-minimal'
 
 # Building linux-arm64-clang-all-clusters-minimal-ipv6only
-ninja -C {out}/linux-arm64-clang-all-clusters-minimal-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-all-clusters-minimal-ipv6only'
 
 # Building linux-arm64-clang-bridge
-ninja -C {out}/linux-arm64-clang-bridge
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-bridge'
 
 # Building linux-arm64-clang-bridge-ipv6only
-ninja -C {out}/linux-arm64-clang-bridge-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-bridge-ipv6only'
 
 # Building linux-arm64-clang-chip-tool
-ninja -C {out}/linux-arm64-clang-chip-tool
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-chip-tool'
 
 # Building linux-arm64-clang-chip-tool-ipv6only
-ninja -C {out}/linux-arm64-clang-chip-tool-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-chip-tool-ipv6only'
 
 # Building linux-arm64-clang-chip-tool-nodeps
-ninja -C {out}/linux-arm64-clang-chip-tool-nodeps
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-chip-tool-nodeps'
 
 # Building linux-arm64-clang-chip-tool-nodeps-ipv6only
-ninja -C {out}/linux-arm64-clang-chip-tool-nodeps-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-chip-tool-nodeps-ipv6only'
 
 # Building linux-arm64-clang-light
-ninja -C {out}/linux-arm64-clang-light
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-light'
 
 # Building linux-arm64-clang-light-ipv6only
-ninja -C {out}/linux-arm64-clang-light-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-light-ipv6only'
 
 # Building linux-arm64-clang-light-rpc
-ninja -C {out}/linux-arm64-clang-light-rpc
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-light-rpc'
 
 # Building linux-arm64-clang-light-rpc-ipv6only
-ninja -C {out}/linux-arm64-clang-light-rpc-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-light-rpc-ipv6only'
 
 # Building linux-arm64-clang-lock
-ninja -C {out}/linux-arm64-clang-lock
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-lock'
 
 # Building linux-arm64-clang-lock-ipv6only
-ninja -C {out}/linux-arm64-clang-lock-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-lock-ipv6only'
 
 # Building linux-arm64-clang-minmdns
-ninja -C {out}/linux-arm64-clang-minmdns
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-minmdns'
 
 # Building linux-arm64-clang-minmdns-ipv6only
-ninja -C {out}/linux-arm64-clang-minmdns-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-minmdns-ipv6only'
 
 # Building linux-arm64-clang-ota-provider
-ninja -C {out}/linux-arm64-clang-ota-provider
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-ota-provider'
 
 # Building linux-arm64-clang-ota-provider-ipv6only
-ninja -C {out}/linux-arm64-clang-ota-provider-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-ota-provider-ipv6only'
 
 # Building linux-arm64-clang-ota-provider-nodeps
-ninja -C {out}/linux-arm64-clang-ota-provider-nodeps
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-ota-provider-nodeps'
 
 # Building linux-arm64-clang-ota-provider-nodeps-ipv6only
-ninja -C {out}/linux-arm64-clang-ota-provider-nodeps-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-ota-provider-nodeps-ipv6only'
 
 # Building linux-arm64-clang-ota-requestor
-ninja -C {out}/linux-arm64-clang-ota-requestor
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-ota-requestor'
 
 # Building linux-arm64-clang-ota-requestor-ipv6only
-ninja -C {out}/linux-arm64-clang-ota-requestor-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-ota-requestor-ipv6only'
 
 # Building linux-arm64-clang-ota-requestor-nodeps
-ninja -C {out}/linux-arm64-clang-ota-requestor-nodeps
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-ota-requestor-nodeps'
 
 # Building linux-arm64-clang-ota-requestor-nodeps-ipv6only
-ninja -C {out}/linux-arm64-clang-ota-requestor-nodeps-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-ota-requestor-nodeps-ipv6only'
 
 # Building linux-arm64-clang-python-bindings
-ninja -C {out}/linux-arm64-clang-python-bindings chip-repl
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-python-bindings chip-repl'
 
 # Building linux-arm64-clang-shell
-ninja -C {out}/linux-arm64-clang-shell
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-shell'
 
 # Building linux-arm64-clang-shell-ipv6only
-ninja -C {out}/linux-arm64-clang-shell-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-shell-ipv6only'
 
 # Building linux-arm64-clang-thermostat
-ninja -C {out}/linux-arm64-clang-thermostat
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-thermostat'
 
 # Building linux-arm64-clang-thermostat-ipv6only
-ninja -C {out}/linux-arm64-clang-thermostat-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-thermostat-ipv6only'
 
 # Building linux-arm64-clang-tv-app
-ninja -C {out}/linux-arm64-clang-tv-app
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-tv-app'
 
 # Building linux-arm64-clang-tv-app-ipv6only
-ninja -C {out}/linux-arm64-clang-tv-app-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-tv-app-ipv6only'
 
 # Building linux-arm64-clang-tv-casting-app
-ninja -C {out}/linux-arm64-clang-tv-casting-app
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-tv-casting-app'
 
 # Building linux-arm64-clang-tv-casting-app-ipv6only
-ninja -C {out}/linux-arm64-clang-tv-casting-app-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-clang-tv-casting-app-ipv6only'
 
 # Building linux-fake-tests
 ninja -C {out}/linux-fake-tests check
