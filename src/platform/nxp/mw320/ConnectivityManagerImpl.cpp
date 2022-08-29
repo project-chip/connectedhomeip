@@ -468,8 +468,8 @@ int ConnectivityManagerImpl::_OnWpaInterfaceScanDone(unsigned int count)
             {
                 networkScanned->push_back(network);
             }
-            //else if (network.ssidLen == sInterestedSSIDLen && memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0)
-            else if ((network.ssidLen<<1) == sInterestedSSIDLen && memcmp(hex_ssid.c_str(), sInterestedSSID, sInterestedSSIDLen) == 0)
+            else if (network.ssidLen == sInterestedSSIDLen && memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0)
+            //else if ((network.ssidLen<<1) == sInterestedSSIDLen && memcmp(hex_ssid.c_str(), sInterestedSSID, sInterestedSSIDLen) == 0)
             {
                 networkScanned->push_back(network);
             }
