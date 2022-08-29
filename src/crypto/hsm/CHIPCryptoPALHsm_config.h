@@ -25,7 +25,7 @@
 /*
  * Enable HSM for SPAKE VERIFIER
  */
-#define ENABLE_HSM_SPAKE_VERIFIER 1
+#define ENABLE_HSM_SPAKE_VERIFIER 0
 
 /*
  * Enable HSM for SPAKE PROVER

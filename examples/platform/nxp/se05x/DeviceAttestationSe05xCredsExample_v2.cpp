@@ -166,6 +166,7 @@ CHIP_ERROR ExampleSe05xDACProviderv2::GetFirmwareInformation(MutableByteSpan & o
 CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
                                                                    MutableByteSpan & out_signature_buffer)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -261,13 +262,24 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
 
     if (sign_cert_decl_attest)
     {
-        ReturnErrorOnFailure(se05xPerformInternalSign(CD_DEV_ATTESTATION_KEY_SE05X_ID, signature_se05x, &signature_se05x_len));
+        err = se05xPerformInternalSign(CD_DEV_ATTESTATION_KEY_SE05X_ID, signature_se05x, &signature_se05x_len);
+        se05x_delete_key(CD_ATTEST_NONCE_DATA_SE05X_ID);
+        se05x_delete_key(CD_TIME_STAMP_LEN_SE05X_ID);
+        se05x_delete_key(CD_TIME_STAMP_DATA_SE05X_ID);
+        se05x_delete_key(CD_ATTEST_CHALLENGE_SE05X_ID);
         sign_cert_decl_attest = 0;
     }
     else
     {
-        ReturnErrorOnFailure(se05xPerformInternalSign(NOCSR_DEV_ATTESTATION_KEY_SE05X_ID, signature_se05x, &signature_se05x_len));
+        err = se05xPerformInternalSign(NOCSR_DEV_ATTESTATION_KEY_SE05X_ID, signature_se05x, &signature_se05x_len);
+        se05x_delete_key(NOCSR_CSR_LEN_SE05X_ID);
+        se05x_delete_key(NOCSR_CSR_DATA_SE05X_ID);
+        se05x_delete_key(NOCSR_CSR_NONCE_DATA_SE05X_ID);
+        se05x_delete_key(NOCSR_ATTEST_CHALLENGE_SE05X_ID);
+        sign_cert_decl_attest = 1;
     }
+
+    ReturnErrorOnFailure(err);
 
     return chip::Crypto::EcdsaAsn1SignatureToRaw(chip::Crypto::kP256_FE_Length, ByteSpan{ signature_se05x, signature_se05x_len },
                                                  out_signature_buffer);

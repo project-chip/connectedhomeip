@@ -246,7 +246,7 @@ CHIP_ERROR se05xSetCertificate(uint32_t keyId, const uint8_t * buf, size_t bufle
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     status = sss_key_object_allocate_handle(&keyObject, keyId, kSSS_KeyPart_Default, kSSS_CipherType_Certificate, buflen,
-                                            kKeyObject_Mode_Persistent);
+                                            kKeyObject_Mode_Transient);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, buf, buflen, buflen * 8, NULL, 0);
