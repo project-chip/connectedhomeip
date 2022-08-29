@@ -256,13 +256,13 @@ void UDPEndPointImplLwIP::CloseImpl()
         // event pending in the event queue (SystemLayer::ScheduleLambda), we
         // schedule a release call to the end of the queue, to ensure that the
         // queued pointer to UDPEndPointImplLwIP is not dangling.
-        if (mDelayReleaseCount == 0)
+        if (mDelayReleaseCount != 0)
         {
             Retain();
             CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Release(); });
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Inet, "Unable scedule lambda: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogError(Inet, "Unable to schedule lambda: %" CHIP_ERROR_FORMAT, err.Format());
                 // There is nothing we can do here, accept the chance of racing
                 Release();
             }
@@ -399,6 +399,7 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
 
     CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda(
         [ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
+            ep->mDelayReleaseCount--;
             ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p), pktInfo);
         });
 
@@ -412,10 +413,6 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     else
     {
         ep->mDelayReleaseCount--;
-
-        // If ScheduleLambda() succeeded, `pktInfo` will be deleted in `HandleDataReceived`.
-        // Otherwise we delete it here.
-        Platform::Delete(pktInfo);
     }
 }
 
