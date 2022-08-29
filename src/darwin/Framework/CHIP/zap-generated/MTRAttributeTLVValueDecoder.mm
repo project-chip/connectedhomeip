@@ -10624,8 +10624,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
             return value;
         }
-        case Attributes::ColorTemperature::Id: {
-            using TypeInfo = Attributes::ColorTemperature::TypeInfo;
+        case Attributes::ColorTemperatureMireds::Id: {
+            using TypeInfo = Attributes::ColorTemperatureMireds::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {

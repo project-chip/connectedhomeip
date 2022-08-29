@@ -16283,13 +16283,13 @@ public class ChipClusters {
       subscribeCompensationTextAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readColorTemperatureAttribute(IntegerAttributeCallback callback) {
-      readColorTemperatureAttribute(chipClusterPtr, callback);
+    public void readColorTemperatureMiredsAttribute(IntegerAttributeCallback callback) {
+      readColorTemperatureMiredsAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeColorTemperatureAttribute(
+    public void subscribeColorTemperatureMiredsAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeColorTemperatureAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+      subscribeColorTemperatureMiredsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readColorModeAttribute(IntegerAttributeCallback callback) {
@@ -16904,10 +16904,10 @@ public class ChipClusters {
         int minInterval,
         int maxInterval);
 
-    private native void readColorTemperatureAttribute(
+    private native void readColorTemperatureMiredsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-    private native void subscribeColorTemperatureAttribute(
+    private native void subscribeColorTemperatureMiredsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readColorModeAttribute(

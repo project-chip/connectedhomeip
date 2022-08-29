@@ -4954,7 +4954,7 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000007: {
-                    "attributeName": "ColorTemperature",
+                    "attributeName": "ColorTemperatureMireds",
                     "attributeId": 0x00000007,
                     "type": "int",
                     "reportable": True,

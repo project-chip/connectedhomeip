@@ -3046,9 +3046,9 @@ namespace CompensationText {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace CompensationText
 
-namespace ColorTemperature {
+namespace ColorTemperatureMireds {
 static constexpr AttributeId Id = 0x00000007;
-} // namespace ColorTemperature
+} // namespace ColorTemperatureMireds
 
 namespace ColorMode {
 static constexpr AttributeId Id = 0x00000008;

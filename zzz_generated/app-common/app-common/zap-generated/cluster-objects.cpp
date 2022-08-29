@@ -14682,8 +14682,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::CompensationText::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, compensationText));
         break;
-    case Attributes::ColorTemperature::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperature));
+    case Attributes::ColorTemperatureMireds::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMireds));
         break;
     case Attributes::ColorMode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, colorMode));

@@ -12949,11 +12949,11 @@ using chip::SessionHandle;
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeColorTemperatureWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeColorTemperatureMiredsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorTemperatureID)
+                                        attributeID:@(MTRClusterColorControlAttributeColorTemperatureMiredsID)
                                              params:params];
 }
 
