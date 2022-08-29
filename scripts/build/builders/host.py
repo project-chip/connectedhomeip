@@ -286,7 +286,6 @@ class HostBuilder(GnBuilder):
                 raise Exception('Address policy applies to minmdns only')
             self.extra_gn_options.append('chip_minmdns_default_policy="%s"' % minmdns_address_policy)
 
-
         if use_platform_mdns:
             self.extra_gn_options.append('chip_mdns="platform"')
 
