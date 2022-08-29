@@ -195,10 +195,10 @@ struct ChipRDN
     bool IsEmpty() const { return mAttrOID == chip::ASN1::kOID_NotSpecified; }
     void Clear()
     {
-        mAttrOID = chip::ASN1::kOID_NotSpecified;
+        mAttrOID               = chip::ASN1::kOID_NotSpecified;
         mAttrIsPrintableString = false;
-        mChipVal = 0;
-        mString = CharSpan{};
+        mChipVal               = 0;
+        mString                = CharSpan{};
     }
 };
 
