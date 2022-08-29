@@ -489,19 +489,13 @@ void DeviceCommissioner::Shutdown()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-    // If we have a commissionee device for the device being commissioned,
-    // release it now, before we release our whole commissionee pool.
-    if (mDeviceBeingCommissioned != nullptr)
-    {
-        auto * commissionee = FindCommissioneeDevice(mDeviceBeingCommissioned->GetDeviceId());
-        if (commissionee)
-        {
-            ReleaseCommissioneeDevice(commissionee);
-        }
-    }
-
-    // Release everything from the commissionee device pool here. DeviceController::Shutdown releases operational.
-    mCommissioneeDevicePool.ReleaseAll();
+    // Release everything from the commissionee device pool here.
+    // Make sure to use ReleaseCommissioneeDevice so we don't keep dangling
+    // pointers to the device objects.
+    mCommissioneeDevicePool.ForEachActiveObject([this](auto * commissioneeDevice) {
+        ReleaseCommissioneeDevice(commissioneeDevice);
+        return Loop::Continue;
+    });
 
     DeviceController::Shutdown();
 }
@@ -539,8 +533,6 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(const Trans
 
 void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device)
 {
-    // TODO: Call CloseSession here see #16440 and #16805 (blocking)
-
 #if CONFIG_NETWORK_LAYER_BLE
     if (mSystemState->BleLayer() != nullptr && device->GetDeviceTransportType() == Transport::Type::kBle)
     {
@@ -559,6 +551,11 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
     {
         mDeviceBeingCommissioned = nullptr;
     }
+
+    // Release the commissionee device after we have nulled out our pointers,
+    // because that can call back in to us with error notifications as the
+    // session is released.
+    mCommissioneeDevicePool.ReleaseObject(device);
 }
 
 CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** out_device)
