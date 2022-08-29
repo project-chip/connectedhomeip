@@ -71,6 +71,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 static NSString * const kErrorGenerateNOC = @"Generating operational certificate failed";
 static NSString * const kErrorKeyAllocation = @"Generating new operational key failed";
 static NSString * const kErrorCSRValidation = @"Extracting public key from CSR failed";
+static NSString * const kErrorGetCommissionee = @"Failure obtaining device being commissioned"
+static NSString * const kErrorGetAttestationChallenge = @"Failure getting attestation challenge"
 
 @interface MTRDeviceController ()
 
@@ -705,30 +707,25 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
 - (nullable NSData *)generateAttestationChallengeForDeviceId:(uint64_t)deviceId
 {
-    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-    if (![self isRunning]) {
-        [self checkForError:errorCode logMsg:kErrorNotRunning error:nil];
-        return nil;
-    }
+    VerifyOrReturn([self checkIsRunning], nil);
 
     __block NSData * attestationChallenge;
     dispatch_sync(_chipWorkQueue, ^{
-        if ([self isRunning]) {
-            chip::CommissioneeDeviceProxy * deviceProxy;
-            errorCode = self.cppCommissioner->GetDeviceBeingCommissioned(deviceId, &deviceProxy);
-            if (errorCode != CHIP_NO_ERROR) {
-                [self checkForError:errorCode logMsg:@"Invalid Attestation Challenge device ID." error:nil];
-                return;
-            }
+        VerifyOrReturn([self checkIsRunning]);
 
-            NSMutableData * challengeBuffer = [[NSMutableData alloc] initWithLength:chip::Crypto::kAES_CCM128_Key_Length];
-            chip::ByteSpan challenge((uint8_t *) [challengeBuffer mutableBytes], chip::Crypto::kAES_CCM128_Key_Length);
+        chip::CommissioneeDeviceProxy * deviceProxy;
+        errorCode = self.cppCommissioner->GetDeviceBeingCommissioned(deviceId, &deviceProxy);
+        auto success = ![self checkForError:errorCode logMsg:kErrorGetCommissionee error:nil];
+        VerifyOrReturn(success);
 
-            errorCode = deviceProxy->GetAttestationChallenge(challenge);
-            MTR_LOG_ERROR("GetAttestationChallenge: %s", chip::ErrorStr(errorCode));
+        uint8_t challengeBuffer[chip::Crypto::kAES_CCM128_Key_Length];
+        chip::ByteSpan challenge(challengeBuffer);
 
-            attestationChallenge = [NSData dataWithBytes:challenge.data() length:challenge.size()];
-        }
+        errorCode = deviceProxy->GetAttestationChallenge(challenge);
+        success = ![self checkForError:errorCode logMsg:kErrorGetAttestationChallenge error:nil];
+        VerifyOrReturn(success);
+
+        attestationChallenge = AsData(challenge);
     });
 
     return attestationChallenge;
