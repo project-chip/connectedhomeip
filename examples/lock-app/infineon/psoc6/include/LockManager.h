@@ -30,6 +30,24 @@
 
 #include <lib/core/CHIPError.h>
 
+struct WeekDaysScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockWeekDaySchedule schedule;
+};
+
+struct YearDayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockYearDaySchedule schedule;
+};
+
+struct HolidayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockHolidaySchedule schedule;
+};
+
 namespace P6DoorLock {
 namespace ResourceRanges {
 // Used to size arrays
@@ -187,9 +205,9 @@ private:
 
     EmberAfPluginDoorLockUserInfo mLockUsers[kMaxUsers];
     EmberAfPluginDoorLockCredentialInfo mLockCredentials[kMaxCredentials];
-    EmberAfPluginDoorLockWeekDaySchedule mWeekdaySchedule[kMaxUsers][kMaxWeekdaySchedulesPerUser];
-    EmberAfPluginDoorLockYearDaySchedule mYeardaySchedule[kMaxUsers][kMaxYeardaySchedulesPerUser];
-    EmberAfPluginDoorLockHolidaySchedule mHolidaySchedule[kMaxHolidaySchedules];
+    WeekDaysScheduleInfo mWeekdaySchedule[kMaxUsers][kMaxWeekdaySchedulesPerUser];
+    YearDayScheduleInfo mYeardaySchedule[kMaxUsers][kMaxYeardaySchedulesPerUser];
+    HolidayScheduleInfo mHolidaySchedule[kMaxHolidaySchedules];
 
     char mUserNames[ArraySize(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
     uint8_t mCredentialData[kMaxCredentials][kMaxCredentialSize];

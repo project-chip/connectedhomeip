@@ -131,8 +131,8 @@ tests:
       attribute: "ColorTemperature"
       response:
           constraints:
-              minValue: 280
-              maxValue: 300
+              minValue: 275
+              maxValue: 305
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -148,8 +148,8 @@ tests:
       attribute: "ColorTemperature"
       response:
           constraints:
-              minValue: 260
-              maxValue: 280
+              minValue: 255
+              maxValue: 285
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -166,7 +166,7 @@ tests:
       response:
           constraints:
               minValue: 250
-              maxValue: 260
+              maxValue: 280
 
     - label: "Wait 5s"
       cluster: "DelayCommands"

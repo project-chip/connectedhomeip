@@ -25,19 +25,6 @@ steps:
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
-          - "-c"
-          - ./scripts/checkout_submodules.py --shallow --recursive --platform efr32
-      id: Checkout EFR32
-      entrypoint: /usr/bin/bash
-      volumes:
-          - name: pwenv
-            path: /pwenv
-      timeout: 900s
-
-    - name: "connectedhomeip/chip-build-vscode:0.5.91"
-      env:
-          - PW_ENVIRONMENT_ROOT=/pwenv
-      args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
               --target-glob '*' --skip-target-glob

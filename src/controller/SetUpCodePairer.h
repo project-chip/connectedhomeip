@@ -51,6 +51,7 @@ class DeviceCommissioner;
 enum class SetupCodePairerBehaviour : uint8_t
 {
     kCommission,
+    kCommissionOnNetwork,
     kPaseOnly,
 };
 

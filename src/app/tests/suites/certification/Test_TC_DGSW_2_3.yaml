@@ -39,7 +39,7 @@ tests:
     - label: "Reads a list of ThreadMetrics struct attribute from DUT."
       command: "readAttribute"
       attribute: "ThreadMetrics"
-      PICS: DGSW.S.A0001
+      PICS: DGSW.S.A0000
       response:
           constraints:
               type: list

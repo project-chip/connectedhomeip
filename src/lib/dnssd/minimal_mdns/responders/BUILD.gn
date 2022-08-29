@@ -31,6 +31,7 @@ static_library("responders") {
   public_deps = [
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/dnssd/minimal_mdns:address_policy",
     "${chip_root}/src/lib/dnssd/minimal_mdns/core",
     "${chip_root}/src/lib/dnssd/minimal_mdns/records",
     "${chip_root}/src/platform",

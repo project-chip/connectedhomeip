@@ -122,10 +122,12 @@ int SilabsLCD::Update(void)
 
 void SilabsLCD::WriteDemoUI(bool state)
 {
+#ifdef QR_CODE_ENABLED
     if (mShowQRCode)
     {
         mShowQRCode = false;
     }
+#endif
     dState.mainState = state;
     WriteDemoUI();
 }

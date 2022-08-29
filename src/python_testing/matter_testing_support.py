@@ -147,7 +147,7 @@ class MatterTestConfig:
     # Node ID to use for controller/commissioner
     controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
     # CAT Tags for default controller/commissioner
-    controller_cat_tags: List[int] = None
+    controller_cat_tags: List[int] = field(default_factory=list)
 
     # Fabric ID which to use
     fabric_id: int = None

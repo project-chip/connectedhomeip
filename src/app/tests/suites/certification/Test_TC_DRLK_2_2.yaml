@@ -33,7 +33,7 @@ tests:
 
     - label: "Create new user"
       command: "SetUser"
-      timedInteractionTimeoutMs: 10000
+      timedInteractionTimeoutMs: 1000
       arguments:
           values:
               - name: "operationType"
@@ -82,7 +82,7 @@ tests:
 
     - label: "Create new PIN credential and lock/unlock user"
       command: "SetCredential"
-      timedInteractionTimeoutMs: 10000
+      timedInteractionTimeoutMs: 1000
       arguments:
           values:
               - name: "operationType"
@@ -155,22 +155,22 @@ tests:
     - label: "TH sends Lock Door Command to the DUT without PINCode"
       PICS: DRLK.S.C00.Rsp
       command: "LockDoor"
-      timedInteractionTimeoutMs: 10000
+      timedInteractionTimeoutMs: 1000
       response:
           error: 0x00
 
     - label: "TH sends Lock Door Command to the DUT with valid PINCode"
       PICS: DRLK.S.C00.Rsp
       command: "LockDoor"
-      timedInteractionTimeoutMs: 10000
+      timedInteractionTimeoutMs: 1000
       arguments:
           values:
               - name: "pinCode"
                 value: "123456"
 
     - label:
-          "TH writes the RequirePINforRemoteOperation attribute value as True on
-          the DUT"
+          "TH writes the RequirePINforRemoteOperation attribute value as False
+          on the DUT"
       PICS: DRLK.S.A0033
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
@@ -178,8 +178,8 @@ tests:
           value: true
 
     - label:
-          "TH writes the RequirePINforRemoteOperation attribute value as True on
-          the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
+          "TH writes the RequirePINforRemoteOperation attribute value as False
+          on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
       PICS: "!DRLK.S.A0033"
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
@@ -198,7 +198,7 @@ tests:
     - label: "TH sends Lock Door Command to the DUT with valid PINCode"
       PICS: DRLK.S.C00.Rsp && DRLK.S.A0033
       command: "LockDoor"
-      timedInteractionTimeoutMs: 10000
+      timedInteractionTimeoutMs: 1000
       arguments:
           values:
               - name: "pinCode"
@@ -207,7 +207,7 @@ tests:
     - label: "TH sends Lock Door Command to the DUT without valid PINCode"
       PICS: DRLK.S.C00.Rsp && DRLK.S.A0033
       command: "LockDoor"
-      timedInteractionTimeoutMs: 10000
+      timedInteractionTimeoutMs: 1000
       arguments:
           values:
               - name: "pinCode"
@@ -219,13 +219,41 @@ tests:
           "TH sends Lock Door Command to the DUT without any argument PINCode"
       PICS: DRLK.S.C00.Rsp && DRLK.S.A0033
       command: "LockDoor"
-      timedInteractionTimeoutMs: 10000
+      timedInteractionTimeoutMs: 1000
       response:
           error: FAILURE
 
+    - label: "TH reads the WrongCodeEntryLimit attribute from the DUT"
+      PICS: DRLK.S.A0030
+      command: "readAttribute"
+      attribute: "WrongCodeEntryLimit"
+      constraints:
+          minValue: 1
+          maxValue: 255
+
+    - label: "TH sends the unlock Door command to the DUT with invalid PINCode"
+      PICS: DRLK.S.A0030
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "1234568"
+      response:
+          error: FAILURE
+
+    - label: "TH sends the unlock Door command to the DUT with valid PINCode"
+      PICS: DRLK.S.A0030
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "123456"
+
     - label:
-          "TH writes WrongCodeEntryLimit attribute value as 3 on the DUT and
-          Verify that the DUT sends Success response"
+          "TH writes WrongCodeEntryLimit attribute value as between 1 and 255 on
+          the DUT and Verify that the DUT sends Success response"
       PICS: DRLK.S.A0030
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
@@ -233,8 +261,8 @@ tests:
           value: 3
 
     - label:
-          "TH writes WrongCodeEntryLimit attribute value as 3 on the DUT and
-          verify DUT responds with UNSUPPORTED_WRITE"
+          "TH writes WrongCodeEntryLimit attribute value as between 1 and 255 on
+          the DUT and verify DUT responds with UNSUPPORTED_WRITE"
       PICS: "!DRLK.S.A0030"
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
@@ -243,9 +271,17 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
+    - label: "TH reads the UserCodeTemporaryDisableTime attribute from the DUT"
+      PICS: DRLK.S.A0031
+      command: "readAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      constraints:
+          minValue: 1
+          maxValue: 255
+
     - label:
-          "TH writes UserCodeTemporaryDisableTime attribute value as 15 seconds
-          on the DUT and Verify that the DUT send the Success response"
+          "TH writes UserCodeTemporaryDisableTime attribute value as between 1
+          and 255 on the DUT and Verify that the DUT sends Success response"
       PICS: DRLK.S.A0031
       command: "writeAttribute"
       attribute: "UserCodeTemporaryDisableTime"
@@ -253,8 +289,8 @@ tests:
           value: 15
 
     - label:
-          "TH writes UserCodeTemporaryDisableTime attribute value as 15 seconds
-          on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
+          "TH writes UserCodeTemporaryDisableTime attribute value as between 1
+          and 255 on the DUT and verify DUT responds with UNSUPPORTED_WRITE"
       PICS: "!DRLK.S.A0031"
       command: "writeAttribute"
       attribute: "UserCodeTemporaryDisableTime"
@@ -263,93 +299,9 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH sends Lock Door Command to the DUT with invalid PINCode"
-      PICS: DRLK.S.C00.Rsp
-      command: "LockDoor"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "pinCode"
-                value: "123458"
-      response:
-          error: FAILURE
-
-    - label: "TH sends Lock Door Command to the DUT with invalid PINCode"
-      PICS: DRLK.S.C00.Rsp
-      command: "LockDoor"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "pinCode"
-                value: "123458"
-      response:
-          error: FAILURE
-
-    - label: "TH sends Lock Door Command to the DUT with invalid PINCode"
-      PICS: DRLK.S.C00.Rsp
-      command: "LockDoor"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "pinCode"
-                value: "123458"
-      response:
-          error: FAILURE
-
-    - label: "TH sends Lock Door Command to the DUT with invalid PINCode"
-      PICS: DRLK.S.C00.Rsp
-      command: "LockDoor"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "pinCode"
-                value: "123458"
-      response:
-          error: FAILURE
-
-    - label:
-          "TH reads UserCodeTemporaryDisableTime attribute from DUT and After
-          sending 3 failure responses verify that UserCodeTemporaryDisableTime
-          attribute is triggered"
-      verification: |
-          ./chip-tool doorlock read user-code-temporary-disable-time 1 1
-
-          On TH, verify the  UserCodeTemporaryDisableTime value as 15
-
-          [1657867358.396037][2551:2556] CHIP:DMG:
-          [1657867358.396067][2551:2556] CHIP:DMG:        SuppressResponse = true,
-          [1657867358.396099][2551:2556] CHIP:DMG:        InteractionModelRevision = 1
-          [1657867358.396129][2551:2556] CHIP:DMG: }
-          [1657867358.396286][2551:2556] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0031 DataVersion: 2082875948
-          [1657867358.396378][2551:2556] CHIP:TOO:   UserCodeTemporaryDisableTime: 15
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DRLK.S.A0031
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label:
-          "TH sends Lock Command to the DUT with valid PINCode before
-          UserCodeTemporaryDisableTime attribute time expires"
-      verification: |
-          Verify that DUT sends failure response to the TH
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DRLK.S.C00.Rsp
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
     - label: "Clean the created user"
       command: "ClearUser"
-      timedInteractionTimeoutMs: 10000
+      timedInteractionTimeoutMs: 1000
       arguments:
           values:
               - name: "userIndex"
@@ -358,7 +310,7 @@ tests:
     - label: "Cleanup the created credential"
       PICS: DRLK.S.C26.Rsp
       command: "ClearCredential"
-      timedInteractionTimeoutMs: 10000
+      timedInteractionTimeoutMs: 1000
       arguments:
           values:
               - name: "credential"
