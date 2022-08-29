@@ -571,7 +571,16 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * se
         return CHIP_ERROR_INCORRECT_STATE;
     }
     ReturnErrorOnFailure(mDefaultCommissioner->SetCommissioningParameters(params));
-    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission);
+
+    auto threadCredentials = params.GetThreadOperationalDataset();
+    auto wiFiCredentials   = params.GetWiFiCredentials();
+    bool hasCredentials    = threadCredentials.HasValue() || wiFiCredentials.HasValue();
+
+    // If there is no network credentials, we assume that the pairing command as been issued to pair with a
+    // device that is already on the network.
+    auto pairerBehaviour = hasCredentials ? SetupCodePairerBehaviour::kCommission : SetupCodePairerBehaviour::kCommissionOnNetwork;
+
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, pairerBehaviour);
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode)

@@ -1,0 +1,239 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    19.1.1. [TC-SC-5.1] Adding member to a group - TH as Admin and DUT as Group
+    Member
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      verification: |
+          Group Member is commissioned with Admin
+
+          DUT will set TestGroupEndpoint
+      disabled: true
+
+    - label: "TH writes ACL entry by setting AuthMode as Group to DUT"
+      verification: |
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]" 1 0
+
+          Verify success response on the TH Log:
+
+          [1652330385.328196][3240:3245] CHIP:DMG:                        StatusIB =
+          [1652330385.328229][3240:3245] CHIP:DMG:                        {
+          [1652330385.328264][3240:3245] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1652330385.328298][3240:3245] CHIP:DMG:                        },
+      disabled: true
+
+    - label:
+          "Admin generates fabric-unique GroupID, GroupName, random key,
+          EpochKey0 and GroupKeySetID. Admin sets GroupKeySecurityPolicy =
+          TrustFirst (1) GroupKeyMulticastPolicy = PerGroupID (0)
+          EpochStartTime0 = 0"
+      verification: |
+          As Admin generates it is not required to verify
+      disabled: true
+
+    - label:
+          "Admin sends KeySetWrite command to GroupKeyManagement cluster to DUT
+          on PIXIT.G.ENDPOINT"
+      verification: |
+          ./chip-tool groupkeymanagement key-set-write "{"groupKeySetID": 42,
+          "groupKeySecurityPolicy": 0, "epochKey0":
+          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
+          "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }" 1 0
+
+          Verify success response on the TH Log:
+
+          [1650610345.847233][2626:2631] CHIP:DMG:
+          [1650610345.847274][2626:2631] CHIP:DMG:                                StatusIB =
+          [1650610345.847317][2626:2631] CHIP:DMG:                                {
+          [1650610345.847383][2626:2631] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1650610345.847429][2626:2631] CHIP:DMG:                                },
+          [1650610345.847477][2626:2631] CHIP:DMG:
+      disabled: true
+
+    - label:
+          "Admin binds GroupId with GroupKeySetID in the GroupKeyMap attribute
+          list on GroupKeyManagement cluster"
+      verification: |
+          ./chip-tool groupkeymanagement write group-key-map "[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]" 1 0
+
+          Verify success response on the TH Log:
+
+          [1652352019.875893][2552:2557] CHIP:DMG: WriteResponseMessage =
+          [1652352019.875922][2552:2557] CHIP:DMG: {
+          [1652352019.875946][2552:2557] CHIP:DMG:        AttributeStatusIBs =
+          [1652352019.875981][2552:2557] CHIP:DMG:        [
+          [1652352019.876008][2552:2557] CHIP:DMG:                AttributeStatusIB =
+          [1652352019.876041][2552:2557] CHIP:DMG:                {
+          [1652352019.876070][2552:2557] CHIP:DMG:                        AttributePathIB =
+          [1652352019.876104][2552:2557] CHIP:DMG:                        {
+          [1652352019.876143][2552:2557] CHIP:DMG:                                Endpoint = 0x0,
+          [1652352019.876183][2552:2557] CHIP:DMG:                                Cluster = 0x3f,
+          [1652352019.876225][2552:2557] CHIP:DMG:                                Attribute = 0x0000_0000,
+          [1652352019.876263][2552:2557] CHIP:DMG:                        }
+          [1652352019.876303][2552:2557] CHIP:DMG:
+          [1652352019.876337][2552:2557] CHIP:DMG:                        StatusIB =
+          [1652352019.876375][2552:2557] CHIP:DMG:                        {
+          [1652352019.876414][2552:2557] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1652352019.876450][2552:2557] CHIP:DMG:                        },
+          [1652352019.876489][2552:2557] CHIP:DMG:
+          [1652352019.876519][2552:2557] CHIP:DMG:                },
+          [1652352019.876562][2552:2557] CHIP:DMG:
+          [1652352019.876590][2552:2557] CHIP:DMG:                AttributeStatusIB =
+          [1652352019.876622][2552:2557] CHIP:DMG:                {
+          [1652352019.876652][2552:2557] CHIP:DMG:                        AttributePathIB =
+          [1652352019.876690][2552:2557] CHIP:DMG:                        {
+          [1652352019.876728][2552:2557] CHIP:DMG:                                Endpoint = 0x0,
+          [1652352019.876768][2552:2557] CHIP:DMG:                                Cluster = 0x3f,
+          [1652352019.876809][2552:2557] CHIP:DMG:                                Attribute = 0x0000_0000,
+          [1652352019.876849][2552:2557] CHIP:DMG:                                ListIndex = Null,
+          [1652352019.876885][2552:2557] CHIP:DMG:                        }
+          [1652352019.876923][2552:2557] CHIP:DMG:
+          [1652352019.876961][2552:2557] CHIP:DMG:                        StatusIB =
+          [1652352019.876995][2552:2557] CHIP:DMG:                        {
+          [1652352019.877029][2552:2557] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1652352019.877077][2552:2557] CHIP:DMG:                        },
+          [1652352019.877132][2552:2557] CHIP:DMG:
+          [1652352019.877179][2552:2557] CHIP:DMG:                },
+          [1652352019.877224][2552:2557] CHIP:DMG:
+          [1652352019.877262][2552:2557] CHIP:DMG:        ],
+          [1652352019.877339][2552:2557] CHIP:DMG:
+          [1652352019.877381][2552:2557] CHIP:DMG:        InteractionModelRevision = 1
+          [1652352019.877419][2552:2557] CHIP:DMG: }
+      disabled: true
+
+    - label:
+          "Admin sends AddGroup Command to DUT with the GroupID set by Admin on
+          PIXIT.SC.ENDPOINT"
+      verification: |
+          ./chip-tool groups add-group 0x0001 grp1 1 1
+
+          Verify AddGroupResponse on the TH Log:
+
+          [1651218084.427102][2526:2531] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
+          [1651218084.427203][2526:2531] CHIP:TOO:   AddGroupResponse: {
+          [1651218084.427241][2526:2531] CHIP:TOO:     status: 0
+          [1651218084.427264][2526:2531] CHIP:TOO:     groupId: 1
+          [1651218084.427314][2526:2531] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Admin sends ViewGroup command with the GroupID to the Group cluster
+          on the DUT on PIXIT.SC.ENDPOINT"
+      verification: |
+          ./chip-tool groups view-group 0x0001 1 1
+
+          Verify  ViewGroupResponse on the TH Log:
+
+          [1651218576.149152][2635:2640] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
+          [1651218576.149231][2635:2640] CHIP:TOO:   ViewGroupResponse: {
+          [1651218576.149265][2635:2640] CHIP:TOO:     status: 0
+          [1651218576.149289][2635:2640] CHIP:TOO:     groupId: 1
+          [1651218576.149311][2635:2640] CHIP:TOO:     groupName: grp1
+          [1651218576.149335][2635:2640] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Admin sends KeySetRead Command to DUT"
+      verification: |
+          ./chip-tool groupkeymanagement key-set-read 42 1 0
+
+          Verify KeySetReadResponse on the TH Log:
+
+          [1650610759.578043][2739:2744] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003F Command=0x0000_0002
+          [1650610759.578099][2739:2744] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Command 0x0000_0002
+          [1650610759.578220][2739:2744] CHIP:TOO:   KeySetReadResponse: {
+          [1650610759.578251][2739:2744] CHIP:TOO:     groupKeySet: {
+          [1650610759.578291][2739:2744] CHIP:TOO:       GroupKeySetID: 42
+          [1650610759.578334][2739:2744] CHIP:TOO:       GroupKeySecurityPolicy: 0
+          [1650610759.578363][2739:2744] CHIP:TOO:       EpochKey0: null
+          [1650610759.578391][2739:2744] CHIP:TOO:       EpochStartTime0: 2220000
+          [1650610759.578418][2739:2744] CHIP:TOO:       EpochKey1: null
+          [1650610759.578445][2739:2744] CHIP:TOO:       EpochStartTime1: 2220001
+          [1650610759.578472][2739:2744] CHIP:TOO:       EpochKey2: null
+          [1650610759.578498][2739:2744] CHIP:TOO:       EpochStartTime2: 2220002
+          [1650610759.578527][2739:2744] CHIP:TOO:      }
+          [1650610759.578553][2739:2744] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "TH reads GroupKeyMap Attribute from the GroupKeyManagement cluster
+          from DUT"
+      verification: |
+          ./chip-tool groupkeymanagement read group-key-map 1 0
+
+          Verify  GroupKeyMapStruct on the TH Log:
+
+          1652429573.936605][2883:2888] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0000 DataVersion: 75110822
+          [1652429573.936744][2883:2888] CHIP:TOO:   GroupKeyMap: 1 entries
+          [1652429573.936819][2883:2888] CHIP:TOO:     [1]: {
+          [1652429573.936860][2883:2888] CHIP:TOO:       GroupId: 1
+          [1652429573.936896][2883:2888] CHIP:TOO:       GroupKeySetID: 42
+          [1652429573.936932][2883:2888] CHIP:TOO:       FabricIndex: 1
+          [1652429573.936969][2883:2888] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "TH reads GroupTable attribute from GroupKeyManagement cluster on DUT."
+      verification: |
+          ./chip-tool groupkeymanagement read group-table 1 0
+
+          Verify  GroupTable on the TH Log:
+
+          [1655965817.917300][3012:3017] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1208492408
+          [1655965817.917408][3012:3017] CHIP:TOO:   GroupTable: 1 entries
+          [1655965817.917506][3012:3017] CHIP:TOO:     [1]: {
+          [1655965817.917559][3012:3017] CHIP:TOO:       GroupId: 1
+          [1655965817.917600][3012:3017] CHIP:TOO:       Endpoints: 2 entries
+          [1655965817.917642][3012:3017] CHIP:TOO:         [1]: 0
+          [1655965817.917680][3012:3017] CHIP:TOO:         [2]: 1
+          [1655965817.917718][3012:3017] CHIP:TOO:       GroupName: grp1
+          [1655965817.917752][3012:3017] CHIP:TOO:       FabricIndex: 1
+          [1655965817.917784][3012:3017] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Configure the TH for sending Group message Add the group that was
+          created in step 3 to the client side Add the keysets with the
+          GroupKeySetID from the step 2 for the client side Bind the
+          GroupKeySetID with the GroupID created View the GroupID, GroupName and
+          GroupKeySetID which is binded for sending the Group message"
+      verification: |
+          ./chip-tool groupsettings add-group grp1 0x0001
+
+          ./chip-tool groupsettings add-keysets 0x0042 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
+
+          ./chip-tool groupsettings bind-keyset 0x0001 0x0042
+
+          ./chip-tool groupsettings show-groups
+
+          Verify groups on the TH Log:
+
+            +-------------------------------------------------------------------------------------+
+            | Available Groups :                                                                  |
+            +-------------------------------------------------------------------------------------+
+            | Group Id   |  KeySet Id     |   Group Name                                          |
+            | 0x101           0x1a1            Group #1                                           |
+            | 0x102           0x1a2            Group #2                                           |
+            | 0x1               0x42              grp1                                                   |
+            +-------------------------------------------------------------------------------------+
+      disabled: true

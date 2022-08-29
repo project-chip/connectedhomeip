@@ -99,8 +99,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 22500
-              maxValue: 27500
+              minValue: 21250
+              maxValue: 28750
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -116,8 +116,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 27500
-              maxValue: 32500
+              minValue: 25500
+              maxValue: 34500
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -149,8 +149,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 34000
-              maxValue: 36500
+              minValue: 30000
+              maxValue: 40250
 
     - label: "Wait 2s"
       cluster: "DelayCommands"
@@ -167,8 +167,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 34500
-              maxValue: 36500
+              minValue: 30000
+              maxValue: 40250
 
     - label:
           "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=25000,
@@ -226,8 +226,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 17500
-              maxValue: 22500
+              minValue: 17000
+              maxValue: 23000
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -243,8 +243,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 12500
-              maxValue: 17500
+              minValue: 12750
+              maxValue: 17250
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -276,8 +276,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 7500
-              maxValue: 12500
+              minValue: 8500
+              maxValue: 11500
 
     - label: "Wait 2s"
       cluster: "DelayCommands"
@@ -294,8 +294,8 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 7500
-              maxValue: 12500
+              minValue: 8500
+              maxValue: 11500
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008

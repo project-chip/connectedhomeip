@@ -638,9 +638,9 @@ tests:
 
           TH all-clusters-minimal-app does not support optional attributes
           To verify this behaviour send the below mentioned commands and check the result as unsupported attribute
-          ./chip-tool levelcontrol write on-off-transition-time 5 1 1
-          ./chip-tool levelcontrol write on-transition-time 5 1 1
-          ./chip-tool levelcontrol write off-transition-time 5 1 1
-          ./chip-tool levelcontrol write default-move-rate 5 1 1
-          ./chip-tool levelcontrol write start-up-current-level 5 1 1
+           ./chip-tool levelcontrol write on-off-transition-time 5 1 1
+           ./chip-tool levelcontrol write on-transition-time 5 1 1
+           ./chip-tool levelcontrol write off-transition-time 5 1 1
+           ./chip-tool levelcontrol write default-move-rate 5 1 1
+           ./chip-tool levelcontrol write start-up-current-level 5 1 1
       disabled: true

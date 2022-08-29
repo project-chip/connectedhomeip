@@ -1,0 +1,62 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 19.1.2. [TC-SC-5.2] Receiving a group message - TH to DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      verification: |
+          DUT and TH are commissioned.
+
+          DUT and TH are part of a common group.- Run TC-SC-5.1 to establish this precondition
+
+          DUT supports the Identify cluster
+      disabled: true
+
+    - label: "TH writes ACL entry by setting AuthMode as Group to DUT"
+      verification: |
+          As this step is executed in the TC-SC-5.1, we can skip this step during execution.
+      disabled: true
+
+    - label:
+          "TH sends a multicast Identify command with the IdentifyTime set to
+          0x0078 (120s) to DUT with GroupID and PIXIT.SC.ENDPOINT"
+      PICS: I.S.C00.Rsp
+      verification: |
+          ./chip-tool identify identify 0x0078 0xffffffffffff0001 1
+
+          Verify command send  to group on the TH Log:
+
+          [1657785273.973231][1618:1623] CHIP:DL: HandlePlatformSpecificBLEEvent 32784[1657785273.973291][1618:1623] CHIP:TOO: Sending command to group 0x1
+          [1657785273.973316][1618:1623] CHIP:TOO: Sending cluster (0x00000003) command (0x00000000) on Group 1
+      disabled: true
+
+    - label:
+          "TH reads immediately IdentifyTime attribute from DUT on the
+          PIXIT.SC.ENDPOINT set by DUT"
+      PICS: I.S.A0000
+      verification: |
+          ./chip-tool identify read identify-time 1 1
+
+          Verify   identify time ,on the TH Log:
+
+          [1657785288.647504][1624:1629] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 1130139861
+          [1657785288.647621][1624:1629] CHIP:TOO:   identify time: 106
+      disabled: true

@@ -128,7 +128,7 @@ tests:
           "TH sends a MoveToLevel command to the DUT with Level = 200 and
           TransitionTime = 300 (30 s). This means the level should increase by
           150 units in 30s, so 5 units/s"
-      PICS: LVL.S.C00.Rsp && LVL.S.M.VarRate
+      PICS: LVL.S.C00.Rsp
       command: "MoveToLevel"
       arguments:
           values:

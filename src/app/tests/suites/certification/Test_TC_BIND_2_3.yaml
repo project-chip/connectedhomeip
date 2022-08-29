@@ -60,7 +60,7 @@ tests:
 
     - label: "TH1 enables DUT as Controller"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "Commission TH2 to TH1s fabric (Node ID = 2)"
@@ -238,7 +238,7 @@ tests:
 
     - label: "TH1 sets up group settings on DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:

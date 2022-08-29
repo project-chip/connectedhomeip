@@ -492,12 +492,9 @@ void DefaultOTARequestor::OnConnectionFailure(void * context, const ScopedNodeId
     switch (requestorCore->mOnConnectedAction)
     {
     case kQueryImage:
-        requestorCore->RecordErrorUpdateState(error);
-        break;
     case kDownload:
-        requestorCore->RecordErrorUpdateState(error);
-        break;
     case kApplyUpdate:
+    case kNotifyUpdateApplied:
         requestorCore->RecordErrorUpdateState(error);
         break;
     default:

@@ -1370,9 +1370,9 @@ tests:
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write 40 0 1 1
+          ./chip-tool doorlock write-by-id 40 0 1 1
 
-          Verify "DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
+          Verify "DUT responds with UNSUPPORTED_ATTRIBUTE" on the TH(Chip-tool) Log:
 
           [1653637444.331118][3599:3604] CHIP:DMG:                        StatusIB =
           [1653637444.331165][3599:3604] CHIP:DMG:                        {

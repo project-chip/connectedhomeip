@@ -26,6 +26,14 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Pre-Conditions"
+      verification: |
+          1. PAI, DAC certificates are obtained and validated against externally obtained PAA certificate
+          2. This test case assumes that during Commissioning AddNOC will be sent with ICACValue
+          3. TH2 is set up with at least one valid CASE Authenticated Tag specified in its NOC, saved as CAT_TH2
+          4. Read SupportedFabrics attributes from the DUT and saves as NumSupportedFabrics . Ensure there are NumSupportedFabrics test harness instances that can each commission the DUT
+      disabled: true
+
     - label:
           "Factory Reset DUT (to ensure NOC list is empty at the beginning of
           the following steps)"

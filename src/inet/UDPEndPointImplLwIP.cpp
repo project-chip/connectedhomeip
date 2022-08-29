@@ -367,10 +367,9 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     {
         return;
     }
-    // Raw pointer is required for passing into lambda.
-    // The memory life cycle of `pktInfo` is manually managed.
-    IPPacketInfo * pktInfo = Platform::New<IPPacketInfo>();
-    if (pktInfo == nullptr)
+
+    auto pktInfo = Platform::MakeUnique<IPPacketInfo>();
+    if (pktInfo.get() == nullptr)
     {
         ChipLogError(Inet, "Cannot allocate packet info");
         return;
@@ -391,20 +390,17 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     pktInfo->SrcPort     = port;
     pktInfo->DestPort    = pcb->local_port;
 
-    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo] {
-        ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p), pktInfo);
-    });
+    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda(
+        [ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
+            ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p), pktInfo);
+        });
 
     if (err == CHIP_NO_ERROR)
     {
         // If ScheduleLambda() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
         static_cast<void>(std::move(buf).UnsafeRelease());
-    }
-    else
-    {
-        // If ScheduleLambda() succeeded, `pktInfo` will be deleted in `HandleDataReceived`.
-        // Otherwise we delete it here.
-        Platform::Delete(pktInfo);
+        // Similarly, ScheduleLambda now has ownership of pktInfo.
+        pktInfo.release();
     }
 }
 

@@ -212,7 +212,24 @@ public:
      */
     bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    SessionHolder & GetSessionHolder() { return mSession; }
+
+    enum class InjectedFailureType : uint8_t
+    {
+        kFailOnSend = 0x01
+    };
+
+    void InjectFailure(InjectedFailureType failureType) { mInjectedFailures.Set(failureType); }
+
+    void ClearInjectedFailures() { mInjectedFailures.ClearAll(); }
+#endif
+
 private:
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    BitFlags<InjectedFailureType> mInjectedFailures;
+#endif
+
     class ExchangeSessionHolder : public SessionHolderWithDelegate
     {
     public:
