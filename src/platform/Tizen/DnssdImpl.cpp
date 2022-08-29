@@ -91,13 +91,13 @@ void OnRegister(dnssd_error_e result, dnssd_service_h service, void * data)
     if (result != DNSSD_ERROR_NONE)
     {
         ChipLogError(DeviceLayer, "DNSsd %s: Error: %d", __func__, result);
-        rCtx->mCallback(rCtx->mCbContext, nullptr, GetChipError(result));
+        rCtx->mCallback(rCtx->mCbContext, nullptr, nullptr, GetChipError(result));
         // After this point, the context might be no longer valid
         rCtx->mInstance->RemoveContext(rCtx);
         return;
     }
 
-    rCtx->mCallback(rCtx->mCbContext, rCtx->mType, CHIP_NO_ERROR);
+    rCtx->mCallback(rCtx->mCbContext, rCtx->mType, rCtx->mName, CHIP_NO_ERROR);
 }
 
 gboolean RegisterAsync(GMainLoop * mainLoop, gpointer userData)
@@ -524,7 +524,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
                 if (ret != DNSSD_ERROR_NONE)
                 {
                     ChipLogError(DeviceLayer, "dnssd_service_add_txt_record() failed. ret: %d", ret);
-                    callback(context, nullptr, err = GetChipError(ret));
+                    callback(context, nullptr, nullptr, err = GetChipError(ret));
                 }
             }
 
@@ -573,7 +573,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
 exit:
     if (err != CHIP_NO_ERROR)
     { // Notify caller about error
-        callback(context, nullptr, err);
+        callback(context, nullptr, nullptr, err);
         RemoveContext(serviceCtx);
     }
     return err;
