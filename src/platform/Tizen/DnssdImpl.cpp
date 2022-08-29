@@ -32,7 +32,9 @@
 
 #include <dns-sd-internal.h>
 #include <glib.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
+#endif
 
 using namespace chip::Dnssd;
 using namespace chip::DeviceLayer::Internal;
