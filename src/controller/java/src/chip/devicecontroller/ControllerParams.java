@@ -10,6 +10,7 @@ public final class ControllerParams {
   private final int failsafeTimerSeconds;
   private final boolean attemptNetworkScanWiFi;
   private final boolean attemptNetworkScanThread;
+  private final boolean skipCommissioningComplete;
   @Nullable private final KeypairDelegate keypairDelegate;
   @Nullable private final byte[] rootCertificate;
   @Nullable private final byte[] intermediateCertificate;
@@ -26,6 +27,7 @@ public final class ControllerParams {
     this.failsafeTimerSeconds = builder.failsafeTimerSeconds;
     this.attemptNetworkScanWiFi = builder.attemptNetworkScanWiFi;
     this.attemptNetworkScanThread = builder.attemptNetworkScanThread;
+    this.skipCommissioningComplete = builder.skipCommissioningComplete;
     this.keypairDelegate = builder.keypairDelegate;
     this.rootCertificate = builder.rootCertificate;
     this.intermediateCertificate = builder.intermediateCertificate;
@@ -53,6 +55,10 @@ public final class ControllerParams {
 
   public boolean getAttemptNetworkScanThread() {
     return attemptNetworkScanThread;
+  }
+
+  public boolean getSkipCommissioningComplete() {
+    return skipCommissioningComplete;
   }
 
   public KeypairDelegate getKeypairDelegate() {
@@ -105,6 +111,7 @@ public final class ControllerParams {
     private int failsafeTimerSeconds = 30;
     private boolean attemptNetworkScanWiFi = false;
     private boolean attemptNetworkScanThread = false;
+    private boolean skipCommissioningComplete = false;
     @Nullable private KeypairDelegate keypairDelegate = null;
     @Nullable private byte[] rootCertificate = null;
     @Nullable private byte[] intermediateCertificate = null;
@@ -179,6 +186,24 @@ public final class ControllerParams {
      */
     public Builder setAttemptNetworkScanThread(boolean attemptNetworkScanThread) {
       this.attemptNetworkScanThread = attemptNetworkScanThread;
+      return this;
+    }
+
+    /**
+     * Disable the CASE phase of commissioning when the CommissioningComplete command is sent
+     * by this ChipDeviceCommissioner.
+     *
+     * <p>Specifically, this sets SkipCommissioningComplete in the CommissioningParameters passed to
+     * the CommissioningDelegate.
+     *
+     * <p>A controller will set this to true when the CASE phase of commissioning is done by a separate 
+     * process, for example, by a Hub on the network.
+     *
+     * @param skipCommissioningComplete
+     * @return
+     */
+    public Builder setSkipCommissioningComplete(boolean skipCommissioningComplete) {
+      this.skipCommissioningComplete = skipCommissioningComplete;
       return this;
     }
 

@@ -281,6 +281,11 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
                                                         &getAttemptNetworkScanThread);
     SuccessOrExit(err);
 
+    jmethodID getSkipCommissioningComplete;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getSkipCommissioningComplete", "()Z",
+                                                        &getSkipCommissioningComplete);
+    SuccessOrExit(err);
+
     jmethodID getKeypairDelegate;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getKeypairDelegate",
                                                         "()Lchip/devicecontroller/KeypairDelegate;", &getKeypairDelegate);
@@ -319,6 +324,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         uint16_t failsafeTimerSeconds      = env->CallIntMethod(controllerParams, getFailsafeTimerSeconds);
         bool attemptNetworkScanWiFi        = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanWiFi);
         bool attemptNetworkScanThread      = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
+        bool skipCommissioningComplete     = env->CallBooleanMethod(controllerParams, getSkipCommissioningComplete);
         uint64_t adminSubject              = env->CallLongMethod(controllerParams, getAdminSubject);
 
         std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
@@ -327,7 +333,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
             sJVM, self, kLocalDeviceId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(), DeviceLayer::TCPEndPointManager(),
             DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate, rootCertificate, intermediateCertificate,
             operationalCertificate, ipk, listenPort, controllerVendorId, failsafeTimerSeconds, attemptNetworkScanWiFi,
-            attemptNetworkScanThread, &err);
+            attemptNetworkScanThread, skipCommissioningComplete, &err);
         SuccessOrExit(err);
 
         if (adminSubject != kUndefinedNodeId)

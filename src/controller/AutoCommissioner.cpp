@@ -139,10 +139,10 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     }
     mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
 
-    if (params.GetPASEOnlyCommissioning().HasValue())
+    if (params.GetSkipCommissioningComplete().HasValue())
     {
         ChipLogProgress(Controller, "Setting PASE-only commissioning from parameters");
-        mParams.SetPASEOnlyCommissioning(params.GetPASEOnlyCommissioning().Value());
+        mParams.SetSkipCommissioningComplete(params.GetSkipCommissioningComplete().Value());
     }
 
     return CHIP_NO_ERROR;
@@ -258,7 +258,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         else
         {
-            if (mParams.GetPASEOnlyCommissioning().ValueOr(false))
+            if (mParams.GetSkipCommissioningComplete().ValueOr(false))
             {
                 return CommissioningStage::kCleanup;
             }
@@ -290,7 +290,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         {
             return CommissioningStage::kThreadNetworkEnable;
         }
-        else if (mParams.GetPASEOnlyCommissioning().ValueOr(false))
+        else if (mParams.GetSkipCommissioningComplete().ValueOr(false))
         {
             return CommissioningStage::kCleanup;
         }
@@ -299,7 +299,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             return CommissioningStage::kFindOperational;
         }
     case CommissioningStage::kThreadNetworkEnable:
-        if (mParams.GetPASEOnlyCommissioning().ValueOr(false))
+        if (mParams.GetSkipCommissioningComplete().ValueOr(false))
         {
             return CommissioningStage::kCleanup;
         }

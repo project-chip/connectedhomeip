@@ -380,10 +380,10 @@ public:
 
     // Only perform the PASE steps of commissioning.
     // Commissioning will be completed by another admin on the network.
-    Optional<bool> GetPASEOnlyCommissioning() const { return mPASEOnlyCommissioning; }
-    CommissioningParameters & SetPASEOnlyCommissioning(bool paseOnlyCommissioning)
+    Optional<bool> GetSkipCommissioningComplete() const { return mSkipCommissioningComplete; }
+    CommissioningParameters & SetSkipCommissioningComplete(bool skipCommissioningComplete)
     {
-        mPASEOnlyCommissioning = MakeOptional(paseOnlyCommissioning);
+        mSkipCommissioningComplete = MakeOptional(skipCommissioningComplete);
         return *this;
     }
 
@@ -416,7 +416,7 @@ private:
         nullptr; // Delegate to handle device attestation failures during commissioning
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
-    Optional<bool> mPASEOnlyCommissioning;
+    Optional<bool> mSkipCommissioningComplete;
 };
 
 struct RequestedCertificate
