@@ -94,7 +94,7 @@ static_library("default_policy") {
   ]
 }
 
-if (current_os == "linux") {
+if (current_os == "linux" && chip_minmdns_default_policy == "libnl") {
   import("${build_root}/config/linux/pkg_config.gni")
 
   pkg_config("libnl_config") {
