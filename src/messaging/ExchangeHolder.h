@@ -33,12 +33,30 @@ namespace Messaging {
  *   established by ExchangeContext and the transfer of ownership at various points
  *   in its lifetime.
  *
- *   It does this by intercepting OnExchangeClosing and looking at the various
- *   states the exchange might be in to decide how best to correctly shutdown the exchange.
- *   (see AbortIfNeeded()).
+ *   An equivalent but simplified version of the rules around exchange management as specified in
+ *   ExchangeDelegate.h are provided here for consumers:
  *
- *   This is a delegate forwarder - consumers can still register to be an ExchangeDelegate
- *   and get notified of all relevant happenings on that delegate interface.
+ *   1. When an exchange is allocated, the holder takes over ownership of the exchange when Grab() is invoked.
+ *      Until a message is sent successfully, the holder will automatically manage the exchange until its
+ *      destructor or Release() is invoked.
+ *
+ *   2. If you send a message successfully that doesn't require a response, invoking Get() on the holder there-after will return
+ *      nullptr.
+ *
+ *   3. If you send a message successfully that does require a response, invoking Get() on the holder will return a valid
+ *      pointer until the response is received or times out.
+ *
+ *   4. On reception of a message on an exchange, if you return from OnMessageReceived() and no messages were sent on that exchange,
+ *      invoking Get() on the holder will return a nullptr.
+ *
+ *   5. If you invoke WillSendMessage() on the exchange in your implementation of OnMessageReceived indicating a desire to send a
+ *      message later on the exchange, invoking Get() on the holder will return a valid exchange until SendMessage() on the exchange
+ *      is called, at which point, rules 2 and 3 apply.
+ *
+ *   6. This is a delegate forwarder -  consumers can still register to be an ExchangeDelegate
+ *      and get notified of all relevant happenings on that delegate interface.
+ *
+ *   7. At no point shall you call Abort/Close/Release/Retain on the exchange tracked by the holder.
  *
  */
 class ExchangeHolder : public ExchangeDelegate
@@ -51,7 +69,13 @@ public:
      */
     ExchangeHolder(ExchangeDelegate & delegate) : mpExchangeDelegate(delegate) {}
 
-    virtual ~ExchangeHolder() { Release(); }
+    virtual ~ExchangeHolder()
+    {
+#if CHIP_EXCHANGE_HOLDER_DETAIL_LOGGING
+        ChipLogDetail(ExchangeManager, "[%p] ~ExchangeHolder", this);
+#endif
+        Release();
+    }
 
     bool Contains(const ExchangeContext * exchange) const { return mpExchangeCtx == exchange; }
 
@@ -70,6 +94,10 @@ public:
 
         mpExchangeCtx = exchange;
         mpExchangeCtx->SetDelegate(this);
+
+#if CHIP_EXCHANGE_HOLDER_DETAIL_LOGGING
+        ChipLogDetail(ExchangeManager, "[%p] ExchangeHolder::Grab: Acquired EC %p", this, exchange);
+#endif
     }
 
     /*
@@ -78,6 +106,10 @@ public:
      */
     void Release()
     {
+#if CHIP_EXCHANGE_HOLDER_DETAIL_LOGGING
+        ChipLogDetail(ExchangeManager, "[%p] ExchangeHolder::Release: mpExchangeCtx = %p", this, mpExchangeCtx);
+#endif
+
         if (mpExchangeCtx)
         {
             mpExchangeCtx->SetDelegate(nullptr);
@@ -96,6 +128,9 @@ public:
              */
             if (mpExchangeCtx->IsResponseExpected() || mpExchangeCtx->IsSendExpected())
             {
+#if CHIP_EXCHANGE_HOLDER_DETAIL_LOGGING
+                ChipLogDetail(ExchangeManager, "[%p] ExchangeHolder::Release: Aborting!", this);
+#endif
                 mpExchangeCtx->Abort();
             }
         }
@@ -123,10 +158,26 @@ private:
 
     void OnExchangeClosing(ExchangeContext * ec) override
     {
+#if CHIP_EXCHANGE_HOLDER_DETAIL_LOGGING
+        ChipLogDetail(ExchangeManager, "[%p] ExchangeHolder::OnExchangeClosing: mpExchangeCtx: %p", this, mpExchangeCtx);
+#endif
+
         if (mpExchangeCtx)
         {
             mpExchangeCtx->SetDelegate(nullptr);
-            mpExchangeCtx = nullptr;
+
+            /**
+             * Unless our consumer has signalled an intention to send a message in the future, the exchange
+             * is owned by the exchange layer and it will automatically handle releasing the ref. So, just null
+             * out our reference to it.
+             */
+            if (!mpExchangeCtx->IsSendExpected())
+            {
+#if CHIP_EXCHANGE_HOLDER_DETAIL_LOGGING
+                ChipLogDetail(ExchangeManager, "[%p] ExchangeHolder::OnExchangeClosing: nulling out ref...", this);
+#endif
+                mpExchangeCtx = nullptr;
+            }
         }
 
         mpExchangeDelegate.OnExchangeClosing(ec);
