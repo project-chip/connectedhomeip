@@ -32,6 +32,9 @@ declare_args() {
   # This enables verbose logging of sent/received mDNS messages. However, will incur extra RAM and
   # time.
   chip_minmdns_high_verbosity = false
+
+  # Compile in the default minmdns policy for endpoint and ip address fetching
+  chip_minmdns_default_policy = true
 }
 
 config("config") {
@@ -48,6 +51,35 @@ config("config") {
   } else {
     defines += [ "CHIP_MINMDNS_HIGH_VERBOSITY=0" ]
   }
+
+  if (chip_minmdns_default_policy) {
+    defines += [ "CHIP_MINMDNS_DEFAULT_POLICY=1" ]
+  }
+}
+
+source_set("address_policy") {
+  sources = [
+    "AddressPolicy.cpp",
+    "AddressPolicy.h",
+    "ServerIPAddresses.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+static_library("default_policy") {
+  sources = [
+    "AddressPolicy_DefaultImpl.cpp",
+    "AddressPolicy_DefaultImpl.h",
+  ]
+
+  public_deps = [
+    ":address_policy",
+    "${chip_root}/src/inet",
+  ]
 }
 
 static_library("minimal_mdns") {
@@ -72,12 +104,17 @@ static_library("minimal_mdns") {
   }
 
   public_deps = [
+    ":address_policy",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd/minimal_mdns/core",
     "${chip_root}/src/lib/dnssd/minimal_mdns/responders",
     "${chip_root}/src/platform",
   ]
+
+  if (chip_minmdns_default_policy) {
+    public_deps += [ ":default_policy" ]
+  }
 
   public_configs = [ ":config" ]
 }
