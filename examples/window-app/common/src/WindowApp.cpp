@@ -29,17 +29,6 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WindowCovering;
 
-#ifdef SL_WIFI
-#include "wfx_host_events.h"
-#include <app/clusters/network-commissioning/network-commissioning.h>
-#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
-#endif
-
-#ifdef SL_WIFI
-chip::app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance()));
-#endif
-
 inline void OnTriggerEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
     WindowApp::Instance().PostEvent(WindowApp::EventId::WinkOff);
@@ -125,20 +114,6 @@ CHIP_ERROR WindowApp::StartAppTask() { return CHIP_NO_ERROR;}
 CHIP_ERROR WindowApp::Init()
 {
     ConfigurationMgr().LogDeviceConfig();
-
-#ifdef SL_WIFI
-    /*
-     * Wait for the WiFi to be initialized
-     */
-    EFR32_LOG("APP: Wait WiFi Init");
-    while (!wfx_hw_ready())
-    {
-        vTaskDelay(10);
-    }
-    EFR32_LOG("APP: Done WiFi Init");
-    /* We will init server when we get IP */
-    sWiFiNetworkCommissioningInstance.Init();
-#endif
 
     // Timers
     mLongPressTimer = CreateTimer("Timer:LongPress", LONG_PRESS_TIMEOUT, OnLongPressTimeout, this);
