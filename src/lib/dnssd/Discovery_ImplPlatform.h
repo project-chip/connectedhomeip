@@ -70,7 +70,7 @@ private:
 
     static void HandleDnssdInit(void * context, CHIP_ERROR initError);
     static void HandleDnssdError(void * context, CHIP_ERROR initError);
-    static void HandleDnssdPublish(void * context, const char * type, CHIP_ERROR error);
+    static void HandleDnssdPublish(void * context, const char * type, const char * instanceName, CHIP_ERROR error);
     static CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize);
     CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
                               size_t subTypeSize, const OperationalAdvertisingParameters & params);

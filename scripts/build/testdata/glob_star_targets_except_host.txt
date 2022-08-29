@@ -43,6 +43,7 @@ esp32-devkitc-all-clusters-minimal
 esp32-devkitc-all-clusters-minimal-ipv6only
 esp32-devkitc-bridge
 esp32-devkitc-light
+esp32-devkitc-light-rpc
 esp32-devkitc-lock
 esp32-devkitc-ota-requestor
 esp32-devkitc-ota-requestor-rpc

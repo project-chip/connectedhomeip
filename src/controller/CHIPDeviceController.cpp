@@ -571,7 +571,16 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * se
         return CHIP_ERROR_INCORRECT_STATE;
     }
     ReturnErrorOnFailure(mDefaultCommissioner->SetCommissioningParameters(params));
-    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission);
+
+    auto threadCredentials = params.GetThreadOperationalDataset();
+    auto wiFiCredentials   = params.GetWiFiCredentials();
+    bool hasCredentials    = threadCredentials.HasValue() || wiFiCredentials.HasValue();
+
+    // If there is no network credentials, we assume that the pairing command as been issued to pair with a
+    // device that is already on the network.
+    auto pairerBehaviour = hasCredentials ? SetupCodePairerBehaviour::kCommission : SetupCodePairerBehaviour::kCommissionOnNetwork;
+
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, pairerBehaviour);
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode)
@@ -1511,12 +1520,13 @@ void DeviceCommissioner::DisarmDone()
     // to do here.
     VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
 
+    NodeId nodeId = mDeviceBeingCommissioned->GetDeviceId();
     // At this point, we also want to close off the pase session so we need to re-establish
-    CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(mDeviceBeingCommissioned->GetDeviceId());
+    CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
 
     // Signal completion - this will reset mDeviceBeingCommissioned.
     CommissioningStageComplete(CHIP_NO_ERROR);
-    SendCommissioningCompleteCallbacks(commissionee->GetDeviceId(), commissioningCompletionStatus);
+    SendCommissioningCompleteCallbacks(nodeId, commissioningCompletionStatus);
 
     // If we've disarmed the failsafe, it's because we're starting again, so kill the pase connection.
     if (commissionee != nullptr)

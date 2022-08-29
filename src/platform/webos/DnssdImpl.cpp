@@ -515,11 +515,11 @@ exit:
     // The code needs to be updated to support that callback properly.
     if (CHIP_NO_ERROR == error)
     {
-        callback(context, type.c_str(), CHIP_NO_ERROR);
+        callback(context, type.c_str(), service.mName, CHIP_NO_ERROR);
     }
     else
     {
-        callback(context, nullptr, error);
+        callback(context, nullptr, nullptr, error);
     }
 
     return error;

@@ -26,6 +26,13 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Pre-Conditions"
+      verification: |
+          1 TH is commissioned with the DUT
+
+          2 Lock device is the DUT
+      disabled: true
+
     - label:
           "TH reads NumberOfTotalUsers Supported attribute and saves for future
           use."

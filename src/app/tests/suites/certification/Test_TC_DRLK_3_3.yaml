@@ -42,6 +42,21 @@ tests:
           4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT
           ps  -aef|grep lock-app
           5. Follow the Verification step below to generate the event in 2nd terminal of DUT "
+
+
+          "Pre-Conditions
+
+          Before sending the Events proceed following step:
+
+          1. Send Set User Command and Get User for setting User.
+
+          2. Send Set Credential Command and Get Credential Status for setting PIN code.
+
+          After sending Events with all condition proceed following step
+
+          1. Send Clear Credential and Clear User Command.
+
+          "
       disabled: true
 
     - label: "TH will initiate DoorLockAlarm Event (LockJammed scenario)"
@@ -445,4 +460,67 @@ tests:
           [1658400921.175494][3227:3227] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=v
           [1658400921.175531][3227:3227] CHIP:DMG: AccessControl: allowed
           [1658400921.175603][3227:3227] CHIP:DMG: Fetched 3 events
+      disabled: true
+
+    - label: ""
+      verification: |
+          ./chip-tool doorlock clear-credential  "{ "credentialType" : 1 , "credentialIndex" : 1 }"  1 1 --timedInteractionTimeoutMs 1000
+
+          Verify " DUT sends success response" on the TH(Lock-app) Log:
+
+          [1657115878.582559][8804:8804] CHIP:DMG: InvokeRequestMessage =
+          [1657115878.582642][8804:8804] CHIP:DMG: {
+          [1657115878.582698][8804:8804] CHIP:DMG:         suppressResponse = false,
+          [1657115878.582787][8804:8804] CHIP:DMG:         timedRequest = true,
+          [1657115878.582848][8804:8804] CHIP:DMG:         InvokeRequests =
+          [1657115878.582948][8804:8804] CHIP:DMG:         [
+          [1657115878.583009][8804:8804] CHIP:DMG:                 CommandDataIB =
+          [1657115878.583098][8804:8804] CHIP:DMG:                 {
+          [1657115878.583161][8804:8804] CHIP:DMG:                         CommandPathIB =
+          [1657115878.583265][8804:8804] CHIP:DMG:                         {
+          [1657115878.583366][8804:8804] CHIP:DMG:                                 EndpointId = 0x1,
+          [1657115878.583607][8804:8804] CHIP:DMG:                                 ClusterId = 0x101,
+          [1657115878.583724][8804:8804] CHIP:DMG:                                 CommandId = 0x26,
+          [1657115878.583802][8804:8804] CHIP:DMG:                         },
+          [1657115878.583906][8804:8804] CHIP:DMG:
+          [1657115878.583972][8804:8804] CHIP:DMG:                         CommandFields =
+          [1657115878.584068][8804:8804] CHIP:DMG:                         {
+          [1657115878.584155][8804:8804] CHIP:DMG:                                 0x0 =
+          [1657115878.584234][8804:8804] CHIP:DMG:                                 {
+          [1657115878.584335][8804:8804] CHIP:DMG:                                         0x0 = 1,
+          [1657115878.584442][8804:8804] CHIP:DMG:                                         0x1 = 1,
+          [1657115878.584527][8804:8804] CHIP:DMG:                                 },
+          [1657115878.584624][8804:8804] CHIP:DMG:                         },
+          [1657115878.584695][8804:8804] CHIP:DMG:                 },
+          [1657115878.584795][8804:8804] CHIP:DMG:
+          [1657115878.584890][8804:8804] CHIP:DMG:         ],
+          [1657115878.584994][8804:8804] CHIP:DMG:
+          [1657115878.585054][8804:8804] CHIP:DMG:         InteractionModelRevision = 1
+          [1657115878.585131][8804:8804] CHIP:DMG: },
+          [1657115878.585305][8804:8804] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
+          [1657115878.585416][8804:8804] CHIP:DMG: AccessControl: allowed
+
+          ./chip-tool doorlock clear-user 1 1 1  --timedInteractionTimeoutMs 1000
+
+          Verify " DUT sends success response" on the TH(Lock-app) Log:
+
+          [1658399465.849095][2474:2474] CHIP:DMG:                        CommandPathIB =
+          [1658399465.849133][2474:2474] CHIP:DMG:                        {
+          [1658399465.849169][2474:2474] CHIP:DMG:                                EndpointId = 0x1,
+          [1658399465.849208][2474:2474] CHIP:DMG:                                ClusterId = 0x101,
+          [1658399465.849245][2474:2474] CHIP:DMG:                                CommandId = 0x1d,
+          [1658399465.849279][2474:2474] CHIP:DMG:                        },
+          [1658399465.849316][2474:2474] CHIP:DMG:
+          [1658399465.849348][2474:2474] CHIP:DMG:                        CommandFields =
+          [1658399465.849386][2474:2474] CHIP:DMG:                        {
+          [1658399465.849422][2474:2474] CHIP:DMG:                                0x0 = 2,
+          [1658399465.849459][2474:2474] CHIP:DMG:                        },
+          [1658399465.849491][2474:2474] CHIP:DMG:                },
+          [1658399465.849528][2474:2474] CHIP:DMG:
+          [1658399465.849555][2474:2474] CHIP:DMG:        ],
+          [1658399465.849589][2474:2474] CHIP:DMG:
+          [1658399465.849616][2474:2474] CHIP:DMG:        InteractionModelRevision = 1
+          [1658399465.849643][2474:2474] CHIP:DMG: },
+          [1658399465.849717][2474:2474] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
+          [1658399465.849757][2474:2474] CHIP:DMG: AccessControl: allowed
       disabled: true

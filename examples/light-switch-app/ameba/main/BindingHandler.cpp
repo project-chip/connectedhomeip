@@ -133,12 +133,20 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
     }
 }
 
+void LightSwitchContextReleaseHandler(void * context)
+{
+    VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "Invalid context for Light switch context release handler"));
+
+    Platform::Delete(static_cast<BindingCommandData *>(context));
+}
+
 void InitBindingHandlerInternal(intptr_t arg)
 {
     auto & server = chip::Server::GetInstance();
     chip::BindingManager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+    chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }
 
 #ifdef CONFIG_ENABLE_CHIP_SHELL
@@ -400,8 +408,6 @@ void SwitchWorkerFunction(intptr_t context)
 
     BindingCommandData * data = reinterpret_cast<BindingCommandData *>(context);
     BindingManager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, static_cast<void *>(data));
-
-    Platform::Delete(data);
 }
 
 void BindingWorkerFunction(intptr_t context)
