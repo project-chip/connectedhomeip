@@ -66,7 +66,7 @@ following features are available:
     MG12 boards:
 
     -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm    
+    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4163A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm,
         868MHz@19dBm
     -   BRD4164A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm,
@@ -79,7 +79,7 @@ following features are available:
     MG21 boards: Currently not supported due to RAM limitation.
 
     -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
- 
+
     MG24 boards :
 
     -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
@@ -88,7 +88,7 @@ following features are available:
     -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-    
+
 *   Build the example application:
 
         cd ~/connectedhomeip/examples/pigweed-app/efr32
