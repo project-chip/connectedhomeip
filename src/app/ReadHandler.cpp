@@ -755,25 +755,27 @@ void ReadHandler::OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLa
     VerifyOrReturn(apAppState != nullptr);
     ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
     readHandler->mFlags.Set(ReadHandlerFlags::HoldSync, false);
-    ChipLogDetail(DataManagement, "Refresh subscribe timer sync after %d seconds",
-                  readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds);
+    ChipLogProgress(DataManagement, "Refresh subscribe timer sync after %d seconds",
+                    readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds);
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 }
 
 CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
 {
-    ChipLogDetail(DataManagement, "Refresh Subscribe Sync Timer with max %d seconds", mMaxInterval);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnUnblockHoldReportCallback, this);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnRefreshSubscribeTimerSyncCallback, this);
 
-    mFlags.Set(ReadHandlerFlags::HoldReport);
-    mFlags.Set(ReadHandlerFlags::HoldSync);
-
-    ReturnErrorOnFailure(
-        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-            System::Clock::Seconds16(mMinIntervalFloorSeconds), OnUnblockHoldReportCallback, this));
+    if (!IsChunkedReport())
+    {
+        ChipLogProgress(DataManagement, "Refresh Subscribe Sync Timer with max %d seconds", mMaxInterval);
+        mFlags.Set(ReadHandlerFlags::HoldReport);
+        mFlags.Set(ReadHandlerFlags::HoldSync);
+        ReturnErrorOnFailure(
+            InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+                System::Clock::Seconds16(mMinIntervalFloorSeconds), OnUnblockHoldReportCallback, this));
+    }
 
     return CHIP_NO_ERROR;
 }
