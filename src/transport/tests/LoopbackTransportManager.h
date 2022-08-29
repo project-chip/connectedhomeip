@@ -81,6 +81,7 @@ public:
                     return;
                 }
             }
+
             // Processing those messages might have queued some run-ASAP async
             // work.  Make sure to process that too, in case it generates
             // response messages.

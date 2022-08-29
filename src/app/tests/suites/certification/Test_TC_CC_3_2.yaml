@@ -99,7 +99,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 245
+              minValue: 215
               maxValue: 255
 
     - label: "Wait 10s"

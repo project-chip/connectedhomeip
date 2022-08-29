@@ -99,8 +99,8 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: 210
-              maxValue: 230
+              minValue: 205
+              maxValue: 235
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -116,7 +116,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: 230
+              minValue: 205
               maxValue: 240
 
     - label: "Wait 5s"
