@@ -24,11 +24,10 @@ all of the EFR32 example applications.
     using the external flash select the "external SPI" bootloader type
     configured with a single slot of at least 1000 KB. For the bootloader using
     the internal flash see the Internal Storage Bootloader section below.
-    Pre-built binaries for some configurations should be available in
+    Pre-built binaries for some configurations are available at the following
+    location, see README.md for details
 
-           ```
            third_party/silabs/matter_support/matter/efr32/bootloader_binaries
-           ```
 
 -   Using the commander tool upload the bootloader to the device running the
     application.
