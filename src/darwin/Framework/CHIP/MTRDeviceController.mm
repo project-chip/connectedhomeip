@@ -71,8 +71,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 static NSString * const kErrorGenerateNOC = @"Generating operational certificate failed";
 static NSString * const kErrorKeyAllocation = @"Generating new operational key failed";
 static NSString * const kErrorCSRValidation = @"Extracting public key from CSR failed";
-static NSString * const kErrorGetCommissionee = @"Failure obtaining device being commissioned"
-static NSString * const kErrorGetAttestationChallenge = @"Failure getting attestation challenge"
+static NSString * const kErrorGetCommissionee = @"Failure obtaining device being commissioned";
+static NSString * const kErrorGetAttestationChallenge = @"Failure getting attestation challenge";
 
 @interface MTRDeviceController ()
 
@@ -707,14 +707,14 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 
 - (nullable NSData *)generateAttestationChallengeForDeviceId:(uint64_t)deviceId
 {
-    VerifyOrReturn([self checkIsRunning], nil);
+    VerifyOrReturnValue([self checkIsRunning], nil);
 
     __block NSData * attestationChallenge;
     dispatch_sync(_chipWorkQueue, ^{
         VerifyOrReturn([self checkIsRunning]);
 
         chip::CommissioneeDeviceProxy * deviceProxy;
-        errorCode = self.cppCommissioner->GetDeviceBeingCommissioned(deviceId, &deviceProxy);
+        auto errorCode = self.cppCommissioner->GetDeviceBeingCommissioned(deviceId, &deviceProxy);
         auto success = ![self checkForError:errorCode logMsg:kErrorGetCommissionee error:nil];
         VerifyOrReturn(success);
 
