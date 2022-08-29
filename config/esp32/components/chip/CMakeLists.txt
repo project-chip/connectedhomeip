@@ -67,6 +67,18 @@ macro(chip_gn_arg_bool arg boolean)
     endif()
 endmacro()
 
+# ESP-IDF lets user set software version string by two ways:
+# 1. Project's CMakeLists.txt file and 2. Config option
+# It depends on CONFIG_APP_PROJECT_VER_FROM_CONFIG option
+# So, below makes the same provision for software version number
+if (CONFIG_APP_PROJECT_VER_FROM_CONFIG)
+    chip_gn_arg_append("chip_config_software_version_number" ${CONFIG_DEVICE_SOFTWARE_VERSION_NUMBER})
+elseif (DEFINED PROJECT_VER_NUMBER)
+    chip_gn_arg_append("chip_config_software_version_number" ${PROJECT_VER_NUMBER})
+else()
+    message(FATAL_ERROR "Please set software version by setting PROJECT_VER_NUMBER in project's CMakeLists.txt or using CONFIG_APP_PROJECT_VER_FROM_CONFIG option")
+endif()
+
 chip_gn_arg_append("esp32_ar"              "\"${CMAKE_AR}\"")
 chip_gn_arg_append("esp32_cc"              "\"${CMAKE_C_COMPILER}\"")
 chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
