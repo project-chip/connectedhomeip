@@ -142,7 +142,10 @@ protected:
 
         Protocols::SecureChannel::StatusReport statusReport(generalCode, Protocols::SecureChannel::Id, protocolCode);
 
-        Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(statusReport.Size()));
+        auto handle = System::PacketBufferHandle::New(statusReport.Size());
+        VerifyOrReturn(!handle.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));
+        Encoding::LittleEndian::PacketBufferWriter bbuf(std::move(handle));
+
         statusReport.WriteToBuffer(bbuf);
 
         System::PacketBufferHandle msg = bbuf.Finalize();
