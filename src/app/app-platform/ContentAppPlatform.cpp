@@ -88,6 +88,64 @@ namespace AppPlatform {
 
 EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,
                                              const Span<DataVersion> & dataVersionStorage,
+                                             const Span<const EmberAfDeviceType> & deviceTypeList)
+{
+    CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
+
+    ChipLogProgress(DeviceLayer, "Adding ContentApp with appid %s ", vendorApp.applicationId);
+    uint8_t index = 0;
+    // check if already loaded
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+    {
+        if (mContentApps[index] == app)
+        {
+            ChipLogProgress(DeviceLayer, "Already added");
+            // already added, return endpointId of already added endpoint.
+            // desired endpointId does not have any impact
+            return app->GetEndpointId();
+        }
+        index++;
+    }
+
+    index = 0;
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+    {
+        if (mContentApps[index] != nullptr)
+        {
+            index++;
+            continue;
+        }
+        mContentApps[index] = app;
+        EmberAfStatus ret;
+        EndpointId initEndpointId = mCurrentEndpointId;
+        
+        do {
+            ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
+            if (ret == EMBER_ZCL_STATUS_SUCCESS)
+            {
+                ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)",
+                                vendorApp.applicationId, mCurrentEndpointId, index);
+                app->SetEndpointId(mCurrentEndpointId);
+                IncrementCurrentEndpointID();
+                return app->GetEndpointId();
+            }
+            else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
+            {
+                ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
+                return kNoCurrentEndpointId;
+            }
+            IncrementCurrentEndpointID();
+        }
+        while (initEndpointId != mCurrentEndpointId);
+        ChipLogError(DeviceLayer, "Failed to add dynamic endpoint: No endpoints available!");
+        return kNoCurrentEndpointId;
+    }
+    ChipLogError(DeviceLayer, "Failed to add dynamic endpoint: max endpoint count reached!");
+    return kNoCurrentEndpointId;
+}
+
+EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,
+                                             const Span<DataVersion> & dataVersionStorage,
                                              const Span<const EmberAfDeviceType> & deviceTypeList, EndpointId desiredEndpointId)
 {
     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
@@ -107,67 +165,44 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
         index++;
     }
 
-    if (desiredEndpointId >= emberAfFixedEndpointCount() &&
-        emberAfGetDynamicIndexFromEndpoint(desiredEndpointId) != kEmberInvalidEndpointIndex)
+    if (desiredEndpointId < FIXED_ENDPOINT_COUNT || emberAfGetDynamicIndexFromEndpoint(desiredEndpointId) != kEmberInvalidEndpointIndex)
     {
-        // an endpoint already exists with the desiredEndpointId. return error.
-        ChipLogError(DeviceLayer, "Failed to add dynamic endpoint: desired endpointID already in use!");
+        // invalid desiredEndpointId
+        ChipLogError(DeviceLayer, "Failed to add dynamic endpoint: desired endpointID is invalid!");
         return kNoCurrentEndpointId;
     }
 
     index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
-        if (nullptr == mContentApps[index])
+        if (mContentApps[index] != nullptr)
         {
-            mContentApps[index] = app;
-            EmberAfStatus ret;
-
-            if (desiredEndpointId >= emberAfFixedEndpointCount())
-            {
-                ret = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
-                if (ret == EMBER_ZCL_STATUS_SUCCESS)
-                {
-                    ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
-                                    desiredEndpointId, index);
-                    app->SetEndpointId(desiredEndpointId);
-                    return app->GetEndpointId();
-                }
-                else
-                {
-                    ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
-                    return kNoCurrentEndpointId;
-                }
-            }
-            else
-            {
-                while (1)
-                {
-                    ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
-                    if (ret == EMBER_ZCL_STATUS_SUCCESS)
-                    {
-                        ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)",
-                                        vendorApp.applicationId, mCurrentEndpointId, index);
-                        app->SetEndpointId(mCurrentEndpointId);
-                        return app->GetEndpointId();
-                    }
-                    else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
-                    {
-                        ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
-                        return kNoCurrentEndpointId;
-                    }
-                    // Handle wrap condition
-                    if (++mCurrentEndpointId < mFirstDynamicEndpointId)
-                    {
-                        mCurrentEndpointId = mFirstDynamicEndpointId;
-                    }
-                }
-            }
+            index++;
+            continue;
         }
-        index++;
+        mContentApps[index] = app;
+        EmberAfStatus ret = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
+        if (ret != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
+            return kNoCurrentEndpointId;
+        }
+        ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
+                        desiredEndpointId, index);
+        app->SetEndpointId(desiredEndpointId);
+        return app->GetEndpointId();
     }
-    ChipLogError(DeviceLayer, "Failed to add dynamic endpoint: No endpoints available!");
+    ChipLogError(DeviceLayer, "Failed to add dynamic endpoint: max endpoint count reached!");
     return kNoCurrentEndpointId;
+}
+
+void ContentAppPlatform::IncrementCurrentEndpointID()
+{
+    // Handle wrap condition
+    if (++mCurrentEndpointId < mFirstDynamicEndpointId)
+    {
+        mCurrentEndpointId = mFirstDynamicEndpointId;
+    }
 }
 
 EndpointId ContentAppPlatform::RemoveContentApp(ContentApp * app)
