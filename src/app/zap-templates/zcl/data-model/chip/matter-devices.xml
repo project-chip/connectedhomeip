@@ -359,9 +359,6 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="false" server="false" clientLocked="true" serverLocked="true">
-                <requireAttribute>BINDING</requireAttribute>
-            </include>
             <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
                 <requireCommand>AddGroup</requireCommand>
@@ -493,9 +490,6 @@ limitations under the License.
                 <requireAttribute>SERVER_LIST</requireAttribute>
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
-            </include>
-            <include cluster="Binding" client="false" server="false" clientLocked="true" serverLocked="true">
-                <requireAttribute>BINDING</requireAttribute>
             </include>
             <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
@@ -639,9 +633,6 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="false" server="false" clientLocked="true" serverLocked="true">
-                <requireAttribute>BINDING</requireAttribute>
-            </include>
             <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
                 <requireCommand>AddGroup</requireCommand>
@@ -723,9 +714,6 @@ limitations under the License.
                 <requireAttribute>SERVER_LIST</requireAttribute>
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
-            </include>
-            <include cluster="Binding" client="false" server="false" clientLocked="true" serverLocked="true">
-                <requireAttribute>BINDING</requireAttribute>
             </include>
             <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
@@ -1808,9 +1796,6 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
-                <requireAttribute>BINDING</requireAttribute>
-            </include>
             <include cluster="On/Off" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Level Control" client="false" server="true" clientLocked="false" serverLocked="true"></include>
         </clusters>
@@ -1834,9 +1819,6 @@ limitations under the License.
                 <requireAttribute>SERVER_LIST</requireAttribute>
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
-            </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
-                <requireAttribute>BINDING</requireAttribute>
             </include>
             <include cluster="Application Basic" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Keypad Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
@@ -1868,9 +1850,6 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
-                <requireAttribute>BINDING</requireAttribute>
-            </include>
             <include cluster="Mode Select" client="false" server="true" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
@@ -1893,9 +1872,6 @@ limitations under the License.
                 <requireAttribute>SERVER_LIST</requireAttribute>
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
-            </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
-                <requireAttribute>BINDING</requireAttribute>
             </include>
             <include cluster="Barrier Control" client="true" server="true" clientLocked="true" serverLocked="true">
                 <requireCommand>BarrierControlGoToPercent</requireCommand>
