@@ -298,7 +298,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     {
         JniByteArray jniIpk(env, ipkEpochKey);
         ipkBuffer = std::vector<uint8_t>(jniIpk.byteSpan().begin(), jniIpk.byteSpan().end());
-        ipkSpan = chip::ByteSpan(ipkBuffer.data(), ipkBuffer.size());
+        ipkSpan   = chip::ByteSpan(ipkBuffer.data(), ipkBuffer.size());
     }
     else
     {
