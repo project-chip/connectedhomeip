@@ -4165,12 +4165,12 @@ PICS:
     - label:
           "Does the DUT(server) support the 'Lock supports yearday access
           schedules' feature?"
-      id: DRLK.S.F10
+      id: DRLK.S.F0a
 
     - label:
           "Does the DUT(server) support the 'Lock supports holiday access
           schedules' feature?"
-      id: DRLK.S.F11
+      id: DRLK.S.F0b
 
     - label:
           "Does the DUT(server) support the 'PIN codes over the-air supported

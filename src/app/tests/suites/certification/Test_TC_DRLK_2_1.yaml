@@ -683,7 +683,7 @@ tests:
 
     - label:
           "TH reads NumberOfYearDay SchedulesSupportedPeruser attribute from DUT"
-      PICS: DRLK.S.F10 && DRLK.S.A0015
+      PICS: DRLK.S.F0a && DRLK.S.A0015
       verification: |
           ./chip-tool doorlock read number-of-year-day-schedules-supported-per-user 1 1
 
@@ -729,7 +729,7 @@ tests:
       disabled: true
 
     - label: "TH reads NumberOfHoliDay SchedulesSupported attribute from DUT"
-      PICS: DRLK.S.F11 && DRLK.S.A0016
+      PICS: DRLK.S.F0b && DRLK.S.A0016
       verification: |
           ./chip-tool doorlock read number-of-holiday-schedules-supported 1 1
 

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 108.1.2. [TC-LTIME-1.2] Global Attributes [DUT as Server]
+name: 108.1.2. [TC-LUNIT-1.2] Global Attributes [DUT as Server]
 
 PICS:
     - LUNIT.S

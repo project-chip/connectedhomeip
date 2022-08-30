@@ -48,11 +48,9 @@ algs
 alloc
 Ameba
 amebad
-AmebaD
 amebaiot
 AmebaZ
 amebaz2
-AmebaZ2
 announcementReason
 AnnounceOTAProvider
 AnnounceOtaProviderRequest
@@ -84,8 +82,6 @@ args
 argv
 armeabi
 armino
-Armino
-ARMINO
 ARMmbed
 armv
 ASAN
@@ -294,8 +290,8 @@ connstring
 conntype
 const
 ContentApp
-ContentApp's
 ContentAppPlatform
+ContentApp's
 ContentLaunch
 ContentLauncher
 continuousHinting
@@ -1116,8 +1112,8 @@ REPL
 repo
 req
 Requestor
-Requestor's
 RequestorCanConsent
+Requestor's
 Requestors
 responder
 RestrictedEvent
@@ -1164,8 +1160,8 @@ SDB
 SDC
 SDHC
 SDK
-SDK's
 sdkconfig
+SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1342,6 +1338,7 @@ trackFree
 TransferSession
 transitionTime
 TransportMgrBase
+TriggerEffect
 TRNG
 TrustedRootCertificates
 tsan

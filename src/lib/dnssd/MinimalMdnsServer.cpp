@@ -16,81 +16,30 @@
  */
 #include "MinimalMdnsServer.h"
 
+#include <lib/dnssd/minimal_mdns/AddressPolicy.h>
+
+#ifndef CHIP_MINMDNS_DEFAULT_POLICY
+#define CHIP_MINMDNS_DEFAULT_POLICY 0
+#endif
+
+#if CHIP_MINMDNS_DEFAULT_POLICY
+#include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
+#endif
+
 namespace chip {
 namespace Dnssd {
-namespace {
 
 using namespace mdns::Minimal;
+using chip::Platform::UniquePtr;
 
-class AllInterfaces : public ListenIterator
+GlobalMinimalMdnsServer::GlobalMinimalMdnsServer()
 {
-private:
-public:
-    AllInterfaces() { SkipToFirstValidInterface(); }
+    mServer.SetDelegate(this);
 
-    bool Next(chip::Inet::InterfaceId * id, chip::Inet::IPAddressType * type) override
-    {
-        if (!mIterator.HasCurrent())
-        {
-            return false;
-        }
-
-#if INET_CONFIG_ENABLE_IPV4
-        if (mState == State::kIpV4)
-        {
-            *id    = mIterator.GetInterfaceId();
-            *type  = chip::Inet::IPAddressType::kIPv4;
-            mState = State::kIpV6;
-            return true;
-        }
+#if CHIP_MINMDNS_DEFAULT_POLICY
+    mdns::Minimal::SetDefaultAddressPolicy();
 #endif
-
-        *id   = mIterator.GetInterfaceId();
-        *type = chip::Inet::IPAddressType::kIPv6;
-#if INET_CONFIG_ENABLE_IPV4
-        mState = State::kIpV4;
-#endif
-
-        for (mIterator.Next(); SkipCurrentInterface(); mIterator.Next())
-        {
-        }
-        return true;
-    }
-
-private:
-#if INET_CONFIG_ENABLE_IPV4
-    enum class State
-    {
-        kIpV4,
-        kIpV6,
-    };
-    State mState = State::kIpV4;
-#endif
-    chip::Inet::InterfaceIterator mIterator;
-
-    void SkipToFirstValidInterface()
-    {
-        do
-        {
-            if (!SkipCurrentInterface())
-            {
-                break;
-            }
-        } while (mIterator.Next());
-    }
-
-    bool SkipCurrentInterface()
-    {
-        if (!mIterator.HasCurrent())
-        {
-            return false; // nothing to try.
-        }
-
-        return !Internal::IsCurrentInterfaceUsable(mIterator);
-    }
-};
-
-} // namespace
+}
 
 GlobalMinimalMdnsServer & GlobalMinimalMdnsServer::Instance()
 {
@@ -102,8 +51,10 @@ CHIP_ERROR GlobalMinimalMdnsServer::StartServer(chip::Inet::EndPointManager<chip
                                                 uint16_t port)
 {
     GlobalMinimalMdnsServer::Server().Shutdown();
-    AllInterfaces allInterfaces;
-    return GlobalMinimalMdnsServer::Server().Listen(udpEndPointManager, &allInterfaces, port);
+
+    UniquePtr<ListenIterator> endpoints = GetAddressPolicy()->GetListenEndpoints();
+
+    return GlobalMinimalMdnsServer::Server().Listen(udpEndPointManager, endpoints.get(), port);
 }
 
 void GlobalMinimalMdnsServer::ShutdownServer()

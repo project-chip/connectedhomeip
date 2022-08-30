@@ -50,7 +50,7 @@ static void HandleBrowse(void * context, DnssdService * services, size_t service
     }
 }
 
-static void HandlePublish(void * context, const char * type, CHIP_ERROR error) {}
+static void HandlePublish(void * context, const char * type, const char * instanceName, CHIP_ERROR error) {}
 
 static void InitCallback(void * context, CHIP_ERROR error)
 {
