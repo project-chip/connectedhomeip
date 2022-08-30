@@ -27,6 +27,7 @@
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/tests/LoopbackTransportManager.h>
+#include <transport/tests/UDPTransportManager.h>
 
 #include <nlunit-test.h>
 
@@ -229,6 +230,47 @@ public:
     }
 
     using LoopbackTransportManager::GetSystemLayer;
+};
+
+// UDPMessagingContext enriches MessagingContext with an UDP transport
+class UDPMessagingContext : public UDPTransportManager, public MessagingContext
+{
+public:
+    virtual ~UDPMessagingContext() {}
+
+    /// Initialize the underlying layers.
+    virtual CHIP_ERROR Init()
+    {
+        ReturnErrorOnFailure(chip::Platform::MemoryInit());
+        ReturnErrorOnFailure(UDPTransportManager::Init());
+        ReturnErrorOnFailure(MessagingContext::Init(&GetTransportMgr(), &GetIOContext()));
+        return CHIP_NO_ERROR;
+    }
+
+    // Shutdown all layers, finalize operations
+    virtual void Shutdown()
+    {
+        MessagingContext::Shutdown();
+        UDPTransportManager::Shutdown();
+        chip::Platform::MemoryShutdown();
+    }
+
+    // Init/Shutdown Helpers that can be used directly as the nlTestSuite
+    // initialize/finalize function.
+    static int Initialize(void * context)
+    {
+        auto * ctx = static_cast<UDPMessagingContext *>(context);
+        return ctx->Init() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+    }
+
+    static int Finalize(void * context)
+    {
+        auto * ctx = static_cast<UDPMessagingContext *>(context);
+        ctx->Shutdown();
+        return SUCCESS;
+    }
+
+    using UDPTransportManager::GetSystemLayer;
 };
 
 // Class that can be used to capture decrypted message traffic in tests using

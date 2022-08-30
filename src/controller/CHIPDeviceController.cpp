@@ -1572,7 +1572,6 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
 {
     // Once this stage is complete, reset mDeviceBeingCommissioned - this will be reset when the delegate calls the next step.
     MATTER_TRACE_EVENT_SCOPE("CommissioningStageComplete", "DeviceCommissioner");
-
     if (mDeviceBeingCommissioned == nullptr)
     {
         // We are getting a stray callback (e.g. due to un-cancellable
@@ -1652,6 +1651,13 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const Scope
     {
         ChipLogError(Controller, "Device connection failed without a valid error code. Making one up.");
         error = CHIP_ERROR_INTERNAL;
+    }
+
+    if (commissioner->mDeviceBeingCommissioned == nullptr ||
+        commissioner->mDeviceBeingCommissioned->GetDeviceId() != peerId.GetNodeId())
+    {
+        // Not the device we are trying to commission.
+        return;
     }
 
     if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational &&

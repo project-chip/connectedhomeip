@@ -192,6 +192,12 @@ protected:
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear();
 
+    /**
+     * Notify our delegate about a session establishment error, if we have not
+     * notified it of an error or success before.
+     */
+    void NotifySessionEstablishmentError(CHIP_ERROR error);
+
 protected:
     CryptoContext::SessionRole mRole;
     SessionHolderWithDelegate mSecureSessionHolder;
