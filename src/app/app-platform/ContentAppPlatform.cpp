@@ -181,7 +181,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             index++;
             continue;
         }
-        EmberAfStatus ret   = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
+        EmberAfStatus ret = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
         if (ret != EMBER_ZCL_STATUS_SUCCESS)
         {
             ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
