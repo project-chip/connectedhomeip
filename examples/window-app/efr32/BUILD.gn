@@ -86,6 +86,11 @@ if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B" ||
 
 # WiFi settings
 if (chip_enable_wifi) {
+  # disabling LCD for MG24 for wifi
+  if (efr32_board == "BRD4186C" || efr32_board == "BRD4187C") {
+    show_qr_code = false
+    disable_lcd = true
+  }
   wifi_sdk_dir = "${chip_root}/third_party/silabs/matter_support/matter/wifi"
   efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
   efr32_lwip_defs += [
