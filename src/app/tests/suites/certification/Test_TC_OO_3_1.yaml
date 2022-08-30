@@ -226,33 +226,38 @@ tests:
 
 
 
-          ./chip-tool onoff write start-up-on-off 60 1 1
+          ./chip-tool onoff write start-up-on-off 2 1 1
 
           verify the WriteRequestMessage of " start-up-on-off " on the TH (all-cluster-app) log:
 
-          [1650536431.411044][3678:3678] CHIP:DMG: WriteRequestMessage =
-          [1650536431.411090][3678:3678] CHIP:DMG: {
-          [1650536431.411132][3678:3678] CHIP:DMG:         suppressResponse = false,
-          [1650536431.411180][3678:3678] CHIP:DMG:         timedRequest = false,
-          [1650536431.411224][3678:3678] CHIP:DMG:         AttributeDataIBs =
-          [1650536431.411278][3678:3678] CHIP:DMG:         [4
-          [1650536431.411323][3678:3678] CHIP:DMG:                 AttributeDataIB =
-          [1650536431.411386][3678:3678] CHIP:DMG:                 {
-          [1650536431.411434][3678:3678] CHIP:DMG:                         AttributePathIB =
-          [1650536431.411490][3678:3678] CHIP:DMG:                         {
-          [1650536431.411551][3678:3678] CHIP:DMG:                                 Endpoint = 0x1,
-          [1650536431.411617][3678:3678] CHIP:DMG:                                 Cluster = 0x6,
-          [1650536431.411683][3678:3678] CHIP:DMG:                                 Attribute = 0x0000_4003,
-          [1650536431.411741][3678:3678] CHIP:DMG:                         }
-          [1650536431.411799][3678:3678] CHIP:DMG:
-          [1650536431.411863][3678:3678] CHIP:DMG:                                 Data = 60,
-          [1650536431.411919][3678:3678] CHIP:DMG:                 },
-          [1650536431.411972][3678:3678] CHIP:DMG:
-          [1650536431.412015][3678:3678] CHIP:DMG:         ],
-          [1650536431.412068][3678:3678] CHIP:DMG:
-          [1650536431.412113][3678:3678] CHIP:DMG:         moreChunkedMessages = false,
-          [1650536431.412165][3678:3678] CHIP:DMG:         InteractionModelRevision = 1
-          [1650536431.412214][3678:3678] CHIP:DMG: },
+          [1661838915.672667][6867:6867] CHIP:DMG: WriteRequestMessage =
+          [1661838915.672676][6867:6867] CHIP:DMG: {
+          [1661838915.672684][6867:6867] CHIP:DMG: 	suppressResponse = false,
+          [1661838915.672692][6867:6867] CHIP:DMG: 	timedRequest = false,
+          [1661838915.672699][6867:6867] CHIP:DMG: 	AttributeDataIBs =
+          [1661838915.672711][6867:6867] CHIP:DMG: 	[
+          [1661838915.672718][6867:6867] CHIP:DMG: 		AttributeDataIB =
+          [1661838915.672727][6867:6867] CHIP:DMG: 		{
+          [1661838915.672734][6867:6867] CHIP:DMG: 			AttributePathIB =
+          [1661838915.672744][6867:6867] CHIP:DMG: 			{
+          [1661838915.672753][6867:6867] CHIP:DMG: 				Endpoint = 0x1,
+          [1661838915.672761][6867:6867] CHIP:DMG: 				Cluster = 0x6,
+          [1661838915.672770][6867:6867] CHIP:DMG: 				Attribute = 0x0000_4003,
+          [1661838915.672778][6867:6867] CHIP:DMG: 			}
+          [1661838915.672788][6867:6867] CHIP:DMG:
+          [1661838915.672797][6867:6867] CHIP:DMG: 			Data = 2,
+          [1661838915.672805][6867:6867] CHIP:DMG: 		},
+          [1661838915.672815][6867:6867] CHIP:DMG:
+          [1661838915.672825][6867:6867] CHIP:DMG: 	],
+          [1661838915.672831][6867:6867] CHIP:DMG:
+          [1661838915.672834][6867:6867] CHIP:DMG: 	moreChunkedMessages = false,
+          [1661838915.672836][6867:6867] CHIP:DMG: 	InteractionModelRevision = 1
+          [1661838915.672838][6867:6867] CHIP:DMG: },
+          [1661838915.672852][6867:6867] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=m
+          [1661838915.672858][6867:6867] CHIP:DMG: AccessControl: allowed
+          [1661838915.672892][6867:6867] CHIP:DL: writing settings to file (/tmp/chip_kvs-mDTHyV)
+          [1661838915.672981][6867:6867] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1661838915.673010][6867:6867] CHIP:DMG: Endpoint 1, Cluster 0x0000_0006 update version to daeb2f6d
       disabled: true
 
     - label:

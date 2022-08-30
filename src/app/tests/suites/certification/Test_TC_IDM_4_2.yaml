@@ -44,7 +44,7 @@ tests:
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
            onoff subscribe on-off  100  3900(65 mins) 1 1
-          On TH, verify that the report data message is received from DUT and check it contains all the data which mentioned in expected outcome
+          On TH(chip-tool), verify that the report data message is received from DUT and check it contains all the data which mentioned in expected outcome
           m RetransTable on exchange 33626i
           [1657449840.232430][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657449840.232485][11635:11640] CHIP:DMG: {
@@ -100,7 +100,7 @@ tests:
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
            basic subscribe location 10 2400 1 0
-          On TH, verify that the report data message is received from DUT and check it contains all the data which mentioned in expected outcome
+          On TH(chip-tool), verify that the report data message is received from DUT and check it contains all the data which mentioned in expected outcome
           m RetransTable on exchange 33628i
           [1657450022.756280][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657450022.756349][11635:11640] CHIP:DMG: {
@@ -269,7 +269,7 @@ tests:
 
           onoff subscribe on-time 100 100 1 1
 
-          On TH verify that the DUT sends a report data with the value of the attribute after the MinIntervalFloor time.
+          On TH(chip-tool) verify that the DUT sends a report data with the value of the attribute after the MinIntervalFloor time.
 
           [1657450934.856825][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733053 from RetransTable on exchange 33631i
           [1657450934.856955][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -314,11 +314,11 @@ tests:
 
            onoff subscribe on-time 500 100 1 1
 
-          On TH Verify that the DUT sends an error message
+          On TH(chip-tool) Verify that the DUT sends an error message
           [1661754615.089845][103654:103659] CHIP:DMG: StatusResponseMessage =
           [1661754615.089857][103654:103659] CHIP:DMG: {
-          [1661754615.089868][103654:103659] CHIP:DMG: 	Status = 0x80 (INVALID_ACTION),
-          [1661754615.089879][103654:103659] CHIP:DMG: 	InteractionModelRevision = 1
+          [1661754615.089868][103654:103659] CHIP:DMG:         Status = 0x80 (INVALID_ACTION),
+          [1661754615.089879][103654:103659] CHIP:DMG:         InteractionModelRevision = 1
           [1661754615.089889][103654:103659] CHIP:DMG: }
           [1661754615.089901][103654:103659] CHIP:IM: Received status response, status is 0x80 (INVALID_ACTION)
           [1661754615.089927][103654:103659] CHIP:EM: Piggybacking Ack for MessageCounter:223396916 on exchange: 6193i
@@ -336,7 +336,7 @@ tests:
 
            any subscribe-by-id 0xFFFFFFFF 0xFFFD  10 300 1 0xFFFF
 
-          On TH Verify that the Subscription succeeds and the DUT sends back the attribute values for the global attribute
+          On TH(chip-tool) Verify that the Subscription succeeds and the DUT sends back the attribute values for the global attribute
       disabled: true
 
     - label:
@@ -351,7 +351,7 @@ tests:
 
           any subscribe-by-id 0xFFFFFFFF 0xFFFD  10 300 1 0
 
-          On TH Verify that the Subscription succeeds and the DUT sends back the attribute values for the global attribute
+          On TH(chip-tool) Verify that the Subscription succeeds and the DUT sends back the attribute values for the global attribute
 
           [1657451191.595630][11635:11640] CHIP:DMG:      InteractionModelRevision = 1
           [1657451191.595654][11635:11640] CHIP:DMG: }

@@ -68,7 +68,7 @@
     ],
     "LocalizationConfiguration": ["Test_TC_LCFG_1_1"],
     "TimeFormatLocalization": ["Test_TC_LTIME_1_2"],
-    "UnitLocalization": ["Test_TC_LUNIT_1_1"],
+    "UnitLocalization": ["Test_TC_LUNIT_1_2"],
     "UserLabel": [
         "Test_TC_ULABEL_1_1",
         "Test_TC_ULABEL_2_1",

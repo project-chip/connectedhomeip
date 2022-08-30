@@ -91,7 +91,7 @@ tests:
           "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
           value is list of AccessControlExtensionStruct containing 1 element
           1.struct Data field: D_OK_EMPTY : 1718"
-      PICS: ACL.S.E01
+      PICS: ACL.S.A0001
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"1718"}]" 1 0
           On TH1(Chiptool), Verify  AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element
@@ -168,7 +168,7 @@ tests:
           value is list of AccessControlExtensionStruct containing 1 element
           1.struct Data field: D_OK_SINGLE
           17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
-      PICS: ACL.S.E01
+      PICS: ACL.S.A0001
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
           On TH1(Chiptool) , Verify   Successfully extension attribute list containing one element
@@ -249,7 +249,7 @@ tests:
           value is list of AccessControlExtensionStruct containing 1 element
           1.struct Data field: D_BAD_LENGTH
           17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"
-      PICS: ACL.S.E01
+      PICS: ACL.S.A0001
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"}]" 1 0
 
@@ -303,7 +303,7 @@ tests:
           value is list of AccessControlExtensionStruct containing 2 elements 1.
           struct Data field: D_OK_EMPTY :1718 2.struct Data field: D_OK_SINGLE
           :17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
-      PICS: ACL.S.E01
+      PICS: ACL.S.A0001
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"1718"},{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
 
@@ -356,7 +356,7 @@ tests:
     - label:
           "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
           value is an empty list"
-      PICS: ACL.S.E01
+      PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol write extension "[]" 1 0
           On TH1(Chiptool) , Verify  AccessControl cluster Extension attribute, value is an empty list

@@ -31,11 +31,19 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
+
     - label:
           "Read FeatureMap  attribute and Check values of flags in this
           FeatureMap"
       PICS:
-          "!SWTCH.S.F00 && SWTCH.S.F01 && !SWTCH.S.F02 && !SWTCH.S.F03 &&
+          "!SWTCH.S.F00 && !SWTCH.S.F01 && !SWTCH.S.F02 && !SWTCH.S.F03 &&
           !SWTCH.S.F04"
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -44,25 +52,55 @@ tests:
           constraints:
               type: bitmap32
 
-    - label:
-          "Read FeatureMap  attribute and Check values of flags in this
-          FeatureMap"
-      PICS:
-          (SWTCH.S.F00 || SWTCH.S.F01 || SWTCH.S.F02 || SWTCH.S.F03 ||
-          SWTCH.S.F04)
+    - label: "Given SWTCH.S.F00(LS) ensure featuremap has the correct bit set"
+      PICS: SWTCH.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              minValue: 1
-              maxValue: 31
+              hasMasksSet: [0x01]
+              hasMasksClear: [0x02, 0x04, 0x08, 0x10]
 
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Given SWTCH.S.F01(MS) ensure featuremap has the correct bit set"
+      PICS: SWTCH.S.F01
       command: "readAttribute"
-      attribute: "ClusterRevision"
+      attribute: "FeatureMap"
       response:
-          value: 1
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+              hasMasksClear: [0x1]
+
+    - label: "Given SWTCH.S.F02(MSR) ensure featuremap has the correct bit set"
+      PICS: SWTCH.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2, 0x4]
+              hasMasksClear: [0x1]
+
+    - label: "Given SWTCH.S.F03(MSL) ensure featuremap has the correct bit set"
+      PICS: SWTCH.S.F03
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2, 0x4, 0x8]
+              hasMasksClear: [0x1]
+
+    - label: "Given SWTCH.S.F04(MSM) ensure featuremap has the correct bit set"
+      PICS: SWTCH.S.F04
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2, 0x4, 0x10]
+              hasMasksClear: [0x1]
 
     - label: "Read the global attribute: AttributeList"
       PICS: SWTCH.S.F04

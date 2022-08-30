@@ -55,7 +55,7 @@ tests:
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           onoff  subscribe start-up-on-off  30 100 1 1
-          on TH, verify that DUT is responds right attribute value for above command
+          on TH(chip-tool), verify that DUT is responds right attribute value for above command
 
           [1657451357.177831][11635:11640] CHIP:DMG: {
           [1657451357.177894][11635:11640] CHIP:DMG:      SubscriptionId = 0xf3aa49ef,
@@ -133,7 +133,7 @@ tests:
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
            onoff  subscribe on-off 10 200  1 1
-           on TH  verify Verify that DUT is responds right attribute value for above command
+           on TH(chip-tool)  verify Verify that DUT is responds right attribute value for above command
 
           [1657451491.078934][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657451491.079004][11635:11640] CHIP:DMG: {
@@ -167,7 +167,7 @@ tests:
 
 
            onoff  subscribe on-off 10 200  1 1  --data-version  0x1979c38
-          On TH,  Verify that there is an empty report data message sent from the DUT to the TH
+          On TH(chip-tool),  Verify that there is an empty report data message sent from the DUT to the TH
           [1657451619.059013][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657451619.059083][11635:11640] CHIP:DMG: {
           [1657451619.059145][11635:11640] CHIP:DMG:      SubscriptionId = 0x28f3dd7,
@@ -201,7 +201,7 @@ tests:
 
 
            basic subscribe local-config-disabled 100 200 1 0
-           on TH verify that DUT is responds right attribute value for above command and then send write command to change the attribute value, verify the attribute value is modified or not.
+           on TH(chip-tool) verify that DUT is responds right attribute value for above command and then send write command to change the attribute value, verify the attribute value is modified or not.
           [1657451690.259096][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733078 from RetransTable on exchange 33639i
           [1657451690.259223][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657451690.259295][11635:11640] CHIP:DMG: {
@@ -291,7 +291,7 @@ tests:
 
           basic subscribe node-label 10 100 1 0
 
-          on TH  verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
+          on TH(chip-tool)  verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
           1657452002.280167][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733100 from RetransTable on exchange 33648i
           [1657452002.280291][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -378,7 +378,7 @@ tests:
 
           any subscribe-by-id 0x0008 0x0010 10 100  1 1
 
-           on TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
+           on TH(chip-tool) verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
           [1657452196.617935][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733107 from RetransTable on exchange 33650i
           [1657452196.618061][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -459,6 +459,9 @@ tests:
       PICS: MCORE.IDM.S.Attribute.DataType_SignedInteger
       verification: |
           Subscribe to an attribute of type signed integer to the Harness
+
+
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -470,6 +473,9 @@ tests:
       PICS: MCORE.IDM.S.Attribute.DataType_FloatingPoint
       verification: |
           Subscribe to an attribute of type floating point to the Harness
+
+
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -488,7 +494,7 @@ tests:
 
 
            userlabel subscribe label-list 100 500 1 0
-           On TH verify that  DUT is responds right attribute value for above  command
+           On TH(chip-tool) verify that  DUT is responds right attribute value for above  command
           [1655896309.160632][1885:1890] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_0000 DataVersion: 3773922725
           [1655896309.160795][1885:1890] CHIP:TOO:   label list: 0 entries
           [1655896309.160851][1885:1890] CHIP:DMG: MoveToState ReadClient[0xffffa0005710]: Moving to [AwaitingSu]
@@ -527,7 +533,7 @@ tests:
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           basic subscribe local-config-disabled 10 100  1 0 --keepSubscriptions 0
-          on TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
+          on TH(chip-tool) verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
           [1657453109.707943][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733139 from RetransTable on exchange 33658i
           [1657453109.708065][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -641,7 +647,7 @@ tests:
 
            levelcontrol subscribe  on-level 10 80 1 1
 
-          On TH verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
+          On TH(chip-tool) verify that DUT is responds right attribute value for below command and then send write command to change the attribute value, verify the attribute value is modified or not.
 
           [1657453503.538054][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733149 from RetransTable on exchange 33661i
           [1657453503.538172][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -721,7 +727,7 @@ tests:
 
 
           onoff subscribe on-time 100 1000 1 1
-          On TH Verify that the DUT sends a Report Data action and  There are no attribute value changes before MaxInterval elapses.
+          On TH(chip-tool) Verify that the DUT sends a Report Data action and  There are no attribute value changes before MaxInterval elapses.
           [1657453718.436970][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657453718.437043][11635:11640] CHIP:DMG: {
           [1657453718.437108][11635:11640] CHIP:DMG:      SubscriptionId = 0xce00f651,
@@ -773,7 +779,7 @@ tests:
           >>>  onoff subscribe off-wait-time 10 500 1 1 --keepSubscriptions 1
 
 
-          On TH verify that DUT is responds right attribute value for above command and then send write command to change the attribute value, verify the attribute value is modified or not for both attributes
+          On TH(chip-tool) verify that DUT is responds right attribute value for above command and then send write command to change the attribute value, verify the attribute value is modified or not for both attributes
 
 
           [1657454078.091825][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -871,7 +877,7 @@ tests:
           [1657454115.801076][11635:11640] CHIP:DMG: Refresh LivenessCheckTime for 525000 milliseconds with SubscriptionId = 0x732d29f8 Peer = 01:0000000000000001
 
 
-          here is an example command the TH can write an attribute in the onoff cluster in the DUT to change the value that the TH subscribed in the above command.
+          here is an example command the TH can write an attribute in the onoff cluster in the DUT to change the value that the TH(chip-tool) subscribed in the above command.
            onoff write on-time 2 1 1
           [1657454129.447088][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657454129.447157][11635:11640] CHIP:DMG: {
@@ -999,7 +1005,7 @@ tests:
           [1657454614.585029][11635:11640] CHIP:TOO:   OffWaitTime: 3
           [1657454614.585094][11635:11640] CHIP:DMG: MoveToState ReadClient[0xffff940092b0]: Moving to [AwaitingSu]
 
-          here is an example command the TH can write an attribute in the onoff cluster in the DUT to change the value that the TH subscribed in the above command.
+          here is an example command the TH can write an attribute in the onoff cluster in the DUT to change the value that the TH(chip-tool) subscribed in the above command.
 
 
           onoff write on-time 1 1 1
@@ -1027,7 +1033,7 @@ tests:
           [1657455187.788687][11635:11640] CHIP:DMG:
           [1657455187.788687][11635:11640] CHIP:DMG:               },
 
-          here is an example command the TH can write an attribute in the onoff cluster in the DUT to change the value that the TH subscribed in the above command.
+          here is an example command the TH can write an attribute in the onoff cluster in the DUT to change the value that the TH(chip-tool) subscribed in the above command.
            onoff write off-wait-time 1 1 1
 
           On TH verify that, TH  received a report data from DUT
@@ -1099,7 +1105,7 @@ tests:
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
           onoff subscribe-by-id 0x4001 200 700  1 0xFFFF
-           on TH, verify that DUT is responds right attribute value for  command and then send write command to change the attribute value,
+           on TH(chip-tool), verify that DUT is responds right attribute value for  command and then send write command to change the attribute value,
           [1658322253.825601][4866:4871] CHIP:DMG: ReportDataMessage =
           [1658322253.825662][4866:4871] CHIP:DMG: {
           [1658322253.825714][4866:4871] CHIP:DMG:        SubscriptionId = 0x42baa1,

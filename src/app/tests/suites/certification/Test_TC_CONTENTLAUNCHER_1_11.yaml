@@ -50,15 +50,25 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Read the global attribute: FeatureMap"
-      PICS: CONTENTLAUNCHER.S.CS || CONTENTLAUNCHER.S.UP
+    - label:
+          "Given CONTENTLAUNCHER.S.CS) ensure featuremap has the correct bit set"
+      PICS: CONTENTLAUNCHER.S.CS
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              minValue: 1
-              maxValue: 3
+              hasMasksSet: [0x1]
+
+    - label:
+          "Given CONTENTLAUNCHER.S.UP ensure featuremap has the correct bit set"
+      PICS: CONTENTLAUNCHER.S.UP
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"

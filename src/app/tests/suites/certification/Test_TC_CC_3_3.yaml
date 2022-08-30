@@ -241,7 +241,7 @@ tests:
     - label: "TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A4001
       command: "readAttribute"
-      attribute: "ColorMode"
+      attribute: "EnhancedColorMode"
       response:
           constraints:
               minValue: 0
