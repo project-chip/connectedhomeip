@@ -23,7 +23,17 @@ It is recommended to install the "GBL Compression (LZMA)" component under Platfo
 At this point the project contains all the components necessary to support the Matter OTA Software Update functionality. Other components can now be added to support additional features such as Secure Boot. Refer to _UG489: Silicon Labs Gecko Bootloader User's Guide for GSDK 4.0 and Higher_  for the description of various Bootloader features and the steps to enable them. 
 
 ### Building and Flashing the Bootloader
-Build the project by clicking on the hammer icon in the Studio toolbar. Flash the bootloader to the board using the "Upload Application" option from the Debug Adapters view. 
+Build the project by clicking on the hammer icon in the Studio toolbar. Flash the bootloader to the board using the "Upload Application" option from the Debug Adapters view.
+
+### Combined bootloader for MG12 boards
+The MG12 boards (which are Series 1 EFR32 boards) require a combined bootloader image (first stage bootloader + main bootloader) the first time a device is programmed -- whether during development or manufacturing.  For subsequent programming, if the combined bootloader had been previously flashed to the device use the regular version.
+
+To create the combined bootloader follow this additional step (Step 6 in Section 6 of _UG489: Silicon Labs Gecko Bootloader User's Guide for GSDK 4.0 and Higher_) before clicking the build icon: Right-click the project name in the Project Explorer view and select Properties. In the C/C++ Build group, click Settings. On the Build Steps tab, in the Post Build Steps Command field enter
+
+           ../postbuild.sh "${ProjDirPath}" "${StudioSdkPath}" "${CommanderAdapterPackPath}"
+
+Click Apply and Close. Three bootloader images will be generated into the build directory: a main bootloader, a main bootloader with CRC32 checksum, and a combined first stage and main bootloader with CRC32 checksum. The main bootloader image is called <project-name>.s37, the main bootloader with CRC32 checksum is called <projectname>-crc.s37, while the combined first stage image + main bootloader image with a CRC32 checksum is called <projectname>-combined.s37.
+
 
 ## Internal Bootloader: Image Size, Selecting Storage Slot Address and Size  
 The internal storage bootloader for Matter OTA software update is supported on MG24 boards only. In this use case both the running image and the downloadable update image must fit on the internal flash at the same time. This in turn requires that both images are built with a reduced feature set such as disabled logging and Matter shell (see [here](./OTA_SOFTWARE_UPDATE.md#Internal-Storage-Bootloader) for the list of features). Using LZMA compression when building the GBL file further reduces the downloaded image size.
