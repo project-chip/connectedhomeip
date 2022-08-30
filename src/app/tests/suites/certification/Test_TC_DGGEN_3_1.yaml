@@ -287,9 +287,9 @@ tests:
           is possible option for this attribute."
       PICS: DGGEN.C.A0007
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          ./chip-tool generaldiagnostics read active-network-faults 1 0 
+          ./chip-tool generaldiagnostics read active-network-faults 1 0
           verify that ActiveNetworkFaults attribute value attribute response should be empty. But when a network fault occurs, the return attribute value must match the value listed in the NetworkFault ENUM on TH(all-clusters-app)
 
           ReadRequestMessage =
@@ -302,10 +302,10 @@ tests:
           [1661422339.662926][2220:2220] CHIP:DMG:                         Cluster = 0x33,
           [1661422339.663022][2220:2220] CHIP:DMG:                         Attribute = 0x0000_0007,
           [1661422339.663110][2220:2220] CHIP:DMG:                 }
-          [1661422339.663184][2220:2220] CHIP:DMG:                         
+          [1661422339.663184][2220:2220] CHIP:DMG:
           [1661422339.663249][2220:2220] CHIP:DMG:         ],
-          [1661422339.663321][2220:2220] CHIP:DMG:                 
-          [1661422339.663389][2220:2220] CHIP:DMG:         isFabricFiltered = true, 
+          [1661422339.663321][2220:2220] CHIP:DMG:
+          [1661422339.663389][2220:2220] CHIP:DMG:         isFabricFiltered = true,
           [1661422339.663454][2220:2220] CHIP:DMG:         InteractionModelRevision = 1
           [1661422339.663514][2220:2220] CHIP:DMG: },
           [1661422339.663697][2220:2220] CHIP:DMG: IM RH moving to [GeneratingReports]
