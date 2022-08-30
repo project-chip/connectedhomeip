@@ -76,7 +76,7 @@ if (CONFIG_APP_PROJECT_VER_FROM_CONFIG)
 elseif (DEFINED PROJECT_VER_NUMBER)
     chip_gn_arg_append("chip_config_software_version_number" ${PROJECT_VER_NUMBER})
 else()
-    message(FATAL_ERROR "Please set software version by setting PROJECT_VER_NUMBER in project's CMakeLists.txt or using CONFIG_APP_PROJECT_VER_FROM_CONFIG option")
+    chip_gn_arg_append("chip_config_software_version_number" 0)
 endif()
 
 chip_gn_arg_append("esp32_ar"              "\"${CMAKE_AR}\"")
