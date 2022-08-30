@@ -48,9 +48,10 @@ static_library("cc32xx") {
 
   include_dirs = [ 
     "ifmod/", 
-    "${chip_root}/src",
      ]
-  deps = []
+  deps = [
+    "${chip_root}/src/lib/dnssd:platform_header",
+  ]
 
   public_deps = [
     "${chip_root}/src/crypto",
