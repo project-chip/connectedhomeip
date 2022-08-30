@@ -41,12 +41,16 @@ from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import *
 from . import clusters as Clusters
 from .FabricAdmin import FabricAdmin
+from . import discovery
 import enum
 import threading
 import typing
 import builtins
 import ctypes
 import copy
+import json
+import time
+import dacite
 
 __all__ = ["ChipDeviceController"]
 
@@ -63,6 +67,8 @@ _DeviceAvailableFunct = CFUNCTYPE(None, c_void_p, c_uint32)
 
 _IssueNOCChainCallbackPythonCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint32, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_uint64)
+
+_ChipDeviceController_IterateDiscoveredCommissionableNodesFunct = CFUNCTYPE(None, c_char_p, c_size_t)
 
 
 @dataclass
@@ -117,6 +123,27 @@ class DCState(enum.IntEnum):
     COMMISSIONING = 5
 
 
+class CommissionableNode(discovery.CommissionableNode):
+    def SetDeviceController(self, devCtrl: 'ChipDeviceController'):
+        self._devCtrl = devCtrl
+
+    def Commission(self, nodeId: int, setupPinCode: int):
+        ''' Commission the device using the device controller discovered this device.
+
+        nodeId: The nodeId commissioned to the device
+        setupPinCode: The setup pin code of the device
+        '''
+        self._devCtrl.CommissionOnNetwork(
+            nodeId, setupPinCode, filterType=discovery.FilterType.INSTANCE_NAME, filter=self.instanceName)
+
+    def __rich_repr__(self):
+        yield "(To Be Commissioned By)", self._devCtrl.name
+
+        for k in self.__dataclass_fields__.keys():
+            if k in self.__dict__:
+                yield k, self.__dict__[k]
+
+
 class DeviceProxyWrapper():
     ''' Encapsulates a pointer to OperationalDeviceProxy on the c++ side that needs to be
         freed when DeviceProxyWrapper goes out of scope. There is a potential issue where
@@ -167,17 +194,7 @@ class DeviceProxyWrapper():
         return numSessions.value
 
 
-class DiscoveryFilterType(enum.IntEnum):
-    # These must match chip::Dnssd::DiscoveryFilterType values (barring the naming convention)
-    NONE = 0
-    SHORT_DISCRIMINATOR = 1
-    LONG_DISCRIMINATOR = 2
-    VENDOR_ID = 3
-    DEVICE_TYPE = 4
-    COMMISSIONING_MODE = 5
-    INSTANCE_NAME = 6
-    COMMISSIONER = 7
-    COMPRESSED_FABRIC_ID = 8
+DiscoveryFilterType = discovery.FilterType
 
 
 class ChipDeviceController():
@@ -589,7 +606,49 @@ class ChipDeviceController():
 
         return (address.value.decode(), port.value) if error == 0 else None
 
+    def DiscoverCommissionableNodes(self, filterType: discovery.FilterType = discovery.FilterType.NONE, filter: typing.Any = None, stopOnFirst: bool = False, timeoutSecond: int = 5) -> typing.Union[None, CommissionableNode, typing.List[CommissionableNode]]:
+        ''' Discover commissionable nodes via DNS-SD with specified filters.
+            Supported filters are:
+
+                discovery.FilterType.NONE
+                discovery.FilterType.SHORT_DISCRIMINATOR
+                discovery.FilterType.LONG_DISCRIMINATOR
+                discovery.FilterType.VENDOR_ID
+                discovery.FilterType.DEVICE_TYPE
+                discovery.FilterType.COMMISSIONING_MODE
+                discovery.FilterType.INSTANCE_NAME
+                discovery.FilterType.COMMISSIONER
+                discovery.FilterType.COMPRESSED_FABRIC_ID
+
+            This function will always return a list of CommissionableDevice. When stopOnFirst is set, this function will return when at least one device is discovered or on timeout.
+        '''
+        self.CheckIsActive()
+
+        if isinstance(filter, int):
+            filter = str(filter)
+
+        res = self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes(
+                self.devCtrl, int(filterType), str(filter).encode("utf-8") + b"\x00"))
+
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+
+        if timeoutSecond != 0:
+            if stopOnFirst:
+                target = time.time() + timeoutSecond
+                while time.time() < target:
+                    if self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode(self.devCtrl)):
+                        break
+                    time.sleep(0.1)
+            else:
+                time.sleep(timeoutSecond)
+
+        return self.GetDiscoveredDevices()
+
     def DiscoverCommissionableNodesLongDiscriminator(self, long_discriminator):
+        ''' Deprecated, use DiscoverCommissionableNodes
+        '''
         self.CheckIsActive()
 
         return self._ChipStack.Call(
@@ -598,6 +657,8 @@ class ChipDeviceController():
         )
 
     def DiscoverCommissionableNodesShortDiscriminator(self, short_discriminator):
+        ''' Deprecated, use DiscoverCommissionableNodes
+        '''
         self.CheckIsActive()
 
         return self._ChipStack.Call(
@@ -606,6 +667,8 @@ class ChipDeviceController():
         )
 
     def DiscoverCommissionableNodesVendor(self, vendor):
+        ''' Deprecated, use DiscoverCommissionableNodes
+        '''
         self.CheckIsActive()
 
         return self._ChipStack.Call(
@@ -614,6 +677,8 @@ class ChipDeviceController():
         )
 
     def DiscoverCommissionableNodesDeviceType(self, device_type):
+        ''' Deprecated, use DiscoverCommissionableNodes
+        '''
         self.CheckIsActive()
 
         return self._ChipStack.Call(
@@ -622,6 +687,8 @@ class ChipDeviceController():
         )
 
     def DiscoverCommissionableNodesCommissioningEnabled(self):
+        ''' Deprecated, use DiscoverCommissionableNodes
+        '''
         self.CheckIsActive()
 
         return self._ChipStack.Call(
@@ -630,12 +697,30 @@ class ChipDeviceController():
         )
 
     def PrintDiscoveredDevices(self):
+        ''' Deprecated, use GetCommissionableNodes
+        '''
         self.CheckIsActive()
 
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_PrintDiscoveredDevices(
                 self.devCtrl)
         )
+
+    def GetDiscoveredDevices(self):
+        def GetDevices(devCtrl):
+            devices = []
+
+            @_ChipDeviceController_IterateDiscoveredCommissionableNodesFunct
+            def HandleDevice(deviceJson, deviceJsonLen):
+                jsonStr = ctypes.string_at(deviceJson, deviceJsonLen).decode("utf-8")
+                device = dacite.from_dict(data_class=CommissionableNode, data=json.loads(jsonStr))
+                device.SetDeviceController(devCtrl)
+                devices.append(device)
+
+            self._dmLib.pychip_DeviceController_IterateDiscoveredCommissionableNodes(devCtrl.devCtrl, HandleDevice)
+            return devices
+
+        return self._ChipStack.Call(lambda: GetDevices(self))
 
     def ParseQRCode(self, qrCode, output):
         self.CheckIsActive()
@@ -655,6 +740,8 @@ class ChipDeviceController():
         )
 
     def DiscoverAllCommissioning(self):
+        ''' Deprecated, use DiscoverCommissionableNodes
+        '''
         self.CheckIsActive()
 
         return self._ChipStack.Call(
@@ -1239,7 +1326,7 @@ class ChipDeviceController():
             self._dmLib.pychip_DeviceController_OnNetworkCommission.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.argtypes = [
-                c_void_p]
+                c_void_p, c_uint8, c_char_p]
             self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator.argtypes = [
@@ -1270,6 +1357,10 @@ class ChipDeviceController():
                 c_void_p]
             self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [
                 c_void_p]
+            self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [
+                c_void_p, _ChipDeviceController_IterateDiscoveredCommissionableNodesFunct]
+            self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode.argtypes = [c_void_p]
+            self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode.restype = c_bool
 
             self._dmLib.pychip_DeviceController_GetIPForDiscoveredDevice.argtypes = [
                 c_void_p, c_int, c_char_p, c_uint32]
