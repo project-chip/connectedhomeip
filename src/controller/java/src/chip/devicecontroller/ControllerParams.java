@@ -211,7 +211,7 @@ public final class ControllerParams {
      * <p>Specifically, this sets SkipCommissioningComplete in the CommissioningParameters passed to
      * the CommissioningDelegate.
      *
-     * <p>A controller will set this to true when the CASE phase of commissioning is done by a separate 
+     * <p>A controller will set this to true when the CASE phase of commissioning is done by a separate
      * process, for example, by a Hub on the network.
      *
      * @param skipCommissioningComplete
