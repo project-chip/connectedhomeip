@@ -1653,6 +1653,13 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const Scope
         error = CHIP_ERROR_INTERNAL;
     }
 
+    if (commissioner->mDeviceBeingCommissioned == nullptr ||
+        commissioner->mDeviceBeingCommissioned->GetDeviceId() != peerId.GetNodeId())
+    {
+        // Not the device we are trying to commission.
+        return;
+    }
+
     if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational &&
         commissioner->mCommissioningDelegate != nullptr)
     {
