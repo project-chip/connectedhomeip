@@ -1124,7 +1124,7 @@ ILL.S.A0002=1
 ILL.S.A0003=1
 ILL.S.A0004=1
 
-#Door Lock 
+#Door Lock
 #server attributes
 DRLK.S.DetectLockJammed=1
 DRLK.S.Simulate.NotFullyLocked=1
@@ -1175,14 +1175,14 @@ DRLK.S.E04=1
 #Server Features
 DRLK.S.F00=1
 DRLK.S.F01=1
-DRLK.S.F02=1
+DRLK.S.F02=0
 DRLK.S.F04=1
 DRLK.S.F05=1
-DRLK.S.F06=1
+DRLK.S.F06=0
 DRLK.S.F07=1
 DRLK.S.F08=1
-DRLK.S.F10=1
-DRLK.S.F11=1
+DRLK.S.F0a=1
+DRLK.S.F0b=1
 
 #Server commands
 DRLK.S.C00.Rsp=1
@@ -1291,7 +1291,7 @@ DRLK.C.C1c.Rsp=1
 DRLK.C.C23.Rsp=1
 DRLK.C.C25.Rsp=1
 
-#Device Management 
+#Device Management
 #Server Attributes
 BINFO.S.A0000=1
 BINFO.S.A0001=1
@@ -1551,7 +1551,7 @@ DESC.C.A0002=1
 DESC.C.A0003=1
 DESC.C.A0004=1
 
-#Secure Channel 
+#Secure Channel
 MCORE.SC.SII_OP_DISCOVERY_KEY=1
 MCORE.SC.SAI_OP_DISCOVERY_KEY=1
 MCORE.SC.T_KEY=1
