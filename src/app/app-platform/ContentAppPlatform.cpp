@@ -115,7 +115,6 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             index++;
             continue;
         }
-        mContentApps[index] = app;
         EmberAfStatus ret;
         EndpointId initEndpointId = mCurrentEndpointId;
 
@@ -127,6 +126,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
                 ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
                                 mCurrentEndpointId, index);
                 app->SetEndpointId(mCurrentEndpointId);
+                mContentApps[index] = app;
                 IncrementCurrentEndpointID();
                 return app->GetEndpointId();
             }
@@ -181,7 +181,6 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             index++;
             continue;
         }
-        mContentApps[index] = app;
         EmberAfStatus ret   = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
         if (ret != EMBER_ZCL_STATUS_SUCCESS)
         {
@@ -191,6 +190,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
         ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
                         desiredEndpointId, index);
         app->SetEndpointId(desiredEndpointId);
+        mContentApps[index] = app;
         return app->GetEndpointId();
     }
     ChipLogError(DeviceLayer, "Failed to add dynamic endpoint: max endpoint count reached!");
