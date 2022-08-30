@@ -607,7 +607,10 @@ bool ChipRDN::IsEqual(const ChipRDN & other) const
     return mString.data_equal(other.mString);
 }
 
-ChipDN::ChipDN() {}
+ChipDN::ChipDN()
+{
+    Clear();
+}
 
 ChipDN::~ChipDN() {}
 
