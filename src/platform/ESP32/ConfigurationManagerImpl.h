@@ -56,6 +56,7 @@ public:
     CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override;
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize);
+    CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
     static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:

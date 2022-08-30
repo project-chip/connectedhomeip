@@ -215,6 +215,12 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
+{
+    softwareVer = CHIP_CONFIG_SOFTWARE_VERSION_NUMBER;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
