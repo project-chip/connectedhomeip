@@ -19,7 +19,6 @@ import("${chip_root}/build/chip/tools.gni")
 
 static_library("minimal-mdns-example-common") {
   sources = [
-    "AllInterfaceListener.h",
     "PacketReporter.cpp",
     "PacketReporter.h",
   ]
@@ -53,6 +52,7 @@ executable("minimal-mdns-server") {
     ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/dnssd/minimal_mdns",
+    "${chip_root}/src/lib/dnssd/minimal_mdns:default_policy",
     "${chip_root}/src/lib/dnssd/minimal_mdns/responders",
   ]
 

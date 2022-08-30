@@ -34,7 +34,7 @@ tests:
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
           DUT
-          sudo ./chip-all-clusters-app
+          sudo ./chip-all-clusters-app --wifi
 
           TH1
           ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
@@ -57,7 +57,7 @@ tests:
           "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin
           node ID N2"
       verification: |
-          Open a commissioning window On TH1(Chiptool)1using below command
+          Open a commissioning window On TH1(Chiptool)using below command
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 180 1  0 --timedInteractionTimeoutMs 1000
 
@@ -95,7 +95,7 @@ tests:
 
 
 
-          CommissiOn TH(Chiptool)2 to DUT using below command
+          CommissiOn TH2(Chiptool) to DUT using below command
 
           ./chip-tool pairing onnetwork 2 20202021 --commissioner-nodeid 223344  --commissioner-name beta
 
@@ -126,7 +126,7 @@ tests:
 
     - label:
           "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value
-          is list of AccessControlEntryStruct containing 1 element struct
+          is list of AccessControlEntryStruct containing 1 element 1.struct
           Privilege field: Administer (5) AuthMode field: CASE (2) Subjects
           field: [N1, 1111] Targets field: null"
       PICS: ACL.S.A0000
@@ -180,7 +180,7 @@ tests:
 
     - label:
           "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute value
-          is list of AccessControlEntryStruct containing 1 element struct
+          is list of AccessControlEntryStruct containing 1 element 1.struct
           Privilege field: Administer (5) AuthMode field: CASE (2) Subjects
           field: [N2, 2222] Targets field: null"
       PICS: ACL.S.A0000
@@ -260,17 +260,21 @@ tests:
           ./chip-tool accesscontrol read acl 2 0 --commissioner-name beta --commissioner-nodeid 223344
 
           On TH2(Chiptool), verify  AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
-          [1657286742.977222][18111:18116] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 3308562953
-          [1657286742.977287][18111:18116] CHIP:TOO:   ACL: 1 entries
-          [1657286742.977344][18111:18116] CHIP:TOO:     [1]: {
-          [1657286742.977368][18111:18116] CHIP:TOO:       Privilege: 5
-          [1657286742.977392][18111:18116] CHIP:TOO:       AuthMode: 2
-          [1657286742.977416][18111:18116] CHIP:TOO:       Subjects: 2 entries
-          [1657286742.977447][18111:18116] CHIP:TOO:         [1]: 223344
-          [1657286742.977468][18111:18116] CHIP:TOO:         [2]: 1111
-          [1657286742.977492][18111:18116] CHIP:TOO:       Targets: null
-          [1657286742.977515][18111:18116] CHIP:TOO:       FabricIndex: 1
-          [1657286742.977537][18111:18116] CHIP:TOO:      }
+
+          [1661407263.740571][2355:2360] CHIP:DMG: 	SuppressResponse = true,
+          [1661407263.740605][2355:2360] CHIP:DMG: 	InteractionModelRevision = 1
+          [1661407263.740640][2355:2360] CHIP:DMG: }
+          [1661407263.741000][2355:2360] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 2445703657
+          [1661407263.741100][2355:2360] CHIP:TOO:   ACL: 1 entries
+          [1661407263.741165][2355:2360] CHIP:TOO:     [1]: {
+          [1661407263.741222][2355:2360] CHIP:TOO:       Privilege: 5
+          [1661407263.741260][2355:2360] CHIP:TOO:       AuthMode: 2
+          [1661407263.741409][2355:2360] CHIP:TOO:       Subjects: 2 entries
+          [1661407263.741453][2355:2360] CHIP:TOO:         [1]: 223344
+          [1661407263.741487][2355:2360] CHIP:TOO:         [2]: 2222
+          [1661407263.741518][2355:2360] CHIP:TOO:       Targets: null
+          [1661407263.741553][2355:2360] CHIP:TOO:       FabricIndex: 2
+          [1661407263.741587][2355:2360] CHIP:TOO:      }
       disabled: true
 
     - label:
@@ -282,61 +286,65 @@ tests:
           On TH1(Chiptool), verify AccessControl cluster AccessControlEntryChanged containing 3 elements, and MUST NOT contain any element with FabricIndex F2
 
 
-          [1657286873.948408][4767:4772] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
-          [1657286873.948509][4767:4772] CHIP:TOO:          Event number: 1
-          [1657286873.948539][4767:4772] CHIP:TOO:          Priority: Info
-          [1657286873.948567][4767:4772] CHIP:TOO:          Timestamp: 31107322
-          [1657286873.948707][4767:4772] CHIP:TOO:   AccessControlEntryChanged: {
-          [1657286873.948741][4767:4772] CHIP:TOO:     AdminNodeID: null
-          [1657286873.948781][4767:4772] CHIP:TOO:     AdminPasscodeID: 0
-          [1657286873.948811][4767:4772] CHIP:TOO:     ChangeType: 1
-          [1657286873.948840][4767:4772] CHIP:TOO:     LatestValue: {
-          [1657286873.948868][4767:4772] CHIP:TOO:       Privilege: 5
-          [1657286873.948895][4767:4772] CHIP:TOO:       AuthMode: 2
-          [1657286873.948930][4767:4772] CHIP:TOO:       Subjects: 1 entries
-          [1657286873.948967][4767:4772] CHIP:TOO:         [1]: 112233
-          [1657286873.948998][4767:4772] CHIP:TOO:       Targets: null
-          [1657286873.949026][4767:4772] CHIP:TOO:       FabricIndex: 1
-          [1657286873.949054][4767:4772] CHIP:TOO:      }
-          [1657286873.949082][4767:4772] CHIP:TOO:     AdminFabricIndex: 1
-          [1657286873.949109][4767:4772] CHIP:TOO:    }
-          [1657286873.949254][4767:4772] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
-          [1657286873.949284][4767:4772] CHIP:TOO:          Event number: 5
-          [1657286873.949311][4767:4772] CHIP:TOO:          Priority: Info
-          [1657286873.949337][4767:4772] CHIP:TOO:          Timestamp: 31185059
-          [1657286873.949422][4767:4772] CHIP:TOO:   AccessControlEntryChanged: {
-          [1657286873.949454][4767:4772] CHIP:TOO:     AdminNodeID: 112233
-          [1657286873.949482][4767:4772] CHIP:TOO:     AdminPasscodeID: null
-          [1657286873.949511][4767:4772] CHIP:TOO:     ChangeType: 2
-          [1657286873.949538][4767:4772] CHIP:TOO:     LatestValue: {
-          [1657286873.949565][4767:4772] CHIP:TOO:       Privilege: 5
-          [1657286873.949592][4767:4772] CHIP:TOO:       AuthMode: 2
-          [1657286873.949623][4767:4772] CHIP:TOO:       Subjects: 1 entries
-          [1657286873.949656][4767:4772] CHIP:TOO:         [1]: 112233
-          [1657286873.949687][4767:4772] CHIP:TOO:       Targets: null
-          [1657286873.949712][4767:4772] CHIP:TOO:       FabricIndex: 1
-          [1657286873.949739][4767:4772] CHIP:TOO:      }
-          [1657286873.949767][4767:4772] CHIP:TOO:     AdminFabricIndex: 1
-          [1657286873.949794][4767:4772] CHIP:TOO:    }
-          [1657286873.949938][4767:4772] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
-          [1657286873.949970][4767:4772] CHIP:TOO:          Event number: 6
-          [1657286873.950056][4767:4772] CHIP:TOO:          Priority: Info
-          [1657286873.950087][4767:4772] CHIP:TOO:          Timestamp: 31185063
-          [1657286873.950142][4767:4772] CHIP:TOO:   AccessControlEntryChanged: {
-          [1657286873.950177][4767:4772] CHIP:TOO:     AdminNodeID: 112233
-          [1657286873.950208][4767:4772] CHIP:TOO:     AdminPasscodeID: null
-          [1657286873.950238][4767:4772] CHIP:TOO:     ChangeType: 1
-          [1657286873.950268][4767:4772] CHIP:TOO:     LatestValue: {
-          [1657286873.950298][4767:4772] CHIP:TOO:       Privilege: 5
-          [1657286873.950330][4767:4772] CHIP:TOO:       AuthMode: 2
-          [1657286873.950364][4767:4772] CHIP:TOO:       Subjects: 2 entries
-          [1657286873.950400][4767:4772] CHIP:TOO:         [1]: 112233
-          [1657286873.950434][4767:4772] CHIP:TOO:         [2]: 1111
-          [1657286873.950467][4767:4772] CHIP:TOO:       Targets: null
-          [1657286873.950497][4767:4772] CHIP:TOO:       FabricIndex: 1
-          [1657286873.950527][4767:4772] CHIP:TOO:      }
-          [1657286873.950557][4767:4772] CHIP:TOO:     AdminFabricIndex: 1
-          [1657286873.950586][4767:4772] CHIP:TOO:    }
+          1661355674.033284][10375:10380] CHIP:DMG:
+          [1661355674.033304][10375:10380] CHIP:DMG:         SuppressResponse = true,
+          [1661355674.033323][10375:10380] CHIP:DMG:         InteractionModelRevision = 1
+          [1661355674.033341][10375:10380] CHIP:DMG: }
+          [1661355674.033748][10375:10380] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1661355674.033771][10375:10380] CHIP:TOO:   Event number: 3
+          [1661355674.033788][10375:10380] CHIP:TOO:   Priority: Info
+          [1661355674.033804][10375:10380] CHIP:TOO:   Timestamp: 23234824
+          [1661355674.033906][10375:10380] CHIP:TOO:   AccessControlEntryChanged: {
+          [1661355674.033942][10375:10380] CHIP:TOO:     AdminNodeID: null
+          [1661355674.033966][10375:10380] CHIP:TOO:     AdminPasscodeID: 0
+          [1661355674.033988][10375:10380] CHIP:TOO:     ChangeType: 1
+          [1661355674.034009][10375:10380] CHIP:TOO:     LatestValue: {
+          [1661355674.034030][10375:10380] CHIP:TOO:       Privilege: 5
+          [1661355674.034052][10375:10380] CHIP:TOO:       AuthMode: 2
+          [1661355674.034078][10375:10380] CHIP:TOO:       Subjects: 1 entries
+          [1661355674.034106][10375:10380] CHIP:TOO:         [1]: 112233
+          [1661355674.034129][10375:10380] CHIP:TOO:       Targets: null
+          [1661355674.034155][10375:10380] CHIP:TOO:       FabricIndex: 1
+          [1661355674.034180][10375:10380] CHIP:TOO:      }
+          [1661355674.034206][10375:10380] CHIP:TOO:     FabricIndex: 1
+          [1661355674.034230][10375:10380] CHIP:TOO:    }
+          [1661355674.034369][10375:10380] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1661355674.034385][10375:10380] CHIP:TOO:   Event number: 5
+          [1661355674.034400][10375:10380] CHIP:TOO:   Priority: Info
+          [1661355674.034413][10375:10380] CHIP:TOO:   Timestamp: 23346775
+          [1661355674.034449][10375:10380] CHIP:TOO:   AccessControlEntryChanged: {
+          [1661355674.034467][10375:10380] CHIP:TOO:     AdminNodeID: 112233
+          [1661355674.034483][10375:10380] CHIP:TOO:     AdminPasscodeID: null
+          [1661355674.034499][10375:10380] CHIP:TOO:     ChangeType: 2
+          [1661355674.034514][10375:10380] CHIP:TOO:     LatestValue: {
+          [1661355674.034529][10375:10380] CHIP:TOO:       Privilege: 5
+          [1661355674.034544][10375:10380] CHIP:TOO:       AuthMode: 2
+          [1661355674.034561][10375:10380] CHIP:TOO:       Subjects: 1 entries
+          [1661355674.034579][10375:10380] CHIP:TOO:         [1]: 112233
+          [1661355674.034595][10375:10380] CHIP:TOO:       Targets: null
+          [1661355674.034611][10375:10380] CHIP:TOO:       FabricIndex: 1
+          [1661355674.034625][10375:10380] CHIP:TOO:      }
+          [1661355674.034640][10375:10380] CHIP:TOO:     FabricIndex: 1
+          [1661355674.034654][10375:10380] CHIP:TOO:    }
+          [1661355674.034789][10375:10380] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1661355674.034805][10375:10380] CHIP:TOO:   Event number: 6
+          [1661355674.034819][10375:10380] CHIP:TOO:   Priority: Info
+          [1661355674.034832][10375:10380] CHIP:TOO:   Timestamp: 23346777
+          [1661355674.034862][10375:10380] CHIP:TOO:   AccessControlEntryChanged: {
+          [1661355674.034879][10375:10380] CHIP:TOO:     AdminNodeID: 112233
+          [1661355674.034894][10375:10380] CHIP:TOO:     AdminPasscodeID: null
+          [1661355674.034909][10375:10380] CHIP:TOO:     ChangeType: 1
+          [1661355674.034923][10375:10380] CHIP:TOO:     LatestValue: {
+          [1661355674.034938][10375:10380] CHIP:TOO:       Privilege: 5
+          [1661355674.034952][10375:10380] CHIP:TOO:       AuthMode: 2
+          [1661355674.034970][10375:10380] CHIP:TOO:       Subjects: 2 entries
+          [1661355674.034988][10375:10380] CHIP:TOO:         [1]: 112233
+          [1661355674.035005][10375:10380] CHIP:TOO:         [2]: 1111
+          [1661355674.035020][10375:10380] CHIP:TOO:       Targets: null
+          [1661355674.035035][10375:10380] CHIP:TOO:       FabricIndex: 1
+          [1661355674.035049][10375:10380] CHIP:TOO:      }
+          [1661355674.035064][10375:10380] CHIP:TOO:     FabricIndex: 1
+          [1661355674.035078][10375:10380] CHIP:TOO:    }
       disabled: true
 
     - label:
@@ -349,40 +357,63 @@ tests:
 
 
 
-          [1657287207.040619][18332:18337] CHIP:TOO:          Event number: 7
-          [1657287207.040624][18332:18337] CHIP:TOO:          Priority: Info
-          [1657287207.040630][18332:18337] CHIP:TOO:          Timestamp: 31903266
-          [1657287207.040653][18332:18337] CHIP:TOO:   AccessControlEntryChanged: {
-          [1657287207.040660][18332:18337] CHIP:TOO:     AdminNodeID: 223344
-          [1657287207.040667][18332:18337] CHIP:TOO:     AdminPasscodeID: null
-          [1657287207.040675][18332:18337] CHIP:TOO:     ChangeType: 2
-          [1657287207.040681][18332:18337] CHIP:TOO:     LatestValue: {
-          [1657287207.040688][18332:18337] CHIP:TOO:       Privilege: 5
-          [1657287207.040695][18332:18337] CHIP:TOO:       AuthMode: 2
-          [1657287207.040703][18332:18337] CHIP:TOO:       Subjects: 1 entries
-          [1657287207.040713][18332:18337] CHIP:TOO:         [1]: 223344
-          [1657287207.040721][18332:18337] CHIP:TOO:       Targets: null
-          [1657287207.040728][18332:18337] CHIP:TOO:       FabricIndex: 2
-          [1657287207.040735][18332:18337] CHIP:TOO:      }
-          [1657287207.040742][18332:18337] CHIP:TOO:     AdminFabricIndex: 2
-          [1657287207.040749][18332:18337] CHIP:TOO:    }
-          [1657287207.040819][18332:18337] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
-          [1657287207.040827][18332:18337] CHIP:TOO:          Event number: 8
-          [1657287207.040833][18332:18337] CHIP:TOO:          Priority: Info
-          [1657287207.040840][18332:18337] CHIP:TOO:          Timestamp: 31903269
-          [1657287207.040856][18332:18337] CHIP:TOO:   AccessControlEntryChanged: {
-          [1657287207.040865][18332:18337] CHIP:TOO:     AdminNodeID: 223344
-          [1657287207.040872][18332:18337] CHIP:TOO:     AdminPasscodeID: null
-          [1657287207.040879][18332:18337] CHIP:TOO:     ChangeType: 1
-          [1657287207.040887][18332:18337] CHIP:TOO:     LatestValue: {
-          [1657287207.040894][18332:18337] CHIP:TOO:       Privilege: 5
-          [1657287207.040901][18332:18337] CHIP:TOO:       AuthMode: 2
-          [1657287207.040910][18332:18337] CHIP:TOO:       Subjects: 2 entries
-          [1657287207.040919][18332:18337] CHIP:TOO:         [1]: 223344
-          [1657287207.040928][18332:18337] CHIP:TOO:         [2]: 1111
-          [1657287207.040936][18332:18337] CHIP:TOO:       Targets: null
-          [1657287207.040943][18332:18337] CHIP:TOO:       FabricIndex: 2
-          [1657287207.040950][18332:18337] CHIP:TOO:      }
-          [1657287207.040957][18332:18337] CHIP:TOO:     AdminFabricIndex: 2
-          [1657287207.040964][18332:18337] CHIP:TOO:    }
+          [1661354915.731697][4136:4141] CHIP:DMG:
+          [1661354915.731730][4136:4141] CHIP:DMG:         SuppressResponse = true,
+          [1661354915.731759][4136:4141] CHIP:DMG:         InteractionModelRevision = 1
+          [1661354915.731790][4136:4141] CHIP:DMG: }
+          [1661354915.732074][4136:4141] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1661354915.732104][4136:4141] CHIP:TOO:   Event number: 4
+          [1661354915.732133][4136:4141] CHIP:TOO:   Priority: Info
+          [1661354915.732159][4136:4141] CHIP:TOO:   Timestamp: 22322302
+          [1661354915.732291][4136:4141] CHIP:TOO:   AccessControlEntryChanged: {
+          [1661354915.732328][4136:4141] CHIP:TOO:     AdminNodeID: null
+          [1661354915.732374][4136:4141] CHIP:TOO:     AdminPasscodeID: 0
+          [1661354915.732423][4136:4141] CHIP:TOO:     ChangeType: 1
+          [1661354915.732456][4136:4141] CHIP:TOO:     LatestValue: {
+          [1661354915.732486][4136:4141] CHIP:TOO:       Privilege: 5
+          [1661354915.732516][4136:4141] CHIP:TOO:       AuthMode: 2
+          [1661354915.732554][4136:4141] CHIP:TOO:       Subjects: 1 entries
+          [1661354915.732593][4136:4141] CHIP:TOO:         [1]: 223344
+          [1661354915.732625][4136:4141] CHIP:TOO:       Targets: null
+          [1661354915.732658][4136:4141] CHIP:TOO:       FabricIndex: 2
+          [1661354915.732688][4136:4141] CHIP:TOO:      }
+          [1661354915.732720][4136:4141] CHIP:TOO:     FabricIndex: 2
+          [1661354915.732749][4136:4141] CHIP:TOO:    }
+          [1661354915.732896][4136:4141] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1661354915.732929][4136:4141] CHIP:TOO:   Event number: 9
+          [1661354915.732955][4136:4141] CHIP:TOO:   Priority: Info
+          [1661354915.732980][4136:4141] CHIP:TOO:   Timestamp: 22566955
+          [1661354915.733031][4136:4141] CHIP:TOO:   AccessControlEntryChanged: {
+          [1661354915.733065][4136:4141] CHIP:TOO:     AdminNodeID: 223344
+          [1661354915.733097][4136:4141] CHIP:TOO:     AdminPasscodeID: null
+          [1661354915.733128][4136:4141] CHIP:TOO:     ChangeType: 2
+          [1661354915.733158][4136:4141] CHIP:TOO:     LatestValue: {
+          [1661354915.733187][4136:4141] CHIP:TOO:       Privilege: 5
+          [1661354915.733219][4136:4141] CHIP:TOO:       AuthMode: 2
+          [1661354915.733252][4136:4141] CHIP:TOO:       Subjects: 1 entries
+          [1661354915.733287][4136:4141] CHIP:TOO:         [1]: 223344
+          [1661354915.733319][4136:4141] CHIP:TOO:       Targets: null
+          [1661354915.733349][4136:4141] CHIP:TOO:       FabricIndex: 2
+          [1661354915.733379][4136:4141] CHIP:TOO:      }
+          [1661354915.733408][4136:4141] CHIP:TOO:     FabricIndex: 2
+          [1661354915.733437][4136:4141] CHIP:TOO:    }
+          [1661354915.733578][4136:4141] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1661354915.733610][4136:4141] CHIP:TOO:   Event number: 10
+          [1661354915.733637][4136:4141] CHIP:TOO:   Priority: Info
+          [1661354915.733662][4136:4141] CHIP:TOO:   Timestamp: 22566957
+          [1661354915.733709][4136:4141] CHIP:TOO:   AccessControlEntryChanged: {
+          [1661354915.733743][4136:4141] CHIP:TOO:     AdminNodeID: 223344
+          [1661354915.733772][4136:4141] CHIP:TOO:     AdminPasscodeID: null
+          [1661354915.733803][4136:4141] CHIP:TOO:     ChangeType: 1
+          [1661354915.733833][4136:4141] CHIP:TOO:     LatestValue: {
+          [1661354915.733863][4136:4141] CHIP:TOO:       Privilege: 5
+          [1661354915.733891][4136:4141] CHIP:TOO:       AuthMode: 2
+          [1661354915.733923][4136:4141] CHIP:TOO:       Subjects: 2 entries
+          [1661354915.733957][4136:4141] CHIP:TOO:         [1]: 223344
+          [1661354915.733991][4136:4141] CHIP:TOO:         [2]: 2222
+          [1661354915.734018][4136:4141] CHIP:TOO:       Targets: null
+          [1661354915.734048][4136:4141] CHIP:TOO:       FabricIndex: 2
+          [1661354915.734077][4136:4141] CHIP:TOO:      }
+          [1661354915.734107][4136:4141] CHIP:TOO:     FabricIndex: 2
+          [1661354915.734136][4136:4141] CHIP:TOO:    }
       disabled: true

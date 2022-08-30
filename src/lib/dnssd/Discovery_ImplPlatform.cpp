@@ -433,11 +433,11 @@ CHIP_ERROR DiscoveryImplPlatform::UpdateCommissionableInstanceName()
     return CHIP_NO_ERROR;
 }
 
-void DiscoveryImplPlatform::HandleDnssdPublish(void * context, const char * type, CHIP_ERROR error)
+void DiscoveryImplPlatform::HandleDnssdPublish(void * context, const char * type, const char * instanceName, CHIP_ERROR error)
 {
     if (CHIP_NO_ERROR == error)
     {
-        ChipLogProgress(Discovery, "mDNS service published: %s", type);
+        ChipLogProgress(Discovery, "mDNS service published: %s; instance name: %s", type, instanceName);
     }
     else
     {

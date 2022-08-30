@@ -489,6 +489,17 @@ void DeviceCommissioner::Shutdown()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
+    // If we have a commissionee device for the device being commissioned,
+    // release it now, before we release our whole commissionee pool.
+    if (mDeviceBeingCommissioned != nullptr)
+    {
+        auto * commissionee = FindCommissioneeDevice(mDeviceBeingCommissioned->GetDeviceId());
+        if (commissionee)
+        {
+            ReleaseCommissioneeDevice(commissionee);
+        }
+    }
+
     // Release everything from the commissionee device pool here. DeviceController::Shutdown releases operational.
     mCommissioneeDevicePool.ReleaseAll();
 
@@ -1520,12 +1531,13 @@ void DeviceCommissioner::DisarmDone()
     // to do here.
     VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
 
+    NodeId nodeId = mDeviceBeingCommissioned->GetDeviceId();
     // At this point, we also want to close off the pase session so we need to re-establish
-    CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(mDeviceBeingCommissioned->GetDeviceId());
+    CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
 
     // Signal completion - this will reset mDeviceBeingCommissioned.
     CommissioningStageComplete(CHIP_NO_ERROR);
-    SendCommissioningCompleteCallbacks(commissionee->GetDeviceId(), commissioningCompletionStatus);
+    SendCommissioningCompleteCallbacks(nodeId, commissioningCompletionStatus);
 
     // If we've disarmed the failsafe, it's because we're starting again, so kill the pase connection.
     if (commissionee != nullptr)
@@ -1560,6 +1572,14 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
 {
     // Once this stage is complete, reset mDeviceBeingCommissioned - this will be reset when the delegate calls the next step.
     MATTER_TRACE_EVENT_SCOPE("CommissioningStageComplete", "DeviceCommissioner");
+    if (mDeviceBeingCommissioned == nullptr)
+    {
+        // We are getting a stray callback (e.g. due to un-cancellable
+        // operations) when we are not in fact commissioning anything.  Just
+        // ignore it.
+        return;
+    }
+
     NodeId nodeId            = mDeviceBeingCommissioned->GetDeviceId();
     DeviceProxy * proxy      = mDeviceBeingCommissioned;
     mDeviceBeingCommissioned = nullptr;
@@ -1631,6 +1651,13 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const Scope
     {
         ChipLogError(Controller, "Device connection failed without a valid error code. Making one up.");
         error = CHIP_ERROR_INTERNAL;
+    }
+
+    if (commissioner->mDeviceBeingCommissioned == nullptr ||
+        commissioner->mDeviceBeingCommissioned->GetDeviceId() != peerId.GetNodeId())
+    {
+        // Not the device we are trying to commission.
+        return;
     }
 
     if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational &&

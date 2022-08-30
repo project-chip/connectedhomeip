@@ -251,26 +251,27 @@ CHIP_ERROR MdnsContexts::GetRegisterContextOfType(const char * type, RegisterCon
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-RegisterContext::RegisterContext(const char * sType, DnssdPublishCallback cb, void * cbContext)
+RegisterContext::RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext)
 {
     type     = ContextType::Register;
     context  = cbContext;
     callback = cb;
 
-    mType = sType;
+    mType         = sType;
+    mInstanceName = instanceName;
 }
 
 void RegisterContext::DispatchFailure(DNSServiceErrorType err)
 {
     ChipLogError(Discovery, "Mdns: Register failure (%s)", Error::ToString(err));
-    callback(context, nullptr, CHIP_ERROR_INTERNAL);
+    callback(context, nullptr, nullptr, CHIP_ERROR_INTERNAL);
     MdnsContexts::GetInstance().Remove(this);
 }
 
 void RegisterContext::DispatchSuccess()
 {
     std::string typeWithoutSubTypes = GetFullTypeWithoutSubTypes(mType);
-    callback(context, typeWithoutSubTypes.c_str(), CHIP_NO_ERROR);
+    callback(context, typeWithoutSubTypes.c_str(), mInstanceName.c_str(), CHIP_NO_ERROR);
 }
 
 BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol)
@@ -374,8 +375,40 @@ bool ResolveContext::HasAddress()
 void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostnameWithDomain, uint16_t port,
                                     uint16_t txtLen, const unsigned char * txtRecord)
 {
-    ChipLogDetail(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%.*s\"", __func__,
-                  hostnameWithDomain, fullname, interfaceId, port, static_cast<int>(txtLen), txtRecord);
+#if CHIP_DETAIL_LOGGING
+    std::string txtString;
+    auto txtRecordIter  = txtRecord;
+    size_t remainingLen = txtLen;
+    while (remainingLen > 0)
+    {
+        size_t len = *txtRecordIter;
+        ++txtRecordIter;
+        --remainingLen;
+        len = min(len, remainingLen);
+        chip::Span<const unsigned char> bytes(txtRecordIter, len);
+        if (txtString.size() > 0)
+        {
+            txtString.push_back(',');
+        }
+        for (auto & byte : bytes)
+        {
+            if ((std::isalnum(byte) || std::ispunct(byte)) && byte != '\\' && byte != ',')
+            {
+                txtString.push_back(static_cast<char>(byte));
+            }
+            else
+            {
+                char hex[5];
+                snprintf(hex, sizeof(hex), "\\x%02x", byte);
+                txtString.append(hex);
+            }
+        }
+        txtRecordIter += len;
+        remainingLen -= len;
+    }
+#endif // CHIP_DETAIL_LOGGING
+    ChipLogDetail(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%s\"", __func__,
+                  hostnameWithDomain, fullname, interfaceId, port, txtString.c_str());
 
     InterfaceInfo interface;
     interface.service.mPort = ntohs(port);

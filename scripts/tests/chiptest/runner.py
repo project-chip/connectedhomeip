@@ -18,6 +18,7 @@ import pty
 import queue
 import re
 import subprocess
+import sys
 import threading
 import typing
 
@@ -129,6 +130,10 @@ class Runner:
         errpipe = LogPipe(
             logging.INFO, capture_delegate=self.capture_delegate,
             name=name + ' ERR')
+
+        if sys.platform == 'darwin':
+            # Try harder to avoid any stdout buffering in our tests
+            cmd = ['stdbuf', '-o0'] + cmd
 
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)
