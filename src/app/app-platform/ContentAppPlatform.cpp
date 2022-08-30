@@ -118,7 +118,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
         mContentApps[index] = app;
         EmberAfStatus ret;
         EndpointId initEndpointId = mCurrentEndpointId;
-        
+
         do {
             ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
             if (ret == EMBER_ZCL_STATUS_SUCCESS)
