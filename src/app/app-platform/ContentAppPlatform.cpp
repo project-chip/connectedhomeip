@@ -119,12 +119,13 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
         EmberAfStatus ret;
         EndpointId initEndpointId = mCurrentEndpointId;
 
-        do {
+        do
+        {
             ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
             if (ret == EMBER_ZCL_STATUS_SUCCESS)
             {
-                ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)",
-                                vendorApp.applicationId, mCurrentEndpointId, index);
+                ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
+                                mCurrentEndpointId, index);
                 app->SetEndpointId(mCurrentEndpointId);
                 IncrementCurrentEndpointID();
                 return app->GetEndpointId();
@@ -135,8 +136,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
                 return kNoCurrentEndpointId;
             }
             IncrementCurrentEndpointID();
-        }
-        while (initEndpointId != mCurrentEndpointId);
+        } while (initEndpointId != mCurrentEndpointId);
         ChipLogError(DeviceLayer, "Failed to add dynamic endpoint: No endpoints available!");
         return kNoCurrentEndpointId;
     }
@@ -165,7 +165,8 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
         index++;
     }
 
-    if (desiredEndpointId < FIXED_ENDPOINT_COUNT || emberAfGetDynamicIndexFromEndpoint(desiredEndpointId) != kEmberInvalidEndpointIndex)
+    if (desiredEndpointId < FIXED_ENDPOINT_COUNT ||
+        emberAfGetDynamicIndexFromEndpoint(desiredEndpointId) != kEmberInvalidEndpointIndex)
     {
         // invalid desiredEndpointId
         ChipLogError(DeviceLayer, "Failed to add dynamic endpoint: desired endpointID is invalid!");
@@ -181,7 +182,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             continue;
         }
         mContentApps[index] = app;
-        EmberAfStatus ret = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
+        EmberAfStatus ret   = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
         if (ret != EMBER_ZCL_STATUS_SUCCESS)
         {
             ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);

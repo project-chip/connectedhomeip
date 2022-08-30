@@ -166,7 +166,6 @@ protected:
 
 private:
     void IncrementCurrentEndpointID();
-
 };
 
 } // namespace AppPlatform
