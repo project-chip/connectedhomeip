@@ -323,7 +323,7 @@ CHIP_ERROR AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(DeviceCon
                                                                        Seconds16 timeout)
 {
     // Not using Platform::New because we want to keep our constructor private.
-    auto * opener = new AutoCommissioningWindowOpener(controller);
+    auto * opener = new (std::nothrow) AutoCommissioningWindowOpener(controller);
     if (opener == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;
@@ -345,7 +345,7 @@ CHIP_ERROR AutoCommissioningWindowOpener::OpenCommissioningWindow(DeviceControll
                                                                   SetupPayload & payload, bool readVIDPIDAttributes)
 {
     // Not using Platform::New because we want to keep our constructor private.
-    auto * opener = new AutoCommissioningWindowOpener(controller);
+    auto * opener = new (std::nothrow) AutoCommissioningWindowOpener(controller);
     if (opener == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;
