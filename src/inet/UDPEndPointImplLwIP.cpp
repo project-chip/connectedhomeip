@@ -252,17 +252,20 @@ void UDPEndPointImplLwIP::CloseImpl()
         mUDP              = nullptr;
         mLwIPEndPointType = LwIPEndPointType::Unknown;
 
-        // In case that there is a UDPEndPointImplLwIP::LwIPReceiveUDPMessage
+        // If there is a UDPEndPointImplLwIP::LwIPReceiveUDPMessage
         // event pending in the event queue (SystemLayer::ScheduleLambda), we
         // schedule a release call to the end of the queue, to ensure that the
         // queued pointer to UDPEndPointImplLwIP is not dangling.
-        Retain();
-        CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Release(); });
-        if (err != CHIP_NO_ERROR)
+        if (mDelayReleaseCount != 0)
         {
-            ChipLogError(Inet, "Unable scedule lambda: %" CHIP_ERROR_FORMAT, err.Format());
-            // There is nothing we can do here, accept the chance of racing
-            Release();
+            Retain();
+            CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Release(); });
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Inet, "Unable to schedule lambda: %" CHIP_ERROR_FORMAT, err.Format());
+                // There is nothing we can do here, accept the chance of racing
+                Release();
+            }
         }
     }
 
@@ -390,8 +393,13 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     pktInfo->SrcPort     = port;
     pktInfo->DestPort    = pcb->local_port;
 
+    // Increase mDelayReleaseCount to delay release of this UDP EndPoint while the HandleDataReceived call is
+    // pending on it.
+    ep->mDelayReleaseCount++;
+
     CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda(
         [ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
+            ep->mDelayReleaseCount--;
             ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p), pktInfo);
         });
 
@@ -401,6 +409,10 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
         static_cast<void>(std::move(buf).UnsafeRelease());
         // Similarly, ScheduleLambda now has ownership of pktInfo.
         pktInfo.release();
+    }
+    else
+    {
+        ep->mDelayReleaseCount--;
     }
 }
 

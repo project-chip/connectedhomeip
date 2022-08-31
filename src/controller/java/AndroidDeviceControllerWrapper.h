@@ -20,6 +20,7 @@
 #include <lib/support/JniReferences.h>
 
 #include <memory>
+#include <vector>
 
 #include <jni.h>
 
@@ -138,6 +139,7 @@ public:
      * @param[in] failsafeTimerSeconds the failsafe timer in seconds
      * @param[in] attemptNetworkScanWiFi whether to attempt a network scan when configuring the network for a WiFi device
      * @param[in] attemptNetworkScanThread whether to attempt a network scan when configuring the network for a Thread device
+     * @param[in] skipCommissioningComplete whether to skip the CASE commissioningComplete command during commissioning
      * @param[out] errInfoOnFailure a pointer to a CHIP_ERROR that will be populated if this method returns nullptr
      */
     static AndroidDeviceControllerWrapper *
@@ -148,7 +150,7 @@ public:
                 AndroidOperationalCredentialsIssuerPtr opCredsIssuer, jobject keypairDelegate, jbyteArray rootCertificate,
                 jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey,
                 uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi,
-                bool attemptNetworkScanThread, CHIP_ERROR * errInfoOnFailure);
+                bool attemptNetworkScanThread, bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure);
 
     chip::Controller::AndroidOperationalCredentialsIssuer * GetAndroidOperationalCredentialsIssuer()
     {
@@ -176,6 +178,10 @@ private:
     const char * password              = nullptr;
     jbyteArray operationalDatasetBytes = nullptr;
     jbyte * operationalDataset         = nullptr;
+
+    std::vector<uint8_t> mNocCertificate;
+    std::vector<uint8_t> mIcacCertificate;
+    std::vector<uint8_t> mRcacCertificate;
 
     chip::Controller::AutoCommissioner mAutoCommissioner;
 

@@ -28,6 +28,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -64,6 +65,7 @@ static QueueHandle_t sAppEventQueue;
 
 static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
+static DeviceInfoProviderImpl sExampleDeviceInfoProvider;
 
 AppTask AppTask::sAppTask;
 
@@ -243,6 +245,11 @@ int AppTask::Init()
     PLAT_LOG("Initialize Server");
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    // Initialize info provider
+    sExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
+
     chip::Server::GetInstance().Init(initParams);
 
     ConfigurationMgr().LogDeviceConfig();
