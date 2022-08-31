@@ -49,6 +49,14 @@ using namespace chip::app::Clusters::ColorControl;
  * Attributes Definition
  *********************************************************/
 
+enum EnhancedColorModeType
+{
+    CurrentHueandCurrentSaturation         = 0,
+    CurrentXandCurrentY                    = 1,
+    ColorTemperatureMireds                 = 2,
+    EnhancedCurrentHueandCurrentSaturation = 3,
+};
+
 ColorControlServer ColorControlServer::instance;
 
 /**********************************************************
@@ -965,6 +973,8 @@ bool ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, uin
     {
         Attributes::EnhancedCurrentHue::Get(endpoint, &(colorHueTransitionState->initialEnhancedHue));
         Attributes::EnhancedCurrentHue::Get(endpoint, &(colorHueTransitionState->currentEnhancedHue));
+        Attributes::ColorMode::Set(endpoint, CurrentHueandCurrentSaturation);
+        Attributes::EnhancedColorMode::Set(endpoint, EnhancedCurrentHueandCurrentSaturation);
 
         colorHueTransitionState->finalEnhancedHue = hue;
     }

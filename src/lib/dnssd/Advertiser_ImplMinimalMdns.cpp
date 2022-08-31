@@ -527,7 +527,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Operational device'.");
+    ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Operational device'; instance name: %s.", instanceName.names[0]);
 
     AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
@@ -724,11 +724,13 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
-        ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Commissionable node device'.");
+        ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Commissionable node device'; instance name: %s.",
+                        instanceName.names[0]);
     }
     else
     {
-        ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Commissioner device'.");
+        ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Commissioner device'; instance name: %s.",
+                        instanceName.names[0]);
     }
 
     AdvertiseRecords(BroadcastAdvertiseType::kStarted);

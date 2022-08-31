@@ -72,7 +72,7 @@ void PASESession::OnSessionReleased()
 {
     Clear();
     // Do this last in case the delegate frees us.
-    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
+    NotifySessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
 }
 
 void PASESession::Finish()
@@ -242,7 +242,7 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
     DiscardExchange();
     Clear();
     // Do this last in case the delegate frees us.
-    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+    NotifySessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session) const
@@ -859,7 +859,7 @@ exit:
         Clear();
         ChipLogError(SecureChannel, "Failed during PASE session setup: %" CHIP_ERROR_FORMAT, err.Format());
         // Do this last in case the delegate frees us.
-        mDelegate->OnSessionEstablishmentError(err);
+        NotifySessionEstablishmentError(err);
     }
     return err;
 }

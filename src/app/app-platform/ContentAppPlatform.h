@@ -80,12 +80,20 @@ public:
 
     // add apps to the platform.
     // This will assign the app to an endpoint (if it is not already added) and make it accessible via Matter
-    // returns the global endpoint for this app, or 0 if an error occurred
-    //
+    // returns the global endpoint for this app, or kNoCurrentEndpointId if an error occurred.
     // dataVersionStorage.size() needs to be at least as big as the number of
     // server clusters in the EmberAfEndpointType passed in.
     EndpointId AddContentApp(ContentApp * app, EmberAfEndpointType * ep, const Span<DataVersion> & dataVersionStorage,
                              const Span<const EmberAfDeviceType> & deviceTypeList);
+
+    // add apps to the platform.
+    // This will assign the app to the desiredEndpointId (if it is not already used)
+    // and make it accessible via Matter, return the global endpoint for this app(if app is already added)
+    // , or kNoCurrentEndpointId if an error occurred. desiredEndpointId cannot be less that Fixed endpoint count
+    // dataVersionStorage.size() needs to be at least as big as the number of
+    // server clusters in the EmberAfEndpointType passed in.
+    EndpointId AddContentApp(ContentApp * app, EmberAfEndpointType * ep, const Span<DataVersion> & dataVersionStorage,
+                             const Span<const EmberAfDeviceType> & deviceTypeList, EndpointId desiredEndpointId);
 
     // remove app from the platform.
     // returns the endpoint id where the app was, or 0 if app was not loaded
@@ -155,6 +163,9 @@ protected:
     EndpointId mCurrentEndpointId;
     EndpointId mFirstDynamicEndpointId;
     ContentApp * mContentApps[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+
+private:
+    void IncrementCurrentEndpointID();
 };
 
 } // namespace AppPlatform

@@ -51,6 +51,7 @@ shared_library("ChipDeviceCtrl") {
   if (chip_controller) {
     sources += [
       "ChipCommissionableNodeController-ScriptBinding.cpp",
+      "ChipDeviceController-Discovery.cpp",
       "ChipDeviceController-IssueNocChain.cpp",
       "ChipDeviceController-ScriptBinding.cpp",
       "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
@@ -109,6 +110,7 @@ shared_library("ChipDeviceCtrl") {
     public_deps += [
       "${chip_root}/src/controller/data_model",
       "${chip_root}/src/credentials:file_attestation_trust_store",
+      "${chip_root}/third_party/jsoncpp",
     ]
   } else {
     public_deps += [ "$chip_data_model" ]
