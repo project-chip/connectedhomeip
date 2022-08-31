@@ -24,7 +24,7 @@ body:
     attributes:
       label: Bug prevalence
       description: "How often do you or others encounter this bug?"
-      placeholder: "Example: Whenever I visit the personal account page (1-2 times a week, day, hour)"
+      placeholder: "Example: Whenever I do this, 1-2 times a week, day, hour, etc"
     validations:
       required: true
   - type: input
@@ -63,7 +63,7 @@ body:
     attributes:
       label: Platform Version(s)
       description: "What platform version(s) are affected [optional]"
-      placeholder: "1.0.1"
+      placeholder: "eg: 1.0.1, N/A"
   - type: dropdown
     attributes:
       label: Type
