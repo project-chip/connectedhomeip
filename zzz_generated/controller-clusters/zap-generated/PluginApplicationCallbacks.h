@@ -86,5 +86,4 @@
     MatterApplicationBasicPluginClientInitCallback();                                                                              \
     MatterAccountLoginPluginClientInitCallback();                                                                                  \
     MatterElectricalMeasurementPluginClientInitCallback();                                                                         \
-    MatterTestClusterPluginClientInitCallback();                                                                                   \
-    MatterFaultInjectionPluginClientInitCallback();
+    MatterTestClusterPluginClientInitCallback();

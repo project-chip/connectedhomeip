@@ -7131,78 +7131,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedFaultInjectionClusterGeneratedCommandListAttributeCallback
-      implements ChipClusters.FaultInjectionCluster.GeneratedCommandListAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedFaultInjectionClusterAcceptedCommandListAttributeCallback
-      implements ChipClusters.FaultInjectionCluster.AcceptedCommandListAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedFaultInjectionClusterAttributeListAttributeCallback
-      implements ChipClusters.FaultInjectionCluster.AttributeListAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public Map<String, ClusterInfo> getClusterMap() {
     Map<String, ClusterInfo> clusterMap = initializeClusterMap();
     Map<String, Map<String, InteractionInfo>> commandMap = getCommandMap();
@@ -7542,11 +7470,6 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.TestClusterCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("testCluster", testClusterClusterInfo);
-    ClusterInfo faultInjectionClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.FaultInjectionCluster(ptr, endpointId),
-            new HashMap<>());
-    clusterMap.put("faultInjection", faultInjectionClusterInfo);
     return clusterMap;
   }
 
@@ -7639,7 +7562,6 @@ public class ClusterInfoMapping {
     destination.get("accountLogin").combineCommands(source.get("accountLogin"));
     destination.get("electricalMeasurement").combineCommands(source.get("electricalMeasurement"));
     destination.get("testCluster").combineCommands(source.get("testCluster"));
-    destination.get("faultInjection").combineCommands(source.get("faultInjection"));
   }
 
   @SuppressWarnings("unchecked")
@@ -12079,51 +12001,6 @@ public class ClusterInfoMapping {
     testClusterClusterInteractionInfoMap.put(
         "testEmitTestEventRequest", testClustertestEmitTestEventRequestInteractionInfo);
     commandMap.put("testCluster", testClusterClusterInteractionInfoMap);
-    Map<String, InteractionInfo> faultInjectionClusterInteractionInfoMap = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> faultInjectionfailAtFaultCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo faultInjectionfailAtFaulttypeCommandParameterInfo =
-        new CommandParameterInfo("type", Integer.class, Integer.class);
-    faultInjectionfailAtFaultCommandParams.put(
-        "type", faultInjectionfailAtFaulttypeCommandParameterInfo);
-
-    CommandParameterInfo faultInjectionfailAtFaultidCommandParameterInfo =
-        new CommandParameterInfo("id", Long.class, Long.class);
-    faultInjectionfailAtFaultCommandParams.put(
-        "id", faultInjectionfailAtFaultidCommandParameterInfo);
-
-    CommandParameterInfo faultInjectionfailAtFaultnumCallsToSkipCommandParameterInfo =
-        new CommandParameterInfo("numCallsToSkip", Long.class, Long.class);
-    faultInjectionfailAtFaultCommandParams.put(
-        "numCallsToSkip", faultInjectionfailAtFaultnumCallsToSkipCommandParameterInfo);
-
-    CommandParameterInfo faultInjectionfailAtFaultnumCallsToFailCommandParameterInfo =
-        new CommandParameterInfo("numCallsToFail", Long.class, Long.class);
-    faultInjectionfailAtFaultCommandParams.put(
-        "numCallsToFail", faultInjectionfailAtFaultnumCallsToFailCommandParameterInfo);
-
-    CommandParameterInfo faultInjectionfailAtFaulttakeMutexCommandParameterInfo =
-        new CommandParameterInfo("takeMutex", Boolean.class, Boolean.class);
-    faultInjectionfailAtFaultCommandParams.put(
-        "takeMutex", faultInjectionfailAtFaulttakeMutexCommandParameterInfo);
-
-    InteractionInfo faultInjectionfailAtFaultInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.FaultInjectionCluster) cluster)
-                  .failAtFault(
-                      (DefaultClusterCallback) callback,
-                      (Integer) commandArguments.get("type"),
-                      (Long) commandArguments.get("id"),
-                      (Long) commandArguments.get("numCallsToSkip"),
-                      (Long) commandArguments.get("numCallsToFail"),
-                      (Boolean) commandArguments.get("takeMutex"));
-            },
-            () -> new DelegatedDefaultClusterCallback(),
-            faultInjectionfailAtFaultCommandParams);
-    faultInjectionClusterInteractionInfoMap.put(
-        "failAtFault", faultInjectionfailAtFaultInteractionInfo);
-    commandMap.put("faultInjection", faultInjectionClusterInteractionInfoMap);
     return commandMap;
   }
 }

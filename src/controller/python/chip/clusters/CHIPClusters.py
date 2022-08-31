@@ -7502,55 +7502,6 @@ class ChipClusters:
                 },
             },
     }
-    _FAULT_INJECTION_CLUSTER_INFO = {
-            "clusterName": "FaultInjection",
-            "clusterId": 0xFFF1FC06,
-            "commands": {
-            0x00000000: {
-                    "commandId": 0x00000000,
-                    "commandName": "FailAtFault",
-                    "args": {
-                        "type": "int",
-                        "id": "int",
-                        "numCallsToSkip": "int",
-                        "numCallsToFail": "int",
-                        "takeMutex": "bool",
-                    },
-                },
-            },
-            "attributes": {
-                0x0000FFF8: {
-                    "attributeName": "GeneratedCommandList",
-                    "attributeId": 0x0000FFF8,
-                    "type": "int",
-                    "reportable": True,
-                },
-                0x0000FFF9: {
-                    "attributeName": "AcceptedCommandList",
-                    "attributeId": 0x0000FFF9,
-                    "type": "int",
-                    "reportable": True,
-                },
-                0x0000FFFB: {
-                    "attributeName": "AttributeList",
-                    "attributeId": 0x0000FFFB,
-                    "type": "int",
-                    "reportable": True,
-                },
-                0x0000FFFC: {
-                    "attributeName": "FeatureMap",
-                    "attributeId": 0x0000FFFC,
-                    "type": "int",
-                    "reportable": True,
-                },
-                0x0000FFFD: {
-                    "attributeName": "ClusterRevision",
-                    "attributeId": 0x0000FFFD,
-                    "type": "int",
-                    "reportable": True,
-                },
-            },
-    }
 
     _CLUSTER_ID_DICT = {
     0x00000003: _IDENTIFY_CLUSTER_INFO,
@@ -7618,7 +7569,6 @@ class ChipClusters:
     0x0000050E: _ACCOUNT_LOGIN_CLUSTER_INFO,
     0x00000B04: _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
     0xFFF1FC05: _TEST_CLUSTER_CLUSTER_INFO,
-    0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
     }
 
     _CLUSTER_NAME_DICT = {
@@ -7687,7 +7637,6 @@ class ChipClusters:
         "AccountLogin": _ACCOUNT_LOGIN_CLUSTER_INFO,
         "ElectricalMeasurement": _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
         "TestCluster": _TEST_CLUSTER_CLUSTER_INFO,
-        "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,
     }
 
     def __init__(self, chipstack):
