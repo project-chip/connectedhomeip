@@ -34,7 +34,7 @@ using namespace System::Clock::Literals;
 ReliableMessageProtocolConfig GetDefaultMRPConfig()
 {
     // Default MRP intervals are defined in spec <2.11.3. Parameters and Constants>
-    static constexpr const System::Clock::Milliseconds32 idleRetransTimeout   = 4000_ms32;
+    static constexpr const System::Clock::Milliseconds32 idleRetransTimeout   = 300_ms32;
     static constexpr const System::Clock::Milliseconds32 activeRetransTimeout = 300_ms32;
     return ReliableMessageProtocolConfig(idleRetransTimeout, activeRetransTimeout);
 }
