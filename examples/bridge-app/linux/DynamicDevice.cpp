@@ -48,7 +48,7 @@ Device DynamicDeviceImpl::CreateDevice()
 
     return Device(chip::Span<chip::DataVersion>(mVersions.data(), mVersions.size()),
                   chip::Span<EmberAfCluster>(mClusterDecls.data(), mClusterDecls.size()),
-                  chip::Span<ClusterImpl *>(mClusterBaseRawPtrs.data(), mClusterBaseRawPtrs.size()),
+                  chip::Span<ClusterInterface *>(mClusterBaseRawPtrs.data(), mClusterBaseRawPtrs.size()),
                   chip::Span<EmberAfDeviceType>(mDeviceTypes.data(), mDeviceTypes.size()), mParentEndpointId);
 }
 

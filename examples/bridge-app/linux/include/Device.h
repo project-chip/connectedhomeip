@@ -46,14 +46,14 @@
 class Device
 {
 public:
-    Device(chip::Span<chip::DataVersion> dataVersions, chip::Span<EmberAfCluster> clusters, chip::Span<ClusterImpl *> clusterImpl,
+    Device(chip::Span<chip::DataVersion> dataVersions, chip::Span<EmberAfCluster> clusters, chip::Span<ClusterInterface *> clusterImpl,
            const chip::Span<const EmberAfDeviceType> & deviceTypeList, chip::EndpointId parentId);
     ~Device() = default;
 
     const chip::Span<chip::DataVersion> & versions() { return mDataVersions; }
     const chip::Span<const EmberAfDeviceType> & deviceTypes() { return mDeviceTypeList; }
     const EmberAfEndpointType * endpointType() { return &mEndpointType; }
-    const chip::Span<ClusterImpl *> & clusters() { return mClusterImpl; }
+    const chip::Span<ClusterInterface *> & clusters() { return mClusterImpl; }
 
     void SetEndpointId(chip::EndpointId id);
     chip::EndpointId GetEndpointId() { return mEndpointId; }
@@ -67,7 +67,7 @@ private:
     chip::EndpointId mEndpointId;
     chip::Span<chip::DataVersion> mDataVersions;
     chip::Span<EmberAfCluster> mClusters;
-    chip::Span<ClusterImpl *> mClusterImpl;
+    chip::Span<ClusterInterface *> mClusterImpl;
     chip::Span<const EmberAfDeviceType> mDeviceTypeList;
     EmberAfEndpointType mEndpointType;
     std::string mDeviceName;

@@ -19,6 +19,7 @@
 #pragma once
 
 #include "Device.h"
+#include "GeneratedClusters.h"
 
 #include <memory>
 #include <vector>
@@ -89,7 +90,7 @@ public:
 private:
     std::vector<std::unique_ptr<CommonCluster>> mClusters;
     std::vector<CommonCluster *> mClusterRawPtrs;
-    std::vector<ClusterImpl *> mClusterBaseRawPtrs;
+    std::vector<ClusterInterface *> mClusterBaseRawPtrs;
 
     std::vector<EmberAfCluster> mClusterDecls;
 

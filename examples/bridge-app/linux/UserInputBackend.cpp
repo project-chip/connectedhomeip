@@ -243,7 +243,7 @@ Device * FindEndpoint(int32_t index)
     }
 }
 
-ClusterImpl * FindCluster(DynamicDeviceImpl * dev, const std::string & clusterId)
+ClusterInterface * FindCluster(DynamicDeviceImpl * dev, const std::string & clusterId)
 {
     uint32_t id;
     const char * start = clusterId.data();
@@ -273,7 +273,7 @@ ClusterImpl * FindCluster(DynamicDeviceImpl * dev, const std::string & clusterId
     return nullptr;
 }
 
-const EmberAfAttributeMetadata * FindAttrib(ClusterImpl * cluster, const std::string & attrId)
+const EmberAfAttributeMetadata * FindAttrib(ClusterInterface * cluster, const std::string & attrId)
 {
     uint32_t id;
     const char * start = attrId.data();
@@ -378,7 +378,7 @@ void SetValue(const std::vector<std::string> & tokens)
         return;
     }
 
-    ClusterImpl * cluster = FindCluster(dev, clusterId);
+    ClusterInterface * cluster = FindCluster(dev, clusterId);
     if (!cluster)
     {
         printf("Device does not implement cluster %s\nSupported clusters: ", clusterId.c_str());

@@ -23,7 +23,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 Device::Device(chip::Span<chip::DataVersion> dataVersions, chip::Span<EmberAfCluster> clusters,
-               chip::Span<ClusterImpl *> clusterImpl, const chip::Span<const EmberAfDeviceType> & deviceTypeList,
+               chip::Span<ClusterInterface *> clusterImpl, const chip::Span<const EmberAfDeviceType> & deviceTypeList,
                chip::EndpointId parentId) :
     mParentEndpointId(parentId),
     mDataVersions(dataVersions), mClusters(clusters), mClusterImpl(clusterImpl), mDeviceTypeList(deviceTypeList)
