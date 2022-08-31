@@ -454,9 +454,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
         if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && !otDatasetIsCommissioned(mOTInst))
         {
             DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-                                                          Impl()->LockThreadStack();
-                                                          otIp6SetEnabled(mOTInst, false);
-                                                          Impl()->UnlockThreadStack();
+                Impl()->LockThreadStack();
+                otIp6SetEnabled(mOTInst, false);
+                Impl()->UnlockThreadStack();
             });
         }
 
