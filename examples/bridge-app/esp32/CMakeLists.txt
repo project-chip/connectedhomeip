@@ -15,6 +15,10 @@
 #    limitations under the License.
 
 cmake_minimum_required(VERSION 3.5)
+
+set(PROJECT_VER "v1.0")
+set(PROJECT_VER_NUMBER 1)
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/cmake/idf_flashing.cmake)
 
