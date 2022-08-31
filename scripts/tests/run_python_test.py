@@ -82,19 +82,26 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
         if retcode != 0:
             raise Exception("Failed to remove /tmp/chip* for factory reset.")
 
+        print("CWD: %s" % os.getcwd())
+        print(subprocess.check_output(["ls -l"], shell=True).decode('us-ascii'))
+
         # Remove native app KVS if that was used
         kvs_match = re.match(r"--KVS (?P<kvs_path>[^ ]+)", app_args)
+        print("Removing KVS")
         if kvs_match:
             kvs_path_to_remove = kvs_match.group("kvs_path")
             retcode = subprocess.call("rm -f %s" % kvs_path_to_remove, shell=True)
+            print("Trying to remove KVS path %s" % kvs_path_to_remove)
             if retcode != 0:
                 raise Exception("Failed to remove %s for factory reset." % kvs_path_to_remove)
 
         # Remove Python test admin storage if provided
         storage_match = re.match(r"--storage-path (?P<storage_path>[^ ]+)", app_args)
+        print("Removing admin storage")
         if storage_match:
             storage_path_to_remove = storage_match.group("storage_path")
             retcode = subprocess.call("rm -f %s" % storage_path_to_remove, shell=True)
+            print("Trying to remove storage path %s" % kvs_path_to_remove)
             if retcode != 0:
                 raise Exception("Failed to remove %s for factory reset." % storage_path_to_remove)
 
