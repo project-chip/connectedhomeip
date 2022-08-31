@@ -151,9 +151,13 @@ private:
     CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 
     void ReportData();
-    void ReportError(CHIP_ERROR err);
-    void ReportError(const StatusIB & status);
-    void ReportError(NSError * _Nullable err);
+
+    // Report an error, which may be due to issues in our own internal state or
+    // due to the OnError callback happening.
+    //
+    // aCancelSubscription should be false for the OnError case, since it will
+    // be immediately followed by OnDone and we want to do the deletion there.
+    void ReportError(CHIP_ERROR aError, bool aCancelSubscription = true);
 
 private:
     dispatch_queue_t mQueue;
@@ -168,11 +172,13 @@ private:
     NSMutableArray * _Nullable mAttributeReports = nil;
     NSMutableArray * _Nullable mEventReports = nil;
 
-    // Our lifetime management is a little complicated.  On error we
-    // attempt to delete the ReadClient, but asynchronously.  While
-    // that's pending, someone else (e.g. an error it runs into) could
-    // delete it too.  And if someone else does attempt to delete it, we want to
-    // make sure we delete ourselves as well.
+    // Our lifetime management is a little complicated.  On errors that don't
+    // originate with the ReadClient we attempt to delete ourselves (and hence
+    // the ReadClient), but asynchronously, because the ReadClient API doesn't
+    // allow sync deletion under callbacks other than OnDone.  While that's
+    // pending, something else (e.g. an error it runs into) could end up calling
+    // OnDone on us.  And generally if OnDone is called we want to delete
+    // ourselves as well.
     //
     // To handle this, enforce the following rules:
     //
@@ -835,7 +841,7 @@ void SubscriptionCallback::OnError(CHIP_ERROR aError)
 {
     // If OnError is called after OnReportBegin, we should report the collected data
     ReportData();
-    ReportError([MTRError errorForCHIPErrorCode:aError]);
+    ReportError(aError, /* aCancelSubscription = */ false);
 }
 
 void SubscriptionCallback::OnDone(ReadClient *)
@@ -883,12 +889,9 @@ CHIP_ERROR SubscriptionCallback::OnResubscriptionNeeded(ReadClient * apReadClien
     return apReadClient->DefaultResubscribePolicy(aTerminationCause);
 }
 
-void SubscriptionCallback::ReportError(CHIP_ERROR err) { ReportError([MTRError errorForCHIPErrorCode:err]); }
-
-void SubscriptionCallback::ReportError(const StatusIB & status) { ReportError([MTRError errorForIMStatus:status]); }
-
-void SubscriptionCallback::ReportError(NSError * _Nullable err)
+void SubscriptionCallback::ReportError(CHIP_ERROR aError, bool aCancelSubscription)
 {
+    auto * err = [MTRError errorForCHIPErrorCode:aError];
     if (!err) {
         // Very strange... Someone tried to create a MTRError for a success status?
         return;
@@ -911,15 +914,22 @@ void SubscriptionCallback::ReportError(NSError * _Nullable err)
         if (onDoneHandler) {
             onDoneHandler();
         }
+    });
 
-        // Deletion of our ReadClient (and hence of ourselves, since the
-        // ReadClient has a pointer to us) needs to happen on the Matter work
-        // queue.
+    if (aCancelSubscription) {
+        // We can't synchronously delete ourselves, because we're inside one of
+        // the ReadClient callbacks and we need to outlive the callback's
+        // execution.  Queue an async deletion on the Matter queue (where we are
+        // running already).
+        //
+        // If we now get OnDone, we will ignore that, since we have the deletion
+        // posted already, but that's OK even during shutdown: since we are
+        // queueing the deletion now, it will be processed before the Matter queue
+        // gets paused, which is fairly early in the shutdown process.
+        mHaveQueuedDeletion = true;
         dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
             delete myself;
         });
-    });
-
-    mHaveQueuedDeletion = true;
+    }
 }
 } // anonymous namespace
