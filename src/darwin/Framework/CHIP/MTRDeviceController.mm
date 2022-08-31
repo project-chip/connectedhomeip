@@ -149,6 +149,9 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         _cppCommissioner->Shutdown();
         delete _cppCommissioner;
         _cppCommissioner = nullptr;
+        if (_operationalCredentialsDelegate != nil) {
+            _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
+        }
     }
 }
 
@@ -164,14 +167,14 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         _operationalCredentialsDelegate = nullptr;
     }
 
-    if (_pairingDelegateBridge) {
-        delete _pairingDelegateBridge;
-        _pairingDelegateBridge = nullptr;
-    }
-
     if (_partialDACVerifier) {
         delete _partialDACVerifier;
         _partialDACVerifier = nullptr;
+    }
+
+    if (_pairingDelegateBridge) {
+        delete _pairingDelegateBridge;
+        _pairingDelegateBridge = nullptr;
     }
 }
 

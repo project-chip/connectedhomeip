@@ -147,6 +147,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::CallbackGenerateNOCChain(const chi
     const chip::ByteSpan & DAC, const chip::ByteSpan & PAI,
     chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
 {
+    VerifyOrReturnError(mCppCommissioner != nil, CHIP_ERROR_INCORRECT_STATE);
     mOnNOCCompletionCallback = onCompletion;
 
     TLVReader reader;
@@ -178,8 +179,6 @@ CHIP_ERROR MTROperationalCredentialsDelegate::CallbackGenerateNOCChain(const chi
     chip::ByteSpan firmwareInfoSpan;
     chip::Credentials::DeviceAttestationVendorReservedDeconstructor vendorReserved;
 
-    // Dereferencing mCppCommissioner as it would be set to point to a valid Cpp commissioner by now, as we are in the middle of
-    // commissioning
     chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters
         = mCppCommissioner->GetCommissioningParameters();
     VerifyOrReturnError(commissioningParameters.HasValue(), CHIP_ERROR_INCORRECT_STATE);
@@ -226,15 +225,20 @@ void MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(NSData * op
 {
     if (operationalCertificate == nil || intermediateCertificate == nil || rootCertificate == nil) {
         setNSError(CHIP_ERROR_INVALID_ARGUMENT, error);
+        return;
     }
 
-    // use ipk and adminSubject from CommissioningParameters if not passed in.
-    // Dereferencing mCppCommissioner as it would be set to point to a valid Cpp commissioner by now, as we are in the middle of
-    // commissioning
-    chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters
-        = mCppCommissioner->GetCommissioningParameters();
+    if (mCppCommissioner == nil) {
+        setNSError(CHIP_ERROR_INCORRECT_STATE, error);
+        return;
+    }
+    __block chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters;
+    dispatch_sync(mChipWorkQueue, ^{
+        commissioningParameters = mCppCommissioner->GetCommissioningParameters();
+    });
     if (!commissioningParameters.HasValue()) {
         setNSError(CHIP_ERROR_INCORRECT_STATE, error);
+        return;
     }
 
     chip::Optional<chip::Crypto::AesCcm128KeySpan> ipkOptional;
@@ -243,6 +247,7 @@ void MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(NSData * op
     if (ipk != nil) {
         if ([ipk length] != sizeof(ipkValue)) {
             setNSError(CHIP_ERROR_INCORRECT_STATE, error);
+            return;
         }
         memcpy(&ipkValue[0], [ipk bytes], [ipk length]);
         ipkOptional.SetValue(ipkTempSpan);
