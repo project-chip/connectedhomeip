@@ -71,6 +71,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 static NSString * const kErrorGenerateNOC = @"Generating operational certificate failed";
 static NSString * const kErrorKeyAllocation = @"Generating new operational key failed";
 static NSString * const kErrorCSRValidation = @"Extracting public key from CSR failed";
+static NSString * const kErrorGetCommissionee = @"Failure obtaining device being commissioned";
+static NSString * const kErrorGetAttestationChallenge = @"Failure getting attestation challenge";
 
 @interface MTRDeviceController ()
 
@@ -701,6 +703,32 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     });
 
     return result;
+}
+
+- (nullable NSData *)generateAttestationChallengeForDeviceId:(uint64_t)deviceId
+{
+    VerifyOrReturnValue([self checkIsRunning], nil);
+
+    __block NSData * attestationChallenge;
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning]);
+
+        chip::CommissioneeDeviceProxy * deviceProxy;
+        auto errorCode = self.cppCommissioner->GetDeviceBeingCommissioned(deviceId, &deviceProxy);
+        auto success = ![self checkForError:errorCode logMsg:kErrorGetCommissionee error:nil];
+        VerifyOrReturn(success);
+
+        uint8_t challengeBuffer[chip::Crypto::kAES_CCM128_Key_Length];
+        chip::ByteSpan challenge(challengeBuffer);
+
+        errorCode = deviceProxy->GetAttestationChallenge(challenge);
+        success = ![self checkForError:errorCode logMsg:kErrorGetAttestationChallenge error:nil];
+        VerifyOrReturn(success);
+
+        attestationChallenge = AsData(challenge);
+    });
+
+    return attestationChallenge;
 }
 
 - (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg
