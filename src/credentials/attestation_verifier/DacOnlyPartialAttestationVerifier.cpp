@@ -148,7 +148,7 @@ void PartialDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
     }
 
 exit:
-    onCompletion->mCall(onCompletion->mContext, attestationError);
+    onCompletion->mCall(onCompletion->mContext, info, attestationError);
 }
 
 } // namespace Credentials
