@@ -50,9 +50,9 @@ lock and unlock of the door lock. The left button (`BTN-1`) is used to request
 locking. The right button (`BTN-2`) is used to request unlocking.
 
 Long presses (greater than 1000ms) of the user buttons are used for controlling
-BLE advertisements. The left button (`BTN-1`) is used to disable advertisements
-if they are enabled. The Right button (`BTN-2`) is used to enable
-advertisements.
+BLE advertisements and resets. The left button (`BTN-1`) is used to perform a
+factory reset of the device. The Right button (`BTN-2`) is used to disable BLE
+advertisements (if enabled) or enable advertisements (if disabled).
 
 ## Building
 
