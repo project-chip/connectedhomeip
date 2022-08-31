@@ -329,6 +329,9 @@ void DeviceController::Shutdown()
 
     if (mFabricIndex != kUndefinedFabricIndex)
     {
+        // Shut down any subscription clients for this fabric.
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricIndex);
+
         // Shut down any ongoing CASE session activity we have.  We're going to
         // assume that all sessions for our fabric belong to us here.
         mSystemState->CASESessionMgr()->ReleaseSessionsForFabric(mFabricIndex);

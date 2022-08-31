@@ -253,24 +253,50 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(const ScopedNodeId & aPe
 
 void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
 {
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    // This is assuming that ReadClient::Close will not affect any other
+    // ReadClients in the list.
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
     {
+        // Grab the next client now, because we might be about to delete readClient.
+        auto * nextClient = readClient->GetNextClient();
         if (readClient->IsSubscriptionType() && readClient->GetFabricIndex() == aFabricIndex &&
             readClient->GetPeerNodeId() == aPeerNodeId)
         {
             readClient->Close(CHIP_NO_ERROR);
         }
+        readClient = nextClient;
+    }
+}
+
+void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex)
+{
+    // This is assuming that ReadClient::Close will not affect any other
+    // ReadClients in the list.
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
+    {
+        // Grab the next client now, because we might be about to delete readClient.
+        auto * nextClient = readClient->GetNextClient();
+        if (readClient->IsSubscriptionType() && readClient->GetFabricIndex() == aFabricIndex)
+        {
+            readClient->Close(CHIP_NO_ERROR);
+        }
+        readClient = nextClient;
     }
 }
 
 void InteractionModelEngine::ShutdownAllSubscriptions()
 {
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    // This is assuming that ReadClient::Close will not affect any other
+    // ReadClients in the list.
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
     {
+        // Grab the next client now, because we might be about to delete readClient.
+        auto * nextClient = readClient->GetNextClient();
         if (readClient->IsSubscriptionType())
         {
             readClient->Close(CHIP_NO_ERROR);
         }
+        readClient = nextClient;
     }
 }
 

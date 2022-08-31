@@ -140,6 +140,11 @@ public:
     void ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
 
     /**
+     * Tears down all active subscriptions for a given fabric.
+     */
+    void ShutdownSubscriptions(FabricIndex aFabricIndex);
+
+    /**
      * Tears down all active subscriptions.
      */
     void ShutdownAllSubscriptions();
