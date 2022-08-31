@@ -78,6 +78,7 @@ ti_simplelink_executable("all-clusters-minimal-app") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+    "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/ClusterManager.cpp",
     "${project_dir}/main/Globals.cpp",
@@ -102,6 +103,7 @@ ti_simplelink_executable("all-clusters-minimal-app") {
     "${project_dir}",
     "${project_dir}/main",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+    "${chip_root}/examples/providers/",
   ]
 
   cflags = [

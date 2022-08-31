@@ -24,6 +24,12 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Pre-Conditions"
+      verification: |
+          TH is commissioned with the DUT
+          Lock device is the DUT
+      disabled: true
+
     - label: "TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
       verification: |
@@ -120,7 +126,7 @@ tests:
     - label: "TH sends a Unlock Door command to the DUT."
       PICS: DRLK.S.A0000
       verification: |
-          ./chip-tool doorlock  unlock-door 1 1  --timedInteractionTimeoutMs 100
+          ./chip-tool doorlock  unlock-door 1 1  --timedInteractionTimeoutMs 1000
 
           Verify "DUT performs the door unlock action" on the TH(Chip-tool) Log:
 
@@ -328,7 +334,7 @@ tests:
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write-by-id 4 10 1 1
+          ./chip-tool doorlock write-by-id 4 0 1 1
 
           Verify " DUT sends SUCCESS response " on the TH(Chip-tool) Log:
 
@@ -398,7 +404,7 @@ tests:
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write-by-id 5 11 1 1
+          ./chip-tool doorlock write-by-id 5 0 1 1
 
           Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
@@ -1049,7 +1055,7 @@ tests:
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write ledsettings 1 1 1
+          ./chip-tool doorlock write ledsettings 2 1 1
 
           Verify " DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
 
@@ -2009,7 +2015,7 @@ tests:
 
     - label: "TH writes NumberOfCredentials SupportedPerUser attribute as 85"
       verification: |
-          ./chip-tool doorlock  write-by-id 28 10 1 1
+          ./chip-tool doorlock  write-by-id 28 85 1 1
           Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1654683627.680196][4148:4153] CHIP:DMG:                        StatusIB =

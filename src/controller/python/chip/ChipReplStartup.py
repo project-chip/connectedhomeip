@@ -14,6 +14,7 @@ import builtins
 import chip.FabricAdmin
 import chip.CertificateAuthority
 import chip.native
+import chip.discovery
 from chip.utils import CommissioningBuildingBlocks
 import atexit
 

@@ -1724,19 +1724,19 @@ tests:
           [1659973152.263905][3652:3652] CHIP:IM: Received Read request
           [1659973152.264002][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659973152.264053][3652:3652] CHIP:DMG: {
-          [1659973152.264083][3652:3652] CHIP:DMG: 	AttributePathIBs =
-          [1659973152.264130][3652:3652] CHIP:DMG: 	[
-          [1659973152.264163][3652:3652] CHIP:DMG: 		AttributePathIB =
-          [1659973152.264214][3652:3652] CHIP:DMG: 		{
-          [1659973152.264255][3652:3652] CHIP:DMG: 			Endpoint = 0x3,
-          [1659973152.264308][3652:3652] CHIP:DMG: 			Cluster = 0x6,
-          [1659973152.264350][3652:3652] CHIP:DMG: 			Attribute = 0x0000_0000,
-          [1659973152.264404][3652:3652] CHIP:DMG: 		}
+          [1659973152.264083][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973152.264130][3652:3652] CHIP:DMG:         [
+          [1659973152.264163][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973152.264214][3652:3652] CHIP:DMG:                 {
+          [1659973152.264255][3652:3652] CHIP:DMG:                         Endpoint = 0x3,
+          [1659973152.264308][3652:3652] CHIP:DMG:                         Cluster = 0x6,
+          [1659973152.264350][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659973152.264404][3652:3652] CHIP:DMG:                 }
           [1659973152.264457][3652:3652] CHIP:DMG:
-          [1659973152.264494][3652:3652] CHIP:DMG: 	],
+          [1659973152.264494][3652:3652] CHIP:DMG:         ],
           [1659973152.264541][3652:3652] CHIP:DMG:
-          [1659973152.264577][3652:3652] CHIP:DMG: 	isFabricFiltered = true,
-          [1659973152.264622][3652:3652] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659973152.264577][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973152.264622][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
           [1659973152.264654][3652:3652] CHIP:DMG: },
           [1659973152.264756][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1659973152.264871][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
@@ -1919,7 +1919,7 @@ tests:
           [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
           [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
 
-          Verify on DUT(chip-tool) Log
+          Verify on TH(chip-tool) Log
 
           "b
           [1659089470.077297][12236:12241] CHIP:DL: Device[Light 1]: New Name=""Light 1b""
@@ -1953,7 +1953,7 @@ tests:
     - label: "Verify DUT contains the added device in the list of devices"
       PICS: MCORE.DEVLIST.UseDeviceNames
       verification: |
-          Verify on DUT(chip-tool) Log
+          Verify on TH(chip-tool) Log
 
 
           b
@@ -2073,7 +2073,7 @@ tests:
     - label: "Verify DUT contains the added device in the list of devices"
       PICS: MCORE.DEVLIST.UseDevices
       verification: |
-          Verify on DUT(chip-tool) Log
+          Verify on TH(chip-tool) Log
 
           2
           [1659352274.915018][14237:14242] CHIP:DMG: Endpoint 1, Cluster 0x0000_001D update version to 7e918bae
@@ -2141,7 +2141,7 @@ tests:
           devices"
       PICS: MCORE.DEVLIST.UseDevices
       verification: |
-          Verify on DUT(chip-tool) Log
+          Verify on TH(chip-tool) Log
 
           4
           [1659352426.184434][14237:14242] CHIP:DMG: Endpoint 1, Cluster 0x0000_001D update version to 7e918baf
