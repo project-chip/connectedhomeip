@@ -51,8 +51,13 @@ class DeviceCommissioner;
 enum class SetupCodePairerBehaviour : uint8_t
 {
     kCommission,
-    kCommissionOnNetwork,
     kPaseOnly,
+};
+
+enum class DiscoveryType : uint8_t
+{
+    kDiscoveryNetworkOnly,
+    kAll,
 };
 
 class DLL_EXPORT SetUpCodePairer : public DevicePairingDelegate
@@ -62,7 +67,8 @@ public:
     virtual ~SetUpCodePairer() {}
 
     CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode,
-                          SetupCodePairerBehaviour connectionType = SetupCodePairerBehaviour::kCommission);
+                          SetupCodePairerBehaviour connectionType = SetupCodePairerBehaviour::kCommission,
+                          DiscoveryType discoveryType             = DiscoveryType::kAll);
 
     // Called by the DeviceCommissioner to notify that we have discovered a new device.
     void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData);
@@ -152,6 +158,7 @@ private:
     chip::NodeId mRemoteId;
     uint32_t mSetUpPINCode                   = 0;
     SetupCodePairerBehaviour mConnectionType = SetupCodePairerBehaviour::kCommission;
+    DiscoveryType mDiscoveryType             = DiscoveryType::kAll;
 
     // While we are trying to pair, we intercept the DevicePairingDelegate
     // notifications from mCommissioner.  We want to make sure we send them on
