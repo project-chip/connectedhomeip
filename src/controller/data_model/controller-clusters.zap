@@ -19408,7 +19408,7 @@
           "mfgCode": null,
           "define": "FAULT_INJECTION_CLUSTER",
           "side": "client",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "FailAtFault",
