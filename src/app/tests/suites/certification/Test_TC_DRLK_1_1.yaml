@@ -44,7 +44,7 @@ tests:
       PICS:
           " !DRLK.S.F00 && !DRLK.S.F01 && !DRLK.S.F02 && !DRLK.S.F04 &&
           !DRLK.S.F05 && !DRLK.S.F06 && !DRLK.S.F07 && !DRLK.S.F08 &&
-          !DRLK.S.F10 && !DRLK.S.F11 "
+          !DRLK.S.F0a && !DRLK.S.F0b "
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -52,17 +52,95 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads the FeatureMap from DUT"
-      PICS:
-          DRLK.S.F00 || DRLK.S.F01 || DRLK.S.F02 || DRLK.S.F04 || DRLK.S.F05 ||
-          DRLK.S.F06 || DRLK.S.F07 || DRLK.S.F08 || DRLK.S.F10 || DRLK.S.F11
+    - label: "Given DRLK.S.F00(PIN) ensure featuremap has the correct bit set"
+      PICS: DRLK.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              minValue: 1
-              maxValue: 4095
+              hasMasksSet: [0x1]
+
+    - label: "Given DRLK.S.F01(RID) ensure featuremap has the correct bit set"
+      PICS: DRLK.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label: "Given DRLK.S.F02(FGP) ensure featuremap has the correct bit set"
+      PICS: DRLK.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
+
+    - label: "Given DRLK.S.F04(WDSCH) ensure featuremap has the correct bit set"
+      PICS: DRLK.S.F04
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x10]
+
+    - label: "Given DRLK.S.F05(DPS) ensure featuremap has the correct bit set"
+      PICS: DRLK.S.F05
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x20]
+
+    - label: "Given DRLK.S.F06(FACE) ensure featuremap has the correct bit set"
+      PICS: DRLK.S.F06
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x40]
+
+    - label: "Given DRLK.S.F07(COTA) ensure featuremap has the correct bit set"
+      PICS: DRLK.S.F07
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x80]
+
+    - label: "Given DRLK.S.F08(USR) ensure featuremap has the correct bit set"
+      PICS: DRLK.S.F08
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x100]
+
+    - label: "Given DRLK.S.F0a(YDSCH) ensure featuremap has the correct bit set"
+      PICS: DRLK.S.F0a
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x400]
+
+    - label: "Given DRLK.S.F0b(HDSCH) ensure featuremap has the correct bit set"
+      PICS: DRLK.S.F0b
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x800]
 
     - label: "TH reads AttributeList from DUT"
       command: "readAttribute"
@@ -111,8 +189,8 @@ tests:
               type: list
               contains: [20]
 
-    - label: "TH reads Feature dependent(DRLK.S.F10) attribute in AttributeList"
-      PICS: DRLK.S.F10
+    - label: "TH reads Feature dependent(DRLK.S.F0a) attribute in AttributeList"
+      PICS: DRLK.S.F0a
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -120,8 +198,8 @@ tests:
               type: list
               contains: [21]
 
-    - label: "TH reads Feature dependent(DRLK.S.F11) attribute in AttributeList"
-      PICS: DRLK.S.F11
+    - label: "TH reads Feature dependent(DRLK.S.F0b) attribute in AttributeList"
+      PICS: DRLK.S.F0b
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -269,9 +347,9 @@ tests:
               contains: [11, 12, 13]
 
     - label:
-          "TH reads Feature dependent commands(DRLK.S.F10) in
+          "TH reads Feature dependent commands(DRLK.S.F0a) in
           AcceptedCommandList"
-      PICS: DRLK.S.F10
+      PICS: DRLK.S.F0a
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -280,9 +358,9 @@ tests:
               contains: [14, 15, 16]
 
     - label:
-          "TH reads Feature dependent commands(DRLK.S.F11) in
+          "TH reads Feature dependent commands(DRLK.S.F0b) in
           AcceptedCommandList"
-      PICS: DRLK.S.F11
+      PICS: DRLK.S.F0b
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -322,9 +400,9 @@ tests:
               contains: [12]
 
     - label:
-          "TH reads Feature dependent command(DRLK.S.F10) in
+          "TH reads Feature dependent command(DRLK.S.F0a) in
           GeneratedCommandList"
-      PICS: DRLK.S.F10
+      PICS: DRLK.S.F0a
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -333,9 +411,9 @@ tests:
               contains: [15]
 
     - label:
-          "TH reads Feature dependent command(DRLK.S.F11) in
+          "TH reads Feature dependent command(DRLK.S.F0b) in
           GeneratedCommandList"
-      PICS: DRLK.S.F11
+      PICS: DRLK.S.F0b
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
