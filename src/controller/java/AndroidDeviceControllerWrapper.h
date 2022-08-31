@@ -20,6 +20,7 @@
 #include <lib/support/JniReferences.h>
 
 #include <memory>
+#include <vector>
 
 #include <jni.h>
 
@@ -177,6 +178,10 @@ private:
     const char * password              = nullptr;
     jbyteArray operationalDatasetBytes = nullptr;
     jbyte * operationalDataset         = nullptr;
+
+    std::vector<uint8_t> mNocCertificate;
+    std::vector<uint8_t> mIcacCertificate;
+    std::vector<uint8_t> mRcacCertificate;
 
     chip::Controller::AutoCommissioner mAutoCommissioner;
 
