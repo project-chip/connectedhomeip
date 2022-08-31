@@ -285,7 +285,7 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
 
     add_custom_target(west_sign ALL
         COMMAND
-        west sign -t imgtool -d ${PROJECT_BINARY_DIR}/.. -- --key ${ZEPHYR_BASE}/../bootloader/mcuboot/root-rsa-2048.pem
+        west sign -t imgtool -p ${ZEPHYR_BASE}/../bootloader/mcuboot/scripts/imgtool.py -d ${PROJECT_BINARY_DIR}/.. -- --key ${ZEPHYR_BASE}/../bootloader/mcuboot/root-rsa-2048.pem
     )
 
     add_custom_target(final_bin ALL
