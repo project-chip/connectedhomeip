@@ -227,14 +227,14 @@ Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToBob(M
         delegate);
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate)
+Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate, bool isInitiator)
 {
-    return mExchangeManager.NewContext(GetSessionBobToAlice(), delegate);
+    return mExchangeManager.NewContext(GetSessionBobToAlice(), delegate, isInitiator);
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::ExchangeDelegate * delegate)
+Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::ExchangeDelegate * delegate, bool isInitiator)
 {
-    return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate);
+    return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate, isInitiator);
 }
 
 void MessageCapturer::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,

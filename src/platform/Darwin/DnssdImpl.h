@@ -92,8 +92,9 @@ struct RegisterContext : public GenericContext
 {
     DnssdPublishCallback callback;
     std::string mType;
+    std::string mInstanceName;
 
-    RegisterContext(const char * sType, DnssdPublishCallback cb, void * cbContext);
+    RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext);
     virtual ~RegisterContext() {}
 
     void DispatchFailure(DNSServiceErrorType err) override;

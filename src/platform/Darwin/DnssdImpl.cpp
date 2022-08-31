@@ -185,7 +185,7 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
         return CHIP_NO_ERROR;
     }
 
-    sdCtx = chip::Platform::New<RegisterContext>(type, callback, context);
+    sdCtx = chip::Platform::New<RegisterContext>(type, name, callback, context);
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
 
     DNSServiceRef sdRef;

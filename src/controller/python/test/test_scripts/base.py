@@ -37,6 +37,7 @@ from chip.ChipStack import *
 import chip.native
 import chip.FabricAdmin
 import chip.CertificateAuthority
+import chip.discovery
 import copy
 import secrets
 import faulthandler
@@ -223,15 +224,14 @@ class BaseTestHelper:
     def TestDiscovery(self, discriminator: int):
         self.logger.info(
             f"Discovering commissionable nodes with discriminator {discriminator}")
-        self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(
-            ctypes.c_uint16(int(discriminator)))
-        res = self._WaitForOneDiscoveredDevice()
+        res = self.devCtrl.DiscoverCommissionableNodes(
+            chip.discovery.FilterType.LONG_DISCRIMINATOR, discriminator, stopOnFirst=True, timeoutSecond=3)
         if not res:
             self.logger.info(
                 f"Device not found")
             return False
-        self.logger.info(f"Found device at {res}")
-        return res
+        self.logger.info(f"Found device {res[0]}")
+        return res[0]
 
     def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info(

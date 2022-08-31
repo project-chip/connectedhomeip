@@ -161,6 +161,103 @@ static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t
     return 0;
 }
 
+struct AesCtrTestEntry
+{
+    const uint8_t * key;   ///< Key to use for AES-CTR-128 encryption/decryption -- 16 byte length
+    const uint8_t * nonce; ///< Nonce to use for AES-CTR-128 encryption/decryption -- 13 byte length
+    const uint8_t * plaintext;
+    size_t plaintextLen;
+    const uint8_t * ciphertext;
+    size_t ciphertextLen;
+};
+
+/**
+ * Test vectors for AES-CTR-128 encryption/decryption.
+ *
+ * Sourced from: https://www.ietf.org/rfc/rfc3686.txt (Section 6)
+ * Modified to use `IV = flags byte | 13 byte nonce | u16 counter` as defined in NIST SP 800-38A.
+ *
+ * All AES-CCM test vectors can be used as well, but those are already called to validate underlying AES-CCM functionality.
+ */
+const AesCtrTestEntry theAesCtrTestVector[] = {
+    {
+        .key           = (const uint8_t *) "\xae\x68\x52\xf8\x12\x10\x67\xcc\x4b\xf7\xa5\x76\x55\x77\xf3\x9e",
+        .nonce         = (const uint8_t *) "\x00\x00\x00\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+        .plaintext     = (const uint8_t *) "\x53\x69\x6e\x67\x6c\x65\x20\x62\x6c\x6f\x63\x6b\x20\x6d\x73\x67",
+        .plaintextLen  = 16,
+        .ciphertext    = (const uint8_t *) "\x0d\x0a\x6b\x6d\xc1\xf6\x9b\x4d\x14\xca\x4c\x15\x42\x22\x42\xc4",
+        .ciphertextLen = 16,
+    },
+    {
+        .key       = (const uint8_t *) "\x7e\x24\x06\x78\x17\xfa\xe0\xd7\x43\xd6\xce\x1f\x32\x53\x91\x63",
+        .nonce     = (const uint8_t *) "\x00\x6c\xb6\xdb\xc0\x54\x3b\x59\xda\x48\xd9\x0b\x00",
+        .plaintext = (const uint8_t *) "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+                                       "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
+        .plaintextLen = 32,
+        .ciphertext   = (const uint8_t *) "\x4f\x3d\xf9\x49\x15\x88\x4d\xe0\xdc\x0e\x30\x95\x0d\xe7\xa6\xe9"
+                                        "\x5a\x91\x7e\x1d\x06\x42\x22\xdb\x2f\x6e\xc7\x3d\x99\x4a\xd9\x5f",
+        .ciphertextLen = 32,
+    }
+};
+
+constexpr size_t kAesCtrTestVectorSize = sizeof(theAesCtrTestVector) / sizeof(theAesCtrTestVector[0]);
+
+constexpr size_t KEY_LENGTH   = Crypto::kAES_CCM128_Key_Length;
+constexpr size_t NONCE_LENGTH = Crypto::kAES_CCM128_Nonce_Length;
+
+static void TestAES_CTR_128_Encrypt(nlTestSuite * inSuite, const AesCtrTestEntry * vector)
+{
+    chip::Platform::ScopedMemoryBuffer<uint8_t> outBuffer;
+    outBuffer.Alloc(vector->ciphertextLen);
+    NL_TEST_ASSERT(inSuite, outBuffer);
+
+    CHIP_ERROR err = AES_CTR_crypt(vector->plaintext, vector->plaintextLen, vector->key, KEY_LENGTH, vector->nonce, NONCE_LENGTH,
+                                   outBuffer.Get());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    bool outputMatches = memcmp(outBuffer.Get(), vector->ciphertext, vector->ciphertextLen) == 0;
+    NL_TEST_ASSERT(inSuite, outputMatches);
+    if (!outputMatches)
+    {
+        printf("\n Test failed due to mismatching ciphertext\n");
+    }
+}
+
+static void TestAES_CTR_128_Decrypt(nlTestSuite * inSuite, const AesCtrTestEntry * vector)
+{
+    chip::Platform::ScopedMemoryBuffer<uint8_t> outBuffer;
+    outBuffer.Alloc(vector->plaintextLen);
+    NL_TEST_ASSERT(inSuite, outBuffer);
+
+    CHIP_ERROR err = AES_CTR_crypt(vector->ciphertext, vector->ciphertextLen, vector->key, KEY_LENGTH, vector->nonce, NONCE_LENGTH,
+                                   outBuffer.Get());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    bool outputMatches = memcmp(outBuffer.Get(), vector->plaintext, vector->plaintextLen) == 0;
+    NL_TEST_ASSERT(inSuite, outputMatches);
+    if (!outputMatches)
+    {
+        printf("\n Test failed due to mismatching plaintext\n");
+    }
+}
+
+static void TestAES_CTR_128CryptTestVectors(nlTestSuite * inSuite, void * inContext)
+{
+    HeapChecker heapChecker(inSuite);
+    int numOfTestsRan = 0;
+    for (size_t vectorIndex = 0; vectorIndex < kAesCtrTestVectorSize; vectorIndex++)
+    {
+        const AesCtrTestEntry * vector = &theAesCtrTestVector[vectorIndex];
+        if (vector->plaintextLen > 0)
+        {
+            numOfTestsRan++;
+            TestAES_CTR_128_Encrypt(inSuite, vector);
+            TestAES_CTR_128_Decrypt(inSuite, vector);
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
 static void TestAES_CCM_128EncryptTestVectors(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
@@ -2279,6 +2376,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test decrypting AES-CCM-128 invalid key", TestAES_CCM_128DecryptInvalidKey),
     NL_TEST_DEF("Test decrypting AES-CCM-128 invalid nonce", TestAES_CCM_128DecryptInvalidNonceLen),
     NL_TEST_DEF("Test decrypting AES-CCM-128 Containers", TestAES_CCM_128Containers),
+    NL_TEST_DEF("Test encrypt/decrypt AES-CTR-128 test vectors", TestAES_CTR_128CryptTestVectors),
     NL_TEST_DEF("Test ASN.1 signature conversion routines", TestAsn1Conversions),
     NL_TEST_DEF("Test Integer to ASN.1 DER conversion", TestRawIntegerToDerValidCases),
     NL_TEST_DEF("Test Integer to ASN.1 DER conversion error cases", TestRawIntegerToDerInvalidCases),
