@@ -121,30 +121,34 @@ tests:
 
           ./chip-tool thermostatuserinterfaceconfiguration write temperature-display-mode  1 1 1
           Verify DUT receives  temperature-display-mode   attribute  write response on the TH(all-clusters-app) Log:
-          [1658143515.699171][13946:13946] CHIP:DMG: WriteRequestMessage =
-          [1658143515.699197][13946:13946] CHIP:DMG: {
-          [1658143515.699221][13946:13946] CHIP:DMG:         suppressResponse = false,
-          [1658143515.699248][13946:13946] CHIP:DMG:         timedRequest = false,
-          [1658143515.699272][13946:13946] CHIP:DMG:         AttributeDataIBs =
-          [1658143515.699302][13946:13946] CHIP:DMG:         [
-          [1658143515.699326][13946:13946] CHIP:DMG:                 AttributeDataIB =
-          [1658143515.699362][13946:13946] CHIP:DMG:                 {
-          [1658143515.699388][13946:13946] CHIP:DMG:                         AttributePathIB =
-          [1658143515.699419][13946:13946] CHIP:DMG:                         {
-          [1658143515.699451][13946:13946] CHIP:DMG:                                 Endpoint = 0x1,
-          [1658143515.699484][13946:13946] CHIP:DMG:                                 Cluster = 0x204,
-          [1658143515.699514][13946:13946] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1658143515.699544][13946:13946] CHIP:DMG:                         }
-          [1658143515.699577][13946:13946] CHIP:DMG:
-          [1658143515.699609][13946:13946] CHIP:DMG:                         Data = 1,
-          [1658143515.699638][13946:13946] CHIP:DMG:                 },
-          [1658143515.699667][13946:13946] CHIP:DMG:
-          [1658143515.699690][13946:13946] CHIP:DMG:         ],
-          [1658143515.699719][13946:13946] CHIP:DMG:
-          [1658143515.699743][13946:13946] CHIP:DMG:         moreChunkedMessages = false,
-          [1658143515.699768][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
-          [1658143515.699792][13946:13946] CHIP:DMG: },
-          [1658143515.699876][13946:13946] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=m
+          [1661765030.276401][103574:103574] CHIP:DMG: IM WH moving to [Initialized]
+          [1661765030.276428][103574:103574] CHIP:DMG: WriteRequestMessage =
+          [1661765030.276436][103574:103574] CHIP:DMG: {
+          [1661765030.276443][103574:103574] CHIP:DMG:         suppressResponse = false,
+          [1661765030.276450][103574:103574] CHIP:DMG:         timedRequest = false,
+          [1661765030.276457][103574:103574] CHIP:DMG:         AttributeDataIBs =
+          [1661765030.276469][103574:103574] CHIP:DMG:         [
+          [1661765030.276476][103574:103574] CHIP:DMG:                 AttributeDataIB =
+          [1661765030.276484][103574:103574] CHIP:DMG:                 {
+          [1661765030.276492][103574:103574] CHIP:DMG:                         AttributePathIB =
+          [1661765030.276500][103574:103574] CHIP:DMG:                         {
+          [1661765030.276509][103574:103574] CHIP:DMG:                                 Endpoint = 0x1,
+          [1661765030.276517][103574:103574] CHIP:DMG:                                 Cluster = 0x204,
+          [1661765030.276525][103574:103574] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1661765030.276532][103574:103574] CHIP:DMG:                         }
+          [1661765030.276542][103574:103574] CHIP:DMG:
+          [1661765030.276550][103574:103574] CHIP:DMG:                         Data = 1,
+          [1661765030.276557][103574:103574] CHIP:DMG:                 },
+          [1661765030.276567][103574:103574] CHIP:DMG:
+          [1661765030.276573][103574:103574] CHIP:DMG:         ],
+          [1661765030.276582][103574:103574] CHIP:DMG:
+          [1661765030.276589][103574:103574] CHIP:DMG:         moreChunkedMessages = false,
+          [1661765030.276597][103574:103574] CHIP:DMG:         InteractionModelRevision = 1
+          [1661765030.276603][103574:103574] CHIP:DMG: },
+          [1661765030.276642][103574:103574] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=o
+          [1661765030.276657][103574:103574] CHIP:DMG: AccessControl: allowed
+          [1661765030.276675][103574:103574] CHIP:DMG: Endpoint 1, Cluster 0x0000_0204 update version to 929de252
+
 
 
            ./chip-tool thermostatuserinterfaceconfiguration write keypad-lockout 1  1 1
