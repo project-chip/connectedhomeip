@@ -48,6 +48,7 @@ JNI_METHOD(void, OnPinCodeDeclined)(JNIEnv *, jobject)
 JNI_METHOD(void, OnPromptAccepted)(JNIEnv *, jobject)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Zcl, "OnPromptAccepted");
     GetCommissionerDiscoveryController()->Ok();
 #endif
@@ -56,6 +57,7 @@ JNI_METHOD(void, OnPromptAccepted)(JNIEnv *, jobject)
 JNI_METHOD(void, OnPromptDeclined)(JNIEnv *, jobject)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Zcl, "OnPromptDeclined");
     GetCommissionerDiscoveryController()->Cancel();
 #endif

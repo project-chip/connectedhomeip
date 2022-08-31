@@ -193,6 +193,7 @@ JNI_METHOD(void, setChipDeviceEventProvider)(JNIEnv *, jobject, jobject provider
 JNI_METHOD(jint, addContentApp)
 (JNIEnv *, jobject, jstring vendorName, jint vendorId, jstring appName, jint productId, jstring appVersion, jobject manager)
 {
+    chip::DeviceLayer::StackLock lock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     JniUtfString vName(env, vendorName);
