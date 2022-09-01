@@ -126,15 +126,6 @@ tests:
               - name: "nextCredentialIndex"
                 value: null
 
-    - label: "Precondition: Door is in locked state"
-      PICS: DRLK.S.C00.Rsp
-      command: "LockDoor"
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "PINCode"
-                value: "123456"
-
     - label:
           "TH writes the RequirePINforRemoteOperation attribute value as False
           on the DUT"

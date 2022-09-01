@@ -428,6 +428,8 @@ tests:
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_SignedInteger
       verification: |
           DUT implementation required to verify write an attribute of data type signed integer.
+
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -436,6 +438,8 @@ tests:
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_FloatingPoint
       verification: |
           DUT implementation required to verify write an attribute of data type float
+
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -444,6 +448,8 @@ tests:
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_OctetString
       verification: |
           DUT implementation required to verify write an attribute of data type Octet String
+
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -452,6 +458,8 @@ tests:
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Struct
       verification: |
           DUT implementation required to verify write an attribute ofdata type Struct
+
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -460,6 +468,8 @@ tests:
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_List
       verification: |
           DUT implementation required to verify write an attribute of  data type List
+
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -651,6 +661,8 @@ tests:
           DUT implementation required to verify write an attribute which is is larger than 1 MTU(1280 bytes)
           Here is an example command to verify the write functionality. User must choose an attribute which has large list of attribute data.
            ./chip-tool basic write node-label node 1 0
+
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:

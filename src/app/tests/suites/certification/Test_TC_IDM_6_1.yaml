@@ -35,7 +35,7 @@ tests:
 
           sudo ./chip-tool basic read-event start-up 1  0
 
-          On TH verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
+          On TH(chip-tool) verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
 
           [1653051591.078855][11664:11669] CHIP:DMG: ReportDataMessage =
           [1653051591.078885][11664:11669] CHIP:DMG: {
@@ -86,7 +86,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
            ./chip-tool any read-event-by-id 0x0028 0x0FFFFFFFF 1 0
-          On TH verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
+          On TH(chip-tool) verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
           [1652420332.235228][6031:6036] CHIP:DMG: ReportDataMessage =
           [1652420332.235259][6031:6036] CHIP:DMG: {
           [1652420332.235283][6031:6036] CHIP:DMG:         EventReportIBs =
@@ -135,7 +135,7 @@ tests:
       verification: |
           ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0
 
-          On TH verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
+          On TH(chip-tool) verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
           [1651584987.671229][2932:2937] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
           [1651584987.671263][2932:2937] CHIP:TOO:          Event number: 0
           [1651584987.671294][2932:2937] CHIP:TOO:          Priority: Critical
@@ -180,7 +180,7 @@ tests:
 
           sudo ./chip-tool basic read-event start-up 1  0xFFFF
 
-          On TH, verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
+          On TH(chip-tool), verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
 
           [1653051642.744722][11676:11681] CHIP:DMG: ReportDataMessage =
           [1653051642.744736][11676:11681] CHIP:DMG: {
@@ -231,7 +231,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo ./chip-tool basic read-event-by-id 0xFFFFFFFF 1  0xFFFF
-          On TH verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
+          On TH(chip-tool) verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
 
           [1653051699.893049][11691:11696] CHIP:DMG: ReportDataMessage =
           [1653051699.893068][11691:11696] CHIP:DMG: {
@@ -280,7 +280,7 @@ tests:
           Wildcard]."
       verification: |
           sudo ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1  0xFFFF
-          On TH verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
+          On TH(chip-tool) verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
           [1653051769.144914][11706:11711] CHIP:DMG: ReportDataMessage =
           [1653051769.144939][11706:11711] CHIP:DMG: {
           [1653051769.144954][11706:11711] CHIP:DMG:         EventReportIBs =
@@ -407,7 +407,7 @@ tests:
           "TH sends Read Request Message to DUT with EventRequests set to path
           which indicates a cluster event that is not supported."
       verification: |
-          cannot be executed with V1.0 SDK.
+          Mark this as not testable /NA. Out of Scope for V1.0
       disabled: true
 
     - label:
@@ -513,7 +513,7 @@ tests:
 
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]" 1 0
           ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
-          On TH verify DUT sends Report Data Message with no entry for that event in EventReports list.
+          On TH(chip-tool) verify DUT sends Report Data Message with no entry for that event in EventReports list.
 
           [1653054297.608259][12300:12305] CHIP:DMG: ReportDataMessage =
           [1653054297.608278][12300:12305] CHIP:DMG: {
@@ -535,7 +535,7 @@ tests:
           sudo ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
 
 
-          On TH verify that the DUT sends Report Data Message with EventReports
+          On TH(chip-tool) verify that the DUT sends Report Data Message with EventReports
 
           [1655986008.400642][4813:4818] CHIP:DMG: }
           [1655986008.400859][4813:4818] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
@@ -607,7 +607,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
           sudo ./chip-tool basic read-event start-up 1 0 --event-min 131073
 
-          On TH verify that the DUT sends  Report Data Message with empty EventReports
+          On TH(chip-tool) verify that the DUT sends  Report Data Message with empty EventReports
           [1650622225.700153][3069:3074] CHIP:DMG: ReportDataMessage =
           [1650622225.700193][3069:3074] CHIP:DMG: {
           [1650622225.700227][3069:3074] CHIP:DMG:         SuppressResponse = true,
@@ -632,7 +632,7 @@ tests:
               DUT -> TH ReportData, last chunk, SuppressResponse set to true
               TH -> DUT standalone ack
 
-          On TH verify that  The last chunked message should not receive any status response from the DUT
+          On TH(chip-tool) verify that  The last chunked message should not receive any status response from the DUT
 
           [1656510389.524811][20396:20396] CHIP:DMG: Fetched 16 events
           [1656510389.524838][20396:20396] CHIP:DMG: <RE> Sending report (payload has 973 bytes)...

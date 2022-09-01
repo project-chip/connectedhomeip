@@ -40,16 +40,6 @@ tests:
               type: int16u
 
     - label: "Read the global attribute: FeatureMap"
-      PICS: LVL.S.F00 || LVL.S.F01 || LVL.S.F02
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              minValue: 1
-              maxValue: 7
-
-    - label: "Read the global attribute: FeatureMap"
       PICS: " !LVL.S.F00 && !LVL.S.F01 && !LVL.S.F02 "
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -57,6 +47,33 @@ tests:
           value: 0
           constraints:
               type: bitmap32
+
+    - label: "Given LVL.S.F00(OO) ensure featuremap has the correct bit set"
+      PICS: LVL.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label: "Given LVL.S.F01(LT) ensure featuremap has the correct bit set"
+      PICS: LVL.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label: "Given LVL.S.F02(FQ) ensure featuremap has the correct bit set"
+      PICS: LVL.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
