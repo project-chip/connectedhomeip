@@ -232,6 +232,7 @@ void MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(NSData * op
         setNSError(CHIP_ERROR_INCORRECT_STATE, error);
         return;
     }
+
     __block chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters;
     dispatch_sync(mChipWorkQueue, ^{
         commissioningParameters = mCppCommissioner->GetCommissioningParameters();
