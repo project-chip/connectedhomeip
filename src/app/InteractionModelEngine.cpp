@@ -98,6 +98,11 @@ void InteractionModelEngine::Shutdown()
 
     mReadHandlers.ReleaseAll();
 
+    // Shut down any subscription clients that are still around.  They won't be
+    // able to work after this point anyway, since we're about to drop our refs
+    // to them.
+    ShutdownAllSubscriptions();
+
     //
     // We hold weak references to ReadClient objects. The application ultimately
     // actually owns them, so it's on them to eventually shut them down and free them
