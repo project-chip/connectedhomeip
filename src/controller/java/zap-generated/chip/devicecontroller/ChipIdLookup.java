@@ -220,9 +220,6 @@ public final class ChipIdLookup {
     if (clusterId == 4294048773L) {
       return "TestCluster";
     }
-    if (clusterId == 4294048774L) {
-      return "FaultInjection";
-    }
     return "";
   }
 
@@ -3090,24 +3087,6 @@ public final class ChipIdLookup {
       }
       return "";
     }
-    if (clusterId == 4294048774L) {
-      if (attributeId == 65528L) {
-        return "GeneratedCommandList";
-      }
-      if (attributeId == 65529L) {
-        return "AcceptedCommandList";
-      }
-      if (attributeId == 65531L) {
-        return "AttributeList";
-      }
-      if (attributeId == 65532L) {
-        return "FeatureMap";
-      }
-      if (attributeId == 65533L) {
-        return "ClusterRevision";
-      }
-      return "";
-    }
     return "";
   }
 
@@ -3480,9 +3459,6 @@ public final class ChipIdLookup {
       if (eventId == 2L) {
         return "TestFabricScopedEvent";
       }
-      return "";
-    }
-    if (clusterId == 4294048774L) {
       return "";
     }
     return "";
