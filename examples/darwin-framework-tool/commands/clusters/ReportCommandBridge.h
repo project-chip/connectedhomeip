@@ -90,11 +90,7 @@ public:
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        ModelCommand::AddArguments();
+        AddCommonArguments();
     }
 
     SubscribeAttribute(chip::ClusterId clusterId)
@@ -102,21 +98,23 @@ public:
         , mClusterId(clusterId)
     {
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        ModelCommand::AddArguments();
+        AddCommonArguments();
     }
 
     SubscribeAttribute(const char * _Nonnull attributeName)
         : ModelCommand("subscribe")
     {
         AddArgument("attr-name", attributeName);
+        AddCommonArguments();
+    }
+
+    void AddCommonArguments()
+    {
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
+        AddArgument("autoResubscribe", 0, 1, &mAutoResubscribe);
         ModelCommand::AddArguments();
     }
 
@@ -125,9 +123,12 @@ public:
     CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+
         MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
         params.keepPreviousSubscriptions
             = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.autoResubscribe = mAutoResubscribe.HasValue() ? [NSNumber numberWithBool:mAutoResubscribe.Value()] : nil;
+
         [device subscribeAttributeWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
             clusterId:[NSNumber numberWithUnsignedInteger:mClusterId]
             attributeId:[NSNumber numberWithUnsignedInteger:mAttributeId]
@@ -154,6 +155,7 @@ public:
 
 protected:
     chip::Optional<bool> mKeepSubscriptions;
+    chip::Optional<bool> mAutoResubscribe;
     chip::Optional<bool> mFabricFiltered;
     bool mSubscriptionEstablished = NO;
     uint16_t mMinInterval;
@@ -180,6 +182,7 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
+        AddArgument("autoResubscribe", 0, 1, &mAutoResubscribe);
         ModelCommand::AddArguments();
     }
 
@@ -192,6 +195,8 @@ public:
         MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
         params.keepPreviousSubscriptions
             = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.autoResubscribe = mAutoResubscribe.HasValue() ? [NSNumber numberWithBool:mAutoResubscribe.Value()] : nil;
+
         [device subscribeWithQueue:callbackQueue
             minInterval:mMinInterval
             maxInterval:mMaxInterval
@@ -220,6 +225,7 @@ public:
 
 protected:
     chip::Optional<bool> mKeepSubscriptions;
+    chip::Optional<bool> mAutoResubscribe;
     chip::Optional<chip::EventNumber> mEventNumber;
     bool mSubscriptionEstablished = NO;
     uint16_t mMinInterval;
