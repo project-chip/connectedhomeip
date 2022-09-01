@@ -19,6 +19,7 @@
 #include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <app/server/Server.h>
+#include <platform/CommissionableDataProvider.h>
 
 #include <ctype.h>
 #include <stdio.h>
@@ -174,11 +175,22 @@ static CHIP_ERROR VersionHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+static CHIP_ERROR SetPinCodeHandler(int argc, char **argv)
+{
+    VerifyOrReturnError(argc == 1, CHIP_ERROR_INVALID_ARGUMENT);
+    uint32_t setupPinCode = strtoull(argv[0], nullptr, 10);
+
+    ReturnErrorOnFailure(DeviceLayer::GetCommissionableDataProvider()->SetSetupPasscode(setupPinCode));
+
+    return CHIP_NO_ERROR;
+}
+
 static void RegisterMetaCommands(void)
 {
     static shell_command_t sCmds[] = {
         { &ShutdownHandler, "shutdown", "Exit the shell application" },
         { &VersionHandler, "version", "Output the software version" },
+        { &SetPinCodeHandler, "pincode", "Set the pin code" },
     };
 
     std::atexit(AtExitShell);
