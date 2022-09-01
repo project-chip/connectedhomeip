@@ -207,13 +207,22 @@ tests:
                 value: 10000
 
     - label: "TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              minValue: 0
-              maxValue: 15
+      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool colorcontrol read current-hue 1 1
+          Verify response contains a CurrentHue value  in  TH(chip-tool)  Logs:
+
+          [1649661849.854961][8307:8312] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274517
+          [1649661849.855019][8307:8312] CHIP:TOO:   current hue: 0 (value can vary)
+          [1649661849.855097][8307:8312] CHIP:EM: Sending Standalone Ack for MessageCounter:13414799 on exchange 39735i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -489,6 +498,7 @@ tests:
       command: "readAttribute"
       attribute: "ColorMode"
       response:
+          value: 0
           constraints:
               minValue: 0
               maxValue: 2
@@ -496,8 +506,9 @@ tests:
     - label: "TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A4001
       command: "readAttribute"
-      attribute: "ColorMode"
+      attribute: "EnhancedColorMode"
       response:
+          value: 0
           constraints:
               minValue: 0
               maxValue: 3

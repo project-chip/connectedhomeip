@@ -48,15 +48,50 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Read the global attribute: FeatureMap"
-      PICS: ( CC.S.F00 || CC.S.F01 || CC.S.F02 || CC.S.F03 || CC.S.F04)
+    - label: "Given CC.S.F00(HS) ensure featuremap has the correct bit set"
+      PICS: CC.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              minValue: 1
-              maxValue: 31
+              hasMasksSet: [0x1]
+
+    - label: "Given CC.S.F01(EHue) ensure featuremap has the correct bit set"
+      PICS: CC.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label: "Given CC.S.F02(CL) ensure featuremap has the correct bit set"
+      PICS: CC.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
+
+    - label: "Given CC.S.F03(XY) ensure featuremap has the correct bit set"
+      PICS: CC.S.F03
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x8]
+
+    - label: "Given CC.S.F04(CT) ensure featuremap has the correct bit set"
+      PICS: CC.S.F04
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x10]
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"

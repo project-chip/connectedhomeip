@@ -39,7 +39,7 @@ tests:
       verification: |
           ./chip-tool actions  read action-list 1 1
 
-          Verify read command is received on TH(all-clusters-app)
+          Verify read command is received on TH(bridge-app)
 
           [1658848323.188336][28392:28392] CHIP:IM: Received Read request
           [1658848323.188433][28392:28392] CHIP:DMG: ReadRequestMessage =
@@ -98,7 +98,7 @@ tests:
 
           ./chip-tool actions read setup-url 1 1
 
-          Verify read command is received on TH(all-clusters-app)
+          Verify read command is received on TH(bridge-app)
 
           [1658848453.728775][28392:28392] CHIP:IM: Received Read request
           [1658848453.728895][28392:28392] CHIP:DMG: ReadRequestMessage =

@@ -40,13 +40,49 @@ tests:
               type: int16u
 
     - label: "Read the global attribute: FeatureMap"
+      PICS: " !PS.S.F00 && !PS.S.F01 && !PS.S.F02 && !PS.S.F03 "
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label: "Given PS.S.F00(WIRED) ensure featuremap has the correct bit set"
+      PICS: PS.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              minValue: 0
-              maxValue: 15
+              hasMasksSet: [0x1]
+
+    - label: "Given PS.S.F01(BAT) ensure featuremap has the correct bit set"
+      PICS: PS.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label: "Given PS.S.F02(RECHG) ensure featuremap has the correct bit set"
+      PICS: PS.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2, 0x4]
+
+    - label: "Given PS.S.F03(REPLC) ensure featuremap has the correct bit set"
+      PICS: PS.S.F03
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2, 0x8]
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"

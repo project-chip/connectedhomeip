@@ -46,7 +46,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 1
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972694.732632][3652:3652] CHIP:IM: Received Read request
           [1659972694.732712][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972694.732739][3652:3652] CHIP:DMG: {
@@ -74,7 +74,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 2
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972694.732632][3652:3652] CHIP:IM: Received Read request
           [1659972694.732712][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972694.732739][3652:3652] CHIP:DMG: {
@@ -101,7 +101,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 3
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -127,7 +127,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 4
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -154,7 +154,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 5
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -181,7 +181,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 6
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -208,7 +208,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 7
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -235,7 +235,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 8
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -262,7 +262,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 9
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -289,7 +289,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 10
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -315,7 +315,8 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 11
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
+
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -342,7 +343,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 12
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -369,7 +370,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 13
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -397,7 +398,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 0
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972886.385353][3652:3652] CHIP:DMG: {
@@ -421,7 +422,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 1
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972886.385353][3652:3652] CHIP:DMG: {
@@ -445,7 +446,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 2
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972886.385353][3652:3652] CHIP:DMG: {
@@ -469,7 +470,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 3
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972886.385353][3652:3652] CHIP:DMG: {
@@ -494,7 +495,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 4
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -520,7 +521,7 @@ tests:
 
            ./chip-tool  descriptor read parts-list 1 5
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -546,7 +547,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 6
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -572,7 +573,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 7
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -598,7 +599,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 8
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -624,7 +625,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 9
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -650,7 +651,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 10
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -675,7 +676,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 11
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -701,7 +702,7 @@ tests:
 
           ./chip-tool  descriptor read  parts-list 1 12
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -727,7 +728,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 13
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -754,12 +755,13 @@ tests:
     - label: "Verify DUT contains the (supported) devices from the above list"
       PICS: MCORE.DEVLIST.UseDevices
       verification: |
-          Verify DUT contains the (supported) devices from the above list
+          sudo ./chip-bridge-app
+
+          ./chip-tool pairing ethernet 1 20202021 3840 fe80::e65f:1ff:fe0f:2753  5540
 
           ./chip-tool  descriptor read device-list 1 1
 
-          Verify in TH(all-clusters-app) Log:
-
+          Verify in TH(bridge-app) Log:
           [1659972694.732632][3652:3652] CHIP:IM: Received Read request
           [1659972694.732712][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972694.732739][3652:3652] CHIP:DMG: {
@@ -785,10 +787,36 @@ tests:
           [1659972694.733520][3652:3652] CHIP:DMG: AccessControl: allowed
 
 
+          ./chip-tool  descriptor read device-list 1 2
+
+          Verify in TH(bridge-app) Log:
+          [1659972694.732632][3652:3652] CHIP:IM: Received Read request
+          [1659972694.732712][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972694.732739][3652:3652] CHIP:DMG: {
+          [1659972694.732761][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972694.732800][3652:3652] CHIP:DMG:         [
+          [1659972694.732824][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972694.732866][3652:3652] CHIP:DMG:                 {
+          [1659972694.732905][3652:3652] CHIP:DMG:                         Endpoint = 0x2,
+          [1659972694.732940][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972694.732980][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972694.733009][3652:3652] CHIP:DMG:                 }
+          [1659972694.733066][3652:3652] CHIP:DMG:
+          [1659972694.733092][3652:3652] CHIP:DMG:         ],
+          [1659972694.733128][3652:3652] CHIP:DMG:
+          [1659972694.733154][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972694.733188][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972694.733211][3652:3652] CHIP:DMG: },
+          [1659972694.733292][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972694.733401][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972694.733429][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+          [1659972694.733460][3652:3652] CHIP:DMG: Reading attribute: Cluster=0x0000_001D Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1659972694.733487][3652:3652] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_001D e=1 p=v
+          [1659972694.733520][3652:3652] CHIP:DMG: AccessControl: allowed
+
           ./chip-tool  descriptor read device-list 1 3
 
-          Verify in TH(all-clusters-app) Log:
-
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -814,8 +842,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 4
 
-          Verify in TH(all-clusters-app) Log:
-
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -842,8 +869,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 5
 
-          Verify in TH(all-clusters-app) Log:
-
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -870,8 +896,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 6
 
-          Verify in TH(all-clusters-app) Log:
-
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -898,8 +923,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 7
 
-          Verify in TH(all-clusters-app) Log:
-
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -926,8 +950,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 8
 
-          Verify in TH(all-clusters-app) Log:
-
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -954,8 +977,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 9
 
-          Verify in TH(all-clusters-app) Log:
-
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -982,8 +1004,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 10
 
-          Verify in TH(all-clusters-app) Log:
-
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -1009,8 +1030,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 11
 
-          Verify in TH(all-clusters-app) Log:
-
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -1037,8 +1057,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 12
 
-          Verify in TH(all-clusters-app) Log:
-
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -1065,8 +1084,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 13
 
-          Verify in TH(all-clusters-app) Log:
-
+          Verify in TH(bridge-app) Log:
           [1659972745.371532][3652:3652] CHIP:IM: Received Read request
           [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972745.371654][3652:3652] CHIP:DMG: {
@@ -1094,8 +1112,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 0
 
-          Verify in TH(all-clusters-app) Log:
-
+          Verify in TH(bridge-app) Log:
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972886.385353][3652:3652] CHIP:DMG: {
@@ -1117,11 +1134,57 @@ tests:
           [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
           [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
 
+          ./chip-tool  descriptor read parts-list 1 1
+
+          Verify in TH(bridge-app) Log:
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x1,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+          ./chip-tool  descriptor read parts-list 1 2
+
+          Verify in TH(bridge-app) Log:
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x2,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
 
           ./chip-tool  descriptor read parts-list 1 3
 
-          Verify in TH(all-clusters-app) Log:
-
+          Verify in TH(bridge-app) Log:
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659972886.385353][3652:3652] CHIP:DMG: {
@@ -1146,7 +1209,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 4
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1172,7 +1235,7 @@ tests:
 
            ./chip-tool  descriptor read parts-list 1 5
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1198,7 +1261,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 6
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1224,7 +1287,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 7
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1250,7 +1313,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 8
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1276,7 +1339,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 9
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1302,7 +1365,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 10
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1327,7 +1390,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 11
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1353,7 +1416,7 @@ tests:
 
           ./chip-tool  descriptor read  parts-list 1 12
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1379,7 +1442,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 13
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1413,7 +1476,7 @@ tests:
 
           ./chip-tool bridgeddevicebasic read node-label 1 3
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659973028.616696][3652:3652] CHIP:IM: Received Read request
           [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1440,7 +1503,7 @@ tests:
 
           ./chip-tool bridgeddevicebasic read node-label 1 4
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659973028.616696][3652:3652] CHIP:IM: Received Read request
           [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1467,7 +1530,7 @@ tests:
 
           ./chip-tool bridgeddevicebasic read node-label 1 5
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659973028.616696][3652:3652] CHIP:IM: Received Read request
           [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1495,7 +1558,7 @@ tests:
 
           ./chip-tool bridgeddevicebasic read node-label 1 6
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659973028.616696][3652:3652] CHIP:IM: Received Read request
           [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1523,7 +1586,7 @@ tests:
 
           ./chip-tool bridgeddevicebasic read node-label 1 7
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659973028.616696][3652:3652] CHIP:IM: Received Read request
           [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1550,7 +1613,7 @@ tests:
 
           ./chip-tool bridgeddevicebasic read node-label 1 8
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659973028.616696][3652:3652] CHIP:IM: Received Read request
           [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1577,7 +1640,7 @@ tests:
 
           ./chip-tool bridgeddevicebasic read node-label 1 9
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659973028.616696][3652:3652] CHIP:IM: Received Read request
           [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1604,7 +1667,7 @@ tests:
 
           ./chip-tool bridgeddevicebasic read node-label 1 10
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659973028.616696][3652:3652] CHIP:IM: Received Read request
           [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1631,7 +1694,7 @@ tests:
 
           ./chip-tool bridgeddevicebasic read node-label 1 11
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659973028.616696][3652:3652] CHIP:IM: Received Read request
           [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1658,7 +1721,7 @@ tests:
 
           ./chip-tool bridgeddevicebasic read node-label 1 12
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659973028.616696][3652:3652] CHIP:IM: Received Read request
           [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1685,7 +1748,7 @@ tests:
 
           ./chip-tool bridgeddevicebasic read node-label 1 13
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659973028.616696][3652:3652] CHIP:IM: Received Read request
           [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1719,7 +1782,7 @@ tests:
 
           ./chip-tool onoff read on-off 1 3
 
-          Verify in TH(all-clusters-app) Log:
+          Verify in TH(bridge-app) Log:
 
           [1659973152.263905][3652:3652] CHIP:IM: Received Read request
           [1659973152.264002][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1748,7 +1811,7 @@ tests:
           bridged On/Off lights (use key c in the console to bridge-app)"
       PICS: MCORE.DEVLIST.UseDeviceState
       verification: |
-          Verify on TH(all-clusters-app) Log:
+          Verify on TH(bridge-app) Log:
           ./chip-tool onoff read on-off 1 3
 
           [1659973152.263905][3652:3652] CHIP:IM: Received Read request
@@ -1783,24 +1846,24 @@ tests:
       verification: |
           ./chip-tool temperaturemeasurement read measured-value 1 4
 
-          Verify on TH(all-clusters-app) Log:
+          Verify on TH(bridge-app) Log:
 
           [1659973227.630446][3652:3652] CHIP:IM: Received Read request
           [1659973227.630527][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659973227.630570][3652:3652] CHIP:DMG: {
-          [1659973227.630594][3652:3652] CHIP:DMG: 	AttributePathIBs =
-          [1659973227.630633][3652:3652] CHIP:DMG: 	[
-          [1659973227.630658][3652:3652] CHIP:DMG: 		AttributePathIB =
-          [1659973227.630699][3652:3652] CHIP:DMG: 		{
-          [1659973227.630728][3652:3652] CHIP:DMG: 			Endpoint = 0x4,
-          [1659973227.630779][3652:3652] CHIP:DMG: 			Cluster = 0x402,
-          [1659973227.630821][3652:3652] CHIP:DMG: 			Attribute = 0x0000_0000,
-          [1659973227.630853][3652:3652] CHIP:DMG: 		}
+          [1659973227.630594][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973227.630633][3652:3652] CHIP:DMG:         [
+          [1659973227.630658][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973227.630699][3652:3652] CHIP:DMG:                 {
+          [1659973227.630728][3652:3652] CHIP:DMG:                         Endpoint = 0x4,
+          [1659973227.630779][3652:3652] CHIP:DMG:                         Cluster = 0x402,
+          [1659973227.630821][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659973227.630853][3652:3652] CHIP:DMG:                 }
           [1659973227.630892][3652:3652] CHIP:DMG:
-          [1659973227.630919][3652:3652] CHIP:DMG: 	],
+          [1659973227.630919][3652:3652] CHIP:DMG:         ],
           [1659973227.630957][3652:3652] CHIP:DMG:
-          [1659973227.630984][3652:3652] CHIP:DMG: 	isFabricFiltered = true,
-          [1659973227.631020][3652:3652] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659973227.630984][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973227.631020][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
           [1659973227.631044][3652:3652] CHIP:DMG: },
           [1659973227.631126][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1659973227.631231][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
@@ -1818,7 +1881,7 @@ tests:
 
           ./chip-tool temperaturemeasurement read measured-value 1 4
 
-          Verify on TH(all-clusters-app) Log:
+          Verify on TH(bridge-app) Log:
 
           expect to get a different value than step 7b
           [1659351542.393349][12212:12217] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0402 Attribute 0x0000_0000 DataVersion: 2406690153
@@ -1835,24 +1898,24 @@ tests:
       verification: |
           ./chip-tool powersource read bat-charge-level 1 9
 
-          Verify on TH(all-clusters-app) Log:
+          Verify on TH(bridge-app) Log:
 
           [1659973227.630446][3652:3652] CHIP:IM: Received Read request
           [1659973227.630527][3652:3652] CHIP:DMG: ReadRequestMessage =
           [1659973227.630570][3652:3652] CHIP:DMG: {
-          [1659973227.630594][3652:3652] CHIP:DMG: 	AttributePathIBs =
-          [1659973227.630633][3652:3652] CHIP:DMG: 	[
-          [1659973227.630658][3652:3652] CHIP:DMG: 		AttributePathIB =
-          [1659973227.630699][3652:3652] CHIP:DMG: 		{
-          [1659973227.630728][3652:3652] CHIP:DMG: 			Endpoint = 0x4,
-          [1659973227.630779][3652:3652] CHIP:DMG: 			Cluster = 0x402,
-          [1659973227.630821][3652:3652] CHIP:DMG: 			Attribute = 0x0000_0000,
-          [1659973227.630853][3652:3652] CHIP:DMG: 		}
+          [1659973227.630594][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973227.630633][3652:3652] CHIP:DMG:         [
+          [1659973227.630658][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973227.630699][3652:3652] CHIP:DMG:                 {
+          [1659973227.630728][3652:3652] CHIP:DMG:                         Endpoint = 0x4,
+          [1659973227.630779][3652:3652] CHIP:DMG:                         Cluster = 0x402,
+          [1659973227.630821][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659973227.630853][3652:3652] CHIP:DMG:                 }
           [1659973227.630892][3652:3652] CHIP:DMG:
-          [1659973227.630919][3652:3652] CHIP:DMG: 	],
+          [1659973227.630919][3652:3652] CHIP:DMG:         ],
           [1659973227.630957][3652:3652] CHIP:DMG:
-          [1659973227.630984][3652:3652] CHIP:DMG: 	isFabricFiltered = true,
-          [1659973227.631020][3652:3652] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659973227.630984][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973227.631020][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
           [1659973227.631044][3652:3652] CHIP:DMG: },
           [1659973227.631126][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1659973227.631231][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
@@ -1865,7 +1928,7 @@ tests:
       verification: |
           ./chip-tool onoff read on-off 1 3
 
-          Verify on TH(all-clusters-app) Log:
+          Verify on TH(bridge-app) Log:
 
           [1659973152.263905][3652:3652] CHIP:IM: Received Read request
           [1659973152.264002][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1896,7 +1959,7 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasic  read node-label 1 3
 
-          Verify on TH(all-clusters-app) Log:
+          Verify on TH(bridge-app) Log:
 
           [1659973028.616696][3652:3652] CHIP:IM: Received Read request
           [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1919,14 +1982,14 @@ tests:
           [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
           [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
 
-          Verify on TH(chip-tool) Log
+          Verify on TH(bridge-app) Log
 
           "b
           [1659089470.077297][12236:12241] CHIP:DL: Device[Light 1]: New Name=""Light 1b""
 
           ./chip-tool bridgeddevicebasic  read node-label 1 3
 
-          Verify on TH(all-clusters-app) Log:
+          Verify on TH(bridge-app) Log:
 
           [1659973028.616696][3652:3652] CHIP:IM: Received Read request
           [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1953,7 +2016,7 @@ tests:
     - label: "Verify DUT contains the added device in the list of devices"
       PICS: MCORE.DEVLIST.UseDeviceNames
       verification: |
-          Verify on TH(chip-tool) Log
+          Verify on TH(bridge-app) Log
 
 
           b
@@ -1964,11 +2027,11 @@ tests:
           "Use TH/bridge-app to add a bridged light (use key 2 in the console to
           bridge-app to add Light 2)"
       verification: |
-          Press "2" on TH(chip-tool) Log
+          Press "2" on TH(bridge-app) Log
 
           ./chip-tool  descriptor read parts-list 1 0
 
-          Verify the endpoints listed in TH(all-clusters-app) Log
+          Verify the endpoints listed in TH(bridge-app) Log
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -1993,7 +2056,7 @@ tests:
 
           "
           ./chip-tool  descriptor read parts-list 1 1
-          Verify the list contains 11 entries in TH(all-clusters-app) Log
+          Verify the list contains 11 entries in TH(bridge-app) Log
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -2018,7 +2081,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 14
 
-          Verify on TH(all-clusters-app) Log
+          Verify on TH(bridge-app) Log
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -2043,7 +2106,7 @@ tests:
 
           ./chip-tool  descriptor read device-list 1 14
 
-          Verify the list contains 11 entries in TH(all-clusters-app) Log
+          Verify the list contains 11 entries in TH(bridge-app) Log
 
           [1659972694.732632][3652:3652] CHIP:IM: Received Read request
           [1659972694.732712][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -2073,7 +2136,7 @@ tests:
     - label: "Verify DUT contains the added device in the list of devices"
       PICS: MCORE.DEVLIST.UseDevices
       verification: |
-          Verify on TH(chip-tool) Log
+          Verify on TH(bridge-app) Log
 
           2
           [1659352274.915018][14237:14242] CHIP:DMG: Endpoint 1, Cluster 0x0000_001D update version to 7e918bae
@@ -2087,7 +2150,7 @@ tests:
       verification: |
           ./chip-tool  descriptor read parts-list 1 0
 
-          Verify on TH(all-clusters-app) Log:
+          Verify on TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -2112,7 +2175,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 1
 
-          Verify on TH(all-clusters-app) Log:
+          Verify on TH(bridge-app) Log:
 
           [1659972886.385225][3652:3652] CHIP:IM: Received Read request
           [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
@@ -2141,7 +2204,7 @@ tests:
           devices"
       PICS: MCORE.DEVLIST.UseDevices
       verification: |
-          Verify on TH(chip-tool) Log
+          Verify on TH(bridge-app) Log
 
           4
           [1659352426.184434][14237:14242] CHIP:DMG: Endpoint 1, Cluster 0x0000_001D update version to 7e918baf

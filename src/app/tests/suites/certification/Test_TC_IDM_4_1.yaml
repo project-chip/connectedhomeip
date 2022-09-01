@@ -482,6 +482,9 @@ tests:
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_Integer
       verification: |
           DUT implementation required to verify subscribe an attribute of data type signed integer
+
+
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -492,6 +495,10 @@ tests:
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_FloatingPoint
       verification: |
           DUT implementation required to verify subscribe an attribute of data type floating point
+
+
+
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -502,6 +509,10 @@ tests:
       PICS: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_List
       verification: |
           DUT implementation required to verify subscribe and list an attribute of data type list
+
+
+
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
