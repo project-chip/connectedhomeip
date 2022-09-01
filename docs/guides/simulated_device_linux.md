@@ -90,7 +90,7 @@ interact with it using chip-tool
 
 2. Run this command to commission.
     ```
-    ./out/debug/standalone/chip-tool pairing code MT:-24J0AFN00KA0648G00
+    ./out/debug/standalone/chip-tool pairing code 0x654321 MT:-24J0AFN00KA0648G00
     ```
     or whatever is listed on the "SetupQRCode:" line in the log output.
 3. Most tests will start at this point and now an send cluster commands with
