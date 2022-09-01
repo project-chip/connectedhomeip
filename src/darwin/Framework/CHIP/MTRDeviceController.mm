@@ -60,6 +60,7 @@ static NSString * const kErrorSigningKeypairInit = @"Init failure while creating
 static NSString * const kErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
 static NSString * const kErrorOperationalKeypairInit = @"Init failure while creating operational keypair bridge";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
+static NSString * const kErrorPartialDacVerifierInit = @"Init failure while creating a partial DAC verifier";
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
@@ -106,6 +107,11 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             return nil;
         }
 
+        _partialDACVerifier = new chip::Credentials::PartialDACVerifier();
+        if ([self checkForInitError:(_partialDACVerifier != nullptr) logMsg:kErrorPartialDacVerifierInit]) {
+            return nil;
+        }
+
         _operationalCredentialsDelegate = new MTROperationalCredentialsDelegate();
         if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kErrorOperationalCredentialsInit]) {
             return nil;
@@ -145,6 +151,9 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
         _cppCommissioner->Shutdown();
         delete _cppCommissioner;
         _cppCommissioner = nullptr;
+        if (_operationalCredentialsDelegate != nil) {
+            _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
+        }
     }
 }
 
@@ -158,6 +167,11 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     if (_operationalCredentialsDelegate) {
         delete _operationalCredentialsDelegate;
         _operationalCredentialsDelegate = nullptr;
+    }
+
+    if (_partialDACVerifier) {
+        delete _partialDACVerifier;
+        _partialDACVerifier = nullptr;
     }
 
     if (_pairingDelegateBridge) {
