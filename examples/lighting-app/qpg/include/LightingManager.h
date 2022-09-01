@@ -41,6 +41,7 @@ public:
         LEVEL_ACTION,
         COLOR_ACTION_XY,
         COLOR_ACTION_HSV,
+        COLOR_ACTION_CT,
         INVALID_ACTION
     } Action;
 
@@ -66,6 +67,7 @@ private:
     XyColor_t mXY;
     HsvColor_t mHSV;
     RgbColor_t mRGB;
+    CtColor_t mCT;
 
     LightingCallback_fn mActionInitiated_CB;
     LightingCallback_fn mActionCompleted_CB;
@@ -74,6 +76,7 @@ private:
     void SetLevel(uint8_t aLevel);
     void SetColor(uint16_t x, uint16_t y);
     void SetColor(uint8_t hue, uint8_t saturation);
+    void SetColorTemperature(CtColor_t ct);
 
     void UpdateLight();
 
