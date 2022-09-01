@@ -16,12 +16,15 @@
  */
 
 #import "MTRAttestationTrustStoreBridge.h"
-
-static chip::ByteSpan asByteSpan(NSData * value) { return chip::ByteSpan(static_cast<const uint8_t *>(value.bytes), value.length); }
+#import "NSDataSpanConversion.h"
 
 CHIP_ERROR MTRAttestationTrustStoreBridge::GetProductAttestationAuthorityCert(
     const chip::ByteSpan & skid, chip::MutableByteSpan & outPaaDerBuffer) const
 {
+    if (mPaaCerts == nil) {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
     VerifyOrReturnError(skid.size() == chip::Crypto::kSubjectKeyIdentifierLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     size_t paaIdx;
@@ -29,7 +32,7 @@ CHIP_ERROR MTRAttestationTrustStoreBridge::GetProductAttestationAuthorityCert(
 
     for (paaIdx = 0; paaIdx < mPaaCerts.count; ++paaIdx) {
         uint8_t skidBuf[chip::Crypto::kSubjectKeyIdentifierLength] = { 0 };
-        candidate = asByteSpan(mPaaCerts[paaIdx]);
+        candidate = AsByteSpan(mPaaCerts[paaIdx]);
         chip::MutableByteSpan candidateSkidSpan { skidBuf };
         VerifyOrReturnError(
             CHIP_NO_ERROR == chip::Crypto::ExtractSKIDFromX509Cert(candidate, candidateSkidSpan), CHIP_ERROR_INTERNAL);
@@ -39,5 +42,33 @@ CHIP_ERROR MTRAttestationTrustStoreBridge::GetProductAttestationAuthorityCert(
             return CopySpanToMutableSpan(candidate, outPaaDerBuffer);
         }
     }
+    return CHIP_ERROR_CA_CERT_NOT_FOUND;
+}
+
+CHIP_ERROR MTRAttestationTrustStoreBridge::GetCertificationDeclarationSigningKey(
+    const chip::ByteSpan & skid, chip::Crypto::P256PublicKey & pubKey) const
+{
+    if (mCDCerts == nil) {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    VerifyOrReturnError(skid.size() == chip::Crypto::kSubjectKeyIdentifierLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+    size_t cdIdx;
+    chip::ByteSpan candidate;
+
+    for (cdIdx = 0; cdIdx < mCDCerts.count; ++cdIdx) {
+        uint8_t skidBuf[chip::Crypto::kSubjectKeyIdentifierLength] = { 0 };
+        candidate = AsByteSpan(mCDCerts[cdIdx]);
+        chip::MutableByteSpan candidateSkidSpan { skidBuf };
+        VerifyOrReturnError(
+            CHIP_NO_ERROR == chip::Crypto::ExtractSKIDFromX509Cert(candidate, candidateSkidSpan), CHIP_ERROR_INTERNAL);
+
+        if (skid.data_equal(candidateSkidSpan)) {
+            // Found a match
+            return chip::Crypto::ExtractPubkeyFromX509Cert(candidate, pubKey);
+        }
+    }
+
     return CHIP_ERROR_CA_CERT_NOT_FOUND;
 }

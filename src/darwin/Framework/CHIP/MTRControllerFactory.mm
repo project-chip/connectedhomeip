@@ -257,8 +257,8 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
         // Initialize device attestation verifier
         const Credentials::AttestationTrustStore * trustStore;
-        if (startupParams.paaCerts) {
-            _attestationTrustStoreBridge = new MTRAttestationTrustStoreBridge(startupParams.paaCerts);
+        if (startupParams.paaCerts || startupParams.cdCerts) {
+            _attestationTrustStoreBridge = new MTRAttestationTrustStoreBridge(startupParams.paaCerts, startupParams.cdCerts);
             if (_attestationTrustStoreBridge == nullptr) {
                 MTR_LOG_ERROR("Error: %@", kErrorAttestationTrustStoreInit);
                 return;
@@ -612,6 +612,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     _storageDelegate = storageDelegate;
     _otaProviderDelegate = nil;
     _paaCerts = nil;
+    _cdCerts = nil;
     _port = nil;
     _startServer = NO;
 
