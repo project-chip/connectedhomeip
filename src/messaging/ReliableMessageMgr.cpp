@@ -320,7 +320,8 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
         if (exchangeMgr)
         {
             // After the first failure notify session manager to refresh device data
-            if (entry->sendCount == 1 && mSessionUpdateDelegate != nullptr)
+            if (entry->sendCount == 1 && mSessionUpdateDelegate != nullptr && entry->ec->GetSessionHandle()->IsSecureSession() &&
+                entry->ec->GetSessionHandle()->AsSecureSession()->IsCASESession())
             {
                 ChipLogDetail(ExchangeManager, "Notify session manager to update peer address");
                 mSessionUpdateDelegate->UpdatePeerAddress(entry->ec->GetSessionHandle()->GetPeer());
