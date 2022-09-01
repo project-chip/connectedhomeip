@@ -144,8 +144,8 @@ tests:
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
           On TH1(Chiptool), Verify  AccessControlExtensionChanged containing 1 element
 
-          [1661428343.981198][23629:23634] CHIP:DMG:         
-          [1661428343.981205][23629:23634] CHIP:DMG:         SuppressResponse = true, 
+          [1661428343.981198][23629:23634] CHIP:DMG:
+          [1661428343.981205][23629:23634] CHIP:DMG:         SuppressResponse = true,
           [1661428343.981211][23629:23634] CHIP:DMG:         InteractionModelRevision = 1
           [1661428343.981217][23629:23634] CHIP:DMG: }
           [1661428343.981366][23629:23634] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
@@ -171,7 +171,7 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
-          On TH1(Chiptool) , Verify   Successfully extension attribute list containing one element 
+          On TH1(Chiptool) , Verify   Successfully extension attribute list containing one element
           7284747.131523][2411:2416] CHIP:DMG:                        StatusIB =
           [1657284747.131568][2411:2416] CHIP:DMG:                        {
           [1657284747.131618][2411:2416] CHIP:DMG:                                status = 0x00 (SUCCESS),
@@ -334,7 +334,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
-          On TH1(Chiptool) , Verify AccessControl cluster AccessControlExtensionChanged event 
+          On TH1(Chiptool) , Verify AccessControl cluster AccessControlExtensionChanged event
           containing at least 1 new element, and MUST NOT contain an added event for the second extension
           [[1661428163.049647][23604:23609] CHIP:TOO:   Event number: 8
           [1661428163.049660][23604:23609] CHIP:TOO:   Priority: Info

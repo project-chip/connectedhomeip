@@ -43,8 +43,8 @@ tests:
 
           1659945239.794637][2742:2742] CHIP:DMG: InvokeRequestMessage =
           [1659945239.794680][2742:2742] CHIP:DMG: {
-          [1659945239.794718][2742:2742] CHIP:DMG:         suppressResponse = false, 
-          [1659945239.794762][2742:2742] CHIP:DMG:         timedRequest = false, 
+          [1659945239.794718][2742:2742] CHIP:DMG:         suppressResponse = false,
+          [1659945239.794762][2742:2742] CHIP:DMG:         timedRequest = false,
           [1659945239.794801][2742:2742] CHIP:DMG:         InvokeRequests =
           [1659945239.794851][2742:2742] CHIP:DMG:         [
           [1659945239.794891][2742:2742] CHIP:DMG:                 CommandDataIB =
@@ -55,8 +55,8 @@ tests:
           [1659945239.795177][2742:2742] CHIP:DMG:                                 ClusterId = 0x102,
           [1659945239.795239][2742:2742] CHIP:DMG:                                 CommandId = 0x0,
           [1659945239.795297][2742:2742] CHIP:DMG:                         },
-          [1659945239.795353][2742:2742] CHIP:DMG:                         
-          [1659945239.795403][2742:2742] CHIP:DMG:                         CommandFields = 
+          [1659945239.795353][2742:2742] CHIP:DMG:
+          [1659945239.795403][2742:2742] CHIP:DMG:                         CommandFields =
           [1659945239.795451][2742:2742] CHIP:DMG:                         {
           [1659945239.795500][2742:2742] CHIP:DMG:                         },
           [1659945239.795547][2742:2742] CHIP:DMG:                 },
@@ -78,8 +78,8 @@ tests:
 
           [1659945343.976313][2742:2742] CHIP:DMG: InvokeRequestMessage =
           [1659945343.976344][2742:2742] CHIP:DMG: {
-          [1659945343.976367][2742:2742] CHIP:DMG:         suppressResponse = false, 
-          [1659945343.976399][2742:2742] CHIP:DMG:         timedRequest = false, 
+          [1659945343.976367][2742:2742] CHIP:DMG:         suppressResponse = false,
+          [1659945343.976399][2742:2742] CHIP:DMG:         timedRequest = false,
           [1659945343.976424][2742:2742] CHIP:DMG:         InvokeRequests =
           [1659945343.976454][2742:2742] CHIP:DMG:         [
           [1659945343.976479][2742:2742] CHIP:DMG:                 CommandDataIB =
@@ -90,14 +90,14 @@ tests:
           [1659945343.976639][2742:2742] CHIP:DMG:                                 ClusterId = 0x102,
           [1659945343.976672][2742:2742] CHIP:DMG:                                 CommandId = 0x1,
           [1659945343.976701][2742:2742] CHIP:DMG:                         },
-          [1659945343.976734][2742:2742] CHIP:DMG:                         
-          [1659945343.976764][2742:2742] CHIP:DMG:                         CommandFields = 
+          [1659945343.976734][2742:2742] CHIP:DMG:
+          [1659945343.976764][2742:2742] CHIP:DMG:                         CommandFields =
           [1659945343.976792][2742:2742] CHIP:DMG:                         {
           [1659945343.976823][2742:2742] CHIP:DMG:                         },
           [1659945343.976852][2742:2742] CHIP:DMG:                 },
-          [1659945343.976882][2742:2742] CHIP:DMG:                 
+          [1659945343.976882][2742:2742] CHIP:DMG:
           [1659945343.976906][2742:2742] CHIP:DMG:         ],
-          [1659945343.976936][2742:2742] CHIP:DMG:         
+          [1659945343.976936][2742:2742] CHIP:DMG:
           [1659945343.976960][2742:2742] CHIP:DMG:         InteractionModelRevision = 1
           [1659945343.976984][2742:2742] CHIP:DMG: },
       disabled: true
@@ -117,8 +117,8 @@ tests:
 
           [1661859427.618059][2477:2477] CHIP:DMG: InvokeRequestMessage =
           [1661859427.618086][2477:2477] CHIP:DMG: {
-          [1661859427.618112][2477:2477] CHIP:DMG:         suppressResponse = false, 
-          [1661859427.618140][2477:2477] CHIP:DMG:         timedRequest = false, 
+          [1661859427.618112][2477:2477] CHIP:DMG:         suppressResponse = false,
+          [1661859427.618140][2477:2477] CHIP:DMG:         timedRequest = false,
           [1661859427.618165][2477:2477] CHIP:DMG:         InvokeRequests =
           [1661859427.618196][2477:2477] CHIP:DMG:         [
           [1661859427.618221][2477:2477] CHIP:DMG:                 CommandDataIB =
@@ -129,14 +129,14 @@ tests:
           [1661859427.618383][2477:2477] CHIP:DMG:                                 ClusterId = 0x102,
           [1661859427.618420][2477:2477] CHIP:DMG:                                 CommandId = 0x2,
           [1661859427.618452][2477:2477] CHIP:DMG:                         },
-          [1661859427.618487][2477:2477] CHIP:DMG:                         
-          [1661859427.618516][2477:2477] CHIP:DMG:                         CommandFields = 
+          [1661859427.618487][2477:2477] CHIP:DMG:
+          [1661859427.618516][2477:2477] CHIP:DMG:                         CommandFields =
           [1661859427.618551][2477:2477] CHIP:DMG:                         {
           [1661859427.618583][2477:2477] CHIP:DMG:                         },
           [1661859427.618613][2477:2477] CHIP:DMG:                 },
-          [1661859427.618645][2477:2477] CHIP:DMG:                 
+          [1661859427.618645][2477:2477] CHIP:DMG:
           [1661859427.618670][2477:2477] CHIP:DMG:         ],
-          [1661859427.618700][2477:2477] CHIP:DMG:         
+          [1661859427.618700][2477:2477] CHIP:DMG:
           [1661859427.618724][2477:2477] CHIP:DMG:         InteractionModelRevision = 1
           [1661859427.618747][2477:2477] CHIP:DMG: },
           [1661859427.618814][2477:2477] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0102 e=1 p=o

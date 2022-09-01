@@ -51,10 +51,10 @@ tests:
 
           echo "{"Name":"SwitchLatched","NewPosition":1}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-            Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event switch-latched 1 100 1 1 
+            Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event switch-latched 1 100 1 1
 
           Verify inTH(chip-tool) Log:
 
@@ -153,7 +153,7 @@ tests:
           Raspi device doesn"t support more than 2 position ,so this step is not verifiable by using raspi device
 
 
-          In Raspi platform to change the switch to third position use the below sample command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal. 
+          In Raspi platform to change the switch to third position use the below sample command, Pls use equivalent command on the respective DUT.open one more terminal on DUT side execute the echo command on that terminal.
 
           echo "{"Name":"SwitchLatched","NewPosition":3" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
@@ -211,10 +211,10 @@ tests:
           [1659612230.312472][7312:7312] CHIP:ZCL: SwitchServer: OnInitialPress
 
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event  initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event  initial-press 1 100 1 1
 
           Verify inTH (chip-tool)Log:
 
@@ -324,10 +324,10 @@ tests:
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event  initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event  initial-press 1 100 1 1
 
           [1659686631.947247][3045:3050] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659686631.947272][3045:3050] CHIP:TOO:          Event number: 23
@@ -341,10 +341,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           [1659686907.770389][3061:3066] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659686907.770413][3061:3066] CHIP:TOO:          Event number: 24
@@ -368,10 +368,10 @@ tests:
           [1659686596.526820][2530:2530] CHIP:-: The new position when the momentary switch starts to be pressed:1
           [1659686596.526881][2530:2530] CHIP:ZCL: SwitchServer: OnInitialPress
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event  initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event  initial-press 1 100 1 1
 
           [1659692069.006090][3668:3674] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659692069.006114][3668:3674] CHIP:TOO:          Event number: 26
@@ -394,10 +394,10 @@ tests:
           [1659686852.011466][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
           [1659686852.011490][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           [1659692123.069593][3675:3680] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659692123.069616][3675:3680] CHIP:TOO:          Event number: 27
@@ -459,10 +459,10 @@ tests:
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event  initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event  initial-press 1 100 1 1
 
           [1659692507.869323][3696:3701] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659692507.869342][3696:3701] CHIP:TOO:          Event number: 28
@@ -476,10 +476,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           [1659692890.665344][3721:3726] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659692890.665369][3721:3726] CHIP:TOO:          Event number: 31
@@ -494,10 +494,10 @@ tests:
           "Operator operates switch (keep pressed for long time, e.g. 5 seconds)"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event  initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event  initial-press 1 100 1 1
 
           [1659692507.869323][3696:3701] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659692507.869342][3696:3701] CHIP:TOO:          Event number: 28
@@ -507,10 +507,10 @@ tests:
           [1659692507.869421][3696:3701] CHIP:TOO:     NewPosition: 1
           [1659692507.869440][3696:3701] CHIP:TOO:    }
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event long-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event long-press 1 100 1 1
 
           [1659692638.993482][3706:3712] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0002
           [1659692638.993504][3706:3712] CHIP:TOO:          Event number: 30
@@ -524,10 +524,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event long-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event long-release 1 100 1 1
 
           [1659693001.739969][3732:3737] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0004
           [1659693001.740012][3732:3737] CHIP:TOO:          Event number: 32
@@ -591,10 +591,10 @@ tests:
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           [1659694345.040034][3787:3792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659694345.040059][3787:3792] CHIP:TOO:          Event number: 37
@@ -607,10 +607,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           [1659694426.794832][3797:3802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659694426.794853][3797:3802] CHIP:TOO:          Event number: 38
@@ -621,10 +621,10 @@ tests:
           [1659694426.794952][3797:3802] CHIP:TOO:    }
 
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event multi-press-complete 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-complete 1 100 1 1
 
 
           [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
@@ -640,10 +640,10 @@ tests:
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           [1659695901.066563][3955:3960] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659695901.066583][3955:3960] CHIP:TOO:          Event number: 46
@@ -657,10 +657,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           [1659694426.794832][3797:3802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659694426.794853][3797:3802] CHIP:TOO:          Event number: 38
@@ -674,10 +674,10 @@ tests:
     - label: "Briefly after 6f, operator operates switch again (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           [1659694345.040034][3787:3792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659694345.040059][3787:3792] CHIP:TOO:          Event number: 37
@@ -686,10 +686,10 @@ tests:
           [1659694345.040135][3787:3792] CHIP:TOO:   InitialPress: {
           [1659694345.040160][3787:3792] CHIP:TOO:     NewPosition: 1
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event multi-press-ongoing 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-ongoing 1 100 1 1
 
 
           [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
@@ -705,10 +705,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           [1659696223.568247][3981:3986] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659696223.568272][3981:3986] CHIP:TOO:          Event number: 53
@@ -719,10 +719,10 @@ tests:
           [1659696223.568397][3981:3986] CHIP:TOO:    }
 
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event multi-press-complete 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-complete 1 100 1 1
 
           [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
           [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45
@@ -744,10 +744,10 @@ tests:
     - label: "Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           [1659695901.066563][3955:3960] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659695901.066583][3955:3960] CHIP:TOO:          Event number: 46
@@ -761,10 +761,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           [1659694426.794832][3797:3802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659694426.794853][3797:3802] CHIP:TOO:          Event number: 38
@@ -778,10 +778,10 @@ tests:
     - label: "Briefly after 6k, operator operates switch again (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           [1659694345.040034][3787:3792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659694345.040059][3787:3792] CHIP:TOO:          Event number: 37
@@ -790,10 +790,10 @@ tests:
           [1659694345.040135][3787:3792] CHIP:TOO:   InitialPress: {
           [1659694345.040160][3787:3792] CHIP:TOO:     NewPosition: 1
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event multi-press-ongoing 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-ongoing 1 100 1 1
 
           [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
           [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45
@@ -808,10 +808,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
 
           [1659694426.794832][3797:3802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
@@ -826,10 +826,10 @@ tests:
     - label: "Briefly after 6m, operator operates switch again (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event initial-press 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event initial-press 1 100 1 1
 
           [1659694345.040034][3787:3792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
           [1659694345.040059][3787:3792] CHIP:TOO:          Event number: 37
@@ -842,9 +842,9 @@ tests:
 
           echo "{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":3}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
            2. switch subscribe-event multi-press-ongoing 1 100 1 1
 
           [1659698336.786184][4081:4086] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
@@ -860,10 +860,10 @@ tests:
     - label: "Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event short-release 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event short-release 1 100 1 1
 
           [1659696223.568247][3981:3986] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1659696223.568272][3981:3986] CHIP:TOO:          Event number: 53
@@ -882,10 +882,10 @@ tests:
           [1659694592.348389][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e772b
           [1659694592.348481][2530:2530] CHIP:-: The new position when the momentary switch has been pressed in a multi-press sequence:1
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start                        
-           2. switch subscribe-event multi-press-complete 1 100 1 1 
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+           2. switch subscribe-event multi-press-complete 1 100 1 1
 
           [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
           [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45
