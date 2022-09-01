@@ -87,7 +87,7 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
 
         # Remove native app KVS if that was used
         kvs_match = re.match(r"--KVS (?P<kvs_path>[^ ]+)", app_args)
-        print("Removing KVS")
+        print("Removing KVS from %s" % app_args)
         if kvs_match:
             kvs_path_to_remove = kvs_match.group("kvs_path")
             retcode = subprocess.call("rm -f %s" % kvs_path_to_remove, shell=True)
@@ -96,12 +96,12 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
                 raise Exception("Failed to remove %s for factory reset." % kvs_path_to_remove)
 
         # Remove Python test admin storage if provided
-        storage_match = re.match(r"--storage-path (?P<storage_path>[^ ]+)", app_args)
-        print("Removing admin storage")
+        storage_match = re.match(r"--storage-path (?P<storage_path>[^ ]+)", script_args)
+        print("Removing admin storage from %s" % script_args)
         if storage_match:
             storage_path_to_remove = storage_match.group("storage_path")
             retcode = subprocess.call("rm -f %s" % storage_path_to_remove, shell=True)
-            print("Trying to remove storage path %s" % kvs_path_to_remove)
+            print("Trying to remove storage path %s" % storage_path_to_remove)
             if retcode != 0:
                 raise Exception("Failed to remove %s for factory reset." % storage_path_to_remove)
 
