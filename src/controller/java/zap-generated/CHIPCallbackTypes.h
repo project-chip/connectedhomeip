@@ -1282,8 +1282,8 @@ typedef void (*CHIPColorControlClusterDriftCompensationAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::DriftCompensation::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterCompensationTextAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::CompensationText::TypeInfo::DecodableArgType);
-typedef void (*CHIPColorControlClusterColorTemperatureAttributeCallbackType)(
-    void *, chip::app::Clusters::ColorControl::Attributes::ColorTemperature::TypeInfo::DecodableArgType);
+typedef void (*CHIPColorControlClusterColorTemperatureMiredsAttributeCallbackType)(
+    void *, chip::app::Clusters::ColorControl::Attributes::ColorTemperatureMireds::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterColorModeAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::ColorMode::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterOptionsAttributeCallbackType)(

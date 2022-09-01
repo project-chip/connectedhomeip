@@ -2078,7 +2078,7 @@ public final class ChipIdLookup {
         return "CompensationText";
       }
       if (attributeId == 7L) {
-        return "ColorTemperature";
+        return "ColorTemperatureMireds";
       }
       if (attributeId == 8L) {
         return "ColorMode";
