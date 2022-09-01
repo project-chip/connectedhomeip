@@ -228,7 +228,7 @@ void MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(NSData * op
         return;
     }
 
-    if (mCppCommissioner == nil) {
+    if (mCppCommissioner == nullptr) {
         setNSError(CHIP_ERROR_INCORRECT_STATE, error);
         return;
     }
