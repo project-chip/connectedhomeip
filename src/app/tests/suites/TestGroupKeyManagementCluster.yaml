@@ -39,7 +39,8 @@ tests:
       command: "readAttribute"
       attribute: "maxGroupKeysPerFabric"
       response:
-          value: 2
+          constraints:
+              minValue: 3
 
     - label: "KeySet Write 1"
       command: "KeySetWrite"

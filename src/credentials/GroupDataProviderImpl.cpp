@@ -1604,7 +1604,10 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
         return keyset.Save(mStorage);
     }
 
-    // New keyset, insert first
+    // New keyset
+    VerifyOrReturnError(fabric.keyset_count < mMaxGroupKeysPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+
+    // Insert first
     keyset.next = fabric.first_keyset;
     ReturnErrorOnFailure(keyset.Save(mStorage));
     // Update fabric

@@ -48,7 +48,7 @@ static const size_t kSize1  = strlen(kValue1) + 1;
 static const size_t kSize2  = strlen(kValue2) + 1;
 
 constexpr uint16_t kMaxGroupsPerFabric    = 5;
-constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+constexpr uint16_t kMaxGroupKeysPerFabric = 4;
 
 // If test cases covering more than 2 fabrics are added, update `ResetProvider` function.
 constexpr chip::FabricIndex kFabric1 = 1;
@@ -93,6 +93,7 @@ constexpr uint16_t kKeysetId0 = 0x0;
 constexpr uint16_t kKeysetId1 = 0x1111;
 constexpr uint16_t kKeysetId2 = 0x2222;
 constexpr uint16_t kKeysetId3 = 0x3333;
+constexpr uint16_t kKeysetId4 = 0x4444;
 
 static const GroupInfo kGroupInfo1_1(kGroup1, "Group-1.1");
 static const GroupInfo kGroupInfo1_2(kGroup2, "Group-1.2");
@@ -123,6 +124,7 @@ static KeySet kKeySet0(kKeysetId0, SecurityPolicy::kCacheAndSync, 3);
 static KeySet kKeySet1(kKeysetId1, SecurityPolicy::kTrustFirst, 1);
 static KeySet kKeySet2(kKeysetId2, SecurityPolicy::kTrustFirst, 2);
 static KeySet kKeySet3(kKeysetId3, SecurityPolicy::kCacheAndSync, 3);
+static KeySet kKeySet4(kKeysetId4, SecurityPolicy::kTrustFirst, 1);
 
 uint8_t kZeroKey[EpochKey::kLengthBytes] = { 0 };
 
@@ -735,6 +737,7 @@ void TestKeySets(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric1, kCompressedFabricId1, kKeySet0));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric1, kCompressedFabricId1, kKeySet2));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric1, kCompressedFabricId1, kKeySet3));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR != provider->SetKeySet(kFabric1, kCompressedFabricId1, kKeySet4));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kCompressedFabricId2, kKeySet3));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kCompressedFabricId2, kKeySet0));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kCompressedFabricId2, kKeySet2));
