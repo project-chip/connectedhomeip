@@ -243,7 +243,7 @@ jobs:
         container:
             image: connectedhomeip/chip-build:0.5.91
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
-                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+                net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
@@ -273,19 +273,18 @@ jobs:
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
-                      --target linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test \
+                      --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-python-bindings \
                       build \
                       --copy-artifacts-to objdir-clone \
                    "
             - name: Run Tests
-              timeout-minutes: 40
+              timeout-minutes: 10
               run: |
-                  scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factoryreset --script-args "--log-level INFO -t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
-              # the below tests are broken, enable them when they are fixed. Suspect hermetic issues for now
-              # scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_RR_1_1.py" --script-args "--commissioning-method on-network --discriminator 1234 --passcode 20202021"'
-              # scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_SC_3_6.py" --script-args "--commissioning-method on-network --discriminator 1234 --passcode 20202021"'
-              # scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_DA_1_7.py"'
+                  scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factoryreset --script-args "--log-level INFO -t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
+                  scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_RR_1_1.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021"'
+                  scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_SC_3_6.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021"'
+                  scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_DA_1_7.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --bool-arg allow_sdk_dac:true"'
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() && !env.ACT }}
