@@ -23,6 +23,7 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVTags.h>
 #include <lib/core/CHIPTLVTypes.h>
+#include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/Span.h>
 
 #if CHIP_CRYPTO_HSM
@@ -172,49 +173,50 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
 
     ChipLogDetail(Crypto, "Sign using DA key from se05x (Using internal sign)");
 
-    MutableByteSpan tlv_buffer = ((MutableByteSpan &) message_to_sign).SubSpan(1); // Exclude the Start container
-
     TLV::TLVReader msg_reader;
-    TLV::Tag tagValue;
+    TLV::TLVReader tagReader;
 
-    msg_reader.Init(tlv_buffer);
-    msg_reader.Next();
+    msg_reader.Init(message_to_sign);
 
     /* To be removed. Use common key id to sign message */
     static bool sign_cert_decl_attest = 1;
 
     if (sign_cert_decl_attest)
     {
-        /* Skip certificate declaration tag */
-        msg_reader.Next();
+        /* Get length and Skip certificate declaration tag */
+        ReturnErrorOnFailure(TLV::Utilities::Find(msg_reader, TLV::ContextTag(1), tagReader));
+        uint8_t cdlen = tagReader.GetLength();
 
-        tagValue = msg_reader.GetTag();
-        VerifyOrReturnError(TLV::ContextTag(2) == tagValue, CHIP_ERROR_INVALID_TLV_TAG);
-        /* Get attestation nonce */
-        ByteSpan attest_nonce;
-        msg_reader.Get(attest_nonce);
-        /* Set attestation nonce */
-        VerifyOrReturnError(CHIP_NO_ERROR ==
-                                se05xSetCertificate(CD_ATTEST_NONCE_DATA_SE05X_ID, attest_nonce.data(), attest_nonce.size()),
-                            CHIP_ERROR_INTERNAL);
-
-        msg_reader.Next();
-        tagValue = msg_reader.GetTag();
-        VerifyOrReturnError(TLV::ContextTag(3) == tagValue, CHIP_ERROR_INVALID_TLV_TAG);
-        ByteSpan time_stamp;
-        msg_reader.Get(time_stamp);
-        uint8_t tmp = time_stamp.size();
-        /* Set time stamp length */
-        VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(CD_TIME_STAMP_LEN_SE05X_ID, &tmp, 1), CHIP_ERROR_INTERNAL);
-        if (time_stamp.size() > 0)
+        ReturnErrorOnFailure(TLV::Utilities::Find(msg_reader, TLV::ContextTag(2), tagReader));
+        uint8_t attlen = tagReader.GetLength();
+        if (attlen > 0)
         {
+            /* Get attestation nonce */
+            ByteSpan attest_nonce;
+            ReturnErrorOnFailure(tagReader.Get(attest_nonce));
+            /* Set attestation nonce */
+            VerifyOrReturnError(CHIP_NO_ERROR ==
+                                    se05xSetCertificate(CD_ATTEST_NONCE_DATA_SE05X_ID, attest_nonce.data(), attest_nonce.size()),
+                                CHIP_ERROR_INTERNAL);
+        }
+
+        ReturnErrorOnFailure(TLV::Utilities::Find(msg_reader, TLV::ContextTag(3), tagReader));
+        uint8_t tslen = tagReader.GetLength();
+        /* Set time stamp length */
+        VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(CD_TIME_STAMP_LEN_SE05X_ID, &tslen, 1), CHIP_ERROR_INTERNAL);
+        if (tslen > 0)
+        {
+            ByteSpan time_stamp;
+            tagReader.Get(time_stamp);
             /* Set time stamp data */
             VerifyOrReturnError(CHIP_NO_ERROR ==
                                     se05xSetCertificate(CD_TIME_STAMP_DATA_SE05X_ID, time_stamp.data(), time_stamp.size()),
                                 CHIP_ERROR_INTERNAL);
         }
 
-        if (message_to_sign.size() >= 16)
+        if (message_to_sign.size() -
+                (cdlen + attlen + tslen + 9 /* Tag + control byte + len */ + 2 /* start and end containers*/) >=
+            16)
         {
             /* Set attestation challenge */
             VerifyOrReturnError(CHIP_NO_ERROR ==
@@ -224,31 +226,35 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
     }
     else
     {
-        tagValue = msg_reader.GetTag();
-        VerifyOrReturnError(TLV::ContextTag(1) == tagValue, CHIP_ERROR_INVALID_TLV_TAG);
-        /* Get nocsr */
-        ByteSpan csr_data;
-        msg_reader.Get(csr_data);
-        uint8_t tmp = csr_data.size();
+        ReturnErrorOnFailure(TLV::Utilities::Find(msg_reader, TLV::ContextTag(1), tagReader));
+        uint8_t csrlen = tagReader.GetLength();
         /* Set nocsr length */
-        VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(NOCSR_CSR_LEN_SE05X_ID, &tmp, 1), CHIP_ERROR_INTERNAL);
-        /* Set nocsr data */
-        se05x_delete_key(NOCSR_CSR_DATA_SE05X_ID);
-        VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(NOCSR_CSR_DATA_SE05X_ID, csr_data.data(), csr_data.size()),
-                            CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(NOCSR_CSR_LEN_SE05X_ID, &csrlen, 1), CHIP_ERROR_INTERNAL);
+        if (csrlen > 0)
+        {
+            /* Get nocsr */
+            ByteSpan csr_data;
+            ReturnErrorOnFailure(tagReader.Get(csr_data));
+            /* Set nocsr data */
+            se05x_delete_key(NOCSR_CSR_DATA_SE05X_ID);
+            VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(NOCSR_CSR_DATA_SE05X_ID, csr_data.data(), csr_data.size()),
+                                CHIP_ERROR_INTERNAL);
+        }
 
-        msg_reader.Next();
-        tagValue = msg_reader.GetTag();
-        VerifyOrReturnError(TLV::ContextTag(2) == tagValue, CHIP_ERROR_INVALID_TLV_TAG);
-        /* Get nocsr nonce */
-        ByteSpan nocsr_nonce;
-        msg_reader.Get(nocsr_nonce);
-        /* Set nocsr nonce data */
-        VerifyOrReturnError(CHIP_NO_ERROR ==
-                                se05xSetCertificate(NOCSR_CSR_NONCE_DATA_SE05X_ID, nocsr_nonce.data(), nocsr_nonce.size()),
-                            CHIP_ERROR_INTERNAL);
+        ReturnErrorOnFailure(TLV::Utilities::Find(msg_reader, TLV::ContextTag(2), tagReader));
+        uint8_t noncelen = tagReader.GetLength();
+        if (noncelen > 0)
+        {
+            /* Get nocsr nonce */
+            ByteSpan nocsr_nonce;
+            ReturnErrorOnFailure(tagReader.Get(nocsr_nonce));
+            /* Set nocsr nonce data */
+            VerifyOrReturnError(CHIP_NO_ERROR ==
+                                    se05xSetCertificate(NOCSR_CSR_NONCE_DATA_SE05X_ID, nocsr_nonce.data(), nocsr_nonce.size()),
+                                CHIP_ERROR_INTERNAL);
+        }
 
-        if (message_to_sign.size() >= 16)
+        if (message_to_sign.size() - (csrlen + noncelen + 6 /* Tag + control byte + len */ + 2 /* start and end containers*/) >= 16)
         {
             /* Set attestation challenge */
             VerifyOrReturnError(CHIP_NO_ERROR ==
