@@ -1215,7 +1215,7 @@ void ShellCLIMain(void * pvParameter)
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PlatformMgr().InitChipStack();
     ConfigurationMgr().LogDeviceConfig();
-    PrintOnboardingCodes(chip::RendezvousInformationFlag::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlag::kOnNetwork);
     chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     chip::DeviceLayer::ConnectivityManagerImpl().StartWiFiManagement();
