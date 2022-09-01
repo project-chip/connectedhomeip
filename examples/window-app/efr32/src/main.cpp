@@ -68,7 +68,7 @@ int main(void)
 #endif
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    EFR32_LOG("Starting App Task");
+    EFR32_LOG("Starting App");
     err = app.StartAppTask();
     if (err != CHIP_NO_ERROR)
     {

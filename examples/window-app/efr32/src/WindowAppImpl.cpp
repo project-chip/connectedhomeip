@@ -48,7 +48,6 @@ chip::app::Clusters::NetworkCommissioning::Instance
 #endif
 
 #define APP_TASK_STACK_SIZE (4096)
-#define APP_MAIN_TASK_SIZE (APP_TASK_STACK_SIZE + 2048)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define EXAMPLE_VENDOR_ID 0xcafe
@@ -206,7 +205,6 @@ CHIP_ERROR WindowAppImpl::Init()
     }
     EFR32_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
-    sWiFiNetworkCommissioningInstance.Init();
 #endif
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -228,6 +226,9 @@ return CHIP_NO_ERROR;
 
 CHIP_ERROR WindowAppImpl::Start()
 {
+    #ifdef SL_WIFI
+    sWiFiNetworkCommissioningInstance.Init();
+    #endif
     EFR32_LOG("Starting FreeRTOS scheduler");
     sl_system_kernel_start();
 
