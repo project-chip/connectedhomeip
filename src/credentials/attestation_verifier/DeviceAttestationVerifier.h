@@ -180,7 +180,9 @@ public:
 class ArrayAttestationTrustStore : public AttestationTrustStore
 {
 public:
-    ArrayAttestationTrustStore(const ByteSpan * derCerts, size_t numCerts) : mDerCerts(derCerts), mNumCerts(numCerts) {}
+    ArrayAttestationTrustStore(const ByteSpan * derCerts, size_t numCerts, const ByteSpan * cdDerCerts, size_t numCDCerts) :
+        mDerCerts(derCerts), mNumCerts(numCerts), mCDDerCerts(cdDerCerts), mNumCDCerts(numCDCerts)
+    {}
 
     CHIP_ERROR GetProductAttestationAuthorityCert(const ByteSpan & skid, MutableByteSpan & outPaaDerBuffer) const override
     {
@@ -208,9 +210,37 @@ public:
         return CHIP_ERROR_CA_CERT_NOT_FOUND;
     }
 
+    CHIP_ERROR GetCertificationDeclarationSigningKey(const ByteSpan & skid, Crypto::P256PublicKey & pubKey) const override
+    {
+        VerifyOrReturnError(!skid.empty() && (skid.data() != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(skid.size() == Crypto::kSubjectKeyIdentifierLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+        size_t cdIdx;
+        ByteSpan candidate;
+
+        for (cdIdx = 0; cdIdx < mNumCDCerts; ++cdIdx)
+        {
+            uint8_t skidBuf[Crypto::kSubjectKeyIdentifierLength] = { 0 };
+            candidate                                            = mCDDerCerts[cdIdx];
+            MutableByteSpan candidateSkidSpan{ skidBuf };
+            VerifyOrReturnError(CHIP_NO_ERROR == Crypto::ExtractSKIDFromX509Cert(candidate, candidateSkidSpan),
+                                CHIP_ERROR_INTERNAL);
+
+            if (skid.data_equal(candidateSkidSpan))
+            {
+                // Found a match
+                return Crypto::ExtractPubkeyFromX509Cert(candidate, pubKey);
+            }
+        }
+
+        return CHIP_ERROR_CA_CERT_NOT_FOUND;
+    }
+
 protected:
     const ByteSpan * mDerCerts;
     const size_t mNumCerts;
+    const ByteSpan * mCDDerCerts;
+    const size_t mNumCDCerts;
 };
 
 class DeviceAttestationVerifier
