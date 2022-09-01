@@ -103,7 +103,7 @@ class SubscriptionCallback final : public MTRBaseSubscriptionCallback {
 public:
     SubscriptionCallback(dispatch_queue_t queue, DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
         ErrorCallback errorCallback, SubscriptionEstablishedHandler subscriptionEstablishedHandler,
-        ResubscriptionCallback resubscriptionCallback, OnDoneHandler onDoneHandler)
+        MTRDeviceResubscriptionScheduledHandler resubscriptionCallback, OnDoneHandler onDoneHandler)
         : MTRBaseSubscriptionCallback(queue, attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
             subscriptionEstablishedHandler, onDoneHandler)
     {
@@ -331,7 +331,7 @@ private:
                                    // OnSubscriptionEstablished
                                    [self _handleSubscriptionEstablished];
                                },
-                               ^(void) {
+                               ^(NSError * error, NSNumber * resubscriptionDelay) {
                                    // OnResubscriptionNeeded
                                    [self _handleResubscriptionNeeded];
                                },

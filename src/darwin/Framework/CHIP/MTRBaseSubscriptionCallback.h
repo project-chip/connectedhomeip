@@ -17,6 +17,7 @@
 #pragma once
 
 #import "Foundation/Foundation.h"
+#import "MTRBaseDevice.h"
 
 #include <app/BufferedReadCallback.h>
 #include <app/ClusterStateCache.h>
@@ -43,7 +44,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^DataReportCallback)(NSArray * value);
 typedef void (^ErrorCallback)(NSError * error);
-typedef void (^ResubscriptionCallback)(void);
 typedef void (^SubscriptionEstablishedHandler)(void);
 typedef void (^OnDoneHandler)(void);
 
@@ -51,7 +51,7 @@ class MTRBaseSubscriptionCallback : public chip::app::ClusterStateCache::Callbac
 public:
     MTRBaseSubscriptionCallback(dispatch_queue_t queue, DataReportCallback attributeReportCallback,
         DataReportCallback eventReportCallback, ErrorCallback errorCallback,
-        ResubscriptionCallback _Nullable resubscriptionCallback,
+        MTRDeviceResubscriptionScheduledHandler _Nullable resubscriptionCallback,
         SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, OnDoneHandler _Nullable onDoneHandler)
         : mQueue(queue)
         , mAttributeReportCallback(attributeReportCallback)
@@ -124,7 +124,7 @@ private:
     // make sure to only report one error.
     ErrorCallback _Nullable mErrorCallback = nil;
     SubscriptionEstablishedHandler _Nullable mSubscriptionEstablishedHandler = nil;
-    ResubscriptionCallback _Nullable mResubscriptionCallback = nil;
+    MTRDeviceResubscriptionScheduledHandler _Nullable mResubscriptionCallback = nil;
     chip::app::BufferedReadCallback mBufferedReadAdapter;
 
     // Our lifetime management is a little complicated.  On errors that don't

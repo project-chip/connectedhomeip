@@ -250,8 +250,9 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
                     errorHandler:^(NSError * error) {
                         NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
                     }
-                    subscriptionEstablished:^ {
-                    }];
+                    subscriptionEstablished:^{
+                    }
+                    resubscriptionScheduled:nil];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
