@@ -363,11 +363,22 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
     return nullptr;
 }
 
-EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl * app, jobject contentAppEndpointManager)
+EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl * app)
 {
     DataVersion dataVersionBuf[ArraySize(contentAppClusters)];
     EndpointId epId = ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf),
-                                                                      Span<const EmberAfDeviceType>(gContentAppDeviceType));
+                                                                    Span<const EmberAfDeviceType>(gContentAppDeviceType));
+    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
+                    app->GetEndpointId());
+    mContentApps.push_back(app);
+    return epId;
+}
+
+EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl * app, EndpointId desiredEndpointId)
+{
+    DataVersion dataVersionBuf[ArraySize(contentAppClusters)];
+    EndpointId epId = ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf),
+                                                                    Span<const EmberAfDeviceType>(gContentAppDeviceType), desiredEndpointId);
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
                     app->GetEndpointId());
     mContentApps.push_back(app);
@@ -462,7 +473,19 @@ EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const cha
     ContentAppImpl * app =
         new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "20202021", manager);
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
-    return gFactory.AddContentApp(app, manager);
+    return gFactory.AddContentApp(app);
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    return 0;
+}
+
+EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
+                         const char * szApplicationVersion, EndpointId endpointId, jobject manager)
+{
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentAppImpl * app =
+        new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "20202021", manager);
+    ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
+    return gFactory.AddContentApp(app, endpointId);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     return 0;
 }

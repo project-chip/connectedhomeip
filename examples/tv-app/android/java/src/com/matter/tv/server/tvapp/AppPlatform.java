@@ -17,6 +17,9 @@
  */
 package com.matter.tv.server.tvapp;
 
+/*
+ *   This class is provides the JNI interface to the linux layer of the ContentAppPlatform
+ */
 public class AppPlatform {
   private static final String TAG = "AppPlatform";
 
@@ -24,8 +27,10 @@ public class AppPlatform {
     nativeInit(userPrompter, manager);
   }
 
+  // Initializes the ContentAppPlatform on startup
   public native void nativeInit(UserPrompter userPrompter, ContentAppEndpointManager manager);
 
+  // Method to add a content app as a new endpoint
   public native int addContentApp(
       String vendorName,
       int vendorId,
@@ -34,6 +39,17 @@ public class AppPlatform {
       String appVersion,
       ContentAppEndpointManager manager);
 
+  // Method to add a content app at an existing endpoint after restart of the matter server
+  public native int addContentAppAtEndpoint(
+      String vendorName,
+      int vendorId,
+      String appName,
+      int productId,
+      String appVersion,
+      int endpointId,
+      ContentAppEndpointManager manager);
+
+  // Method to remove content app as endpoint (happens when the app is uninstalled)
   public native int removeContentApp(int endpointId);
 
   static {

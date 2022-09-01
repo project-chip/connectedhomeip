@@ -55,6 +55,8 @@
 CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter, jobject contentAppEndpointManager);
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
                          const char * szApplicationVersion, jobject manager);
+EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
+                         const char * szApplicationVersion, EndpointId endpointId, jobject manager);
 EndpointId RemoveContentApp(EndpointId epId);
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -130,7 +132,9 @@ public:
     // Lookup ContentApp for this catalog id / app id and load it
     ContentApp * LoadContentApp(const CatalogVendorApp & vendorApp) override;
 
-    EndpointId AddContentApp(ContentAppImpl * app, jobject contentAppEndpointManager);
+    EndpointId AddContentApp(ContentAppImpl * app);
+
+    EndpointId AddContentApp(ContentAppImpl * app, EndpointId desiredEndpointId);
 
     EndpointId RemoveContentApp(EndpointId epId);
 
