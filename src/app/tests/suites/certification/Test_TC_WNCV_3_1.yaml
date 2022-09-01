@@ -164,18 +164,68 @@ tests:
     ### Depends on the FeatureMap
     # The value of bit 0..1 must be 01b & if (LF) value of bit 2..3 must be 01b else 00b & if (TL) value of bit 4..5 must be 01b else 00b
     # Only 3 possibilities are possible here : 05h =  5, 11h = 17 or 15h = 21 then check a range for simplicity [5  - 21]
-    - label: "3a: TH reads OperationalStatus attribute from DUT"
+    - label: "3a: TH reads OperationalStatus attribute's bit 0..1"
+      PICS: WNCV.S.A000a
       command: "readAttribute"
       attribute: "OperationalStatus"
-      PICS: WNCV.S.A000a
       response:
           constraints:
               type: bitmap8
-              minValue: 5
-              maxValue: 21
+              hasMasksSet: [0x1]
+              hasMasksClear: [0x2]
+
+    - label:
+          "3a: TH reads OperationalStatus attribute's bit 2..3 (WNCV.S.F00(LF))"
+      PICS: WNCV.S.A000a && WNCV.S.F00
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x4]
+              hasMasksClear: [0x8]
+
+    - label:
+          "3a: TH reads OperationalStatus attribute's bit 2..3 (WNCV.S.F00(LF))"
+      PICS: WNCV.S.A000a && !WNCV.S.F00
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksClear: [0x4, 0x8]
+
+    - label:
+          "3a: TH reads OperationalStatus attribute's bit 4..5 (WNCV.S.F01(TL))"
+      PICS: WNCV.S.A000a && WNCV.S.F01
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x10]
+              hasMasksClear: [0x20]
+
+    - label:
+          "3a: TH reads OperationalStatus attribute's bit 4..5 (WNCV.S.F01(TL))"
+      PICS: WNCV.S.A000a && !WNCV.S.F01
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksClear: [0x10, 0x20]
+
+    ### Depending on the DUT specs we might prefer a arguments here
+    - label: "3a2: DUT updates its attributes"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 3000
 
     ### Mandatory Depends on the FeatureMap
-    ### Issue https://github.com/project-chip/connectedhomeip/issues/22265
     - label:
           "3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
           from DUT"

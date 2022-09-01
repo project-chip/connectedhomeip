@@ -1674,6 +1674,12 @@ PICS:
       id: MCORE.OTA.VendorSpecific
 
     - label:
+          "Does the Requestor DUT support querying a different Provider in its
+          OTA Provider List when it hits error conditions in invoking the
+          QueryImage command?"
+      id: MCORE.OTA.Retry
+
+    - label:
           "Does the DUT have Administer privilege over the Access Control of
           another node?"
       id: MCORE.ACL.Administrator

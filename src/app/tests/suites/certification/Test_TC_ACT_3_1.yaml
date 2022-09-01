@@ -39,7 +39,7 @@ tests:
       verification: |
           ./chip-tool actions  read action-list 1 1
 
-          Verify read command is received on TH(all-clusters-app)
+          Verify read command is received on TH(bridge-app)
 
           [1658848323.188336][28392:28392] CHIP:IM: Received Read request
           [1658848323.188433][28392:28392] CHIP:DMG: ReadRequestMessage =
@@ -52,10 +52,10 @@ tests:
           [1658848323.188690][28392:28392] CHIP:DMG:                         Cluster = 0x25,
           [1658848323.188733][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1658848323.188774][28392:28392] CHIP:DMG:                 }
-          [1658848323.188812][28392:28392] CHIP:DMG:
+          [1658848323.188812][28392:28392] CHIP:DMG:                         
           [1658848323.188846][28392:28392] CHIP:DMG:         ],
-          [1658848323.188884][28392:28392] CHIP:DMG:
-          [1658848323.188919][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848323.188884][28392:28392] CHIP:DMG:                 
+          [1658848323.188919][28392:28392] CHIP:DMG:         isFabricFiltered = true, 
           [1658848323.188954][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
           [1658848323.188985][28392:28392] CHIP:DMG: },
           [1658848323.189080][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -79,10 +79,10 @@ tests:
           [1658848398.260642][28392:28392] CHIP:DMG:                         Cluster = 0x25,
           [1658848398.260673][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1658848398.260702][28392:28392] CHIP:DMG:                 }
-          [1658848398.260731][28392:28392] CHIP:DMG:
+          [1658848398.260731][28392:28392] CHIP:DMG:                         
           [1658848398.260756][28392:28392] CHIP:DMG:         ],
-          [1658848398.260784][28392:28392] CHIP:DMG:
-          [1658848398.260810][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848398.260784][28392:28392] CHIP:DMG:                 
+          [1658848398.260810][28392:28392] CHIP:DMG:         isFabricFiltered = true, 
           [1658848398.260836][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
           [1658848398.260859][28392:28392] CHIP:DMG: },
           [1658848398.260930][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -98,7 +98,7 @@ tests:
 
           ./chip-tool actions read setup-url 1 1
 
-          Verify read command is received on TH(all-clusters-app)
+          Verify read command is received on TH(bridge-app)
 
           [1658848453.728775][28392:28392] CHIP:IM: Received Read request
           [1658848453.728895][28392:28392] CHIP:DMG: ReadRequestMessage =
@@ -111,10 +111,10 @@ tests:
           [1658848453.729118][28392:28392] CHIP:DMG:                         Cluster = 0x25,
           [1658848453.729157][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1658848453.729191][28392:28392] CHIP:DMG:                 }
-          [1658848453.729223][28392:28392] CHIP:DMG:
+          [1658848453.729223][28392:28392] CHIP:DMG:                         
           [1658848453.729251][28392:28392] CHIP:DMG:         ],
-          [1658848453.729280][28392:28392] CHIP:DMG:
-          [1658848453.729307][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848453.729280][28392:28392] CHIP:DMG:                 
+          [1658848453.729307][28392:28392] CHIP:DMG:         isFabricFiltered = true, 
           [1658848453.729332][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
           [1658848453.729358][28392:28392] CHIP:DMG: },
           [1658848453.729436][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -172,10 +172,10 @@ tests:
           [1658848323.188690][28392:28392] CHIP:DMG:                         Cluster = 0x25,
           [1658848323.188733][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1658848323.188774][28392:28392] CHIP:DMG:                 }
-          [1658848323.188812][28392:28392] CHIP:DMG:
+          [1658848323.188812][28392:28392] CHIP:DMG:                         
           [1658848323.188846][28392:28392] CHIP:DMG:         ],
-          [1658848323.188884][28392:28392] CHIP:DMG:
-          [1658848323.188919][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848323.188884][28392:28392] CHIP:DMG:                 
+          [1658848323.188919][28392:28392] CHIP:DMG:         isFabricFiltered = true, 
           [1658848323.188954][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
           [1658848323.188985][28392:28392] CHIP:DMG: },
           [1658848323.189080][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -199,10 +199,10 @@ tests:
           [1658848398.260642][28392:28392] CHIP:DMG:                         Cluster = 0x25,
           [1658848398.260673][28392:28392] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1658848398.260702][28392:28392] CHIP:DMG:                 }
-          [1658848398.260731][28392:28392] CHIP:DMG:
+          [1658848398.260731][28392:28392] CHIP:DMG:                         
           [1658848398.260756][28392:28392] CHIP:DMG:         ],
-          [1658848398.260784][28392:28392] CHIP:DMG:
-          [1658848398.260810][28392:28392] CHIP:DMG:         isFabricFiltered = true,
+          [1658848398.260784][28392:28392] CHIP:DMG:                 
+          [1658848398.260810][28392:28392] CHIP:DMG:         isFabricFiltered = true, 
           [1658848398.260836][28392:28392] CHIP:DMG:         InteractionModelRevision = 1
           [1658848398.260859][28392:28392] CHIP:DMG: },
           [1658848398.260930][28392:28392] CHIP:DMG: IM RH moving to [GeneratingReports]

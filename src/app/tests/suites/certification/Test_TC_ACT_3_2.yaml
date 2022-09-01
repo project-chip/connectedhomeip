@@ -46,15 +46,15 @@ tests:
     - label: "DUT issues an InstantAction command to TH"
       PICS: ACT.C.C00.Tx
       verification: |
-          ./chip-tool actions instant-action 0x1001 1 1
+          ./chip-tool actions instant-action 0xA001 1 1
 
-          Verify command is successfully sent on TH(all-clusters-app)
+          Verify command is successfully sent on TH(bridge-app)
 
           [1658848801.832452][10096:10101] CHIP:EM: Removed CHIP MessageCounter:163269462 from RetransTable on exchange 54295i
           [1658848801.832487][10096:10101] CHIP:DMG: ICR moving to [ResponseRe]
           [1658848801.832544][10096:10101] CHIP:DMG: InvokeResponseMessage =
           [1658848801.832574][10096:10101] CHIP:DMG: {
-          [1658848801.832603][10096:10101] CHIP:DMG:         suppressResponse = false,
+          [1658848801.832603][10096:10101] CHIP:DMG:         suppressResponse = false, 
           [1658848801.832637][10096:10101] CHIP:DMG:         InvokeResponseIBs =
           [1658848801.832675][10096:10101] CHIP:DMG:         [
           [1658848801.832705][10096:10101] CHIP:DMG:                 InvokeResponseIB =
@@ -67,18 +67,18 @@ tests:
           [1658848801.832972][10096:10101] CHIP:DMG:                                         ClusterId = 0x25,
           [1658848801.833017][10096:10101] CHIP:DMG:                                         CommandId = 0x0,
           [1658848801.833055][10096:10101] CHIP:DMG:                                 },
-          [1658848801.833100][10096:10101] CHIP:DMG:
+          [1658848801.833100][10096:10101] CHIP:DMG:                                 
           [1658848801.833133][10096:10101] CHIP:DMG:                                 StatusIB =
           [1658848801.833176][10096:10101] CHIP:DMG:                                 {
           [1658848801.833217][10096:10101] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1658848801.833256][10096:10101] CHIP:DMG:                                 },
-          [1658848801.833292][10096:10101] CHIP:DMG:
+          [1658848801.833292][10096:10101] CHIP:DMG:                                 
           [1658848801.833326][10096:10101] CHIP:DMG:                         },
-          [1658848801.833371][10096:10101] CHIP:DMG:
+          [1658848801.833371][10096:10101] CHIP:DMG:                         
           [1658848801.833402][10096:10101] CHIP:DMG:                 },
-          [1658848801.833438][10096:10101] CHIP:DMG:
+          [1658848801.833438][10096:10101] CHIP:DMG:                 
           [1658848801.833466][10096:10101] CHIP:DMG:         ],
-          [1658848801.833502][10096:10101] CHIP:DMG:
+          [1658848801.833502][10096:10101] CHIP:DMG:         
           [1658848801.833530][10096:10101] CHIP:DMG:         InteractionModelRevision = 1
           [1658848801.833559][10096:10101] CHIP:DMG: },
           [1658848801.833627][10096:10101] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0025 Command=0x0000_0000 Status=0x0
@@ -161,7 +161,7 @@ tests:
     - label: "DUT issues an DisableActionWithDuration command to TH"
       PICS: ACT.C.C0b.Tx
       verification: |
-          ./chip-tool actions disable-action-with-duration 0 100 1 1
+          ./chip-tool actions disable-action-with-duration 0x1001 100 1 1
 
           Note: Message log similar as in step 1
       disabled: true

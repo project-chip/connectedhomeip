@@ -266,6 +266,7 @@ tests:
       command: "readAttribute"
       attribute: "ColorMode"
       response:
+          value: 2
           constraints:
               minValue: 0
               maxValue: 2
@@ -275,6 +276,7 @@ tests:
       command: "readAttribute"
       attribute: "EnhancedColorMode"
       response:
+          value: 2
           constraints:
               minValue: 0
               maxValue: 3
