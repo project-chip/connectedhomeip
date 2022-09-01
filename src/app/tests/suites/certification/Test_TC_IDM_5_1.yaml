@@ -77,7 +77,7 @@ tests:
           [1655797318.627467][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
 
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent Subscription report with unic subscriptionID
           [1657886182.184612][3396:3401] CHIP:DMG: StatusResponseMessage =
           [1657886182.184642][3396:3401] CHIP:DMG: {
           [1657886182.184667][3396:3401] CHIP:DMG:         Status = 0x00 (SUCCESS),
@@ -171,9 +171,7 @@ tests:
           [1657459639.600888][11525:11525] CHIP:DMG: AccessControl: allowed
           [1657459639.600936][11525:11525] CHIP:DMG: Endpoint 1, Cluster 0x0000_0006 update version to 1979c48
 
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
-
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent Subscription report with unic subscriptionID
           [1657886272.645704][3404:3409] CHIP:DMG: StatusResponseMessage =
           [1657886272.645751][3404:3409] CHIP:DMG: {
           [1657886272.645792][3404:3409] CHIP:DMG:         Status = 0x00 (SUCCESS),

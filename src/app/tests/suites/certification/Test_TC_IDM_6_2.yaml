@@ -46,7 +46,7 @@ tests:
 
           basic subscribe-event  start-up  20 100 1 0
 
-          On TH verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
+          On TH(chip-tool) verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
 
           [1657455811.902338][11635:11640] CHIP:EM: Rxd Ack; Removing MessageCounter:190733244 from Retrans Table on exchange 33691i
           [1657455811.902404][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733244 from RetransTable on exchange 33691i
@@ -102,7 +102,7 @@ tests:
 
           basic subscribe-event-by-id 0xFFFFFFFF 10 100 1 0
 
-          On TH verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
+          On TH(chip-tool) verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
 
 
           [1657455904.721037][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733247 from RetransTable on exchange 33692i
@@ -158,7 +158,7 @@ tests:
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
           any subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 20 100  1 0
 
-          On TH verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
+          On TH(chip-tool) verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
           [1657455981.545783][11635:11640] CHIP:EM: Rxd Ack; Removing MessageCounter:190733250 from Retrans Table on exchange 33693i
           [1657455981.545845][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733250 from RetransTable on exchange 33693i
           [1657455981.545995][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -265,7 +265,7 @@ tests:
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
           basic subscribe-event-by-id 0x00 10 700 1 0xFFFF
-          On TH verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
+          On TH(chip-tool) verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
           [1657456063.474971][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733253 from RetransTable on exchange 33694i
           [1657456063.475103][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657456063.475171][11635:11640] CHIP:DMG: {
@@ -318,7 +318,7 @@ tests:
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
            basic subscribe-event-by-id 0xFFFFFFFF 10 100 1 0xFFFF
-          On TH verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
+          On TH(chip-tool) verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
           [1657456157.932285][11635:11640] CHIP:EM: Rxd Ack; Removing MessageCounter:190733256 from Retrans Table on exchange 33695i
           [1657456157.932327][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733256 from RetransTable on exchange 33695i
           [1657456157.932418][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -372,7 +372,7 @@ tests:
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
           any subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 100 1000 1 0xFFFF
-          On TH verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
+          On TH(chip-tool) verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
           [1657456221.167627][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657456221.167698][11635:11640] CHIP:DMG: {
           [1657456221.167760][11635:11640] CHIP:DMG:      SubscriptionId = 0xbcc84d35,
@@ -592,7 +592,7 @@ tests:
 
            basic subscribe-event-by-id 0x000 100 1000 1 0
 
-          On TH verify that the Report Data Message for event only after the minimum interval has expiredwith SubscriptionId which uniquely identifies this subscription events in Subscribe Request Message from DUT.
+          On TH(chip-tool) verify that the Report Data Message for event only after the minimum interval has expiredwith SubscriptionId which uniquely identifies this subscription events in Subscribe Request Message from DUT.
           [1657456305.446793][11635:11640] CHIP:EM: Rxd Ack; Removing MessageCounter:190733262 from Retrans Table on exchange 33697i
           [1657456305.446853][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733262 from RetransTable on exchange 33697i
           [1657456305.446978][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -647,7 +647,7 @@ tests:
 
           basic subscribe-event start-up  30 100 1 0 --is-urgent true
 
-          On TH verify that the Report Data Message for all subscribed events,
+          On TH(chip-tool) verify that the Report Data Message for all subscribed events,
           [1657456352.516479][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657456352.516569][11635:11640] CHIP:DMG: {
           [1657456352.516631][11635:11640] CHIP:DMG:      SubscriptionId = 0x88b484dc,
@@ -698,7 +698,7 @@ tests:
 
           basic subscribe-event  start-up  20 100 1 0
 
-          On TH verify that the Report Data Message from DUT to TH
+          On TH(chip-tool) verify that the Report Data Message from DUT to TH
 
           [1656586853.121700][3433:3438] CHIP:EM: Removed CHIP MessageCounter:63910370 from RetransTable on exchange 37869i
           [1656586853.121777][3433:3438] CHIP:DMG: ReportDataMessage =
@@ -751,7 +751,7 @@ tests:
 
           basic subscribe-event-by-id 0x000 10 500 1 0
 
-          On TH verify that the Report Data Message any event changes for the second subscribe request sent by the TH with SubscriptionId which uniquely identifies this subscription events in Subscribe Request Message from DUT.
+          On TH(chip-tool) verify that the Report Data Message any event changes for the second subscribe request sent by the TH with SubscriptionId which uniquely identifies this subscription events in Subscribe Request Message from DUT.
 
           [1657456542.476859][11635:11640] CHIP:DMG: ReportDataMessage =
           [1657456542.476888][11635:11640] CHIP:DMG: {
@@ -846,7 +846,7 @@ tests:
 
           basic subscribe-event-by-id 0x000 20 400 1 0
 
-          On TH verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher, Maximuminterval and miinimuminterval in seconds for events in Subscribe Request Message from DUT
+          On TH(chip-tool) verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher, Maximuminterval and miinimuminterval in seconds for events in Subscribe Request Message from DUT
 
           [1655979596.078821][4557:4562] CHIP:DMG: SubscribeResponseMessage =
           [1655979596.078861][4557:4562] CHIP:DMG: {
@@ -881,14 +881,14 @@ tests:
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
 
-          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
 
            accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]" 1 0
 
 
           basic subscribe-event-by-id 0x000 100 1000 1 0
-          In TH log verify DUT responds with UNSUPPORTED_ACCESS  for the data sent in the above command
+          on TH(chip-tool) verify DUT responds with UNSUPPORTED_ACCESS  for the data sent in the above command
 
 
           [1653479886.551289][22629:22634] CHIP:DMG: ReportDataMessage =
@@ -965,7 +965,7 @@ tests:
            accesscontrol subscribe-event access-control-entry-changed 5 10 1 0
 
 
-          On TH, verify that the Report Data Message with EventReports for event numbers higher than the EventMin field and
+          On TH(chip-tool), verify that the Report Data Message with EventReports for event numbers higher than the EventMin field and
            Verify that the subsequent ReportData actions as part of the subscription include the latest EventNo associated with each node generating new events
 
 
@@ -1177,7 +1177,7 @@ tests:
           basic subscribe-event-by-id 0x000 100 1000 1 0  --event-min 1
 
 
-          On TH verify that the Report Data Message with empty EventReports from DUT
+          On TH(chip-tool) verify that the Report Data Message with empty EventReports from DUT
           [1655980488.281744][4665:4671] CHIP:EM: Removed CHIP MessageCounter:255017723 from RetransTable on exchange 3120i
           [1655980488.281823][4665:4671] CHIP:DMG: ReportDataMessage =
           [1655980488.281891][4665:4671] CHIP:DMG: {
@@ -1197,7 +1197,7 @@ tests:
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
           accesscontrol subscribe-event access-control-entry-changed  20 500 1 0
-          On TH verify that each event number
+          On TH(chip-tool) verify that each event number
           [1658405014.975407][4236:4241] CHIP:DMG: }
           [1658405014.975582][4236:4241] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
           [1658405014.975608][4236:4241] CHIP:TOO:          Event number: 2

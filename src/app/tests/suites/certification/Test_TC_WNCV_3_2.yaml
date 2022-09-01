@@ -13,8 +13,8 @@
 # limitations under the License.
 
 name:
-    Window Covering [TC-WNCV-3.2] DownOrClose Command & Report Verification with
-    server as DUT
+    Window Covering [TC-WNCV-3.2] DownOrClose command & OperationalStatus
+    attribute Verification [DUT_Server]
 
 PICS:
     - WNCV.S
@@ -164,17 +164,57 @@ tests:
     ### Depends on the FeatureMap
     # The value of bit 0..1 must be 10b & if (LF) value of bit 2..3 must be 10b else 00b & if (TL) value of bit 4..5 must be 10b else 00b
     # Only 3 possibilities are possible here : 0Ah = 10, 22h = 34 or 2Ah = 42 then check a range for simplicity [10 - 42]
-    - label:
-          "3a: Verify DUT reports OperationalStatus attribute to TH after a
-          DownOrClose"
-      command: "waitForReport"
-      attribute: "OperationalStatus"
+    - label: "3a: TH reads OperationalStatus attribute's bit 0..1"
       PICS: WNCV.S.A000a
+      command: "readAttribute"
+      attribute: "OperationalStatus"
       response:
           constraints:
               type: bitmap8
-              minValue: 10
-              maxValue: 42
+              hasMasksSet: [0x2]
+              hasMasksClear: [0x1]
+
+    - label:
+          "3a: TH reads OperationalStatus attribute's bit 2..3 (WNCV.S.F00(LF))"
+      PICS: WNCV.S.A000a && WNCV.S.F00
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x8]
+              hasMasksClear: [0x4]
+
+    - label:
+          "3a: TH reads OperationalStatus attribute's bit 2..3 (WNCV.S.F00(LF))"
+      PICS: WNCV.S.A000a && !WNCV.S.F00
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksClear: [0x4, 0x8]
+
+    - label:
+          "3a: TH reads OperationalStatus attribute's bit 4..5 (WNCV.S.F01(TL))"
+      PICS: WNCV.S.A000a && WNCV.S.F01
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x20]
+              hasMasksClear: [0x10]
+
+    - label:
+          "3a: TH reads OperationalStatus attribute's bit 4..5 (WNCV.S.F01(TL))"
+      PICS: WNCV.S.A000a && !WNCV.S.F01
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksClear: [0x10, 0x20]
 
     ### Depending on the DUT specs we might prefer a arguments here
     - label: "3a2: DUT updates its attributes"
@@ -183,15 +223,16 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 2000
+                value: 3000
 
     ### Mandatory Depends on the FeatureMap
+    ### Issue https://github.com/project-chip/connectedhomeip/issues/22265
     - label:
           "3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e && PICS_SKIP_SAMPLE_APP
       response:
           constraints:
               type: Percent100ths
@@ -204,7 +245,7 @@ tests:
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008 && PICS_SKIP_SAMPLE_APP
       response:
           constraints:
               type: Percent
@@ -217,7 +258,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f && PICS_SKIP_SAMPLE_APP
       response:
           constraints:
               type: Percent100ths
@@ -230,7 +271,7 @@ tests:
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009 && PICS_SKIP_SAMPLE_APP
       response:
           constraints:
               type: Percent
@@ -280,7 +321,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b && PICS_SKIP_SAMPLE_APP
       response:
           constraints:
               type: Percent100ths
@@ -293,7 +334,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c && PICS_SKIP_SAMPLE_APP
       response:
           constraints:
               type: Percent100ths
