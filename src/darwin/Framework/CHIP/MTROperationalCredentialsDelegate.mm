@@ -147,7 +147,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::CallbackGenerateNOCChain(const chi
     const chip::ByteSpan & DAC, const chip::ByteSpan & PAI,
     chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
 {
-    VerifyOrReturnError(mCppCommissioner != nil, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mCppCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mOnNOCCompletionCallback = onCompletion;
 
     TLVReader reader;
