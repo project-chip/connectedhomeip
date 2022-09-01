@@ -516,6 +516,51 @@ menu "CHIP Device Layer"
 
     endmenu
 
+    menu "Ethernet Options"
+        visible if ENABLE_ETHERNET_TELEMETRY
+
+        config GPIO_RANGE_MIN
+            int 
+            default 0
+
+        config GPIO_RANGE_MAX
+            int 
+            default 33 if IDF_TARGET_ESP32
+            default 46 if IDF_TARGET_ESP32S2
+            default 19 if IDF_TARGET_ESP32C3
+            default 48 if IDF_TARGET_ESP32S3
+
+        config ETH_MDC_GPIO
+            int "SMI MDC GPIO number"
+            range GPIO_RANGE_MIN GPIO_RANGE_MAX
+            default 23 if ENABLE_ETHERNET_TELEMETRY 
+            help
+                Set the GPIO number used by SMI MDC.
+
+        config ETH_MDIO_GPIO
+            int "SMI MDIO GPIO number"
+            range GPIO_RANGE_MIN GPIO_RANGE_MAX
+            default 18 if ENABLE_ETHERNET_TELEMETRY
+            help
+                Set the GPIO number used by SMI MDIO.
+
+        config ETH_PHY_RST_GPIO
+            int "PHY Reset GPIO number"
+            range -1 GPIO_RANGE_MAX
+            default 5 if ENABLE_ETHERNET_TELEMETRY
+            help
+                Set the GPIO number used to reset PHY chip.
+                Set to -1 to disable PHY chip hardware reset.
+
+        config ETH_PHY_ADDR
+            int "PHY Address"
+            range 0 31
+            default 1 if ENABLE_ETHERNET_TELEMETRY
+            help
+                Set PHY address according your board schematic.
+
+    endmenu
+
     menu "CHIP Trait Manager"
 
         config ENABLE_TRAIT_MANAGER
@@ -723,6 +768,12 @@ menu "CHIP Device Layer"
             default n
             help
                 Enable automatically uploading CHIP tunnel telemetry via trait on an interval.
+
+        config ENABLE_ETHERNET_TELEMETRY
+            bool "Enable Ethernet Telemetry"
+            default n
+            help
+                Enable ethernet support for boards with Internal Ethernet
 
     endmenu
 
