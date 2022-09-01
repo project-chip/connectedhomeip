@@ -93,7 +93,7 @@ AttestationVerificationResult MapError(CertificateChainValidationResult certific
  *
  * Current version uses only test key/cert provided in spec.
  */
-CHIP_ERROR GetCertificationDeclarationCertificate(const ByteSpan & skid, MutableByteSpan & outCertificate)
+CHIP_ERROR GetDevelopmentCDSigningKey(const ByteSpan & skid, Crypto::P256PublicKey & pubKey)
 {
     struct CertChainLookupTable
     {
@@ -142,7 +142,7 @@ CHIP_ERROR GetCertificationDeclarationCertificate(const ByteSpan & skid, Mutable
 
     VerifyOrReturnError(certChainLookupTableIdx < ArraySize(sCertChainLookupTable), CHIP_ERROR_INVALID_ARGUMENT);
 
-    return CopySpanToMutableSpan(ByteSpan{ sCertChainLookupTable[certChainLookupTableIdx].mCertificate }, outCertificate);
+    return Crypto::ExtractPubkeyFromX509Cert(ByteSpan{ sCertChainLookupTable[certChainLookupTableIdx].mCertificate }, pubKey);
 }
 
 } // namespace
@@ -283,17 +283,23 @@ exit:
 AttestationVerificationResult DefaultDACVerifier::ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
                                                                                             ByteSpan & certDeclBuffer)
 {
-    uint8_t certificate[Credentials::kMaxDERCertLength];
-    MutableByteSpan certificateSpan(certificate);
     ByteSpan skid;
 
     VerifyOrReturnError(CMS_ExtractKeyId(cmsEnvelopeBuffer, skid) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kCertificationDeclarationNoKeyId);
 
-    VerifyOrReturnError(GetCertificationDeclarationCertificate(skid, certificateSpan) == CHIP_NO_ERROR,
+    Crypto::P256PublicKey pubKey;
+    auto err = mAttestationTrustStore->GetCertificationDeclarationSigningKey(skid, pubKey);
+    VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED,
                         AttestationVerificationResult::kCertificationDeclarationNoCertificateFound);
 
-    VerifyOrReturnError(CMS_Verify(cmsEnvelopeBuffer, certificateSpan, certDeclBuffer) == CHIP_NO_ERROR,
+    if (err == CHIP_ERROR_NOT_IMPLEMENTED)
+    {
+        VerifyOrReturnError(GetDevelopmentCDSigningKey(skid, pubKey) == CHIP_NO_ERROR,
+                            AttestationVerificationResult::kCertificationDeclarationNoCertificateFound);
+    }
+
+    VerifyOrReturnError(CMS_Verify(cmsEnvelopeBuffer, pubKey, certDeclBuffer) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kCertificationDeclarationInvalidSignature);
 
     return AttestationVerificationResult::kSuccess;

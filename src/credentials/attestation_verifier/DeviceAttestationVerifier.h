@@ -146,6 +146,28 @@ public:
      *
      */
     virtual CHIP_ERROR GetProductAttestationAuthorityCert(const ByteSpan & skid, MutableByteSpan & outPaaDerBuffer) const = 0;
+
+    /**
+     * @brief Look-up a CD signing key by SKID
+     *
+     * The implementations of this interface must have access to a set of CDs to trust.
+     *
+     * Interface is synchronous, and therefore this should not be used unless to expose a CD
+     * store that is both fully local and quick to access.
+     *
+     * @param[in] skid        Key identifier (SKID) of the CD key to look-up (SHA-1 of public key)
+     * @param[in,out] pubKey  Reference to public key object that gets updated on success.
+     *
+     * @returns CHIP_NO_ERROR on success, CHIP_INVALID_ARGUMENT if `skid` is not usable
+     *          CHIP_ERROR_CA_CERT_NOT_FOUND if no CD signing key found that matches `skid.
+     *          By default CHIP_ERROR_NOT_IMPLEMENTED is returned if the method is not overriden. Depending on the
+     *          implementation it may results into using the development CD signing key.
+     *
+     */
+    virtual CHIP_ERROR GetCertificationDeclarationSigningKey(const ByteSpan & skid, Crypto::P256PublicKey & pubKey) const
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 };
 
 /**
