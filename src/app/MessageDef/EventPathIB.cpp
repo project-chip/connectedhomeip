@@ -163,6 +163,7 @@ CHIP_ERROR EventPathIB::Parser::GetEventPath(ConcreteEventPath * const apPath) c
     VerifyOrReturnError(GetEndpoint(&(apPath->mEndpointId)) == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
     VerifyOrReturnError(GetCluster(&(apPath->mClusterId)) == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
     VerifyOrReturnError(GetEvent(&(apPath->mEventId)) == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
+    GetIsUrgent(&(apPath->mIsUrgentEvent));
     return CHIP_NO_ERROR;
 }
 

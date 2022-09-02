@@ -20,9 +20,15 @@ package chip.devicecontroller;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.NodeState;
 
+import androidx.annotation.Nullable;
+
 /** An interface for receiving read/subscribe CHIP reports. */
 public interface ReportCallback {
-  void onError(ChipAttributePath attributePath, Exception e);
+  default void onError(Exception e) {
+    onError(null, e);
+  }
+
+  void onError(@Nullable ChipAttributePath attributePath, Exception e);
 
   void onReport(NodeState nodeState);
 

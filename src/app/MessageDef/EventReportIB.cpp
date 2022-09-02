@@ -161,6 +161,7 @@ CHIP_ERROR EventReportIB::ConstructEventStatusIB(TLV::TLVWriter & aWriter, const
     ReturnErrorOnFailure(eventPathIBBuilder.Endpoint(aEvent.mEndpointId)
                              .Cluster(aEvent.mClusterId)
                              .Event(aEvent.mEventId)
+                             .IsUrgent(aEvent.mIsUrgentEvent)
                              .EndOfEventPathIB()
                              .GetError());
 

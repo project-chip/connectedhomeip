@@ -23,11 +23,13 @@ import java.util.Objects;
 /** An event path that should be used for requests. */
 public class ChipEventPath {
   private ChipPathId endpointId, clusterId, eventId;
+  private boolean isUrgentEvent;
 
-  private ChipEventPath(ChipPathId endpointId, ChipPathId clusterId, ChipPathId eventId) {
+  private ChipEventPath(ChipPathId endpointId, ChipPathId clusterId, ChipPathId eventId, boolean isUrgentEvent) {
     this.endpointId = endpointId;
     this.clusterId = clusterId;
     this.eventId = eventId;
+    this.isUrgentEvent = isUrgentEvent;
   }
 
   public ChipPathId getEndpointId() {
@@ -42,36 +44,52 @@ public class ChipEventPath {
     return eventId;
   }
 
+  public boolean IsUrgentEvent() {
+    return isUrgentEvent;
+  }
+
   @Override
   public boolean equals(Object object) {
     if (object instanceof ChipEventPath) {
       ChipEventPath that = (ChipEventPath) object;
       return Objects.equals(this.endpointId, that.endpointId)
           && Objects.equals(this.clusterId, that.clusterId)
-          && Objects.equals(this.eventId, that.eventId);
+          && Objects.equals(this.eventId, that.eventId)
+          && Objects.equals(this.isUrgentEvent, that.isUrgentEvent);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(endpointId, clusterId, eventId);
+    return Objects.hash(endpointId, clusterId, eventId, isUrgentEvent);
   }
 
   @Override
   public String toString() {
     return String.format(
-        Locale.ENGLISH, "Endpoint %s, cluster %s, event %s", endpointId, clusterId, eventId);
+        Locale.ENGLISH, "Endpoint %s, cluster %s, event %s, isUrgent %s", endpointId, clusterId, eventId, isUrgentEvent ? "true" : "false");
   }
 
   public static ChipEventPath newInstance(
       ChipPathId endpointId, ChipPathId clusterId, ChipPathId eventId) {
-    return new ChipEventPath(endpointId, clusterId, eventId);
+    return new ChipEventPath(endpointId, clusterId, eventId, false);
   }
 
   /** Create a new {@link ChipEventPath} with only concrete ids. */
   public static ChipEventPath newInstance(long endpointId, long clusterId, long eventId) {
     return new ChipEventPath(
-        ChipPathId.forId(endpointId), ChipPathId.forId(clusterId), ChipPathId.forId(eventId));
+        ChipPathId.forId(endpointId), ChipPathId.forId(clusterId), ChipPathId.forId(eventId), false);
+  }
+
+  public static ChipEventPath newInstance(
+      ChipPathId endpointId, ChipPathId clusterId, ChipPathId eventId, boolean isUrgentEvent) {
+    return new ChipEventPath(endpointId, clusterId, eventId, isUrgentEvent);
+  }
+
+  /** Create a new {@link ChipEventPath} with only concrete ids. */
+  public static ChipEventPath newInstance(long endpointId, long clusterId, long eventId, boolean isUrgentEvent) {
+    return new ChipEventPath(
+        ChipPathId.forId(endpointId), ChipPathId.forId(clusterId), ChipPathId.forId(eventId), isUrgentEvent);
   }
 }

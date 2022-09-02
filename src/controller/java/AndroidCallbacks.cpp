@@ -516,10 +516,10 @@ CHIP_ERROR ReportEventCallback::CreateChipEventPath(const app::ConcreteEventPath
     JniClass eventPathJniCls(eventPathCls);
 
     jmethodID eventPathCtor =
-        env->GetStaticMethodID(eventPathCls, "newInstance", "(JJJ)Lchip/devicecontroller/model/ChipEventPath;");
+        env->GetStaticMethodID(eventPathCls, "newInstance", "(JJJZ)Lchip/devicecontroller/model/ChipEventPath;");
     VerifyOrReturnError(eventPathCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, aPath.mEndpointId, aPath.mClusterId, aPath.mEventId);
+    outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, aPath.mEndpointId, aPath.mClusterId, aPath.mEventId, aPath.mIsUrgentEvent);
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
     return err;
@@ -569,17 +569,17 @@ CHIP_ERROR ReportEventCallback::OnResubscriptionNeeded(app::ReadClient * apReadC
     return CHIP_NO_ERROR;
 }
 
-void ReportEventCallback::ReportError(jobject attributePath, CHIP_ERROR err)
+void ReportEventCallback::ReportError(jobject eventPath, CHIP_ERROR err)
 {
-    ReportError(attributePath, ErrorStr(err), err.AsInteger());
+    ReportError(eventPath, ErrorStr(err), err.AsInteger());
 }
 
-void ReportEventCallback::ReportError(jobject attributePath, Protocols::InteractionModel::Status status)
+void ReportEventCallback::ReportError(jobject eventPath, Protocols::InteractionModel::Status status)
 {
-    ReportError(attributePath, "IM Status", static_cast<std::underlying_type_t<Protocols::InteractionModel::Status>>(status));
+    ReportError(eventPath, "IM Status", static_cast<std::underlying_type_t<Protocols::InteractionModel::Status>>(status));
 }
 
-void ReportEventCallback::ReportError(jobject attributePath, const char * message, ChipError::StorageType errorCode)
+void ReportEventCallback::ReportError(jobject eventPath, const char * message, ChipError::StorageType errorCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -594,7 +594,7 @@ void ReportEventCallback::ReportError(jobject attributePath, const char * messag
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mReportCallbackRef, onErrorMethod, attributePath, exception);
+    env->CallVoidMethod(mReportCallbackRef, onErrorMethod, eventPath, exception);
 }
 
 } // namespace Controller

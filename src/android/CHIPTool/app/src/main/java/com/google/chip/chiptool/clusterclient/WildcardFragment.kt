@@ -44,7 +44,7 @@ class WildcardFragment : Fragment() {
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 
   private val reportCallback = object : ReportCallback {
-    override fun onError(attributePath: ChipAttributePath, ex: Exception) {
+    override fun onError(attributePath: ChipAttributePath?, ex: Exception) {
       Log.e(TAG, "Report error for $attributePath: $ex")
     }
 
@@ -62,7 +62,7 @@ class WildcardFragment : Fragment() {
   }
 
   private val reportEventCallback = object : ReportEventCallback {
-    override fun onError(eventPath: ChipEventPath, ex: Exception) {
+    override fun onError(eventPath: ChipEventPath?, ex: Exception) {
       Log.e(TAG, "Report error for $eventPath: $ex")
     }
 

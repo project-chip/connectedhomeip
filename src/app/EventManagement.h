@@ -369,6 +369,7 @@ private:
         ClusterId mClusterId     = 0;
         EndpointId mEndpointId   = 0;
         EventId mEventId         = 0;
+        bool mIsUrgent           = false;
         EventNumber mEventNumber = 0;
         Optional<FabricIndex> mFabricIndex;
     };

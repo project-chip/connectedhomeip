@@ -29,8 +29,8 @@ namespace app {
  */
 struct ConcreteEventPath : public ConcreteClusterPath
 {
-    ConcreteEventPath(EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId) :
-        ConcreteClusterPath(aEndpointId, aClusterId), mEventId(aEventId)
+    ConcreteEventPath(EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId, bool isUrgentEvent = false) :
+        ConcreteClusterPath(aEndpointId, aClusterId), mEventId(aEventId), mIsUrgentEvent(isUrgentEvent)
     {}
 
     ConcreteEventPath() {}
@@ -40,7 +40,7 @@ struct ConcreteEventPath : public ConcreteClusterPath
 
     bool operator==(const ConcreteEventPath & aOther) const
     {
-        return ConcreteClusterPath::operator==(aOther) && (mEventId == aOther.mEventId);
+        return ConcreteClusterPath::operator==(aOther) && (mEventId == aOther.mEventId) && (mIsUrgentEvent == aOther.mIsUrgentEvent);
     }
 
     bool operator!=(const ConcreteEventPath & aOther) const { return !(*this == aOther); }
@@ -52,6 +52,7 @@ struct ConcreteEventPath : public ConcreteClusterPath
     }
 
     EventId mEventId = 0;
+    bool mIsUrgentEvent = false;
 };
 } // namespace app
 } // namespace chip

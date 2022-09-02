@@ -289,6 +289,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     eventPathBuilder.Endpoint(apOptions->mPath.mEndpointId)
         .Cluster(apOptions->mPath.mClusterId)
         .Event(apOptions->mPath.mEventId)
+        .IsUrgent(apOptions->mPath.mIsUrgentEvent)
         .EndOfEventPathIB();
     ReturnErrorOnFailure(eventPathBuilder.GetError());
     eventDataIBBuilder.EventNumber(apContext->mCurrentEventNumber).Priority(chip::to_underlying(apContext->mPriority));
@@ -478,9 +479,9 @@ exit:
 #if CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
         ChipLogDetail(EventLogging,
                       "LogEvent event number: 0x" ChipLogFormatX64 " priority: %u, endpoint id:  0x%x"
-                      " cluster id: " ChipLogFormatMEI " event id: 0x%" PRIx32 " %s timestamp: 0x" ChipLogFormatX64,
+                      " cluster id: " ChipLogFormatMEI " event id: 0x%" PRIx32 " isUrgent: %s %s timestamp: 0x" ChipLogFormatX64,
                       ChipLogValueX64(aEventNumber), static_cast<unsigned>(opts.mPriority), opts.mPath.mEndpointId,
-                      ChipLogValueMEI(opts.mPath.mClusterId), opts.mPath.mEventId,
+                      ChipLogValueMEI(opts.mPath.mClusterId), opts.mPath.mEventId, opts.mPath.mIsUrgentEvent ? "true" : "false",
                       opts.mTimestamp.mType == Timestamp::Type::kSystem ? "Sys" : "Epoch", ChipLogValueX64(opts.mTimestamp.mValue));
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
@@ -533,7 +534,7 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
         return CHIP_ERROR_UNEXPECTED_EVENT;
     }
 
-    ConcreteEventPath path(event.mEndpointId, event.mClusterId, event.mEventId);
+    ConcreteEventPath path(event.mEndpointId, event.mClusterId, event.mEventId, event.mIsUrgent);
     CHIP_ERROR ret = CHIP_ERROR_UNEXPECTED_EVENT;
 
     for (auto * interestedPath = eventLoadOutContext->mpInterestedEventPaths; interestedPath != nullptr;
@@ -755,6 +756,7 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
         ReturnErrorOnFailure(path.GetEndpoint(&(envelope->mEndpointId)));
         ReturnErrorOnFailure(path.GetCluster(&(envelope->mClusterId)));
         ReturnErrorOnFailure(path.GetEvent(&(envelope->mEventId)));
+        ReturnErrorOnFailure(path.GetIsUrgent(&(envelope->mIsUrgent)));
         envelope->mFieldsToRead |= 1 << to_underlying(EventDataIB::Tag::kPath);
     }
 
