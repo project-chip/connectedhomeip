@@ -68,9 +68,16 @@ public:
     // configurable allowed number of messages (mNumMessagesToAllowBeforeDropping)
     virtual void OnMessageDropped() {}
 };
-
 class LoopbackTransport : public Transport::Base
 {
+private:
+    // Use unique pointers for work callbacks, so that one callback does not cancel another.
+    struct LoopbackWork
+    {
+        LoopbackTransport * self;
+        LoopbackWork(LoopbackTransport * transport) : self(transport) {}
+    };
+
 public:
     void InitLoopbackTransport(System::Layer * systemLayer) { mSystemLayer = systemLayer; }
     void ShutdownLoopbackTransport()
@@ -89,7 +96,9 @@ public:
 
     static void OnMessageReceived(System::Layer * aSystemLayer, void * aAppState)
     {
-        LoopbackTransport * _this = static_cast<LoopbackTransport *>(aAppState);
+        LoopbackWork * work       = static_cast<LoopbackWork *>(aAppState);
+        LoopbackTransport * _this = work->self;
+        delete work;
 
         while (!_this->mPendingMessageQueue.empty())
         {
@@ -129,7 +138,7 @@ public:
         {
             System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
             mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
-            mSystemLayer->ScheduleWork(OnMessageReceived, this);
+            mSystemLayer->ScheduleWork(OnMessageReceived, new LoopbackWork(this));
         }
 
         return CHIP_NO_ERROR;
