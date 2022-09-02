@@ -1,4 +1,4 @@
-# Commissioning Wifi Device using Android
+# Commissioning Wi-Fi Device using Android
 
 Commissioning can be done using an Android Phone through the following steps.
 
@@ -19,21 +19,23 @@ Download pre-build application from the
    screen
 1. Click on 'Light ON/OFF & Level Cluster'
 1. You can then bring up the On/Off Cluster and send On/Off Commands (Toggle
-    does not work as required currently) - this will cause LED 1 on the WSTK to
-    change states
+   does not work as required currently) - this will cause LED 1 on the WSTK to
+   change states
 
-> If the Commissioning is not successful, try to re-boot your mobile and try
-> again.
+If the Commissioning is not successful, try to re-boot your mobile and try
+again.
 
-> Once commissioning is completed, if you want to repeat the test, follow these
-> steps:
->
-> -   Remove power to the system (EFR32MG12 + RS9116)
-> -   Power up the system again - this should cause the LCD to turn on and the
->     QR code to show up
-> -   Press the BTN0 button and keep it pressed for about 1 min - this should
->     cause LED0 and LED1 to turns ON and OFF for 3 times. You can then release
->     the button
+Once commissioning is completed, if you want to repeat the test, follow these
+steps:
 
-----
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) | [Wi-Fi Demo](./DEMO_OVERVIEW.md)
+-   Remove power to the system (EFR32MG12 + RS9116)
+-   Power up the system again - this should cause the LCD to turn on and the QR
+    code to show up
+-   Press the BTN0 button and keep it pressed for about 1 min - this should
+    cause LED0 and LED1 to turns ON and OFF for 3 times. You can then release
+    the button
+
+---
+
+[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
+[Wi-Fi Demo](./DEMO_OVERVIEW.md)

@@ -1,86 +1,30 @@
-# Build Environment using Linux
+# Building Your Wi-Fi Matter End Device and the Chip-Tool
 
-This section will go through the steps required to build the demo using Linux.
-
-> **Do not execute any commands on this page as ROOT (no _su_ required), unless
-> specified**
-
-<br>
-
-## Prepare Linux Packages
-
-Update the latest packages by typing following commands in terminal:
-
-> `$ sudo apt update`
-
-> `$ sudo apt install`
-
-<br>
-
-## Prerequisites for CHIP project on Linux
-
-### 1. Installing packages on Ubuntu Laptop/PC
-
--   Open the Linux terminal from Start menu
--   Install required packages on Ubuntu Laptop/PC using the following commands:
-
-    > `$ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
-     libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
-     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev` <br>
-
-
-<br>
-
-### 2. Matter codebase
-
--   Check out Matter codebase from GitHub:
-
-    -   Create a working directory. In this example it is named `git`:
-
-        > `$ mkdir git`
-
-        > `$ cd git`
-
-        > `$ MATTER_WORKDIR=git`
-
-            --> We will use $MATTER_WORKDIR later
-
-    -   Download the
-        [Matter codebase](https://github.com/SiliconLabs/matter.git)
-        from here as follows:
-        > `$ git clone https://github.com/SiliconLabs/matter.git`
-
--   Sync submodules by running the following commands:
-
-    > `$ cd matter`
-
-    > `$ ./scripts/checkout_submodules.py --shallow --recursive --platform efr32`
-
--   Environment Builds
-
-    -   Activate environment builds:
-        > `$ . scripts/bootstrap.sh`
-    -   Create a directory where binaries will be updated:
-        > `$ mkdir out`
-
--   **[Optional:** Increasing stack size **]** <br> &emsp; Navigate to
-    `git/matter` and open the file in the path
-    `examples/lighting-app/efr32/include/FreeRTOSConfig.h`. Find the macro:
-    \``configMINIMAL_STACK_SIZE`\`, and change the macro value from `140` to
-    **`320`**.
-
-<br>
-
-### 3. Compiling the Lighting-app
+## Compiling the Lighting-app
 
 The following commands are for building the example. Depending on which device
 you are using, select the appropriate build command to run.
 
-Build command for RS911x:
-`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD4161A --wifi rs911x |& tee out/rs911x_lighting.out`
+> Please note that these examples reference a specific board the BRD4161A. You
+> may be using a different board like the BRD4186C, please change the board
+> referenced in the build command to your specific board before running the
+> command.
 
-Build command for WF200:
-`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/wf200_lighting BRD4161A is_debug=false --wifi wf200 |& tee out/rs911x_lighting.out`
+Build command for RS911x + EFR32MG12:
+
+> `$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD4161A --wifi rs911x |& tee out/rs911x_lighting.out`
+
+Build command for WF200 + EFR32MG12:
+
+> `$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/wf200_lighting BRD4161A is_debug=false --wifi wf200 |& tee out/rs911x_lighting.out`
+
+Build command for RS911x + EFR32MG24:
+
+> `$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_mg24_lighting BRD4186C disable_lcd=true show_qr_code=false use_external_flash=false --wifi rs911x`
+
+Build command for WF200 + EFR32MG24:
+
+> `$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_mg24_lighting BRD4186C disable_lcd=true show_qr_code=false use_external_flash=false --wifi wf200`
 
 Run the following:
 
@@ -99,7 +43,7 @@ This is what you will flash into the EFR32.
 
 <br>
 
-## Compiling ChipTool
+## Compiling Chip-Tool
 
 -   Build the ChipTool on a laptop which has Wi-Fi and Bluetooth LE
 -   Run the following commands:
@@ -110,7 +54,12 @@ This is what you will flash into the EFR32.
 
     This will build chiptool in `out/standalone`
 
-Now you have all the binaries to flash onto the MG12 platform.
+Now you have all the binaries to flash onto the Silicon Labs platform (MG12,
+MG24, etc...). For more information on how to flash a Silicon Labs device please
+consult the [Flashing Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md)
+page.
 
-----
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) | [Wi-Fi Demo](./DEMO_OVERVIEW.md)
+---
+
+[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
+[Wi-Fi Demo](./DEMO_OVERVIEW.md)

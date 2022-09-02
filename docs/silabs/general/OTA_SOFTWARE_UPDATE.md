@@ -1,8 +1,8 @@
 # Matter Software Update with EFR32 Example Applications
 
-The Over The Air (OTA) Software Update functionality is enabled by default
-for all of the EFR32 example applications. Its inclusion in an application
-is controlled by the `chip_enable_ota_requestor` compile flag.
+The Over The Air (OTA) Software Update functionality is enabled by default for
+all of the EFR32 example applications. Its inclusion in an application is
+controlled by the `chip_enable_ota_requestor` compile flag.
 
 ## Running the OTA Download Scenario
 
@@ -13,66 +13,52 @@ is controlled by the `chip_enable_ota_requestor` compile flag.
 -   On a Linux or Darwin platform build the chip-tool and the ota-provider-app
     as follows:
 
-           
-           scripts/examples/gn_build_example.sh examples/chip-tool out/
-           scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
-          
+    > `$ scripts/examples/gn_build_example.sh examples/chip-tool out/`
+
+    > `$ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false`
 
 -   Build or download the Gecko Bootloader binary. Follow the instructions in
-    [Creating the Bootloader for Use in Matter OTA](OTA_BOOTLOADER.md). For the bootloader
-    using the external flash select the "external SPI" bootloader type
-    configured with a single slot of at least 1000 KB. For the bootloader using
-    the internal flash see the Internal Storage Bootloader section below.
-    Pre-built binaries for some configurations are available on the [Matter Artifacts page](./ARTIFACTS.md),
-    see README.md for details.
- 
+    [Creating the Bootloader for Use in Matter OTA](OTA_BOOTLOADER.md). For the
+    bootloader using the external flash select the "external SPI" bootloader
+    type configured with a single slot of at least 1000 KB. For the bootloader
+    using the internal flash see the Internal Storage Bootloader section below.
+    Pre-built binaries for some configurations are available on the
+    [Matter Artifacts page](./ARTIFACTS.md), see README.md for details.
+
 -   Using the commander tool, upload the bootloader to the device running the
     application.
 
 -   Create a bootable image file (using the Lighting application image as an
     example):
 
-     
-           commander gbl create chip-efr32-lighting-example.gbl --app chip-efr32-lighting-example.s37
-     
+    > `$ commander gbl create chip-efr32-lighting-example.gbl --app chip-efr32-lighting-example.s37`
 
 -   Create the Matter OTA file from the bootable image file:
 
-     
-           ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 2 -vs "2.0" -da sha256 chip-efr32-lighting-example.gbl chip-efr32-lighting-example.ota
-     
+    > `$ ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 2 -vs "2.0" -da sha256 chip-efr32-lighting-example.gbl chip-efr32-lighting-example.ota`
 
 -   In a terminal start the Provider app and pass to it the path to the Matter
     OTA file created in the previous step:
 
-           
-           rm -r /tmp/chip_*
-           ./out/debug/chip-ota-provider-app -f chip-efr32-lighting-example.ota
-           
+    > `$ rm -r /tmp/chip_* ./out/debug/chip-ota-provider-app -f chip-efr32-lighting-example.ota`
 
 -   In a separate terminal run the chip-tool commands to provision the Provider:
 
-           
-           ./out/chip-tool pairing onnetwork 1 20202021
-           ./out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
-           
+    > `$ ./out/chip-tool pairing onnetwork 1 20202021`
 
--   If the application device had been previously commissioned, hold Button 0 for
-    six seconds to factory-reset the device.
+    > `$ ./out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0`
+
+-   If the application device had been previously commissioned, hold Button 0
+    for six seconds to factory-reset the device.
 
 -   In the chip-tool terminal enter:
-
-           
-           ./out/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021 3840
-           
+    > `$ ./out/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021 3840`
 
 where operationalDataset is obtained from the OpenThread Border Router.
 
 -   Once the commissioning process completes enter:
 
-           
-           ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
-           
+    > ` $ ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0`
 
 -   The application device will connect to the Provider and start the image
     download. Once the image is downloaded the device will reboot into the
@@ -87,9 +73,14 @@ that both images are built with a reduced feature set such as disabled logging
 and Matter shell. The following set of compile flags leaves out all the optional
 features and results in the minimal image size:
 
-           
-           chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false is_debug=false show_qr_code=false chip_build_libshell=false enable_openthread_cli=false chip_openthread_ftd=true
-           
+    chip_detail_logging=false
+    chip_automation_logging=false
+    chip_progress_logging=false
+    is_debug=false
+    show_qr_code=false
+    chip_build_libshell=false
+    enable_openthread_cli=false
+    chip_openthread_ftd=true
 
 Using LZMA compression when building the .gbl file ( passing `--compress lzma`
 parameter to the `commander gbl create` command) further reduces the downloaded
@@ -101,8 +92,8 @@ Slot component. The storage slot must not overlap with the running image and the
 NVM section of the flash. In other words, the slot start address must be greater
 than the end of the running image address and the sum of the start address and
 the slot size must be less than the address of the NVM section. The simplest way
-to get the relevant addresses for the running image and NVM is by using
-the Silicon Labs `Simplicity Commander` (Device Info->Main Flash->Flash Map).
+to get the relevant addresses for the running image and NVM is by using the
+Silicon Labs `Simplicity Commander` (Device Info->Main Flash->Flash Map).
 
 The pre-built bootloader binaries are configured with slot start address of
 0x080EC000 and slot size of 548864
@@ -135,14 +126,12 @@ Product ID that identify the image served by the Provider, see
 
 Example provider configuration file:
 
-
         { "foo": 1, // ignored by parser
           "deviceSoftwareVersionModel":
           [
            { "vendorId": 65521, "productId": 32773, "softwareVersion": 1, "softwareVersionString": "1.0.0", "cDVersionNumber": 18, "softwareVersionValid": true, "minApplicableSoftwareVersion": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "chip-efr32-lighting-example.ota" }
           ]
         }
-
 
 ## Additional Info
 

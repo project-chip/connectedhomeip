@@ -5,10 +5,10 @@ development kit or Thunderboard Sense 2. The 15.4 stack on the development kit
 communicates with the higher layers of the Thread stack running on the Raspberry
 Pi over a USB connection.
 
-First, in order to flash the RCP, connect it to your laptop directly by USB.
+A complete list of supported hardware for the RCP is provided on the
+[Matter Hardware Requirements](../general/HARDWARE_REQUIREMENTS.md) page.
 
-<!-- In order to for the OTBR to work, both the RCP and
-the OTBR need to be built off a commit that allows them to communicate properly. -->
+First, in order to flash the RCP, connect it to your laptop directly by USB.
 
 <br>
 
@@ -18,8 +18,8 @@ We have provided two ways to get the required image to flash the RCP. You can
 use one of the following options:
 
 1. Use the pre-built image `ot-rcp` image file
-2. Build the image file from the '`ot-efr32`' repository, which is listed on
-   the [Matter Repositories and Commit Hashes page](../general/COMMIT_HASHES.md)
+2. Build the image file from the '`ot-efr32`' repository, which is listed on the
+   [Matter Repositories and Commit Hashes page](../general/COMMIT_HASHES.md)
 
 <br>
 
@@ -38,18 +38,20 @@ image file, you can skip forward to Step #2: Flashing the RCP.
 The ot-efr32 repo is located in Github here:
 https://github.com/SiliconLabs/ot-efr32.
 
-You must have Git installed on your
-local machine. To clone the repo use the following command:
+You must have Git installed on your local machine. To clone the repo use the
+following command:
 
 > `$ git clone https://github.com/SiliconLabs/ot-efr32.git`
 
 Once you have cloned the repo, enter the repo and sync all the submodules with
 the following command:
 
-> `$ cd ot-efr32` <br> > `$ git submodule update --init`
+> `$ cd ot-efr32`
 
-After updating the submodules you can check out the correct branch or commit hash
-for the system. Check the current branch and commit hash used here:
+> `$ git submodule update --init`
+
+After updating the submodules you can check out the correct branch or commit
+hash for the system. Check the current branch and commit hash used here:
 [Matter Branches and Commit Hashes](../general/COMMIT_HASHES.md)
 
 > `$ git checkout <commit hash>`
@@ -72,17 +74,20 @@ location: `<git>/ot-efr32/build/<efr32xgxx>`
 
 ## Step 2: Flash the RCP
 
-Once you get the RCP image, either by downloading a prebuilt image or building the image file from the repo, you can flash it onto your device. This is done directly from your laptop and
-not through the Raspberry Pi, so make sure that the device is connected directly
-over USB to your laptop. Further information on flashing a Silicon Labs device
-is located here:
+Once you get the RCP image, either by downloading a prebuilt image or building
+the image file from the repo, you can flash it onto your device. This is done
+directly from your laptop and not through the Raspberry Pi, so make sure that
+the device is connected directly over USB to your laptop. Further information on
+flashing a Silicon Labs device is located here:
 [How to Flash a Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md)
 
-Once you have flashed the image, the device becomes the RCP. Disconnect it from you laptop and
-connect it via USB to the Raspberry Pi.
+Once you have flashed the image, the device becomes the RCP. Disconnect it from
+you laptop and connect it via USB to the Raspberry Pi.
 
 The Raspberry Pi's Open Thread Border Router can then use the RCP to communicate
 with the Thread network.
 
-----
-[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)
+---
+
+[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) |
+[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

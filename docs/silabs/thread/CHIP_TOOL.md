@@ -36,7 +36,7 @@ You can also use the full ChipTool command as usual (still using mattertool)
 
 <br>
 
-### Open Thread Border Router (OTBR)
+## Open Thread Border Router (OTBR)
 
 For information on what commits to use for the OTBR and RCP, please consult the
 [Matter Repositories and Commit Hashes page](../general/COMMIT_HASHES.md)
@@ -45,19 +45,19 @@ The pre-installed OTBR is configured for the infrastructure interface eth0.
 
 Bash script to modify, reinstall or update the OTBR:
 
-> `otbrsetup`
+> `$ otbrsetup`
 
 This bash script centralizes and simplifies the local OTBR installation.
 
 Available commands:
 
-| **Command**                    | **Description**                                                                                                                   |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| -h, --help                     | Prints help options                                                                                                               |
-| -if, --interface <eth0\|wlan0> | Select infrastructure interface. Default eth0                                                                                     |
-| -i, --install                  | Bootstrap, set up and install the OTBR. Usually for a new installation                                                            |
-| -s, --setup                    | Runs the OTBR setup only, use this to change the configured infrastructure interface (use in combination with -if wlan0 for wifi) |
-| -u, --update                   | Update the OTBR installation after the repo is updated                                                                            |
+| **Command**                    | **Description**                                                                                                                    |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| -h, --help                     | Prints help options                                                                                                                |
+| -if, --interface <eth0\|wlan0> | Select infrastructure interface. Default eth0                                                                                      |
+| -i, --install                  | Bootstrap, set up and install the OTBR. Usually for a new installation                                                             |
+| -s, --setup                    | Runs the OTBR setup only, use this to change the configured infrastructure interface (use in combination with -if wlan0 for Wi-Fi) |
+| -u, --update                   | Update the OTBR installation after the repo is updated                                                                             |
 
 <br>
 
@@ -67,6 +67,8 @@ Available commands:
 
 Change infrastructure to wlan0: `$ otbrsetup -if wlan0 -s` <br> Rerun full
 install for eth0 interface: `$ otbrsetup -i`
+
+## Upgrading the OpenThread Border Router (OTBR)
 
 Change OTBR commit reference/version
 
@@ -80,7 +82,7 @@ Change OTBR commit reference/version
 
 <br>
 
-### Matter - ChipTool
+## Upgrading the Matter - ChipTool
 
 For more information on the commit hashes used for this demo please consult the
 following page:
@@ -108,7 +110,7 @@ Available commands:
 | help         | Prints help options                                                                                           |
 | startThread  | Start a new thread network and store the operational thread dataset for the commissioning purpose (bleThread) |
 | bleThread    | For Matter Ble thread commissioning with an EFR32 device                                                      |
-| bleWifi      | For Matter Ble WiFI commissioning with an EFR32 device                                                        |
+| bleWifi      | For Matter Ble Wi-FI commissioning with an EFR32 device                                                       |
 | buildCT      | Clean build of the chip-tool                                                                                  |
 | cleanVars    | Erase every Set variable used in the script. They will be set back to default or randomized value             |
 | off          | Turn off the Light on the already commissioned EFR32 device                                                   |
@@ -127,14 +129,14 @@ variables used by the script.
 
 Available commands:
 
-| **Command**              | **Description**                                      |
-| ------------------------ | ---------------------------------------------------- |
-| -h, --help               | Prints help options                                  |
-| -n, --nodeId DIGIT       | Specify the Nodeid you are trying to reach           |
-| -e, --endpoint DIGIT     | Specify an endpoint for the desired cluster          |
-| -d, --dataset HEX_STRING | Thread Operation Dataset to be provisioned           |
-| -s, --ssid STRING        | WiFi AP SSID that the end devices need to connect to |
-| -p, --password STRING    | WiFi AP password                                     |
+| **Command**              | **Description**                                       |
+| ------------------------ | ----------------------------------------------------- |
+| -h, --help               | Prints help options                                   |
+| -n, --nodeId DIGIT       | Specify the Nodeid you are trying to reach            |
+| -e, --endpoint DIGIT     | Specify an endpoint for the desired cluster           |
+| -d, --dataset HEX_STRING | Thread Operation Dataset to be provisioned            |
+| -s, --ssid STRING        | Wi-Fi AP SSID that the end devices need to connect to |
+| -p, --password STRING    | Wi-Fi AP password                                     |
 
 > These configurations are held until overwritten, cleared with cleanVars or
 > when Raspberry Pi reboots.
@@ -177,5 +179,7 @@ and rename the following alias to your liking.
 
 > `$ alias otbrsetup=‘source $HOME/scripts/setupOTBR.sh’`
 
-----
-[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)
+---
+
+[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) |
+[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

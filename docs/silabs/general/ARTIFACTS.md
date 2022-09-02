@@ -24,7 +24,7 @@ used with a Raspberry Pi to allow the Raspberry Pi's Open Thread Border Router
 to access the Thread network. Radio Co-Processor (RCP) images are available in
 the Assets section of this page:
 
-https://github.com/SiliconLabs/matter/releases/tag/v0.2.0
+https://github.com/SiliconLabs/matter/releases/tag/v0.3.0
 
 <br>
 
@@ -34,25 +34,26 @@ The Matter Accessory Device Images are used to turn an EFR into a Matter device.
 These are pre-built binary images for the Matter Demo. Matter Accessory Device
 Images are located in the Assets section of this page:
 
-https://github.com/SiliconLabs/matter/releases/tag/v0.2.0
+https://github.com/SiliconLabs/matter/releases/tag/v0.3.0
 
 <br>
 
 ## Matter Bootloader Binaries
 
-If you are using the OTA functionality and especially if you are using an EFR32MG2x device you will need to flash a bootloader binary on your device along with the application image. Bootloader binaries for all of the Matter supported devices are available here:
+If you are using the OTA functionality and especially if you are using an
+EFR32MG2x device you will need to flash a bootloader binary on your device along
+with the application image. Bootloader binaries for all of the Matter supported
+devices are available here:
 
-https://github.com/SiliconLabs/matter/releases/tag/v0.2.0
+https://github.com/SiliconLabs/matter/releases/tag/v0.3.0
 
+<br>
 
 ## RS9116 Firmware
 
 The RS9116 firmware is used to update the RS9116 - it can be found in the
-repository you have cloned, at the following relative path from the
-`/matter` directory:
-
-> $ /third_party/silabs/wiseconnect-wifi-bt-sdk/firmware
-
+repository you have cloned, at the following relative path from the `/matter`
+directory, `./third_party/silabs/wiseconnect-wifi-bt-sdk/firmware`
 
 <br>
 

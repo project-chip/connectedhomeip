@@ -1,8 +1,8 @@
 # Matter over Thread Demo Overview
 
 This section reviews the steps for running an example lighting-app for Matter
-over Thread. See [this file](THREAD.md) for an introduction to the
-Matter over Thread setup.
+over Thread. See [this file](THREAD.md) for an introduction to the Matter over
+Thread setup.
 
 At a high level, we will walk through starting a Thread network, commissioning a
 new device to the Thread network using Bluetooth LE, and finally sending a basic
@@ -10,10 +10,11 @@ OnOff command to the end device.
 
 <br>
 
-## Prerequisites
+## Step 0: Prerequisites
 
-Before beginning your Matter project, you should have the software and systems described in
-[Matter Hardware and Software Prerequisites](./THREAD_PREREQS.md).
+Before beginning your Silicon Labs Matter project be sure you have satisfied all
+of the [Matter Hardware](../general/HARDWARE_REQUIREMENTS.md) and
+[Matter Software](../general/SOFTWARE_REQUIREMENTS.md) Requirements.
 
 <br>
 
@@ -28,15 +29,16 @@ packets into Thread packets. The Thread packets are then routed to the Silicon
 Labs end device.
 
 See [How to use Matter Hub \(Raspberry Pi\) Image](./RASPI_IMG.md) for setup
-instructions. 
+instructions.
 
 <br>
 
 ## Step 2: Flash the RCP
 
 The Radio Co-Processor (RCP) is a Thread device that connects to the Raspberry
-Pi via USB. To flash the RCP, connect it to your laptop via
-USB. Thereafter, it should be connected to the Raspberry Pi via USB as well. Prebuilt RCP images are available for the demo
+Pi via USB. To flash the RCP, connect it to your laptop via USB. Thereafter, it
+should be connected to the Raspberry Pi via USB as well. Prebuilt RCP images are
+available for the demo
 
 Information on flashing and optionally building the RCP is located here:
 [How To Build and Flash the RCP](RCP.md)
@@ -46,10 +48,12 @@ Information on flashing and optionally building the RCP is located here:
 ## Step 3: Build and Flash the MAD
 
 The Matter Accessory Device (MAD) is the actual Matter device that will be
-commissioned onto the Matter network and controlled using the ChipTool. Prebuilt MAD images are available for the demo.
+commissioned onto the Matter network and controlled using the ChipTool. Prebuilt
+MAD images are available for the demo.
 
-Information on flashing and optionally building the Matter Accessory device is located
-here: [How To Build and Flash the Matter Accessory Device](./BUILD_FLASH_MAD.md)
+Information on flashing and optionally building the Matter Accessory device is
+located here:
+[How To Build and Flash the Matter Accessory Device](./BUILD_FLASH_MAD.md)
 
 <br>
 
@@ -68,5 +72,7 @@ Pi image:
 
 <br>
 
-----
-[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)
+---
+
+[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) |
+[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

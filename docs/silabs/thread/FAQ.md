@@ -16,7 +16,7 @@
 -   How can I find the IP address of my Raspberry Pi?
 
     -   First, make sure the Raspberry Pi is connected to a network (ethernet or
-        wifi). This page has more information on the same:
+        Wi-Fi). This page has more information on the same:
         [Setting up the Matter Hub (Raspberry Pi)](RASPI_IMG.md)
     -   Refer to this page for general questions on finding the Raspberry Pi on
         your network: [Finding your Raspberry Pi](../general/FIND_RASPI.md)

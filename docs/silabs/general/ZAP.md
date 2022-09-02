@@ -21,7 +21,7 @@ CHIP, and a template for creating real products on the Silicon Labs platform.
 Each Matter application consists of the following layers:
 
 -   Matter SDK: Source code necessary to communicate through the Matter network
-    over Thread or Wifi
+    over Thread or Wi-Fi
 -   Data model layer in the form of clusters. There are two types of clusters:
     -   Utility Clusters:
         -   They represent common management and diagnostic features of a Matter
@@ -62,10 +62,11 @@ the lock-app is left up to the application developer.
 
 ## ZAP Tool
 
-The ZAP tool is built and maintained by Silicon Labs and developers in the ZAP opensource community. It inherits its name and
-features from the Zigbee Cluster Library, which was the starting point for the Matter data model. ZAP is used
-for generating code for Matter applications based on the Zigbee Cluster
-Library and associated Matter code templates.
+The ZAP tool is built and maintained by Silicon Labs and developers in the ZAP
+opensource community. It inherits its name and features from the Zigbee Cluster
+Library, which was the starting point for the Matter data model. ZAP is used for
+generating code for Matter applications based on the Zigbee Cluster Library and
+associated Matter code templates.
 
 The ZAP tool can be cloned using the following git command. This will create a
 root level matter folder in your current directory. All following commands
@@ -73,9 +74,8 @@ should be run from the matter folder.
 
 > `$ git clone https://github.com/SiliconLabs/matter.git`
 
-The `run_zaptool.sh` script can be invoked
-without arguments, or, you can provide the path to a ZAP file to be opened upon
-launch.
+The `run_zaptool.sh` script can be invoked without arguments, or, you can
+provide the path to a ZAP file to be opened upon launch.
 
 In the following examples, the ZAP file for the lock-app has been chosen.
 
@@ -106,9 +106,14 @@ ZAP tool offers a Door lock cluster, which contains Commands(lock, unlock, set
 credential, etc..) and Attributes(Lock state, Require PIN) that a standard door
 lock application might use.
 
-More endpoints can be added. Each endpoint acts like a port on a network interface.
+More endpoints can be added. Each endpoint acts like a port on a network
+interface.
 
-Endpoints contain clusters which are bundles of device functionality. Clusters have both a Client and a Server interface. In general the Client interface sends commands and the Server interface receives them. For instance a Light would implement the Server side of the on/off clusters. A Switch would implement the Client side of the same cluster.
+Endpoints contain clusters which are bundles of device functionality. Clusters
+have both a Client and a Server interface. In general the Client interface sends
+commands and the Server interface receives them. For instance a Light would
+implement the Server side of the on/off clusters. A Switch would implement the
+Client side of the same cluster.
 
 Click on Endpoint 1 on the left hand side of the application. The door lock
 cluster should already be enabled as "Server".
@@ -130,7 +135,7 @@ has a type, some are standard C types and some have specially defined enums.
 Each attribute can be provided with a default starting value value.
 
 Click the settings wheel to enable/disable, choose a storage option, and choose
-a default value for attributes, commands and events for Endpoint 1. 
+a default value for attributes, commands and events for Endpoint 1.
 
 ![ZAP Attributes](./images/zap_attributes.png)
 
@@ -158,5 +163,7 @@ save location for the generated ZAP code. In the Silicon Labs Matter repository,
 the lock-app generated files belong in
 matter/zzz_generated/lock-app/zap-generated .
 
-----
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)
+---
+
+[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
+[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

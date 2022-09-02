@@ -10,7 +10,7 @@
 
 **Command leading to error:**
 
-    $ out/standalone/chip-tool pairing ble-wifi 1122 mySSID myPassword 20202021 3840
+> `$ out/standalone/chip-tool pairing ble-wifi 1122 mySSID myPassword 20202021 3840`
 
 > Where `mySSID` is **your AP's SSID** and `mypassword` is **your AP's
 > password**.
@@ -33,14 +33,19 @@
 
 **Procedure:**
 
-1. Stop Bluetooth service: `$ systemctl stop bluetooth.service`
+1. Stop Bluetooth service:
+    > `$ systemctl stop bluetooth.service`
 2. Wait 20 seconds
-3. Restart Bluetooth service: `$ sudo service bluetooth restart`
-4. Unblock Bluetooth service: `$ rfkill unblock all`
-5. Enable Bluetooth service: `$ sudo systemctl enable bluetooth`
+3. Restart Bluetooth service:
+    > `$ sudo service bluetooth restart`
+4. Unblock Bluetooth service:
+    > `$ rfkill unblock all`
+5. Enable Bluetooth service:
+    > `$ sudo systemctl enable bluetooth`
 6. Issue the pairing command:
-   `$ out/standalone/chip-tool pairing ble-wifi 1122 mySSID mypassword 20202021 3840`
-   <br>
+
+    > `$ out/standalone/chip-tool pairing ble-wifi 1122 mySSID mypassword 20202021 3840`
+    > <br>
 
     > Where `mySSID` is **your AP's SSID** and `mypassword` is **your AP's
     > password**.
