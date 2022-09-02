@@ -33,6 +33,8 @@ std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;
 dispatch_queue_t CHIPCommandBridge::mOTAProviderCallbackQueue;
 OTAProviderDelegate * CHIPCommandBridge::mOTADelegate;
 
+CHIPToolKeypair * gNocSigner = [[CHIPToolKeypair alloc] init];
+
 CHIP_ERROR CHIPCommandBridge::Run()
 {
     ChipLogProgress(chipTool, "Running Command");
@@ -61,7 +63,7 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
         return CHIP_NO_ERROR;
     }
     NSData * ipk;
-    CHIPToolKeypair * nocSigner = [[CHIPToolKeypair alloc] init];
+    gNocSigner = [[CHIPToolKeypair alloc] init];
     storage = [[CHIPToolPersistentStorageDelegate alloc] init];
 
     mOTADelegate = [[OTAProviderDelegate alloc] init];
@@ -82,13 +84,13 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
         return CHIP_ERROR_INTERNAL;
     }
 
-    ReturnLogErrorOnFailure([nocSigner createOrLoadKeys:storage]);
+    ReturnLogErrorOnFailure([gNocSigner createOrLoadKeys:storage]);
 
-    ipk = [nocSigner getIPK];
+    ipk = [gNocSigner getIPK];
 
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     for (size_t i = 0; i < ArraySize(identities); ++i) {
-        auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:nocSigner
+        auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:gNocSigner
                                                                                         fabricId:(i + 1)
                                                                                              ipk:ipk];
 
@@ -133,6 +135,26 @@ void CHIPCommandBridge::SetIdentity(const char * identity)
 MTRDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrentController; }
 
 MTRDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
+
+void CHIPCommandBridge::RestartCommissioners()
+{
+    for (auto & pair : mControllers) {
+        [pair.second shutdown];
+    }
+
+    auto factory = [MTRControllerFactory sharedInstance];
+    NSData * ipk = [gNocSigner getIPK];
+
+    constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
+    for (size_t i = 0; i < ArraySize(identities); ++i) {
+        auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:gNocSigner
+                                                                                        fabricId:(i + 1)
+                                                                                             ipk:ipk];
+
+        auto controller = [factory startControllerOnExistingFabric:controllerParams];
+        mControllers[identities[i]] = controller;
+    }
+}
 
 void CHIPCommandBridge::ShutdownCommissioner()
 {

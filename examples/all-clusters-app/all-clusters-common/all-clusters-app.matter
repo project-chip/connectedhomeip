@@ -2807,7 +2807,7 @@ server cluster ColorControl = 768 {
   readonly attribute int16u currentY = 4;
   readonly attribute enum8 driftCompensation = 5;
   readonly attribute char_string<254> compensationText = 6;
-  readonly attribute int16u colorTemperature = 7;
+  readonly attribute int16u colorTemperatureMireds = 7;
   readonly attribute enum8 colorMode = 8;
   attribute bitmap8 options = 15;
   readonly attribute nullable int8u numberOfPrimaries = 16;
@@ -4489,7 +4489,7 @@ endpoint 1 {
     ram      attribute currentY default = 0x607D;
     ram      attribute driftCompensation;
     ram      attribute compensationText;
-    ram      attribute colorTemperature default = 0x00FA;
+    ram      attribute colorTemperatureMireds default = 0x00FA;
     ram      attribute colorMode default = 0x01;
     ram      attribute options;
     ram      attribute numberOfPrimaries;

@@ -12,8 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import com.matter.tv.server.MainActivity;
 import com.matter.tv.server.R;
-import com.matter.tv.server.model.ContentApp;
-import com.matter.tv.server.receivers.ContentAppDiscoveryService;
 
 public class MatterServantService extends Service {
   private static final String CHANNEL_ID = "Matter";
@@ -24,12 +22,7 @@ public class MatterServantService extends Service {
     // Start Matter Server
     MatterServant.get().init(this.getApplicationContext());
 
-    // Register for packages updates
-    ContentAppDiscoveryService.getReceiverInstance().registerSelf(this.getApplicationContext());
-    for (ContentApp app :
-        ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().values()) {
-      app.setEndpointId(MatterServant.get().addContentApp(app));
-    }
+    AppPlatformService.get().init(this.getApplicationContext());
   }
 
   @Nullable

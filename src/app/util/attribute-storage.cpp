@@ -187,6 +187,11 @@ void emberAfSetDynamicEndpointCount(uint16_t dynamicEndpointCount)
 
 uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
 {
+    if (id == kInvalidEndpointId)
+    {
+        return kEmberInvalidEndpointIndex;
+    }
+
     uint16_t index;
     for (index = FIXED_ENDPOINT_COUNT; index < MAX_ENDPOINT_COUNT; index++)
     {
@@ -831,6 +836,11 @@ static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterI
         {
             break;
         }
+        if (emAfEndpoints[i].endpoint == kInvalidEndpointId)
+        {
+            // Not actually a configured endpoint.
+            continue;
+        }
         epi = static_cast<uint16_t>(
             epi + ((emberAfFindClusterIncludingDisabledEndpoints(emAfEndpoints[i].endpoint, clusterId, mask) != nullptr) ? 1 : 0));
     }
@@ -840,6 +850,11 @@ static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterI
 
 static uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEndpoints)
 {
+    if (endpoint == kInvalidEndpointId)
+    {
+        return kEmberInvalidEndpointIndex;
+    }
+
     uint16_t epi;
     for (epi = 0; epi < emberAfEndpointCount(); epi++)
     {

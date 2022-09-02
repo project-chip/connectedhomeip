@@ -90,6 +90,12 @@ void CASESessionManager::UpdatePeerAddress(ScopedNodeId peerId)
             return;
         }
     }
+    else
+    {
+        ChipLogDetail(CASESessionManager,
+                      "UpdatePeerAddress: Found existing OperationalSessionSetup instance for peerId[" ChipLogFormatX64 "]",
+                      ChipLogValueX64(peerId.GetNodeId()));
+    }
 
     session->PerformAddressUpdate();
 }

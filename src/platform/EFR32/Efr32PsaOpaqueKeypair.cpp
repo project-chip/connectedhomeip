@@ -417,6 +417,8 @@ CHIP_ERROR EFR32OpaqueP256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t ms
     CHIP_ERROR error     = CHIP_NO_ERROR;
     size_t output_length = 0;
 
+    VerifyOrExit((msg != nullptr) && (msg_length > 0), error = CHIP_ERROR_INVALID_ARGUMENT);
+
     error = Sign(msg, msg_length, out_signature.Bytes(), out_signature.Capacity(), &output_length);
 
     SuccessOrExit(error);

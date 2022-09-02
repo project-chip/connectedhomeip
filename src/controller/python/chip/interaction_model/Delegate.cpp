@@ -55,7 +55,7 @@ chip::ChipError::StorageType pychip_InteractionModel_GetCommandSenderHandle(uint
 {
     chip::app::CommandSender * commandSenderObj = nullptr;
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    commandSenderObj = new chip::app::CommandSender(nullptr, nullptr);
+    commandSenderObj = new (std::nothrow) chip::app::CommandSender(nullptr, nullptr);
     VerifyOrReturnError(commandSenderObj != nullptr, (CHIP_ERROR_NO_MEMORY).AsInteger());
     *commandSender = reinterpret_cast<uint64_t>(commandSenderObj);
     return CHIP_NO_ERROR.AsInteger();

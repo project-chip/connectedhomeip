@@ -221,7 +221,7 @@ int PacketBufferTest::TestSetup(void * inContext)
         return FAILURE;
 
     TestContext * const theContext = reinterpret_cast<TestContext *>(inContext);
-    theContext->test               = new PacketBufferTest(theContext);
+    theContext->test               = new (std::nothrow) PacketBufferTest(theContext);
     if (theContext->test == nullptr)
     {
         return FAILURE;

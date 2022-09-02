@@ -31,7 +31,7 @@ tests:
 
     - label: "Check UpOrOpen command"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT sends UpOrOpen command to TH"
@@ -65,7 +65,7 @@ tests:
 
     - label: "Check DownOrClose command"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT sends DownOrClose command to TH"
@@ -104,7 +104,7 @@ tests:
 
     - label: "Check StopMotion command"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT sends a StopMotion command to TH"
@@ -113,37 +113,35 @@ tests:
           ./chip-tool windowcovering stop-motion 1 1
 
 
-          Verify the " DUT responds with status as SUCCESS" on TH(all-clusters-app):
+          Verify the " DUT responds with request response" on TH(all-clusters-app):
 
-          [1657103367.961698][4676:4681] CHIP:DMG: InvokeResponseMessage =
-          [1657103367.961722][4676:4681] CHIP:DMG: {
-          [1657103367.961747][4676:4681] CHIP:DMG:         suppressResponse = false,
-          [1657103367.961771][4676:4681] CHIP:DMG:         InvokeResponseIBs =
-          [1657103367.961802][4676:4681] CHIP:DMG:         [
-          [1657103367.961826][4676:4681] CHIP:DMG:                 InvokeResponseIB =
-          [1657103367.961861][4676:4681] CHIP:DMG:                 {
-          [1657103367.961886][4676:4681] CHIP:DMG:                         CommandStatusIB =
-          [1657103367.961917][4676:4681] CHIP:DMG:                         {
-          [1657103367.961947][4676:4681] CHIP:DMG:                                 CommandPathIB =
-          [1657103367.961980][4676:4681] CHIP:DMG:                                 {
-          [1657103367.962014][4676:4681] CHIP:DMG:                                         EndpointId = 0x1,
-          [1657103367.962048][4676:4681] CHIP:DMG:                                         ClusterId = 0x102,
-          [1657103367.962081][4676:4681] CHIP:DMG:                                         CommandId = 0x2,
-          [1657103367.962116][4676:4681] CHIP:DMG:                                 },
-          [1657103367.962154][4676:4681] CHIP:DMG:
-          [1657103367.962184][4676:4681] CHIP:DMG:                                 StatusIB =
-          [1657103367.962216][4676:4681] CHIP:DMG:                                 {
-          [1657103367.962249][4676:4681] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657103367.962282][4676:4681] CHIP:DMG:                                 },
-          [1657103367.962314][4676:4681] CHIP:DMG:
-          [1657103367.962343][4676:4681] CHIP:DMG:                         },
-          [1657103367.962409][4676:4681] CHIP:DMG:
-          [1657103367.962437][4676:4681] CHIP:DMG:                 },
-          [1657103367.962467][4676:4681] CHIP:DMG:
-          [1657103367.962491][4676:4681] CHIP:DMG:         ],
-          [1657103367.962520][4676:4681] CHIP:DMG:
-          [1657103367.962544][4676:4681] CHIP:DMG:         InteractionModelRevision = 1
-          [1657103367.962567][4676:4681] CHIP:DMG: },
-          [1657103367.962624][4676:4681] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0102 Command=0x0000_0002 Status=0x0
-          [1657103367.962664][4676:4681] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1661859427.618059][2477:2477] CHIP:DMG: InvokeRequestMessage =
+          [1661859427.618086][2477:2477] CHIP:DMG: {
+          [1661859427.618112][2477:2477] CHIP:DMG:         suppressResponse = false,
+          [1661859427.618140][2477:2477] CHIP:DMG:         timedRequest = false,
+          [1661859427.618165][2477:2477] CHIP:DMG:         InvokeRequests =
+          [1661859427.618196][2477:2477] CHIP:DMG:         [
+          [1661859427.618221][2477:2477] CHIP:DMG:                 CommandDataIB =
+          [1661859427.618252][2477:2477] CHIP:DMG:                 {
+          [1661859427.618279][2477:2477] CHIP:DMG:                         CommandPathIB =
+          [1661859427.618312][2477:2477] CHIP:DMG:                         {
+          [1661859427.618347][2477:2477] CHIP:DMG:                                 EndpointId = 0x1,
+          [1661859427.618383][2477:2477] CHIP:DMG:                                 ClusterId = 0x102,
+          [1661859427.618420][2477:2477] CHIP:DMG:                                 CommandId = 0x2,
+          [1661859427.618452][2477:2477] CHIP:DMG:                         },
+          [1661859427.618487][2477:2477] CHIP:DMG:
+          [1661859427.618516][2477:2477] CHIP:DMG:                         CommandFields =
+          [1661859427.618551][2477:2477] CHIP:DMG:                         {
+          [1661859427.618583][2477:2477] CHIP:DMG:                         },
+          [1661859427.618613][2477:2477] CHIP:DMG:                 },
+          [1661859427.618645][2477:2477] CHIP:DMG:
+          [1661859427.618670][2477:2477] CHIP:DMG:         ],
+          [1661859427.618700][2477:2477] CHIP:DMG:
+          [1661859427.618724][2477:2477] CHIP:DMG:         InteractionModelRevision = 1
+          [1661859427.618747][2477:2477] CHIP:DMG: },
+          [1661859427.618814][2477:2477] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0102 e=1 p=o
+          [1661859427.618853][2477:2477] CHIP:DMG: AccessControl: allowed
+          [1661859427.618882][2477:2477] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0102 Command=0x0000_0002
+          [1661859427.618914][2477:2477] CHIP:ZCL: StopMotion command received
+          [1661859427.618961][2477:2477] CHIP:DMG: Endpoint 1, Cluster 0x0000_0102 update version to f31db
       disabled: true

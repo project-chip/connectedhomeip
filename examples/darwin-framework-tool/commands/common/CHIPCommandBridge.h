@@ -95,6 +95,8 @@ protected:
 
     static std::set<CHIPCommandBridge *> sDeferredCleanups;
 
+    void RestartCommissioners();
+
 private:
     CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
                                       const chip::Credentials::AttestationTrustStore * trustStore);

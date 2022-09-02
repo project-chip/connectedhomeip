@@ -1,5 +1,5 @@
 {
-  "featureLevel": 77,
+  "featureLevel": 80,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -2439,7 +2439,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "CommissioningWindowStatus",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -3929,7 +3929,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ColorTemperature",
+              "name": "ColorTemperatureMireds",
               "code": 7,
               "mfgCode": null,
               "side": "server",

@@ -549,6 +549,7 @@ tests:
       command: "readAttribute"
       attribute: "ColorMode"
       response:
+          value: 1
           constraints:
               minValue: 0
               maxValue: 2
@@ -556,8 +557,9 @@ tests:
     - label: "TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A4001
       command: "readAttribute"
-      attribute: "ColorMode"
+      attribute: "EnhancedColorMode"
       response:
+          value: 1
           constraints:
               minValue: 0
               maxValue: 3

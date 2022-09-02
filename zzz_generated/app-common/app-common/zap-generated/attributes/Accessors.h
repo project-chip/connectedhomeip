@@ -3029,10 +3029,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // ch
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace CompensationText
 
-namespace ColorTemperature {
+namespace ColorTemperatureMireds {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace ColorTemperature
+} // namespace ColorTemperatureMireds
 
 namespace ColorMode {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8

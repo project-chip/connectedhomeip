@@ -30,8 +30,7 @@ tests:
           "NOTE: https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#readme
            Events to be executed as following
            1. Compile app using below command in connectedhomeip folder
-           a. ./scripts/run_in_build_env.sh ""./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build""
-           b. ./scripts/run_in_build_env.sh ""./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-libfuzzer-clang build""
+           a. ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build"
            2. Build respective app (all-clusters-app)
            3. Commission DUT to TH
            4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT

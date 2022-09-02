@@ -61,7 +61,8 @@ efr32_executable("shell_app") {
     "src/main.cpp",
   ]
 
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
+      use_wf200) {
     sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
 
