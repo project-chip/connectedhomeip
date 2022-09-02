@@ -104,9 +104,10 @@ CHIP_ERROR FileAttestationTrustStore::GetProductAttestationAuthorityCert(const B
     {
         uint8_t skidBuf[Crypto::kSubjectKeyIdentifierLength] = { 0 };
         MutableByteSpan candidateSkidSpan{ skidBuf };
-        VerifyOrReturnError(CHIP_NO_ERROR ==
-                                Crypto::ExtractSKIDFromX509Cert(ByteSpan{ candidate.data(), candidate.size() }, candidateSkidSpan),
-                            CHIP_ERROR_INTERNAL);
+        if (CHIP_NO_ERROR != Crypto::ExtractSKIDFromX509Cert(ByteSpan{ candidate.data(), candidate.size() }, candidateSkidSpan))
+        {
+            continue;
+        }
 
         if (skid.data_equal(candidateSkidSpan))
         {
