@@ -257,6 +257,69 @@ void CheckOrder(nlTestSuite * inSuite, void * aContext)
     Clock::Internal::SetSystemClockForTesting(savedClock);
 }
 
+void CheckCancellation(nlTestSuite * inSuite, void * aContext)
+{
+    if (!LayerEvents<LayerImpl>::HasServiceEvents())
+        return;
+
+    TestContext & testContext = *static_cast<TestContext *>(aContext);
+    Layer & systemLayer       = *testContext.mLayer;
+    nlTestSuite * const suite = testContext.mTestSuite;
+
+    struct TestState
+    {
+        TestState(Layer & systemLayer) : systemLayer(systemLayer) {}
+
+        void Record(char c)
+        {
+            size_t n = strlen(record);
+            if (n + 1 < sizeof(record))
+            {
+                record[n++] = c;
+                record[n]   = 0;
+            }
+        }
+        static void A(Layer * layer, void * state)
+        {
+            auto self = static_cast<TestState *>(state);
+            self->Record('A');
+            self->systemLayer.CancelTimer(B, state);
+            self->systemLayer.CancelTimer(D, state);
+        }
+        static void B(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('B'); }
+        static void C(Layer * layer, void * state)
+        {
+            auto self = static_cast<TestState *>(state);
+            self->Record('C');
+            self->systemLayer.CancelTimer(E, state);
+        }
+        static void D(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('D'); }
+        static void E(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('E'); }
+        char record[6] = { 0 };
+
+        Layer & systemLayer;
+    };
+    TestState testState(systemLayer);
+    NL_TEST_ASSERT(suite, testState.record[0] == 0);
+
+    Clock::ClockBase * const savedClock = &SystemClock();
+    Clock::Internal::MockClock mockClock;
+    Clock::Internal::SetSystemClockForTesting(&mockClock);
+
+    using namespace Clock::Literals;
+    systemLayer.StartTimer(0_ms, TestState::A, &testState);
+    systemLayer.StartTimer(0_ms, TestState::B, &testState);
+    systemLayer.StartTimer(20_ms, TestState::C, &testState);
+    systemLayer.StartTimer(30_ms, TestState::D, &testState);
+    systemLayer.StartTimer(50_ms, TestState::E, &testState);
+
+    mockClock.AdvanceMonotonic(100_ms);
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    NL_TEST_ASSERT(suite, strcmp(testState.record, "AC") == 0);
+
+    Clock::Internal::SetSystemClockForTesting(savedClock);
+}
+
 // Test the implementation helper classes TimerPool, TimerList, and TimerData.
 namespace chip {
 namespace System {
@@ -416,6 +479,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Timer::TestOverflow",             CheckOverflow),
     NL_TEST_DEF("Timer::TestTimerStarvation",      CheckStarvation),
     NL_TEST_DEF("Timer::TestTimerOrder",           CheckOrder),
+    NL_TEST_DEF("Timer::TestTimerCancellation",    CheckCancellation),
     NL_TEST_DEF("Timer::TestTimerPool",            chip::System::TestTimer::CheckTimerPool),
     NL_TEST_SENTINEL()
 };

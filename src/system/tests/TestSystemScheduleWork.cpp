@@ -22,18 +22,25 @@
 #include <nlunit-test.h>
 #include <platform/CHIPDeviceLayer.h>
 
-// Test input data.
-
-static void CheckScheduleLambda(nlTestSuite * inSuite, void * aContext)
+static void IncrementIntCounter(chip::System::Layer *, void * state)
 {
-    bool * called = new bool(false);
-    chip::DeviceLayer::SystemLayer().ScheduleLambda([called] {
-        *called = true;
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-    });
+    ++(*static_cast<int *>(state));
+}
+
+static void StopEventLoop(chip::System::Layer *, void *)
+{
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+}
+
+static void CheckScheduleWorkTwice(nlTestSuite * inSuite, void * aContext)
+{
+    int * callCount = new int(0);
+    NL_TEST_ASSERT(inSuite, chip::DeviceLayer::SystemLayer().ScheduleWork(IncrementIntCounter, callCount) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, chip::DeviceLayer::SystemLayer().ScheduleWork(IncrementIntCounter, callCount) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, chip::DeviceLayer::SystemLayer().ScheduleWork(StopEventLoop, nullptr) == CHIP_NO_ERROR);
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
-    NL_TEST_ASSERT(inSuite, *called);
-    delete called;
+    NL_TEST_ASSERT(inSuite, *callCount == 2);
+    delete callCount;
 }
 
 // Test Suite
@@ -44,7 +51,7 @@ static void CheckScheduleLambda(nlTestSuite * inSuite, void * aContext)
 // clang-format off
 static const nlTest sTests[] =
 {
-    NL_TEST_DEF("System::TestScheduleLambda", CheckScheduleLambda),
+    NL_TEST_DEF("System::TestScheduleWorkTwice", CheckScheduleWorkTwice),
     NL_TEST_SENTINEL()
 };
 // clang-format on
@@ -55,7 +62,7 @@ static int TestTeardown(void * aContext);
 // clang-format off
 static nlTestSuite kTheSuite =
 {
-    "chip-system-schedule-lambda",
+    "chip-system-schedule-work",
     &sTests[0],
     TestSetup,
     TestTeardown
@@ -67,6 +74,11 @@ static nlTestSuite kTheSuite =
  */
 static int TestSetup(void * aContext)
 {
+    if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
+    {
+        return FAILURE;
+    }
+
     if (chip::DeviceLayer::PlatformMgr().InitChipStack() != CHIP_NO_ERROR)
         return FAILURE;
 
@@ -80,10 +92,11 @@ static int TestSetup(void * aContext)
 static int TestTeardown(void * aContext)
 {
     chip::DeviceLayer::PlatformMgr().Shutdown();
+    chip::Platform::MemoryShutdown();
     return (SUCCESS);
 }
 
-int TestSystemScheduleLambda(void)
+int TestSystemScheduleWork(void)
 {
     // Run test suit againt one lContext.
     nlTestRunner(&kTheSuite, nullptr);
@@ -91,4 +104,4 @@ int TestSystemScheduleLambda(void)
     return nlTestRunnerStats(&kTheSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestSystemScheduleLambda)
+CHIP_REGISTER_TEST_SUITE(TestSystemScheduleWork)
