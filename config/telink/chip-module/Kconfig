@@ -51,3 +51,8 @@ config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
 config CHIP_OTA_IMAGE_BUILD
 	bool
 	default y if CHIP_OTA_REQUESTOR
+
+# Enable getting reboot reasons information
+config HWINFO
+    bool
+    default y
