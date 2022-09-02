@@ -7,7 +7,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.matter.tv.server.fragments.ContentAppFragment;
 import com.matter.tv.server.fragments.QrCodeFragment;
 import com.matter.tv.server.fragments.TerminalFragment;
-import com.matter.tv.server.service.MatterServant;
+import com.matter.tv.server.service.AppPlatformService;
 import java.util.LinkedHashMap;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     // MainActivity is needed to launch dialog prompt
     // in UserPrompter
-    MatterServant.get().setActivity(this);
+    AppPlatformService.get().setActivity(this);
 
     BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
     bottomNavigationView.setOnItemSelectedListener(navListener);

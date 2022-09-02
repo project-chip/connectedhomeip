@@ -79,6 +79,7 @@ assert(!(use_rs911x && chip_enable_openthread))
 assert(!(use_wf200 && chip_enable_openthread))
 if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
+  enable_openthread_cli = false
 }
 
 # ThunderBoards and Explorer Kit (No LCD)
@@ -181,7 +182,8 @@ efr32_executable("thermostat_app") {
     "src/main.cpp",
   ]
 
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
+      use_wf200) {
     sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
 

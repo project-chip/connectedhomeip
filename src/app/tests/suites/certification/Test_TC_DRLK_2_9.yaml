@@ -86,7 +86,7 @@ tests:
     - label:
           "TH reads NumberOfTotalUsersSupported attribute and saves for future
           use."
-      PICS: DRLK.C.F08 && DRLK.S.A0011
+      PICS: DRLK.S.F08 && DRLK.S.A0011
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
       response:
@@ -156,7 +156,7 @@ tests:
               - name: "credentialData"
                 value: "4321"
               - name: "userIndex"
-                value: 2
+                value: null
               - name: "userStatus"
                 value: 5
               - name: "userType"
@@ -183,7 +183,7 @@ tests:
               - name: "credentialData"
                 value: "123456"
               - name: "userIndex"
-                value: 2
+                value: null
               - name: "userStatus"
                 value: null
               - name: "userType"
@@ -211,7 +211,7 @@ tests:
               - name: "credentialData"
                 value: "123456"
               - name: "userIndex"
-                value: 2
+                value: 1
               - name: "userStatus"
                 value: null
               - name: "userType"
@@ -260,11 +260,11 @@ tests:
               - name: "operationType"
                 value: 0
               - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 3 }
+                value: { CredentialType: 1, CredentialIndex: 1 }
               - name: "credentialData"
                 value: "123456"
               - name: "userIndex"
-                value: 3
+                value: 1
               - name: "userStatus"
                 value: null
               - name: "userType"
@@ -276,7 +276,7 @@ tests:
               - name: "userIndex"
                 value: null
               - name: "nextCredentialIndex"
-                value: 4
+                value: 2
 
     #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
     - label:
@@ -317,7 +317,7 @@ tests:
               - name: "credentialData"
                 value: "123456"
               - name: "userIndex"
-                value: 2
+                value: 1
               - name: "userStatus"
                 value: null
               - name: "userType"
@@ -386,6 +386,7 @@ tests:
                 value: null
 
     - label: "TH sends Set User Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
       command: "SetUser"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -397,7 +398,7 @@ tests:
               - name: "userName"
                 value: "xxx"
               - name: "userUniqueId"
-                value: 6452
+                value: "6452"
               - name: "userStatus"
                 value: 1
               - name: "userType"

@@ -1674,6 +1674,12 @@ PICS:
       id: MCORE.OTA.VendorSpecific
 
     - label:
+          "Does the Requestor DUT support querying a different Provider in its
+          OTA Provider List when it hits error conditions in invoking the
+          QueryImage command?"
+      id: MCORE.OTA.Retry
+
+    - label:
           "Does the DUT have Administer privilege over the Access Control of
           another node?"
       id: MCORE.ACL.Administrator
@@ -1813,13 +1819,13 @@ PICS:
       id: LUNIT.S.Afffd
 
     - label: "Does the DUT (Server) support Fahrenheit TemperatureUnit?"
-      id: LUNIT.S.A0000.Fahrenheit
+      id: LUNIT.TempUnit.Fahrenheit
 
     - label: "Does the DUT (Server) support Celsius TemperatureUnit?"
-      id: LUNIT.S.A0000.Celsius
+      id: LUNIT.TempUnit.Celsius
 
     - label: "Does the DUT (Server) support Kelvin TemperatureUnit?"
-      id: LUNIT.S.A0000.Kelvin
+      id: LUNIT.TempUnit.Kelvin
 
     - label: "Does the DUT (Client) support TemperatureUnit attribute?"
       id: LUNIT.C.A0000
@@ -1997,6 +2003,11 @@ PICS:
           "Does the DUT support the Media Input server cluster Name Updates
           feature?"
       id: MEDIAINPUT.S.NU
+
+    - label:
+          "Does the DUT support the Audio Ouput server cluster, Name Updates
+          feature?"
+      id: AUDIOOUTPUT.S.NU
 
     - label:
           "Does the DUT support the Channel server cluster Channel List feature?"

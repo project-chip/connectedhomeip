@@ -101,8 +101,8 @@ tests:
       attribute: "CurrentX"
       response:
           constraints:
-              minValue: 19500
-              maxValue: 26500
+              minValue: 13000
+              maxValue: 33000
 
     - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
@@ -110,8 +110,8 @@ tests:
       attribute: "CurrentY"
       response:
           constraints:
-              minValue: 14500
-              maxValue: 19500
+              minValue: 14000
+              maxValue: 20000
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -127,8 +127,8 @@ tests:
       attribute: "CurrentX"
       response:
           constraints:
-              minValue: 13000
-              maxValue: 15000
+              minValue: 11050
+              maxValue: 14950
 
     - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
@@ -136,8 +136,8 @@ tests:
       attribute: "CurrentY"
       response:
           constraints:
-              minValue: 14000
-              maxValue: 16000
+              minValue: 11900
+              maxValue: 16100
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
@@ -166,6 +166,7 @@ tests:
       command: "readAttribute"
       attribute: "ColorMode"
       response:
+          value: 1
           constraints:
               minValue: 0
               maxValue: 2
@@ -173,8 +174,9 @@ tests:
     - label: "TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A4001
       command: "readAttribute"
-      attribute: "ColorMode"
+      attribute: "EnhancedColorMode"
       response:
+          value: 1
           constraints:
               minValue: 0
               maxValue: 3

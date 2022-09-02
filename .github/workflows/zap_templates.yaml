@@ -55,7 +55,7 @@ jobs:
                   npm rebuild canvas --update-binary
                   npm run build-spa
             - name: Generate all
-              timeout-minutes: 30
+              timeout-minutes: 45
               run: scripts/tools/zap_regen_all.py
             - name: Check for uncommited changes
               run: |

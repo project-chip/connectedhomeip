@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Window Covering [TC-WNCV-3.3] StopMotion Verification with server as DUT
+name:
+    Window Covering [TC-WNCV-3.3] StopMotion command & OperationalStatus
+    attribute Verification [DUT_Server]
 
 PICS:
     - WNCV.S
@@ -64,6 +66,22 @@ tests:
               - name: "ms"
                 value: 2000
 
+    - label: "1e: TH reads OperationalStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
+      response:
+          constraints:
+              notValue: 0
+
+    - label: "1d: TH Waits for 2 seconds movement(s) on the device"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
     ######## StopMotion Command #######
     ### Step 2x -> Check StopMotion fast effects
     ### Before subscribe to reports
@@ -95,9 +113,8 @@ tests:
     ### Must Be ZERO
     # The value of bit 0..1 must be 00b & if (LF) value of bit 2..3 must be 00b & if (TL) value of bit 4..5 must be 00b
     - label:
-          "2c: Verify DUT reports OperationalStatus attribute to TH after a
-          StopMotion"
-      command: "waitForReport"
+          "2c: TH reads OperationalStatus attribute from DUT after a StopMotion"
+      command: "readAttribute"
       attribute: "OperationalStatus"
       PICS: WNCV.S.A000a
       response:
@@ -172,6 +189,8 @@ tests:
           4c: it Must be equal with CurrentPositionTiltPercent100ths from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000c && WNCV.S.A000f
+      PICS:
+          WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000c && WNCV.S.A000f &&
+          PICS_SKIP_SAMPLE_APP
       response:
           value: attrCurrentPositionTilt

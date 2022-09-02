@@ -123,14 +123,34 @@ static bool _isValidTagLength(size_t tag_length)
     return false;
 }
 
-static bool _isValidKeyLength(size_t length)
+/**
+ * @brief Compare two times
+ *
+ * @param t1 First time to compare
+ * @param t2 Second time to compare
+ * @return int  0 If both times are idential to the second, -1 if t1 < t2, 1 if t1 > t2.
+ */
+static int timeCompare(mbedtls_x509_time * t1, mbedtls_x509_time * t2)
 {
-    // 16 bytes key for AES-CCM-128, 32 for AES-CCM-256
-    if (length == 16 || length == 32)
-    {
-        return true;
-    }
-    return false;
+    VerifyOrReturnValue(t1->year >= t2->year, -1);
+    VerifyOrReturnValue(t1->year <= t2->year, 1);
+    // Same year
+    VerifyOrReturnValue(t1->mon >= t2->mon, -1);
+    VerifyOrReturnValue(t1->mon <= t2->mon, 1);
+    // Same month
+    VerifyOrReturnValue(t1->day >= t2->day, -1);
+    VerifyOrReturnValue(t1->day <= t2->day, 1);
+    // Same day
+    VerifyOrReturnValue(t1->hour >= t2->hour, -1);
+    VerifyOrReturnValue(t1->hour <= t2->hour, 1);
+    // Same hour
+    VerifyOrReturnValue(t1->min >= t2->min, -1);
+    VerifyOrReturnValue(t1->min <= t2->min, 1);
+    // Same minute
+    VerifyOrReturnValue(t1->sec >= t2->sec, -1);
+    VerifyOrReturnValue(t1->sec <= t2->sec, 1);
+    // Same second
+    return 0;
 }
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
@@ -144,6 +164,15 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     uint8_t * buffer          = nullptr;
     bool allocated_buffer     = false;
 
+    VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(key_length == kAES_CCM128_Key_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(key_length == kAES_CCM128_Key_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(nonce != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(nonce_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(CanCastTo<int>(nonce_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+
     // If the ciphertext and tag outputs aren't a contiguous buffer, the PSA API requires buffer copying
     if (Uint8::to_uchar(ciphertext) + plaintext_length != Uint8::to_uchar(tag))
     {
@@ -151,10 +180,6 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
         allocated_buffer = true;
         VerifyOrExit(buffer != nullptr, error = CHIP_ERROR_NO_MEMORY);
     }
-
-    // Superimpose tag and key length requirements. The other checks are done by the PSA implementation.
-    VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE);
 
     psa_crypto_init();
 
@@ -198,6 +223,13 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     uint8_t * buffer          = nullptr;
     bool allocated_buffer     = false;
 
+    VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(key_length == kAES_CCM128_Key_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(nonce != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(nonce_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
     // If the ciphertext and tag outputs aren't a contiguous buffer, the PSA API requires buffer copying
     if (Uint8::to_const_uchar(ciphertext) + ciphertext_len != Uint8::to_const_uchar(tag))
     {
@@ -205,10 +237,6 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
         allocated_buffer = true;
         VerifyOrExit(buffer != nullptr, error = CHIP_ERROR_NO_MEMORY);
     }
-
-    // Superimpose tag and key length requirements. The other checks are done by the PSA implementation.
-    VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE);
 
     psa_crypto_init();
 
@@ -302,6 +330,7 @@ CHIP_ERROR Hash_SHA256_stream::Begin(void)
     psa_crypto_init();
 
     psa_hash_operation_t * context = to_inner_hash_sha256_context(&mContext);
+    *context                       = PSA_HASH_OPERATION_INIT;
     const psa_status_t result      = psa_hash_setup(context, PSA_ALG_SHA_256);
 
     VerifyOrReturnError(result == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
@@ -326,6 +355,8 @@ CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
     size_t output_length           = 0;
     psa_hash_operation_t * context = to_inner_hash_sha256_context(&mContext);
 
+    VerifyOrReturnError(out_buffer.size() >= kSHA256_Hash_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     // Clone the context first since calculating the digest finishes the operation
     psa_hash_operation_t digest_context = PSA_HASH_OPERATION_INIT;
     status                              = psa_hash_clone(context, &digest_context);
@@ -347,6 +378,7 @@ CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
     psa_hash_operation_t * context = to_inner_hash_sha256_context(&mContext);
     size_t output_length           = 0;
 
+    VerifyOrReturnError(out_buffer.size() >= kSHA256_Hash_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
     const psa_status_t status = psa_hash_finish(context, Uint8::to_uchar(out_buffer.data()), out_buffer.size(), &output_length);
 
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
@@ -506,8 +538,8 @@ CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, c
             // U2 ends up in md1
             //
 
-            status = psa_driver_wrapper_mac_compute(&attr, password, plen, PSA_ALG_HMAC(PSA_ALG_SHA_256), md1, sizeof(md1), md1,
-                                                    sizeof(md1), &output_length);
+            status = psa_driver_wrapper_mac_compute(&attr, password, plen, PSA_ALG_HMAC(PSA_ALG_SHA_256), md1, sizeof(md1_buffer),
+                                                    md1, sizeof(md1_buffer), &output_length);
 
             VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
             VerifyOrExit(output_length == PSA_HASH_LENGTH(PSA_ALG_SHA_256), error = CHIP_ERROR_INTERNAL);
@@ -705,7 +737,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     status = psa_driver_wrapper_verify_hash(&attr, Uint8::to_const_uchar(*this), Length(), PSA_ALG_ECDSA(PSA_ALG_SHA_256), hash,
                                             hash_length, signature.ConstBytes(), signature.Length());
 
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INVALID_SIGNATURE);
 exit:
     _log_PSA_error(status);
     psa_reset_key_attributes(&attr);
@@ -1275,8 +1307,12 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     CHIP_ERROR error = CHIP_NO_ERROR;
     mbedtls_x509_crt certChain;
     mbedtls_x509_crt rootCert;
+    mbedtls_x509_time leaf_valid_from;
+    mbedtls_x509_crt * cert = NULL;
     int mbedResult;
     uint32_t flags;
+    int compare_from  = 0;
+    int compare_until = 0;
 
     result = CertificateChainValidationResult::kInternalFrameworkError;
 
@@ -1293,6 +1329,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     /* Start of chain  */
     mbedResult = mbedtls_x509_crt_parse(&certChain, Uint8::to_const_uchar(leafCertificate), leafCertificateLen);
     VerifyOrExit(mbedResult == 0, (result = CertificateChainValidationResult::kLeafFormatInvalid, error = CHIP_ERROR_INTERNAL));
+    leaf_valid_from = certChain.valid_from;
 
     /* Add the intermediate to the chain  */
     mbedResult = mbedtls_x509_crt_parse(&certChain, Uint8::to_const_uchar(caCertificate), caCertificateLen);
@@ -1301,6 +1338,21 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     /* Parse the root cert */
     mbedResult = mbedtls_x509_crt_parse(&rootCert, Uint8::to_const_uchar(rootCertificate), rootCertificateLen);
     VerifyOrExit(mbedResult == 0, (result = CertificateChainValidationResult::kRootFormatInvalid, error = CHIP_ERROR_INTERNAL));
+
+    /* Validates that intermediate and root certificates are valid at the time of the leaf certificate's start time.  */
+    compare_from  = timeCompare(&leaf_valid_from, &rootCert.valid_from);
+    compare_until = timeCompare(&leaf_valid_from, &rootCert.valid_to);
+    VerifyOrExit((compare_from >= 0) && (compare_until <= 0),
+                 (result = CertificateChainValidationResult::kChainInvalid, error = CHIP_ERROR_CERT_NOT_TRUSTED));
+    cert = certChain.next;
+    while (cert)
+    {
+        compare_from  = timeCompare(&leaf_valid_from, &cert->valid_from);
+        compare_until = timeCompare(&leaf_valid_from, &cert->valid_to);
+        VerifyOrExit((compare_from >= 0) && (compare_until <= 0),
+                     (result = CertificateChainValidationResult::kChainInvalid, error = CHIP_ERROR_CERT_NOT_TRUSTED));
+        cert = cert->next;
+    }
 
     /* Verify the chain against the root */
     mbedResult = mbedtls_x509_crt_verify(&certChain, &rootCert, NULL, NULL, &flags, NULL, NULL);

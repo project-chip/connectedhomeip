@@ -46,9 +46,9 @@ tests:
     - label: "DUT issues an InstantAction command to TH"
       PICS: ACT.C.C00.Tx
       verification: |
-          ./chip-tool actions instant-action 0x1001 1 1
+          ./chip-tool actions instant-action 0xA001 1 1
 
-          Verify command is successfully sent on TH(all-clusters-app)
+          Verify command is successfully sent on TH(bridge-app)
 
           [1658848801.832452][10096:10101] CHIP:EM: Removed CHIP MessageCounter:163269462 from RetransTable on exchange 54295i
           [1658848801.832487][10096:10101] CHIP:DMG: ICR moving to [ResponseRe]
@@ -161,7 +161,7 @@ tests:
     - label: "DUT issues an DisableActionWithDuration command to TH"
       PICS: ACT.C.C0b.Tx
       verification: |
-          ./chip-tool actions disable-action-with-duration 0 100 1 1
+          ./chip-tool actions disable-action-with-duration 0x1001 100 1 1
 
           Note: Message log similar as in step 1
       disabled: true
