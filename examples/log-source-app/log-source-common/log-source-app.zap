@@ -1,5 +1,5 @@
 {
-  "featureLevel": 77,
+  "featureLevel": 80,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -2693,7 +2693,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ColorTemperature",
+              "name": "ColorTemperatureMireds",
               "code": 7,
               "mfgCode": null,
               "side": "server",

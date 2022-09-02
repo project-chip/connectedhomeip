@@ -34,7 +34,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo ./chip-tool identify read identify-time 1 1
-          Verify on TH , DUT  responds the right attribute value for above command
+          Verify on TH(chip-tool) , DUT  responds the right attribute value for above command
 
           [1655727338.260966][5267:5272] CHIP:DMG: ReportDataMessage =
           [1655727338.261012][5267:5272] CHIP:DMG: {
@@ -78,7 +78,7 @@ tests:
 
           sudo ./chip-tool any read-by-id 0x03 0xFFFFFFFF 1 0
 
-          on TH , Verify  that  DUT  responds the right attribute value for above command
+          on TH(chip-tool), Verify  that  DUT  responds the right attribute value for above command
 
           [1655727546.354466][5286:5291] CHIP:DMG:
           [1655727546.354512][5286:5291] CHIP:DMG:         SuppressResponse = true,
@@ -120,7 +120,7 @@ tests:
 
           sudo ./chip-tool any read-by-id 0x03 0x00 1 0xFFFF
 
-          Verify on TH , DUT responds the right attribute value for above command
+          Verify on TH(chip-tool) , DUT responds the right attribute value for above command
 
           [1655727602.117907][5301:5306] CHIP:EM: Removed CHIP MessageCounter:97487240 from RetransTable on exchange 58891i
           [1655727602.117985][5301:5306] CHIP:DMG: ReportDataMessage =
@@ -184,7 +184,7 @@ tests:
 
           sudo ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD 1 0
 
-          Verify on TH , DUT is responds right attribute value for above command
+          Verify on TH(chip-tool), DUT is responds right attribute value for above command
 
 
           [1655727656.941694][5312:5317] CHIP:DMG:         SuppressResponse = true,
@@ -255,7 +255,7 @@ tests:
 
 
           sudo ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF --timeout 40
-          received report data message has all the right attribute values from DUT to TH
+          received report data message has all the right attribute values from DUT to TH(chip-tool)
       disabled: true
 
     - label:
@@ -268,7 +268,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
           sudo ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD 1 0xFFFF
           Here Verifying cluster revision global attribute from all cluster for all endpoint.
-          received report data message has all the right attribute values from DUT to TH
+          received report data message has all the right attribute values from DUT to TH(chip-tool)
       disabled: true
 
     - label:
@@ -280,7 +280,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
           sudo ./chip-tool any read-by-id 0x03 0xFFFFFFFF 1 0xFFFF
 
-          Verify on TH , DUT is responds right attribute value for above command
+          Verify on TH(chip-tool) , DUT is responds right attribute value for above command
 
           [1653629930.057852][8778:8783] CHIP:DMG: }
           [1653629930.058739][8778:8783] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 2065044836
@@ -342,7 +342,7 @@ tests:
           sudo ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 1
 
 
-          received report data message has all the right attribute values from DUT to TH
+          received report data message has all the right attribute values from DUT to TH(chip-tool)
       disabled: true
 
     - label:
@@ -354,7 +354,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo ./chip-tool onoff read on-off 1 1
-          Verify on TH , DUT is responds right attribute value for above command
+          Verify on TH(chip-tool) , DUT is responds right attribute value for above command
 
           [1653630222.692433][8886:8891] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 312829505
           [1653630222.692468][8886:8891] CHIP:TOO:   OnOff: FALSE
@@ -371,7 +371,7 @@ tests:
 
           sudo  ./chip-tool modeselect read description  1 1
 
-          Verify on TH , DUT is responds right attribute value for above command
+          Verify on TH(chip-tool) , DUT is responds right attribute value for above command
 
           [1653630307.924844][8910:8915] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000 DataVersion: 722071058
           [1653630307.924909][8910:8915] CHIP:TOO:   Description: Coffee
@@ -387,7 +387,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
            sudo  ./chip-tool any read-by-id 0x3 0x1 1 0
-          Verify on TH , DUT is responds right attribute value for above command
+          Verify on TH(chip-tool), DUT is responds right attribute value for above command
 
           [1653630355.834677][8923:8928] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 2065044836
           [1653630355.834735][8923:8928] CHIP:TOO:   identify type: 2
@@ -404,7 +404,7 @@ tests:
 
           sudo ./chip-tool pressuremeasurement read measured-value 1 1
 
-          Verify on TH , DUT is responds right attribute value for above command
+          Verify on TH(chip-tool), DUT is responds right attribute value for above command
 
           [1653630404.570993][8934:8939] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0403 Attribute 0x0000_0000 DataVersion: 3770689028
           [1653630404.571019][8934:8939] CHIP:TOO:   MeasuredValue: 0
@@ -418,6 +418,8 @@ tests:
       PICS: MCORE.IDM.S.Attribute.DataType_FloatingPoint
       verification: |
           DUT implementation required to verify read an attribute of data type Float
+
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -430,7 +432,7 @@ tests:
 
           sudo  ./chip-tool operationalcredentials read trusted-root-certificates 1 0
 
-          Verify on TH , DUT is responds right attribute value for above command
+          Verify on TH(chip-tool) , DUT is responds right attribute value for above command
 
           [1655729519.609898][5433:5438] CHIP:DMG: }
           [1655729519.610252][5433:5438] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2726656324
@@ -449,7 +451,7 @@ tests:
 
           sudo   ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
 
-          Verify on TH , DUT is responds right attribute value for above command
+          Verify on TH(chip-tool) , DUT is responds right attribute value for above command
 
           [1653630542.619226][9034:9039] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 3604656322
           [1653630542.619277][9034:9039] CHIP:TOO:   occupancy sensor type: 0
@@ -465,7 +467,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo   ./chip-tool  timeformatlocalization read supported-calendar-types 1 0
-          Verify on TH , DUT is responds right attribute value for above command
+          Verify on TH(chip-tool) , DUT is responds right attribute value for above command
 
           [1653630857.535521][9171:9176] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0002 DataVersion: 139938310
           [1653630857.535636][9171:9176] CHIP:TOO:   SupportedCalendarTypes: 12 entries
@@ -494,7 +496,7 @@ tests:
 
           sudo   ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
 
-          Verify on TH , DUT is responds right attribute value for above command
+          Verify on TH(chip-tool) , DUT is responds right attribute value for above command
           [1653630949.025002][9198:9203] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 3604656322
           [1653630949.025066][9198:9203] CHIP:TOO:   occupancy sensor type: 0
           [1653630949.025181][9198:9203] CHIP:EM: Sending Standalone Ack for MessageCounter:1638675 on exchange 63250i
@@ -531,7 +533,7 @@ tests:
 
           sudo  ./chip-tool any read-by-id 0x3 0x1 1 8
 
-          Verify on TH , DUT is responds  status code UNSUPPORTED_ENDPOINT for above command
+          Verify on TH(chip-tool) , DUT is responds  status code UNSUPPORTED_ENDPOINT for above command
 
           [1653631094.367299][9229:9234] CHIP:DMG:         SuppressResponse = true,
           [1653631094.367315][9229:9234] CHIP:DMG:         InteractionModelRevision = 1
@@ -548,7 +550,7 @@ tests:
 
           sudo ./chip-tool any read-by-id 0x3 0x1 1 2
 
-          Verify on TH , DUT is responds  status code  UNSUPPORTED_CLUSTER for above command
+          Verify on TH(chip-tool) , DUT is responds  status code  UNSUPPORTED_CLUSTER for above command
 
           [1653631187.121757][9257:9262] CHIP:DMG:         SuppressResponse = true,
           [1653631187.121774][9257:9262] CHIP:DMG:         InteractionModelRevision = 1
@@ -565,7 +567,7 @@ tests:
 
           sudo ./chip-tool thermostat read outdoor-temperature 1 1
 
-           Verify on TH , DUT is responds  status code  UNSUPPORTED_ATTRIBUTE for above command
+           Verify on TH(chip-tool) , DUT is responds  status code  UNSUPPORTED_ATTRIBUTE for above command
 
           [1653631289.755681][9274:9279] CHIP:DMG:         SuppressResponse = true,
           [1653631289.755689][9274:9279] CHIP:DMG:         InteractionModelRevision = 1
@@ -579,6 +581,7 @@ tests:
           which is not readable. DUT responds with the report data action."
       verification: |
           DUT implementation required to verify read an attribute which is not having a read access
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -589,7 +592,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
-          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except identify cluster command if try to send any other command will get status as unsupported access.
 
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]" 1 0
@@ -660,7 +663,7 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
-          Verify on TH , DUT is responds right attribute value for below command for all the 3 times.
+          Verify on TH(chip-tool) , DUT is responds right attribute value for below command for all the 3 times.
 
           sudo ./chip-tool identify read identify-time 1 1
           [1653631418.770328][9322:9327] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435651
@@ -718,7 +721,7 @@ tests:
           [1653633746.448576][9791:9796] CHIP:TOO:   identify time: 0
           [1653633746.448656][9791:9796] CHIP:EM: Sending Standalone Ack for MessageCounter:16255130 on exchange 13134i
 
-          Verify on TH that DUT should not send a report data action with the attribute value to the TH
+          Verify on TH(chip-tool) that DUT should not send a report data action with the attribute value to the TH
 
           sudo ./chip-tool identify read identify-time 1 1 --data-version 0xd7cb76c6
           [1653633771.729259][9806:9811] CHIP:DMG: ReportDataMessage =
@@ -740,7 +743,7 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
-          Verify on TH , DUT is responds right attribute value for above command
+          Verify on TH(chip-tool) , DUT is responds right attribute value for above command
 
           sudo ./chip-tool identify read identify-time 1 1
 
@@ -805,7 +808,7 @@ tests:
 
           sudo ./chip-tool any read-by-id 0x03 0xFFFFFFFF  1 1
 
-          Verify on TH , DUT is responds right attribute value for below command
+          Verify on TH(chip-tool), DUT is responds right attribute value for below command
 
 
           [1653633965.092996][9835:9840] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435654
@@ -900,7 +903,7 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
-          Verify on TH , DUT is responds right attribute value for below command
+          Verify on TH(chip-tool) , DUT is responds right attribute value for below command
 
           sudo ./chip-tool identify read identify-time 1 1
 
@@ -972,7 +975,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
-          On TH Verify that the DUT sends a report data action with the attribute value from the cluster B to the TH and DUT does not send the attribute value from cluster A
+          On TH(chip-tool) Verify that the DUT sends a report data action with the attribute value from the cluster B to the TH and DUT does not send the attribute value from cluster A
 
           sudo ./chip-tool any read-by-id 0x03 0xFFFFFFFF 1 1
 
@@ -1034,6 +1037,7 @@ tests:
       PICS: MCORE.IDM.S.LargeData
       verification: |
           DUT implementation required to verify read an attribute which is is larger than 1 MTU(1280 bytes)
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -1046,7 +1050,7 @@ tests:
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0x0 1 1
 
-          Verify on TH , DUT is responds right attribute value for below command
+          Verify on TH(chip-tool) , DUT is responds right attribute value for below command
 
           [1656504191.589526][2805:2810] CHIP:EM: Removed CHIP MessageCounter:183619379 from RetransTable on exchange 22711i
           [1656504191.589590][2805:2810] CHIP:DMG: StatusResponseMessage =
@@ -1067,7 +1071,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0x0 1 0xFFFF
-          Verify on TH , DUT is  sends the error message above command
+          Verify on TH(chip-tool) , DUT is  sends the error message above command
           [1656503822.388967][2787:2792] CHIP:DMG: StatusResponseMessage =
           [1656503822.389027][2787:2792] CHIP:DMG: {
           [1656503822.389066][2787:2792] CHIP:DMG:         Status = 0x80 (INVALID_ACTION),
@@ -1087,7 +1091,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
-          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except identify cluster command if try to send any other command will get status as unsupported access.
 
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]" 1 0
@@ -1200,5 +1204,5 @@ tests:
 
            ./chip-tool any read-all 0xFFFFFFFF,0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF,0xFFFF
 
-          on TH verify that DUT sends back data of all attributes and events that the TH has access to
+          on TH(chip-tool) verify that DUT sends back data of all attributes and events that the TH has access to
       disabled: true

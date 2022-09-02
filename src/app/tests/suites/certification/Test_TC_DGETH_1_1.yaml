@@ -41,13 +41,31 @@ tests:
               type: int16u
 
     - label: "TH reads the FeatureMap from DUT"
+      PICS: " !DGETH.S.F00 && !DGETH.S.F01"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label: "Given DGETH.S.F00 ensure featuremap has the correct bit set"
+      PICS: DGETH.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              minValue: 0
-              maxValue: 3
+              hasMasksSet: [0x1]
+
+    - label: "Given DGETH.S.F01 ensure featuremap has the correct bit set"
+      PICS: DGETH.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
 
     - label: "TH reads AttributeList from DUT"
       command: "readAttribute"

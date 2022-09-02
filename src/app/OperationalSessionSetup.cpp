@@ -411,7 +411,7 @@ void OperationalSessionSetup::PerformAddressUpdate()
     CHIP_ERROR err = LookupPeerAddress();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "PerformAddressUpdate could not perform lookup");
+        ChipLogError(Controller, "Failed to look up peer address: %" CHIP_ERROR_FORMAT, err.Format());
         DequeueConnectionCallbacks(err);
         // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
         return;

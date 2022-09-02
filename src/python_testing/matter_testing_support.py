@@ -686,7 +686,7 @@ def default_matter_test_main(argv=None, **kwargs):
     matter_test_config = parse_matter_test_args(argv)
 
     # Allow override of command line from optional arguments
-    if matter_test_config.controller_cat_tags is None and "controller_cat_tags" in kwargs:
+    if not matter_test_config.controller_cat_tags and "controller_cat_tags" in kwargs:
         matter_test_config.controller_cat_tags = kwargs["controller_cat_tags"]
 
     # Find the test class in the test script.

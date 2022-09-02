@@ -23,7 +23,6 @@ config:
     nodeId: 0x12344321
     cluster: "Door Lock"
     endpoint: 1
-    timeout: 200
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -128,40 +127,15 @@ tests:
               - name: "nextCredentialIndex"
                 value: null
 
-    - label: "Precondition: Door is in locked state"
-      PICS: DRLK.S.C00.Rsp
-      command: "LockDoor"
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "PINCode"
-                value: "123456"
-
-    - label: "TH writes AutoRelockTime attribute value as 10 seconds on the DUT"
-      PICS: DRLK.S.A0023 && PICS_SDK_CI_ONLY
-      command: "writeAttribute"
-      attribute: "AutoRelockTime"
-      arguments:
-          value: 10
-
     - label: "TH writes AutoRelockTime attribute value as 60 seconds on the DUT"
-      PICS: DRLK.S.A0023 && PICS_SKIP_SAMPLE_APP
+      PICS: DRLK.S.A0023
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
           value: 60
 
-    - label: "TH writes AutoRelockTime attribute value as 10 seconds on the DUT"
-      PICS: "!DRLK.S.A0023 && PICS_SDK_CI_ONLY"
-      command: "writeAttribute"
-      attribute: "AutoRelockTime"
-      arguments:
-          value: 10
-      response:
-          error: UNSUPPORTED_WRITE
-
     - label: "TH writes AutoRelockTime attribute value as 60 seconds on the DUT"
-      PICS: "!DRLK.S.A0023 && PICS_SKIP_SAMPLE_APP"
+      PICS: " !DRLK.S.A0023 "
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
@@ -169,19 +143,8 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH sends the unlock with Timeout command to the DUT "
-      PICS: DRLK.S.C03.Rsp && PICS_SDK_CI_ONLY
-      command: "UnlockWithTimeout"
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "Timeout"
-                value: 10
-              - name: "PINCode"
-                value: "123456"
-
-    - label: "TH sends the unlock with Timeout command to the DUT "
-      PICS: DRLK.S.C03.Rsp && PICS_SKIP_SAMPLE_APP
+    - label: "TH sends the Unlock with Timeout argument value as 60 seconds"
+      PICS: DRLK.S.C03.Rsp
       command: "UnlockWithTimeout"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -191,40 +154,17 @@ tests:
               - name: "PINCode"
                 value: "123456"
 
-    - label: "TH reads AutoRelockTime attribute from DUT"
-      PICS: DRLK.S.A0023 && PICS_SDK_CI_ONLY
-      command: "readAttribute"
-      attribute: "AutoRelockTime"
-      response:
-          value: 10
-
-    - label: "TH reads AutoRelockTime attribute from DUT"
-      PICS: DRLK.S.A0023 && PICS_SKIP_SAMPLE_APP
-      command: "readAttribute"
-      attribute: "AutoRelockTime"
-      response:
-          value: 60
-
-    - label: "Wait 10000ms"
-      PICS: PICS_SDK_CI_ONLY
+    - label: "Wait 60s"
+      PICS: DRLK.S.C03.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10000
-
-    - label: "Wait 70000ms"
-      PICS: PICS_SKIP_SAMPLE_APP
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 70000
+                value: 60000
 
     - label: "TH reads LockState attribute"
-      PICS: DRLK.S.A0000
+      PICS: DRLK.S.A0000 && DRLK.S.C03.Rsp
       command: "readAttribute"
       attribute: "LockState"
       response:

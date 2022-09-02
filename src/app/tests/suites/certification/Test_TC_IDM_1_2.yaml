@@ -32,7 +32,7 @@ tests:
 
           ./chip-tool onoff on 1 20
 
-          On TH, verify DUT responsds as unsuppported endpoint  for the data sent in the above command
+          On TH(chip-tool), verify DUT responsds as unsuppported endpoint  for the data sent in the above command
 
           [1655718065.882392][4587:4592] CHIP:DMG: Received Command Response Status for Endpoint=20 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x7f
           [1655718065.882440][4587:4592] CHIP:TOO: Error: IM Error 0x0000057F: General error: 0x7f (UNSUPPORTED_ENDPOINT)
@@ -47,7 +47,7 @@ tests:
 
           ./chip-tool any command-by-id 0x0003 0 1 1 2
 
-          On TH, verify DUT responsds as unsuppported cluster for the data sent in the above command
+          On TH(chip-tool), verify DUT responsds as unsuppported cluster for the data sent in the above command
 
           [1655718144.692503][4602:4607] CHIP:DMG: Received Command Response Status for Endpoint=2 Cluster=0x0000_0003 Command=0x0000_0000 Status=0xc3
           [1655718144.692570][4602:4607] CHIP:TOO: Error: IM Error 0x000005C3: General error: 0xc3 (UNSUPPORTED_CLUSTER)
@@ -62,7 +62,7 @@ tests:
 
            ./chip-tool any command-by-id 0x0003 3 1 1 0
 
-          On TH, verify DUT responsds as unsuppported command  for the data sent in the above command
+          On TH(chip-tool), verify DUT responsds as unsuppported command  for the data sent in the above command
 
           [1654076838.936184][13752:13757] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0003 Command=0x0000_0003 Status=0x81
           [1654076838.936215][13752:13757] CHIP:TOO: Error: IM Error 0x00000581: General error: 0x81 (UNSUPPORTED_COMMAND)
@@ -77,7 +77,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
-          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except identify cluster command if try to send any other command will get status as unsupported access.
 
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]" 1 0
@@ -128,7 +128,7 @@ tests:
 
 
           ./chip-tool onoff on 1 1
-          On TH, verify DUT  responsds as UNSUPPORTED_ACCESS  for the data sent in the above command
+          On TH(chip-tool), verify DUT  responsds as UNSUPPORTED_ACCESS  for the data sent in the above command
           [1657869005.834700][2816:2821] CHIP:DMG: },
           [1657869005.834790][2816:2821] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x7e
           [1657869005.834841][2816:2821] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
@@ -147,7 +147,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
-          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except identify cluster command if try to send any other command will get status as unsupported access.
 
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]" 1 0
@@ -197,7 +197,7 @@ tests:
 
 
            ./chip-tool  generalcommissioning commissioning-complete  1 0
-          On TH, verify DUT  responsds as UNSUPPORTED_ACCESS  for the data sent in the above command
+          On TH(chip-tool), verify DUT  responsds as UNSUPPORTED_ACCESS  for the data sent in the above command
           [1659420197.313287][1960:1965] CHIP:DMG: },
           [1659420197.313357][1960:1965] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0004 Status=0x7e
           [1659420197.313397][1960:1965] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
@@ -217,7 +217,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
           sudo ./chip-tool generalcommissioning arm-fail-safe  1000 1  1 0
 
-          On TH,  Verify  DUT generates an InvokeResponseIB with a valid CommandDataIB and
+          On TH(chip-tool),  Verify  DUT generates an InvokeResponseIB with a valid CommandDataIB and
           sends it to the TH for the data sent in the above command
 
           [1657091692.258118][5248:5253] CHIP:DMG: InvokeResponseMessage =
@@ -274,7 +274,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
-          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
 
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]" 1 0
@@ -324,7 +324,7 @@ tests:
 
 
            ./chip-tool onoff on 1 1 --timedInteractionTimeoutMs 100
-          On TH, verify DUT  responsds as UNSUPPORTED_ACCESS  for the data sent in the above command
+          On TH(chip-tool), verify DUT  responsds as UNSUPPORTED_ACCESS  for the data sent in the above command
           [1659422136.353455][2014:2019] CHIP:DMG:
           [1659422136.353482][2014:2019] CHIP:DMG:         InteractionModelRevision = 1
           [1659422136.353510][2014:2019] CHIP:DMG: },
@@ -354,7 +354,7 @@ tests:
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0
 
-          On TH,  verify DUT responsds as NEEDS_TIMED_INTERACTION for the data sent in the above command
+          On TH(chip-tool),  verify DUT responsds as NEEDS_TIMED_INTERACTION for the data sent in the above command
 
           [1654077001.606235][13788:13793] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0xc6
           [1654077001.606268][13788:13793] CHIP:TOO: Error: IM Error 0x000005C6: General error: 0xc6 (NEEDS_TIMED_INTERACTION)

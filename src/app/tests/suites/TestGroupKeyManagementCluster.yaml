@@ -39,7 +39,8 @@ tests:
       command: "readAttribute"
       attribute: "maxGroupKeysPerFabric"
       response:
-          value: 2
+          constraints:
+              minValue: 3
 
     - label: "KeySet Write 1"
       command: "KeySetWrite"
@@ -112,6 +113,20 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
+    - label: "Write Group Keys (too many)"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+              ]
+      response:
+          error: FAILURE
+
     - label: "Write Group Keys"
       command: "writeAttribute"
       attribute: "GroupKeyMap"
@@ -119,6 +134,7 @@ tests:
           value:
               [
                   { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
                   { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
               ]
 
@@ -129,6 +145,7 @@ tests:
           value:
               [
                   { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
                   { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
               ]
 

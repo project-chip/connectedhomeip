@@ -27,12 +27,7 @@ config:
 tests:
     - label: "Commission DUT to TH"
       verification: |
-          verification step to be updated.
-      disabled: true
 
-    - label: "Commission DUT to TH"
-      verification: |
-          verification step to be updated.
       disabled: true
 
     - label: "TH reads TestEventTriggersEnabled attribute value"
