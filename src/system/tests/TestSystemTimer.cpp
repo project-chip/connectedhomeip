@@ -277,7 +277,7 @@ static void CheckCancellation(nlTestSuite * inSuite, void * aContext)
 
     struct TestState
     {
-        TestState(Layer & systemLayer) : systemLayer(systemLayer) {}
+        TestState(Layer & aSystemLayer) : mSystemLayer(aSystemLayer) {}
 
         void Record(char c)
         {
@@ -292,21 +292,21 @@ static void CheckCancellation(nlTestSuite * inSuite, void * aContext)
         {
             auto self = static_cast<TestState *>(state);
             self->Record('A');
-            self->systemLayer.CancelTimer(B, state);
-            self->systemLayer.CancelTimer(D, state);
+            self->mSystemLayer.CancelTimer(B, state);
+            self->mSystemLayer.CancelTimer(D, state);
         }
         static void B(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('B'); }
         static void C(Layer * layer, void * state)
         {
             auto self = static_cast<TestState *>(state);
             self->Record('C');
-            self->systemLayer.CancelTimer(E, state);
+            self->mSystemLayer.CancelTimer(E, state);
         }
         static void D(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('D'); }
         static void E(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('E'); }
         char record[6] = { 0 };
 
-        Layer & systemLayer;
+        Layer & mSystemLayer;
     };
     TestState testState(systemLayer);
     NL_TEST_ASSERT(suite, testState.record[0] == 0);
